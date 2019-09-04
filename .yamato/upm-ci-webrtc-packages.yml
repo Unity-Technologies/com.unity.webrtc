@@ -1,4 +1,5 @@
-# .yamato/upm-ci-renderstreaming-packages.yml
+# .yamato/upm-ci-webrtc-packages.yml
+yamato_name: webrtc
 editors:
   - version: 2019.1
   - version: 2019.2  
@@ -11,12 +12,9 @@ platforms:
     image: renderstreaming/win10:latest
     flavor: b1.large
 packages:
-  - name: webrtc
+  - name: {{ yamato_name }}
     packagename: com.unity.webrtc
     prepack_command: build_plugin.cmd
-  - name: renderstreaming
-    packagename: com.unity.renderstreaming
-    prepack_command: 
     
 ---
 {% for package in packages %}
@@ -50,7 +48,7 @@ pack_{{ package.name }}:
         - "upm-ci~/packages/**/*"
   dependencies:
     {% for platform in platforms %}
-    - .yamato/upm-ci-renderstreaming-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
+    - .yamato/upm-ci-{{ yamato_name }}-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
     {% endfor %}
 
 {% for editor in editors %}
@@ -76,7 +74,7 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
-    - .yamato/upm-ci-renderstreaming-packages.yml#pack_{{ package.name }}
+    - .yamato/upm-ci-{{ yamato_name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 {% endfor %}
 
@@ -98,10 +96,10 @@ publish_{{ package.name }}:
       paths:
         - "upm-ci~/packages/*.tgz"
   dependencies:
-    - .yamato/upm-ci-renderstreaming-packages.yml#pack_{{ package.name }}
+    - .yamato/upm-ci-{{ yamato_name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
     {% for platform in platforms %}
-    - .yamato/upm-ci-renderstreaming-packages.yml#test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}
+    - .yamato/upm-ci-{{ yamato_name }}-packages.yml#test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
 {% endfor %}
