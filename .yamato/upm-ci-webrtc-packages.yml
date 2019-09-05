@@ -14,7 +14,7 @@ platforms:
 packages:
   - name: {{ yamato_name }}
     packagename: com.unity.webrtc
-    prepack_command: build_plugin.cmd
+    prepack_command: BuildScripts~/build_plugin.cmd
     
 ---
 {% for package in packages %}
