@@ -344,6 +344,9 @@ MigrationBackup/
 # Exclude Documentation folder
 !Documentation~
 
+# Exclude Samples folder
+!Samples~
+
 # Exclude webrtc source 
 Plugin/webrtc
 
