@@ -1,4 +1,4 @@
-# .yamato/upm-ci-renderstreaming-packages.yml
+# .yamato/upm-ci-webrtc-packages.yml
 editors:
   - version: 2019.1
   - version: 2019.2  
@@ -13,10 +13,7 @@ platforms:
 packages:
   - name: webrtc
     packagename: com.unity.webrtc
-    prepack_command: build_plugin.cmd
-  - name: renderstreaming
-    packagename: com.unity.renderstreaming
-    prepack_command: 
+    prepack_command: BuildScripts~/build_plugin.cmd
     
 ---
 {% for package in packages %}
@@ -29,10 +26,6 @@ prepack_{{ package.name }}_{{ platform.name }}:
     flavor: {{ platform.flavor}}
   commands:
     - {{ package.prepack_command}}
-  artifacts:
-    {{ package.name }}_{{ platform.name }}_prepack: 
-      paths:
-        - "Packages/{{ package.packagename }}/**/*"
 {% endfor %}
 
 pack_{{ package.name }}:
@@ -43,14 +36,14 @@ pack_{{ package.name }}:
     flavor: b1.large
   commands:
     - npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
-    - upm-ci package pack --package-path Packages/{{ package.packagename }}
+    - upm-ci package pack  
   artifacts:
     {{ package.name }}_package:  
       paths:
         - "upm-ci~/packages/**/*"
   dependencies:
     {% for platform in platforms %}
-    - .yamato/upm-ci-renderstreaming-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
     {% endfor %}
 
 {% for editor in editors %}
@@ -63,7 +56,7 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     flavor: {{ platform.flavor}}
   commands:
     - npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
-    - upm-ci package test -u {{ editor.version }} --package-path Packages/{{ package.packagename }}
+    - upm-ci package test -u {{ editor.version }} 
   triggers:
     branches:
       only:
@@ -76,7 +69,7 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
-    - .yamato/upm-ci-renderstreaming-packages.yml#pack_{{ package.name }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 {% endfor %}
 
@@ -88,7 +81,7 @@ publish_{{ package.name }}:
     flavor: b1.large
   commands:
     - npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
-    - upm-ci package publish --package-path Packages/{{ package.packagename }}
+    - upm-ci package publish  
   triggers:
     tags:
       only:
@@ -98,10 +91,10 @@ publish_{{ package.name }}:
       paths:
         - "upm-ci~/packages/*.tgz"
   dependencies:
-    - .yamato/upm-ci-renderstreaming-packages.yml#pack_{{ package.name }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
     {% for platform in platforms %}
-    - .yamato/upm-ci-renderstreaming-packages.yml#test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
 {% endfor %}
