@@ -32,3 +32,4 @@
 
 - [LICENSE.md](LICENSE.md)
 - [Third Party Notices.md](Third%20Party%20Notices.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
