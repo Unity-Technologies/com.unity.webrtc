@@ -9,8 +9,6 @@ WebRTC を活用したソリューションのサンプルについては [Unity
 ## ガイド
 
 * [チュートリアル](tutorial.md)
-* [データチャネル](datachennel.md)
-* [メディアストリーム](mediastream.md)
 
 ## インストール方法
 パッケージをインストールするためには、パッケージマネージャから WebRTC for Unity を検索しインストールします。パッケージマネージャの利用方法は[ドキュメント](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html)を参照してください。
