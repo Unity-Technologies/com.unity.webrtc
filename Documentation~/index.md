@@ -4,7 +4,7 @@
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
-If you interest in the streaming solution with WebRTC, you can check [Unity Render Streaming](https://github.com/Unity-Technologies/UnityRenderStreaming). 
+If you are interested in the streaming solution with WebRTC, you can check [Unity Render Streaming](https://github.com/Unity-Technologies/UnityRenderStreaming). 
 
 ## Guide
 
@@ -35,7 +35,7 @@ This version of the package is compatible with the following versions of the Uni
 
 Currently the software only supports `windows64`.
 
-Graphics API version is only supports `Direct3D11`.
+Graphics API version only supports `Direct3D11`.
 
 ## Limitations
 
