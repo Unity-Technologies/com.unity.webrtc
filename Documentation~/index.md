@@ -2,7 +2,9 @@
 
 - [Japanese](../jp/index.md)
 
-WebRTC for Unity is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
+**WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
+
+If you interest in the streaming solution with WebRTC, you can check [Unity Render Streaming](https://github.com/Unity-Technologies/UnityRenderStreaming). 
 
 ## Guide
 
@@ -22,9 +24,22 @@ The package contains the following 3 samples.
 | DataChannel    | A scene for sending and receiving text       |
 | MediaStream    | A scene for sending and receiving video/audio    |
 
+## Requirements
+
+This version of the package is compatible with the following versions of the Unity Editor:
+
+- 2019.1 and later (recommended)
+
+> [!NOTE]
+> <`Unity 2018.3` is not supported.>
+
+Currently the software only supports `windows64`.
+
+Graphics API version is only supports `Direct3D11`.
+
 ## Limitations
 
-This package uses GPU hardware acceleration for video encoding, so it only runs on graphics cards that support NVCodec.
+This package uses GPU hardware acceleration for video encoding, so it only runs on graphics cards that support [NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/nvidia-video-codec-sdk).
 
 ## Update History
 
