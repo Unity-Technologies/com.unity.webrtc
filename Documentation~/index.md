@@ -1,6 +1,6 @@
 # WebRTC
 
-- [Japanese](../jp/index.md)
+- [Japanese](./jp/index.md)
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -8,7 +8,7 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Guide
 
-* [Tutorial](../en/tutorial.md)
+* [Tutorial](./en/tutorial.md)
 
 ## Installation
 To install the package, download WebRTC for Unity from the package manager. See the [documentation](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html) for details on how to use the package manager. 

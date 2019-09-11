@@ -8,7 +8,7 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Documentation
 
-- [English](./Documentation~/en/index.md)
+- [English](./Documentation~/index.md)
 - [Japanese]( ./Documentation~/jp/index.md)
 
 ### Guide
