@@ -76,11 +76,11 @@ The package contains the following 3 samples.
 
 ## Roadmap
 
-| Version | libwebrtc version                                            | Focus                                        |
-| ------- | ------------------------------------------------------------ | -------------------------------------------- |
-| `1.0`   | [M72](https://groups.google.com/forum/#!msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                              |
-| `2.0`   |                                                              | - Multi camera <br>- DirectX12 (DXR) Support |
-| `2.1`   |                                                              | - Linux support <br>- Add HW encoder         |
+| Version | libwebrtc version                                            | Focus                                                        |
+| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `1.0`   | [M72](https://groups.google.com/forum/#!msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                              |
+| `2.0`   |                                                              | - Multi camera <br>- DirectX12 (DXR) Support<br/>- IL2CPP Support |
+| `2.1`   |                                                              | - Linux support <br>- Add HW encoder                         |
 
 ## Licenses
 
