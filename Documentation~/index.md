@@ -30,12 +30,11 @@ This version of the package is compatible with the following versions of the Uni
 
 - 2019.1 and later (recommended)
 
-> [!NOTE]
-> <`Unity 2018.3` is not supported.>
-
 Currently the software only supports `windows64`.
 
 Graphics API version only supports `Direct3D11`.
+
+`IL2CPP` is not supported in Scripting Backend by this package.
 
 ## Limitations
 
