@@ -12,8 +12,8 @@ publish_github_release:
     flavor: b1.large
   commands:
     - npm install github-release-cli -g
-    - github-release upload -o "Unity-Technologies" -r "UnityRenderStreaming" -t "%GIT_TAG%" -n "%GIT_TAG%" "upm-ci~/packages/com.unity.webrtc-%GIT_TAG%.tgz"
-    - github-release upload -o "Unity-Technologies" -r "UnityRenderStreaming" -t "%GIT_TAG%" -n "%GIT_TAG%" "artifacts/webrtc-win.zip"
+    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "%GIT_TAG%" -n "%GIT_TAG%" "upm-ci~/packages/com.unity.webrtc-%GIT_TAG%.tgz"
+    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "%GIT_TAG%" -n "%GIT_TAG%" "artifacts/webrtc-win.zip"
   triggers:
     tags:
       only:
