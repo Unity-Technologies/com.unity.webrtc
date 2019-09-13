@@ -34,6 +34,8 @@ WebRTC を活用したソリューションのサンプルについては [Unity
 
 Graphics API は `DirectX11` のみサポートしています。
 
+Scripting Backend の `IL2CPP` は現在のところサポートされていません。
+
 ## 制限事項
 
 ビデオエンコーディングにGPUハードウェアアクセラレーションを使用しているため、[NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) 対応のグラフィックスボードでのみ動作します。
