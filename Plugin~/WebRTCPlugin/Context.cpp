@@ -346,27 +346,20 @@ namespace WebRTC
         return audioStream.get();
     }
 
-    PeerSDPObserver* PeerSDPObserver::Create(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
+    PeerSDPObserver* PeerSDPObserver::Create(PeerConnectionObject* obj)
     {
         auto observer = new rtc::RefCountedObject<PeerSDPObserver>();
-        observer->onSuccess = onSuccess;
-        observer->onFailure = onFailure;
+        observer->m_obj = obj;
         return observer;
     }
 
     void PeerSDPObserver::OnSuccess()
     {
-        if (onSuccess != nullptr)
-        {
-            onSuccess();
-        }
+        m_obj->onSetSDSuccess(m_obj);
     }
 
     void PeerSDPObserver::OnFailure(const std::string& error)
     {
-        if (onFailure != nullptr)
-        {
-            onFailure();
-        }
+        m_obj->onSetSDFailure(m_obj);
     }
 }

@@ -218,6 +218,7 @@ namespace Unity.WebRTC
         private static Context s_context;
         private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
+        private static Hashtable s_tableInstance = new Hashtable();
         private static Material flipMat;
 
         public static void Initialize()
@@ -227,7 +228,7 @@ namespace Unity.WebRTC
             var result = Context.GetCodecInitializationResult();
             if (result != CodecInitializationResult.Success)
             {
-                switch(result)
+                switch (result)
                 {
                     case CodecInitializationResult.DriverNotInstalled:
                         Debug.LogError("[WebRTC] The hardware codec driver not installed");
@@ -248,12 +249,12 @@ namespace Unity.WebRTC
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
             var flipShader = Resources.Load<Shader>("Flip");
-            if(flipShader != null)
+            if (flipShader != null)
             {
-                flipMat = new Material(flipShader); 
+                flipMat = new Material(flipShader);
             }
         }
-        public static IEnumerator Update() 
+        public static IEnumerator Update()
         {
             while (true)
             {
@@ -262,7 +263,7 @@ namespace Unity.WebRTC
                 if (CameraExtension.started)
                 {
                     //Blit is for DirectX Rendering API Only
-                    foreach(var rts in CameraExtension.camCopyRts)
+                    foreach (var rts in CameraExtension.camCopyRts)
                     {
                         Graphics.Blit(rts[0], rts[1], flipMat);
                     }
@@ -278,6 +279,7 @@ namespace Unity.WebRTC
             NativeMethods.RegisterDebugLog(null);
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
             Debug.Log(str);
@@ -285,6 +287,7 @@ namespace Unity.WebRTC
 
         internal static Context Context { get { return s_context; } }
         internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
+        internal static Hashtable Table { get { return s_tableInstance; } }
 
         public static bool HWEncoderSupport
         {
@@ -303,19 +306,18 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDSuccess(RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
+    internal delegate void DelegateCreateSDSuccess(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDFailure();
+    internal delegate void DelegateCreateSDFailure(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateSetSDSuccess();
+    internal delegate void DelegateSetSDSuccess(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateSetSDFailure();
+    internal delegate void DelegateSetSDFailure(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
+    public delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnIceCandidate([MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
+    public delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
     public delegate void DelegateOnNegotiationNeeded();
@@ -326,7 +328,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegatePeerConnectionCallbackEvent(RTCPeerConnectionEventType type, [MarshalAs(UnmanagedType.LPStr, SizeConst = 1024)] string str);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeOnDataChannel(IntPtr ptr);
+    internal delegate void DelegateNativeOnDataChannel(IntPtr ptrChannel);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnMessage([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] bytes, int size);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -369,7 +371,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackSetSD(IntPtr ptr, DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateOnIceConnectionChange callback);
+        public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]

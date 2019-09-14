@@ -63,7 +63,7 @@ namespace WebRTC
         auto type = ConvertSdpType(desc->GetType());
         if (onCreateSDSuccess != nullptr)
         {
-            onCreateSDSuccess(type, out.c_str());
+            onCreateSDSuccess(this, type, out.c_str());
         }
     }
 
@@ -73,7 +73,7 @@ namespace WebRTC
         //RTCError _error = { RTCErrorDetailType::IdpTimeout };
         if (onCreateSDFailure != nullptr)
         {
-            onCreateSDFailure();
+            onCreateSDFailure(this);
         }
     }
 
@@ -163,7 +163,7 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description);
             return;
         }
-        auto observer = PeerSDPObserver::Create(this->onSetSDSuccess, this->onSetSDFailure);
+        auto observer = PeerSDPObserver::Create(this);
         connection->SetLocalDescription(observer, _desc.release());
     }
 
@@ -177,7 +177,7 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description);
             return;
         }
-        auto observer = PeerSDPObserver::Create(this->onSetSDSuccess, this->onSetSDFailure);
+        auto observer = PeerSDPObserver::Create(this);
         connection->SetRemoteDescription(observer, _desc.release());
     }
 

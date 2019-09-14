@@ -69,15 +69,14 @@ namespace WebRTC
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver
     {
     public:
-        static PeerSDPObserver* Create(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure);
+        static PeerSDPObserver* Create(PeerConnectionObject* obj);
         virtual void OnSuccess();
         virtual void OnFailure(const std::string& error);
-        DelegateSetSDSuccess onSuccess;
-        DelegateSetSDFailure onFailure;
     protected:
         PeerSDPObserver() {}
         ~PeerSDPObserver() {}
-
+    private:
+        PeerConnectionObject* m_obj;
     };  // class PeerSDPObserver
 
     extern void Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);
