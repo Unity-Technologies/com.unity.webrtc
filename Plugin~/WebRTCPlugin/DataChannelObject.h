@@ -3,9 +3,10 @@
 namespace WebRTC
 {
     class PeerConnectionObject;
-    using DelegateOnMessage = void(*)(const byte*, int size);
-    using DelegateOnOpen = void(*)();
-    using DelegateOnClose = void(*)();
+    class DataChannelObject;
+    using DelegateOnMessage = void(*)(DataChannelObject*, const byte*, int);
+    using DelegateOnOpen = void(*)(DataChannelObject*);
+    using DelegateOnClose = void(*)(DataChannelObject*);
 
     class DataChannelObject : public webrtc::DataChannelObserver
     {

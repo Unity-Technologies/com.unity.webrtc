@@ -218,13 +218,14 @@ namespace Unity.WebRTC
         private static Context s_context;
         private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
-        private static Hashtable s_tableInstance = new Hashtable();
+        private static Hashtable s_tableInstance;
         private static Material flipMat;
 
         public static void Initialize()
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create();
+            s_tableInstance = new Hashtable();
             var result = Context.GetCodecInitializationResult();
             if (result != CodecInitializationResult.Success)
             {
@@ -276,6 +277,7 @@ namespace Unity.WebRTC
         public static void Finalize(int id = 0)
         {
             s_context.Destroy();
+            s_tableInstance.Clear();
             NativeMethods.RegisterDebugLog(null);
         }
 
@@ -317,24 +319,19 @@ namespace Unity.WebRTC
     public delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
-    public delegate void DelegateOnNegotiationNeeded();
+    public delegate void DelegateNativeOnNegotiationNeeded(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnTrack(IntPtr rtpTransceiverInterface);
+    public delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnTrack(RTCTrackEvent e);
+    internal delegate void DelegateNativeOnDataChannel(IntPtr ptr, IntPtr ptrChannel);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegatePeerConnectionCallbackEvent(RTCPeerConnectionEventType type, [MarshalAs(UnmanagedType.LPStr, SizeConst = 1024)] string str);
+    internal delegate void DelegateNativeOnMessage(IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] bytes, int size);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeOnDataChannel(IntPtr ptrChannel);
+    public delegate void DelegateNativeOnOpen(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeOnMessage([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] bytes, int size);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnOpen();
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnClose();
+    public delegate void DelegateNativeOnClose(IntPtr ptr);
 
     internal static class NativeMethods
     {
@@ -393,7 +390,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnDataChannel(IntPtr ptr, DelegateNativeOnDataChannel callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterOnRenegotiationNeeded(IntPtr ptr, DelegateOnNegotiationNeeded callback);
+        public static extern void PeerConnectionRegisterOnRenegotiationNeeded(IntPtr ptr, DelegateNativeOnNegotiationNeeded callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnTrack(IntPtr ptr, DelegateNativeOnTrack rtpTransceiverInterface);
         [DllImport(WebRTC.Lib)]
@@ -411,9 +408,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnMessage(IntPtr ptr, DelegateNativeOnMessage callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void DataChannelRegisterOnOpen(IntPtr ptr, DelegateOnOpen callback);
+        public static extern void DataChannelRegisterOnOpen(IntPtr ptr, DelegateNativeOnOpen callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateOnClose callback);
+        public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CaptureVideoStream(IntPtr context, IntPtr rt, int width, int height);
         [DllImport(WebRTC.Lib)]

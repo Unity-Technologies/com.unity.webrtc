@@ -5,8 +5,9 @@ using System;
 namespace Unity.WebRTC
 {
     public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
-
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
+    public delegate void DelegateOnNegotiationNeeded();
+    public delegate void DelegateOnTrack(RTCTrackEvent e);
 
     public class RTCPeerConnection : IDisposable
     {
@@ -21,7 +22,7 @@ namespace Unity.WebRTC
         private DelegateNativeOnTrack selfOnTrack;
         private DelegateOnTrack onTrack;
         private DelegateOnNegotiationNeeded onNegotiationNeeded;
-        private DelegateOnNegotiationNeeded selfOnNegotiationNeeded;
+        private DelegateNativeOnNegotiationNeeded selfOnNegotiationNeeded;
         private DelegateCreateSDSuccess onCreateSDSuccess;
         private DelegateCreateSDFailure onCreateSDFailure;
         private DelegateSetSDSuccess onSetSDSuccess;
@@ -49,6 +50,7 @@ namespace Unity.WebRTC
             {
                 Close();
                 NativeMethods.ContextDeletePeerConnection(WebRTC.Context.self, m_id);
+                WebRTC.Table.Remove(self);
             }
             this.disposed = true;
         }
@@ -106,7 +108,7 @@ namespace Unity.WebRTC
             set
             {
                 onNegotiationNeeded = value;
-                selfOnNegotiationNeeded = new DelegateOnNegotiationNeeded(PCOnNegotiationNeeded);
+                selfOnNegotiationNeeded = new DelegateNativeOnNegotiationNeeded(PCOnNegotiationNeeded);
                 NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, selfOnNegotiationNeeded);
             }
         }
@@ -143,26 +145,34 @@ namespace Unity.WebRTC
                 connection.OnIceConnectionChange(state);
             }, null);
         }
-        void PCOnNegotiationNeeded()
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnNegotiationNeeded))]
+        static void PCOnNegotiationNeeded(IntPtr ptr)
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                OnNegotiationNeeded();
-            }, null);
-        }
-        void PCOnDataChannel(IntPtr ptr)
-        {
-            WebRTC.SyncContext.Post(_ =>
-            {
-                OnDataChannel(new RTCDataChannel(ptr));
+                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
+                connection.OnNegotiationNeeded();
             }, null);
         }
 
-        void PCOnTrack(IntPtr ptr)
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnDataChannel))]
+        static void PCOnDataChannel(IntPtr ptr, IntPtr ptrChannel)
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                OnTrack(new RTCTrackEvent(ptr));
+                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
+                connection.OnDataChannel(new RTCDataChannel(ptrChannel));
+            }, null);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnTrack))]
+        static void PCOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface)
+        {
+            WebRTC.SyncContext.Post(_ =>
+            {
+                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
+                connection.OnTrack(new RTCTrackEvent(rtpTransceiverInterface));
             }, null);
         }
 

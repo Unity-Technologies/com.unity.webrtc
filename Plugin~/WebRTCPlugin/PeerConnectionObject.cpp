@@ -84,7 +84,7 @@ namespace WebRTC
         remoteDataChannels[id] = remoteDataChannelObj;
         if (onDataChannel != nullptr)
         {
-            onDataChannel(remoteDataChannels[id]);
+            onDataChannel(this, remoteDataChannels[id]);
         }
     }
     void PeerConnectionObject::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
@@ -97,7 +97,7 @@ namespace WebRTC
         }
         if (onIceCandidate != nullptr)
         {
-            onIceCandidate(out.c_str(), candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
+            onIceCandidate(this, out.c_str(), candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
         }
     }
 
@@ -105,7 +105,7 @@ namespace WebRTC
     {
         if (onRenegotiationNeeded != nullptr)
         {
-            onRenegotiationNeeded();
+            onRenegotiationNeeded(this);
         }
     }
 
@@ -113,7 +113,7 @@ namespace WebRTC
     {
         if (onTrack != nullptr)
         {
-            onTrack(transceiver.get());
+            onTrack(this, transceiver.get());
         }
     }
     // Called any time the IceConnectionState changes.
@@ -121,7 +121,7 @@ namespace WebRTC
     {
         if (onIceConnectionChange != nullptr)
         {
-            onIceConnectionChange(new_state);
+            onIceConnectionChange(this, new_state);
         }
     }
     // Called any time the IceGatheringState changes.
