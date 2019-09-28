@@ -270,6 +270,20 @@ namespace WebRTC
         localDataChannels[id] = dataChannelObj;
         return localDataChannels[id];
     }
+
+    void PeerConnectionObject::DeleteDataChannel(DataChannelObject* channel)
+    {
+        auto id = channel->GetID();
+        if (localDataChannels.count(id) > 0)
+        {
+            localDataChannels.erase(id);
+        }
+        else if (remoteDataChannels.count(id) > 0)
+        {
+            remoteDataChannels.erase(id);
+        }
+    }
+
 #pragma warning(push)
 #pragma warning(disable: 4715)
     RTCIceConnectionState PeerConnectionObject::GetIceCandidateState()

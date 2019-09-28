@@ -42,6 +42,8 @@ class DataChannelTest
         Assert.AreEqual(channel1.Id, -1);
         Assert.AreEqual(channel2.Id, -1);
 
+        channel1.Close();
+        channel2.Close();
         peer.Close();
     }
 
@@ -103,6 +105,9 @@ class DataChannelTest
         channel1.Send(message3);
         yield return new WaitUntil(() => message4 != null);
         Assert.AreEqual(message3, message4);
+
+        channel1.Close();
+        channel2.Close();
 
         peer1.Close();
         peer2.Close();

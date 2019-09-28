@@ -244,6 +244,12 @@ extern "C"
         return obj->CreateDataChannel(label, *options);
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionDeleteDataChannel(PeerConnectionObject* obj, DataChannelObject* channel)
+    {
+        obj->DeleteDataChannel(channel);
+    }
+    
+
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterIceConnectionChange(PeerConnectionObject* obj, DelegateOnIceConnectionChange callback)
     {
         obj->RegisterIceConnectionChange(callback);

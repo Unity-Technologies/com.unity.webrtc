@@ -11,6 +11,7 @@ namespace Unity.WebRTC
     public class RTCDataChannel
     {
         private IntPtr self;
+        private RTCPeerConnection peerConnection;
         private DelegateOnMessage onMessage;
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
@@ -89,9 +90,10 @@ namespace Unity.WebRTC
                 channel.onClose();
             }, null);
         }
-        internal RTCDataChannel(IntPtr ptr)
+        internal RTCDataChannel(IntPtr ptr, RTCPeerConnection peerConnection)
         {
             self = ptr;
+            this.peerConnection = peerConnection;
             WebRTC.Table.Add(self, this);
             var labelPtr = NativeMethods.DataChannelGetLabel(self);
             Label = Marshal.PtrToStringAnsi(labelPtr);
@@ -111,8 +113,9 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 Close();
-                WebRTC.Table.Remove(self);
+                peerConnection.DeleteDataChannel(self);
             }
+            WebRTC.Table.Remove(self);
             this.disposed = true;
         }
 
@@ -128,7 +131,10 @@ namespace Unity.WebRTC
 
         public void Close()
         {
-            NativeMethods.DataChannelClose(self);
+            if (self != IntPtr.Zero)
+            {
+                NativeMethods.DataChannelClose(self);
+            }
         }
     }
 }

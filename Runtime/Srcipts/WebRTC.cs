@@ -276,9 +276,9 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
-            s_context.Destroy();
             s_tableInstance.Clear();
             NativeMethods.RegisterDebugLog(null);
+            s_context.Destroy();
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
@@ -357,6 +357,8 @@ namespace Unity.WebRTC
         public static extern RTCErrorType PeerConnectionSetConfiguration(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string conf);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionCreateDataChannel(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
+        [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetConfiguration(IntPtr ptr, ref IntPtr conf, ref int len);
         [DllImport(WebRTC.Lib)]

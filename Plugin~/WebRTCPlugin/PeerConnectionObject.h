@@ -34,6 +34,7 @@ namespace WebRTC
         void CreateAnswer(const RTCAnswerOptions& options);
         void AddIceCandidate(const RTCIceCandidate& candidate);
         DataChannelObject* CreateDataChannel(const char* label, const RTCDataChannelInit& options);
+        void DeleteDataChannel(DataChannelObject* channel);
 
         void RegisterCallbackSetSD(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
         {
