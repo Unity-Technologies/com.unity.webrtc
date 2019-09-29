@@ -120,6 +120,7 @@ publish_{{ package.name }}:
     {% for editor in editors %}
     {% for platform in platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
 {% endfor %}
