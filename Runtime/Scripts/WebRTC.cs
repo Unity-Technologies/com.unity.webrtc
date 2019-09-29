@@ -314,22 +314,22 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateSetSDFailure(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
+    internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
+    internal delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
-    public delegate void DelegateNativeOnNegotiationNeeded(IntPtr ptr);
+    internal delegate void DelegateNativeOnNegotiationNeeded(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface);
+    internal delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnDataChannel(IntPtr ptr, IntPtr ptrChannel);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnMessage(IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] bytes, int size);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnOpen(IntPtr ptr);
+    internal delegate void DelegateNativeOnOpen(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnClose(IntPtr ptr);
+    internal delegate void DelegateNativeOnClose(IntPtr ptr);
 
     internal static class NativeMethods
     {

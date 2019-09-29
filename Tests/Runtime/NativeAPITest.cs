@@ -3,18 +3,6 @@ using Unity.WebRTC;
 
 class NativeAPITest
 {
-    [SetUp]
-    public void SetUp()
-    {
-        WebRTC.Initialize();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        WebRTC.Finalize();
-    }
-
     [Test]
     public void RegisterDebugLog()
     {

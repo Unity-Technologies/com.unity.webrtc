@@ -86,7 +86,6 @@ public class PeerConnectionSample : MonoBehaviour
         var configuration = GetSelectedSdpSemantics();
         pc1 = new RTCPeerConnection(ref configuration);
         Debug.Log("Created local peer connection object pc1");
-        /*
         pc1.OnIceCandidate = pc1OnIceCandidate;
         pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
         pc2 = new RTCPeerConnection(ref configuration);
@@ -94,15 +93,12 @@ public class PeerConnectionSample : MonoBehaviour
         pc2.OnIceCandidate = pc2OnIceCandidate;
         pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         Debug.Log("pc1 createOffer start");
-        */
 
         var conf = new RTCDataChannelInit(true);
         dataChannel = pc1.CreateDataChannel("data", ref conf);
 
         var op = pc1.CreateOffer(ref OfferOptions);
         yield return op;
-
-        yield break;
 
         if (!op.isError)
         {
