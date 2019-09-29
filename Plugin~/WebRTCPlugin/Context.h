@@ -43,18 +43,24 @@ namespace WebRTC
         webrtc::MediaStreamInterface* CreateAudioStream();
         ~Context();
 
-        PeerConnectionObject* CreatePeerConnection(int id);
-        PeerConnectionObject* CreatePeerConnection(int id, const std::string& conf);
-        void DeletePeerConnection(int id) { clients.erase(id); }
+        PeerConnectionObject* CreatePeerConnection();
+        PeerConnectionObject* CreatePeerConnection(const std::string& conf);
+        void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
         void InitializeEncoder(int32 width, int32 height) { nvVideoCapturer->InitializeEncoder(width, height); }
         void EncodeFrame() { nvVideoCapturer->EncodeVideoData(); }
         void StopCapturer() { nvVideoCapturer->Stop(); }
         void ProcessAudioData(const float* data, int32 size) { audioDevice->ProcessAudioData(data, size); }
+
+        DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
+        void DeleteDataChannel(DataChannelObject* obj);
+
+        std::map<DataChannelObject*, std::unique_ptr<DataChannelObject>> dataChannels;
+
     private:
         int m_uid;
         std::unique_ptr<rtc::Thread> workerThread;
         std::unique_ptr<rtc::Thread> signalingThread;
-        std::map<int, rtc::scoped_refptr<PeerConnectionObject>> clients;
+        std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
         NvVideoCapturer* nvVideoCapturer;
         std::unique_ptr<NvVideoCapturer> nvVideoCapturerUnique;

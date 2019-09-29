@@ -218,14 +218,12 @@ namespace Unity.WebRTC
         private static Context s_context;
         private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
-        private static Hashtable s_tableInstance;
         private static Material flipMat;
 
         public static void Initialize()
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create();
-            s_tableInstance = new Hashtable();
             var result = Context.GetCodecInitializationResult();
             if (result != CodecInitializationResult.Success)
             {
@@ -276,9 +274,9 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
-            s_tableInstance.Clear();
             NativeMethods.RegisterDebugLog(null);
-            s_context.Destroy();
+            s_context.Dispose();
+            s_context = null;
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
@@ -289,7 +287,7 @@ namespace Unity.WebRTC
 
         internal static Context Context { get { return s_context; } }
         internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
-        internal static Hashtable Table { get { return s_tableInstance; } }
+        internal static Hashtable Table { get { return s_context.table; } }
 
         public static bool HWEncoderSupport
         {
@@ -342,23 +340,23 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]
-        public static extern Context ContextCreate(int uid);
+        public static extern IntPtr ContextCreate(int uid);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDestroy(int uid);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreatePeerConnection(IntPtr ptr, int id);
+        public static extern IntPtr ContextCreatePeerConnection(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreatePeerConnectionWithConfig(IntPtr ptr, int id, string conf);
+        public static extern IntPtr ContextCreatePeerConnectionWithConfig(IntPtr ptr, string conf);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextDeletePeerConnection(IntPtr ptr, int id);
+        public static extern void ContextDeletePeerConnection(IntPtr ptr, IntPtr ptrPeerConnection);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionClose(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetConfiguration(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string conf);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionCreateDataChannel(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
+        public static extern IntPtr ContextCreateDataChannel(IntPtr ptr, IntPtr ptrPeer, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
+        public static extern void ContextDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetConfiguration(IntPtr ptr, ref IntPtr conf, ref int len);
         [DllImport(WebRTC.Lib)]
@@ -443,21 +441,6 @@ namespace Unity.WebRTC
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
-    }
-
-    internal struct Context
-    {
-        internal IntPtr self;
-        public bool IsNull { get { return self == IntPtr.Zero; } }
-        public static implicit operator bool(Context v) { return v.self != IntPtr.Zero; }
-        public static bool ToBool(Context v) { return v; }
-        public static Context Create(int uid = 0) { return NativeMethods.ContextCreate(uid); }
-        public static CodecInitializationResult GetCodecInitializationResult() { return NativeMethods.GetCodecInitializationResult(); }
-        public void Destroy(int uid = 0) { NativeMethods.ContextDestroy(uid); self = IntPtr.Zero; }
-        public IntPtr CaptureVideoStream(IntPtr rt, int width, int height) { return NativeMethods.CaptureVideoStream(self, rt, width, height); }
-        public IntPtr CaptureAudioStream() { return NativeMethods.CaptureAudioStream(self); }
-        public IntPtr GetRenderEventFunc() { return NativeMethods.GetRenderEventFunc(self); }
-        public void StopMediaStreamTrack(IntPtr track) { NativeMethods.StopMediaStreamTrack(self, track); }
     }
 }
 

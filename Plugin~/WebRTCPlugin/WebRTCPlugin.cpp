@@ -170,18 +170,18 @@ extern "C"
         ContextManager::GetInstance()->DestroyContext(uid);
     }
 
-    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* ctx, int id)
+    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* ctx)
     {
-        return ctx->CreatePeerConnection(id);
+        return ctx->CreatePeerConnection();
     }
 
-    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* ctx, int id, const char* conf)
+    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* ctx, const char* conf)
     {
-        return ctx->CreatePeerConnection(id, conf);
+        return ctx->CreatePeerConnection(conf);
     }
-    UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* ctx, int id)
+    UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* ctx, PeerConnectionObject* ptr)
     {
-        ctx->DeletePeerConnection(id);
+        ctx->DeletePeerConnection(ptr);
     }
     UNITY_INTERFACE_EXPORT void PeerConnectionClose(PeerConnectionObject* obj)
     {
@@ -239,16 +239,15 @@ extern "C"
         obj->CreateAnswer(*options);
     }
 
-    UNITY_INTERFACE_EXPORT DataChannelObject* PeerConnectionCreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit* options)
+    UNITY_INTERFACE_EXPORT DataChannelObject* ContextCreateDataChannel(Context* ctx, PeerConnectionObject* obj, const char* label, const RTCDataChannelInit* options)
     {
-        return obj->CreateDataChannel(label, *options);
+        return ctx->CreateDataChannel(obj, label, *options);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionDeleteDataChannel(PeerConnectionObject* obj, DataChannelObject* channel)
+    UNITY_INTERFACE_EXPORT void ContextDeleteDataChannel(Context* ctx, DataChannelObject* channel)
     {
-        obj->DeleteDataChannel(channel);
+        ctx->DeleteDataChannel(channel);
     }
-    
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterIceConnectionChange(PeerConnectionObject* obj, DelegateOnIceConnectionChange callback)
     {

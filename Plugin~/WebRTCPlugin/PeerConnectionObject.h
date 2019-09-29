@@ -21,7 +21,7 @@ namespace WebRTC
         , public webrtc::PeerConnectionObserver
     {
     public:
-        PeerConnectionObject(int id);
+        PeerConnectionObject(Context& context);
         ~PeerConnectionObject();
 
         void Close();
@@ -34,7 +34,6 @@ namespace WebRTC
         void CreateAnswer(const RTCAnswerOptions& options);
         void AddIceCandidate(const RTCIceCandidate& candidate);
         DataChannelObject* CreateDataChannel(const char* label, const RTCDataChannelInit& options);
-        void DeleteDataChannel(DataChannelObject* channel);
 
         void RegisterCallbackSetSD(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
         {
@@ -111,8 +110,6 @@ namespace WebRTC
         DelegateOnTrack onTrack;
         rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection;
     private:
-        std::map<int, DataChannelObject*> localDataChannels;
-        std::map<int, DataChannelObject*> remoteDataChannels;
-        int32 id;
+        Context& context;
     };
 }

@@ -8,7 +8,7 @@ namespace Unity.WebRTC
     public delegate void DelegateOnMessage(byte[] bytes);
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
-    public class RTCDataChannel
+    public class RTCDataChannel : IDisposable
     {
         private IntPtr self;
         private RTCPeerConnection peerConnection;
@@ -101,7 +101,11 @@ namespace Unity.WebRTC
 
         ~RTCDataChannel()
         {
-            this.Dispose();
+            if (!this.disposed)
+            {
+                this.Dispose();
+                WebRTC.Table.Remove(self);
+            }
         }
 
         public void Dispose()
@@ -113,9 +117,9 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 Close();
-                peerConnection.DeleteDataChannel(self);
+                WebRTC.Context.DeleteDataChannel(self);
+                self = IntPtr.Zero;
             }
-            WebRTC.Table.Remove(self);
             this.disposed = true;
         }
 

@@ -37,7 +37,12 @@ namespace Unity.WebRTC
 
         ~RTCPeerConnection()
         {
-            this.Dispose();
+            if(!this.disposed)
+            {
+                this.Dispose();
+                WebRTC.Table.Remove(self);
+                self = IntPtr.Zero;
+            }
         }
 
         public void Dispose()
@@ -49,8 +54,7 @@ namespace Unity.WebRTC
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 Close();
-                NativeMethods.ContextDeletePeerConnection(WebRTC.Context.self, m_id);
-                WebRTC.Table.Remove(self);
+                WebRTC.Context.DeletePeerConnection(self);
             }
             this.disposed = true;
         }
@@ -125,7 +129,6 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceCandidate))]
-
         static void PCOnIceCandidate(IntPtr ptr, string sdp, string sdpMid, int sdpMlineIndex)
         {
             WebRTC.SyncContext.Post(_ =>
@@ -162,7 +165,7 @@ namespace Unity.WebRTC
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.OnDataChannel(new RTCDataChannel(ptrChannel));
+                connection.OnDataChannel(new RTCDataChannel(ptrChannel, connection));
             }, null);
         }
 
@@ -193,8 +196,7 @@ namespace Unity.WebRTC
 
         public RTCPeerConnection()
         {
-            m_id = GetHashCode();
-            self = NativeMethods.ContextCreatePeerConnection(WebRTC.Context.self, m_id);
+            self = WebRTC.Context.CreatePeerConnection();
             if (self == IntPtr.Zero)
             {
                 throw new ArgumentException("Could not instantiate RTCPeerConnection");
@@ -205,9 +207,8 @@ namespace Unity.WebRTC
 
         public RTCPeerConnection(ref RTCConfiguration config)
         {
-            m_id = GetHashCode();
             string configStr = JsonUtility.ToJson(config);
-            self = NativeMethods.ContextCreatePeerConnectionWithConfig(WebRTC.Context.self, m_id, configStr);
+            self = WebRTC.Context.CreatePeerConnection(configStr);
             if(self == IntPtr.Zero)
             {
                 throw new ArgumentException("Could not instantiate RTCPeerConnection");
@@ -264,7 +265,7 @@ namespace Unity.WebRTC
 
         public RTCDataChannel CreateDataChannel(string label, ref RTCDataChannelInit options)
         {
-            return new RTCDataChannel(NativeMethods.PeerConnectionCreateDataChannel(self, label, ref options));
+            return new RTCDataChannel(WebRTC.Context.CreateDataChannel(self, label, ref options), this);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDSuccess))]

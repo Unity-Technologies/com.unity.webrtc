@@ -4,7 +4,7 @@
 
 namespace WebRTC
 {
-    PeerConnectionObject::PeerConnectionObject(int id) : id(id) {}
+    PeerConnectionObject::PeerConnectionObject(Context& context) : context(context) {}
 
     PeerConnectionObject::~PeerConnectionObject()
     {
@@ -26,9 +26,9 @@ namespace WebRTC
         connection.release();
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection(int id)
+    PeerConnectionObject* Context::CreatePeerConnection()
     {
-        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(id);
+        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
         _config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
         obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
@@ -37,14 +37,14 @@ namespace WebRTC
         {
             return nullptr;
         }
-        
-        clients[id] = std::move(obj);
-        return clients[id].get();
+        auto ptr = obj.get();
+        clients[ptr] = std::move(obj);
+        return clients[ptr].get();
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection(int id, const std::string& conf)
+    PeerConnectionObject* Context::CreatePeerConnection(const std::string& conf)
     {
-        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(id);
+        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
         Convert(conf, _config);
         obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
@@ -52,8 +52,9 @@ namespace WebRTC
         {
             return nullptr;
         }
-        clients[id] = std::move(obj);
-        return clients[id].get();
+        auto ptr = obj.get();
+        clients[ptr] = std::move(obj);
+        return clients[ptr].get();
     }
 
     void PeerConnectionObject::OnSuccess(webrtc::SessionDescriptionInterface* desc)
@@ -77,14 +78,14 @@ namespace WebRTC
         }
     }
 
-    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> remoteDataChannel)
+    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
     {
-        auto remoteDataChannelObj = new DataChannelObject(remoteDataChannel, *this);
-        int id = remoteDataChannelObj->GetID();
-        remoteDataChannels[id] = remoteDataChannelObj;
+        auto obj = std::make_unique<DataChannelObject>(channel, *this);
+        auto ptr = obj.get();
+        context.dataChannels[ptr] = std::move(obj);
         if (onDataChannel != nullptr)
         {
-            onDataChannel(this, remoteDataChannels[id]);
+            onDataChannel(this, ptr);
         }
     }
     void PeerConnectionObject::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
@@ -252,36 +253,6 @@ namespace WebRTC
         desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
-    }
-
-    DataChannelObject* PeerConnectionObject::CreateDataChannel(const char* label, const RTCDataChannelInit& options)
-    {
-        webrtc::DataChannelInit config;
-        config.reliable = options.reliable;
-        config.ordered = options.ordered;
-        config.maxRetransmitTime = options.maxRetransmitTime;
-        config.maxRetransmits = options.maxRetransmits;
-        config.protocol = options.protocol;
-        config.negotiated = options.negotiated;
-
-        auto channel = connection->CreateDataChannel(label, &config);
-        auto dataChannelObj = new DataChannelObject(channel, *this);
-        int id = dataChannelObj->GetID();
-        localDataChannels[id] = dataChannelObj;
-        return localDataChannels[id];
-    }
-
-    void PeerConnectionObject::DeleteDataChannel(DataChannelObject* channel)
-    {
-        auto id = channel->GetID();
-        if (localDataChannels.count(id) > 0)
-        {
-            localDataChannels.erase(id);
-        }
-        else if (remoteDataChannels.count(id) > 0)
-        {
-            remoteDataChannels.erase(id);
-        }
     }
 
 #pragma warning(push)
