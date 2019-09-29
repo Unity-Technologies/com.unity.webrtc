@@ -52,7 +52,6 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero)
             {
-                UnityEngine.Debug.Log("Dispose");
                 foreach(var value in table.Values)
                 {
                     var disposable = value as IDisposable;
@@ -60,10 +59,8 @@ namespace Unity.WebRTC
                 }
                 table.Clear();
 
-                UnityEngine.Debug.Log("ContextDestroy");
                 NativeMethods.ContextDestroy(id);
                 self = IntPtr.Zero;
-                UnityEngine.Debug.Log("Destroy end");
             }
             this.disposed = true;
         }
