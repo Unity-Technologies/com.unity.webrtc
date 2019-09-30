@@ -101,11 +101,8 @@ namespace Unity.WebRTC
 
         ~RTCDataChannel()
         {
-            if (!this.disposed)
-            {
-                this.Dispose();
-                WebRTC.Table.Remove(self);
-            }
+            this.Dispose();
+            WebRTC.Table.Remove(self);
         }
 
         public void Dispose()
@@ -121,6 +118,7 @@ namespace Unity.WebRTC
                 self = IntPtr.Zero;
             }
             this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         public void Send(string msg)

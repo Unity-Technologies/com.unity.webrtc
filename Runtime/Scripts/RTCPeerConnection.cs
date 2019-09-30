@@ -37,12 +37,8 @@ namespace Unity.WebRTC
 
         ~RTCPeerConnection()
         {
-            if(!this.disposed)
-            {
-                this.Dispose();
-                WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
-            }
+            this.Dispose();
+            WebRTC.Table.Remove(self);
         }
 
         public void Dispose()
@@ -55,8 +51,10 @@ namespace Unity.WebRTC
             {
                 Close();
                 WebRTC.Context.DeletePeerConnection(self);
+                self = IntPtr.Zero;
             }
             this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         public RTCIceConnectionState IceConnectionState
