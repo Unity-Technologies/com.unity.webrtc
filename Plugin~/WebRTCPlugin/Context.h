@@ -2,8 +2,7 @@
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
-#include "NvVideoCapturer.h"
-
+#include "UnityVideoCapturer.h"
 
 namespace WebRTC
 {
@@ -62,8 +61,8 @@ namespace WebRTC
         std::unique_ptr<rtc::Thread> signalingThread;
         std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
-        NvVideoCapturer* nvVideoCapturer;
-        std::unique_ptr<NvVideoCapturer> nvVideoCapturerUnique;
+        UnityVideoCapturer* nvVideoCapturer;
+        std::unique_ptr<UnityVideoCapturer> nvVideoCapturerUnique;
         rtc::scoped_refptr<DummyAudioDevice> audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
         rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;

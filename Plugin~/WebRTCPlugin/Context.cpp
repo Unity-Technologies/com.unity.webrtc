@@ -283,7 +283,7 @@ namespace WebRTC
         rtc::InitializeSSL();
 
         audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
-        nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
+        nvVideoCapturerUnique = std::make_unique<UnityVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
         auto dummyVideoEncoderFactory = std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
 

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "DummyVideoEncoder.h"
-#include "NvVideoCapturer.h"
+#include "UnityVideoCapturer.h"
 #include <algorithm>
 
 namespace WebRTC
@@ -67,7 +67,7 @@ namespace WebRTC
         SetRate(allocation.get_sum_kbps() * 1000);
         return 0;
     }
-    DummyVideoEncoderFactory::DummyVideoEncoderFactory(NvVideoCapturer* videoCapturer):capturer(videoCapturer){}
+    DummyVideoEncoderFactory::DummyVideoEncoderFactory(UnityVideoCapturer* videoCapturer):capturer(videoCapturer){}
     std::vector<webrtc::SdpVideoFormat> DummyVideoEncoderFactory::GetSupportedFormats() const
     {
         const absl::optional<std::string> profileLevelId =
@@ -87,8 +87,8 @@ namespace WebRTC
         const webrtc::SdpVideoFormat& format)
     {
         auto dummyVideoEncoder = std::make_unique<DummyVideoEncoder>();
-        dummyVideoEncoder->SetKeyFrame.connect(capturer, &NvVideoCapturer::SetKeyFrame);
-        dummyVideoEncoder->SetRate.connect(capturer, &NvVideoCapturer::SetRate);
+        dummyVideoEncoder->SetKeyFrame.connect(capturer, &UnityVideoCapturer::SetKeyFrame);
+        dummyVideoEncoder->SetRate.connect(capturer, &UnityVideoCapturer::SetRate);
         return dummyVideoEncoder;
     }
 }

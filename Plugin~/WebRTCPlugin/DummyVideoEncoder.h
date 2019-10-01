@@ -2,7 +2,7 @@
 
 namespace WebRTC
 {
-    class NvVideoCapturer;
+    class UnityVideoCapturer;
     class DummyVideoEncoder : public webrtc::VideoEncoder
     {
     public:
@@ -51,8 +51,8 @@ namespace WebRTC
         // Creates a VideoEncoder for the specified format.
         virtual std::unique_ptr<webrtc::VideoEncoder> CreateVideoEncoder(
             const webrtc::SdpVideoFormat& format) override;
-        DummyVideoEncoderFactory(NvVideoCapturer* videoCapturer);
+        DummyVideoEncoderFactory(UnityVideoCapturer* videoCapturer);
     private:
-        NvVideoCapturer* capturer;
+        UnityVideoCapturer* capturer;
     };
 }

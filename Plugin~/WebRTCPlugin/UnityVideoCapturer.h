@@ -3,10 +3,10 @@
 
 namespace WebRTC
 {
-    class NvVideoCapturer : public cricket::VideoCapturer
+    class UnityVideoCapturer : public cricket::VideoCapturer
     {
     public:
-        NvVideoCapturer();
+        UnityVideoCapturer();
         void EncodeVideoData();
         // Start the video capturer with the specified capture format.
         virtual cricket::CaptureState Start(const cricket::VideoFormat& Format) override
