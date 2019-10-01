@@ -52,7 +52,7 @@ namespace Unity.WebRTC
             }
             if (ptrNativeObj != IntPtr.Zero)
             {
-                foreach(var value in table.Values)
+                foreach (var value in table.Values)
                 {
                     var disposable = value as IDisposable;
                     disposable.Dispose();
@@ -97,16 +97,26 @@ namespace Unity.WebRTC
 
         public IntPtr CreateMediaStream(string label)
         {
-            return NativeMethods.CreateMediaStream(ptrNativeObj, label);
+            return NativeMethods.ContextCreateMediaStream(ptrNativeObj, label);
+        }
+
+        public void DeleteMediaStream(IntPtr stream)
+        {
+            NativeMethods.ContextDeleteMediaStream(ptrNativeObj, stream);
         }
 
         public IntPtr CreateVideoTrack(string label, IntPtr rt, int width, int height, int bitRate)
         {
-            return NativeMethods.CreateVideoTrack(ptrNativeObj, label, rt, width, height, bitRate);
+            return NativeMethods.ContextCreateVideoTrack(ptrNativeObj, label, rt, width, height, bitRate);
         }
         public IntPtr CreateAudioTrack(string label)
         {
-            return NativeMethods.CreateAudioTrack(ptrNativeObj, label);
+            return NativeMethods.ContextCreateAudioTrack(ptrNativeObj, label);
+        }
+
+        public void DeleteMediaStreamTrack(IntPtr stream)
+        {
+            NativeMethods.ContextDeleteMediaStreamTrack(ptrNativeObj, stream);
         }
 
         public IntPtr GetRenderEventFunc()
@@ -116,7 +126,7 @@ namespace Unity.WebRTC
 
         public void StopMediaStreamTrack(IntPtr track)
         {
-            NativeMethods.StopMediaStreamTrack(ptrNativeObj, track);
+            NativeMethods.ContextStopMediaStreamTrack(ptrNativeObj, track);
         }
     }
 }

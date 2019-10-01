@@ -4,17 +4,41 @@ using UnityEngine;
 
 namespace Unity.WebRTC
 {
-    public class MediaStreamTrack
+    public class MediaStreamTrack : IDisposable
     {
         internal IntPtr ptrNativeObj;
         private TrackKind kind;
         private string id;
+
+        private bool disposed;
 
         internal MediaStreamTrack(IntPtr ptr)
         {
             ptrNativeObj = ptr;
             kind = NativeMethods.MediaStreamTrackGetKind(ptrNativeObj);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamTrackGetID(ptrNativeObj));
+            WebRTC.Table.Add(ptrNativeObj, this);
+        }
+
+        ~MediaStreamTrack()
+        {
+            this.Dispose();
+            WebRTC.Table.Remove(ptrNativeObj);
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if (ptrNativeObj != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Context.DeleteMediaStreamTrack(ptrNativeObj);
+                ptrNativeObj = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         public bool Enabled
@@ -36,6 +60,14 @@ namespace Unity.WebRTC
             }
             private set { }
         }
+
+        // TODO::
+        void Stop()
+        {
+            throw new NotImplementedException("not impletemented native code");
+            WebRTC.Context.StopMediaStreamTrack(ptrNativeObj);
+        }
+            
 
         public TrackKind Kind { get => kind; private set { } }
         public string Id { get => id; private set { } }

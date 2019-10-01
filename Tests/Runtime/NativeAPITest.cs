@@ -3,11 +3,24 @@ using Unity.WebRTC;
 
 class NativeAPITest
 {
-    [Test]
-    public void RegisterDebugLog()
+    [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
+    static void DebugLog(string str)
+    {
+        UnityEngine.Debug.Log(str);
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        NativeMethods.RegisterDebugLog(DebugLog);
+    }
+
+    [TearDown]
+    public void TearDown()
     {
         NativeMethods.RegisterDebugLog(null);
     }
+
 
     [Test]
     public void CreateAndDestroyContext()
@@ -41,10 +54,23 @@ class NativeAPITest
     {
         var context = NativeMethods.ContextCreate(0);
         var peer = NativeMethods.ContextCreatePeerConnection(context);
+        var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+        NativeMethods.ContextDeleteMediaStream(context, stream);
+        NativeMethods.ContextDeletePeerConnection(context, peer);
+        NativeMethods.ContextDestroy(0);
+    }
+    [Test]
+    public void CreateAndDeleteVideoTrack()
+    {
+        var context = NativeMethods.ContextCreate(0);
+        var peer = NativeMethods.ContextCreatePeerConnection(context);
         var width = 1280;
         var height = 720;
-        var renderTexture = new UnityEngine.RenderTexture(width, height, 0, UnityEngine.RenderTextureFormat.BGRA32);
-        var stream = NativeMethods.CreateMediaStream(context, "MediaStream");
+        var rt = new UnityEngine.RenderTexture(width, height, 0, UnityEngine.RenderTextureFormat.BGRA32);
+        var label = "Test";
+        var bitRate = 10000000;
+        var track = NativeMethods.ContextCreateVideoTrack(context, label, rt.GetNativeTexturePtr(), width, height, bitRate);
+        NativeMethods.ContextDeleteMediaStreamTrack(context, track);
         NativeMethods.ContextDeletePeerConnection(context, peer);
         NativeMethods.ContextDestroy(0);
     }

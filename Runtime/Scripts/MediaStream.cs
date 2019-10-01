@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
-    public class MediaStream
+    public class MediaStream : IDisposable
     {
         private IntPtr ptrNativeObj;
         private string id;
@@ -14,11 +14,14 @@ namespace Unity.WebRTC
         private static int sMediaStreamCount = 0;
         public string Id { get => id; private set { } }
 
+        private bool disposed;
+
         public MediaStream()
         {
             sMediaStreamCount++;
             id = "MediaStream" + sMediaStreamCount;
             ptrNativeObj = WebRTC.Context.CreateMediaStream(id);
+            WebRTC.Table.Add(ptrNativeObj, this);
         }
 
         public MediaStream(MediaStreamTrack[] tracks)
@@ -26,11 +29,32 @@ namespace Unity.WebRTC
             sMediaStreamCount++;
             id = "MediaStream" + sMediaStreamCount;
             ptrNativeObj = WebRTC.Context.CreateMediaStream(id);
+            WebRTC.Table.Add(ptrNativeObj, this);
 
             foreach (var t in tracks)
             {
                 AddTrack(t);
             }
+        }
+
+        ~MediaStream()
+        {
+            this.Dispose();
+            WebRTC.Table.Remove(ptrNativeObj);
+        }
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if (ptrNativeObj != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Context.DeleteMediaStream(ptrNativeObj);
+                ptrNativeObj = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         public void AddTrack(MediaStreamTrack track)
@@ -57,7 +81,7 @@ namespace Unity.WebRTC
         }
         public static void AddCleanerCallback(GameObject obj, Action callback)
         {
-            Cleaner cleaner = obj.GetComponent<Cleaner>();
+            var cleaner = obj.GetComponent<Cleaner>();
             if (!cleaner)
             {
                 cleaner = obj.AddComponent<Cleaner>();

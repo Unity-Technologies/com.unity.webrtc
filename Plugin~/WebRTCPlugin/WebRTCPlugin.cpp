@@ -34,27 +34,36 @@ extern "C"
         return ContextManager::GetInstance()->GetCodecInitializationResult();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* CreateMediaStream(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* label)
     {
         return context->CreateMediaStream(label);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* CreateVideoTrack(Context* context, const char* label, UnityFrameBuffer* rt, int32 width, int32 height, int32 bitRate)
+    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStream(Context* context, webrtc::MediaStreamInterface* stream)
+    {
+        return context->DeleteMediaStream(stream);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, UnityFrameBuffer* rt, int32 width, int32 height, int32 bitRate)
     {
         return context->CreateVideoTrack(label, rt, width, height, bitRate);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* CreateAudioTrack(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
     {
         return context->CreateAudioTrack(label);
     }
 
-    //TODO: Multi-track support
-    UNITY_INTERFACE_EXPORT void StopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextDeleteMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
     {
-        context->StopCapturer();
+        context->DeleteMediaStreamTrack(track);
     }
 
+    //TODO: Multi-track support
+    UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    {
+        context->StopMediaStreamTrack(track);
+    }
 
     UNITY_INTERFACE_EXPORT void MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
     {

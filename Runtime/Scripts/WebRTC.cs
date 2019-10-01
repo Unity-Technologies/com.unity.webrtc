@@ -343,7 +343,7 @@ namespace Unity.WebRTC
     internal static class NativeMethods
     {
         [DllImport(WebRTC.Lib)]
-        public static extern void StopMediaStreamTrack(IntPtr context, IntPtr track);
+        public static extern void ContextStopMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult GetCodecInitializationResult();
         [DllImport(WebRTC.Lib)]
@@ -421,11 +421,15 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnClose(IntPtr dc, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
+        public static extern IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CreateVideoTrack(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, IntPtr rt, int width, int height, int bitRate);
+        public static extern void ContextDeleteMediaStream(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CreateAudioTrack(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
+        public static extern IntPtr ContextCreateVideoTrack(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, IntPtr rt, int width, int height, int bitRate);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextCreateAudioTrack(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextDeleteMediaStreamTrack(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]

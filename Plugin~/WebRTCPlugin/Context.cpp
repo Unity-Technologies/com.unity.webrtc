@@ -329,8 +329,9 @@ namespace WebRTC
         }
     }
 
-    void Context::StopCapturer()
+    void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
+        //TODO::
         for (std::list<UnityVideoCapturer*>::iterator it = nvVideoCapturerList.begin(); it != nvVideoCapturerList.end(); ++it)
         {
             (*it)->Stop();
@@ -347,6 +348,15 @@ namespace WebRTC
         return mediaStreamMap[stream_id];
     }
 
+    void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
+    {
+        auto stream_id = stream->id();
+        if (mediaStreamMap.count(stream_id) > 0)
+        {
+            mediaStreamMap.erase(stream_id);
+        }
+    }
+
     webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, UnityFrameBuffer* frameBuffer, int32 width, int32 height, int32 bitRate)
     {
         UnityEncoder* pUnityEncoder = pDummyVideoEncoderFactory->CreatePlatformEncoder(WebRTC::Nvidia, width, height, bitRate);
@@ -358,9 +368,10 @@ namespace WebRTC
         pUnityVideoCapturer->unityRT = frameBuffer;
         pUnityVideoCapturer->StartEncoder();
 
+        // TODO:: Create dictionary to impletement StopMediaStreamTrack API
         nvVideoCapturerList.push_back(pUnityVideoCapturer);
         mediaSteamTrackList.push_back(videoTrack);
-        return videoTrack;
+        return videoTrack.get();
     }
 
     webrtc::MediaStreamTrackInterface* Context::CreateAudioTrack(const std::string& label)
@@ -373,7 +384,12 @@ namespace WebRTC
         //TODO: label and stream id should be maintained in some way for multi-stream
         auto audioTrack = peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions));
         mediaSteamTrackList.push_back(audioTrack);
-        return audioTrack;
+        return audioTrack.get();
+    }
+
+    void Context::DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
+    {
+        mediaSteamTrackList.remove_if([&](webrtc::MediaStreamTrackInterface* _track) { return track == _track; });
     }
 
     DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)

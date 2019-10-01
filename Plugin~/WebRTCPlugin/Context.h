@@ -41,15 +41,17 @@ namespace WebRTC
     public:
         explicit Context(int uid = -1);
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& stream_id);
+        void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, UnityFrameBuffer* frameBuffer, int32 width, int32 height, int32 bitRate);
         webrtc::MediaStreamTrackInterface* CreateAudioTrack(const std::string& label);
+        void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         ~Context();
 
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
         void EncodeFrame();
-        void StopCapturer();
+        void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void ProcessAudioData(const float* data, int32 size) { audioDevice->ProcessAudioData(data, size); }
 
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
