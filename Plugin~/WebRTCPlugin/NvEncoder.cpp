@@ -6,29 +6,55 @@
 
 namespace WebRTC
 {
-    NvEncoder::NvEncoder(int width, int height) :width(width), height(height)
+    std::list<NvEncoder::EncoderInputTexture*> NvEncoder::nvEncoderInputTextureList;
+
+    NvEncoder::NvEncoder()
     {
-        LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
-        checkf(g_D3D11Device != nullptr, "D3D11Device is invalid");
-        checkf(width > 0 && height > 0, "Invalid width or height!");
-        bool result = true;
+        if (pEncoderInterface == nullptr)
+        {
+            bool result = true;
 #pragma region open an encode session
-        //open an encode session
-        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
-        openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
-        openEncdoeSessionExParams.device = g_D3D11Device;
-        openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
-        openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
-        result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
-        checkf(result, "Unable to open NvEnc encode session");
-        LogPrint(StringFormat("OpenEncodeSession Error is %d", errorCode).c_str());
-#pragma endregion
+            //open an encode session
+            NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
+            openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
+            openEncdoeSessionExParams.device = g_D3D11Device;
+            openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
+            openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
+            result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
+            checkf(result, "Unable to open NvEnc encode session");
+            LogPrint(StringFormat("OpenEncodeSession Error is %d", errorCode).c_str());
+#pragma endregion    
+        }
+    }
+
+    NvEncoder::~NvEncoder()
+    {
+        ReleaseEncoderResources();
+        if (pEncoderInterface)
+        {
+            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface));
+            checkf(result, "Failed to destroy NV encoder interface");
+            pEncoderInterface = nullptr;
+        }
+    }
+
+    void NvEncoder::InitEncoder(int width, int height, int _bitRate)
+    {
+        encodeWidth = width;
+        encodeHeight = height;
+        bitRate = _bitRate;
+
+        LogPrint(StringFormat("width is %d, height is %d", encodeWidth, encodeHeight).c_str());
+        checkf(g_D3D11Device != nullptr, "D3D11Device is invalid");
+        checkf(encodeWidth > 0 && encodeHeight > 0, "Invalid width or height!");
+
+        bool result = true;
 #pragma region set initialization parameters
         nvEncInitializeParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
-        nvEncInitializeParams.encodeWidth = width;
-        nvEncInitializeParams.encodeHeight = height;
-        nvEncInitializeParams.darWidth = width;
-        nvEncInitializeParams.darHeight = height;
+        nvEncInitializeParams.encodeWidth = encodeWidth;
+        nvEncInitializeParams.encodeHeight = encodeHeight;
+        nvEncInitializeParams.darWidth = encodeWidth;
+        nvEncInitializeParams.darHeight = encodeHeight;
         nvEncInitializeParams.encodeGUID = NV_ENC_CODEC_H264_GUID;
         nvEncInitializeParams.presetGUID = NV_ENC_PRESET_LOW_LATENCY_HQ_GUID;
         nvEncInitializeParams.frameRateNum = frameRate;
@@ -37,8 +63,8 @@ namespace WebRTC
         nvEncInitializeParams.reportSliceOffsets = 0;
         nvEncInitializeParams.enableSubFrameWrite = 0;
         nvEncInitializeParams.encodeConfig = &nvEncConfig;
-        nvEncInitializeParams.maxEncodeWidth = 3840;
-        nvEncInitializeParams.maxEncodeHeight = 2160;
+        nvEncInitializeParams.maxEncodeWidth = encodeWidth;//3840;
+        nvEncInitializeParams.maxEncodeHeight = encodeHeight;//2160;
 #pragma endregion
 #pragma region get preset ocnfig and set it
         NV_ENC_PRESET_CONFIG presetConfig = { 0 };
@@ -74,20 +100,10 @@ namespace WebRTC
 #pragma endregion
         InitEncoderResources();
         isNvEncoderSupported = true;
-    }
-    NvEncoder::~NvEncoder()
-    {
-        ReleaseEncoderResources();
-        if (pEncoderInterface)
-        {
-            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface));
-            checkf(result, "Failed to destroy NV encoder interface");
-            pEncoderInterface = nullptr;
-        }
-     
+        isInitialize = true;
     }
 
-    void NvEncoder::UpdateSettings()
+    void NvEncoder::UpdateSettings(int width, int height)
     {
         bool settingChanged = false;
         if (nvEncConfig.rcParams.averageBitRate != bitRate)
@@ -120,11 +136,13 @@ namespace WebRTC
             lastBitRate = bitRate;
         }
     }
+
     //entry for encoding a frame
-    void NvEncoder::EncodeFrame()
+    void NvEncoder::EncodeFrame(int width, int height)
     {
-        UpdateSettings();
+        UpdateSettings(width, height);
         uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;
+
         Frame& frame = bufferedFrames[bufferIndexToWrite];
 #pragma region set frame params
         //no free buffer, skip this frame
@@ -140,8 +158,8 @@ namespace WebRTC
         picParams.pictureStruct = NV_ENC_PIC_STRUCT_FRAME;
         picParams.inputBuffer = frame.inputFrame.mappedResource;
         picParams.bufferFmt = frame.inputFrame.bufferFormat;
-        picParams.inputWidth = nvEncInitializeParams.encodeWidth;
-        picParams.inputHeight = nvEncInitializeParams.encodeHeight;
+        picParams.inputWidth = width;
+        picParams.inputHeight = height;
         picParams.outputBitstream = frame.outputFrame;
         picParams.inputTimeStamp = frameCount;
 #pragma endregion
@@ -151,8 +169,10 @@ namespace WebRTC
             picParams.encodePicFlags |= NV_ENC_PIC_FLAG_FORCEIDR;
         }
         isIdrFrame = false;
+
         bool result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncEncodePicture(pEncoderInterface, &picParams)));
         checkf(result, StringFormat("Failed to encode frame, error is %d", errorCode).c_str());
+
 #pragma endregion
         ProcessEncodedFrame(frame);
         frameCount++;
@@ -166,12 +186,15 @@ namespace WebRTC
         {
             return;
         }
+
         frame.isEncoding = false;
+
 #pragma region retrieve encoded frame from output buffer
         NV_ENC_LOCK_BITSTREAM lockBitStream = { 0 };
         lockBitStream.version = NV_ENC_LOCK_BITSTREAM_VER;
         lockBitStream.outputBitstream = frame.outputFrame;
         lockBitStream.doNotWait = nvEncInitializeParams.enableEncodeAsync;
+
         bool result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncLockBitstream(pEncoderInterface, &lockBitStream)));
         checkf(result, StringFormat("Failed to lock bit stream, error is %d", errorCode).c_str());
         if (lockBitStream.bitstreamSizeInBytes)
@@ -184,15 +207,15 @@ namespace WebRTC
         checkf(result, StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
         frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
-        CaptureFrame(frame.encodedFrame);
+        captureFrame(frame.encodedFrame);
     }
 
     ID3D11Texture2D* NvEncoder::AllocateInputBuffers()
     {
         ID3D11Texture2D* inputTextures = nullptr;
         D3D11_TEXTURE2D_DESC desc = { 0 };
-        desc.Width = width;
-        desc.Height = height;
+        desc.Width = encodeWidth;
+        desc.Height = encodeHeight;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -200,7 +223,7 @@ namespace WebRTC
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = D3D11_BIND_RENDER_TARGET;
         desc.CPUAccessFlags = 0;
-        g_D3D11Device->CreateTexture2D(&desc, NULL, &inputTextures);
+        HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &inputTextures);
         return inputTextures;
     }
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(void *buffer)
@@ -212,8 +235,8 @@ namespace WebRTC
 
         if (!registerResource.resourceToRegister)
             LogPrint("resource is not initialized");
-        registerResource.width = width;
-        registerResource.height = height;
+        registerResource.width = encodeWidth;
+        registerResource.height = encodeHeight;
         LogPrint(StringFormat("nvEncRegisterResource: width is %d, height is %d", registerResource.width, registerResource.height).c_str());
         registerResource.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
         checkf(NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource))),
@@ -237,13 +260,39 @@ namespace WebRTC
             StringFormat("nvEncCreateBitstreamBuffer error is %d", errorCode).c_str());
         return createBitstreamBuffer.bitstreamBuffer;
     }
+
+
+    void NvEncoder::DestroyEncoderTexture()
+    {
+        for (std::list<EncoderInputTexture*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
+        {
+            delete (*it);
+        }
+        nvEncoderInputTextureList.clear();
+    }
+
+    UnityFrameBuffer* NvEncoder::getEncoderTexture(int width, int height)
+    {
+        for (std::list<EncoderInputTexture*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
+        {
+            if ((*it)->width == width && (*it)->height == height)
+            {
+                return (*it)->texture;
+            }
+        }
+
+        EncoderInputTexture* pEncoderInputTexture = new EncoderInputTexture(width, height);
+        nvEncoderInputTextureList.push_back(pEncoderInputTexture);
+        return pEncoderInputTexture->texture;
+    }
+
     void NvEncoder::InitEncoderResources()
     {
-        for (uint32 i = 0; i < bufferedFrameNum; i++)
+        nvEncoderTexture = getEncoderTexture(encodeWidth, encodeHeight);
+        for (int i = 0; i < bufferedFrameNum; i++)
         {
-            renderTextures[i] = AllocateInputBuffers();
             Frame& frame = bufferedFrames[i];
-            frame.inputFrame.registeredResource = RegisterResource(renderTextures[i]);
+            frame.inputFrame.registeredResource = RegisterResource(nvEncoderTexture);
             frame.inputFrame.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
             MapResources(frame.inputFrame);
             frame.outputFrame = InitializeBitstreamBuffer();
@@ -263,10 +312,13 @@ namespace WebRTC
     {
         for (Frame& frame : bufferedFrames)
         {
-            ReleaseFrameInputBuffer(frame);
-            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame));
-            checkf(result, "Failed to destroy output buffer bit stream");
-            frame.outputFrame = nullptr;
+            if (frame.outputFrame != nullptr)
+            {
+                ReleaseFrameInputBuffer(frame);
+                bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame));
+                checkf(result, "Failed to destroy output buffer bit stream");
+                frame.outputFrame = nullptr;
+            }
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿#pragma once
+#include "UnityEncoder.h"
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "UnityVideoCapturer.h"
+#include "NvEncoder.h"
 
 namespace WebRTC
 {
@@ -38,16 +40,16 @@ namespace WebRTC
     {
     public:
         explicit Context(int uid = -1);
-        webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer);
-        webrtc::MediaStreamInterface* CreateAudioStream();
+        webrtc::MediaStreamInterface* CreateMediaStream(const std::string& stream_id);
+        webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, UnityFrameBuffer* frameBuffer, int32 width, int32 height, int32 bitRate);
+        webrtc::MediaStreamTrackInterface* CreateAudioTrack(const std::string& label);
         ~Context();
 
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
-        void InitializeEncoder(int32 width, int32 height) { nvVideoCapturer->InitializeEncoder(width, height); }
-        void EncodeFrame() { nvVideoCapturer->EncodeVideoData(); }
-        void StopCapturer() { nvVideoCapturer->Stop(); }
+        void EncodeFrame();
+        void StopCapturer();
         void ProcessAudioData(const float* data, int32 size) { audioDevice->ProcessAudioData(data, size); }
 
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
@@ -61,14 +63,12 @@ namespace WebRTC
         std::unique_ptr<rtc::Thread> signalingThread;
         std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
-        UnityVideoCapturer* nvVideoCapturer;
-        std::unique_ptr<UnityVideoCapturer> nvVideoCapturerUnique;
+        DummyVideoEncoderFactory* pDummyVideoEncoderFactory;
+        std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
+        std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> mediaSteamTrackList;
+
+        std::list<UnityVideoCapturer*> nvVideoCapturerList;
         rtc::scoped_refptr<DummyAudioDevice> audioDevice;
-        rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
-        rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
-        //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
-        std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
-        std::map<UnityFrameBuffer*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver
