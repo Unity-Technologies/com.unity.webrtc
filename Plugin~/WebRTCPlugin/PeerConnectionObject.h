@@ -5,23 +5,23 @@
 
 namespace WebRTC
 {
-    using DelegateCreateSDSuccess = void(*)(RTCSdpType, const char*);
-    using DelegateCreateSDFailure = void(*)();
-    using DelegateSetSDSuccess = void(*)();
-    using DelegateSetSDFailure = void(*)();
-    using DelegateLocalSdpReady = void(*)(const char*, const char*);
-    using DelegateIceCandidate = void(*)(const char*, const char*, const int);
-    using DelegateOnIceConnectionChange = void(*)(webrtc::PeerConnectionInterface::IceConnectionState);
-    using DelegateOnDataChannel = void(*)(DataChannelObject*);
-    using DelegateOnRenegotiationNeeded = void(*)();
-    using DelegateOnTrack = void(*)(webrtc::RtpTransceiverInterface*);
+    using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
+    using DelegateCreateSDFailure = void(*)(PeerConnectionObject*);
+    using DelegateSetSDSuccess = void(*)(PeerConnectionObject*);
+    using DelegateSetSDFailure = void(*)(PeerConnectionObject*);
+    using DelegateLocalSdpReady = void(*)(PeerConnectionObject*, const char*, const char*);
+    using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
+    using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);
+    using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
+    using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
+    using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
 
     class PeerConnectionObject
         : public webrtc::CreateSessionDescriptionObserver
         , public webrtc::PeerConnectionObserver
     {
     public:
-        PeerConnectionObject(int id);
+        PeerConnectionObject(Context& context);
         ~PeerConnectionObject();
 
         void Close();
@@ -110,8 +110,6 @@ namespace WebRTC
         DelegateOnTrack onTrack;
         rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection;
     private:
-        std::map<int, DataChannelObject*> localDataChannels;
-        std::map<int, DataChannelObject*> remoteDataChannels;
-        int32 id;
+        Context& context;
     };
 }

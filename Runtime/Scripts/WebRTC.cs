@@ -227,7 +227,7 @@ namespace Unity.WebRTC
             var result = Context.GetCodecInitializationResult();
             if (result != CodecInitializationResult.Success)
             {
-                switch(result)
+                switch (result)
                 {
                     case CodecInitializationResult.DriverNotInstalled:
                         Debug.LogError("[WebRTC] The hardware codec driver not installed");
@@ -248,12 +248,12 @@ namespace Unity.WebRTC
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
             var flipShader = Resources.Load<Shader>("Flip");
-            if(flipShader != null)
+            if (flipShader != null)
             {
-                flipMat = new Material(flipShader); 
+                flipMat = new Material(flipShader);
             }
         }
-        public static IEnumerator Update() 
+        public static IEnumerator Update()
         {
             while (true)
             {
@@ -262,7 +262,7 @@ namespace Unity.WebRTC
                 if (CameraExtension.started)
                 {
                     //Blit is for DirectX Rendering API Only
-                    foreach(var rts in CameraExtension.camCopyRts)
+                    foreach (var rts in CameraExtension.camCopyRts)
                     {
                         Graphics.Blit(rts[0], rts[1], flipMat);
                     }
@@ -274,10 +274,12 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
-            s_context.Destroy();
             NativeMethods.RegisterDebugLog(null);
+            s_context.Dispose();
+            s_context = null;
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
             Debug.Log(str);
@@ -285,6 +287,7 @@ namespace Unity.WebRTC
 
         internal static Context Context { get { return s_context; } }
         internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
+        internal static Hashtable Table { get { return s_context.table; } }
 
         public static bool HWEncoderSupport
         {
@@ -303,36 +306,30 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDSuccess(RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
+    internal delegate void DelegateCreateSDSuccess(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDFailure();
+    internal delegate void DelegateCreateSDFailure(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateSetSDSuccess();
+    internal delegate void DelegateSetSDSuccess(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateSetSDFailure();
+    internal delegate void DelegateSetSDFailure(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
+    internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnIceCandidate([MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
+    internal delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
-    public delegate void DelegateOnNegotiationNeeded();
+    internal delegate void DelegateNativeOnNegotiationNeeded(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateNativeOnTrack(IntPtr rtpTransceiverInterface);
+    internal delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnTrack(RTCTrackEvent e);
+    internal delegate void DelegateNativeOnDataChannel(IntPtr ptr, IntPtr ptrChannel);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegatePeerConnectionCallbackEvent(RTCPeerConnectionEventType type, [MarshalAs(UnmanagedType.LPStr, SizeConst = 1024)] string str);
+    internal delegate void DelegateNativeOnMessage(IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] bytes, int size);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeOnDataChannel(IntPtr ptr);
+    internal delegate void DelegateNativeOnOpen(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeOnMessage([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] bytes, int size);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnOpen();
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DelegateOnClose();
+    internal delegate void DelegateNativeOnClose(IntPtr ptr);
 
     internal static class NativeMethods
     {
@@ -343,21 +340,23 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]
-        public static extern Context ContextCreate(int uid);
+        public static extern IntPtr ContextCreate(int uid);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDestroy(int uid);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreatePeerConnection(IntPtr ptr, int id);
+        public static extern IntPtr ContextCreatePeerConnection(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreatePeerConnectionWithConfig(IntPtr ptr, int id, string conf);
+        public static extern IntPtr ContextCreatePeerConnectionWithConfig(IntPtr ptr, string conf);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextDeletePeerConnection(IntPtr ptr, int id);
+        public static extern void ContextDeletePeerConnection(IntPtr ptr, IntPtr ptrPeerConnection);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionClose(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetConfiguration(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string conf);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionCreateDataChannel(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
+        public static extern IntPtr ContextCreateDataChannel(IntPtr ptr, IntPtr ptrPeer, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetConfiguration(IntPtr ptr, ref IntPtr conf, ref int len);
         [DllImport(WebRTC.Lib)]
@@ -369,7 +368,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackSetSD(IntPtr ptr, DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateOnIceConnectionChange callback);
+        public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]
@@ -391,7 +390,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnDataChannel(IntPtr ptr, DelegateNativeOnDataChannel callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterOnRenegotiationNeeded(IntPtr ptr, DelegateOnNegotiationNeeded callback);
+        public static extern void PeerConnectionRegisterOnRenegotiationNeeded(IntPtr ptr, DelegateNativeOnNegotiationNeeded callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnTrack(IntPtr ptr, DelegateNativeOnTrack rtpTransceiverInterface);
         [DllImport(WebRTC.Lib)]
@@ -409,9 +408,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnMessage(IntPtr ptr, DelegateNativeOnMessage callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void DataChannelRegisterOnOpen(IntPtr ptr, DelegateOnOpen callback);
+        public static extern void DataChannelRegisterOnOpen(IntPtr ptr, DelegateNativeOnOpen callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateOnClose callback);
+        public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CaptureVideoStream(IntPtr context, IntPtr rt, int width, int height);
         [DllImport(WebRTC.Lib)]
@@ -442,21 +441,6 @@ namespace Unity.WebRTC
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
-    }
-
-    internal struct Context
-    {
-        internal IntPtr self;
-        public bool IsNull { get { return self == IntPtr.Zero; } }
-        public static implicit operator bool(Context v) { return v.self != IntPtr.Zero; }
-        public static bool ToBool(Context v) { return v; }
-        public static Context Create(int uid = 0) { return NativeMethods.ContextCreate(uid); }
-        public static CodecInitializationResult GetCodecInitializationResult() { return NativeMethods.GetCodecInitializationResult(); }
-        public void Destroy(int uid = 0) { NativeMethods.ContextDestroy(uid); self = IntPtr.Zero; }
-        public IntPtr CaptureVideoStream(IntPtr rt, int width, int height) { return NativeMethods.CaptureVideoStream(self, rt, width, height); }
-        public IntPtr CaptureAudioStream() { return NativeMethods.CaptureAudioStream(self); }
-        public IntPtr GetRenderEventFunc() { return NativeMethods.GetRenderEventFunc(self); }
-        public void StopMediaStreamTrack(IntPtr track) { NativeMethods.StopMediaStreamTrack(self, track); }
     }
 }
 

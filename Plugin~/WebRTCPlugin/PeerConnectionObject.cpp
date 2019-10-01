@@ -4,7 +4,7 @@
 
 namespace WebRTC
 {
-    PeerConnectionObject::PeerConnectionObject(int id) : id(id) {}
+    PeerConnectionObject::PeerConnectionObject(Context& context) : context(context) {}
 
     PeerConnectionObject::~PeerConnectionObject()
     {
@@ -26,9 +26,9 @@ namespace WebRTC
         connection.release();
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection(int id)
+    PeerConnectionObject* Context::CreatePeerConnection()
     {
-        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(id);
+        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
         _config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
         obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
@@ -37,14 +37,14 @@ namespace WebRTC
         {
             return nullptr;
         }
-        
-        clients[id] = std::move(obj);
-        return clients[id].get();
+        auto ptr = obj.get();
+        clients[ptr] = std::move(obj);
+        return clients[ptr].get();
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection(int id, const std::string& conf)
+    PeerConnectionObject* Context::CreatePeerConnection(const std::string& conf)
     {
-        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(id);
+        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
         Convert(conf, _config);
         obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
@@ -52,8 +52,9 @@ namespace WebRTC
         {
             return nullptr;
         }
-        clients[id] = std::move(obj);
-        return clients[id].get();
+        auto ptr = obj.get();
+        clients[ptr] = std::move(obj);
+        return clients[ptr].get();
     }
 
     void PeerConnectionObject::OnSuccess(webrtc::SessionDescriptionInterface* desc)
@@ -63,7 +64,7 @@ namespace WebRTC
         auto type = ConvertSdpType(desc->GetType());
         if (onCreateSDSuccess != nullptr)
         {
-            onCreateSDSuccess(type, out.c_str());
+            onCreateSDSuccess(this, type, out.c_str());
         }
     }
 
@@ -73,18 +74,18 @@ namespace WebRTC
         //RTCError _error = { RTCErrorDetailType::IdpTimeout };
         if (onCreateSDFailure != nullptr)
         {
-            onCreateSDFailure();
+            onCreateSDFailure(this);
         }
     }
 
-    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> remoteDataChannel)
+    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
     {
-        auto remoteDataChannelObj = new DataChannelObject(remoteDataChannel, *this);
-        int id = remoteDataChannelObj->GetID();
-        remoteDataChannels[id] = remoteDataChannelObj;
+        auto obj = std::make_unique<DataChannelObject>(channel, *this);
+        auto ptr = obj.get();
+        context.dataChannels[ptr] = std::move(obj);
         if (onDataChannel != nullptr)
         {
-            onDataChannel(remoteDataChannels[id]);
+            onDataChannel(this, ptr);
         }
     }
     void PeerConnectionObject::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
@@ -97,7 +98,7 @@ namespace WebRTC
         }
         if (onIceCandidate != nullptr)
         {
-            onIceCandidate(out.c_str(), candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
+            onIceCandidate(this, out.c_str(), candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
         }
     }
 
@@ -105,7 +106,7 @@ namespace WebRTC
     {
         if (onRenegotiationNeeded != nullptr)
         {
-            onRenegotiationNeeded();
+            onRenegotiationNeeded(this);
         }
     }
 
@@ -113,7 +114,7 @@ namespace WebRTC
     {
         if (onTrack != nullptr)
         {
-            onTrack(transceiver.get());
+            onTrack(this, transceiver.get());
         }
     }
     // Called any time the IceConnectionState changes.
@@ -121,7 +122,7 @@ namespace WebRTC
     {
         if (onIceConnectionChange != nullptr)
         {
-            onIceConnectionChange(new_state);
+            onIceConnectionChange(this, new_state);
         }
     }
     // Called any time the IceGatheringState changes.
@@ -163,7 +164,7 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description);
             return;
         }
-        auto observer = PeerSDPObserver::Create(this->onSetSDSuccess, this->onSetSDFailure);
+        auto observer = PeerSDPObserver::Create(this);
         connection->SetLocalDescription(observer, _desc.release());
     }
 
@@ -177,7 +178,7 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description);
             return;
         }
-        auto observer = PeerSDPObserver::Create(this->onSetSDSuccess, this->onSetSDFailure);
+        auto observer = PeerSDPObserver::Create(this);
         connection->SetRemoteDescription(observer, _desc.release());
     }
 
@@ -254,22 +255,6 @@ namespace WebRTC
         desc.sdp[out.size()] = '\0';
     }
 
-    DataChannelObject* PeerConnectionObject::CreateDataChannel(const char* label, const RTCDataChannelInit& options)
-    {
-        webrtc::DataChannelInit config;
-        config.reliable = options.reliable;
-        config.ordered = options.ordered;
-        config.maxRetransmitTime = options.maxRetransmitTime;
-        config.maxRetransmits = options.maxRetransmits;
-        config.protocol = options.protocol;
-        config.negotiated = options.negotiated;
-
-        auto channel = connection->CreateDataChannel(label, &config);
-        auto dataChannelObj = new DataChannelObject(channel, *this);
-        int id = dataChannelObj->GetID();
-        localDataChannels[id] = dataChannelObj;
-        return localDataChannels[id];
-    }
 #pragma warning(push)
 #pragma warning(disable: 4715)
     RTCIceConnectionState PeerConnectionObject::GetIceCandidateState()

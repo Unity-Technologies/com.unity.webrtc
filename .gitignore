@@ -212,6 +212,7 @@ _pkginfo.txt
 ClientBin/
 Bin~/
 upm-ci~/
+Plugin~/webrtc/*
 *.dbmdl
 *.dbproj.schemaview
 *.jfm

@@ -346,27 +346,45 @@ namespace WebRTC
         return audioStream.get();
     }
 
-    PeerSDPObserver* PeerSDPObserver::Create(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
+    DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)
+    {
+        webrtc::DataChannelInit config;
+        config.reliable = options.reliable;
+        config.ordered = options.ordered;
+        config.maxRetransmitTime = options.maxRetransmitTime;
+        config.maxRetransmits = options.maxRetransmits;
+        config.protocol = options.protocol;
+        config.negotiated = options.negotiated;
+
+        auto channel = obj->connection->CreateDataChannel(label, &config);
+        auto dataChannelObj = std::make_unique<DataChannelObject>(channel, *obj);
+        auto ptr = dataChannelObj.get();
+        dataChannels[ptr] = std::move(dataChannelObj);
+        return ptr;
+    }
+
+    void Context::DeleteDataChannel(DataChannelObject* obj)
+    {
+        if (dataChannels.count(obj) > 0)
+        {
+            dataChannels.erase(obj);
+        }
+    }
+
+    PeerSDPObserver* PeerSDPObserver::Create(PeerConnectionObject* obj)
     {
         auto observer = new rtc::RefCountedObject<PeerSDPObserver>();
-        observer->onSuccess = onSuccess;
-        observer->onFailure = onFailure;
+        observer->m_obj = obj;
         return observer;
     }
 
     void PeerSDPObserver::OnSuccess()
     {
-        if (onSuccess != nullptr)
-        {
-            onSuccess();
-        }
+        m_obj->onSetSDSuccess(m_obj);
     }
 
     void PeerSDPObserver::OnFailure(const std::string& error)
     {
-        if (onFailure != nullptr)
-        {
-            onFailure();
-        }
+        m_obj->onSetSDFailure(m_obj);
     }
 }
