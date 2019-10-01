@@ -121,4 +121,45 @@ class PeerConnectionTest
         Assert.False(op2.isError);
         peer.Close();
     }
+
+    [UnityTest]
+    [Timeout(5000)]
+    [Category("PeerConnection")]
+    public IEnumerator PeerConnection_CreateDataChannel()
+    {
+        RTCConfiguration config = default;
+        config.iceServers = new RTCIceServer[]
+        {
+            new RTCIceServer
+            {
+                urls = new string[] { "stun:stun.l.google.com:19302" }
+            }
+        };
+        var peer1 = new RTCPeerConnection(ref config);
+        var peer2 = new RTCPeerConnection(ref config);
+
+        peer1.OnIceCandidate = new DelegateOnIceCandidate(candidate => { peer2.AddIceCandidate(ref candidate); });
+        peer2.OnIceCandidate = new DelegateOnIceCandidate(candidate => { peer1.AddIceCandidate(ref candidate); });
+
+        var conf = new RTCDataChannelInit(true);
+        var channel1 = peer1.CreateDataChannel("data", ref conf);
+
+        RTCOfferOptions options1 = default;
+        RTCAnswerOptions options2 = default;
+        var op1 = peer1.CreateOffer(ref options1);
+        yield return op1;
+        var op2 = peer1.SetLocalDescription(ref op1.desc);
+        yield return op2;
+        var op3 = peer2.SetRemoteDescription(ref op1.desc);
+        yield return op3;
+        var op4 = peer2.CreateAnswer(ref options2);
+        yield return op4;
+        var op5 = peer2.SetLocalDescription(ref op4.desc);
+        yield return op5;
+        var op6 = peer1.SetRemoteDescription(ref op4.desc);
+        yield return op6;
+
+        yield return new WaitUntil(() => peer1.IceConnectionState == RTCIceConnectionState.Connected || peer1.IceConnectionState == RTCIceConnectionState.Completed);
+        yield return new WaitUntil(() => peer2.IceConnectionState == RTCIceConnectionState.Connected || peer2.IceConnectionState == RTCIceConnectionState.Completed);
+    }
 }

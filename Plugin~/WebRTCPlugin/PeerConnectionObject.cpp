@@ -82,9 +82,12 @@ namespace WebRTC
     {
         auto obj = std::make_unique<DataChannelObject>(channel, *this);
         auto ptr = obj.get();
-        context.dataChannels[ptr] = std::move(obj);
+
+        // If the callback is not registered by managed side,
+        // datachannel instance is disposed immediately.
         if (onDataChannel != nullptr)
         {
+            context.dataChannels[ptr] = std::move(obj);
             onDataChannel(this, ptr);
         }
     }
