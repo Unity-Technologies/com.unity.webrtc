@@ -151,6 +151,18 @@ namespace WebRTC
         if (connection != nullptr)
         {
             connection->Close();
+
+            //Cleanup delegates/callbacks
+            onCreateSDSuccess = nullptr;
+            onCreateSDFailure = nullptr;
+            onSetSDSuccess = nullptr;
+            onSetSDFailure = nullptr;
+            onLocalSdpReady = nullptr;
+            onIceCandidate = nullptr;
+            onIceConnectionChange = nullptr;
+            onDataChannel = nullptr;
+            onRenegotiationNeeded = nullptr;
+            onTrack = nullptr;
         }
     }
 
