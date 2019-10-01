@@ -70,6 +70,23 @@ class PeerConnectionTest
         Assert.AreEqual(RTCErrorType.None, result);
     }
 
+    [Test]
+    [Category("PeerConnection")]
+    public void PeerConnection_SetCallback()
+    {
+        var peer = new RTCPeerConnection();
+        var config = GetConfiguration();
+        var result = peer.SetConfiguration(ref config);
+
+        var pc1OnIceCandidate = new DelegateOnIceCandidate(candidate => { ; });
+        var pc1OnIceConnectionChange = new DelegateOnIceConnectionChange(candidate => { ; });
+        var pc1OnNegotiationNeeded = new DelegateOnNegotiationNeeded(() => { ; });
+
+        peer.OnIceCandidate = pc1OnIceCandidate;
+        peer.OnIceConnectionChange = pc1OnIceConnectionChange;
+        peer.OnNegotiationNeeded = pc1OnNegotiationNeeded;
+    }
+
     [UnityTest]
     [Category("PeerConnection")]
 

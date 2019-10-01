@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading;
 
 namespace Unity.WebRTC
 {
@@ -7,6 +8,7 @@ namespace Unity.WebRTC
     {
         internal IntPtr ptrNativeObj;
         internal Hashtable table;
+        internal SynchronizationContext syncContext;
 
         private int id;
         private bool disposed;
@@ -37,6 +39,7 @@ namespace Unity.WebRTC
             ptrNativeObj = ptr;
             this.id = id;
             this.table = new Hashtable();
+            this.syncContext = SynchronizationContext.Current;
         }
 
         ~Context()
@@ -58,11 +61,11 @@ namespace Unity.WebRTC
                     disposable.Dispose();
                 }
                 table.Clear();
-
                 NativeMethods.ContextDestroy(id);
                 ptrNativeObj = IntPtr.Zero;
             }
             this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         public static CodecInitializationResult GetCodecInitializationResult()

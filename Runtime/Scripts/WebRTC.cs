@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Collections;
 
@@ -225,7 +224,6 @@ namespace Unity.WebRTC
 
         private static Context s_context;
         private static IntPtr s_renderCallback;
-        private static SynchronizationContext s_syncContext;
         private static Material flipMat;
 
         public static void Initialize()
@@ -254,7 +252,6 @@ namespace Unity.WebRTC
 
             s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.ptrNativeObj);
-            s_syncContext = SynchronizationContext.Current;
             var flipShader = Resources.Load<Shader>("Flip");
             if (flipShader != null)
             {
@@ -283,9 +280,9 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
-            NativeMethods.RegisterDebugLog(null);
             s_context.Dispose();
             s_context = null;
+            NativeMethods.RegisterDebugLog(null);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
@@ -295,7 +292,7 @@ namespace Unity.WebRTC
         }
 
         internal static Context Context { get { return s_context; } }
-        internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
+        internal static SynchronizationContext SyncContext { get { return s_context.syncContext; } }
         internal static Hashtable Table { get { return s_context.table; } }
 
         public static bool HWEncoderSupport
