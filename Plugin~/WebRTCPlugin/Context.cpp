@@ -244,7 +244,7 @@ namespace WebRTC
         }
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
 
-        Json::Value bundle_policy = configJson["bundle_policy"];
+        Json::Value bundle_policy = configJson["bundlePolicy"];
         config.bundle_policy = (webrtc::PeerConnectionInterface::BundlePolicy)bundle_policy.asInt();
     }
 #pragma warning(push)

@@ -37,14 +37,14 @@ class NativeAPITest
         NativeMethods.ContextDestroy(0);
     }
     [Test]
-    public void CreateAndDeleteMediaTrack()
+    public void CreateAndDeleteMediaStream()
     {
         var context = NativeMethods.ContextCreate(0);
         var peer = NativeMethods.ContextCreatePeerConnection(context);
         var width = 1280;
         var height = 720;
         var renderTexture = new UnityEngine.RenderTexture(width, height, 0, UnityEngine.RenderTextureFormat.BGRA32);
-        var stream = NativeMethods.CaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
+        var stream = NativeMethods.CreateMediaStream(context, "MediaStream");
         NativeMethods.ContextDeletePeerConnection(context, peer);
         NativeMethods.ContextDestroy(0);
     }

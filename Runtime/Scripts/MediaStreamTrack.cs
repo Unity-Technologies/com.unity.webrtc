@@ -6,47 +6,52 @@ namespace Unity.WebRTC
 {
     public class MediaStreamTrack
     {
-        internal IntPtr self;
+        internal IntPtr ptrNativeObj;
         private TrackKind kind;
         private string id;
-        private bool enabled;
-        private TrackState readyState;
-        internal Action<MediaStreamTrack> stopTrack;
-        internal Func<MediaStreamTrack, RenderTexture[]> getRts;
+
+        internal MediaStreamTrack(IntPtr ptr)
+        {
+            ptrNativeObj = ptr;
+            kind = NativeMethods.MediaStreamTrackGetKind(ptrNativeObj);
+            id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamTrackGetID(ptrNativeObj));
+        }
 
         public bool Enabled
         {
             get
             {
-                return NativeMethods.MediaStreamTrackGetEnabled(self);
+                return NativeMethods.MediaStreamTrackGetEnabled(ptrNativeObj);
             }
             set
             {
-                NativeMethods.MediaStreamTrackSetEnabled(self, value);
+                NativeMethods.MediaStreamTrackSetEnabled(ptrNativeObj, value);
             }
         }
         public TrackState ReadyState
         {
             get
             {
-                return NativeMethods.MediaStreamTrackGetReadyState(self);
+                return NativeMethods.MediaStreamTrackGetReadyState(ptrNativeObj);
             }
             private set { }
         }
 
         public TrackKind Kind { get => kind; private set { } }
         public string Id { get => id; private set { } }
+    }
 
-        internal MediaStreamTrack(IntPtr ptr)
+    public class VideoStreamTrack : MediaStreamTrack
+    {
+        public VideoStreamTrack(string label, RenderTexture rt, int bitRateMbps = 10000000) : base(WebRTC.Context.CreateVideoTrack(label, rt.GetNativeTexturePtr(), rt.width, rt.height, bitRateMbps))
         {
-            self = ptr;
-            kind = NativeMethods.MediaStreamTrackGetKind(self);
-            id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamTrackGetID(self));
         }
-        //Disassociate track from its source(video or audio), not for destroying the track
-        public void Stop()
+    }
+
+    public class AudioStreamTrack : MediaStreamTrack
+    {
+        public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(label))
         {
-            stopTrack(this);
         }
     }
 

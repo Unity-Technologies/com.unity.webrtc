@@ -5,7 +5,7 @@ namespace Unity.WebRTC
 {
     internal class Context : IDisposable
     {
-        internal IntPtr self;
+        internal IntPtr ptrNativeObj;
         internal Hashtable table;
 
         private int id;
@@ -13,12 +13,12 @@ namespace Unity.WebRTC
 
         public bool IsNull
         {
-            get { return self == IntPtr.Zero; }
+            get { return ptrNativeObj == IntPtr.Zero; }
         }
 
         public static implicit operator bool(Context v)
         {
-            return v.self != IntPtr.Zero;
+            return v.ptrNativeObj != IntPtr.Zero;
         }
 
         public static bool ToBool(Context v)
@@ -34,7 +34,7 @@ namespace Unity.WebRTC
 
         private Context(IntPtr ptr, int id)
         {
-            self = ptr;
+            ptrNativeObj = ptr;
             this.id = id;
             this.table = new Hashtable();
         }
@@ -50,7 +50,7 @@ namespace Unity.WebRTC
             {
                 return;
             }
-            if (self != IntPtr.Zero)
+            if (ptrNativeObj != IntPtr.Zero)
             {
                 foreach(var value in table.Values)
                 {
@@ -60,7 +60,7 @@ namespace Unity.WebRTC
                 table.Clear();
 
                 NativeMethods.ContextDestroy(id);
-                self = IntPtr.Zero;
+                ptrNativeObj = IntPtr.Zero;
             }
             this.disposed = true;
         }
@@ -72,47 +72,51 @@ namespace Unity.WebRTC
 
         public IntPtr CreatePeerConnection()
         {
-            return NativeMethods.ContextCreatePeerConnection(self);
+            return NativeMethods.ContextCreatePeerConnection(ptrNativeObj);
         }
 
         public IntPtr CreatePeerConnection(string conf)
         {
-            return NativeMethods.ContextCreatePeerConnectionWithConfig(self, conf);
+            return NativeMethods.ContextCreatePeerConnectionWithConfig(ptrNativeObj, conf);
         }
 
         public void DeletePeerConnection(IntPtr ptr)
         {
-            NativeMethods.ContextDeletePeerConnection(self, ptr);
+            NativeMethods.ContextDeletePeerConnection(ptrNativeObj, ptr);
         }
 
         public IntPtr CreateDataChannel(IntPtr ptr, string label, ref RTCDataChannelInit options)
         {
-            return NativeMethods.ContextCreateDataChannel(self, ptr, label, ref options);
+            return NativeMethods.ContextCreateDataChannel(ptrNativeObj, ptr, label, ref options);
         }
 
         public void DeleteDataChannel(IntPtr ptr)
         {
-            NativeMethods.ContextDeleteDataChannel(self, ptr);
+            NativeMethods.ContextDeleteDataChannel(ptrNativeObj, ptr);
         }
 
-        public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
+        public IntPtr CreateMediaStream(string label)
         {
-            return NativeMethods.CaptureVideoStream(self, rt, width, height);
+            return NativeMethods.CreateMediaStream(ptrNativeObj, label);
         }
 
-        public IntPtr CaptureAudioStream()
+        public IntPtr CreateVideoTrack(string label, IntPtr rt, int width, int height, int bitRate)
         {
-            return NativeMethods.CaptureAudioStream(self);
+            return NativeMethods.CreateVideoTrack(ptrNativeObj, label, rt, width, height, bitRate);
+        }
+        public IntPtr CreateAudioTrack(string label)
+        {
+            return NativeMethods.CreateAudioTrack(ptrNativeObj, label);
         }
 
         public IntPtr GetRenderEventFunc()
         {
-            return NativeMethods.GetRenderEventFunc(self);
+            return NativeMethods.GetRenderEventFunc(ptrNativeObj);
         }
 
         public void StopMediaStreamTrack(IntPtr track)
         {
-            NativeMethods.StopMediaStreamTrack(self, track);
+            NativeMethods.StopMediaStreamTrack(ptrNativeObj, track);
         }
     }
 }
