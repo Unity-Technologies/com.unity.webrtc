@@ -11,23 +11,20 @@ namespace Unity.WebRTC
         private IntPtr ptrNativeObj;
         private string id;
         protected List<MediaStreamTrack> mediaStreamTrackList = new List<MediaStreamTrack>();
-        private static int sMediaStreamCount = 0;
         public string Id { get => id; private set { } }
 
         private bool disposed;
 
         public MediaStream()
         {
-            sMediaStreamCount++;
-            id = "MediaStream" + sMediaStreamCount;
+            id = Guid.NewGuid().ToString();
             ptrNativeObj = WebRTC.Context.CreateMediaStream(id);
             WebRTC.Table.Add(ptrNativeObj, this);
         }
 
         public MediaStream(MediaStreamTrack[] tracks)
         {
-            sMediaStreamCount++;
-            id = "MediaStream" + sMediaStreamCount;
+            id = Guid.NewGuid().ToString();
             ptrNativeObj = WebRTC.Context.CreateMediaStream(id);
             WebRTC.Table.Add(ptrNativeObj, this);
 
