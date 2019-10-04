@@ -66,6 +66,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onMessage(msg);
             }, null);
@@ -76,6 +77,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onOpen();
             }, null);
@@ -86,6 +88,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onClose();
             }, null);

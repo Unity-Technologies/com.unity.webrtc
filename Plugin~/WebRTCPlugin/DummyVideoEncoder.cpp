@@ -1,7 +1,8 @@
 ﻿#include "pch.h"
 #include "DummyVideoEncoder.h"
-#include "NvVideoCapturer.h"
+#include "UnityVideoCapturer.h"
 #include <algorithm>
+#include "NvEncoder.h"
 
 namespace WebRTC
 {
@@ -67,7 +68,22 @@ namespace WebRTC
         SetRate(allocation.get_sum_kbps() * 1000);
         return 0;
     }
-    DummyVideoEncoderFactory::DummyVideoEncoderFactory(NvVideoCapturer* videoCapturer):capturer(videoCapturer){}
+
+    DummyVideoEncoderFactory::DummyVideoEncoderFactory()
+    {
+
+    }
+
+    void DummyVideoEncoderFactory::Destroy()
+    {
+        for (std::list<UnityEncoder*>::iterator it = unityEncoders.begin(); it != unityEncoders.end(); ++it)
+        {
+            delete *it;
+        }
+        unityEncoders.clear();
+        NvEncoder::DestroyEncoderTexture();
+    }
+
     std::vector<webrtc::SdpVideoFormat> DummyVideoEncoderFactory::GetSupportedFormats() const
     {
         const absl::optional<std::string> profileLevelId =
@@ -87,8 +103,47 @@ namespace WebRTC
         const webrtc::SdpVideoFormat& format)
     {
         auto dummyVideoEncoder = std::make_unique<DummyVideoEncoder>();
-        dummyVideoEncoder->SetKeyFrame.connect(capturer, &NvVideoCapturer::SetKeyFrame);
-        dummyVideoEncoder->SetRate.connect(capturer, &NvVideoCapturer::SetRate);
+
+        {
+            //todo: According to condition of format choose different capturer.
+            //UnityVideoCapturer* pCapturer = *(++capturers.begin());
+
+            //dummyVideoEncoder->SetKeyFrame.connect(pCapturer, &UnityVideoCapturer::SetKeyFrame);
+            //dummyVideoEncoder->SetRate.connect(pCapturer, &UnityVideoCapturer::SetRate);
+        }
+
         return dummyVideoEncoder;
+    }
+
+    UnityEncoder* DummyVideoEncoderFactory::CreatePlatformEncoder(EncoderPlatform platform, int width, int height, int bitRate)
+    {
+        UnityEncoder* pEncoder = NULL;
+        switch (platform)
+        {
+        case WebRTC::Nvidia:
+            pEncoder = new NvEncoder();
+            break;
+        case WebRTC::Amd:
+            break;
+        case WebRTC::Soft:
+            break;
+        default:
+            break;
+        }
+        pEncoder->InitEncoder(width, height, bitRate);
+        unityEncoders.push_back(pEncoder);
+        return pEncoder;
+    }
+
+    UnityEncoder* DummyVideoEncoderFactory::GetPlatformEncoder(EncoderPlatform platform, int width, int height, int bitRate)
+    {
+        for (std::list<UnityEncoder*>::iterator it = unityEncoders.begin(); it != unityEncoders.end(); ++it)
+        {
+            if ((*it)->getEncodeWidth() == width && (*it)->getEncodeHeight() == height && (*it)->getBitRate() == bitRate) {
+                return (*it);
+            }
+        }
+
+        return CreatePlatformEncoder(platform, width, height, bitRate);
     }
 }

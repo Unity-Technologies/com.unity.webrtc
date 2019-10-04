@@ -131,6 +131,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 var candidate = new RTCIceCandidate { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
                 connection.OnIceCandidate(candidate);
@@ -142,6 +143,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnIceConnectionChange(state);
             }, null);
@@ -152,6 +154,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnNegotiationNeeded();
             }, null);
@@ -162,6 +165,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnDataChannel(new RTCDataChannel(ptrChannel, connection));
             }, null);
@@ -172,6 +176,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnTrack(new RTCTrackEvent(rtpTransceiverInterface));
             }, null);
@@ -233,9 +238,9 @@ namespace Unity.WebRTC
             }
         }
 
-        public RTCRtpSender AddTrack(MediaStreamTrack track)
+        public RTCRtpSender AddTrack(MediaStreamTrack track, string mediaStreamId = "unity")
         {
-            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self));
+            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.ptrNativeObj, mediaStreamId));
         }
         public void RemoveTrack(RTCRtpSender sender)
         {
@@ -271,6 +276,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.m_opSessionDesc.desc.sdp = sdp;
                 connection.m_opSessionDesc.desc.type = type;
@@ -283,6 +289,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.m_opSessionDesc.isError = true;
                 connection.m_opSessionDesc.Done();
@@ -315,6 +322,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.m_opSetDesc.Done();
             }, null);
@@ -325,6 +333,7 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.m_opSetDesc.isError = true;
                 connection.m_opSetDesc.Done();
