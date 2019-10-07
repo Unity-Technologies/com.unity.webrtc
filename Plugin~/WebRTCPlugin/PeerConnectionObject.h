@@ -12,6 +12,7 @@ namespace WebRTC
     using DelegateLocalSdpReady = void(*)(PeerConnectionObject*, const char*, const char*);
     using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
     using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);
+    using DelegateOnSignalingChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::SignalingState);
     using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
@@ -48,6 +49,7 @@ namespace WebRTC
         void RegisterLocalSdpReady(DelegateLocalSdpReady callback) { onLocalSdpReady = callback; }
         void RegisterIceCandidate(DelegateIceCandidate callback) { onIceCandidate = callback; }
         void RegisterIceConnectionChange(DelegateOnIceConnectionChange callback) { onIceConnectionChange = callback; };
+        void RegisterSignalingChange(DelegateOnSignalingChange callback) { onSignalingChange = callback; };
         void RegisterOnDataChannel(DelegateOnDataChannel callback) { onDataChannel = callback; }
         void RegisterOnRenegotiationNeeded(DelegateOnRenegotiationNeeded callback) { onRenegotiationNeeded = callback; }
         void RegisterOnTrack(DelegateOnTrack callback) { onTrack = callback; }
@@ -105,6 +107,7 @@ namespace WebRTC
         DelegateLocalSdpReady onLocalSdpReady;
         DelegateIceCandidate onIceCandidate;
         DelegateOnIceConnectionChange onIceConnectionChange;
+        DelegateOnSignalingChange onSignalingChange;
         DelegateOnDataChannel onDataChannel;
         DelegateOnRenegotiationNeeded onRenegotiationNeeded;
         DelegateOnTrack onTrack;

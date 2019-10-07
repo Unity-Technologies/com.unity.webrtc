@@ -137,6 +137,11 @@ namespace WebRTC
     void PeerConnectionObject::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state)
     {
         DebugLog("OnSignalingChange %d", new_state);
+        if (onSignalingChange != nullptr)
+        {
+            onSignalingChange(this, new_state);
+        }
+
     }
 
     void PeerConnectionObject::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream)
@@ -163,6 +168,7 @@ namespace WebRTC
             onLocalSdpReady = nullptr;
             onIceCandidate = nullptr;
             onIceConnectionChange = nullptr;
+            onSignalingChange = nullptr;
             onDataChannel = nullptr;
             onRenegotiationNeeded = nullptr;
             onTrack = nullptr;

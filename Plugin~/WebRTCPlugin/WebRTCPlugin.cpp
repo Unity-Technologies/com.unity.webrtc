@@ -270,6 +270,11 @@ extern "C"
         obj->RegisterIceConnectionChange(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterSignalingChange(PeerConnectionObject* obj, DelegateOnSignalingChange callback)
+    {
+        obj->RegisterSignalingChange(callback);
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnIceCandidate(PeerConnectionObject*obj, DelegateIceCandidate callback)
     {
         obj->RegisterIceCandidate(callback);

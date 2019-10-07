@@ -6,6 +6,7 @@ namespace Unity.WebRTC
 {
     public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
+    public delegate void DelegateOnSignalingChange(SignalingState state);
     public delegate void DelegateOnNegotiationNeeded();
     public delegate void DelegateOnTrack(RTCTrackEvent e);
 
@@ -15,6 +16,8 @@ namespace Unity.WebRTC
         private IntPtr self = IntPtr.Zero;
         private DelegateOnIceConnectionChange onIceConnectionChange;
         private DelegateNativeOnIceConnectionChange selfOnIceConnectionChange;
+        private DelegateOnSignalingChange onSignalingChange;
+        private DelegateNativeOnSignalingChange selfOnSignalingChange;
         private DelegateOnIceCandidate onIceCandidate;
         private DelegateNativeOnIceCandidate selfOnIceCandidate;
         private DelegateOnDataChannel onDataChannel;
@@ -83,6 +86,17 @@ namespace Unity.WebRTC
                 NativeMethods.PeerConnectionRegisterIceConnectionChange(self, selfOnIceConnectionChange);
             }
         }
+        public DelegateOnSignalingChange OnSignalingChange
+        {
+            get => onSignalingChange;
+            set
+            {
+                onSignalingChange = value;
+                selfOnSignalingChange = new DelegateNativeOnSignalingChange(PCOnSignalingChange);
+                NativeMethods.PeerConnectionRegisterSignalingChange(self, selfOnSignalingChange);
+            }
+        }
+
         public DelegateOnIceCandidate OnIceCandidate
         {
             get => onIceCandidate;
@@ -146,6 +160,17 @@ namespace Unity.WebRTC
                 if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnIceConnectionChange(state);
+            }, null);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnSignalingChange))]
+        static void PCOnSignalingChange(IntPtr ptr, SignalingState state)
+        {
+            WebRTC.SyncContext.Post(_ =>
+            {
+                if (WebRTC.Context == null || !WebRTC.Table.Contains(ptr)) { return; }
+                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
+                connection.OnSignalingChange(state);
             }, null);
         }
 
