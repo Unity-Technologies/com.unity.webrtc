@@ -54,7 +54,7 @@ extern "C"
         return context->CreateAudioTrack(label);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextDeleteMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
     {
         context->DeleteMediaStreamTrack(track);
     }
