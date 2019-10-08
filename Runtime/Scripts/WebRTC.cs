@@ -98,6 +98,16 @@ namespace Unity.WebRTC
         Max
     }
 
+    public enum SignalingState
+    {
+        Stable,
+        HaveLocalOffer,
+        HaveLocalPrAnswer,
+        HaveRemoteOffer,
+        HaveRemotePrAnswer,
+        Closed
+    }
+
     public enum RTCErrorType
     {
         None,
@@ -322,6 +332,8 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateNativeOnSignalingChange(IntPtr ptr, SignalingState state);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
@@ -375,6 +387,8 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionRegisterCallbackSetSD(IntPtr pc, DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr pc, DelegateNativeOnIceConnectionChange callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionRegisterSignalingChange(IntPtr pc, DelegateNativeOnSignalingChange callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr pc, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]
