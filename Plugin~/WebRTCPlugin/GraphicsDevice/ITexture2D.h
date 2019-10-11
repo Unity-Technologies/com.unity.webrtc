@@ -11,8 +11,8 @@ public:
     bool IsSize(uint32_t w, uint32_t h) { return m_width == w && m_height == h; }
 
     virtual ~ITexture2D() = 0;
-    virtual void* GetResourcePtrV() = 0;
-    virtual const void* GetResourcePtrV() const = 0;
+    virtual void* GetNativeTexturePtrV() = 0;
+    virtual const void* GetNativeTexturePtrV() const = 0;
 
 protected:
     uint32_t m_width;

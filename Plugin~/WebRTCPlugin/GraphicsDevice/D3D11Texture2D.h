@@ -16,15 +16,15 @@ public:
         m_texture = nullptr;
     }
 
-    inline virtual void* GetResourcePtrV();
-    inline virtual const void* GetResourcePtrV() const;
+    inline virtual void* GetNativeTexturePtrV();
+    inline virtual const void* GetNativeTexturePtrV() const;
 
 };
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* D3D11Texture2D::GetResourcePtrV() { return m_texture; }
-const void* D3D11Texture2D::GetResourcePtrV() const { return m_texture; }
+void* D3D11Texture2D::GetNativeTexturePtrV() { return m_texture; }
+const void* D3D11Texture2D::GetNativeTexturePtrV() const { return m_texture; }
 
 } //end namespace
 
