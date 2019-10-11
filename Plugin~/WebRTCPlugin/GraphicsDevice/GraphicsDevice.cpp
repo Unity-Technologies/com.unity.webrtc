@@ -1,9 +1,10 @@
 ﻿#include "pch.h"
 #include "GraphicsDevice.h"
 #include "WebRTCConstants.h" //NUM_TEXTURES_FOR_BUFFERING
+#include "IGraphicsDevice.h"
 
 //D3D11
-#include "D3D11Texture2D.h" 
+#include "D3D11/D3D11GraphicsDevice.h" 
 
 namespace WebRTC {
 
@@ -24,6 +25,7 @@ void GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
     if (m_rendererType == kUnityGfxRendererD3D11)
     {
         g_D3D11Device = unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice();
+        m_device = new D3D11GraphicsDevice(g_D3D11Device);  
         g_D3D11Device->GetImmediateContext(&context);
     }
 }
@@ -31,6 +33,9 @@ void GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 //---------------------------------------------------------------------------------------------------------------------
 
 void GraphicsDevice::Shutdown() {
+    m_device->ShutdownV();
+    m_device = nullptr;
+
     for (auto rt : g_renderTextures)  {
         if (rt) {
             rt->Release();
@@ -41,22 +46,7 @@ void GraphicsDevice::Shutdown() {
 
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* GraphicsDevice::CreateEncoderInputTexture(uint32_t w , uint32_t h ) {
-
-    //[TODO-sin: 2019-10-11] Move this to GraphicsDeviceDX11
-    ID3D11Texture2D* texture = nullptr;
-    D3D11_TEXTURE2D_DESC desc = { 0 };
-    desc.Width = w;
-    desc.Height = h;
-    desc.MipLevels = 1;
-    desc.ArraySize = 1;
-    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-    desc.CPUAccessFlags = 0;
-    HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &texture);
-
-    return new D3D11Texture2D(w,h,texture);
+    return m_device->CreateEncoderInputTextureV(w,h);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

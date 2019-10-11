@@ -3,6 +3,7 @@
 namespace WebRTC {
 
 struct ITexture2D;
+class IGraphicsDevice;
 
 //Singleton
 class GraphicsDevice {
@@ -19,6 +20,7 @@ class GraphicsDevice {
         void operator=(GraphicsDevice const&);
 
         UnityGfxRenderer m_rendererType;
+        IGraphicsDevice* m_device = nullptr;
 
 };
 
