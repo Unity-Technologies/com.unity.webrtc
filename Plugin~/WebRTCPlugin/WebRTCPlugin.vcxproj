@@ -178,6 +178,7 @@
     <ClInclude Include="DummyAudioDevice.h" />
     <ClInclude Include="DummyVideoEncoder.h" />
     <ClInclude Include="GraphicsDevice\D3D11Texture2D.h" />
+    <ClInclude Include="GraphicsDevice\GraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="nvEncodeAPI.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="DummyAudioDevice.cpp" />
     <ClCompile Include="DummyVideoEncoder.cpp" />
     <ClCompile Include="GraphicsDevice\D3D11Texture2D.cpp" />
+    <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp" />
     <ClCompile Include="GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="NvEncoder.cpp" />
