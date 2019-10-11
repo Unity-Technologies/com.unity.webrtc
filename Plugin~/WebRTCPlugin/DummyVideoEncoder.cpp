@@ -115,8 +115,11 @@ namespace WebRTC
         return dummyVideoEncoder;
     }
 
-    UnityEncoder* DummyVideoEncoderFactory::CreatePlatformEncoder(EncoderPlatform platform, int width, int height, int bitRate)
+    UnityEncoder* DummyVideoEncoderFactory::CreatePlatformEncoder(EncoderPlatform platform, int w , int h , int bitRate)
     {
+        uint32_t width = static_cast<uint32_t>(w);
+        uint32_t height= static_cast<uint32_t>(h);
+
         UnityEncoder* pEncoder = NULL;
         switch (platform)
         {
@@ -124,8 +127,10 @@ namespace WebRTC
             pEncoder = new NvEncoder();
             break;
         case WebRTC::Amd:
+            DebugError("AMD is not supported");
             break;
         case WebRTC::Soft:
+            DebugError("Hardware is not supported");
             break;
         default:
             break;
@@ -135,8 +140,11 @@ namespace WebRTC
         return pEncoder;
     }
 
-    UnityEncoder* DummyVideoEncoderFactory::GetPlatformEncoder(EncoderPlatform platform, int width, int height, int bitRate)
+    UnityEncoder* DummyVideoEncoderFactory::GetPlatformEncoder(EncoderPlatform platform, int w, int h, int bitRate)
     {
+        uint32_t width = static_cast<uint32_t>(w);
+        uint32_t height= static_cast<uint32_t>(h);
+
         for (std::list<UnityEncoder*>::iterator it = unityEncoders.begin(); it != unityEncoders.end(); ++it)
         {
             if ((*it)->getEncodeWidth() == width && (*it)->getEncodeHeight() == height && (*it)->getBitRate() == bitRate) {

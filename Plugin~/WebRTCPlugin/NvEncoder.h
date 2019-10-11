@@ -42,12 +42,12 @@ namespace WebRTC
         bool IsSupported() const { return isNvEncoderSupported; }
         void SetIdrFrame() { isIdrFrame = true; }
         uint64 GetCurrentFrameCount() { return frameCount; }
-        void InitEncoder(int width, int height, int _bitRate);
+        void InitEncoder(uint32_t width, uint32_t height, int _bitRate);
         void InitEncoderResources();
 
         void* getRenderTexture() { return nvEncoderTexture; }
-        int getEncodeWidth() { return encodeWidth; }
-        int getEncodeHeight() { return encodeHeight; }
+        uint32_t getEncodeWidth() { return encodeWidth; }
+        uint32_t getEncodeHeight() { return encodeHeight; }
         int getBitRate() { return bitRate; }
         static void DestroyEncoderTexture();
     private:
@@ -70,8 +70,8 @@ namespace WebRTC
         bool isNvEncoderSupported = false;
         bool isInitialize = false;
         bool isIdrFrame = false;
-        int encodeWidth;
-        int encodeHeight;
+        uint32_t encodeWidth;
+        uint32_t encodeHeight;
         //10Mbps
         int bitRate = 10000000;
         //100Mbps

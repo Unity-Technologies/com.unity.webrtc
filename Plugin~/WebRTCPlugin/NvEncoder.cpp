@@ -39,7 +39,7 @@ namespace WebRTC
         }
     }
 
-    void NvEncoder::InitEncoder(int width, int height, int _bitRate)
+    void NvEncoder::InitEncoder(uint32_t width, uint32_t height, int _bitRate)
     {
         encodeWidth = width;
         encodeHeight = height;
