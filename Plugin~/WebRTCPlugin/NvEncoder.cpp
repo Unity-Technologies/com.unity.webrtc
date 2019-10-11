@@ -274,7 +274,7 @@ namespace WebRTC
         nvEncoderInputTextureList.clear();
     }
 
-    ITexture2D* NvEncoder::getEncoderTexture(int width, int height)
+    ITexture2D* NvEncoder::getEncoderTexture(uint32_t width, uint32_t height)
     {
         for (std::list<ITexture2D*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
         {

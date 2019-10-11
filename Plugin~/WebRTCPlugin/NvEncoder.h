@@ -51,7 +51,7 @@ namespace WebRTC
         int getBitRate() { return bitRate; }
         static void DestroyEncoderTexture();
     private:
-        static ITexture2D* getEncoderTexture(int width, int height);
+        static ITexture2D* getEncoderTexture(uint32_t width, uint32_t height);
         void ReleaseFrameInputBuffer(Frame& frame);
         void ReleaseEncoderResources();
         void ProcessEncodedFrame(Frame& frame);
