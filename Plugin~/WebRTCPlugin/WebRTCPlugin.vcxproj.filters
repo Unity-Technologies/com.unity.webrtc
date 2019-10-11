@@ -16,6 +16,9 @@
     <Filter Include="Header Files\Unity">
       <UniqueIdentifier>{16932972-c865-4546-9602-539504fea736}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsDevice">
+      <UniqueIdentifier>{a68e7998-601c-4854-b2f6-00f03841ad0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebRTCPlugin.h">
@@ -63,6 +66,9 @@
     <ClInclude Include="UnityVideoCapturer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDevice\ITexture2D.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -100,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="UnityVideoCapturer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\ITexture2D.cpp">
+      <Filter>GraphicsDevice</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

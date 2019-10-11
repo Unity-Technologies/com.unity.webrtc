@@ -3,10 +3,11 @@
 #include "IUnityGraphicsD3D11.h"
 #include "Context.h"
 #include <CString>
+#include "GraphicsDevice/ITexture2D.h"
 
 namespace WebRTC
 {
-    std::list<NvEncoder::EncoderInputTexture*> NvEncoder::nvEncoderInputTextureList;
+    std::list<ITexture2D*> NvEncoder::nvEncoderInputTextureList;
 
     NvEncoder::NvEncoder()
     {
@@ -264,7 +265,7 @@ namespace WebRTC
 
     void NvEncoder::DestroyEncoderTexture()
     {
-        for (std::list<EncoderInputTexture*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
+        for (std::list<ITexture2D*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
         {
             delete (*it);
         }
@@ -273,7 +274,7 @@ namespace WebRTC
 
     UnityFrameBuffer* NvEncoder::getEncoderTexture(int width, int height)
     {
-        for (std::list<EncoderInputTexture*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
+        for (std::list<ITexture2D*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
         {
             if ((*it)->width == width && (*it)->height == height)
             {
@@ -281,7 +282,7 @@ namespace WebRTC
             }
         }
 
-        EncoderInputTexture* pEncoderInputTexture = new EncoderInputTexture(width, height);
+        ITexture2D* pEncoderInputTexture = new ITexture2D(width, height);
         nvEncoderInputTextureList.push_back(pEncoderInputTexture);
         return pEncoderInputTexture->texture;
     }

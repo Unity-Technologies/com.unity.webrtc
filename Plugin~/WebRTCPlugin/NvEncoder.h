@@ -8,6 +8,8 @@
 
 namespace WebRTC
 {
+    struct ITexture2D;
+
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class NvEncoder : public UnityEncoder
     {
@@ -29,34 +31,6 @@ namespace WebRTC
             std::atomic<bool> isEncoding = false;
         };
 
-        struct EncoderInputTexture
-        {
-            UnityFrameBuffer* texture;
-            int width;
-            int height;
-            EncoderInputTexture(int w, int h)
-            {
-                width = w;
-                height = h;
-                D3D11_TEXTURE2D_DESC desc = { 0 };
-                desc.Width = width;
-                desc.Height = height;
-                desc.MipLevels = 1;
-                desc.ArraySize = 1;
-                desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-                desc.SampleDesc.Count = 1;
-                desc.Usage = D3D11_USAGE_DEFAULT;
-                desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-                desc.CPUAccessFlags = 0;
-                HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &texture);
-            }
-
-            ~EncoderInputTexture()
-            {
-                texture->Release();
-                texture = nullptr;
-            }
-        };
 
     public:
         NvEncoder();
@@ -89,7 +63,7 @@ namespace WebRTC
         NV_ENC_CONFIG nvEncConfig = {};
         _NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
-        static std::list<EncoderInputTexture*> nvEncoderInputTextureList;
+        static std::list<ITexture2D*> nvEncoderInputTextureList;
         UnityFrameBuffer* nvEncoderTexture;
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
