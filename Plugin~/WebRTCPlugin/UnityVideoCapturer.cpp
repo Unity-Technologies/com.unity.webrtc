@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "UnityVideoCapturer.h"
 #include "UnityEncoder.h"
-#include "GraphicsDevice/D3D11Texture2D.h"
+#include "GraphicsDevice/D3D11/D3D11Texture2D.h"
 
 namespace WebRTC
 {

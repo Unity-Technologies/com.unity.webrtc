@@ -177,8 +177,8 @@
     <ClInclude Include="DataChannelObject.h" />
     <ClInclude Include="DummyAudioDevice.h" />
     <ClInclude Include="DummyVideoEncoder.h" />
-    <ClInclude Include="GraphicsDevice\D3D11Texture2D.h" />
     <ClInclude Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11Texture2D.h" />
     <ClInclude Include="GraphicsDevice\GraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\ITexture2D.h" />
@@ -199,8 +199,8 @@
     <ClCompile Include="DataChannelObject.cpp" />
     <ClCompile Include="DummyAudioDevice.cpp" />
     <ClCompile Include="DummyVideoEncoder.cpp" />
-    <ClCompile Include="GraphicsDevice\D3D11Texture2D.cpp" />
     <ClCompile Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11Texture2D.cpp" />
     <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp" />
     <ClCompile Include="GraphicsDevice\IGraphicsDevice.cpp" />
     <ClCompile Include="GraphicsDevice\ITexture2D.cpp" />

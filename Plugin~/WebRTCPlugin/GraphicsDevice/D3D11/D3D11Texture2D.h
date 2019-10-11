@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "ITexture2D.h"
+#include "GraphicsDevice/ITexture2D.h"
 #include "d3d11.h"
 
 #include "WebRTCMacros.h"

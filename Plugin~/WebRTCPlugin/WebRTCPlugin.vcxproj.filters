@@ -72,9 +72,6 @@
     <ClInclude Include="GraphicsDevice\ITexture2D.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsDevice\D3D11Texture2D.h">
-      <Filter>GraphicsDevice</Filter>
-    </ClInclude>
     <ClInclude Include="WebRTCConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -89,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="GraphicsDevice\IGraphicsDevice.h">
       <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11Texture2D.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,9 +131,6 @@
     <ClCompile Include="GraphicsDevice\ITexture2D.cpp">
       <Filter>GraphicsDevice</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsDevice\D3D11Texture2D.cpp">
-      <Filter>GraphicsDevice</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp">
       <Filter>GraphicsDevice</Filter>
     </ClCompile>
@@ -142,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="GraphicsDevice\IGraphicsDevice.cpp">
       <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "D3D11GraphicsDevice.h"
-#include "GraphicsDevice/D3D11Texture2D.h"
+#include "D3D11Texture2D.h"
 
 namespace WebRTC {
 

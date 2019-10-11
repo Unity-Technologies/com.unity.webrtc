@@ -4,8 +4,7 @@
 #include "Context.h"
 #include <CString>
 
-//#include "GraphicsDevice/ITexture2D.h"
-#include "GraphicsDevice/D3D11Texture2D.h"
+#include "GraphicsDevice/D3D11/D3D11Texture2D.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 
 
@@ -220,6 +219,7 @@ namespace WebRTC
 
     ID3D11Texture2D* NvEncoder::AllocateInputBuffers()
     {
+        //[TODO-sin: 2019-10-11] Abstract this out
         ID3D11Texture2D* inputTextures = nullptr;
         D3D11_TEXTURE2D_DESC desc = { 0 };
         desc.Width = encodeWidth;
