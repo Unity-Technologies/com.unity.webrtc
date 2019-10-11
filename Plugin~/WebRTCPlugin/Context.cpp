@@ -7,6 +7,8 @@ namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
 
+    extern ID3D11Device* g_D3D11Device;
+
     CodecInitializationResult ContextManager::InitializeAndTryNvEnc()
     {
         auto result = LoadNvEncApi();

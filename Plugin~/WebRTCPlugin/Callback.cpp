@@ -13,7 +13,7 @@ namespace WebRTC
     //d3d11 device
     ID3D11Device* g_D3D11Device = nullptr;
     //natively created ID3D11Texture2D ptrs
-    ID3D11Texture2D* renderTextures[bufferedFrameNum];
+    ID3D11Texture2D* renderTextures[NUM_TEXTURES_FOR_BUFFERING];
 
     Context* s_context;
 }

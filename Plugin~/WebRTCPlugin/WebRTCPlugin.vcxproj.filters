@@ -72,6 +72,9 @@
     <ClInclude Include="GraphicsDevice\D3D11Texture2D.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="WebRTCConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">

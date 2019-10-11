@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include "UnityEncoder.h"
+#include "WebRTCConstants.h" //NUM_TEXTURES_FOR_BUFFERING
 
 namespace WebRTC
 {
@@ -62,7 +63,7 @@ namespace WebRTC
         NV_ENC_INITIALIZE_PARAMS nvEncInitializeParams = {};
         NV_ENC_CONFIG nvEncConfig = {};
         _NVENCSTATUS errorCode;
-        Frame bufferedFrames[bufferedFrameNum];
+        Frame bufferedFrames[NUM_TEXTURES_FOR_BUFFERING];
         static std::list<ITexture2D*> nvEncoderInputTextureList;
         ITexture2D* nvEncoderTexture;
         uint64 frameCount = 0;

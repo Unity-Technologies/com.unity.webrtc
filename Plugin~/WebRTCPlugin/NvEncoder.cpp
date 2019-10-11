@@ -7,8 +7,12 @@
 //#include "GraphicsDevice/ITexture2D.h"
 #include "GraphicsDevice/D3D11Texture2D.h"
 
+
+
+
 namespace WebRTC
 {
+    extern ID3D11Device* g_D3D11Device;
     std::list<ITexture2D*> NvEncoder::nvEncoderInputTextureList;
 
     NvEncoder::NvEncoder()
@@ -144,7 +148,7 @@ namespace WebRTC
     void NvEncoder::EncodeFrame(int width, int height)
     {
         UpdateSettings(width, height);
-        uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;
+        uint32 bufferIndexToWrite = frameCount % NUM_TEXTURES_FOR_BUFFERING;
 
         Frame& frame = bufferedFrames[bufferIndexToWrite];
 #pragma region set frame params
@@ -285,7 +289,7 @@ namespace WebRTC
         }
 
         //[TODO-Sin: 2019-19-11] ITexture2D should not be created directly, but should be called using
-    //GraphicsDevice->CreateEncoderInputTexture
+        //GraphicsDevice->CreateEncoderInputTexture
         ITexture2D* pEncoderInputTexture = new D3D11Texture2D(width, height);
         nvEncoderInputTextureList.push_back(pEncoderInputTexture);
         return pEncoderInputTexture;
@@ -294,7 +298,7 @@ namespace WebRTC
     void NvEncoder::InitEncoderResources()
     {
         nvEncoderTexture = getEncoderTexture(encodeWidth, encodeHeight);
-        for (int i = 0; i < bufferedFrameNum; i++)
+        for (int i = 0; i < NUM_TEXTURES_FOR_BUFFERING; ++i)
         {
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(nvEncoderTexture);

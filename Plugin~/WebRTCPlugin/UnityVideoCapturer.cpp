@@ -5,6 +5,10 @@
 
 namespace WebRTC
 {
+    //d3d11 context
+    extern ID3D11DeviceContext* context;
+
+
     UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr)
         : nvEncoder(pEncoder), width(_width), height(_height)
     {
