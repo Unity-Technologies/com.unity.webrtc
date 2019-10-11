@@ -188,6 +188,7 @@
     <ClInclude Include="PeerConnectionObject.h" />
     <ClInclude Include="UnityEncoder.h" />
     <ClInclude Include="WebRTCConstants.h" />
+    <ClInclude Include="WebRTCMacros.h" />
     <ClInclude Include="WebRTCPlugin.h" />
   </ItemGroup>
   <ItemGroup>

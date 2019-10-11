@@ -78,6 +78,9 @@
     <ClInclude Include="GraphicsDevice\GraphicsDevice.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="WebRTCMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
