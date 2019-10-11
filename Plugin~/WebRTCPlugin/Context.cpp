@@ -357,15 +357,14 @@ namespace WebRTC
         }
     }
 
-    webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, UnityFrameBuffer* frameBuffer, int32 width, int32 height, int32 bitRate)
+    webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* nativeTexPtr, int32 width, int32 height, int32 bitRate)
     {
         UnityEncoder* pUnityEncoder = pDummyVideoEncoderFactory->CreatePlatformEncoder(WebRTC::Nvidia, width, height, bitRate);
-        UnityVideoCapturer* pUnityVideoCapturer = new UnityVideoCapturer(pUnityEncoder, width, height);
+        UnityVideoCapturer* pUnityVideoCapturer = new UnityVideoCapturer(pUnityEncoder, width, height, nativeTexPtr);
         pUnityVideoCapturer->InitializeEncoder();
         pDummyVideoEncoderFactory->AddCapturer(pUnityVideoCapturer);
 
         auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, peerConnectionFactory->CreateVideoSource(pUnityVideoCapturer));
-        pUnityVideoCapturer->unityRT = frameBuffer;
         pUnityVideoCapturer->StartEncoder();
 
         // TODO:: Create dictionary to impletement StopMediaStreamTrack API

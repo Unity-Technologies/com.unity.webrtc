@@ -44,7 +44,7 @@ extern "C"
         return context->DeleteMediaStream(stream);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, UnityFrameBuffer* rt, int32 width, int32 height, int32 bitRate)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt, int32 width, int32 height, int32 bitRate)
     {
         return context->CreateVideoTrack(label, rt, width, height, bitRate);
     }

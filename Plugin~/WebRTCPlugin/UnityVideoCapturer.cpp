@@ -1,11 +1,18 @@
 ﻿#include "pch.h"
 #include "UnityVideoCapturer.h"
 #include "UnityEncoder.h"
+#include "GraphicsDevice/D3D11Texture2D.h"
 
 namespace WebRTC
 {
-    UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height) : nvEncoder(pEncoder), width(_width), height(_height)
+    UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr)
+        : nvEncoder(pEncoder), width(_width), height(_height)
     {
+        
+        //[TODO-Sin: 2019-19-11] ITexture2D should not be created directly, but should be called using
+        //GraphicsDevice->CreateEncoderInputTexture
+        m_unityRT = new D3D11Texture2D(_width, _height, reinterpret_cast<ID3D11Texture2D*>(unityNativeTexPtr));
+
         set_enable_video_adapter(false);
         SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));
     }
@@ -13,7 +20,8 @@ namespace WebRTC
     {
         if (captureStarted && !captureStopped)
         {
-            context->CopyResource((ID3D11Resource*)nvEncoder->getRenderTexture(), unityRT);
+            //[TODO-Sin: 2019-19-11] Use GraphicsDevice for this
+            context->CopyResource((ID3D11Resource*)nvEncoder->getRenderTexture(), reinterpret_cast<ID3D11Texture2D*>(m_unityRT->GetNativeTexturePtrV()));
             nvEncoder->EncodeFrame(width, height);
         }
     }
