@@ -6,6 +6,7 @@
 
 //#include "GraphicsDevice/ITexture2D.h"
 #include "GraphicsDevice/D3D11Texture2D.h"
+#include "GraphicsDevice/GraphicsDevice.h"
 
 
 
@@ -288,9 +289,7 @@ namespace WebRTC
             }
         }
 
-        //[TODO-Sin: 2019-19-11] ITexture2D should not be created directly, but should be called using
-        //GraphicsDevice->CreateEncoderInputTexture
-        ITexture2D* pEncoderInputTexture = new D3D11Texture2D(width, height);
+        ITexture2D* pEncoderInputTexture = GraphicsDevice::GetInstance().CreateEncoderInputTexture(width, height);
         nvEncoderInputTextureList.push_back(pEncoderInputTexture);
         return pEncoderInputTexture;
     }

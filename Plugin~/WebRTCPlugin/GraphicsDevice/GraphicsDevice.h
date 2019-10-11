@@ -2,6 +2,8 @@
 
 namespace WebRTC {
 
+struct ITexture2D;
+
 //Singleton
 class GraphicsDevice {
 
@@ -9,8 +11,7 @@ class GraphicsDevice {
         static GraphicsDevice& GetInstance();
         void Init(IUnityInterfaces* unityInterface);
         void Shutdown();
-        //void* CreateEncoderInputTexture(uint32_t w , uint32_t h );
-        //void ReleaseEncoderInputTexture(void *texture);
+        ITexture2D* CreateEncoderInputTexture(uint32_t w , uint32_t h );
 
     private:
         GraphicsDevice();
