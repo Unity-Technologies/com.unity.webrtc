@@ -59,6 +59,14 @@
 #include "media/base/videobroadcaster.h"
 #pragma endregion
 #include "d3d11.h"
+#include "d3d12.h"
+
+//Unity
+#include "IUnityGraphics.h"
+#include "IUnityGraphicsD3D11.h"
+#include "IUnityGraphicsD3D12.h"
+//#include "IUnityGraphicsVulkan.h"
+
 
 namespace WebRTC
 {
