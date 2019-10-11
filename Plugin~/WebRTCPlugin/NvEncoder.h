@@ -51,12 +51,12 @@ namespace WebRTC
         int getBitRate() { return bitRate; }
         static void DestroyEncoderTexture();
     private:
-        static UnityFrameBuffer* getEncoderTexture(int width, int height);
+        static ITexture2D* getEncoderTexture(int width, int height);
         void ReleaseFrameInputBuffer(Frame& frame);
         void ReleaseEncoderResources();
         void ProcessEncodedFrame(Frame& frame);
         ID3D11Texture2D* AllocateInputBuffers();
-        NV_ENC_REGISTERED_PTR RegisterResource(void *pBuffer);
+        NV_ENC_REGISTERED_PTR RegisterResource(ITexture2D* tex);
         void MapResources(InputFrame& inputFrame);
         NV_ENC_OUTPUT_PTR InitializeBitstreamBuffer();
         NV_ENC_INITIALIZE_PARAMS nvEncInitializeParams = {};
@@ -64,7 +64,7 @@ namespace WebRTC
         _NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
         static std::list<ITexture2D*> nvEncoderInputTextureList;
-        UnityFrameBuffer* nvEncoderTexture;
+        ITexture2D* nvEncoderTexture;
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isNvEncoderSupported = false;

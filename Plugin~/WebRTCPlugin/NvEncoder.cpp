@@ -3,7 +3,9 @@
 #include "IUnityGraphicsD3D11.h"
 #include "Context.h"
 #include <CString>
-#include "GraphicsDevice/ITexture2D.h"
+
+//#include "GraphicsDevice/ITexture2D.h"
+#include "GraphicsDevice/D3D11Texture2D.h"
 
 namespace WebRTC
 {
@@ -227,12 +229,12 @@ namespace WebRTC
         HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &inputTextures);
         return inputTextures;
     }
-    NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(void *buffer)
+    NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(ITexture2D* tex)
     {
         NV_ENC_REGISTER_RESOURCE registerResource = { 0 };
         registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
         registerResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
-        registerResource.resourceToRegister = buffer;
+        registerResource.resourceToRegister = tex->GetResourcePtrV();
 
         if (!registerResource.resourceToRegister)
             LogPrint("resource is not initialized");
@@ -272,19 +274,21 @@ namespace WebRTC
         nvEncoderInputTextureList.clear();
     }
 
-    UnityFrameBuffer* NvEncoder::getEncoderTexture(int width, int height)
+    ITexture2D* NvEncoder::getEncoderTexture(int width, int height)
     {
         for (std::list<ITexture2D*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
         {
-            if ((*it)->width == width && (*it)->height == height)
+            if ((*it)->IsSize(width, height))
             {
-                return (*it)->texture;
+                return (*it);
             }
         }
 
-        ITexture2D* pEncoderInputTexture = new ITexture2D(width, height);
+        //[TODO-Sin: 2019-19-11] ITexture2D should not be created directly, but should be called using
+    //GraphicsDevice->CreateEncoderInputTexture
+        ITexture2D* pEncoderInputTexture = new D3D11Texture2D(width, height);
         nvEncoderInputTextureList.push_back(pEncoderInputTexture);
-        return pEncoderInputTexture->texture;
+        return pEncoderInputTexture;
     }
 
     void NvEncoder::InitEncoderResources()
