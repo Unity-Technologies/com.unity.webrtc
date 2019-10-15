@@ -10,7 +10,6 @@ namespace WebRTC {
 
 ID3D11DeviceContext* context; ////d3d11 context
 ID3D11Device* g_D3D11Device = nullptr; ////d3d11 device
-ID3D11Texture2D* g_renderTextures[NUM_TEXTURES_FOR_BUFFERING]; ////natively created ID3D11Texture2D ptrs
 
 GraphicsDevice& GraphicsDevice::GetInstance() {
     static GraphicsDevice device;
@@ -37,13 +36,6 @@ void GraphicsDevice::Shutdown() {
         m_device->ShutdownV();
         delete m_device;
         m_device = nullptr;
-    }
-
-    for (auto rt : g_renderTextures)  {
-        if (rt) {
-            rt->Release();
-            rt = nullptr;
-        }
     }
 }
 

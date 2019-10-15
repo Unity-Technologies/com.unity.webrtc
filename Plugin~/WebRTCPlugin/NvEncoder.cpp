@@ -217,23 +217,6 @@ namespace WebRTC
         captureFrame(frame.encodedFrame);
     }
 
-    ID3D11Texture2D* NvEncoder::AllocateInputBuffers()
-    {
-        //[TODO-sin: 2019-10-11] Abstract this out
-        ID3D11Texture2D* inputTextures = nullptr;
-        D3D11_TEXTURE2D_DESC desc = { 0 };
-        desc.Width = encodeWidth;
-        desc.Height = encodeHeight;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-        desc.CPUAccessFlags = 0;
-        HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &inputTextures);
-        return inputTextures;
-    }
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(ITexture2D* tex)
     {
         NV_ENC_REGISTER_RESOURCE registerResource = { 0 };

@@ -56,7 +56,6 @@ namespace WebRTC
         void ReleaseFrameInputBuffer(Frame& frame);
         void ReleaseEncoderResources();
         void ProcessEncodedFrame(Frame& frame);
-        ID3D11Texture2D* AllocateInputBuffers();
         NV_ENC_REGISTERED_PTR RegisterResource(ITexture2D* tex);
         void MapResources(InputFrame& inputFrame);
         NV_ENC_OUTPUT_PTR InitializeBitstreamBuffer();
