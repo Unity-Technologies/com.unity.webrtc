@@ -3,8 +3,9 @@
 #include "WebRTCConstants.h" //NUM_TEXTURES_FOR_BUFFERING
 #include "IGraphicsDevice.h"
 
-//D3D11
+//Graphics 
 #include "D3D11/D3D11GraphicsDevice.h" 
+#include "D3D12/D3D12GraphicsDevice.h" 
 
 namespace WebRTC {
 
@@ -18,9 +19,19 @@ GraphicsDevice& GraphicsDevice::GetInstance() {
 void GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 
     m_rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
-    if (m_rendererType == kUnityGfxRendererD3D11)
-    {
-        m_device = new D3D11GraphicsDevice(unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice());  
+    switch (m_rendererType) {
+        case kUnityGfxRendererD3D11: {
+            m_device = new D3D11GraphicsDevice(unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice());  
+            break;
+        }
+        case kUnityGfxRendererD3D12: {
+            m_device = new D3D12GraphicsDevice(unityInterface->Get<IUnityGraphicsD3D12v2>()->GetDevice());  
+            break;
+        }
+        default: {
+            DebugError("Unsupported Unity Renderer: %d", m_rendererType);
+            break;
+        }
     }
 }
 

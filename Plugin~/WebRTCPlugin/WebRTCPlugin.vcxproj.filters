@@ -22,6 +22,9 @@
     <Filter Include="GraphicsDevice\D3D11">
       <UniqueIdentifier>{9eac67b4-cc43-476a-9f7c-e806d957f4b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsDevice\D3D12">
+      <UniqueIdentifier>{e08d503c-149d-4cb5-9840-4814c83bc578}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebRTCPlugin.h">
@@ -90,6 +93,12 @@
     <ClInclude Include="GraphicsDevice\D3D11\D3D11Texture2D.h">
       <Filter>GraphicsDevice\D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -142,6 +151,12 @@
     </ClCompile>
     <ClCompile Include="GraphicsDevice\D3D11\D3D11Texture2D.cpp">
       <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

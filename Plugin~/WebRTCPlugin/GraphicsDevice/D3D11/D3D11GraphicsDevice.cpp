@@ -32,7 +32,7 @@ ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t
     desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_RENDER_TARGET;
+    desc.BindFlags = 0;
     desc.CPUAccessFlags = 0;
     HRESULT r = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
     return new D3D11Texture2D(w,h,texture);
