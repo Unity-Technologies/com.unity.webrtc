@@ -46,6 +46,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt, int32 width, int32 height, int32 bitRate)
     {
+        assert(nullptr!=rt);
         return context->CreateVideoTrack(label, rt, width, height, bitRate);
     }
 

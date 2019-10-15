@@ -69,6 +69,7 @@ class NativeAPITest
         var rt = new UnityEngine.RenderTexture(width, height, 0, UnityEngine.RenderTextureFormat.BGRA32);
         var label = "Test";
         var bitRate = 10000000;
+        rt.Create();
         var track = NativeMethods.ContextCreateVideoTrack(context, label, rt.GetNativeTexturePtr(), width, height, bitRate);
         NativeMethods.ContextDeleteMediaStreamTrack(context, track);
         NativeMethods.ContextDeletePeerConnection(context, peer);
