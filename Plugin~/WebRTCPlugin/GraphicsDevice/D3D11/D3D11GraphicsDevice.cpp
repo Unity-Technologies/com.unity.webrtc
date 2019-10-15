@@ -7,7 +7,6 @@ namespace WebRTC {
 D3D11GraphicsDevice::D3D11GraphicsDevice(ID3D11Device* nativeDevice) : m_d3d11Device(nativeDevice)
 {
     m_d3d11Device->GetImmediateContext(&m_d3d11Context);
-    memset(m_renderTextures,0,sizeof(m_renderTextures));
 }
 
 
@@ -19,12 +18,6 @@ D3D11GraphicsDevice::~D3D11GraphicsDevice() {
 //---------------------------------------------------------------------------------------------------------------------
 
 void D3D11GraphicsDevice::ShutdownV() {
-    for (auto rt : m_renderTextures)  {
-        if (rt) {
-            rt->Release();
-            rt = nullptr;
-        }
-    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -21,7 +21,6 @@ public:
 private:
     ID3D11Device* m_d3d11Device;
     ID3D11DeviceContext* m_d3d11Context; 
-    ID3D11Texture2D* m_renderTextures[NUM_TEXTURES_FOR_BUFFERING]; 
 };
 
 //---------------------------------------------------------------------------------------------------------------------
