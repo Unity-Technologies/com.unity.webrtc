@@ -33,8 +33,11 @@ void GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 //---------------------------------------------------------------------------------------------------------------------
 
 void GraphicsDevice::Shutdown() {
-    m_device->ShutdownV();
-    m_device = nullptr;
+    if (nullptr != m_device) {
+        m_device->ShutdownV();
+        delete m_device;
+        m_device = nullptr;
+    }
 
     for (auto rt : g_renderTextures)  {
         if (rt) {
