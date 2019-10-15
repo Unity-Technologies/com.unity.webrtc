@@ -8,6 +8,8 @@ namespace WebRTC
     {
     public:
         UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr);
+        virtual ~UnityVideoCapturer();
+
         void EncodeVideoData();
         // Start the video capturer with the specified capture format.
         virtual cricket::CaptureState Start(const cricket::VideoFormat& Format) override

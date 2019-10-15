@@ -2,12 +2,11 @@
 #include "WebRTCPlugin.h"
 #include "UnityEncoder.h"
 #include "Context.h"
+#include "GraphicsDevice/GraphicsDevice.h"
 
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
-
-    extern ID3D11Device* g_D3D11Device;
 
     CodecInitializationResult ContextManager::InitializeAndTryNvEnc()
     {
@@ -57,7 +56,7 @@ namespace WebRTC
         //open an encode session
         NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
         openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
-        openEncdoeSessionExParams.device = g_D3D11Device;
+        openEncdoeSessionExParams.device = GraphicsDevice::GetInstance().GetNativeDevicePtr();
         openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
         result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));

@@ -7,6 +7,7 @@ namespace WebRTC {
 D3D11GraphicsDevice::D3D11GraphicsDevice(ID3D11Device* nativeDevice) : m_d3d11Device(nativeDevice)
 {
     m_d3d11Device->GetImmediateContext(&m_d3d11Context);
+    memset(m_renderTextures,0,sizeof(m_renderTextures));
 }
 
 
@@ -42,8 +43,23 @@ ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t width, uint
     desc.CPUAccessFlags = 0;
     HRESULT r = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
     return new D3D11Texture2D(width,height,texture);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
+    assert(nullptr!=nativeTexturePtr);
+    ID3D11Texture2D* texPtr = reinterpret_cast<ID3D11Texture2D*>(nativeTexturePtr);
+    texPtr->AddRef();
+    return new D3D11Texture2D(w,h,texPtr);
+}
 
 
+//---------------------------------------------------------------------------------------------------------------------
+void D3D11GraphicsDevice::CopyNativeResourceV(void* dest, void* src) {
+    m_d3d11Context->CopyResource(
+        reinterpret_cast<ID3D11Resource*>(dest),
+        reinterpret_cast<ID3D11Texture2D*>(src)
+    );
 }
 
 } //end namespace
