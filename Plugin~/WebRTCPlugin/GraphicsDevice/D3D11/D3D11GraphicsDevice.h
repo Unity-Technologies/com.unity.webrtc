@@ -13,8 +13,8 @@ public:
     virtual void ShutdownV();
     inline virtual void* GetNativeDevicePtrV();
 
-    virtual ITexture2D* CreateEncoderInputTextureV(uint32_t width, uint32_t height);
-    virtual ITexture2D* CreateEncoderInputTextureV(uint32_t width, uint32_t height, void* nativeTexturePtr);
+    virtual ITexture2D* CreateEncoderInputTextureV(uint32_t w, uint32_t h);
+    virtual ITexture2D* CreateEncoderInputTextureV(uint32_t w, uint32_t h, void* nativeTexturePtr);
     virtual void CopyNativeResourceV(void* dest, void* src);
 
 

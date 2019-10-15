@@ -21,12 +21,12 @@ void D3D11GraphicsDevice::ShutdownV() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t width, uint32_t height) {
+ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t h) {
 
     ID3D11Texture2D* texture = nullptr;
     D3D11_TEXTURE2D_DESC desc = { 0 };
-    desc.Width = width;
-    desc.Height = height;
+    desc.Width = w;
+    desc.Height = h;
     desc.MipLevels = 1;
     desc.ArraySize = 1;
     desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -35,7 +35,7 @@ ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t width, uint
     desc.BindFlags = D3D11_BIND_RENDER_TARGET;
     desc.CPUAccessFlags = 0;
     HRESULT r = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
-    return new D3D11Texture2D(width,height,texture);
+    return new D3D11Texture2D(w,h,texture);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
