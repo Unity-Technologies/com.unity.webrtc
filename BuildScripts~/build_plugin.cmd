@@ -1,6 +1,5 @@
 @echo off
 
-set WebRTC_VERSION=M72
 set LIBWEBRTC_DOWNLOAD_URL=https://github.com/karasusan/build-webrtc/releases/download/v0.1.0/webrtc-win.zip
 set SOLUTION_DIR=%cd%\Plugin~
 
