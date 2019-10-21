@@ -10,7 +10,7 @@ platforms:
     flavor: m1.mac  
     build_command: BuildScripts~/build_libwebrtc_macos.sh
   - name: linux
-    type: Unity::VM::osx
+    type: Unity::VM
     image: slough-ops/ubuntu-18.04-base:v0.3.0-429341
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_linux.sh
