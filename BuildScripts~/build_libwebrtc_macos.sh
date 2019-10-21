@@ -6,7 +6,7 @@ then
 fi
 
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=77
+export WEBRTC_VERSION=72
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 
@@ -41,4 +41,4 @@ done
 
 # create zip
 cd "$ARTIFACTS_DIR"
-zip -r webrtc-mac.zip
+zip -r webrtc-mac.zip lib include 

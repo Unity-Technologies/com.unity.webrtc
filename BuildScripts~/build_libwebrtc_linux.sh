@@ -41,4 +41,4 @@ done
 
 # create zip
 cd "$ARTIFACTS_DIR"
-zip -r webrtc-linux.zip 
+zip -r webrtc-linux.zip lib include
