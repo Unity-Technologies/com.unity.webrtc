@@ -36,7 +36,7 @@ find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 mkdir "$ARTIFACTS_DIR/lib"
 array=("libwebrtc.a" "libaudio_decoder_opus.a" "libwebrtc_opus.a" "libjsoncpp.a")
 for item in ${array[@]}; do
-  find "$OUTPUT_DIR/obj" -name $item | xargs -J% cp % "$ARTIFACTS_DIR/lib"
+  find "$OUTPUT_DIR/obj" -name $item | xargs -J % cp % "$ARTIFACTS_DIR/lib"
 done
 
 # create zip
