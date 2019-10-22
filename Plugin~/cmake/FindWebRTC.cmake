@@ -1,15 +1,12 @@
 # Find WebRTC include path
 
-set(WEBRTC_DIR "webrtc")
+set(WEBRTC_DIR "${CMAKE_SOURCE_DIR}/webrtc")
 
-find_path(WEBRTC_INCLUDE_DIR
-  NAMES
-    include
-    include/third_party/abseil-cpp
-    include/third_party/jsoncpp/source/include
-    include/third_party/jsoncpp/generated
-  PATHS
-    ${WEBRTC_DIR}
+set(WEBRTC_INCLUDE_DIR
+    ${WEBRTC_DIR}/include
+    ${WEBRTC_DIR}/include/third_party/abseil-cpp
+    ${WEBRTC_DIR}/include/third_party/jsoncpp/source/include
+    ${WEBRTC_DIR}/include/third_party/jsoncpp/generated
 )
 
 set(LIBRARY_PATHS

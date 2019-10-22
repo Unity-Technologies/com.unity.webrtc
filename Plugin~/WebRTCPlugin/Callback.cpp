@@ -1,7 +1,10 @@
 ﻿#include "pch.h"
 #include "Context.h"
 #include "IUnityGraphics.h"
+
+#ifdef _WIN32
 #include "IUnityGraphicsD3D11.h"
+#endif
 
 namespace WebRTC
 {

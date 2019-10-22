@@ -25,8 +25,6 @@
 #include "rtc_base/flags.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/ssladapter.h"
-#include "rtc_base/win32socketinit.h"
-#include "rtc_base/win32socketserver.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/nethelpers.h"
 #include "rtc_base/stringutils.h"
@@ -34,9 +32,14 @@
 #include "rtc_base/signalthread.h"
 #include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/atomicops.h"
+#include "rtc_base/asynctcpsocket.h"
+
+#ifdef _WIN32
 #include "rtc_base/win32.h"
 #include "rtc_base/win32socketserver.h"
-#include "rtc_base/asynctcpsocket.h"
+#include "rtc_base/win32socketinit.h"
+#include "rtc_base/win32socketserver.h"
+#endif
 
 #include "media/base/videocapturer.h"
 #include "media/engine/webrtcvideocapturerfactory.h"
@@ -58,7 +61,10 @@
 
 #include "media/base/videobroadcaster.h"
 #pragma endregion
+
+#ifdef _WIN32
 #include "d3d11.h"
+#endif
 
 namespace WebRTC
 {
