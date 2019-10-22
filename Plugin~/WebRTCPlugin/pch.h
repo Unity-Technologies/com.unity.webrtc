@@ -62,9 +62,11 @@
 #include "media/base/videobroadcaster.h"
 #pragma endregion
 
-#ifdef _WIN32
+#include "PlatformBase.h"
+
+#if SUPPORT_D3D11
 #include "d3d11.h"
-#endif
+#endif // if SUPPORT_D3D11
 
 namespace WebRTC
 {
@@ -87,7 +89,13 @@ namespace WebRTC
         snprintf(buf.get(), size, format.c_str(), args ...);
         return std::string(buf.get(), buf.get() + size - 1);
     }
+
+#if SUPPORT_D3D11
     using UnityFrameBuffer = ID3D11Texture2D;
+    extern ID3D11DeviceContext* context;
+    extern ID3D11Device* g_D3D11Device;
+#endif //if SUPPORT_D3D11
+
     using uint8 = unsigned char;
     using uint16 = unsigned short int;
     using uint32 = unsigned int;
@@ -99,6 +107,4 @@ namespace WebRTC
 
     const uint32 bufferedFrameNum = 3;
     extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
-    extern ID3D11DeviceContext* context;
-    extern ID3D11Device* g_D3D11Device;
 }
