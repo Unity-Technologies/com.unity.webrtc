@@ -288,8 +288,8 @@ namespace WebRTC
         }
     private:
         std::unique_ptr<webrtc::AudioDeviceBuffer> deviceBuffer;
-        std::atomic<bool> started = false;
-        std::atomic<bool> isRecording = false;
+        std::atomic<bool> started {false};
+        std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
     };
 }

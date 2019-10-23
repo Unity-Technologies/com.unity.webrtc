@@ -1,5 +1,6 @@
-﻿#include "pch.h"
-#include "NvEncoder.h"
+﻿#ifdef _WIN32
+#include "pch.h"
+#include "NvEncoderD3D11.h"
 #include "IUnityGraphicsD3D11.h"
 #include "Context.h"
 #include <CString>
@@ -270,5 +271,4 @@ namespace WebRTC
         }
     }
 }
-
-
+#endif

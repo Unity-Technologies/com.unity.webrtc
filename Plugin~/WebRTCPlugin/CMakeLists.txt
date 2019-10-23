@@ -33,11 +33,13 @@ target_include_directories(webrtc
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
+    ${GLEW_INCLUDE_DIRS}
 )
 
 target_link_libraries(webrtc
   PRIVATE
     ${WEBRTC_LIBRARIES}
+    ${GLEW_LIBRARIES}
 )
 
 install(TARGETS webrtc DESTINATION ${CMAKE_INSTALL_PREFIX}/com.unity.webrtc/Runtime/Plugins/x86_64)

@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "NvEncoder.h"
 
 namespace WebRTC
 {
+    class NvEncoder;
     class NvVideoCapturer : public cricket::VideoCapturer
     {
     public:

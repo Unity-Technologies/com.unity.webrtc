@@ -95,8 +95,11 @@ namespace WebRTC
     extern ID3D11DeviceContext* context;
     extern ID3D11Device* g_D3D11Device;
     extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
+#elif SUPPORT_OPENGL_CORE
+    using UnityFrameBuffer = void;
 #endif //if SUPPORT_D3D11
 
+    using byte = unsigned char;
     using uint8 = unsigned char;
     using uint16 = unsigned short int;
     using uint32 = unsigned int;

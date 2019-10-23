@@ -2,6 +2,11 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
+#if _WIN32
+#else
+#include <dlfcn.h>
+#endif
+
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
@@ -54,8 +59,15 @@ namespace WebRTC
         //open an encode session
         NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
         openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
+
+//TODO:: avoid to use preprocessing conditionals
+#if _WIN32
         openEncdoeSessionExParams.device = g_D3D11Device;
         openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
+#else
+        openEncdoeSessionExParams.device = NULL;
+        openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_OPENGL;
+#endif
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
         result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
         checkf(result, "Unable to open NvEnc encode session");
@@ -206,7 +218,11 @@ namespace WebRTC
     {
         if (hModule)
         {
+#if _WIN32
             FreeLibrary((HMODULE)hModule);
+#else
+            dlclose(hModule);
+#endif
             hModule = nullptr;
         }
         if (m_contexts.size()) {

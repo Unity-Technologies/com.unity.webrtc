@@ -1,5 +1,5 @@
 ﻿#pragma once
-#define _WINSOCKAPI_  //Stops windows.h including winsock.h
+#ifdef _WIN32
 #include <vector>
 #include "nvEncodeAPI.h"
 #include <thread>
@@ -68,5 +68,5 @@ namespace WebRTC
         const int minBitRate = 5000000;
         int frameRate = 45;
     };
-
 }
+#endif
