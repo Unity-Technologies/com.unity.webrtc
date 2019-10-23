@@ -25,6 +25,7 @@ target_include_directories(webrtc
   PRIVATE
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
+    ${OPENGL_INCLUDE_DIR}
 )
 
 target_link_libraries(webrtc

@@ -23,7 +23,9 @@
 #endif
 #elif defined(__ANDROID__)
 #define UNITY_ANDROID 1
-#elif defined(UNITY_METRO) || defined(UNITY_LINUX) || defined(UNITY_WEBGL)
+#elif defined(__linux__)
+#define UNITY_LINUX 1
+#elif defined(UNITY_METRO) || defined(UNITY_WEBGL)
     // these are defined externally
 #elif defined(__EMSCRIPTEN__)
     // this is already defined in Unity 5.6
