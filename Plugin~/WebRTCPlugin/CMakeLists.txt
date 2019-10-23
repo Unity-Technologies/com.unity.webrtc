@@ -12,13 +12,20 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
-elseif(APPLE OR UNIX)
+elseif(APPLE)
   # Update if necessary
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-long-long -pedantic")
   target_compile_definitions(webrtc 
     PRIVATE
+      WEBRTC_MAC
       WEBRTC_POSIX
-  )  
+  )
+elseif(UNIX)
+  target_compile_definitions(webrtc
+    PRIVATE
+      WEBRTC_LINUX
+      WEBRTC_POSIX
+  )
 endif()
 
 target_include_directories(webrtc
