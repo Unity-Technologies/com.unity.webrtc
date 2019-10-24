@@ -1,5 +1,4 @@
 ﻿#pragma once
-#ifdef _WIN32
 #include <vector>
 #include "nvEncodeAPI.h"
 #include <thread>
@@ -25,7 +24,7 @@ namespace WebRTC
             OutputFrame outputFrame;
             std::vector<uint8> encodedFrame;
             bool isIdrFrame = false;
-            std::atomic<bool> isEncoding = false;
+            std::atomic<bool> isEncoding = {false};
         };
 
     public:
@@ -42,11 +41,14 @@ namespace WebRTC
         void InitEncoderResources();
 
     private:
-        void LoadNvEncApi();
         void ReleaseFrameInputBuffer(Frame& frame);
         void ReleaseEncoderResources();
         void ProcessEncodedFrame(Frame& frame);
+#if _WIN32
         ID3D11Texture2D* AllocateInputBuffers();
+#else
+        void* AllocateInputBuffers();
+#endif
         NV_ENC_REGISTERED_PTR RegisterResource(void *pBuffer);
         void MapResources(InputFrame& inputFrame);
         NV_ENC_OUTPUT_PTR InitializeBitstreamBuffer();
@@ -54,6 +56,9 @@ namespace WebRTC
         NV_ENC_CONFIG nvEncConfig = {};
         _NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
+        static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
+        static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
+        static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isNvEncoderSupported = false;
@@ -69,4 +74,3 @@ namespace WebRTC
         int frameRate = 45;
     };
 }
-#endif

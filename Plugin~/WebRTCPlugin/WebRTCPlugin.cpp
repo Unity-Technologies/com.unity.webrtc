@@ -77,7 +77,8 @@ extern "C"
     {
         auto idStr = stream->id();
         //TODO: Linux compatibility 
-        char* id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        //char* id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        auto id = new char[idStr.size() + sizeof(char)];
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -90,7 +91,8 @@ extern "C"
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
         //TODO: Linux compatibility 
-        auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        //auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        auto tracks = new webrtc::MediaStreamTrackInterface*[tracksVector.size()];
         for (int i = 0; i < tracksVector.size(); i++)
         {
             tracks[i] = tracksVector[i].get();
@@ -104,7 +106,8 @@ extern "C"
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
         //TODO: Linux compatibility 
-        auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        //auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        auto tracks = new webrtc::MediaStreamTrackInterface*[tracksVector.size()];
         for (int i = 0; i < tracksVector.size(); i++)
         {
             tracks[i] = tracksVector[i].get();
@@ -134,7 +137,8 @@ extern "C"
     {
         auto idStr = track->id();
         //TODO: Linux compatibility 
-        char* id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        //char* id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        auto id = new char[idStr.size() + sizeof(char)];
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -209,7 +213,8 @@ extern "C"
 #pragma warning(suppress: 4267)
         *len = _conf.size();
         //TODO: Linux compatibility 
-        *conf = (char*)::CoTaskMemAlloc(_conf.size() + sizeof(char));
+        //*conf = (char*)::CoTaskMemAlloc(_conf.size() + sizeof(char));
+        *conf = new char[_conf.size() + sizeof(char)];
         _conf.copy(*conf, _conf.size());
         (*conf)[_conf.size()] = '\0';
     }
@@ -312,7 +317,8 @@ extern "C"
     {
         std::string tmp = dataChannelObj->GetLabel();
         //TODO: Linux compatibility 
-        char* label = (char*)CoTaskMemAlloc(tmp.size() + sizeof(char));
+        //char* label = (char*)CoTaskMemAlloc(tmp.size() + sizeof(char));
+        auto label = new char[tmp.size() + sizeof(char)];
         tmp.copy(label, tmp.size());
         label[tmp.size()] = '\0';
         return label;

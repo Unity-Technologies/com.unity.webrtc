@@ -90,7 +90,11 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             if (rt)
             {
+#if _WIN32
                 rt->Release();
+#else
+                delete rt;
+#endif
                 rt = nullptr;
             }
         }

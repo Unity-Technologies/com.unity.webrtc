@@ -1,24 +1,35 @@
-﻿#ifdef _WIN32
+﻿
 #include "pch.h"
-#include "NvEncoderD3D11.h"
-#include "IUnityGraphicsD3D11.h"
+#include "NvEncoder.h"
 #include "Context.h"
 #include <CString>
+
+#if _WIN32
+#include "IUnityGraphicsD3D11.h"
+#else
+#include <GL/glew.h>
+#endif
 
 namespace WebRTC
 {
     NvEncoder::NvEncoder(int width, int height) :width(width), height(height)
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
-        checkf(g_D3D11Device != nullptr, "D3D11Device is invalid");
         checkf(width > 0 && height > 0, "Invalid width or height!");
         bool result = true;
 #pragma region open an encode session
         //open an encode session
         NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
         openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
+
+//TODO:: avoid to use preprocessing conditionals
+#if _WIN32
         openEncdoeSessionExParams.device = g_D3D11Device;
         openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
+#else
+        openEncdoeSessionExParams.device = NULL;
+        openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_OPENGL;
+#endif
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
         result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
         checkf(result, "Unable to open NvEnc encode session");
@@ -188,6 +199,7 @@ namespace WebRTC
         CaptureFrame(frame.encodedFrame);
     }
 
+#if _WIN32
     ID3D11Texture2D* NvEncoder::AllocateInputBuffers()
     {
         ID3D11Texture2D* inputTextures = nullptr;
@@ -204,11 +216,40 @@ namespace WebRTC
         g_D3D11Device->CreateTexture2D(&desc, NULL, &inputTextures);
         return inputTextures;
     }
+#else
+    void* NvEncoder::AllocateInputBuffers()
+    {
+        NV_ENC_INPUT_RESOURCE_OPENGL_TEX *pResource = new NV_ENC_INPUT_RESOURCE_OPENGL_TEX;
+        NV_ENC_BUFFER_FORMAT format = NV_ENC_BUFFER_FORMAT_ARGB;
+        uint32_t tex;
+
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_RECTANGLE, tex);
+
+        uint32_t chromaHeight = GetNumChromaPlanes(format) * GetChromaHeight(format, height);
+
+        glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_R8,
+                     GetWidthInBytes(format, width),
+                     height + chromaHeight,
+                     0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
+        glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+
+        pResource->texture = tex;
+        pResource->target = GL_TEXTURE_RECTANGLE;
+        return pResource;
+    }
+#endif
+
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(void *buffer)
     {
         NV_ENC_REGISTER_RESOURCE registerResource = { 0 };
         registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
+#if _WIN32
         registerResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
+#else
+        registerResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_OPENGL_TEX;
+#endif
         registerResource.resourceToRegister = buffer;
 
         if (!registerResource.resourceToRegister)
@@ -217,6 +258,7 @@ namespace WebRTC
         registerResource.height = height;
         LogPrint(StringFormat("nvEncRegisterResource: width is %d, height is %d", registerResource.width, registerResource.height).c_str());
         registerResource.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
+        registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;
         checkf(NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource))),
             StringFormat("nvEncRegisterResource error is %d", errorCode).c_str());
         return registerResource.registeredResource;
@@ -270,5 +312,69 @@ namespace WebRTC
             frame.outputFrame = nullptr;
         }
     }
+    uint32_t NvEncoder::GetNumChromaPlanes(const NV_ENC_BUFFER_FORMAT bufferFormat)
+    {
+        switch (bufferFormat)
+        {
+            case NV_ENC_BUFFER_FORMAT_NV12:
+            case NV_ENC_BUFFER_FORMAT_YUV420_10BIT:
+                return 1;
+            case NV_ENC_BUFFER_FORMAT_YV12:
+            case NV_ENC_BUFFER_FORMAT_IYUV:
+            case NV_ENC_BUFFER_FORMAT_YUV444:
+            case NV_ENC_BUFFER_FORMAT_YUV444_10BIT:
+                return 2;
+            case NV_ENC_BUFFER_FORMAT_ARGB:
+            case NV_ENC_BUFFER_FORMAT_ARGB10:
+            case NV_ENC_BUFFER_FORMAT_AYUV:
+            case NV_ENC_BUFFER_FORMAT_ABGR:
+            case NV_ENC_BUFFER_FORMAT_ABGR10:
+                return 0;
+            default:
+                return -1;
+        }
+    }
+    uint32_t NvEncoder::GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight)
+    {
+        switch (bufferFormat)
+        {
+            case NV_ENC_BUFFER_FORMAT_YV12:
+            case NV_ENC_BUFFER_FORMAT_IYUV:
+            case NV_ENC_BUFFER_FORMAT_NV12:
+            case NV_ENC_BUFFER_FORMAT_YUV420_10BIT:
+                return (lumaHeight + 1)/2;
+            case NV_ENC_BUFFER_FORMAT_YUV444:
+            case NV_ENC_BUFFER_FORMAT_YUV444_10BIT:
+                return lumaHeight;
+            case NV_ENC_BUFFER_FORMAT_ARGB:
+            case NV_ENC_BUFFER_FORMAT_ARGB10:
+            case NV_ENC_BUFFER_FORMAT_AYUV:
+            case NV_ENC_BUFFER_FORMAT_ABGR:
+            case NV_ENC_BUFFER_FORMAT_ABGR10:
+                return 0;
+            default:
+                return 0;
+        }
+    }
+    uint32_t NvEncoder::GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width)
+    {
+        switch (bufferFormat) {
+            case NV_ENC_BUFFER_FORMAT_NV12:
+            case NV_ENC_BUFFER_FORMAT_YV12:
+            case NV_ENC_BUFFER_FORMAT_IYUV:
+            case NV_ENC_BUFFER_FORMAT_YUV444:
+                return width;
+            case NV_ENC_BUFFER_FORMAT_YUV420_10BIT:
+            case NV_ENC_BUFFER_FORMAT_YUV444_10BIT:
+                return width * 2;
+            case NV_ENC_BUFFER_FORMAT_ARGB:
+            case NV_ENC_BUFFER_FORMAT_ARGB10:
+            case NV_ENC_BUFFER_FORMAT_AYUV:
+            case NV_ENC_BUFFER_FORMAT_ABGR:
+            case NV_ENC_BUFFER_FORMAT_ABGR10:
+                return width * 4;
+            default:
+                return 0;
+        }
+    }
 }
-#endif

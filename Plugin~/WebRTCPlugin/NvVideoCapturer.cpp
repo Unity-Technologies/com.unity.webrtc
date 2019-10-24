@@ -1,5 +1,9 @@
 ﻿#include "pch.h"
 #include "NvVideoCapturer.h"
+#if _WIN32
+#else
+#include <GL/glew.h>
+#endif
 
 namespace WebRTC
 {
@@ -13,7 +17,12 @@ namespace WebRTC
         if (captureStarted && !captureStopped)
         {
             int curFrameNum = nvEncoder->GetCurrentFrameCount() % bufferedFrameNum;
+#if _WIN32
             context->CopyResource(renderTextures[curFrameNum], unityRT);
+#else
+            // TODO:: Copy texture on GPU to GPU
+            // glCopyTexImage2D();
+#endif
             nvEncoder->EncodeFrame();
         }
     }
