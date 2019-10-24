@@ -21,6 +21,9 @@ elseif(APPLE)
       WEBRTC_POSIX
   )
 elseif(UNIX)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long -pedantic")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
   target_compile_definitions(webrtc
     PRIVATE
       WEBRTC_LINUX
@@ -41,5 +44,3 @@ target_link_libraries(webrtc
     ${WEBRTC_LIBRARIES}
     ${GLEW_LIBRARIES}
 )
-
-install(TARGETS webrtc DESTINATION ${CMAKE_INSTALL_PREFIX}/com.unity.webrtc/Runtime/Plugins/x86_64)
