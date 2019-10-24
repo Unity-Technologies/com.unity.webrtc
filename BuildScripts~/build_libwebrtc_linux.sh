@@ -21,12 +21,12 @@ cd ..
 gclient sync -f
 
 # change jsoncpp static library
-sed -i '' 's/source_set/static_library/' src/third_party/jsoncpp/BUILD.gn
+# sed -i '' 's/source_set/static_library/' src/third_party/jsoncpp/BUILD.gn
 
-gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false symbol_level=0 enable_iterator_debugging=false"
+gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"linux\" target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false symbol_level=0 enable_iterator_debugging=false"
 
-#add json.obj in link list of webrtc.ninja
-sed -i '' 's|obj/rtc_base/rtc_base/crc32.obj|obj/rtc_base/rtc_base/crc32.obj obj/rtc_base/rtc_json/json.obj|' "$OUTPUT_DIR/obj/webrtc.ninja"
+# add json.obj in link list of webrtc.ninja
+# sed -i '' 's|obj/rtc_base/rtc_base/crc32.obj|obj/rtc_base/rtc_base/crc32.obj obj/rtc_base/rtc_json/json.obj|' "$OUTPUT_DIR/obj/webrtc.ninja"
 
 ninja -C "$OUTPUT_DIR"
 
