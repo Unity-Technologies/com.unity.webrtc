@@ -2,7 +2,7 @@ file(GLOB sources *.cpp *.h)
 
 add_plugin(webrtc
   SOURCES ${sources}
-  PLUGINS_DIR ${CMAKE_INSTALL_PREFIX}/Runtime/Plugins/x86_64
+  PLUGINS_DIR ${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64
 )
 
 if(MSVC)

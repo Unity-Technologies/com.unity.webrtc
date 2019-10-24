@@ -90,6 +90,16 @@ namespace WebRTC
         return std::string(buf.get(), buf.get() + size - 1);
     }
 
+    using byte = unsigned char;
+    using uint8 = unsigned char;
+    using uint16 = unsigned short int;
+    using uint32 = unsigned int;
+    using uint64 = unsigned long long;
+    using int8 = signed char;
+    using int16 = signed short int;
+    using int32 = signed int;
+    using int64 = signed long long;
+
     const uint32 bufferedFrameNum = 3;
 
 #if SUPPORT_D3D11
@@ -101,14 +111,4 @@ namespace WebRTC
     using UnityFrameBuffer = void;
     extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
 #endif //if SUPPORT_D3D11
-
-    using byte = unsigned char;
-    using uint8 = unsigned char;
-    using uint16 = unsigned short int;
-    using uint32 = unsigned int;
-    using uint64 = unsigned long long;
-    using int8 = signed char;
-    using int16 = signed short int;
-    using int32 = signed int;
-    using int64 = signed long long;
 }

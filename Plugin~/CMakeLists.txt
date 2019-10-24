@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Threads REQUIRED)
-find_package(GLEW 2.1.0 REQUIRED)
+find_package(GLEW REQUIRED)
 
 project(webrtc)
 
