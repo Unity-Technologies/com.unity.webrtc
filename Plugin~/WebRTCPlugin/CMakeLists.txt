@@ -12,18 +12,19 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
-elseif(APPLE)
-  # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long -pedantic")
+elseif(APPLE OR UNIX)
+  message(STATUS "macos or linux")
+  target_compile_options(webrtc PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
+  target_compile_features(webrtc PRIVATE cxx_std_14)
+endif()
+
+if(APPLE)
   target_compile_definitions(webrtc 
     PRIVATE
       WEBRTC_MAC
       WEBRTC_POSIX
   )
 elseif(UNIX)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long -pedantic")
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
   target_compile_definitions(webrtc
     PRIVATE
       WEBRTC_LINUX
