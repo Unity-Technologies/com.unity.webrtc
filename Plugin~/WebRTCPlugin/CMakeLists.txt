@@ -24,11 +24,24 @@ if(APPLE)
       WEBRTC_MAC
       WEBRTC_POSIX
   )
+  target_link_libraries(webrtc
+     PRIVATE
+     ${WEBRTC_LIBRARIES}
+     ${GLEW_LIBRARIES}
+     ${OPENGL_LIBRARIES}
+     ${FRAMEWORK_LIBS}
+  )
 elseif(UNIX)
   target_compile_definitions(webrtc
     PRIVATE
       WEBRTC_LINUX
       WEBRTC_POSIX
+  )
+  target_link_libraries(webrtc
+    PRIVATE
+    ${WEBRTC_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${OPENGL_LIBRARIES}
   )
 endif()
 
@@ -38,10 +51,4 @@ target_include_directories(webrtc
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIRS}
-)
-
-target_link_libraries(webrtc
-  PRIVATE
-    ${WEBRTC_LIBRARIES}
-    ${GLEW_LIBRARIES}
 )

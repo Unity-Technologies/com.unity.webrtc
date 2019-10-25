@@ -7,6 +7,9 @@ project(webrtc)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(WebRTC REQUIRED)
+if(APPLE)
+  find_package(Framework REQUIRED)
+endif()
 include(AddPlugin)
 
 add_subdirectory(WebRTCPlugin)
