@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "NvEncoder.h"
 #include "Context.h"
-#include <CString>
+#include <cstring>
 
 #if _WIN32
 #include "IUnityGraphicsD3D11.h"

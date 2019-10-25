@@ -2,7 +2,7 @@ file(GLOB sources *.cpp *.h)
 
 add_plugin(webrtc
   SOURCES ${sources}
-  PLUGINS_DIR ${CMAKE_INSTALL_PREFIX}/Runtime/Plugins/x86_64
+  PLUGINS_DIR ${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64
 )
 
 if(MSVC)
@@ -12,9 +12,13 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
-elseif(APPLE)
-  # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long -pedantic")
+elseif(APPLE OR UNIX)
+  message(STATUS "macos or linux")
+  target_compile_options(webrtc PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
+  target_compile_features(webrtc PRIVATE cxx_std_14)
+endif()
+
+if(APPLE)
   target_compile_definitions(webrtc 
     PRIVATE
       WEBRTC_MAC
@@ -41,5 +45,3 @@ target_link_libraries(webrtc
     ${WEBRTC_LIBRARIES}
     ${GLEW_LIBRARIES}
 )
-
-install(TARGETS webrtc DESTINATION ${CMAKE_INSTALL_PREFIX}/com.unity.webrtc/Runtime/Plugins/x86_64)
