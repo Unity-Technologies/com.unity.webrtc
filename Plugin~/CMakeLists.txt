@@ -5,6 +5,8 @@ find_package(GLEW REQUIRED)
 
 project(webrtc)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(WebRTC REQUIRED)
 if(APPLE)
