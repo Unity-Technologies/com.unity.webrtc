@@ -81,6 +81,11 @@ namespace WebRTC
 #define DebugErrorW(...)    LogPrint(L"webrtc Error: "  __VA_ARGS__)
 #define NV_RESULT(NvFunction) NvFunction == NV_ENC_SUCCESS
 
+#ifndef _WIN32
+#define CoTaskMemAlloc(p) malloc(p)
+#define CoTaskMemFree(p) free(p)
+#endif
+
     template<class ... Args>
     std::string StringFormat(const std::string& format, Args ... args)
     {

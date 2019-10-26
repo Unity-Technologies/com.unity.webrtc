@@ -261,9 +261,7 @@ namespace WebRTC
         current->ToString(&out);
 
         desc.type = ConvertSdpType(current->GetType());
-        // TODO: Linux compatibility
-        // desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
-        desc.sdp = new char[out.size() + 1];
+        desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
     }
