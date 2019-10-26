@@ -11,6 +11,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(WebRTC REQUIRED)
 if(APPLE)
   find_package(Framework REQUIRED)
+elseif(UNIX)
+  find_package(LibCXX REQUIRED)
 endif()
 include(AddPlugin)
 

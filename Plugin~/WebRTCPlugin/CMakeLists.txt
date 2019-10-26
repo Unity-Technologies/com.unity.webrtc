@@ -14,7 +14,7 @@ if(MSVC)
   endif()
 elseif(APPLE OR UNIX)
   message(STATUS "macos or linux")
-  target_compile_options(webrtc PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
+  target_compile_options(webrtc PRIVATE -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
   target_compile_features(webrtc PRIVATE cxx_std_14)
 endif()
 
@@ -32,6 +32,11 @@ if(APPLE)
      ${FRAMEWORK_LIBS}
   )
 elseif(UNIX)
+  set(CMAKE_C_COMPILER_ID Clang)
+  set(CMAKE_CXX_COMPILER_ID Clang)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++")
+
   target_compile_definitions(webrtc
     PRIVATE
       WEBRTC_LINUX
@@ -42,6 +47,7 @@ elseif(UNIX)
     ${WEBRTC_LIBRARIES}
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    ${LIBCXX_LIBRARIES}
   )
 endif()
 
@@ -51,4 +57,5 @@ target_include_directories(webrtc
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIRS}
+    ${LIBCXX_INCLUDE_DIRS}
 )
