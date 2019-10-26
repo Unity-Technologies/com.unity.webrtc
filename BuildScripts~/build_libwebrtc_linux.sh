@@ -21,7 +21,7 @@ cd ..
 gclient sync -f
 
 # add jsoncpp
-patch src/BUILD.gn < add_jsoncpp.patch
+patch src/BUILD.gn < "$(pwd)/add_jsoncpp.patch"
 
 gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"linux\" rtc_include_tests=false rtc_build_examples=false symbol_level=0 enable_iterator_debugging=false use_rtti=true"
 ninja -C "$OUTPUT_DIR"
