@@ -20,14 +20,10 @@ cd ..
 
 gclient sync -f
 
-# change jsoncpp static library
-sed -i '' 's/source_set/static_library/' src/third_party/jsoncpp/BUILD.gn
+# add jsoncpp
+patch src/BUILD.gn < add_jsoncpp.patch
 
 gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"mac\" rtc_include_tests=false rtc_build_examples=false symbol_level=0 enable_iterator_debugging=false use_rtti=true"
-
-#add json.obj in link list of webrtc.ninja
-sed -i '' 's|obj/rtc_base/rtc_base/crc32.obj|obj/rtc_base/rtc_base/crc32.obj obj/rtc_base/rtc_json/json.obj|' "$OUTPUT_DIR/obj/webrtc.ninja"
-
 ninja -C "$OUTPUT_DIR"
 
 cd src
