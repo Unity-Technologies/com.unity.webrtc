@@ -30,7 +30,7 @@ cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
 mkdir "$ARTIFACTS_DIR/lib"
-array=("libwebrtc.a" "libaudio_decoder_opus.a" "libwebrtc_opus.a" "libjsoncpp.a")
+array=("libwebrtc.a")
 for item in ${array[@]}; do
   find "$OUTPUT_DIR/obj" -name $item | xargs -I % cp % "$ARTIFACTS_DIR/lib"
 done
