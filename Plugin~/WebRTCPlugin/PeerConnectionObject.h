@@ -98,17 +98,17 @@ namespace WebRTC
         friend class DataChannelObject;
 
     public:
-        DelegateCreateSDSuccess onCreateSDSuccess;
-        DelegateCreateSDFailure onCreateSDFailure;
-        DelegateSetSDSuccess onSetSDSuccess;
-        DelegateSetSDFailure onSetSDFailure;
-        DelegateLocalSdpReady onLocalSdpReady;
-        DelegateIceCandidate onIceCandidate;
-        DelegateOnIceConnectionChange onIceConnectionChange;
-        DelegateOnDataChannel onDataChannel;
-        DelegateOnRenegotiationNeeded onRenegotiationNeeded;
-        DelegateOnTrack onTrack;
-        rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection;
+        DelegateCreateSDSuccess onCreateSDSuccess = nullptr;
+        DelegateCreateSDFailure onCreateSDFailure = nullptr;
+        DelegateSetSDSuccess onSetSDSuccess = nullptr;
+        DelegateSetSDFailure onSetSDFailure = nullptr;
+        DelegateIceCandidate onIceCandidate = nullptr;
+        DelegateLocalSdpReady onLocalSdpReady = nullptr;
+        DelegateOnIceConnectionChange onIceConnectionChange = nullptr;
+        DelegateOnDataChannel onDataChannel = nullptr;
+        DelegateOnRenegotiationNeeded onRenegotiationNeeded = nullptr;
+        DelegateOnTrack onTrack = nullptr;
+        rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection = nullptr;
     private:
         Context& context;
     };
