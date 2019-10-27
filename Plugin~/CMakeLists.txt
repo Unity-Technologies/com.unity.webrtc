@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 enable_language(CXX)
-find_package(Threads REQUIRED)
-find_package(GLEW REQUIRED)
 
 project(webrtc)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -pg")
+
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+find_package(Threads REQUIRED)
+find_package(GLEW REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(WebRTC REQUIRED)
