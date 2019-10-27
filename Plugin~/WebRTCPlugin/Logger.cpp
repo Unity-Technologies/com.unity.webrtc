@@ -9,13 +9,13 @@ namespace WebRTC
 #ifdef _DEBUG
         va_list vl;
         va_start(vl, fmt);
-#ifdef _WIN32
         char buf[2048];
+#ifdef _WIN32
         vsprintf_s(buf, fmt, vl);
-        debugLog(buf);
 #else
-        vprintf(fmt, vl);
+        vsprintf(buf, fmt, vl);
 #endif
+        debugLog(buf);
         va_end(vl);
 #endif
     }

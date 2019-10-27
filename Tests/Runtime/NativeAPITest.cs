@@ -1,13 +1,25 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Unity.WebRTC;
 
 class NativeAPITest
 {
-    [Test]
-    public void RegisterDebugLog()
+    [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
+    static void DebugLog(string str)
+    {
+        UnityEngine.Debug.Log(str);
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        NativeMethods.RegisterDebugLog(DebugLog);
+    }
+
+    [TearDown]
+    public void TearDown()
     {
         NativeMethods.RegisterDebugLog(null);
-    }
+    }   
 
     [Test]
     public void CreateAndDestroyContext()
