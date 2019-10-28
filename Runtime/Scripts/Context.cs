@@ -97,12 +97,17 @@ namespace Unity.WebRTC
 
         public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
         {
-            return NativeMethods.CaptureVideoStream(self, rt, width, height);
+            return NativeMethods.ContextCaptureVideoStream(self, rt, width, height);
+        }
+
+        public void DeleteVideoStream(IntPtr stream)
+        {
+            NativeMethods.ContextDeleteVideoStream(self, stream);
         }
 
         public IntPtr CaptureAudioStream()
         {
-            return NativeMethods.CaptureAudioStream(self);
+            return NativeMethods.ContextCaptureAudioStream(self);
         }
 
         public IntPtr GetRenderEventFunc()

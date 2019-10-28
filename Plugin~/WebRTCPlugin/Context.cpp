@@ -348,6 +348,12 @@ namespace WebRTC
         return videoStream.get();
     }
 
+    void Context::DeleteVideoStream(webrtc::MediaStreamInterface* stream)
+    {
+        auto item = std::find(videoStreams.begin(), videoStreams.end(), stream);
+        videoStreams.erase(item);
+    }
+
     webrtc::MediaStreamInterface* Context::CreateAudioStream()
     {
         //avoid optimization specially for voice

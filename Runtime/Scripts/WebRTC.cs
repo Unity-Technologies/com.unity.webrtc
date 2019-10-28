@@ -412,9 +412,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CaptureVideoStream(IntPtr context, IntPtr rt, int width, int height);
+        public static extern IntPtr ContextCaptureVideoStream(IntPtr context, IntPtr rt, int width, int height);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CaptureAudioStream(IntPtr context);
+        public static extern IntPtr ContextCaptureAudioStream(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]

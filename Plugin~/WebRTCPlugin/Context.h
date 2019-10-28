@@ -40,6 +40,7 @@ namespace WebRTC
     public:
         explicit Context(int uid = -1);
         webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer);
+        void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamInterface* CreateAudioStream();
         ~Context();
 

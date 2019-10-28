@@ -1,12 +1,29 @@
 using NUnit.Framework;
+using UnityEngine;
 using Unity.WebRTC;
+using UnityEngine.Rendering;
 
 class NativeAPITest
 {
     [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
     static void DebugLog(string str)
     {
-        UnityEngine.Debug.Log(str);
+        Debug.Log(str);
+    }
+
+    static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
+    {
+        switch (type)
+        {
+            case GraphicsDeviceType.Direct3D11:
+            case GraphicsDeviceType.Direct3D12:
+                return RenderTextureFormat.BGRA32;
+            case GraphicsDeviceType.OpenGLCore:
+            case GraphicsDeviceType.OpenGLES2:
+            case GraphicsDeviceType.OpenGLES3:
+                return RenderTextureFormat.ARGB32;
+        }
+        return RenderTextureFormat.Default;
     }
 
     [SetUp]
@@ -19,7 +36,7 @@ class NativeAPITest
     public void TearDown()
     {
         NativeMethods.RegisterDebugLog(null);
-    }   
+    }
 
     [Test]
     public void CreateAndDestroyContext()
@@ -49,15 +66,40 @@ class NativeAPITest
         NativeMethods.ContextDestroy(0);
     }
     [Test]
-    public void CreateAndDeleteMediaTrack()
+    public void CreateAndDeleteVideoStream()
     {
         var context = NativeMethods.ContextCreate(0);
-        var peer = NativeMethods.ContextCreatePeerConnection(context);
-        var width = 1280;
-        var height = 720;
-        var renderTexture = new UnityEngine.RenderTexture(width, height, 0, UnityEngine.RenderTextureFormat.BGRA32);
-        var stream = NativeMethods.CaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
-        NativeMethods.ContextDeletePeerConnection(context, peer);
+        const int width = 1280;
+        const int height = 720;
+        var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+        var renderTexture = new RenderTexture(width, height, 0, format);
+        var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
+        NativeMethods.ContextDeleteVideoStream(context, stream);
+        NativeMethods.ContextDestroy(0);
+    }
+
+    [Test]
+    public void CallIssuePluginEventWithoutStream()
+    {
+        var context = NativeMethods.ContextCreate(0);
+        var callback = NativeMethods.GetRenderEventFunc(context);
+        GL.IssuePluginEvent(callback, 0);
+        NativeMethods.ContextDestroy(0);
+    }
+
+    [Test]
+    public void CallIssuePluginEvent()
+    {
+        var context = NativeMethods.ContextCreate(0);
+        var callback = NativeMethods.GetRenderEventFunc(context);
+        const int width = 1280;
+        const int height = 720;
+        var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+
+        var renderTexture = new RenderTexture(width, height, 0, format);
+        var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
+        GL.IssuePluginEvent(callback, 0);
+        NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);
     }
 }

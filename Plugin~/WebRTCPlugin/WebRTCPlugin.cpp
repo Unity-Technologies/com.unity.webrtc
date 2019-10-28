@@ -34,11 +34,18 @@ extern "C"
         return ContextManager::GetInstance()->GetCodecInitializationResult();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* CaptureVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCaptureVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
     {
         context->InitializeEncoder(width, height);
         return context->CreateVideoStream(rt);
     }
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
+    {
+        // TODO: context->FinalizeEncoder();
+        context->DeleteVideoStream(stream);
+    }
+
     //TODO: Multi-track support
     UNITY_INTERFACE_EXPORT void StopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
     {
