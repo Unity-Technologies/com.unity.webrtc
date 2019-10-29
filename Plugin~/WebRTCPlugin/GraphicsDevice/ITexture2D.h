@@ -8,7 +8,7 @@ public:
     //GraphicsDevice->CreateEncoderInputTexture
 
     ITexture2D(uint32_t w, uint32_t h) : m_width (w), m_height(h) {}
-    bool IsSize(uint32_t w, uint32_t h) { return m_width == w && m_height == h; }
+    bool IsSize(uint32_t w, uint32_t h) const { return m_width == w && m_height == h; }
 
     virtual ~ITexture2D() = 0;
     virtual void* GetNativeTexturePtrV() = 0;
