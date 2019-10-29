@@ -3,10 +3,13 @@
 namespace WebRTC
 {
     class UnityEncoder;
+    struct ITexture2D;
     class UnityVideoCapturer : public cricket::VideoCapturer
     {
     public:
-        UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height);
+        UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr);
+        virtual ~UnityVideoCapturer();
+
         void EncodeVideoData();
         // Start the video capturer with the specified capture format.
         virtual cricket::CaptureState Start(const cricket::VideoFormat& Format) override
@@ -35,8 +38,6 @@ namespace WebRTC
         void SetRate(uint32 rate);
         void CaptureFrame(std::vector<uint8>& data);
         bool CaptureStarted() { return captureStarted; }
-    public:
-        UnityFrameBuffer* unityRT = nullptr;
     private:
         // subclasses override this virtual method to provide a vector of fourccs, in
         // order of preference, that are expected by the media engine.
@@ -54,6 +55,7 @@ namespace WebRTC
 
         bool captureStarted = false;
         bool captureStopped = false;
+        ITexture2D* m_unityRT = nullptr;
 
     };
 

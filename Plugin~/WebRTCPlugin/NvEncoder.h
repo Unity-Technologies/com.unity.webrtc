@@ -5,9 +5,12 @@
 #include <thread>
 #include <atomic>
 #include "UnityEncoder.h"
+#include "WebRTCConstants.h" //NUM_TEXTURES_FOR_BUFFERING
 
 namespace WebRTC
 {
+    struct ITexture2D;
+
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class NvEncoder : public UnityEncoder
     {
@@ -29,34 +32,6 @@ namespace WebRTC
             std::atomic<bool> isEncoding = false;
         };
 
-        struct EncoderInputTexture
-        {
-            UnityFrameBuffer* texture;
-            int width;
-            int height;
-            EncoderInputTexture(int w, int h)
-            {
-                width = w;
-                height = h;
-                D3D11_TEXTURE2D_DESC desc = { 0 };
-                desc.Width = width;
-                desc.Height = height;
-                desc.MipLevels = 1;
-                desc.ArraySize = 1;
-                desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-                desc.SampleDesc.Count = 1;
-                desc.Usage = D3D11_USAGE_DEFAULT;
-                desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-                desc.CPUAccessFlags = 0;
-                HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &texture);
-            }
-
-            ~EncoderInputTexture()
-            {
-                texture->Release();
-                texture = nullptr;
-            }
-        };
 
     public:
         NvEncoder();
@@ -68,36 +43,35 @@ namespace WebRTC
         bool IsSupported() const { return isNvEncoderSupported; }
         void SetIdrFrame() { isIdrFrame = true; }
         uint64 GetCurrentFrameCount() { return frameCount; }
-        void InitEncoder(int width, int height, int _bitRate);
+        void InitEncoder(uint32_t width, uint32_t height, int _bitRate);
         void InitEncoderResources();
 
         void* getRenderTexture() { return nvEncoderTexture; }
-        int getEncodeWidth() { return encodeWidth; }
-        int getEncodeHeight() { return encodeHeight; }
+        uint32_t getEncodeWidth() { return encodeWidth; }
+        uint32_t getEncodeHeight() { return encodeHeight; }
         int getBitRate() { return bitRate; }
         static void DestroyEncoderTexture();
     private:
-        static UnityFrameBuffer* getEncoderTexture(int width, int height);
+        static ITexture2D* getEncoderTexture(uint32_t width, uint32_t height);
         void ReleaseFrameInputBuffer(Frame& frame);
         void ReleaseEncoderResources();
         void ProcessEncodedFrame(Frame& frame);
-        ID3D11Texture2D* AllocateInputBuffers();
-        NV_ENC_REGISTERED_PTR RegisterResource(void *pBuffer);
+        NV_ENC_REGISTERED_PTR RegisterResource(ITexture2D* tex);
         void MapResources(InputFrame& inputFrame);
         NV_ENC_OUTPUT_PTR InitializeBitstreamBuffer();
         NV_ENC_INITIALIZE_PARAMS nvEncInitializeParams = {};
         NV_ENC_CONFIG nvEncConfig = {};
         _NVENCSTATUS errorCode;
-        Frame bufferedFrames[bufferedFrameNum];
-        static std::list<EncoderInputTexture*> nvEncoderInputTextureList;
-        UnityFrameBuffer* nvEncoderTexture;
+        Frame bufferedFrames[NUM_TEXTURES_FOR_BUFFERING];
+        static std::list<ITexture2D*> nvEncoderInputTextureList;
+        ITexture2D* nvEncoderTexture;
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isNvEncoderSupported = false;
         bool isInitialize = false;
         bool isIdrFrame = false;
-        int encodeWidth;
-        int encodeHeight;
+        uint32_t encodeWidth;
+        uint32_t encodeHeight;
         //10Mbps
         int bitRate = 10000000;
         //100Mbps

@@ -4,9 +4,15 @@
 #include "Context.h"
 #include <CString>
 
+#include "GraphicsDevice/D3D11/D3D11Texture2D.h"
+#include "GraphicsDevice/GraphicsDevice.h"
+
+
+
+
 namespace WebRTC
 {
-    std::list<NvEncoder::EncoderInputTexture*> NvEncoder::nvEncoderInputTextureList;
+    std::list<ITexture2D*> NvEncoder::nvEncoderInputTextureList;
 
     NvEncoder::NvEncoder()
     {
@@ -17,7 +23,7 @@ namespace WebRTC
             //open an encode session
             NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
             openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
-            openEncdoeSessionExParams.device = g_D3D11Device;
+            openEncdoeSessionExParams.device = GraphicsDevice::GetInstance().GetNativeDevicePtr();
             openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
             openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
             result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
@@ -38,14 +44,15 @@ namespace WebRTC
         }
     }
 
-    void NvEncoder::InitEncoder(int width, int height, int _bitRate)
+    void NvEncoder::InitEncoder(uint32_t width, uint32_t height, int _bitRate)
     {
         encodeWidth = width;
         encodeHeight = height;
         bitRate = _bitRate;
 
         LogPrint(StringFormat("width is %d, height is %d", encodeWidth, encodeHeight).c_str());
-        checkf(g_D3D11Device != nullptr, "D3D11Device is invalid");
+        void* nativeDevicePtr = GraphicsDevice::GetInstance().GetNativeDevicePtr();
+        checkf(nativeDevicePtr != nullptr, "D3D11Device is invalid");
         checkf(encodeWidth > 0 && encodeHeight > 0, "Invalid width or height!");
 
         bool result = true;
@@ -141,7 +148,7 @@ namespace WebRTC
     void NvEncoder::EncodeFrame(int width, int height)
     {
         UpdateSettings(width, height);
-        uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;
+        uint32 bufferIndexToWrite = frameCount % NUM_TEXTURES_FOR_BUFFERING;
 
         Frame& frame = bufferedFrames[bufferIndexToWrite];
 #pragma region set frame params
@@ -210,28 +217,12 @@ namespace WebRTC
         captureFrame(frame.encodedFrame);
     }
 
-    ID3D11Texture2D* NvEncoder::AllocateInputBuffers()
-    {
-        ID3D11Texture2D* inputTextures = nullptr;
-        D3D11_TEXTURE2D_DESC desc = { 0 };
-        desc.Width = encodeWidth;
-        desc.Height = encodeHeight;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-        desc.CPUAccessFlags = 0;
-        HRESULT r = g_D3D11Device->CreateTexture2D(&desc, NULL, &inputTextures);
-        return inputTextures;
-    }
-    NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(void *buffer)
+    NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(ITexture2D* tex)
     {
         NV_ENC_REGISTER_RESOURCE registerResource = { 0 };
         registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
         registerResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
-        registerResource.resourceToRegister = buffer;
+        registerResource.resourceToRegister = tex->GetNativeTexturePtrV();
 
         if (!registerResource.resourceToRegister)
             LogPrint("resource is not initialized");
@@ -264,32 +255,32 @@ namespace WebRTC
 
     void NvEncoder::DestroyEncoderTexture()
     {
-        for (std::list<EncoderInputTexture*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
+        for (std::list<ITexture2D*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
         {
             delete (*it);
         }
         nvEncoderInputTextureList.clear();
     }
 
-    UnityFrameBuffer* NvEncoder::getEncoderTexture(int width, int height)
+    ITexture2D* NvEncoder::getEncoderTexture(uint32_t width, uint32_t height)
     {
-        for (std::list<EncoderInputTexture*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
+        for (std::list<ITexture2D*>::iterator it = nvEncoderInputTextureList.begin(); it != nvEncoderInputTextureList.end(); ++it)
         {
-            if ((*it)->width == width && (*it)->height == height)
+            if ((*it)->IsSize(width, height))
             {
-                return (*it)->texture;
+                return (*it);
             }
         }
 
-        EncoderInputTexture* pEncoderInputTexture = new EncoderInputTexture(width, height);
+        ITexture2D* pEncoderInputTexture = GraphicsDevice::GetInstance().CreateEncoderInputTexture(width, height);
         nvEncoderInputTextureList.push_back(pEncoderInputTexture);
-        return pEncoderInputTexture->texture;
+        return pEncoderInputTexture;
     }
 
     void NvEncoder::InitEncoderResources()
     {
         nvEncoderTexture = getEncoderTexture(encodeWidth, encodeHeight);
-        for (int i = 0; i < bufferedFrameNum; i++)
+        for (int i = 0; i < NUM_TEXTURES_FOR_BUFFERING; ++i)
         {
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(nvEncoderTexture);

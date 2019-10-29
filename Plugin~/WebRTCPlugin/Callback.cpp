@@ -2,18 +2,12 @@
 #include "Context.h"
 #include "IUnityGraphics.h"
 #include "IUnityGraphicsD3D11.h"
+#include "GraphicsDevice/GraphicsDevice.h"
 
 namespace WebRTC
 {
     IUnityInterfaces* s_UnityInterfaces = nullptr;
     IUnityGraphics* s_Graphics = nullptr;
-    UnityGfxRenderer s_RenderType;
-    //d3d11 context
-    ID3D11DeviceContext* context;
-    //d3d11 device
-    ID3D11Device* g_D3D11Device = nullptr;
-    //natively created ID3D11Texture2D ptrs
-    UnityFrameBuffer* renderTextures[bufferedFrameNum];
 
     Context* s_context;
 }
@@ -25,24 +19,13 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
     case kUnityGfxDeviceEventInitialize:
     {
-        s_RenderType = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
-        if (s_RenderType == kUnityGfxRendererD3D11)
-        {
-            g_D3D11Device = s_UnityInterfaces->Get<IUnityGraphicsD3D11>()->GetDevice();
-            g_D3D11Device->GetImmediateContext(&context);
-        }
+        GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
-        for (auto rt : renderTextures)
-        {
-            if (rt)
-            {
-                rt->Release();
-                rt = nullptr;
-            }
-        }
+        GraphicsDevice::GetInstance().Shutdown();
+
         //UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
         break;

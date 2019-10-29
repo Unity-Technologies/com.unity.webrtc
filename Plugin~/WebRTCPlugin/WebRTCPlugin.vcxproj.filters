@@ -16,6 +16,15 @@
     <Filter Include="Header Files\Unity">
       <UniqueIdentifier>{16932972-c865-4546-9602-539504fea736}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsDevice">
+      <UniqueIdentifier>{a68e7998-601c-4854-b2f6-00f03841ad0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\D3D11">
+      <UniqueIdentifier>{9eac67b4-cc43-476a-9f7c-e806d957f4b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\D3D12">
+      <UniqueIdentifier>{e08d503c-149d-4cb5-9840-4814c83bc578}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebRTCPlugin.h">
@@ -63,6 +72,33 @@
     <ClInclude Include="UnityVideoCapturer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDevice\ITexture2D.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="WebRTCConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\GraphicsDevice.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="WebRTCMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\IGraphicsDevice.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11Texture2D.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -100,6 +136,27 @@
     </ClCompile>
     <ClCompile Include="UnityVideoCapturer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\ITexture2D.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\IGraphicsDevice.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

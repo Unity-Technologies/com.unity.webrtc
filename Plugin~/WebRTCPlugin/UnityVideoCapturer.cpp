@@ -2,18 +2,31 @@
 #include "UnityVideoCapturer.h"
 #include "UnityEncoder.h"
 
+#include "GraphicsDevice/GraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
+#include "WebRTCMacros.h"
+
 namespace WebRTC
 {
-    UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height) : nvEncoder(pEncoder), width(_width), height(_height)
-    {
+    UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr)
+        : nvEncoder(pEncoder), width(_width), height(_height)
+    {       
+        m_unityRT = GraphicsDevice::GetInstance().CreateEncoderInputTexture(_width, _height, unityNativeTexPtr);
+
         set_enable_video_adapter(false);
         SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));
     }
+
+    UnityVideoCapturer::~UnityVideoCapturer() {
+        SAFE_DELETE(m_unityRT);
+
+    }
+
     void UnityVideoCapturer::EncodeVideoData()
     {
         if (captureStarted && !captureStopped)
         {
-            context->CopyResource((ID3D11Resource*)nvEncoder->getRenderTexture(), unityRT);
+            GraphicsDevice::GetInstance().CopyNativeResource(nvEncoder->getRenderTexture(),m_unityRT->GetNativeTexturePtrV());
             nvEncoder->EncodeFrame(width, height);
         }
     }

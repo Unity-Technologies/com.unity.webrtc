@@ -177,6 +177,13 @@
     <ClInclude Include="DataChannelObject.h" />
     <ClInclude Include="DummyAudioDevice.h" />
     <ClInclude Include="DummyVideoEncoder.h" />
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11Texture2D.h" />
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h" />
+    <ClInclude Include="GraphicsDevice\GraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\IGraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="nvEncodeAPI.h" />
     <ClInclude Include="NvEncoder.h" />
@@ -184,6 +191,8 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PeerConnectionObject.h" />
     <ClInclude Include="UnityEncoder.h" />
+    <ClInclude Include="WebRTCConstants.h" />
+    <ClInclude Include="WebRTCMacros.h" />
     <ClInclude Include="WebRTCPlugin.h" />
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +201,13 @@
     <ClCompile Include="DataChannelObject.cpp" />
     <ClCompile Include="DummyAudioDevice.cpp" />
     <ClCompile Include="DummyVideoEncoder.cpp" />
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11Texture2D.cpp" />
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12Texture2D.cpp" />
+    <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsDevice\IGraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="NvEncoder.cpp" />
     <ClCompile Include="UnityVideoCapturer.cpp" />
