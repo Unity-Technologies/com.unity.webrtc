@@ -272,7 +272,7 @@ namespace WebRTC
             }
         }
 
-        ITexture2D* pEncoderInputTexture = GraphicsDevice::GetInstance().CreateEncoderInputTexture(width, height);
+        ITexture2D* pEncoderInputTexture = GraphicsDevice::GetInstance().CreateDefaultTexture(width, height);
         nvEncoderInputTextureList.push_back(pEncoderInputTexture);
         return pEncoderInputTexture;
     }

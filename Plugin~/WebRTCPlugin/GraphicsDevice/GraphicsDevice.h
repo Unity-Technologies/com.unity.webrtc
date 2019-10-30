@@ -13,7 +13,7 @@ class GraphicsDevice {
         static GraphicsDevice& GetInstance();
         void Init(IUnityInterfaces* unityInterface);
         void Shutdown();
-        inline ITexture2D* CreateEncoderInputTexture(uint32_t w , uint32_t h );
+        inline ITexture2D* CreateDefaultTexture(uint32_t w , uint32_t h );
         inline ITexture2D* CreateDefaultTextureFromNative(uint32_t width, uint32_t height, void* nativeTexturePtr);
 
         inline void* GetEncodeDevicePtr();
@@ -30,7 +30,7 @@ class GraphicsDevice {
 };
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* GraphicsDevice::CreateEncoderInputTexture(uint32_t w, uint32_t h) {
+ITexture2D* GraphicsDevice::CreateDefaultTexture(uint32_t w, uint32_t h) {
     return m_device->CreateDefaultTextureV(w,h);
 }
 
