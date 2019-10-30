@@ -21,7 +21,7 @@ public:
 
 private:
 
-    ITexture2D* CreateD3D12Texture(uint32_t w, uint32_t h);
+    ITexture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
 
     ID3D12Device* m_d3d12Device;
     //ID3D12DeviceContext* m_d3d12Context;
