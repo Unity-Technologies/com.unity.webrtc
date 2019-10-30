@@ -1,4 +1,4 @@
-﻿
+
 #include "pch.h"
 #include "NvEncoder.h"
 #include "Context.h"
@@ -31,8 +31,8 @@ namespace WebRTC
         openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_OPENGL;
 #endif
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
-        result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
-        checkf(result, "Unable to open NvEnc encode session");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface);
+        checkf(NV_RESULT(errorCode), StringFormat("Unable to open NvEnc encode session %d", errorCode).c_str());
         LogPrint(StringFormat("OpenEncodeSession Error is %d", errorCode).c_str());
 #pragma endregion
 #pragma region set initialization parameters
@@ -56,8 +56,8 @@ namespace WebRTC
         NV_ENC_PRESET_CONFIG presetConfig = { 0 };
         presetConfig.version = NV_ENC_PRESET_CONFIG_VER;
         presetConfig.presetCfg.version = NV_ENC_CONFIG_VER;
-        result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodePresetConfig(pEncoderInterface, nvEncInitializeParams.encodeGUID, nvEncInitializeParams.presetGUID, &presetConfig));
-        checkf(result, "Failed to select NVEncoder preset config");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodePresetConfig(pEncoderInterface, nvEncInitializeParams.encodeGUID, nvEncInitializeParams.presetGUID, &presetConfig);
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to select NVEncoder preset config %d", errorCode).c_str());
         std::memcpy(&nvEncConfig, &presetConfig.presetCfg, sizeof(NV_ENC_CONFIG));
         nvEncConfig.profileGUID = NV_ENC_H264_PROFILE_BASELINE_GUID;
         nvEncConfig.gopLength = nvEncInitializeParams.frameRateNum;
@@ -75,14 +75,14 @@ namespace WebRTC
         capsParam.version = NV_ENC_CAPS_PARAM_VER;
         capsParam.capsToQuery = NV_ENC_CAPS_ASYNC_ENCODE_SUPPORT;
         int32 asyncMode = 0;
-        result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodeCaps(pEncoderInterface, nvEncInitializeParams.encodeGUID, &capsParam, &asyncMode));
-        checkf(result, "Failded to get NVEncoder capability params");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodeCaps(pEncoderInterface, nvEncInitializeParams.encodeGUID, &capsParam, &asyncMode);
+        checkf(NV_RESULT(errorCode), StringFormat("Failded to get NVEncoder capability params %d", errorCode).c_str());
         nvEncInitializeParams.enableEncodeAsync = 0;
 #pragma endregion
 #pragma region initialize hardware encoder session
-        result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncInitializeEncoder(pEncoderInterface, &nvEncInitializeParams)));
-        checkf(result, "Failed to initialize NVEncoder");
-        LogPrint(StringFormat("nvEncInitializeEncoder error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncInitializeEncoder(pEncoderInterface, &nvEncInitializeParams);
+        result = NV_RESULT(errorCode);
+        checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
 #pragma endregion
         InitEncoderResources();
         isNvEncoderSupported = true;
@@ -92,8 +92,8 @@ namespace WebRTC
         ReleaseEncoderResources();
         if (pEncoderInterface)
         {
-            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface));
-            checkf(result, "Failed to destroy NV encoder interface");
+            errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface);
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy NV encoder interface %d", errorCode).c_str());
             pEncoderInterface = nullptr;
         }
      
@@ -118,8 +118,8 @@ namespace WebRTC
             NV_ENC_RECONFIGURE_PARAMS nvEncReconfigureParams;
             std::memcpy(&nvEncReconfigureParams.reInitEncodeParams, &nvEncInitializeParams, sizeof(nvEncInitializeParams));
             nvEncReconfigureParams.version = NV_ENC_RECONFIGURE_PARAMS_VER;
-            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncReconfigureEncoder(pEncoderInterface, &nvEncReconfigureParams));
-            checkf(result, "Failed to reconfigure encoder setting");
+            errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncReconfigureEncoder(pEncoderInterface, &nvEncReconfigureParams);
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d", errorCode).c_str());
         }
     }
     void NvEncoder::SetRate(uint32 rate)
@@ -163,8 +163,8 @@ namespace WebRTC
             picParams.encodePicFlags |= NV_ENC_PIC_FLAG_FORCEIDR;
         }
         isIdrFrame = false;
-        bool result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncEncodePicture(pEncoderInterface, &picParams)));
-        checkf(result, StringFormat("Failed to encode frame, error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncEncodePicture(pEncoderInterface, &picParams);
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to encode frame, error is %d", errorCode).c_str());
 #pragma endregion
         ProcessEncodedFrame(frame);
         frameCount++;
@@ -184,16 +184,15 @@ namespace WebRTC
         lockBitStream.version = NV_ENC_LOCK_BITSTREAM_VER;
         lockBitStream.outputBitstream = frame.outputFrame;
         lockBitStream.doNotWait = nvEncInitializeParams.enableEncodeAsync;
-        bool result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncLockBitstream(pEncoderInterface, &lockBitStream)));
-        checkf(result, StringFormat("Failed to lock bit stream, error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncLockBitstream(pEncoderInterface, &lockBitStream);
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to lock bit stream, error is %d", errorCode).c_str());
         if (lockBitStream.bitstreamSizeInBytes)
         {
             frame.encodedFrame.resize(lockBitStream.bitstreamSizeInBytes);
             std::memcpy(frame.encodedFrame.data(), lockBitStream.bitstreamBufferPtr, lockBitStream.bitstreamSizeInBytes);
         }
-
-        result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnlockBitstream(pEncoderInterface, frame.outputFrame)));
-        checkf(result, StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnlockBitstream(pEncoderInterface, frame.outputFrame);
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
         frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
         CaptureFrame(frame.encodedFrame);
@@ -256,11 +255,10 @@ namespace WebRTC
             LogPrint("resource is not initialized");
         registerResource.width = width;
         registerResource.height = height;
-        LogPrint(StringFormat("nvEncRegisterResource: width is %d, height is %d", registerResource.width, registerResource.height).c_str());
         registerResource.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
         registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;
-        checkf(NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource))),
-            StringFormat("nvEncRegisterResource error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource);
+        checkf(NV_RESULT(errorCode), StringFormat("nvEncRegisterResource error is %d", errorCode).c_str());
         return registerResource.registeredResource;
     }
     void NvEncoder::MapResources(InputFrame& inputFrame)
@@ -268,16 +266,16 @@ namespace WebRTC
         NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { 0 };
         mapInputResource.version = NV_ENC_MAP_INPUT_RESOURCE_VER;
         mapInputResource.registeredResource = inputFrame.registeredResource;
-        checkf(NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncMapInputResource(pEncoderInterface, &mapInputResource))),
-            StringFormat("nvEncMapInputResource error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncMapInputResource(pEncoderInterface, &mapInputResource);
+        checkf(NV_RESULT(errorCode), StringFormat("nvEncMapInputResource error is %d", errorCode).c_str());
         inputFrame.mappedResource = mapInputResource.mappedResource;
     }
     NV_ENC_OUTPUT_PTR NvEncoder::InitializeBitstreamBuffer()
     {
         NV_ENC_CREATE_BITSTREAM_BUFFER createBitstreamBuffer = { 0 };
         createBitstreamBuffer.version = NV_ENC_CREATE_BITSTREAM_BUFFER_VER;
-        checkf(NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncCreateBitstreamBuffer(pEncoderInterface, &createBitstreamBuffer))),
-            StringFormat("nvEncCreateBitstreamBuffer error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncCreateBitstreamBuffer(pEncoderInterface, &createBitstreamBuffer);
+        checkf(NV_RESULT(errorCode), StringFormat("nvEncCreateBitstreamBuffer error is %d", errorCode).c_str());
         return createBitstreamBuffer.bitstreamBuffer;
     }
     void NvEncoder::InitEncoderResources()
@@ -294,12 +292,12 @@ namespace WebRTC
     }
     void NvEncoder::ReleaseFrameInputBuffer(Frame& frame)
     {
-        bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnmapInputResource(pEncoderInterface, frame.inputFrame.mappedResource));
-        checkf(result, "Failed to unmap input resource");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnmapInputResource(pEncoderInterface, frame.inputFrame.mappedResource);
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to unmap input resource %d", errorCode).c_str());
         frame.inputFrame.mappedResource = nullptr;
 
-        result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnregisterResource(pEncoderInterface, frame.inputFrame.registeredResource));
-        checkf(result, "Failed to unregister input buffer resource");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnregisterResource(pEncoderInterface, frame.inputFrame.registeredResource);
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to unregister input buffer resource %d", errorCode).c_str());
         frame.inputFrame.registeredResource = nullptr;
     }
     void NvEncoder::ReleaseEncoderResources()
@@ -307,8 +305,8 @@ namespace WebRTC
         for (Frame& frame : bufferedFrames)
         {
             ReleaseFrameInputBuffer(frame);
-            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame));
-            checkf(result, "Failed to destroy output buffer bit stream");
+            errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame);
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy output buffer bit stream %d", errorCode).c_str());
             frame.outputFrame = nullptr;
         }
     }

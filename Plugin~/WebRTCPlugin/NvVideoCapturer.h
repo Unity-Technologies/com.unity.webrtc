@@ -31,14 +31,13 @@ namespace WebRTC
             return false;
         }
         void StartEncoder();
+        void SetFrameBuffer(UnityFrameBuffer* frameBuffer);
         void InitializeEncoder(int32 width, int32 height);
         void SetKeyFrame();
         void SetRate(uint32 rate);
         void CaptureFrame(std::vector<uint8>& data);
-        void CopyRenderTexture(void*& dst, UnityFrameBuffer*& src);
+        bool CopyRenderTexture(void*& dst, UnityFrameBuffer*& src);
         bool CaptureStarted() { return captureStarted; }
-    public:
-        UnityFrameBuffer* unityRT = nullptr;
     private:
         // subclasses override this virtual method to provide a vector of fourccs, in
         // order of preference, that are expected by the media engine.
@@ -47,6 +46,8 @@ namespace WebRTC
             fourccs->push_back(cricket::FOURCC_H264);
             return true;
         }
+        UnityFrameBuffer* unityRT = nullptr;
+
         std::unique_ptr<NvEncoder> nvEncoder;
 
         //just fake info

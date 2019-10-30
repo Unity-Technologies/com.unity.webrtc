@@ -18,16 +18,26 @@ namespace WebRTC
         {
             int curFrameNum = nvEncoder->GetCurrentFrameCount() % bufferedFrameNum;
             auto dst = renderTextures[curFrameNum];
-            CopyRenderTexture(dst, unityRT);
+
+            if(!CopyRenderTexture(dst, unityRT))
+            {
+                LogPrint("CopyRenderTexture Failed");
+                return;
+            }
+            if(nvEncoder == nullptr)
+            {
+                LogPrint("nvEncoder is null");
+                return;
+            }
             nvEncoder->EncodeFrame();
         }
         else
         {
-            LogPrint("video capture is not started");
+            LogPrint("Video capture is not started");
         }
     }
 
-    void NvVideoCapturer::CopyRenderTexture(void*& dst, UnityFrameBuffer*& src)
+    bool NvVideoCapturer::CopyRenderTexture(void*& dst, UnityFrameBuffer*& src)
     {
 #if _WIN32
         context->CopyResource(dst, src);
@@ -40,19 +50,22 @@ namespace WebRTC
         if(glIsTexture(srcName) == GL_FALSE)
         {
             LogPrint("srcName is not texture");
-            return;
+            return false;
         }
+
         if(glIsTexture(dstName) == GL_FALSE)
         {
             LogPrint("dstName is not texture");
-            return;
+            return false;
         }
+
         glCopyImageSubData(
-                srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
-                dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
+                srcName, GL_TEXTURE_RECTANGLE, 0, 0, 0, 0,
+                dstName, GL_TEXTURE_RECTANGLE, 0, 0, 0, 0,
                 width, height, 1
                 );
 #endif
+        return true;
     }
 
     void NvVideoCapturer::CaptureFrame(std::vector<uint8>& data)
@@ -68,6 +81,11 @@ namespace WebRTC
         captureStarted = true;
         SetKeyFrame();
     }
+    void NvVideoCapturer::SetFrameBuffer(UnityFrameBuffer* frameBuffer)
+    {
+        unityRT = frameBuffer;
+    }
+
     void NvVideoCapturer::SetKeyFrame()
     {
         nvEncoder->SetIdrFrame();

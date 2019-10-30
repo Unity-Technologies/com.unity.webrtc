@@ -56,13 +56,9 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         s_RenderType = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
         if (s_RenderType == kUnityGfxRendererOpenGLES20)
         {
-//            m_VertexShader = CreateShader(GL_VERTEX_SHADER, kGlesVProgTextGLES2);
-//            m_FragmentShader = CreateShader(GL_FRAGMENT_SHADER, kGlesFShaderTextGLES2);
         }
         else if (s_RenderType == kUnityGfxRendererOpenGLES30)
         {
-//            m_VertexShader = CreateShader(GL_VERTEX_SHADER, kGlesVProgTextGLES3);
-//            m_FragmentShader = CreateShader(GL_FRAGMENT_SHADER, kGlesFShaderTextGLES3);
         }
 #if SUPPORT_OPENGL_CORE
         else if (s_RenderType == kUnityGfxRendererOpenGLCore)
@@ -70,8 +66,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 #if UNITY_WIN
             gl3wInit();
 #endif
-//            m_VertexShader = CreateShader(GL_VERTEX_SHADER, kGlesVProgTextGLCore);
-//            m_FragmentShader = CreateShader(GL_FRAGMENT_SHADER, kGlesFShaderTextGLCore);
         }
 #endif // if SUPPORT_OPENGL_CORE
 #if SUPPORT_D3D11

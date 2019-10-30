@@ -73,6 +73,7 @@ class NativeAPITest
         const int height = 720;
         var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
         var renderTexture = new RenderTexture(width, height, 0, format);
+        renderTexture.Create();
         var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);
@@ -97,6 +98,7 @@ class NativeAPITest
         var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
 
         var renderTexture = new RenderTexture(width, height, 0, format);
+        renderTexture.Create();
         var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
         GL.IssuePluginEvent(callback, 0);
         NativeMethods.ContextDeleteVideoStream(context, stream);
