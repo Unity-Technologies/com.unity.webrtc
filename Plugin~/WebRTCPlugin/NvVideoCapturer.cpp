@@ -17,15 +17,44 @@ namespace WebRTC
         if (captureStarted && !captureStopped)
         {
             int curFrameNum = nvEncoder->GetCurrentFrameCount() % bufferedFrameNum;
-#if _WIN32
-            context->CopyResource(renderTextures[curFrameNum], unityRT);
-#else
-            // TODO:: Copy texture on GPU to GPU
-            // glCopyTexImage2D();
-#endif
+            auto dst = renderTextures[curFrameNum];
+            CopyRenderTexture(dst, unityRT);
             nvEncoder->EncodeFrame();
         }
+        else
+        {
+            LogPrint("video capture is not started");
+        }
     }
+
+    void NvVideoCapturer::CopyRenderTexture(void*& dst, UnityFrameBuffer*& src)
+    {
+#if _WIN32
+        context->CopyResource(dst, src);
+#else
+        auto tex = static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(dst);
+
+        GLuint srcName = (GLuint)(size_t)(src);
+        GLuint dstName = tex->texture;
+
+        if(glIsTexture(srcName) == GL_FALSE)
+        {
+            LogPrint("srcName is not texture");
+            return;
+        }
+        if(glIsTexture(dstName) == GL_FALSE)
+        {
+            LogPrint("dstName is not texture");
+            return;
+        }
+        glCopyImageSubData(
+                srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
+                dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
+                width, height, 1
+                );
+#endif
+    }
+
     void NvVideoCapturer::CaptureFrame(std::vector<uint8>& data)
     {
         rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, data);

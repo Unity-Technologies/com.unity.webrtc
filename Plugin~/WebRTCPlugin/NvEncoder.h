@@ -47,7 +47,7 @@ namespace WebRTC
 #if _WIN32
         ID3D11Texture2D* AllocateInputBuffers();
 #else
-        void* AllocateInputBuffers();
+        NV_ENC_INPUT_RESOURCE_OPENGL_TEX* AllocateInputBuffers();
 #endif
         NV_ENC_REGISTERED_PTR RegisterResource(void *pBuffer);
         void MapResources(InputFrame& inputFrame);

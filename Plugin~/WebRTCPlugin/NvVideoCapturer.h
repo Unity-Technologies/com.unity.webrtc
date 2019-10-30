@@ -35,6 +35,7 @@ namespace WebRTC
         void SetKeyFrame();
         void SetRate(uint32 rate);
         void CaptureFrame(std::vector<uint8>& data);
+        void CopyRenderTexture(void*& dst, UnityFrameBuffer*& src);
         bool CaptureStarted() { return captureStarted; }
     public:
         UnityFrameBuffer* unityRT = nullptr;

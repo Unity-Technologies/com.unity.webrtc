@@ -217,7 +217,7 @@ namespace WebRTC
         return inputTextures;
     }
 #else
-    void* NvEncoder::AllocateInputBuffers()
+    NV_ENC_INPUT_RESOURCE_OPENGL_TEX* NvEncoder::AllocateInputBuffers()
     {
         NV_ENC_INPUT_RESOURCE_OPENGL_TEX *pResource = new NV_ENC_INPUT_RESOURCE_OPENGL_TEX;
         NV_ENC_BUFFER_FORMAT format = NV_ENC_BUFFER_FORMAT_ARGB;

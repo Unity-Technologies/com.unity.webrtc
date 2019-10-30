@@ -114,6 +114,6 @@ namespace WebRTC
     extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
 #elif SUPPORT_OPENGL_CORE
     using UnityFrameBuffer = void;
-    extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
+    extern void* renderTextures[bufferedFrameNum];
 #endif //if SUPPORT_D3D11
 }
