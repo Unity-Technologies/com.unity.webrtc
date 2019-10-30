@@ -74,6 +74,17 @@ void D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+void D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
+    ID3D12Resource* src = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
+    if (dest->GetNativeTexturePtrV() == src)
+        return;
+
+    //[TODO-sin: 2019-10-30] Implement copying native resource
+   
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 
 ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h) {
     //[Note-sin: 2019-10-30] Taken from RaytracedHardShadow

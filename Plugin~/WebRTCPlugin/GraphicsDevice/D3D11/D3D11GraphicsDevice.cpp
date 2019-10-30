@@ -58,4 +58,14 @@ void D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     m_d3d11Context->CopyResource(nativeDest, nativeSrc);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+void D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
+    if (dest->GetNativeTexturePtrV() == nativeTexturePtr)
+        return;
+
+    //[Note-sin: 2019-10-30] Do we need to implement this for RenderStreaming ?
+    DebugWarning("D3D11: CopyResourceFromNativeV() is not supported");
+
+}
+
 } //end namespace

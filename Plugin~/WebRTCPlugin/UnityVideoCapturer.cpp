@@ -10,7 +10,8 @@ namespace WebRTC
 {
     UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr)
         : nvEncoder(pEncoder), width(_width), height(_height)
-    {       
+    {
+        m_unityNativeTex = unityNativeTexPtr;
         m_unityRT = GraphicsDevice::GetInstance().CreateDefaultTextureFromNative(_width, _height, unityNativeTexPtr);
 
         set_enable_video_adapter(false);
@@ -26,7 +27,11 @@ namespace WebRTC
     {
         if (captureStarted && !captureStopped)
         {
-            GraphicsDevice::GetInstance().CopyResource(nvEncoder->getRenderTexture(),m_unityRT);
+            GraphicsDevice& graphicsDevice = GraphicsDevice::GetInstance();
+            ITexture2D* encoderRT = nvEncoder->getRenderTexture();
+
+            graphicsDevice.CopyResourceFromNative(encoderRT, m_unityNativeTex);
+            GraphicsDevice::GetInstance().CopyResource(encoderRT,m_unityRT);
             nvEncoder->EncodeFrame(width, height);
         }
     }

@@ -18,6 +18,7 @@ class GraphicsDevice {
 
         inline void* GetEncodeDevicePtr();
         inline void CopyResource(ITexture2D* dest, ITexture2D* src);
+        inline void CopyResourceFromNative(ITexture2D* dest, void* nativeTexturePtr);
 
     private:
         GraphicsDevice();
@@ -36,6 +37,9 @@ ITexture2D* GraphicsDevice::CreateDefaultTexture(uint32_t w, uint32_t h) {
 
 void* GraphicsDevice::GetEncodeDevicePtr() { return m_device->GetEncodeDevicePtrV(); }
 void GraphicsDevice::CopyResource(ITexture2D* dest, ITexture2D* src) { m_device->CopyResourceV(dest, src); }
+void GraphicsDevice::CopyResourceFromNative(ITexture2D* dest, void* nativeTexturePtr) {
+    m_device->CopyResourceFromNativeV(dest, nativeTexturePtr);
+};
 
 ITexture2D* GraphicsDevice::CreateDefaultTextureFromNative(uint32_t width, uint32_t height, void* nativeTexturePtr) {
     return m_device->CreateDefaultTextureFromNativeV(width, height, nativeTexturePtr);

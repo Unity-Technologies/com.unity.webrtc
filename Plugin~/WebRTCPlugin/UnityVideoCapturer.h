@@ -56,6 +56,7 @@ namespace WebRTC
         bool captureStarted = false;
         bool captureStopped = false;
         ITexture2D* m_unityRT = nullptr;
+        void* m_unityNativeTex = nullptr;
 
     };
 
