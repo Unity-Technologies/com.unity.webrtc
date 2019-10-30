@@ -19,13 +19,17 @@ public:
 
     inline virtual void* GetNativeTexturePtrV();
     inline virtual const void* GetNativeTexturePtrV() const;
+    inline virtual void* GetEncodeTexturePtrV();
+    inline virtual const void* GetEncodeTexturePtrV() const;
 
 };
 
 //---------------------------------------------------------------------------------------------------------------------
 
 void* D3D11Texture2D::GetNativeTexturePtrV() { return m_texture; }
-const void* D3D11Texture2D::GetNativeTexturePtrV() const { return m_texture; }
+const void* D3D11Texture2D::GetNativeTexturePtrV() const { return m_texture; };
+void* D3D11Texture2D::GetEncodeTexturePtrV() { return m_texture; }
+const void* D3D11Texture2D::GetEncodeTexturePtrV() const { return m_texture; }
 
 } //end namespace
 

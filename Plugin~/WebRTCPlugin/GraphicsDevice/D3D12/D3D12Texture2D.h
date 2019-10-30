@@ -20,6 +20,8 @@ public:
 
     inline virtual void* GetNativeTexturePtrV();
     inline virtual const void* GetNativeTexturePtrV() const;
+    inline virtual void* GetEncodeTexturePtrV();
+    inline virtual const void* GetEncodeTexturePtrV() const;
 
 private:
     ID3D12Resource* m_nativeTexture;
@@ -30,7 +32,10 @@ private:
 //---------------------------------------------------------------------------------------------------------------------
 
 void* D3D12Texture2D::GetNativeTexturePtrV() { return m_nativeTexture; }
-const void* D3D12Texture2D::GetNativeTexturePtrV() const { return m_nativeTexture; }
+const void* D3D12Texture2D::GetNativeTexturePtrV() const { return m_nativeTexture; };
+
+void* D3D12Texture2D::GetEncodeTexturePtrV() { return m_sharedTexture; }
+const void* D3D12Texture2D::GetEncodeTexturePtrV() const { return m_sharedTexture; }
 
 } //end namespace
 

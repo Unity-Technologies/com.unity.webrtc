@@ -222,7 +222,7 @@ namespace WebRTC
         NV_ENC_REGISTER_RESOURCE registerResource = { 0 };
         registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
         registerResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
-        registerResource.resourceToRegister = tex->GetNativeTexturePtrV();
+        registerResource.resourceToRegister = tex->GetEncodeTexturePtrV();
 
         if (!registerResource.resourceToRegister)
             LogPrint("resource is not initialized");
