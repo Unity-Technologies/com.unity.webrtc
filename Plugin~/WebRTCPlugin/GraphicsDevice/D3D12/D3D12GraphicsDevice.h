@@ -26,8 +26,9 @@ private:
     ID3D12Device* m_d3d12Device;
     //ID3D12DeviceContext* m_d3d12Context;
 
-    ID3D11Device* m_d3d11Device;
-    ID3D11DeviceContext* m_d3d11Context;
+    //[Note-sin: 2019-10-30] sharing res from d3d12 to d3d11 require d3d11.1. Fence is supported in d3d11.4 or newer.
+    ID3D11Device5* m_d3d11Device;
+    ID3D11DeviceContext4* m_d3d11Context;
 
 };
 
@@ -36,9 +37,11 @@ private:
 //use D3D11. See notes below
 void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
 
+
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 //[Note-sin: 2019-10-30]
 //Since NVEncoder does not support DX12, we copy the texture from DX12 resource to DX11 resource first (GPU), and then
 //pass it to NVidia
 
-
-}

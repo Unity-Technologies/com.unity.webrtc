@@ -5,6 +5,16 @@
 
 namespace WebRTC {
 
+const D3D12_HEAP_PROPERTIES DEFAULT_HEAP_PROPS = {
+    D3D12_HEAP_TYPE_DEFAULT,
+    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
+    D3D12_MEMORY_POOL_UNKNOWN,
+    0,
+    0
+};
+
+//---------------------------------------------------------------------------------------------------------------------
+
 D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice) : m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
 {
@@ -19,7 +29,10 @@ D3D12GraphicsDevice::~D3D12GraphicsDevice() {
 //---------------------------------------------------------------------------------------------------------------------
 
 void D3D12GraphicsDevice::InitV() {
-    
+
+    ID3D11Device* legacyDevice;
+    ID3D11DeviceContext* legacyContext;
+
     D3D11CreateDevice(
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
@@ -28,10 +41,14 @@ void D3D12GraphicsDevice::InitV() {
         nullptr,
         0,
         D3D11_SDK_VERSION,
-        &m_d3d11Device,
+        &legacyDevice,
         nullptr,
-        &m_d3d11Context);
+        &legacyContext);
 
+    legacyDevice->QueryInterface(IID_PPV_ARGS(&m_d3d11Device));
+
+    legacyDevice->GetImmediateContext(&legacyContext);
+    legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
 }
 
 //---------------------------------------------------------------------------------------------------------------------
