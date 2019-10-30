@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
-#include "../D3D11/D3D11Texture2D.h"
 
 namespace WebRTC {
 
@@ -60,30 +59,12 @@ void D3D12GraphicsDevice::ShutdownV() {
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 
-    ID3D11Texture2D* texture = nullptr;
-    D3D11_TEXTURE2D_DESC desc = { 0 };
-    desc.Width = w;
-    desc.Height = h;
-    desc.MipLevels = 1;
-    desc.ArraySize = 1;
-    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = 0;
-    desc.CPUAccessFlags = 0;
-    HRESULT r = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
-    return new D3D11Texture2D(w,h,texture);
+    return CreateSharedD3D12Texture(w,h);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
-    assert(nullptr!=nativeTexturePtr);
-    //ID3D12Resource* texPtr = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
-    //texPtr->AddRef();
-
-    //[TODO-sin: 2019-10-30] Copy resource from D3D12 to D3D11
-
-    return CreateDefaultTextureV(w,h);
+    return CreateSharedD3D12Texture(w,h);
 }
 
 
