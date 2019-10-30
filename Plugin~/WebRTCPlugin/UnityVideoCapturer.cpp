@@ -26,7 +26,7 @@ namespace WebRTC
     {
         if (captureStarted && !captureStopped)
         {
-            GraphicsDevice::GetInstance().CopyNativeResource(nvEncoder->getRenderTexture(),m_unityRT->GetNativeTexturePtrV());
+            GraphicsDevice::GetInstance().CopyResource(nvEncoder->getRenderTexture(),m_unityRT);
             nvEncoder->EncodeFrame(width, height);
         }
     }

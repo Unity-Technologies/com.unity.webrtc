@@ -46,7 +46,7 @@ namespace WebRTC
         void InitEncoder(uint32_t width, uint32_t height, int _bitRate);
         void InitEncoderResources();
 
-        void* getRenderTexture() { return nvEncoderTexture; }
+        ITexture2D* getRenderTexture() { return nvEncoderTexture; }
         uint32_t getEncodeWidth() { return encodeWidth; }
         uint32_t getEncodeHeight() { return encodeHeight; }
         int getBitRate() { return bitRate; }

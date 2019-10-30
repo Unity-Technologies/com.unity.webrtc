@@ -88,7 +88,7 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uin
 
 
 //---------------------------------------------------------------------------------------------------------------------
-void D3D12GraphicsDevice::CopyNativeResourceV(void* dest, void* src) {
+void D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     //[TODO-sin: 2019-10-15] Implement copying native resource
 }
 

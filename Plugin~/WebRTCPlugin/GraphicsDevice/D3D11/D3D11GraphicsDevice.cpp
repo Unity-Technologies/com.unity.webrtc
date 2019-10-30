@@ -52,11 +52,10 @@ ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uin
 
 
 //---------------------------------------------------------------------------------------------------------------------
-void D3D11GraphicsDevice::CopyNativeResourceV(void* dest, void* src) {
-    m_d3d11Context->CopyResource(
-        reinterpret_cast<ID3D11Resource*>(dest),
-        reinterpret_cast<ID3D11Texture2D*>(src)
-    );
+void D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
+    ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
+    ID3D11Resource* nativeSrc= reinterpret_cast<ID3D11Texture2D*>(src->GetNativeTexturePtrV());
+    m_d3d11Context->CopyResource(nativeDest, nativeSrc);
 }
 
 } //end namespace
