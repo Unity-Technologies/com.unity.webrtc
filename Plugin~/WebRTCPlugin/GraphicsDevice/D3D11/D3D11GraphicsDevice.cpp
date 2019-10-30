@@ -16,6 +16,10 @@ D3D11GraphicsDevice::~D3D11GraphicsDevice() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+void D3D11GraphicsDevice::InitV() {
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 
 void D3D11GraphicsDevice::ShutdownV() {
 }
@@ -39,9 +43,9 @@ ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
+ITexture2D* D3D11GraphicsDevice::CreateEncoderInputTextureFromUnityV(uint32_t w, uint32_t h, void* unityTexturePtr) {
     assert(nullptr!=nativeTexturePtr);
-    ID3D11Texture2D* texPtr = reinterpret_cast<ID3D11Texture2D*>(nativeTexturePtr);
+    ID3D11Texture2D* texPtr = reinterpret_cast<ID3D11Texture2D*>(unityTexturePtr);
     texPtr->AddRef();
     return new D3D11Texture2D(w,h,texPtr);
 }

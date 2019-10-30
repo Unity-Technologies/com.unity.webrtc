@@ -14,7 +14,7 @@ class GraphicsDevice {
         void Init(IUnityInterfaces* unityInterface);
         void Shutdown();
         inline ITexture2D* CreateEncoderInputTexture(uint32_t w , uint32_t h );
-        inline ITexture2D* CreateEncoderInputTexture(uint32_t width, uint32_t height, void* nativeTexturePtr);
+        inline ITexture2D* CreateEncoderInputTextureFromUnity(uint32_t width, uint32_t height, void* unityTexturePtr);
 
         inline void* GetNativeDevicePtr();
         inline void CopyNativeResource(void* dest, void* src);
@@ -37,8 +37,8 @@ ITexture2D* GraphicsDevice::CreateEncoderInputTexture(uint32_t w, uint32_t h) {
 void* GraphicsDevice::GetNativeDevicePtr() { return m_device->GetNativeDevicePtrV(); }
 void GraphicsDevice::CopyNativeResource(void* dest, void* src) { m_device->CopyNativeResourceV(dest, src); }
 
-ITexture2D* GraphicsDevice::CreateEncoderInputTexture(uint32_t width, uint32_t height, void* nativeTexturePtr) {
-    return m_device->CreateEncoderInputTextureV(width, height, nativeTexturePtr);
+ITexture2D* GraphicsDevice::CreateEncoderInputTextureFromUnity(uint32_t width, uint32_t height, void* unityTexturePtr) {
+    return m_device->CreateEncoderInputTextureFromUnityV(width, height, unityTexturePtr);
 }
 
 
