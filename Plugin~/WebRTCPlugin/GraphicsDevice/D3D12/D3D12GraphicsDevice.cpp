@@ -41,7 +41,7 @@ void D3D12GraphicsDevice::ShutdownV() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D12GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t h) {
+ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 
     ID3D11Texture2D* texture = nullptr;
     D3D11_TEXTURE2D_DESC desc = { 0 };
@@ -59,14 +59,14 @@ ITexture2D* D3D12GraphicsDevice::CreateEncoderInputTextureV(uint32_t w, uint32_t
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D12GraphicsDevice::CreateEncoderInputTextureFromUnityV(uint32_t w, uint32_t h, void* unityTexturePtr) {
-    assert(nullptr!=unityTexturePtr);
+ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
+    assert(nullptr!=nativeTexturePtr);
     //ID3D12Resource* texPtr = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
     //texPtr->AddRef();
 
     //[TODO-sin: 2019-10-30] Copy resource from D3D12 to D3D11
 
-    return CreateEncoderInputTextureV(w,h);
+    return CreateDefaultTextureV(w,h);
 }
 
 

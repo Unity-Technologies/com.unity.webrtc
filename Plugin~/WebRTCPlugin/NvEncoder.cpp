@@ -23,7 +23,7 @@ namespace WebRTC
             //open an encode session
             NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
             openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
-            openEncdoeSessionExParams.device = GraphicsDevice::GetInstance().GetNativeDevicePtr();
+            openEncdoeSessionExParams.device = GraphicsDevice::GetInstance().GetEncodeDevicePtr();
             openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
             openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
             result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
@@ -51,7 +51,7 @@ namespace WebRTC
         bitRate = _bitRate;
 
         LogPrint(StringFormat("width is %d, height is %d", encodeWidth, encodeHeight).c_str());
-        void* nativeDevicePtr = GraphicsDevice::GetInstance().GetNativeDevicePtr();
+        void* nativeDevicePtr = GraphicsDevice::GetInstance().GetEncodeDevicePtr();
         checkf(nativeDevicePtr != nullptr, "D3D11Device is invalid");
         checkf(encodeWidth > 0 && encodeHeight > 0, "Invalid width or height!");
 

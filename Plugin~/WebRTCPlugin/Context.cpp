@@ -56,7 +56,7 @@ namespace WebRTC
         //open an encode session
         NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
         openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
-        openEncdoeSessionExParams.device = GraphicsDevice::GetInstance().GetNativeDevicePtr();
+        openEncdoeSessionExParams.device = GraphicsDevice::GetInstance().GetEncodeDevicePtr();
         openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
         result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));

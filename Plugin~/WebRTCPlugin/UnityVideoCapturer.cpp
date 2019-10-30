@@ -11,7 +11,7 @@ namespace WebRTC
     UnityVideoCapturer::UnityVideoCapturer(UnityEncoder* pEncoder, int _width, int _height, void* unityNativeTexPtr)
         : nvEncoder(pEncoder), width(_width), height(_height)
     {       
-        m_unityRT = GraphicsDevice::GetInstance().CreateEncoderInputTextureFromUnity(_width, _height, unityNativeTexPtr);
+        m_unityRT = GraphicsDevice::GetInstance().CreateDefaultTextureFromNative(_width, _height, unityNativeTexPtr);
 
         set_enable_video_adapter(false);
         SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));

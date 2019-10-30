@@ -13,10 +13,10 @@ public:
 
     virtual void InitV();
     virtual void ShutdownV();
-    inline virtual void* GetNativeDevicePtrV();
+    inline virtual void* GetEncodeDevicePtrV();
 
-    virtual ITexture2D* CreateEncoderInputTextureV(uint32_t w, uint32_t h);
-    virtual ITexture2D* CreateEncoderInputTextureFromUnityV(uint32_t w, uint32_t h, void* unityTexturePtr);
+    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h);
+    virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
     virtual void CopyNativeResourceV(void* dest, void* src);
 
 
@@ -27,7 +27,7 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* D3D11GraphicsDevice::GetNativeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
+void* D3D11GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
 
 
 

@@ -12,10 +12,10 @@ public:
     virtual ~D3D12GraphicsDevice();
     virtual void InitV();
     virtual void ShutdownV();
-    inline virtual void* GetNativeDevicePtrV();
+    inline virtual void* GetEncodeDevicePtrV();
 
-    virtual ITexture2D* CreateEncoderInputTextureV(uint32_t w, uint32_t h);
-    virtual ITexture2D* CreateEncoderInputTextureFromUnityV(uint32_t w, uint32_t h, void* unityTexturePtr);
+    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h);
+    virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
     virtual void CopyNativeResourceV(void* dest, void* src);
 
 
@@ -34,7 +34,7 @@ private:
 //---------------------------------------------------------------------------------------------------------------------
 
 //use D3D11. See notes below
-void* D3D12GraphicsDevice::GetNativeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
+void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
 
 //[Note-sin: 2019-10-30]
 //Since NVEncoder does not support DX12, we copy the texture from DX12 resource to DX11 resource first (GPU), and then
