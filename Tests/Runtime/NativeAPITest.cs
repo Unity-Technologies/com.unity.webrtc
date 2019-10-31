@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using UnityEngine;
 using Unity.WebRTC;
@@ -80,27 +81,32 @@ class NativeAPITest
     }
 
     [Test]
-    public void CallIssuePluginEventWithoutStream()
+    public void CallGetRenderEventFunc()
     {
         var context = NativeMethods.ContextCreate(0);
         var callback = NativeMethods.GetRenderEventFunc(context);
-        GL.IssuePluginEvent(callback, 0);
+        Assert.AreNotEqual(callback, IntPtr.Zero);
         NativeMethods.ContextDestroy(0);
     }
 
     [Test]
-    public void CallIssuePluginEvent()
+    public void CallVideoEncoderMethods()
     {
         var context = NativeMethods.ContextCreate(0);
-        var callback = NativeMethods.GetRenderEventFunc(context);
         const int width = 1280;
         const int height = 720;
         var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-
         var renderTexture = new RenderTexture(width, height, 0, format);
         renderTexture.Create();
         var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
-        GL.IssuePluginEvent(callback, 0);
+        var callback = NativeMethods.GetRenderEventFunc(context);
+
+        // TODO::
+        // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
+        VideoEncoderMethods.InitializeEncoder(callback);
+        VideoEncoderMethods.Encode(callback);
+        VideoEncoderMethods.FinalizeEncoder(callback);
+
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);
     }

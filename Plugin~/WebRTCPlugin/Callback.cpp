@@ -27,6 +27,14 @@
 #	error Unknown platform
 #endif
 
+enum class VideoStreamRenderEventID
+{
+    Initialize = 0,
+    Encode = 1,
+    Finalize = 2
+};
+
+
 namespace WebRTC
 {
     IUnityInterfaces* s_UnityInterfaces = nullptr;
@@ -121,9 +129,25 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
-    if (s_context != nullptr)
+    if (s_context == nullptr)
     {
-        s_context->EncodeFrame();
+        LogPrint("context is not initialized", eventID);
+        return;
+    }
+    switch(static_cast<VideoStreamRenderEventID>(eventID))
+    {
+        case VideoStreamRenderEventID::Initialize:
+            s_context->InitializeEncoder();
+            return;
+        case VideoStreamRenderEventID::Encode:
+            s_context->EncodeFrame();
+            return;
+        case VideoStreamRenderEventID::Finalize:
+            s_context->FinalizerEncoder();
+            return;
+        default:
+            LogPrint("Unknown event id %d", eventID);
+            return;
     }
 }
 

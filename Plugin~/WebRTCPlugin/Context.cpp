@@ -334,7 +334,21 @@ namespace WebRTC
         signalingThread.reset();
     }
 
-    webrtc::MediaStreamInterface* Context::CreateVideoStream(UnityFrameBuffer* frameBuffer)
+    void Context::InitializeEncoder()
+    {
+        nvVideoCapturer->InitializeEncoder();
+        nvVideoCapturer->StartEncoder();
+    }
+    void Context::EncodeFrame()
+    {
+        nvVideoCapturer->EncodeVideoData();
+    }
+    void Context::FinalizerEncoder()
+    {
+        nvVideoCapturer->FinalizeEncoder();
+    }
+
+    webrtc::MediaStreamInterface* Context::CreateVideoStream(UnityFrameBuffer* frameBuffer, int width, int height)
     {
         //TODO: label and stream id should be maintained in some way for multi-stream
         auto videoTrack = peerConnectionFactory->CreateVideoTrack(
@@ -347,7 +361,7 @@ namespace WebRTC
         videoStream->AddTrack(videoTrack);
         videoStreams.push_back(videoStream);
         nvVideoCapturer->SetFrameBuffer(frameBuffer);
-        nvVideoCapturer->StartEncoder();
+        nvVideoCapturer->SetSize(width, height);
         return videoStream.get();
     }
 

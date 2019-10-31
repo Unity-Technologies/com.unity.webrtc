@@ -214,7 +214,6 @@ namespace Unity.WebRTC
 #elif UNITY_STANDALONE
         internal const string Lib = "webrtc";
 #endif
-
         private static Context s_context;
         private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
@@ -266,7 +265,7 @@ namespace Unity.WebRTC
                     {
                         Graphics.Blit(rts[0], rts[1], flipMat);
                     }
-                    GL.IssuePluginEvent(s_renderCallback, 0);
+                    Context.Encode();
                 }
                 Audio.Update();
             }
@@ -443,6 +442,29 @@ namespace Unity.WebRTC
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
+    }
+
+    internal static class VideoEncoderMethods
+    {
+        enum VideoStreamRenderEventId
+        {
+            Initialize = 0,
+            Encode = 1,
+            Finalize = 2,
+        }
+
+        public static void InitializeEncoder(IntPtr callback)
+        {
+            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Initialize);
+        }
+        public static void Encode(IntPtr callback)
+        {
+            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Encode);
+        }
+        public static void FinalizeEncoder(IntPtr callback)
+        {
+            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Finalize);
+        }
     }
 }
 

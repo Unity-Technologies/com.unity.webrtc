@@ -10,6 +10,7 @@ namespace Unity.WebRTC
 
         private int id;
         private bool disposed;
+        private IntPtr renderFunction;
 
         public bool IsNull
         {
@@ -97,11 +98,17 @@ namespace Unity.WebRTC
 
         public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
         {
-            return NativeMethods.ContextCaptureVideoStream(self, rt, width, height);
+            var stream = NativeMethods.ContextCaptureVideoStream(self, rt, width, height);
+
+            // You should initialize encoder after create stream instance.
+            // This specification will change in the future.
+            InitializeEncoder();
+            return stream;
         }
 
         public void DeleteVideoStream(IntPtr stream)
         {
+            FinalizeEncoder();
             NativeMethods.ContextDeleteVideoStream(self, stream);
         }
 
@@ -118,6 +125,24 @@ namespace Unity.WebRTC
         public void StopMediaStreamTrack(IntPtr track)
         {
             NativeMethods.StopMediaStreamTrack(self, track);
+        }
+
+        internal void InitializeEncoder()
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.InitializeEncoder(renderFunction);
+        }
+
+        internal void FinalizeEncoder()
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.FinalizeEncoder(renderFunction);
+        }
+
+        internal void Encode()
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.Encode(renderFunction);
         }
     }
 }

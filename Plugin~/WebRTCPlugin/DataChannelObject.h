@@ -53,9 +53,9 @@ namespace WebRTC
         //  A data buffer was successfully received.
         void OnMessage(const webrtc::DataBuffer& buffer) override;
     public:
-        DelegateOnMessage onMessage;
-        DelegateOnOpen onOpen;
-        DelegateOnClose onClose;
+        DelegateOnMessage onMessage = nullptr;
+        DelegateOnOpen onOpen = nullptr;
+        DelegateOnClose onClose = nullptr;
     private:
         rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
         PeerConnectionObject& peerConnectionObj;

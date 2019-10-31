@@ -6,14 +6,42 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
-    public class MediaStream
+    public class MediaStream : IDisposable
     {
         private IntPtr self;
         private string id;
-        public string Id { get => id; private set { } }
-
+        private bool disposed;
         private Dictionary<MediaStreamTrack, RenderTexture[]> VideoTrackToRts;
         private List<MediaStreamTrack> AudioTracks;
+
+        public string Id
+        {
+            get
+            {
+                return id;
+            }
+        }
+
+        ~MediaStream()
+        {
+            this.Dispose();
+            WebRTC.Table.Remove(self);
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Context.DeleteVideoStream(self);
+                self = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
+        }
 
         private void StopTrack(MediaStreamTrack track)
         {
@@ -41,7 +69,7 @@ namespace Unity.WebRTC
         {
             return VideoTrackToRts[track];
         }
-        public MediaStreamTrack[] GetTracks() 
+        public MediaStreamTrack[] GetTracks()
         {
             MediaStreamTrack[] tracks = new MediaStreamTrack[VideoTrackToRts.Keys.Count + AudioTracks.Count];
             AudioTracks.CopyTo(tracks, 0);
@@ -82,12 +110,12 @@ namespace Unity.WebRTC
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
             VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
             AudioTracks = new List<MediaStreamTrack>();
-            //get initial tracks 
+            //get initial tracks
             int trackSize = 0;
             IntPtr tracksNativePtr = NativeMethods.MediaStreamGetVideoTracks(self, ref trackSize);
             IntPtr[] tracksPtr = new IntPtr[trackSize];
             Marshal.Copy(tracksNativePtr, tracksPtr, 0, trackSize);
-            //TODO: Linux compatibility 
+            //TODO: Linux compatibility
             Marshal.FreeCoTaskMem(tracksNativePtr);
             for (int i = 0; i < trackSize; i++)
             {
@@ -109,7 +137,7 @@ namespace Unity.WebRTC
             IntPtr trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(self, ref trackSize);
             IntPtr[] tracksPtr = new IntPtr[trackSize];
             Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
-            //TODO: Linux compatibility 
+            //TODO: Linux compatibility
             Marshal.FreeCoTaskMem(trackNativePtr);
 
             for (int i = 0; i < trackSize; i++)
@@ -171,14 +199,11 @@ namespace Unity.WebRTC
             cam.targetTexture = rts[0];
             cam.gameObject.AddCleanerCallback(() =>
             {
-                if (rts != null)
-                {
-                    CameraExtension.RemoveRt(rts);
-                    rts[0].Release();
-                    rts[1].Release();
-                    UnityEngine.Object.Destroy(rts[0]);
-                    UnityEngine.Object.Destroy(rts[1]);
-                }
+                CameraExtension.RemoveRt(rts);
+                rts[0].Release();
+                rts[1].Release();
+                UnityEngine.Object.Destroy(rts[0]);
+                UnityEngine.Object.Destroy(rts[1]);
             });
             started = true;
             return new MediaStream(rts, WebRTC.Context.CaptureVideoStream(rts[1].GetNativeTexturePtr(), width, height));

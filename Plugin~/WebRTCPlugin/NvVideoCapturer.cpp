@@ -58,12 +58,9 @@ namespace WebRTC
             LogPrint("dstName is not texture");
             return false;
         }
-
-        glCopyImageSubData(
-                srcName, GL_TEXTURE_RECTANGLE, 0, 0, 0, 0,
-                dstName, GL_TEXTURE_RECTANGLE, 0, 0, 0, 0,
-                width, height, 1
-                );
+        glBindTexture(GL_TEXTURE_2D, dstName); // ok
+        glClearColor(1.0, 0.0, 0.0, 1.0);
+        glBindTexture(GL_TEXTURE_2D, 0); // ok
 #endif
         return true;
     }
@@ -86,6 +83,12 @@ namespace WebRTC
         unityRT = frameBuffer;
     }
 
+    void NvVideoCapturer::SetSize(int32 width, int32 height)
+    {
+        this->width = width;
+        this->height = height;
+    }
+
     void NvVideoCapturer::SetKeyFrame()
     {
         nvEncoder->SetIdrFrame();
@@ -95,9 +98,14 @@ namespace WebRTC
         nvEncoder->SetRate(rate);
     }
 
-    void NvVideoCapturer::InitializeEncoder(int32 width, int32 height)
+    void NvVideoCapturer::InitializeEncoder()
     {
         nvEncoder = std::make_unique<NvEncoder>(width, height);
         nvEncoder->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
+    }
+
+    void NvVideoCapturer::FinalizeEncoder()
+    {
+        nvEncoder.release();
     }
 }

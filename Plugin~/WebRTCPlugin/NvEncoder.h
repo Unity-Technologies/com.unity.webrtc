@@ -20,11 +20,11 @@ namespace WebRTC
 
         struct Frame
         {
-            InputFrame inputFrame;
-            OutputFrame outputFrame;
-            std::vector<uint8> encodedFrame;
+            InputFrame inputFrame = {nullptr, nullptr, NV_ENC_BUFFER_FORMAT_UNDEFINED };
+            OutputFrame outputFrame = nullptr;
+            std::vector<uint8> encodedFrame = {};
             bool isIdrFrame = false;
-            std::atomic<bool> isEncoding = {false};
+            std::atomic<bool> isEncoding = { false };
         };
 
     public:
@@ -38,11 +38,11 @@ namespace WebRTC
         void SetIdrFrame() { isIdrFrame = true; }
         uint64 GetCurrentFrameCount() { return frameCount; }
         sigslot::signal1<std::vector<uint8>&> CaptureFrame;
-        void InitEncoderResources();
 
     private:
-        void ReleaseFrameInputBuffer(Frame& frame);
+        void InitEncoderResources();
         void ReleaseEncoderResources();
+        void ReleaseFrameInputBuffer(Frame& frame);
         void ProcessEncodedFrame(Frame& frame);
 #if _WIN32
         ID3D11Texture2D* AllocateInputBuffers();
@@ -65,6 +65,7 @@ namespace WebRTC
         bool isIdrFrame = false;
         int width = 1920;
         int height = 1080;
+        int pitch = 0;
         //10Mbps
         int bitRate = 10000000;
         //100Mbps

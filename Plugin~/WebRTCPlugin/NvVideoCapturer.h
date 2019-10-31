@@ -32,8 +32,10 @@ namespace WebRTC
         }
         void StartEncoder();
         void SetFrameBuffer(UnityFrameBuffer* frameBuffer);
-        void InitializeEncoder(int32 width, int32 height);
+        void InitializeEncoder();
+        void FinalizeEncoder();
         void SetKeyFrame();
+        void SetSize(int32 width, int32 height);
         void SetRate(uint32 rate);
         void CaptureFrame(std::vector<uint8>& data);
         bool CopyRenderTexture(void*& dst, UnityFrameBuffer*& src);
@@ -51,9 +53,9 @@ namespace WebRTC
         std::unique_ptr<NvEncoder> nvEncoder;
 
         //just fake info
-        const int32 width = 1280;
-        const int32 height = 720;
-        const int32 framerate = 60;
+        int32 width = 1280;
+        int32 height = 720;
+        int32 framerate = 60;
 
         bool captureStarted = false;
         bool captureStopped = false;

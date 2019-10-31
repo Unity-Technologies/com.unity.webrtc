@@ -33,7 +33,6 @@ namespace WebRTC
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
         errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface);
         checkf(NV_RESULT(errorCode), StringFormat("Unable to open NvEnc encode session %d", errorCode).c_str());
-        LogPrint(StringFormat("OpenEncodeSession Error is %d", errorCode).c_str());
 #pragma endregion
 #pragma region set initialization parameters
         nvEncInitializeParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
@@ -220,22 +219,32 @@ namespace WebRTC
     {
         NV_ENC_INPUT_RESOURCE_OPENGL_TEX *pResource = new NV_ENC_INPUT_RESOURCE_OPENGL_TEX;
         NV_ENC_BUFFER_FORMAT format = NV_ENC_BUFFER_FORMAT_ARGB;
-        uint32_t tex;
-
-        glGenTextures(1, &tex);
-        glBindTexture(GL_TEXTURE_RECTANGLE, tex);
-
         uint32_t chromaHeight = GetNumChromaPlanes(format) * GetChromaHeight(format, height);
 
-        glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_R8,
+//        uint32_t tex;
+//        glGenTextures(1, &tex);
+//        glBindTexture(GL_TEXTURE_2D, tex);
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+//                     width,
+//                     height,
+//                     0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+//        glBindTexture(GL_TEXTURE_2D, 0);
+//        glDeleteTextures(1, &tex);
+
+        uint32_t tex;
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
                      GetWidthInBytes(format, width),
                      height + chromaHeight,
                      0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
-        glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+        pitch = GetWidthInBytes(format, width);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         pResource->texture = tex;
-        pResource->target = GL_TEXTURE_RECTANGLE;
+        pResource->target = GL_TEXTURE_2D;
         return pResource;
     }
 #endif
@@ -255,6 +264,7 @@ namespace WebRTC
             LogPrint("resource is not initialized");
         registerResource.width = width;
         registerResource.height = height;
+        registerResource.pitch = pitch;
         registerResource.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
         registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;
         errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource);
@@ -292,13 +302,19 @@ namespace WebRTC
     }
     void NvEncoder::ReleaseFrameInputBuffer(Frame& frame)
     {
-        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnmapInputResource(pEncoderInterface, frame.inputFrame.mappedResource);
-        checkf(NV_RESULT(errorCode), StringFormat("Failed to unmap input resource %d", errorCode).c_str());
-        frame.inputFrame.mappedResource = nullptr;
+        if(frame.inputFrame.mappedResource)
+        {
+            errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnmapInputResource(pEncoderInterface, frame.inputFrame.mappedResource);
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to unmap input resource %d", errorCode).c_str());
+            frame.inputFrame.mappedResource = nullptr;
+        }
 
-        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnregisterResource(pEncoderInterface, frame.inputFrame.registeredResource);
-        checkf(NV_RESULT(errorCode), StringFormat("Failed to unregister input buffer resource %d", errorCode).c_str());
-        frame.inputFrame.registeredResource = nullptr;
+        if(frame.inputFrame.registeredResource)
+        {
+            errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncUnregisterResource(pEncoderInterface, frame.inputFrame.registeredResource);
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to unregister input buffer resource %d", errorCode).c_str());
+            frame.inputFrame.registeredResource = nullptr;
+        }
     }
     void NvEncoder::ReleaseEncoderResources()
     {

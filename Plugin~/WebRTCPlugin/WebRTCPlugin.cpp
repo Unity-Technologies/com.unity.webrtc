@@ -26,7 +26,6 @@ namespace WebRTC
     }
 }
 
-
 extern "C"
 {
     UNITY_INTERFACE_EXPORT CodecInitializationResult GetCodecInitializationResult()
@@ -36,13 +35,11 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCaptureVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
     {
-        context->InitializeEncoder(width, height);
-        return context->CreateVideoStream(rt);
+        return context->CreateVideoStream(rt, width, height);
     }
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
     {
-        // TODO: context->FinalizeEncoder();
         context->DeleteVideoStream(stream);
     }
 
