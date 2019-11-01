@@ -22,7 +22,7 @@
 #include "gl3w.h"
 #elif UNITY_LINUX
 #	define GL_GLEXT_PROTOTYPES
-#	include <GL/gl.h>
+#include <GL/glew.h>
 #else
 #	error Unknown platform
 #endif
@@ -54,36 +54,22 @@ namespace WebRTC
     Context* s_context;
 }
 using namespace WebRTC;
-//get d3d11 device
+
+// get d3d11 device.
+// this function is not called on Linux.
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch (eventType)
     {
     case kUnityGfxDeviceEventInitialize:
     {
-        s_RenderType = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
-        if (s_RenderType == kUnityGfxRendererOpenGLES20)
-        {
-        }
-        else if (s_RenderType == kUnityGfxRendererOpenGLES30)
-        {
-        }
-#if SUPPORT_OPENGL_CORE
-        else if (s_RenderType == kUnityGfxRendererOpenGLCore)
-        {
-#if UNITY_WIN
-            gl3wInit();
-#endif
-        }
-#endif // if SUPPORT_OPENGL_CORE
 #if SUPPORT_D3D11
-        else if (s_RenderType == kUnityGfxRendererD3D11)
+        if (s_RenderType == kUnityGfxRendererD3D11)
         {
             g_D3D11Device = s_UnityInterfaces->Get<IUnityGraphicsD3D11>()->GetDevice();
             g_D3D11Device->GetImmediateContext(&context);
         }
 #endif // if SUPPORT_D3D11
-
         break;
     }
     case kUnityGfxDeviceEventShutdown:
@@ -127,8 +113,27 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
-static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
-{
+static bool isInitializedGL = false;
+
+static void UNITY_INTERFACE_API OnRenderEvent(int eventID) {
+#if SUPPORT_OPENGL_CORE
+    if(!isInitializedGL)
+    {
+        GLenum err = glewInit();
+        GLuint unusedIds = 0;
+#if _DEBUG
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(OnOpenGLDebugMessage, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
+#endif
+        if (err != GLEW_OK)
+        {
+            LogPrint("OpenGL initialize failed");
+        }
+        isInitializedGL = true;
+    }
+#endif
+
     if (s_context == nullptr)
     {
         LogPrint("context is not initialized", eventID);

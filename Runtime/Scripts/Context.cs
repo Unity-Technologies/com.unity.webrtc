@@ -96,9 +96,10 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
+        // TODO:: Fix API design for multi tracks
         public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
         {
-            var stream = NativeMethods.ContextCaptureVideoStream(self, rt, width, height);
+            var stream = NativeMethods.ContextCreateVideoStream(self, rt, width, height);
 
             // You should initialize encoder after create stream instance.
             // This specification will change in the future.
@@ -106,15 +107,23 @@ namespace Unity.WebRTC
             return stream;
         }
 
+        // TODO:: Fix API design for multi tracks
         public void DeleteVideoStream(IntPtr stream)
         {
             FinalizeEncoder();
             NativeMethods.ContextDeleteVideoStream(self, stream);
         }
 
-        public IntPtr CaptureAudioStream()
+        // TODO:: Fix API design for multi tracks
+        public IntPtr CreateAudioStream()
         {
-            return NativeMethods.ContextCaptureAudioStream(self);
+            return NativeMethods.ContextCreateAudioStream(self);
+        }
+
+        // TODO:: Fix API design for multi tracks
+        public void DeleteAudioStream(IntPtr stream)
+        {
+            NativeMethods.ContextDeleteAudioStream(self, stream);
         }
 
         public IntPtr GetRenderEventFunc()

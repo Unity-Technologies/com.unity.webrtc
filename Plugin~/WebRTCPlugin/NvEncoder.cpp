@@ -221,23 +221,11 @@ namespace WebRTC
         NV_ENC_BUFFER_FORMAT format = NV_ENC_BUFFER_FORMAT_ARGB;
         uint32_t chromaHeight = GetNumChromaPlanes(format) * GetChromaHeight(format, height);
 
-//        uint32_t tex;
-//        glGenTextures(1, &tex);
-//        glBindTexture(GL_TEXTURE_2D, tex);
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-//                     width,
-//                     height,
-//                     0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-//        glBindTexture(GL_TEXTURE_2D, 0);
-//        glDeleteTextures(1, &tex);
-
         uint32_t tex;
         glGenTextures(1, &tex);
         glBindTexture(GL_TEXTURE_2D, tex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
-                     GetWidthInBytes(format, width),
-                     height + chromaHeight,
-                     0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         pitch = GetWidthInBytes(format, width);
 

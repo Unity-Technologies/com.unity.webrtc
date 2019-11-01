@@ -53,6 +53,10 @@ class MediaStreamTest
         {
             pc1Senders.Add(peer1.AddTrack(track));
         }
+
+        var audioStream = Audio.CaptureStream();
+        peer1.AddTrack(audioStream.GetTracks()[0]);
+
         var conf = new RTCDataChannelInit(true);
 
         RTCOfferOptions options1 = default;

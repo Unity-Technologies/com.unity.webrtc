@@ -68,6 +68,10 @@
 #include "d3d11.h"
 #endif // if SUPPORT_D3D11
 
+#if SUPPORT_OPENGL_CORE
+#include <GL/glew.h>
+#endif
+
 namespace WebRTC
 {
     void LogPrint(const char* fmt, ...);
@@ -86,6 +90,9 @@ namespace WebRTC
 #define CoTaskMemFree(p) free(p)
 #endif
 
+#if SUPPORT_OPENGL_CORE
+    void OnOpenGLDebugMessage( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+#endif
     template<class ... Args>
     std::string StringFormat(const std::string& format, Args ... args)
     {

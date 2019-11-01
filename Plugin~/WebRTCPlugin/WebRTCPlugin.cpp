@@ -33,7 +33,7 @@ extern "C"
         return ContextManager::GetInstance()->GetCodecInitializationResult();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCaptureVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
     {
         return context->CreateVideoStream(rt, width, height);
     }
@@ -49,9 +49,14 @@ extern "C"
         context->StopCapturer();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* CaptureAudioStream(Context* context)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateAudioStream(Context* context)
     {
         return context->CreateAudioStream();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextDeleteAudioStream(Context* context, webrtc::MediaStreamInterface* stream)
+    {
+        context->DeleteAudioStream(stream);
     }
 
     UNITY_INTERFACE_EXPORT void MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)

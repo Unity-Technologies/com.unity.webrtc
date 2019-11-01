@@ -8,9 +8,16 @@ namespace Unity.WebRTC
 {
     public class MediaStream : IDisposable
     {
+        enum MediaStreamType
+        {
+            Video,
+            Audio
+        }
+
         private IntPtr self;
         private string id;
         private bool disposed;
+        private MediaStreamType _streamType;
         private Dictionary<MediaStreamTrack, RenderTexture[]> VideoTrackToRts;
         private List<MediaStreamTrack> AudioTracks;
 
@@ -36,7 +43,15 @@ namespace Unity.WebRTC
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                WebRTC.Context.DeleteVideoStream(self);
+                switch (_streamType)
+                {
+                    case MediaStreamType.Video:
+                        WebRTC.Context.DeleteVideoStream(self);
+                        break;
+                    case MediaStreamType.Audio:
+                        WebRTC.Context.DeleteAudioStream(self);
+                        break;
+                }
                 self = IntPtr.Zero;
             }
             this.disposed = true;
@@ -91,10 +106,12 @@ namespace Unity.WebRTC
         {
             if(track.Kind == TrackKind.Video)
             {
+                _streamType = MediaStreamType.Video;
                 VideoTrackToRts[track] = track.getRts(track);
             }
             else
             {
+                _streamType = MediaStreamType.Audio;
                 AudioTracks.Add(track);
             }
             NativeMethods.MediaStreamAddTrack(self, track.self);
@@ -107,6 +124,7 @@ namespace Unity.WebRTC
         internal MediaStream(RenderTexture[] rts, IntPtr ptr)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
             VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
             AudioTracks = new List<MediaStreamTrack>();
@@ -129,6 +147,7 @@ namespace Unity.WebRTC
         internal MediaStream(IntPtr ptr)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
             VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
             AudioTracks = new List<MediaStreamTrack>();
@@ -190,9 +209,10 @@ namespace Unity.WebRTC
             }
 
             RenderTexture[] rts = new RenderTexture[2];
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             //rts[0] for render target, rts[1] for flip and WebRTC source
-            rts[0] = new RenderTexture(width, height, 0, RenderTextureFormat.BGRA32);
-            rts[1] = new RenderTexture(width, height, 0, RenderTextureFormat.BGRA32);
+            rts[0] = new RenderTexture(width, height, 0, format);
+            rts[1] = new RenderTexture(width, height, 0, format);
             rts[0].Create();
             rts[1].Create();
             camCopyRts.Add(rts);
@@ -227,7 +247,7 @@ namespace Unity.WebRTC
         {
             audioInput.BeginRecording();
             started = true;
-            return new MediaStream(WebRTC.Context.CaptureAudioStream());
+            return new MediaStream(WebRTC.Context.CreateAudioStream());
         }
         public static void Update()
         {

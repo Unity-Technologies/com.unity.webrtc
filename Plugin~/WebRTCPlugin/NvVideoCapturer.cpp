@@ -58,9 +58,14 @@ namespace WebRTC
             LogPrint("dstName is not texture");
             return false;
         }
-        glBindTexture(GL_TEXTURE_2D, dstName); // ok
-        glClearColor(1.0, 0.0, 0.0, 1.0);
-        glBindTexture(GL_TEXTURE_2D, 0); // ok
+        glFinish();
+        glBindImageTexture(0, srcName, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+        glBindImageTexture(1, dstName, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+        glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT);
+        glCopyImageSubData(
+            srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
+            dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
+            width, height, 1);
 #endif
         return true;
     }

@@ -382,7 +382,13 @@ namespace WebRTC
         audioTrack = peerConnectionFactory->CreateAudioTrack("audio", peerConnectionFactory->CreateAudioSource(audioOptions));
         audioStream = peerConnectionFactory->CreateLocalMediaStream("audio");
         audioStream->AddTrack(audioTrack);
+
         return audioStream.get();
+    }
+
+    void Context::DeleteAudioStream(webrtc::MediaStreamInterface* stream)
+    {
+        audioStream.release();
     }
 
     DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)

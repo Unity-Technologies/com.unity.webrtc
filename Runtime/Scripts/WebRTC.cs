@@ -278,6 +278,21 @@ namespace Unity.WebRTC
             s_context = null;
         }
 
+        internal static RenderTextureFormat GetSupportedRenderTextureFormat(UnityEngine.Rendering.GraphicsDeviceType type)
+        {
+            switch (type)
+            {
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
+                    return RenderTextureFormat.BGRA32;
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
+                    return RenderTextureFormat.ARGB32;
+            }
+            return RenderTextureFormat.Default;
+        }
+
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
@@ -411,11 +426,13 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCaptureVideoStream(IntPtr context, IntPtr rt, int width, int height);
+        public static extern IntPtr ContextCreateVideoStream(IntPtr context, IntPtr rt, int width, int height);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCaptureAudioStream(IntPtr context);
+        public static extern IntPtr ContextCreateAudioStream(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]

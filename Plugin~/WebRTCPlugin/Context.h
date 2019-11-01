@@ -42,6 +42,7 @@ namespace WebRTC
         webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer, int width, int height);
         void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamInterface* CreateAudioStream();
+        void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
         ~Context();
 
         PeerConnectionObject* CreatePeerConnection();

@@ -2,7 +2,6 @@ using System;
 using NUnit.Framework;
 using UnityEngine;
 using Unity.WebRTC;
-using UnityEngine.Rendering;
 
 class NativeAPITest
 {
@@ -10,21 +9,6 @@ class NativeAPITest
     static void DebugLog(string str)
     {
         Debug.Log(str);
-    }
-
-    static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
-    {
-        switch (type)
-        {
-            case GraphicsDeviceType.Direct3D11:
-            case GraphicsDeviceType.Direct3D12:
-                return RenderTextureFormat.BGRA32;
-            case GraphicsDeviceType.OpenGLCore:
-            case GraphicsDeviceType.OpenGLES2:
-            case GraphicsDeviceType.OpenGLES3:
-                return RenderTextureFormat.ARGB32;
-        }
-        return RenderTextureFormat.Default;
     }
 
     [SetUp]
@@ -72,13 +56,23 @@ class NativeAPITest
         var context = NativeMethods.ContextCreate(0);
         const int width = 1280;
         const int height = 720;
-        var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
         var renderTexture = new RenderTexture(width, height, 0, format);
         renderTexture.Create();
-        var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
+        var stream = NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);
     }
+
+    [Test]
+    public void CreateAndDeleteAudioStream()
+    {
+        var context = NativeMethods.ContextCreate(0);
+        var stream = NativeMethods.ContextCreateAudioStream(context);
+        NativeMethods.ContextDeleteAudioStream(context, stream);
+        NativeMethods.ContextDestroy(0);
+    }
+
 
     [Test]
     public void CallGetRenderEventFunc()
@@ -95,10 +89,10 @@ class NativeAPITest
         var context = NativeMethods.ContextCreate(0);
         const int width = 1280;
         const int height = 720;
-        var format = GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
         var renderTexture = new RenderTexture(width, height, 0, format);
         renderTexture.Create();
-        var stream = NativeMethods.ContextCaptureVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
+        var stream = NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
         var callback = NativeMethods.GetRenderEventFunc(context);
 
         // TODO::
