@@ -120,8 +120,9 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID) {
     if(!isInitializedGL)
     {
         GLenum err = glewInit();
-        GLuint unusedIds = 0;
 #if _DEBUG
+        GLuint unusedIds = 0;
+        glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(OnOpenGLDebugMessage, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
