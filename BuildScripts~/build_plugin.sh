@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export LIBWEBRTC_DOWNLOAD_URL=https://github.com/karasusan/build-webrtc/releases/download/v0.1.0/webrtc-linux.zip
+export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M72/webrtc-linux.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 
 # Download LibWebRTC 
@@ -13,7 +13,6 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 sudo apt install -y libc++-dev libc++abi-dev
 
 # Build UnityRenderStreaming Plugin 
-
 cd $SOLUTION_DIR
 cmake .
 make

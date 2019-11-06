@@ -1,3 +1,5 @@
+{% metadata_file .yamato/environments.yml %}
+
 platforms:
   - name: win
     type: Unity::VM
@@ -15,12 +17,12 @@ platforms:
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_linux.sh
 projects:
-  - name: libwebrtc    
+  - name: libwebrtc
 ---
 {% for project in projects %}
 {% for platform in platforms %}
 build_{{ platform.name }}:
-  name: Build {{ project.name }} on {{ platform.name }}
+  name: Build {{ project.name }} {{ webrtc_version.name }} on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
