@@ -66,9 +66,7 @@
 
 #if SUPPORT_D3D11
 #include "d3d11.h"
-#endif // if SUPPORT_D3D11
-
-#if SUPPORT_OPENGL_CORE
+#elif SUPPORT_OPENGL_CORE
 #include <GL/glew.h>
 #endif
 
