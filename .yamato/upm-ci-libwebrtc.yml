@@ -22,7 +22,7 @@ projects:
 {% for project in projects %}
 {% for platform in platforms %}
 build_{{ platform.name }}:
-  name: Build {{ project.name }} {{ webrtc_version.name }} on {{ platform.name }}
+  name: Build {{ project.name }} {{ webrtc.version }} on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
