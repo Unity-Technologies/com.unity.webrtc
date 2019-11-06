@@ -106,12 +106,10 @@ namespace Unity.WebRTC
         {
             if(track.Kind == TrackKind.Video)
             {
-                _streamType = MediaStreamType.Video;
                 VideoTrackToRts[track] = track.getRts(track);
             }
             else
             {
-                _streamType = MediaStreamType.Audio;
                 AudioTracks.Add(track);
             }
             NativeMethods.MediaStreamAddTrack(self, track.self);
@@ -126,6 +124,7 @@ namespace Unity.WebRTC
             self = ptr;
             WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
+            _streamType = MediaStreamType.Video;
             VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
             AudioTracks = new List<MediaStreamTrack>();
             //get initial tracks
@@ -149,6 +148,7 @@ namespace Unity.WebRTC
             self = ptr;
             WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
+            _streamType = MediaStreamType.Audio;
             VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
             AudioTracks = new List<MediaStreamTrack>();
             //get initial tracks
