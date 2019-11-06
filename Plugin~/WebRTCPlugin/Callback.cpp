@@ -116,7 +116,7 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 static bool isInitializedGL = false;
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID) {
-#if SUPPORT_OPENGL_CORE
+#if defined(SUPPORT_OPENGL_CORE) && defined(_WIN32)
     if(!isInitializedGL)
     {
         GLenum err = glewInit();

@@ -66,7 +66,9 @@
 
 #if SUPPORT_D3D11
 #include "d3d11.h"
-#elif SUPPORT_OPENGL_CORE
+#endif // if SUPPORT_D3D11
+
+#if defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
 #include <GL/glew.h>
 #endif
 
@@ -88,7 +90,7 @@ namespace WebRTC
 #define CoTaskMemFree(p) free(p)
 #endif
 
-#if SUPPORT_OPENGL_CORE
+#if defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
     void OnOpenGLDebugMessage( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 #endif
     template<class ... Args>
@@ -117,7 +119,7 @@ namespace WebRTC
     extern ID3D11DeviceContext* context;
     extern ID3D11Device* g_D3D11Device;
     extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
-#elif SUPPORT_OPENGL_CORE
+#elif defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
     using UnityFrameBuffer = void;
     extern void* renderTextures[bufferedFrameNum];
 #endif //if SUPPORT_D3D11
