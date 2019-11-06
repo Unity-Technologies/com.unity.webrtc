@@ -40,7 +40,8 @@ namespace WebRTC
     bool NvVideoCapturer::CopyRenderTexture(void*& dst, UnityFrameBuffer*& src)
     {
 #if _WIN32
-        context->CopyResource(dst, src);
+        auto tex = static_cast<ID3D11Resource*>(dst);
+        context->CopyResource(tex, src);
 #else
         auto tex = static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(dst);
 
