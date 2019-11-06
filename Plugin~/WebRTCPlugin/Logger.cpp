@@ -1,17 +1,19 @@
 ﻿#include "pch.h"
 #include <cstdarg>
 #include "WebRTCPlugin.h"
+#if !defined(_WIN32)
 #include <GL/glew.h>
+#endif
 
 namespace WebRTC
 {
     void LogPrint(const char* fmt, ...)
     {
-#ifdef _DEBUG
+#if defined(_DEBUG)
         va_list vl;
         va_start(vl, fmt);
         char buf[2048];
-#ifdef _WIN32
+#if defined(_WIN32)
         vsprintf_s(buf, fmt, vl);
 #else
         vsprintf(buf, fmt, vl);
@@ -28,6 +30,7 @@ namespace WebRTC
         }
     }
 
+#if !defined(_WIN32)
     void OnOpenGLDebugMessage(
             GLenum source,
             GLenum type,
@@ -110,4 +113,5 @@ namespace WebRTC
                 strSource.c_str(),
                 message);
     }
+#endif
 }

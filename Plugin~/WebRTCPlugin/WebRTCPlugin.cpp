@@ -38,7 +38,7 @@ extern "C"
         return context->CreateVideoStream(rt, width, height);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
+    UNITY_INTERFACE_EXPORT void ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
     {
         context->DeleteVideoStream(stream);
     }
@@ -54,7 +54,7 @@ extern "C"
         return context->CreateAudioStream();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextDeleteAudioStream(Context* context, webrtc::MediaStreamInterface* stream)
+    UNITY_INTERFACE_EXPORT void ContextDeleteAudioStream(Context* context, webrtc::MediaStreamInterface* stream)
     {
         context->DeleteAudioStream(stream);
     }

@@ -19,7 +19,8 @@
 // On Windows, use gl3w to initialize and load OpenGL Core functions. In principle any other
 // library (like GLEW, GLFW etc.) can be used; here we use gl3w since it's simple and
 // straightforward.
-#include "gl3w.h"
+// TODO::
+// #include "gl3w.h"
 #elif UNITY_LINUX
 #	define GL_GLEXT_PROTOTYPES
 #include <GL/glew.h>
@@ -116,7 +117,7 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 static bool isInitializedGL = false;
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID) {
-#if defined(SUPPORT_OPENGL_CORE) && defined(_WIN32)
+#if defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
     if(!isInitializedGL)
     {
         GLenum err = glewInit();
