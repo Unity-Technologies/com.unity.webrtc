@@ -1,2 +1,2 @@
-webrtc:
-  version: M72
+webrtc_version:
+  name: M72

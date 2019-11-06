@@ -21,7 +21,7 @@ publish_com.unity.webrtc_github_release:
     - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
 
 publish_libwebrtc_github_release:
-  name: Publish libwebrtc {{ webrtc.version }} to Github Release
+  name: Publish libwebrtc {{ webrtc_version.name }} to Github Release
   agent:
     type: Unity::VM
     image: package-ci/win10:stable
@@ -29,7 +29,7 @@ publish_libwebrtc_github_release:
   commands:
     - npm install github-release-cli -g
     {% for platform in platforms %}
-    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc.version }}" -n "{{ webrtc.version }}" "artifacts/webrtc-{{ platform.name }}.zip"
+    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/webrtc-{{ platform.name }}.zip"
     {% endfor %}
   triggers:
     tags:
