@@ -11,11 +11,15 @@ platforms:
     image: renderstreaming/win10:latest
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.cmd
+    plugin_path: Runtime/Plugins/x86_64/webrtc.dll
+    sudo: 
   - name: linux
     type: Unity::VM::GPU
     image: cds-ops/ubuntu-18.04-base:stable
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.sh
+    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
+    sudo: sudo
 packages:
   - name: webrtc
     packagename: com.unity.webrtc
@@ -31,6 +35,10 @@ prepack_{{ package.name }}_{{ platform.name }}:
     flavor: {{ platform.flavor }}
   commands:
     - {{ platform.prepack_command }}
+  artifacts:
+    {{ platform.name }}_plugin:
+      paths:
+        {{ platform.plugin_path }}
 {% endfor %}
 
 pack_{{ package.name }}:
@@ -40,7 +48,7 @@ pack_{{ package.name }}:
     image: renderstreaming/win10:latest
     flavor: b1.large
   commands:
-    - sudo npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
     - upm-ci package pack  
   artifacts:
     {{ package.name }}_package:  
@@ -60,7 +68,7 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
-    - sudo npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - {{ platform.sudo }} npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
     - upm-ci package test -u {{ editor.version }}
   triggers:
     branches:
@@ -86,7 +94,7 @@ test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
-    - sudo npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - {{ platform.sudo }} npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
     - upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
   triggers:
     branches:
@@ -110,7 +118,7 @@ publish_{{ package.name }}:
     image: package-ci/win10:stable
     flavor: b1.large
   commands:
-    - sudo npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
     - upm-ci package publish  
   triggers:
     tags:
