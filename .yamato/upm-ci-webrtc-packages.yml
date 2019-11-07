@@ -15,7 +15,7 @@ platforms:
     sudo: 
   - name: linux
     type: Unity::VM::GPU
-    image: cds-ops/ubuntu-18.04-base:stable
+    image: cds-ops/ubuntu-18.04-base:v1.5.14-439390
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
