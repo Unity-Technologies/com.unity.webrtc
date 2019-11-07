@@ -45,7 +45,7 @@ elseif(UNIX)
   target_link_libraries(webrtc
     PRIVATE
     ${WEBRTC_LIBRARIES}
-    ${GLEW_LIBRARIES}
+    ${GLFW_STATIC_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${LIBCXX_LIBRARIES}
   )
