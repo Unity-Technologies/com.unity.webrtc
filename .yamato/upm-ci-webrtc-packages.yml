@@ -70,8 +70,11 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   commands:
     - pwd
     - echo $PATH
-    - source ~/.profile
+    - cat ~/.profile
     - npm install upm-ci-utils -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - ls /home/bokken/.npm-global/bin
+    - source ~/.profile
+    - echo $PATH
     - upm-ci package test -u {{ editor.version }}
   triggers:
     branches:
