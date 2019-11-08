@@ -74,6 +74,7 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
       cd ..
       mv com.unity.webrtc ..
       cd ..
+      upm-ci package pack --package-path com.unity.webrtc
       upm-ci package test -u {{ editor.version }} --package-path com.unity.webrtc
   triggers:
     branches:
