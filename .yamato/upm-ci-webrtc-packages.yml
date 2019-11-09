@@ -109,7 +109,7 @@ test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
       cd ../com.unity.webrtc
       upm-ci package pack
 {% endif -%}
-      upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
+    - upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
   triggers:
     branches:
       only:
