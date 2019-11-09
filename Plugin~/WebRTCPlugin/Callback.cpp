@@ -40,7 +40,6 @@ namespace WebRTC
 {
     IUnityInterfaces* s_UnityInterfaces = nullptr;
     IUnityGraphics* s_Graphics = nullptr;
-    UnityGfxRenderer s_RenderType;
 
 #if SUPPORT_D3D11
     //d3d11 context
@@ -65,7 +64,8 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     case kUnityGfxDeviceEventInitialize:
     {
 #if SUPPORT_D3D11
-        if (s_RenderType == kUnityGfxRendererD3D11)
+        auto renderType = s_Graphics->GetRenderer();
+        if (renderType == kUnityGfxRendererD3D11)
         {
             g_D3D11Device = s_UnityInterfaces->Get<IUnityGraphicsD3D11>()->GetDevice();
             g_D3D11Device->GetImmediateContext(&context);

@@ -49,6 +49,7 @@ namespace Unity.WebRTC
                         WebRTC.Context.DeleteVideoStream(self);
                         break;
                     case MediaStreamType.Audio:
+                        Audio.Stop();
                         WebRTC.Context.DeleteAudioStream(self);
                         break;
                 }
@@ -56,6 +57,12 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
+        }
+
+        public YieldInstruction FinalizeEncoder()
+        {
+            WebRTC.Context.FinalizeEncoder();
+            return new WaitForEndOfFrame();
         }
 
         private void StopTrack(MediaStreamTrack track)
@@ -78,7 +85,6 @@ namespace Unity.WebRTC
             {
                 Audio.Stop();
             }
-
         }
         private RenderTexture[] GetRts(MediaStreamTrack track)
         {
@@ -226,7 +232,15 @@ namespace Unity.WebRTC
                 UnityEngine.Object.Destroy(rts[1]);
             });
             started = true;
-            return new MediaStream(rts, WebRTC.Context.CaptureVideoStream(rts[1].GetNativeTexturePtr(), width, height));
+
+            var stream = WebRTC.Context.CaptureVideoStream(rts[1].GetNativeTexturePtr(), width, height);
+
+            // TODO::
+            // You should initialize encoder after create stream instance.
+            // This specification will change in the future.
+            WebRTC.Context.InitializeEncoder();
+
+            return new MediaStream(rts, stream);
         }
         public static void RemoveRt(RenderTexture[] rts)
         {

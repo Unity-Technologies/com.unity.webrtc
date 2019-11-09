@@ -1,7 +1,9 @@
-using System;
+﻿using System;
+using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using Unity.WebRTC;
+using UnityEngine.TestTools;
 
 class NativeAPITest
 {
@@ -83,8 +85,8 @@ class NativeAPITest
         NativeMethods.ContextDestroy(0);
     }
 
-    [Test]
-    public void CallVideoEncoderMethods()
+    [UnityTest]
+    public IEnumerator CallVideoEncoderMethods()
     {
         var context = NativeMethods.ContextCreate(0);
         const int width = 1280;
@@ -98,8 +100,11 @@ class NativeAPITest
         // TODO::
         // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
         VideoEncoderMethods.InitializeEncoder(callback);
+        yield return new WaitForEndOfFrame();
         VideoEncoderMethods.Encode(callback);
+        yield return new WaitForEndOfFrame();
         VideoEncoderMethods.FinalizeEncoder(callback);
+        yield return new WaitForEndOfFrame();
 
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);

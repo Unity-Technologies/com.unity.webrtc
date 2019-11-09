@@ -49,7 +49,10 @@ class MediaStreamTest
         {
             pc2Senders.Add(peer2.AddTrack(e.Track));
         });
-        foreach (var track in cam.CaptureStream(1280, 720).GetTracks())
+        var videoStream = cam.CaptureStream(1280, 720);
+        yield return new WaitForEndOfFrame();
+
+        foreach (var track in videoStream.GetTracks())
         {
             pc1Senders.Add(peer1.AddTrack(track));
         }
@@ -91,5 +94,8 @@ class MediaStreamTest
 
         peer1.Close();
         peer2.Close();
+
+        yield return videoStream.FinalizeEncoder();
+        videoStream.Dispose();
     }
 }

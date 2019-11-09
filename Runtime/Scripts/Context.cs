@@ -99,18 +99,12 @@ namespace Unity.WebRTC
         // TODO:: Fix API design for multi tracks
         public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
         {
-            var stream = NativeMethods.ContextCreateVideoStream(self, rt, width, height);
-
-            // You should initialize encoder after create stream instance.
-            // This specification will change in the future.
-            InitializeEncoder();
-            return stream;
+            return NativeMethods.ContextCreateVideoStream(self, rt, width, height);
         }
 
         // TODO:: Fix API design for multi tracks
         public void DeleteVideoStream(IntPtr stream)
         {
-            FinalizeEncoder();
             NativeMethods.ContextDeleteVideoStream(self, stream);
         }
 
