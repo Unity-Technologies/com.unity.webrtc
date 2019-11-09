@@ -72,8 +72,10 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
       upm-ci package pack
-{% endif -%}
+      upm-ci package test -u {{ editor.version }}
+{% else -%}
     - upm-ci package test -u {{ editor.version }}
+{% endif -%}    
   triggers:
     branches:
       only:
@@ -106,8 +108,10 @@ test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
       upm-ci package pack
-{% endif -%}
+      upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
+{% else -%}
     - upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
+{% endif -%}
   triggers:
     branches:
       only:
