@@ -3,6 +3,11 @@ editors:
   - version: 2019.1
   - version: 2019.2  
 #  - version: trunk
+
+scripting_backends:
+  - mono
+  - il2cpp
+
 platforms:
   - name: win
     type: Unity::VM::GPU
@@ -59,43 +64,9 @@ pack_{{ package.name }}:
 
 {% for editor in editors %}
 {% for platform in platforms %}
-test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
-  name : Test {{ package.packagename }} {{ editor.version }} on {{ platform.name }}
-  agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
-  commands:
-    - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
-{% if platform.name == "linux" -%}
-    - |
-      source ~/.profile
-      cd ..
-      mv com.unity.webrtc ..
-      cd ../com.unity.webrtc
-      upm-ci package test -u {{ editor.version }}
-{% else -%}
-    - upm-ci package test -u {{ editor.version }}
-{% endif -%}    
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
-  artifacts:
-    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_test_results: 
-      paths:
-        - "upm-ci~/test-results/**/*"
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% endfor %}
-{% endfor %}
-
-{% for editor in editors %}
-{% for platform in platforms %}
-test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
-  name : Test {{ package.packagename }} with IL2CPP {{ editor.version }} on {{ platform.name }}
+{% for backend in scripting_backends %}
+test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
+  name : Test {{ package.packagename }} with {{ backend }} {{ editor.version }} on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
@@ -109,9 +80,9 @@ test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
       upm-ci package pack
-      upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
+      upm-ci package test -u {{ editor.version }} --platform standalone --backend {{ backend }}
 {% else -%}
-    - upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
+    - upm-ci package test -u {{ editor.version }} --platform standalone --backend {{ backend }}
 {% endif -%}
   triggers:
     branches:
@@ -124,7 +95,8 @@ test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}    
+{% endfor %}
 {% endfor %}
 {% endfor %}
 
@@ -149,8 +121,9 @@ publish_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
     {% for platform in platforms %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}
+    {% for backend in scripting_backends %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}
+    {% endfor %}
     {% endfor %}
     {% endfor %}
 {% endfor %}
