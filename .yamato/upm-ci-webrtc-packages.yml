@@ -12,14 +12,12 @@ platforms:
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
-    source_command: 
   - name: linux
     type: Unity::VM::GPU
     image: renderstreaming/ubuntu-18.04:v0.1.0-448363
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
-    source_command: source ~/.profile
 packages:
   - name: webrtc
     packagename: com.unity.webrtc
@@ -69,13 +67,15 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     flavor: {{ platform.flavor }}
   commands:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+{% if platform.os == "linux" -%}
     - |
-      {{ platform.source_command }}
+      source ~/.profile
       cd ..
       mv com.unity.webrtc ..
-      cd ..
-      upm-ci package pack --package-path com.unity.webrtc
-      upm-ci package test -u {{ editor.version }} --package-path com.unity.webrtc
+      cd ../com.unity.webrtc
+      upm-ci package pack
+{% endif -%}
+    - upm-ci package test -u {{ editor.version }}
   triggers:
     branches:
       only:
@@ -101,8 +101,14 @@ test_{{ package.name }}_il2cpp_{{ platform.name }}_{{ editor.version }}:
     flavor: {{ platform.flavor }}
   commands:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+{% if platform.os == "linux" -%}
     - |
-      {{ platform.source_command }}
+      source ~/.profile
+      cd ..
+      mv com.unity.webrtc ..
+      cd ../com.unity.webrtc
+      upm-ci package pack
+{% endif -%}
       upm-ci package test -u {{ editor.version }} --platform standalone --backend il2cpp
   triggers:
     branches:
