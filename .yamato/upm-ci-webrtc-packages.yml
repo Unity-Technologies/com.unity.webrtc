@@ -73,7 +73,6 @@ test_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
       cd ..
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
-      upm-ci package pack
       upm-ci package test -u {{ editor.version }}
 {% else -%}
     - upm-ci package test -u {{ editor.version }}
