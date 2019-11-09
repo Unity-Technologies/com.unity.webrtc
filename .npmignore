@@ -4,6 +4,8 @@ build/**
 node_modules/**
 Documentation/ApiDocs/**
 Documentation~/ApiDocs/**
+BuildScripts~/**
+Plugin~/**
 .DS_Store
 .npmrc
 .npmignore
