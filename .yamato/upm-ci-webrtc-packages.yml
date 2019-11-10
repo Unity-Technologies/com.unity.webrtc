@@ -19,7 +19,7 @@ platforms:
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
   - name: linux
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu-18.04:v0.1.0-448658
+    image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
