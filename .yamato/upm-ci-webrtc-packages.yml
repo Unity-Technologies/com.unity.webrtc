@@ -4,6 +4,9 @@ editors:
   - version: 2019.2  
 #  - version: trunk
 
+scripting_backends:
+  - mono
+  - il2cpp
 
 platforms:
   - name: win
@@ -12,19 +15,13 @@ platforms:
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
-    scripting_backends:
-      - mono
-      - il2cpp
-
   - name: linux
     type: Unity::VM::GPU
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
-    scripting_backends:
-      - mono
-      # - il2cpp // Not supported yet 
+
 packages:
   - name: webrtc
     packagename: com.unity.webrtc
@@ -66,7 +63,7 @@ pack_{{ package.name }}:
 
 {% for editor in editors %}
 {% for platform in platforms %}
-{% for backend in platform.scripting_backends %}
+{% for backend in scripting_backends %}
 test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
   name : Test {{ package.packagename }} with {{ backend }} {{ editor.version }} on {{ platform.name }}
   agent:
