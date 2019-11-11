@@ -223,26 +223,6 @@ namespace Unity.WebRTC
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create();
-            var result = Context.GetCodecInitializationResult();
-            if (result != CodecInitializationResult.Success)
-            {
-                switch (result)
-                {
-                    case CodecInitializationResult.DriverNotInstalled:
-                        Debug.LogError("[WebRTC] The hardware codec driver not installed");
-                        break;
-                    case CodecInitializationResult.DriverVersionDoesNotSupportAPI:
-                        Debug.LogError("[WebRTC] The version of the hardware codec driver does not support API");
-                        break;
-                    case CodecInitializationResult.EncoderInitializationFailed:
-                        Debug.LogError("[WebRTC] Hardware encoder initialization failed");
-                        break;
-                    case CodecInitializationResult.APINotFound:
-                        Debug.LogError("[WebRTC] Hardware encoder API not found");
-                        break;
-                }
-            }
-
             s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
