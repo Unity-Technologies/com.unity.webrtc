@@ -78,6 +78,7 @@ test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
 {% if platform.name == "linux" -%}
     - |
       source ~/.profile
+      export DISPLAY=:0
       cd ..
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
