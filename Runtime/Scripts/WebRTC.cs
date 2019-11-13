@@ -258,6 +258,11 @@ namespace Unity.WebRTC
             s_context = null;
         }
 
+        internal static string GetModuleName()
+        {
+            return System.IO.Path.GetFileName(Lib);
+        }
+
         internal static RenderTextureFormat GetSupportedRenderTextureFormat(UnityEngine.Rendering.GraphicsDeviceType type)
         {
             switch (type)

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;           // RuntimePlatform
 using System.Diagnostics;    // Process
+using System.Linq;
 using UnityEngine.TestTools; // UnityPlatform
 using NUnit.Framework;       // Assert
 
@@ -16,15 +17,13 @@ public class PluginTest {
     public static void IsPluginLoaded() {
         // Get the current process.
         Process currentProcess = Process.GetCurrentProcess();
-        bool found = false;
-        var enumerator = currentProcess.Modules.GetEnumerator();
-        while (enumerator.MoveNext()) {
-            ProcessModule module = enumerator.Current as ProcessModule;
-            if (null != module && module.ModuleName == WebRTC.Lib)
-                found = true;
+        var names = currentProcess.Modules
+            .Cast<ProcessModule>()
+            .Where(_ => _ != null)
+            .Select(_ => _.ModuleName)
+            .ToArray();
 
-        }
-        Assert.True(found);
+        Assert.Contains(WebRTC.GetModuleName(), names);
     }
 }
 
