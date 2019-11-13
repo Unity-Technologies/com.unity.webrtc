@@ -15,6 +15,9 @@ platforms:
     scripting_backends:
       - mono
       - il2cpp
+    test_platform:
+      - playmode
+      # - standalone
 
   - name: linux
     type: Unity::VM::GPU
@@ -25,6 +28,10 @@ platforms:
     scripting_backends:
       - mono
       # - il2cpp // Not supported yet 
+    test_platform:
+      # - playmode
+      - standalone
+
 packages:
   - name: webrtc
     packagename: com.unity.webrtc
@@ -67,8 +74,9 @@ pack_{{ package.name }}:
 {% for editor in editors %}
 {% for platform in platforms %}
 {% for backend in platform.scripting_backends %}
-test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
-  name : Test {{ package.packagename }} with {{ backend }} {{ editor.version }} on {{ platform.name }}
+{% for test_platform in platform.test_platforms %}
+test_{{ package.name }}_{{ test_platform }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
+  name : Test {{ package.packagename }} with {{ test_platform }} {{ backend }} {{ editor.version }} on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
@@ -82,9 +90,9 @@ test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
       cd ..
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
-      upm-ci package test -u {{ editor.version }} --platform standalone --backend {{ backend }}
+      upm-ci package test -u {{ editor.version }} --platform {{ test_platform }} --backend {{ backend }}
 {% else -%}
-    - upm-ci package test -u {{ editor.version }} --platform playmode --backend {{ backend }}
+    - upm-ci package test -u {{ editor.version }} --platform {{ test_platform }} --backend {{ backend }}
 {% endif -%}
   triggers:
     branches:
@@ -98,6 +106,7 @@ test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
         - "upm-ci~/test-results/**/*"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}    
+{% endfor %}
 {% endfor %}
 {% endfor %}
 {% endfor %}
@@ -124,7 +133,7 @@ publish_{{ package.name }}:
     {% for editor in editors %}
     {% for platform in platforms %}
     {% for backend in scripting_backends %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ test_platform }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
     {% endfor %}
