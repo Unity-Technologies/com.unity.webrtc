@@ -17,35 +17,6 @@ class DataChannelTest
     {
         WebRTC.Finalize();
     }
-    
-    [Test]
-    public void DataChannel_CreateDataChannel()
-    {
-        RTCConfiguration config = default;
-        config.iceServers = new RTCIceServer[]
-        {
-            new RTCIceServer
-            {
-                urls = new string[] { "stun:stun.l.google.com:19302" }
-            }
-        };
-        var peer = new RTCPeerConnection(ref config);
-        var option1 = new RTCDataChannelInit(true);
-        var channel1 = peer.CreateDataChannel("test1", ref option1);
-        Assert.AreEqual("test1", channel1.Label);
-
-        var option2 = new RTCDataChannelInit(false);
-        var channel2 = peer.CreateDataChannel("test2", ref option2);
-        Assert.AreEqual("test2", channel2.Label);
-
-        // It is return -1 when channel is not connected.
-        Assert.AreEqual(channel1.Id, -1);
-        Assert.AreEqual(channel2.Id, -1);
-
-        channel1.Close();
-        channel2.Close();
-        peer.Close();
-    }
 
     [UnityTest]
     [Timeout(5000)]
