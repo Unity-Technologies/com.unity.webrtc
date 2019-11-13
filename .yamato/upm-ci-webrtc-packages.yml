@@ -84,7 +84,7 @@ test_{{ package.name }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
       cd ../com.unity.webrtc
       upm-ci package test -u {{ editor.version }} --platform standalone --backend {{ backend }}
 {% else -%}
-    - upm-ci package test -u {{ editor.version }} --platform standalone --backend {{ backend }}
+    - upm-ci package test -u {{ editor.version }} --platform playmode --backend {{ backend }}
 {% endif -%}
   triggers:
     branches:
