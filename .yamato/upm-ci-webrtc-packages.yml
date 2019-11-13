@@ -12,25 +12,24 @@ platforms:
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
-    scripting_backends:
-      - mono
-      - il2cpp
-    test_platforms:
-      - playmode
-      # - standalone
-
+    test_params:
+      - backend: mono
+        platform: playmode
+      - backend: mono
+        platform: standalone
+      - backend: il2cpp
+        platform: standalone
   - name: linux
     type: Unity::VM::GPU
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
-    scripting_backends:
-      - mono
-      # - il2cpp // Not supported yet 
-    test_platforms:
-      # - playmode
-      - standalone
+    test_params:
+      - backend: mono
+        platform: playmode
+      - backend: mono
+        platform: standalone
 
 packages:
   - name: webrtc
@@ -74,9 +73,9 @@ pack_{{ package.name }}:
 {% for editor in editors %}
 {% for platform in platforms %}
 {% for backend in platform.scripting_backends %}
-{% for test_platform in platform.test_platforms %}
-test_{{ package.name }}_{{ test_platform }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}:
-  name : Test {{ package.packagename }} with {{ test_platform }} {{ backend }} {{ editor.version }} on {{ platform.name }}
+{% for param in platform.test_params %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
@@ -90,9 +89,9 @@ test_{{ package.name }}_{{ test_platform }}_{{ backend }}_{{ platform.name }}_{{
       cd ..
       mv com.unity.webrtc ..
       cd ../com.unity.webrtc
-      upm-ci package test -u {{ editor.version }} --platform {{ test_platform }} --backend {{ backend }}
+      upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
 {% else -%}
-    - upm-ci package test -u {{ editor.version }} --platform {{ test_platform }} --backend {{ backend }}
+    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
 {% endif -%}
   triggers:
     branches:
@@ -133,8 +132,8 @@ publish_{{ package.name }}:
     {% for editor in editors %}
     {% for platform in platforms %}
     {% for backend in scripting_backends %}
-    {% for test_platform in platform.test_platforms %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ test_platform }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}
+    {% for param in platform.test_params %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
     {% endfor %}
