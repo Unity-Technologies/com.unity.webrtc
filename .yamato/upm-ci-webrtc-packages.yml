@@ -15,7 +15,7 @@ platforms:
     scripting_backends:
       - mono
       - il2cpp
-    test_platform:
+    test_platforms:
       - playmode
       # - standalone
 
@@ -28,7 +28,7 @@ platforms:
     scripting_backends:
       - mono
       # - il2cpp // Not supported yet 
-    test_platform:
+    test_platforms:
       # - playmode
       - standalone
 
