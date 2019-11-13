@@ -133,7 +133,9 @@ publish_{{ package.name }}:
     {% for editor in editors %}
     {% for platform in platforms %}
     {% for backend in scripting_backends %}
+    {% for test_platform in platform.test_platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ test_platform }}_{{ backend }}_{{ platform.name }}_{{ editor.version }}
+    {% endfor %}
     {% endfor %}
     {% endfor %}
     {% endfor %}
