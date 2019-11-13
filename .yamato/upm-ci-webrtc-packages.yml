@@ -72,7 +72,6 @@ pack_{{ package.name }}:
 
 {% for editor in editors %}
 {% for platform in platforms %}
-{% for backend in platform.scripting_backends %}
 {% for param in platform.test_params %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ platform.name }}
@@ -108,7 +107,6 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 {% endfor %}
 {% endfor %}
 {% endfor %}
-{% endfor %}
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
@@ -131,10 +129,8 @@ publish_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
     {% for platform in platforms %}
-    {% for backend in scripting_backends %}
     {% for param in platform.test_params %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
-    {% endfor %}
     {% endfor %}
     {% endfor %}
     {% endfor %}
