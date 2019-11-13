@@ -18,6 +18,7 @@ class DataChannelTest
         WebRTC.Finalize();
     }
 
+    /*
     [UnityTest]
     [Timeout(5000)]
     public IEnumerator DataChannel_EventsAreSentToOther()
@@ -83,4 +84,5 @@ class DataChannelTest
         peer1.Close();
         peer2.Close();
     }
+    */
 }
