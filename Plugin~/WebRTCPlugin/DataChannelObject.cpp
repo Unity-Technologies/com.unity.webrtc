@@ -10,6 +10,15 @@ namespace WebRTC
     DataChannelObject::~DataChannelObject()
     {
         dataChannel->UnregisterObserver();
+
+        auto state = dataChannel->state();
+        if (state == webrtc::DataChannelInterface::kOpen)
+        {
+            dataChannel->Close();
+        }
+        onClose = nullptr;
+        onOpen = nullptr;
+        onMessage = nullptr;
     }
 
     void DataChannelObject::OnStateChange()
