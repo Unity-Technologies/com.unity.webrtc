@@ -104,9 +104,6 @@
     <ClInclude Include="Codec\IEncoder.h">
       <Filter>Codec</Filter>
     </ClInclude>
-    <ClInclude Include="NvVideoCapturer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">

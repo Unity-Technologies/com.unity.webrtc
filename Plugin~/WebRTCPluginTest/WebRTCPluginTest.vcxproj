@@ -34,13 +34,62 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\kazuk\Documents\WebRTC\Packages\com.unity.webrtc\Plugin~\webrtc\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\webrtc\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="..\unity\include\IUnityGraphics.h" />
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D11.h" />
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h" />
+    <ClInclude Include="..\unity\include\IUnityInterface.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\EncoderFactory.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\IEncoder.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\nvEncodeAPI.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h" />
+    <ClInclude Include="..\WebRTCPlugin\Context.h" />
+    <ClInclude Include="..\WebRTCPlugin\DataChannelObject.h" />
+    <ClInclude Include="..\WebRTCPlugin\DummyAudioDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\DummyVideoEncoder.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\Logger.h" />
+    <ClInclude Include="..\WebRTCPlugin\NvVideoCapturer.h" />
+    <ClInclude Include="..\WebRTCPlugin\pch.h" />
+    <ClInclude Include="..\WebRTCPlugin\PeerConnectionObject.h" />
+    <ClInclude Include="..\WebRTCPlugin\PlatformBase.h" />
+    <ClInclude Include="..\WebRTCPlugin\targetver.h" />
+    <ClInclude Include="..\WebRTCPlugin\WebRTCConstants.h" />
+    <ClInclude Include="..\WebRTCPlugin\WebRTCMacros.h" />
+    <ClInclude Include="..\WebRTCPlugin\WebRTCPlugin.h" />
     <ClInclude Include="D3D11GraphicsDeviceTestBase.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\WebRTCPlugin\Callback.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Codec\EncoderFactory.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Context.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\DataChannelObject.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\DummyAudioDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\DummyVideoEncoder.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Logger.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\pch.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />
     <ClCompile Include="D3D11GraphicsDeviceTest.cpp" />
     <ClCompile Include="D3D11GraphicsDeviceTestBase.cpp" />
     <ClCompile Include="NvEncoderD3D11Test.cpp" />
@@ -50,11 +99,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WebRTCPlugin\WebRTCPlugin.vcxproj">
-      <Project>{94d2206f-bf45-45bd-8e13-214a3ed917ae}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -120,7 +164,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)..\WebRTCPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
