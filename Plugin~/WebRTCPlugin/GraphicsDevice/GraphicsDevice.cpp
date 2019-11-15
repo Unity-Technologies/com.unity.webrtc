@@ -22,33 +22,62 @@ GraphicsDevice& GraphicsDevice::GetInstance() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
+bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 
     m_rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
+    void* device = nullptr;
     switch (m_rendererType) {
         case kUnityGfxRendererD3D11: {
 #if defined(SUPPORT_D3D11)
-            m_device = new D3D11GraphicsDevice(unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice());
+            device = unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice();
 #endif
             break;
         }
         case kUnityGfxRendererD3D12: {
 #if defined(SUPPORT_D3D12)
-            m_device = new D3D12GraphicsDevice(unityInterface->Get<IUnityGraphicsD3D12v2>()->GetDevice());
+            device = unityInterface->Get<IUnityGraphicsD3D12>()->GetDevice();
 #endif
             break;
         }
         case kUnityGfxRendererOpenGLCore: {
-#if defined(SUPPORT_OPENGL_CORE)
-            m_device = new OpenGLGraphicsDevice();
-#endif
         }
         default: {
             DebugError("Unsupported Unity Renderer: %d", m_rendererType);
-            return;
+            return false;
         }
     }
+    return Init(m_rendererType, device);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+
+bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device)
+{
+    switch (rendererType) {
+    case kUnityGfxRendererD3D11: {
+#if defined(SUPPORT_D3D11)
+        m_device = new D3D11GraphicsDevice(static_cast<ID3D11Device*>(device));
+#endif
+        break;
+    }
+    case kUnityGfxRendererD3D12: {
+#if defined(SUPPORT_D3D12)
+        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device));
+#endif
+        break;
+    }
+    case kUnityGfxRendererOpenGLCore: {
+#if defined(SUPPORT_OPENGL_CORE)
+        m_device = new OpenGLGraphicsDevice();
+#endif
+    }
+    default: {
+        DebugError("Unsupported Unity Renderer: %d", m_rendererType);
+        return false;
+    }
+    }
     m_device->InitV();
+    return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------

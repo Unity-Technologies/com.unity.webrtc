@@ -4,7 +4,6 @@
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
 
-
 namespace WebRTC
 {
     class Context;
@@ -23,7 +22,6 @@ namespace WebRTC
     public:
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
-        std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
         void* hModule = nullptr;
     private:
         ~ContextManager();

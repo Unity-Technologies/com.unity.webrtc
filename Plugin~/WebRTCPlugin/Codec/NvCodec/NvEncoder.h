@@ -19,7 +19,6 @@ namespace WebRTC
 
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class IGraphicsDevice;
-    class ITexture2D;
     class NvEncoder : public IEncoder
     {
     private:

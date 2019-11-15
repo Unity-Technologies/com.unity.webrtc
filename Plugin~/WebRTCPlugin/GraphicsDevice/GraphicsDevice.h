@@ -12,7 +12,8 @@ class GraphicsDevice {
     public:
         static GraphicsDevice& GetInstance();
         bool IsInitialized() { return m_device != nullptr; }
-        void Init(IUnityInterfaces* unityInterface);
+        bool Init(IUnityInterfaces* unityInterface);
+        bool Init(UnityGfxRenderer rendererType, void* device);
         void Shutdown();
         IGraphicsDevice* GetDevice() { return m_device; }
 
