@@ -1,11 +1,11 @@
+{% metadata_file .yamato/environments.yml %}
+
 platforms:
   - name: win
-  - name: mac
-packages:
-  - name: webrtc
+  - name: linux
 ---
-publish_github_release:
-  name: Publish Github Release
+publish_com.unity.webrtc_github_release:
+  name: Publish com.unity.webrtc to Github Release
   agent:
     type: Unity::VM
     image: package-ci/win10:stable
@@ -13,13 +13,29 @@ publish_github_release:
   commands:
     - npm install github-release-cli -g
     - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "%GIT_TAG%" -n "%GIT_TAG%" "upm-ci~/packages/com.unity.webrtc-%GIT_TAG%.tgz"
-    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "%GIT_TAG%" -n "%GIT_TAG%" "artifacts/webrtc-win.zip"
   triggers:
     tags:
       only:
         - /^(v|V)?\d+\.\d+\.\d+(-preview(\.\d+)?)?$/
   dependencies:
-    {% for package in packages%}
-    - .yamato/upm-ci-webrtc-packages.yml#pack_{{ package.name }}
+    - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
+
+publish_libwebrtc_github_release:
+  name: Publish libwebrtc {{ webrtc_version.name }} to Github Release
+  agent:
+    type: Unity::VM
+    image: package-ci/win10:stable
+    flavor: b1.large
+  commands:
+    - npm install github-release-cli -g
+    {% for platform in platforms %}
+    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/webrtc-{{ platform.name }}.zip"
     {% endfor %}
-    - .yamato/upm-ci-libwebrtc.yml#build_win
+  triggers:
+    tags:
+      only:
+        - /^(v|V)?\d+\.\d+\.\d+(-preview(\.\d+)?)?$/
+  dependencies:
+    {% for platform in platforms %}
+    - .yamato/upm-ci-libwebrtc.yml#build_{{ platform.name }}
+    {% endfor %}

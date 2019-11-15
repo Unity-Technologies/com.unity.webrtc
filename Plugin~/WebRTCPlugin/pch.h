@@ -25,8 +25,6 @@
 #include "rtc_base/flags.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/ssladapter.h"
-#include "rtc_base/win32socketinit.h"
-#include "rtc_base/win32socketserver.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/nethelpers.h"
 #include "rtc_base/stringutils.h"
@@ -34,9 +32,14 @@
 #include "rtc_base/signalthread.h"
 #include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/atomicops.h"
+#include "rtc_base/asynctcpsocket.h"
+
+#ifdef _WIN32
 #include "rtc_base/win32.h"
 #include "rtc_base/win32socketserver.h"
-#include "rtc_base/asynctcpsocket.h"
+#include "rtc_base/win32socketinit.h"
+#include "rtc_base/win32socketserver.h"
+#endif
 
 #include "media/base/videocapturer.h"
 #include "media/engine/webrtcvideocapturerfactory.h"
@@ -58,7 +61,16 @@
 
 #include "media/base/videobroadcaster.h"
 #pragma endregion
+
+#include "PlatformBase.h"
+
+#if SUPPORT_D3D11
 #include "d3d11.h"
+#endif // if SUPPORT_D3D11
+
+#if defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
+#include <GL/glew.h>
+#endif
 
 namespace WebRTC
 {
@@ -73,6 +85,14 @@ namespace WebRTC
 #define DebugErrorW(...)    LogPrint(L"webrtc Error: "  __VA_ARGS__)
 #define NV_RESULT(NvFunction) NvFunction == NV_ENC_SUCCESS
 
+#ifndef _WIN32
+#define CoTaskMemAlloc(p) malloc(p)
+#define CoTaskMemFree(p) free(p)
+#endif
+
+#if defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
+    void OnOpenGLDebugMessage( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+#endif
     template<class ... Args>
     std::string StringFormat(const std::string& format, Args ... args)
     {
@@ -81,7 +101,8 @@ namespace WebRTC
         snprintf(buf.get(), size, format.c_str(), args ...);
         return std::string(buf.get(), buf.get() + size - 1);
     }
-    using UnityFrameBuffer = ID3D11Texture2D;
+
+    using byte = unsigned char;
     using uint8 = unsigned char;
     using uint16 = unsigned short int;
     using uint32 = unsigned int;
@@ -92,7 +113,14 @@ namespace WebRTC
     using int64 = signed long long;
 
     const uint32 bufferedFrameNum = 3;
-    extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
+
+#if SUPPORT_D3D11
+    using UnityFrameBuffer = ID3D11Texture2D;
     extern ID3D11DeviceContext* context;
     extern ID3D11Device* g_D3D11Device;
+    extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
+#elif defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
+    using UnityFrameBuffer = void;
+    extern void* renderTextures[bufferedFrameNum];
+#endif //if SUPPORT_D3D11
 }

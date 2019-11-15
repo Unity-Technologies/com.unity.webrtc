@@ -1,16 +1,28 @@
+{% metadata_file .yamato/environments.yml %}
+
 platforms:
   - name: win
     type: Unity::VM
     image: renderstreaming/win10:v0.1.2-276056
     flavor: b1.xlarge
-    build_command: BuildScripts~/build_libwebrtc.cmd
+    build_command: BuildScripts~/build_libwebrtc_win.cmd
+  - name: mac
+    type: Unity::VM::osx
+    image: buildfarm/mac:stable
+    flavor: m1.mac  
+    build_command: BuildScripts~/build_libwebrtc_macos.sh
+  - name: linux
+    type: Unity::VM
+    image: cds-ops/ubuntu-18.04-base:stable
+    flavor: b1.xlarge
+    build_command: BuildScripts~/build_libwebrtc_linux.sh
 projects:
-  - name: libwebrtc    
+  - name: libwebrtc
 ---
 {% for project in projects %}
 {% for platform in platforms %}
 build_{{ platform.name }}:
-  name: Build {{ project.name }} on {{ platform.name }}
+  name: Build {{ project.name }} {{ webrtc_version.name }} on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}

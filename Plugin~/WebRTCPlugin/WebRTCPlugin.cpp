@@ -26,7 +26,6 @@ namespace WebRTC
     }
 }
 
-
 extern "C"
 {
     UNITY_INTERFACE_EXPORT CodecInitializationResult GetCodecInitializationResult()
@@ -34,20 +33,30 @@ extern "C"
         return ContextManager::GetInstance()->GetCodecInitializationResult();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* CaptureVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
     {
-        context->InitializeEncoder(width, height);
-        return context->CreateVideoStream(rt);
+        return context->CreateVideoStream(rt, width, height);
     }
+
+    UNITY_INTERFACE_EXPORT void ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
+    {
+        context->DeleteVideoStream(stream);
+    }
+
     //TODO: Multi-track support
     UNITY_INTERFACE_EXPORT void StopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
     {
         context->StopCapturer();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* CaptureAudioStream(Context* context)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateAudioStream(Context* context)
     {
         return context->CreateAudioStream();
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextDeleteAudioStream(Context* context, webrtc::MediaStreamInterface* stream)
+    {
+        context->DeleteAudioStream(stream);
     }
 
     UNITY_INTERFACE_EXPORT void MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
@@ -76,8 +85,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT char* MediaStreamGetID(webrtc::MediaStreamInterface* stream)
     {
         auto idStr = stream->id();
-        //TODO: Linux compatibility 
-        char* id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        auto id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -89,7 +97,6 @@ extern "C"
         auto tracksVector = stream->GetVideoTracks();
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
-        //TODO: Linux compatibility 
         auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
         for (int i = 0; i < tracksVector.size(); i++)
         {
@@ -103,7 +110,6 @@ extern "C"
         auto tracksVector = stream->GetAudioTracks();
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
-        //TODO: Linux compatibility 
         auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
         for (int i = 0; i < tracksVector.size(); i++)
         {
@@ -133,8 +139,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT char* MediaStreamTrackGetID(webrtc::MediaStreamTrackInterface* track)
     {
         auto idStr = track->id();
-        //TODO: Linux compatibility 
-        char* id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        auto id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -208,7 +213,6 @@ extern "C"
         obj->GetConfiguration(_conf);
 #pragma warning(suppress: 4267)
         *len = _conf.size();
-        //TODO: Linux compatibility 
         *conf = (char*)::CoTaskMemAlloc(_conf.size() + sizeof(char));
         _conf.copy(*conf, _conf.size());
         (*conf)[_conf.size()] = '\0';
@@ -311,8 +315,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelObject* dataChannelObj)
     {
         std::string tmp = dataChannelObj->GetLabel();
-        //TODO: Linux compatibility 
-        char* label = (char*)CoTaskMemAlloc(tmp.size() + sizeof(char));
+        auto label = (char*)CoTaskMemAlloc(tmp.size() + sizeof(char));
         tmp.copy(label, tmp.size());
         label[tmp.size()] = '\0';
         return label;

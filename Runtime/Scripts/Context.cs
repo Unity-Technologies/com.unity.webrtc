@@ -10,6 +10,7 @@ namespace Unity.WebRTC
 
         private int id;
         private bool disposed;
+        private IntPtr renderFunction;
 
         public bool IsNull
         {
@@ -95,14 +96,28 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
+        // TODO:: Fix API design for multi tracks
         public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
         {
-            return NativeMethods.CaptureVideoStream(self, rt, width, height);
+            return NativeMethods.ContextCreateVideoStream(self, rt, width, height);
         }
 
-        public IntPtr CaptureAudioStream()
+        // TODO:: Fix API design for multi tracks
+        public void DeleteVideoStream(IntPtr stream)
         {
-            return NativeMethods.CaptureAudioStream(self);
+            NativeMethods.ContextDeleteVideoStream(self, stream);
+        }
+
+        // TODO:: Fix API design for multi tracks
+        public IntPtr CreateAudioStream()
+        {
+            return NativeMethods.ContextCreateAudioStream(self);
+        }
+
+        // TODO:: Fix API design for multi tracks
+        public void DeleteAudioStream(IntPtr stream)
+        {
+            NativeMethods.ContextDeleteAudioStream(self, stream);
         }
 
         public IntPtr GetRenderEventFunc()
@@ -113,6 +128,24 @@ namespace Unity.WebRTC
         public void StopMediaStreamTrack(IntPtr track)
         {
             NativeMethods.StopMediaStreamTrack(self, track);
+        }
+
+        internal void InitializeEncoder()
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.InitializeEncoder(renderFunction);
+        }
+
+        internal void FinalizeEncoder()
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.FinalizeEncoder(renderFunction);
+        }
+
+        internal void Encode()
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.Encode(renderFunction);
         }
     }
 }

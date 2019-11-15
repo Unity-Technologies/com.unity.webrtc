@@ -173,7 +173,7 @@ namespace WebRTC
         if (!_desc.get())
         {
             DebugLog("Can't parse received session description message.");
-            DebugLog("SdpParseError:\n%s", error.description);
+            DebugLog("SdpParseError:\n%s", error.description.c_str());
             return;
         }
         auto observer = PeerSDPObserver::Create(this);
@@ -187,7 +187,7 @@ namespace WebRTC
         if (!_desc.get())
         {
             DebugLog("Can't parse received session description message.");
-            DebugLog("SdpParseError:\n%s", error.description);
+            DebugLog("SdpParseError:\n%s", error.description.c_str());
             return;
         }
         auto observer = PeerSDPObserver::Create(this);
@@ -261,7 +261,6 @@ namespace WebRTC
         current->ToString(&out);
 
         desc.type = ConvertSdpType(current->GetType());
-        //TODO: Linux compatibility 
         desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';

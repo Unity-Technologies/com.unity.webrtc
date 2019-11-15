@@ -1,0 +1,10 @@
+--- BUILD.gn	2019-10-26 18:36:07.387629080 +0900
++++ BUILD.gn.edited	2019-10-26 18:36:38.013480481 +0900
+@@ -397,6 +397,7 @@ if (!build_with_chromium) {
+       "rtc_base",
+       "sdk",
+       "video",
++      "//third_party/jsoncpp",
+     ]
+ 
+     # Include audio and video codecs by default.

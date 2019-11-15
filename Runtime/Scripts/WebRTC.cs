@@ -206,15 +206,14 @@ namespace Unity.WebRTC
     public static class WebRTC
     {
 #if UNITY_EDITOR_OSX
-        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/abci.bundle/Contents/MacOS/webrtc";
+        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/webrtc.bundle/Contents/MacOS/webrtc";
 #elif UNITY_EDITOR_LINUX
-        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/webrtc.so";
+        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/libwebrtc.so";
 #elif UNITY_EDITOR_WIN
         internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/webrtc.dll";
 #elif UNITY_STANDALONE
         internal const string Lib = "webrtc";
 #endif
-
         private static Context s_context;
         private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
@@ -224,26 +223,6 @@ namespace Unity.WebRTC
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create();
-            var result = Context.GetCodecInitializationResult();
-            if (result != CodecInitializationResult.Success)
-            {
-                switch (result)
-                {
-                    case CodecInitializationResult.DriverNotInstalled:
-                        Debug.LogError("[WebRTC] The hardware codec driver not installed");
-                        break;
-                    case CodecInitializationResult.DriverVersionDoesNotSupportAPI:
-                        Debug.LogError("[WebRTC] The version of the hardware codec driver does not support API");
-                        break;
-                    case CodecInitializationResult.EncoderInitializationFailed:
-                        Debug.LogError("[WebRTC] Hardware encoder initialization failed");
-                        break;
-                    case CodecInitializationResult.APINotFound:
-                        Debug.LogError("[WebRTC] Hardware encoder API not found");
-                        break;
-                }
-            }
-
             s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
@@ -266,7 +245,7 @@ namespace Unity.WebRTC
                     {
                         Graphics.Blit(rts[0], rts[1], flipMat);
                     }
-                    GL.IssuePluginEvent(s_renderCallback, 0);
+                    Context.Encode();
                 }
                 Audio.Update();
             }
@@ -277,6 +256,26 @@ namespace Unity.WebRTC
             NativeMethods.RegisterDebugLog(null);
             s_context.Dispose();
             s_context = null;
+        }
+
+        internal static string GetModuleName()
+        {
+            return System.IO.Path.GetFileName(Lib);
+        }
+
+        internal static RenderTextureFormat GetSupportedRenderTextureFormat(UnityEngine.Rendering.GraphicsDeviceType type)
+        {
+            switch (type)
+            {
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
+                    return RenderTextureFormat.BGRA32;
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
+                    return RenderTextureFormat.ARGB32;
+            }
+            return RenderTextureFormat.Default;
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
@@ -412,9 +411,13 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CaptureVideoStream(IntPtr context, IntPtr rt, int width, int height);
+        public static extern IntPtr ContextCreateVideoStream(IntPtr context, IntPtr rt, int width, int height);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CaptureAudioStream(IntPtr context);
+        public static extern IntPtr ContextCreateAudioStream(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
@@ -441,6 +444,29 @@ namespace Unity.WebRTC
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
+    }
+
+    internal static class VideoEncoderMethods
+    {
+        enum VideoStreamRenderEventId
+        {
+            Initialize = 0,
+            Encode = 1,
+            Finalize = 2,
+        }
+
+        public static void InitializeEncoder(IntPtr callback)
+        {
+            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Initialize);
+        }
+        public static void Encode(IntPtr callback)
+        {
+            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Encode);
+        }
+        public static void FinalizeEncoder(IntPtr callback)
+        {
+            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Finalize);
+        }
     }
 }
 

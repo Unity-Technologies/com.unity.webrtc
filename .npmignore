@@ -4,10 +4,13 @@ build/**
 node_modules/**
 Documentation/ApiDocs/**
 Documentation~/ApiDocs/**
+BuildScripts~/**
+Plugin~/**
 .DS_Store
 .npmrc
 .npmignore
 .gitignore
+.editorconfig
 CONTRIBUTING.md
 CONTRIBUTING.md.meta
 QAReport.md
@@ -19,3 +22,7 @@ build.bat
 build.bat.meta
 
 WebRTC~/**
+
+# waste of the plugin artifacts
+linux_plugin-*
+win_plugin-*

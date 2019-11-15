@@ -39,15 +39,22 @@ namespace WebRTC
     {
     public:
         explicit Context(int uid = -1);
-        webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer);
+        webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer, int width, int height);
+        void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamInterface* CreateAudioStream();
+        void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
         ~Context();
 
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
-        void InitializeEncoder(int32 width, int32 height) { nvVideoCapturer->InitializeEncoder(width, height); }
-        void EncodeFrame() { nvVideoCapturer->EncodeVideoData(); }
+
+        // You must call these methods on Rendering thread.
+        void InitializeEncoder();
+        void EncodeFrame();
+        void FinalizerEncoder();
+        //
+
         void StopCapturer() { nvVideoCapturer->Stop(); }
         void ProcessAudioData(const float* data, int32 size) { audioDevice->ProcessAudioData(data, size); }
 

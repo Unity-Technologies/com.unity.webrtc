@@ -16,6 +16,9 @@
     <Filter Include="Header Files\Unity">
       <UniqueIdentifier>{16932972-c865-4546-9602-539504fea736}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gl3w">
+      <UniqueIdentifier>{0b2d84aa-268b-42c9-9a93-960b25cb7ae2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebRTCPlugin.h">
@@ -60,6 +63,15 @@
     <ClInclude Include="..\unity\include\IUnityInterface.h">
       <Filter>Header Files\Unity</Filter>
     </ClInclude>
+    <ClInclude Include="PlatformBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl3w\gl3w.h">
+      <Filter>Header Files\gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl3w\glcorearb.h">
+      <Filter>Header Files\gl3w</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -93,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DataChannelObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl3w\gl3w.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

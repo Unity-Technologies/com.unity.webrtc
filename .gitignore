@@ -337,6 +337,9 @@ MigrationBackup/
 # Jet Stream Rider 
 .idea/
 
+# CMake
+cmake-build-*/
+
 # Unity Folder 
 [Ll]ibrary/
 [Tt]emp/
@@ -349,12 +352,12 @@ MigrationBackup/
 # Exclude Samples folder
 !Samples~
 
+# Exclude BuildScripts
+!BuildScripts~
+
 # Exclude webrtc source 
-Plugin/webrtc
+!Plugin~
 
 # Exclude imported samples
 Assets/Samples.meta
 Assets/Samples/
-
-
-

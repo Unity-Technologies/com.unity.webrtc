@@ -2,6 +2,11 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
+#if _WIN32
+#else
+#include <dlfcn.h>
+#endif
+
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
@@ -54,12 +59,19 @@ namespace WebRTC
         //open an encode session
         NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
         openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
+
+//TODO:: avoid to use preprocessing conditionals
+#if _WIN32
         openEncdoeSessionExParams.device = g_D3D11Device;
         openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
+#else
+        openEncdoeSessionExParams.device = NULL;
+        openEncdoeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_OPENGL;
+#endif
         openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
-        result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface)));
-        checkf(result, "Unable to open NvEnc encode session");
-        LogPrint(StringFormat("OpenEncodeSession Error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface);
+        result = NV_RESULT(errorCode);
+        checkf(result, StringFormat("Unable to open NvEnc encode session %d", errorCode).c_str());
         if (!result)
         {
             return CodecInitializationResult::EncoderInitializationFailed;
@@ -86,8 +98,9 @@ namespace WebRTC
         NV_ENC_PRESET_CONFIG presetConfig = { 0 };
         presetConfig.version = NV_ENC_PRESET_CONFIG_VER;
         presetConfig.presetCfg.version = NV_ENC_CONFIG_VER;
-        result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodePresetConfig(pEncoderInterface, nvEncInitializeParams.encodeGUID, nvEncInitializeParams.presetGUID, &presetConfig));
-        checkf(result, "Failed to select NVEncoder preset config");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodePresetConfig(pEncoderInterface, nvEncInitializeParams.encodeGUID, nvEncInitializeParams.presetGUID, &presetConfig);
+        result = NV_RESULT(errorCode);
+        checkf(result, StringFormat("Failed to select NVEncoder preset config %d").c_str());
         if(!result)
         {
             return CodecInitializationResult::EncoderInitializationFailed;
@@ -109,8 +122,9 @@ namespace WebRTC
         capsParam.version = NV_ENC_CAPS_PARAM_VER;
         capsParam.capsToQuery = NV_ENC_CAPS_ASYNC_ENCODE_SUPPORT;
         int32 asyncMode = 0;
-        result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodeCaps(pEncoderInterface, nvEncInitializeParams.encodeGUID, &capsParam, &asyncMode));
-        checkf(result, "Failded to get NVEncoder capability params");
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncGetEncodeCaps(pEncoderInterface, nvEncInitializeParams.encodeGUID, &capsParam, &asyncMode);
+        result = NV_RESULT(errorCode);
+        checkf(result, StringFormat("Failded to get NVEncoder capability params %d", errorCode).c_str());
         if (!result)
         {
             return CodecInitializationResult::EncoderInitializationFailed;
@@ -118,9 +132,9 @@ namespace WebRTC
         nvEncInitializeParams.enableEncodeAsync = 0;
 #pragma endregion
 #pragma region initialize hardware encoder session
-        result = NV_RESULT((errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncInitializeEncoder(pEncoderInterface, &nvEncInitializeParams)));
-        checkf(result, "Failed to initialize NVEncoder");
-        LogPrint(StringFormat("nvEncInitializeEncoder error is %d", errorCode).c_str());
+        errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncInitializeEncoder(pEncoderInterface, &nvEncInitializeParams);
+        result = NV_RESULT(errorCode);
+        checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
         if (!result)
         {
             return CodecInitializationResult::EncoderInitializationFailed;
@@ -128,8 +142,9 @@ namespace WebRTC
 #pragma endregion
         if (pEncoderInterface)
         {
-            bool result = NV_RESULT(ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface));
-            checkf(result, "Failed to destroy NV encoder interface");
+            errorCode = ContextManager::GetInstance()->pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface);
+            result = NV_RESULT(errorCode);
+            checkf(result, StringFormat("Failed to destroy NV encoder interface %d", errorCode).c_str());
             pEncoderInterface = nullptr;
         }
         return CodecInitializationResult::Success;
@@ -206,7 +221,11 @@ namespace WebRTC
     {
         if (hModule)
         {
+#if _WIN32
             FreeLibrary((HMODULE)hModule);
+#else
+            dlclose(hModule);
+#endif
             hModule = nullptr;
         }
         if (m_contexts.size()) {
@@ -315,7 +334,21 @@ namespace WebRTC
         signalingThread.reset();
     }
 
-    webrtc::MediaStreamInterface* Context::CreateVideoStream(UnityFrameBuffer* frameBuffer)
+    void Context::InitializeEncoder()
+    {
+        nvVideoCapturer->InitializeEncoder();
+        nvVideoCapturer->StartEncoder();
+    }
+    void Context::EncodeFrame()
+    {
+        nvVideoCapturer->EncodeVideoData();
+    }
+    void Context::FinalizerEncoder()
+    {
+        nvVideoCapturer->FinalizeEncoder();
+    }
+
+    webrtc::MediaStreamInterface* Context::CreateVideoStream(UnityFrameBuffer* frameBuffer, int width, int height)
     {
         //TODO: label and stream id should be maintained in some way for multi-stream
         auto videoTrack = peerConnectionFactory->CreateVideoTrack(
@@ -327,9 +360,15 @@ namespace WebRTC
         auto videoStream = peerConnectionFactory->CreateLocalMediaStream("video");
         videoStream->AddTrack(videoTrack);
         videoStreams.push_back(videoStream);
-        nvVideoCapturer->unityRT = frameBuffer;
-        nvVideoCapturer->StartEncoder();
+        nvVideoCapturer->SetFrameBuffer(frameBuffer);
+        nvVideoCapturer->SetSize(width, height);
         return videoStream.get();
+    }
+
+    void Context::DeleteVideoStream(webrtc::MediaStreamInterface* stream)
+    {
+        auto item = std::find(videoStreams.begin(), videoStreams.end(), stream);
+        videoStreams.erase(item);
     }
 
     webrtc::MediaStreamInterface* Context::CreateAudioStream()
@@ -343,7 +382,13 @@ namespace WebRTC
         audioTrack = peerConnectionFactory->CreateAudioTrack("audio", peerConnectionFactory->CreateAudioSource(audioOptions));
         audioStream = peerConnectionFactory->CreateLocalMediaStream("audio");
         audioStream->AddTrack(audioTrack);
+
         return audioStream.get();
+    }
+
+    void Context::DeleteAudioStream(webrtc::MediaStreamInterface* stream)
+    {
+        audioStream.release();
     }
 
     DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)
