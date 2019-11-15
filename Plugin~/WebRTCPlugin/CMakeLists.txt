@@ -1,4 +1,4 @@
-file(GLOB sources *.cpp *.h)
+file(GLOB sources *.cpp *.h GraphicsDevice/*.h GraphicsDevice/*.cpp Codec/*.h Codec/*.cpp)
 
 add_plugin(webrtc
   SOURCES ${sources}
@@ -54,6 +54,7 @@ endif()
 
 target_include_directories(webrtc
   PRIVATE
+    .
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}

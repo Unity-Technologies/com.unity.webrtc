@@ -33,7 +33,7 @@ extern "C"
         return ContextManager::GetInstance()->GetCodecInitializationResult();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, UnityFrameBuffer* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, void* rt, int32 width, int32 height)
     {
         return context->CreateVideoStream(rt, width, height);
     }

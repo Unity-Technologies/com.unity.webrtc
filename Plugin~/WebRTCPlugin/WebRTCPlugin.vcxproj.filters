@@ -16,8 +16,20 @@
     <Filter Include="Header Files\Unity">
       <UniqueIdentifier>{16932972-c865-4546-9602-539504fea736}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\gl3w">
-      <UniqueIdentifier>{0b2d84aa-268b-42c9-9a93-960b25cb7ae2}</UniqueIdentifier>
+    <Filter Include="GraphicsDevice">
+      <UniqueIdentifier>{a68e7998-601c-4854-b2f6-00f03841ad0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\D3D11">
+      <UniqueIdentifier>{9eac67b4-cc43-476a-9f7c-e806d957f4b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\D3D12">
+      <UniqueIdentifier>{e08d503c-149d-4cb5-9840-4814c83bc578}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codec">
+      <UniqueIdentifier>{76e250e5-9c69-4425-a27b-ebc5ac2854d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codec\NvCodec">
+      <UniqueIdentifier>{fa14041b-dd0a-4710-8ac8-fdee674cf69c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,9 +57,6 @@
     <ClInclude Include="NvEncoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NvVideoCapturer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PeerConnectionObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,14 +72,53 @@
     <ClInclude Include="..\unity\include\IUnityInterface.h">
       <Filter>Header Files\Unity</Filter>
     </ClInclude>
-    <ClInclude Include="PlatformBase.h">
+    <ClInclude Include="UnityEncoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gl3w\gl3w.h">
-      <Filter>Header Files\gl3w</Filter>
+    <ClInclude Include="UnityVideoCapturer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gl3w\glcorearb.h">
-      <Filter>Header Files\gl3w</Filter>
+    <ClInclude Include="GraphicsDevice\ITexture2D.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="WebRTCConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\GraphicsDevice.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="WebRTCMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\IGraphicsDevice.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D11\D3D11Texture2D.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec\NvCodec\nvEncodeAPI.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec\NvCodec\NvEncoder.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec\NvCodec\NvEncoderD3D11.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec\EncoderFactory.h">
+      <Filter>Codec</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec\IEncoder.h">
+      <Filter>Codec</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -92,12 +140,6 @@
     <ClCompile Include="DummyVideoEncoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NvEncoder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NvVideoCapturer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -107,7 +149,37 @@
     <ClCompile Include="DataChannelObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\gl3w\gl3w.c">
+    <ClCompile Include="GraphicsDevice\ITexture2D.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\IGraphicsDevice.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D11\D3D11Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\D3D12\D3D12Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="Codec\NvCodec\NvEncoder.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="Codec\NvCodec\NvEncoderD3D11.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="Codec\EncoderFactory.cpp">
+      <Filter>Codec</Filter>
+    </ClCompile>
+    <ClCompile Include="NvVideoCapturer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

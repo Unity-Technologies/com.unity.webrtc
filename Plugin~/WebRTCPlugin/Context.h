@@ -9,6 +9,7 @@ namespace WebRTC
 {
     class Context;
     class PeerSDPObserver;
+    class IGraphicsDevice;
     class ContextManager
     {
     public:
@@ -27,9 +28,6 @@ namespace WebRTC
     private:
         ~ContextManager();
         CodecInitializationResult InitializeAndTryNvEnc();
-        CodecInitializationResult LoadNvEncApi();
-        CodecInitializationResult TryNvEnc();
-
         CodecInitializationResult codecInitializationResult;
         std::map<int, ContextPtr> m_contexts;
         static ContextManager s_instance;
@@ -39,7 +37,7 @@ namespace WebRTC
     {
     public:
         explicit Context(int uid = -1);
-        webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer, int width, int height);
+        webrtc::MediaStreamInterface* CreateVideoStream(void* frameBuffer, int width, int height);
         void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamInterface* CreateAudioStream();
         void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
@@ -50,7 +48,7 @@ namespace WebRTC
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
 
         // You must call these methods on Rendering thread.
-        void InitializeEncoder();
+        void InitializeEncoder(IGraphicsDevice* device);
         void EncodeFrame();
         void FinalizerEncoder();
         //
@@ -76,7 +74,7 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
         //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
         std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
-        std::map<UnityFrameBuffer*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
+        std::map<void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver

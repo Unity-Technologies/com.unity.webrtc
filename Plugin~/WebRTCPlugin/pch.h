@@ -64,13 +64,23 @@
 
 #include "PlatformBase.h"
 
-#if SUPPORT_D3D11
+#if defined(SUPPORT_D3D11)
 #include "d3d11.h"
-#endif // if SUPPORT_D3D11
+#include "d3d11_4.h"
+#include "d3d12.h"
 
-#if defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
+#include "IUnityGraphicsD3D11.h"
+#include "IUnityGraphicsD3D12.h"
+#endif
+
+#if defined(SUPPORT_OPENGL_CORE)
 #include <GL/glew.h>
 #endif
+#if defined(SUPPORT_VULKAN)
+//#include "IUnityGraphicsVulkan.h"
+#endif
+
+#include "IUnityGraphics.h"
 
 namespace WebRTC
 {
@@ -85,7 +95,7 @@ namespace WebRTC
 #define DebugErrorW(...)    LogPrint(L"webrtc Error: "  __VA_ARGS__)
 #define NV_RESULT(NvFunction) NvFunction == NV_ENC_SUCCESS
 
-#ifndef _WIN32
+#if !defined(UNITY_WIN)
 #define CoTaskMemAlloc(p) malloc(p)
 #define CoTaskMemFree(p) free(p)
 #endif
@@ -113,14 +123,4 @@ namespace WebRTC
     using int64 = signed long long;
 
     const uint32 bufferedFrameNum = 3;
-
-#if SUPPORT_D3D11
-    using UnityFrameBuffer = ID3D11Texture2D;
-    extern ID3D11DeviceContext* context;
-    extern ID3D11Device* g_D3D11Device;
-    extern UnityFrameBuffer* renderTextures[bufferedFrameNum];
-#elif defined(SUPPORT_OPENGL_CORE) && !defined(_WIN32)
-    using UnityFrameBuffer = void;
-    extern void* renderTextures[bufferedFrameNum];
-#endif //if SUPPORT_D3D11
 }

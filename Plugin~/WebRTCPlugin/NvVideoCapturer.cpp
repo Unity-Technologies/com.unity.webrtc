@@ -1,9 +1,6 @@
 ﻿#include "pch.h"
 #include "NvVideoCapturer.h"
-#if _WIN32
-#else
-#include <GL/glew.h>
-#endif
+#include "Codec/EncoderFactory.h"
 
 namespace WebRTC
 {
@@ -16,17 +13,14 @@ namespace WebRTC
     {
         if (captureStarted && !captureStopped)
         {
-            int curFrameNum = nvEncoder->GetCurrentFrameCount() % bufferedFrameNum;
-            void* dst = renderTextures[curFrameNum];
-
-            if(!CopyRenderTexture(dst, unityRT))
-            {
-                LogPrint("CopyRenderTexture Failed");
-                return;
-            }
             if(nvEncoder == nullptr)
             {
                 LogPrint("nvEncoder is null");
+                return;
+            }
+            if(!nvEncoder->CopyFrame(unityRT))
+            {
+                LogPrint("CopyRenderTexture Failed");
                 return;
             }
             nvEncoder->EncodeFrame();
@@ -35,36 +29,6 @@ namespace WebRTC
         {
             LogPrint("Video capture is not started");
         }
-    }
-
-    bool NvVideoCapturer::CopyRenderTexture(void*& dst, UnityFrameBuffer*& src)
-    {
-#if _WIN32
-        auto tex = static_cast<ID3D11Resource*>(dst);
-        context->CopyResource(tex, src);
-#else
-        auto tex = static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(dst);
-
-        GLuint srcName = (GLuint)(size_t)(src);
-        GLuint dstName = tex->texture;
-
-        if(glIsTexture(srcName) == GL_FALSE)
-        {
-            LogPrint("srcName is not texture");
-            return false;
-        }
-
-        if(glIsTexture(dstName) == GL_FALSE)
-        {
-            LogPrint("dstName is not texture");
-            return false;
-        }
-        glCopyImageSubData(
-            srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
-            dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
-            width, height, 1);
-#endif
-        return true;
     }
 
     void NvVideoCapturer::CaptureFrame(std::vector<uint8>& data)
@@ -80,7 +44,7 @@ namespace WebRTC
         captureStarted = true;
         SetKeyFrame();
     }
-    void NvVideoCapturer::SetFrameBuffer(UnityFrameBuffer* frameBuffer)
+    void NvVideoCapturer::SetFrameBuffer(void* frameBuffer)
     {
         unityRT = frameBuffer;
     }
@@ -100,14 +64,15 @@ namespace WebRTC
         nvEncoder->SetRate(rate);
     }
 
-    void NvVideoCapturer::InitializeEncoder()
+    void NvVideoCapturer::InitializeEncoder(IGraphicsDevice* device)
     {
-        nvEncoder = std::make_unique<NvEncoder>(width, height);
+        EncoderFactory::GetInstance().Init(width, height, device);
+        nvEncoder = EncoderFactory::GetInstance().GetEncoder();
         nvEncoder->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
     }
 
     void NvVideoCapturer::FinalizeEncoder()
     {
-        nvEncoder.release();
+        EncoderFactory::GetInstance().Shutdown();
     }
 }
