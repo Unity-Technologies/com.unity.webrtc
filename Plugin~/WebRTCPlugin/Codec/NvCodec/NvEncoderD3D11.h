@@ -6,8 +6,9 @@ namespace WebRTC {
     public:
         NvEncoderD3D11(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
         virtual ~NvEncoderD3D11();
-    private:
+    protected:
         virtual void* AllocateInputBuffer() override;
         virtual void ReleaseInputBuffers() override;
+        virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) override;
     };
 }

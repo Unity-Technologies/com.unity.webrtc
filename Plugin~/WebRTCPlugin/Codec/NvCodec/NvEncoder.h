@@ -18,6 +18,7 @@ namespace WebRTC
     };
 
     using OutputFrame = NV_ENC_OUTPUT_PTR;
+    class ITexture2D;
     class IGraphicsDevice;
     class NvEncoder : public IEncoder
     {
@@ -49,7 +50,7 @@ namespace WebRTC
 
         void SetRate(uint32 rate) override;
         void UpdateSettings() override;
-        bool CopyFrame(void* frame) override;
+        bool CopyBuffer(void* frame) override;
         void EncodeFrame() override;
         bool IsSupported() const override { return isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
@@ -60,27 +61,31 @@ namespace WebRTC
         int pitch = 0;
         IGraphicsDevice* m_device;
         NV_ENC_INPUT_RESOURCE_TYPE m_inputType;
-    private:
-        virtual void* AllocateInputBuffer() = 0;
-        virtual void ReleaseInputBuffers() = 0;
+
         void InitEncoderResources();
         void ReleaseEncoderResources();
+        bool isNvEncoderSupported = false;
+
+        virtual void* AllocateInputBuffer() = 0;
+        virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) = 0;
+        virtual void ReleaseInputBuffers() = 0;
+
+    private:
         void ReleaseFrameInputBuffer(Frame& frame);
         void ProcessEncodedFrame(Frame& frame);
-        NV_ENC_REGISTERED_PTR RegisterResource(void *pBuffer);
+        NV_ENC_REGISTERED_PTR RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE type, void *pBuffer);
         void MapResources(InputFrame& inputFrame);
         NV_ENC_OUTPUT_PTR InitializeBitstreamBuffer();
         NV_ENC_INITIALIZE_PARAMS nvEncInitializeParams = {};
         NV_ENC_CONFIG nvEncConfig = {};
         NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
-        void* renderTextures[bufferedFrameNum];
+        ITexture2D* renderTextures[bufferedFrameNum];
         static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
         static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
         static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
-        bool isNvEncoderSupported = false;
         bool isIdrFrame = false;
         //10Mbps
         int bitRate = 10000000;

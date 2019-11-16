@@ -89,8 +89,6 @@ namespace WebRTC
         result = NV_RESULT(errorCode);
         checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
 #pragma endregion
-        InitEncoderResources();
-        isNvEncoderSupported = true;
     }
     NvEncoder::~NvEncoder()
     {
@@ -208,13 +206,10 @@ namespace WebRTC
         }
     }
 
-    bool NvEncoder::CopyFrame(void* frame)
+    bool NvEncoder::CopyBuffer(void* frame)
     {
         int curFrameNum = GetCurrentFrameCount() % bufferedFrameNum;
-        void* nativeTexPtr = renderTextures[curFrameNum];
-        if (nativeTexPtr == nullptr)
-            return false;
-        auto tex = m_device->CreateDefaultTextureFromNativeV(width, height, nativeTexPtr);
+        auto tex = renderTextures[curFrameNum];
         if (tex == nullptr)
             return false;
         m_device->CopyResourceFromNativeV(tex, frame);
@@ -287,11 +282,11 @@ namespace WebRTC
         CaptureFrame(frame.encodedFrame);
     }
 
-    NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(void *buffer)
+    NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE inputType, void *buffer)
     {
         NV_ENC_REGISTER_RESOURCE registerResource = { 0 };
         registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
-        registerResource.resourceType = m_inputType;
+        registerResource.resourceType = inputType;
         registerResource.resourceToRegister = buffer;
 
         if (!registerResource.resourceToRegister)
@@ -326,14 +321,16 @@ namespace WebRTC
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            renderTextures[i] = AllocateInputBuffer();
+            void* buffer = AllocateInputBuffer();
+            renderTextures[i] = CreateTexture2DFromInputBuffer(buffer);
             Frame& frame = bufferedFrames[i];
-            frame.inputFrame.registeredResource = RegisterResource(renderTextures[i]);
+            frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
             frame.inputFrame.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
             MapResources(frame.inputFrame);
             frame.outputFrame = InitializeBitstreamBuffer();
         }
     }
+
     void NvEncoder::ReleaseFrameInputBuffer(Frame& frame)
     {
         if(frame.inputFrame.mappedResource)

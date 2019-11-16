@@ -42,7 +42,7 @@ TEST_F(NvEncoderD3D11Test, EncoderCopyFrame) {
     int width = 256;
     int height = 256;
     auto tex = device->CreateDefaultTextureV(width, height);
-    auto result = encoder->CopyFrame(tex->GetEncodeTexturePtrV());
+    auto result = encoder->CopyBuffer(tex->GetEncodeTexturePtrV());
     EXPECT_TRUE(result);
 }
 

@@ -9,6 +9,8 @@ namespace WebRTC
     NvEncoderD3D11::NvEncoderD3D11(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device) :
         NvEncoder(NV_ENC_DEVICE_TYPE_DIRECTX, NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX, nWidth, nHeight, device)
     {
+        InitEncoderResources();
+        isNvEncoderSupported = true;
     }
 
     NvEncoderD3D11::~NvEncoderD3D11()
@@ -23,5 +25,10 @@ namespace WebRTC
     {
         auto tex = m_device->CreateDefaultTextureV(width, height);
         return tex->GetNativeTexturePtrV();
+    }
+
+    ITexture2D* NvEncoderD3D11::CreateTexture2DFromInputBuffer(void* buffer)
+    {
+        return m_device->CreateDefaultTextureFromNativeV(width, height, buffer);
     }
 }

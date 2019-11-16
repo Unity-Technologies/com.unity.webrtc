@@ -18,7 +18,7 @@ namespace WebRTC
                 LogPrint("nvEncoder is null");
                 return;
             }
-            if(!nvEncoder->CopyFrame(unityRT))
+            if(!nvEncoder->CopyBuffer(unityRT))
             {
                 LogPrint("CopyRenderTexture Failed");
                 return;
