@@ -10,8 +10,18 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 7z x -aoa webrtc.zip -o%SOLUTION_DIR%\webrtc
 
 echo -------------------
-echo Build UnityRenderStreaming Plugin 
+echo Build com.unity.webrtc Plugin 
 
-MSBuild %SOLUTION_DIR%\UnityRenderStreamingPlugin.sln -t:Rebuild -p:Configuration=Release
+echo Uses the project file in the current folder by default
+MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Restore
+
+MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Rebuild -p:Configuration=Release
+if not %errorlevel% == 0 exit 1
+echo -------------------
+
+echo -------------------
+echo Test com.unity.webrtc Plugin 
+
+%SOLUTION_DIR%\x65\Release\WebRTCPluginTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------
