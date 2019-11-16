@@ -10,14 +10,15 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 7z x -aoa webrtc.zip -o%SOLUTION_DIR%\webrtc
 
 echo -------------------
-echo Build com.unity.webrtc Plugin 
+echo Install nuget packages
+nuget install %SOLUTION_DIR%\packages.config
+if not %errorlevel% == 0 exit 1
 
-echo Uses the project file in the current folder by default
-MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Restore -p:RestoreConfigFile=%SOLUTION_DIR%\packages.config
+echo -------------------
+echo Build com.unity.webrtc Plugin 
 
 MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Rebuild -p:Configuration=Release
 if not %errorlevel% == 0 exit 1
-echo -------------------
 
 echo -------------------
 echo Test com.unity.webrtc Plugin 
