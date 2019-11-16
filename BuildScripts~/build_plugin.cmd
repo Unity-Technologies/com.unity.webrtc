@@ -13,7 +13,7 @@ echo -------------------
 echo Build com.unity.webrtc Plugin 
 
 echo Uses the project file in the current folder by default
-MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Restore
+MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Restore -p:RestoreConfigFile=%SOLUTION_DIR%\packages.config
 
 MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Rebuild -p:Configuration=Release
 if not %errorlevel% == 0 exit 1
