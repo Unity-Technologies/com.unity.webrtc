@@ -13,17 +13,17 @@ namespace WebRTC
     {
         if (captureStarted && !captureStopped)
         {
-            if(nvEncoder == nullptr)
+            if(encoder_ == nullptr)
             {
                 LogPrint("nvEncoder is null");
                 return;
             }
-            if(!nvEncoder->CopyBuffer(unityRT))
+            if(!encoder_->CopyBuffer(unityRT))
             {
                 LogPrint("CopyRenderTexture Failed");
                 return;
             }
-            nvEncoder->EncodeFrame();
+            encoder_->EncodeFrame();
         }
         else
         {
@@ -57,18 +57,29 @@ namespace WebRTC
 
     void NvVideoCapturer::SetKeyFrame()
     {
-        nvEncoder->SetIdrFrame();
+        encoder_->SetIdrFrame();
     }
     void NvVideoCapturer::SetRate(uint32 rate)
     {
-        nvEncoder->SetRate(rate);
+        encoder_->SetRate(rate);
     }
 
-    void NvVideoCapturer::InitializeEncoder(IGraphicsDevice* device)
+    bool NvVideoCapturer::InitializeEncoder(IGraphicsDevice* device)
     {
-        EncoderFactory::GetInstance().Init(width, height, device);
-        nvEncoder = EncoderFactory::GetInstance().GetEncoder();
-        nvEncoder->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
+        try
+        {
+            EncoderFactory::GetInstance().Init(width, height, device);
+        }
+        catch(std::runtime_error& exception)
+        {
+            LogPrint(exception.what());
+            return false;
+        }
+        encoder_ = EncoderFactory::GetInstance().GetEncoder();
+        if (encoder_ == nullptr)
+            return false;
+        encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
+        return true;
     }
 
     void NvVideoCapturer::FinalizeEncoder()

@@ -6,14 +6,18 @@
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
 #include "../WebRTCPlugin/Codec/IEncoder.h"
+#include "../WebRTCPlugin/NvVideoCapturer.h"
 
 using namespace WebRTC;
 
-class NvEncoderD3D11Test : public D3D11GraphicsDeviceTestBase
+class VideoCapturerTest : public D3D11GraphicsDeviceTestBase
 {
 protected:
     IEncoder* encoder_ = nullptr;
     IGraphicsDevice* device_ = nullptr;
+    const int width = 256;
+    const int height = 256;
+    std::unique_ptr<NvVideoCapturer> capturer;
 
     void SetUp() override {
         D3D11GraphicsDeviceTestBase::SetUp();
@@ -22,32 +26,26 @@ protected:
         device_ = GraphicsDevice::GetInstance().GetDevice();
         EXPECT_NE(nullptr, device_);
 
-        const auto width = 256;
-        const auto height = 256;
         EncoderFactory::GetInstance().Init(width, height, device_);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
+
+        capturer = std::make_unique<NvVideoCapturer>();
     }
     void TearDown() override {
         EncoderFactory::GetInstance().Shutdown();
         D3D11GraphicsDeviceTestBase::TearDown();
     }
 };
-TEST_F(NvEncoderD3D11Test, IsSupported) {
-    EXPECT_TRUE(encoder_->IsSupported());
+TEST_F(VideoCapturerTest, InitializeAndFinalize) {
+    capturer->InitializeEncoder(device_);
+    capturer->FinalizeEncoder();
 }
 
-TEST_F(NvEncoderD3D11Test, CopyBuffer) {
-    const auto width = 256;
-    const auto height = 256;
+TEST_F(VideoCapturerTest, EncodeVideoData) {
+    capturer->InitializeEncoder(device_);
     auto tex = device_->CreateDefaultTextureV(width, height);
-    const auto result = encoder_->CopyBuffer(tex->GetEncodeTexturePtrV());
-    EXPECT_TRUE(result);
-}
-
-TEST_F(NvEncoderD3D11Test, EncodeFrame) {
-    auto before = encoder_->GetCurrentFrameCount();
-    encoder_->EncodeFrame();
-    const auto after = encoder_->GetCurrentFrameCount();
-    EXPECT_EQ(before + 1, after);
+    capturer->SetFrameBuffer(tex->GetEncodeTexturePtrV());
+    capturer->EncodeVideoData();
+    capturer->FinalizeEncoder();
 }

@@ -75,6 +75,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
             return;
         case VideoStreamRenderEventID::Finalize:
             s_context->FinalizerEncoder();
+            GraphicsDevice::GetInstance().Shutdown();
             return;
         default:
             LogPrint("Unknown event id %d", eventID);

@@ -2,23 +2,15 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 #include "GraphicsDevice/GraphicsDevice.h"
+#include "Codec/NvCodec/NvEncoder.h"
+#include "DummyVideoEncoder.h"
 
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
 
-    CodecInitializationResult ContextManager::InitializeAndTryNvEnc()
-    {
-        auto result = NvEncoder::LoadCodec();
-        return result;
-    }
-
     Context* ContextManager::GetContext(int uid)
     {
-        if (s_instance.codecInitializationResult == CodecInitializationResult::NotInitialized)
-        {
-            s_instance.codecInitializationResult = s_instance.InitializeAndTryNvEnc();
-        }
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
@@ -30,9 +22,9 @@ namespace WebRTC
         DebugLog("Register context with ID %d", uid);
         return ctx;
     }
-    CodecInitializationResult ContextManager::GetCodecInitializationResult() const
+    CodecInitializationResult ContextManager::GetCodecInitializationResult()
     {
-        return s_instance.codecInitializationResult;
+        return NvEncoder::InitializationResult();
     }
 
     void ContextManager::SetCurContext(Context* context)
@@ -100,6 +92,7 @@ namespace WebRTC
         case RTCSdpType::Answer:
             return webrtc::SdpType::kAnswer;
         }
+        throw std::invalid_argument("Unknown RTCSdpType");
     }
 
     RTCSdpType ConvertSdpType(webrtc::SdpType type)
@@ -113,6 +106,7 @@ namespace WebRTC
         case webrtc::SdpType::kAnswer:
             return RTCSdpType::Answer;
         }
+        throw std::invalid_argument("Unknown SdpType");
     }
 #pragma warning(pop)
 
@@ -159,10 +153,14 @@ namespace WebRTC
         signalingThread.reset();
     }
 
-    void Context::InitializeEncoder(IGraphicsDevice* device)
+    bool Context::InitializeEncoder(IGraphicsDevice* device)
     {
-        nvVideoCapturer->InitializeEncoder(device);
+        if(!nvVideoCapturer->InitializeEncoder(device))
+        {
+            return false;
+        }
         nvVideoCapturer->StartEncoder();
+        return true;
     }
     void Context::EncodeFrame()
     {
@@ -213,6 +211,11 @@ namespace WebRTC
     void Context::DeleteAudioStream(webrtc::MediaStreamInterface* stream)
     {
         audioStream.release();
+    }
+
+    void Context::ProcessAudioData(const float* data, int32 size)
+    {
+        audioDevice->ProcessAudioData(data, size);
     }
 
     DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)

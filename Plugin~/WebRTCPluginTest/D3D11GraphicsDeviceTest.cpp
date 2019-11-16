@@ -1,5 +1,4 @@
 ﻿#include "pch.h"
-#include <d3d11.h>
 #include "D3D11GraphicsDeviceTestBase.h"
 #include "../unity/include/IUnityGraphics.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
@@ -9,13 +8,13 @@ using namespace WebRTC;
 
 class D3D11GraphicsDeviceTest : public D3D11GraphicsDeviceTestBase {};
 
-TEST_F(D3D11GraphicsDeviceTest, GraphicsDeviceInit) {
-    GraphicsDevice::GetInstance().Init(UnityGfxRenderer::kUnityGfxRendererD3D11, pD3DDevice.Get());
+TEST_F(D3D11GraphicsDeviceTest, InitAndShutdown) {
+    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
     GraphicsDevice::GetInstance().Shutdown();
 }
 
-TEST_F(D3D11GraphicsDeviceTest, GraphicsDeviceCreateDefaultTextureV) {
-    GraphicsDevice::GetInstance().Init(UnityGfxRenderer::kUnityGfxRendererD3D11, pD3DDevice.Get());
+TEST_F(D3D11GraphicsDeviceTest, CreateDefaultTextureV) {
+    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
     auto device = GraphicsDevice::GetInstance().GetDevice();
     EXPECT_NE(nullptr, device);
     auto width = 256;
@@ -27,13 +26,13 @@ TEST_F(D3D11GraphicsDeviceTest, GraphicsDeviceCreateDefaultTextureV) {
 }
 
 TEST_F(D3D11GraphicsDeviceTest, GraphicsDeviceCopyResourceV) {
-    GraphicsDevice::GetInstance().Init(UnityGfxRenderer::kUnityGfxRendererD3D11, pD3DDevice.Get());
+    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
     auto device = GraphicsDevice::GetInstance().GetDevice();
     EXPECT_NE(nullptr, device);
-    auto width = 256;
-    auto height = 256;
-    auto src = device->CreateDefaultTextureV(width, height);
-    auto dst = device->CreateDefaultTextureV(width, height);
+    const auto width = 256;
+    const auto height = 256;
+    const auto src = device->CreateDefaultTextureV(width, height);
+    const auto dst = device->CreateDefaultTextureV(width, height);
     device->CopyResourceV(dst, src);
     GraphicsDevice::GetInstance().Shutdown();
 }

@@ -253,9 +253,9 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
-            NativeMethods.RegisterDebugLog(null);
             s_context.Dispose();
             s_context = null;
+            NativeMethods.RegisterDebugLog(null);
         }
 
         internal static string GetModuleName()

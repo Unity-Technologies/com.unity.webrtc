@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "DummyAudioDevice.h"
-#include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
+#include "Codec/IEncoder.h"
 
 namespace WebRTC
 {
@@ -17,7 +17,7 @@ namespace WebRTC
         Context* GetContext(int uid);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
-        CodecInitializationResult GetCodecInitializationResult() const;
+        static CodecInitializationResult GetCodecInitializationResult();
 
     public:
         using ContextPtr = std::unique_ptr<Context>;
@@ -25,8 +25,6 @@ namespace WebRTC
         void* hModule = nullptr;
     private:
         ~ContextManager();
-        CodecInitializationResult InitializeAndTryNvEnc();
-        CodecInitializationResult codecInitializationResult;
         std::map<int, ContextPtr> m_contexts;
         static ContextManager s_instance;
     };
@@ -46,13 +44,13 @@ namespace WebRTC
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
 
         // You must call these methods on Rendering thread.
-        void InitializeEncoder(IGraphicsDevice* device);
+        bool InitializeEncoder(IGraphicsDevice* device);
         void EncodeFrame();
         void FinalizerEncoder();
         //
 
         void StopCapturer() { nvVideoCapturer->Stop(); }
-        void ProcessAudioData(const float* data, int32 size) { audioDevice->ProcessAudioData(data, size); }
+        void ProcessAudioData(const float* data, int32 size);
 
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
         void DeleteDataChannel(DataChannelObject* obj);
@@ -72,7 +70,7 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
         //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
         std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
-        std::map<void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
+        std::map<const void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver

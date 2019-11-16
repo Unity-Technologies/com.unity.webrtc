@@ -73,6 +73,12 @@
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp">
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
+    <ClCompile Include="VideoCapturerTest.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContextTest.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11GraphicsDeviceTestBase.h">

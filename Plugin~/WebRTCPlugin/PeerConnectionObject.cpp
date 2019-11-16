@@ -248,6 +248,11 @@ namespace WebRTC
 
     void PeerConnectionObject::AddIceCandidate(const RTCIceCandidate& candidate)
     {
+        if(connection.get() == nullptr) {
+            LogPrint("peer connection is not initialized %d", this);
+            return;
+        }
+
         webrtc::SdpParseError error;
         std::unique_ptr<webrtc::IceCandidateInterface> _candidate(
             webrtc::CreateIceCandidate(candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate, &error));
@@ -290,6 +295,7 @@ namespace WebRTC
         case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionMax:
             return RTCIceConnectionState::Max;
         }
+        throw std::invalid_argument("Unknown ice connection type");
     }
 
     RTCPeerConnectionState PeerConnectionObject::GetConnectionState()
@@ -310,6 +316,7 @@ namespace WebRTC
         case webrtc::PeerConnectionInterface::PeerConnectionState::kNew:
             return RTCPeerConnectionState::New;
         }
+        throw std::invalid_argument("Unknown peer connection type");
     }
 #pragma warning(pop)
 }

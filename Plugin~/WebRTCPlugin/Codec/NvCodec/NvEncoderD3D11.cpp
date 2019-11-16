@@ -17,10 +17,6 @@ namespace WebRTC
     {
     }
 
-    void NvEncoderD3D11::ReleaseInputBuffers()
-    {
-    }
-
     void* NvEncoderD3D11::AllocateInputBuffer()
     {
         auto tex = m_device->CreateDefaultTextureV(width, height);

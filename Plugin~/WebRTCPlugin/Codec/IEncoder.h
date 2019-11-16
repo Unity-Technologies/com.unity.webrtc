@@ -2,6 +2,16 @@
 
 namespace WebRTC {
 
+    enum class CodecInitializationResult
+    {
+        NotInitialized,
+        Success,
+        DriverNotInstalled,
+        DriverVersionDoesNotSupportAPI,
+        APINotFound,
+        EncoderInitializationFailed
+    };
+
     class IEncoder {
     public:
         virtual ~IEncoder() {};

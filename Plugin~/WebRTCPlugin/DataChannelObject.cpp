@@ -16,6 +16,7 @@ namespace WebRTC
         {
             dataChannel->Close();
         }
+        dataChannel = nullptr;
         onClose = nullptr;
         onOpen = nullptr;
         onMessage = nullptr;

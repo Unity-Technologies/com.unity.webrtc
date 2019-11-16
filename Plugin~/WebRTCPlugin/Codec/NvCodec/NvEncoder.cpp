@@ -13,6 +13,7 @@ namespace WebRTC
 {
     static void* s_hModule = nullptr;
     static std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
+    static CodecInitializationResult initializationResult = CodecInitializationResult::NotInitialized;
 
     NvEncoder::NvEncoder(
         NV_ENC_DEVICE_TYPE type,
@@ -23,11 +24,13 @@ namespace WebRTC
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
         checkf(width > 0 && height > 0, "Invalid width or height!");
         bool result = true;
-        if (pNvEncodeAPI.get() == nullptr) {
-            auto codecResult = LoadCodec();
-            if (codecResult != CodecInitializationResult::Success) {
-                throw codecResult;
-            }
+        if (initializationResult == CodecInitializationResult::NotInitialized)
+        {
+            initializationResult = LoadCodec();
+        }
+        if(initializationResult != CodecInitializationResult::Success)
+        {
+            throw initializationResult;
         }
 #pragma region open an encode session
         //open an encode session
@@ -170,6 +173,12 @@ namespace WebRTC
 #endif
             s_hModule = nullptr;
         }
+        initializationResult = CodecInitializationResult::NotInitialized;
+    }
+
+    CodecInitializationResult NvEncoder::InitializationResult()
+    {
+        return initializationResult;
     }
 
     void NvEncoder::UpdateSettings()
@@ -208,8 +217,8 @@ namespace WebRTC
 
     bool NvEncoder::CopyBuffer(void* frame)
     {
-        int curFrameNum = GetCurrentFrameCount() % bufferedFrameNum;
-        auto tex = renderTextures[curFrameNum];
+        const int curFrameNum = GetCurrentFrameCount() % bufferedFrameNum;
+        const auto tex = renderTextures[curFrameNum];
         if (tex == nullptr)
             return false;
         m_device->CopyResourceFromNativeV(tex, frame);

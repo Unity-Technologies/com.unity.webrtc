@@ -7,16 +7,6 @@
 
 namespace WebRTC
 {
-    enum class CodecInitializationResult
-    {
-        NotInitialized,
-        Success,
-        DriverNotInstalled,
-        DriverVersionDoesNotSupportAPI,
-        APINotFound,
-        EncoderInitializationFailed
-    };
-
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class ITexture2D;
     class IGraphicsDevice;
@@ -45,6 +35,7 @@ namespace WebRTC
             int width, int height, IGraphicsDevice* device);
         virtual ~NvEncoder();
 
+        static CodecInitializationResult InitializationResult();
         static CodecInitializationResult LoadCodec();
         static void UnloadCodec();
 
@@ -68,7 +59,6 @@ namespace WebRTC
 
         virtual void* AllocateInputBuffer() = 0;
         virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) = 0;
-        virtual void ReleaseInputBuffers() = 0;
 
     private:
         void ReleaseFrameInputBuffer(Frame& frame);

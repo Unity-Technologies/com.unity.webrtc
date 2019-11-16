@@ -35,7 +35,7 @@ namespace WebRTC {
     }
     void EncoderFactory::Shutdown()
     {
-        m_encoder.release();
+        m_encoder.reset();
     }
     IEncoder* EncoderFactory::GetEncoder() const
     {

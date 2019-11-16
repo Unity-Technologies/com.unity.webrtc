@@ -90,6 +90,7 @@
     <ClCompile Include="..\WebRTCPlugin\pch.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />
     <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />
+    <ClCompile Include="ContextTest.cpp" />
     <ClCompile Include="D3D11GraphicsDeviceTest.cpp" />
     <ClCompile Include="D3D11GraphicsDeviceTestBase.cpp" />
     <ClCompile Include="NvEncoderD3D11Test.cpp" />
@@ -99,6 +100,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VideoCapturerTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,7 +1,11 @@
 ﻿#include "pch.h"
+
+#if defined(_DEBUG)
 #include <cstdarg>
 #include "WebRTCPlugin.h"
-#if !defined(_WIN32)
+#endif
+
+#if defined(SUPPORT_OPENGL_CORE)
 #include <GL/glew.h>
 #endif
 
@@ -26,7 +30,7 @@ namespace WebRTC
     {
         if (!result)
         {
-            LogPrint(msg);
+            throw std::runtime_error(msg);
         }
     }
 

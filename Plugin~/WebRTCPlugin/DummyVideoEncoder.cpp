@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "DummyVideoEncoder.h"
 #include "NvVideoCapturer.h"
-#include <algorithm>
 
 namespace WebRTC
 {

@@ -13,7 +13,10 @@ namespace WebRTC
     {
         if (delegateDebugLog != nullptr)
         {
-            delegateDebugLog(buf);
+            if(rtc::ThreadManager::Instance()->IsMainThread())
+            {
+                delegateDebugLog(buf);
+            }
         }
     }
 
