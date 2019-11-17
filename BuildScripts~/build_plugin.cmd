@@ -15,7 +15,7 @@ choco install nuget.commandline
 
 echo -------------------
 echo Install nuget packages
-nuget install %SOLUTION_DIR%\packages.config -OutputDirectory %SOLUTION_DIR%\packages
+nuget restore %SOLUTION_DIR%\WebRTCPlugin.sln
 if not %errorlevel% == 0 exit 1
 
 echo -------------------
