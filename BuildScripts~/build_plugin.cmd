@@ -27,6 +27,6 @@ if not %errorlevel% == 0 exit 1
 echo -------------------
 echo Test com.unity.webrtc Plugin 
 
-%SOLUTION_DIR%\x65\Release\WebRTCPluginTest.exe
+%SOLUTION_DIR%\x64\Release\WebRTCPluginTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------
