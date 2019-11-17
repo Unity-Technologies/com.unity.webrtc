@@ -335,7 +335,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void StopMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern CodecInitializationResult GetCodecInitializationResult();
+        public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]

@@ -25,7 +25,7 @@ TEST_F(D3D11GraphicsDeviceTest, CreateDefaultTextureV) {
     GraphicsDevice::GetInstance().Shutdown();
 }
 
-TEST_F(D3D11GraphicsDeviceTest, GraphicsDeviceCopyResourceV) {
+TEST_F(D3D11GraphicsDeviceTest, CopyResourceV) {
     GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
     auto device = GraphicsDevice::GetInstance().GetDevice();
     EXPECT_NE(nullptr, device);
@@ -33,6 +33,20 @@ TEST_F(D3D11GraphicsDeviceTest, GraphicsDeviceCopyResourceV) {
     const auto height = 256;
     const auto src = device->CreateDefaultTextureV(width, height);
     const auto dst = device->CreateDefaultTextureV(width, height);
-    device->CopyResourceV(dst, src);
+    EXPECT_TRUE(device->CopyResourceV(dst, src));
+    EXPECT_FALSE(device->CopyResourceV(src, src));
+    GraphicsDevice::GetInstance().Shutdown();
+}
+
+TEST_F(D3D11GraphicsDeviceTest, CopyResourceNativeV) {
+    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+    auto device = GraphicsDevice::GetInstance().GetDevice();
+    EXPECT_NE(nullptr, device);
+    const auto width = 256;
+    const auto height = 256;
+    const auto src = device->CreateDefaultTextureV(width, height);
+    const auto dst = device->CreateDefaultTextureV(width, height);
+    EXPECT_TRUE(device->CopyResourceFromNativeV(dst, src->GetNativeTexturePtrV()));
+    EXPECT_FALSE(device->CopyResourceFromNativeV(dst, dst->GetNativeTexturePtrV()));
     GraphicsDevice::GetInstance().Shutdown();
 }

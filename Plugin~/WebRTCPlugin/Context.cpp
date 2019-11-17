@@ -22,8 +22,12 @@ namespace WebRTC
         DebugLog("Register context with ID %d", uid);
         return ctx;
     }
-    CodecInitializationResult ContextManager::GetCodecInitializationResult()
+    CodecInitializationResult Context::GetCodecInitializationResult()
     {
+        if (NvEncoder::InitializationResult() == CodecInitializationResult::NotInitialized)
+        {
+            return NvEncoder::LoadCodec();
+        }
         return NvEncoder::InitializationResult();
     }
 

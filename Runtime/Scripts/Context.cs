@@ -66,9 +66,9 @@ namespace Unity.WebRTC
             this.disposed = true;
         }
 
-        public static CodecInitializationResult GetCodecInitializationResult()
+        public CodecInitializationResult GetCodecInitializationResult()
         {
-            return NativeMethods.GetCodecInitializationResult();
+            return NativeMethods.ContextGetCodecInitializationResult(self);
         }
 
         public IntPtr CreatePeerConnection()

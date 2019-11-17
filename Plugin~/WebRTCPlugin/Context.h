@@ -17,7 +17,6 @@ namespace WebRTC
         Context* GetContext(int uid);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
-        static CodecInitializationResult GetCodecInitializationResult();
 
     public:
         using ContextPtr = std::unique_ptr<Context>;
@@ -33,12 +32,13 @@ namespace WebRTC
     {
     public:
         explicit Context(int uid = -1);
+        ~Context();
+
+        CodecInitializationResult GetCodecInitializationResult();
         webrtc::MediaStreamInterface* CreateVideoStream(void* frameBuffer, int width, int height);
         void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamInterface* CreateAudioStream();
         void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
-        ~Context();
-
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }

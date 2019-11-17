@@ -31,6 +31,16 @@ class ContextTest
 
     [Test]
     [Category("Context")]
+    public void Context_GetCodecInitializationResult()
+    {
+        var context = Context.Create();
+        var result = context.GetCodecInitializationResult();
+        Assert.AreEqual(CodecInitializationResult.Success, result); 
+        context.Dispose();
+    }
+
+    [Test]
+    [Category("Context")]
     public void Context_CreateAndDeletePeerConnection()
     {
         var context = Context.Create();

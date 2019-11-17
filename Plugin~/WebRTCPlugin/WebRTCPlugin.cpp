@@ -31,9 +31,9 @@ namespace WebRTC
 
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT CodecInitializationResult GetCodecInitializationResult()
+    UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)
     {
-        return ContextManager::GetInstance()->GetCodecInitializationResult();
+        return context->GetCodecInitializationResult();
     }
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, void* rt, int32 width, int32 height)

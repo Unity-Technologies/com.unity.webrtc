@@ -52,19 +52,27 @@ ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uin
 
 
 //---------------------------------------------------------------------------------------------------------------------
-void D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
+bool D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
     ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Texture2D*>(src->GetNativeTexturePtrV());
+    if (nativeSrc == nativeDest)
+        return false;
+    if (nativeSrc == nullptr || nativeDest == nullptr)
+        return false;
     m_d3d11Context->CopyResource(nativeDest, nativeSrc);
+    return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
-    if (dest->GetNativeTexturePtrV() == nativeTexturePtr)
-        return;
-
-    //[Note-sin: 2019-10-30] Do we need to implement this for RenderStreaming ?
-    DebugWarning("D3D11: CopyResourceFromNativeV() is not supported");
+bool D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
+    auto nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
+    auto nativeSrc = reinterpret_cast<ID3D11Resource*>(nativeTexturePtr);
+    if (nativeSrc == nativeDest)
+        return false;
+    if (nativeSrc == nullptr || nativeDest == nullptr)
+        return false;
+    m_d3d11Context->CopyResource(nativeDest, nativeSrc);
+    return true;
 }
 
 } //end namespace
