@@ -10,6 +10,10 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 7z x -aoa webrtc.zip -o%SOLUTION_DIR%\webrtc
 
 echo -------------------
+echo Install nuget
+choco install nuget.commandline
+
+echo -------------------
 echo Install nuget packages
 nuget install %SOLUTION_DIR%\packages.config
 if not %errorlevel% == 0 exit 1
