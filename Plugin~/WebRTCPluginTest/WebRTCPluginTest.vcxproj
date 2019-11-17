@@ -87,7 +87,6 @@
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Logger.cpp" />
     <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\pch.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />
     <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />
     <ClCompile Include="ContextTest.cpp" />
@@ -101,9 +100,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="VideoCapturerTest.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

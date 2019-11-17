@@ -34,9 +34,6 @@
     <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\WebRTCPlugin\pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -203,10 +200,5 @@
     <Filter Include="Codec\NvCodec">
       <UniqueIdentifier>{d79c0b00-9c97-4666-b84c-948f57798297}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config">
-      <Filter>Test Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
