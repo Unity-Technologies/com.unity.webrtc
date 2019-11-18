@@ -11,7 +11,7 @@ public:
     OpenGLGraphicsDevice();
     virtual ~OpenGLGraphicsDevice();
 
-    virtual void InitV();
+    virtual bool InitV();
     virtual void ShutdownV();
     inline virtual void* GetEncodeDevicePtrV();
 

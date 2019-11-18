@@ -1,5 +1,8 @@
 ﻿#include "pch.h"
 #include "D3D11GraphicsDeviceTestBase.h"
+#include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
+
+using namespace WebRTC;
 
 #if defined(_WIN32)
 #include <d3d11.h>
@@ -32,12 +35,26 @@ void D3D11GraphicsDeviceTestBase::TearDown()
 }
 #else
 
+#include <GL/glut.h>
+
 void D3D11GraphicsDeviceTestBase::SetUp()
 {
+    UnityGfxRenderer unityGfxRenderer;
+    void* pGraphicsDevice;
+    std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
+
+    int argc = 0;
+    glutInit(&argc, nullptr);
+    glutCreateWindow("test");
+
+    ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice));
+    m_device = GraphicsDevice::GetInstance().GetDevice();
+    ASSERT_NE(nullptr, m_device);
 }
 
 void D3D11GraphicsDeviceTestBase::TearDown()
 {
+    GraphicsDevice::GetInstance().Shutdown();
 }
 
 #endif

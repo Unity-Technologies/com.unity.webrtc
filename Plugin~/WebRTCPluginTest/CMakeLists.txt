@@ -26,6 +26,7 @@ if(APPLE OR UNIX)
 endif()
 
 find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
 find_package(X11 REQUIRED)
 find_package(GTest REQUIRED)
 include(GoogleTest)
@@ -63,6 +64,7 @@ elseif(UNIX)
     ${WEBRTC_LIBRARIES}
     ${GLEW_STATIC_LIBRARY}
     ${OPENGL_LIBRARIES}
+    ${GLUT_LIBRARY}
     ${X11_LIBRARIES}
     ${CMAKE_DL_LIBS}
     ${LIBCXX_LIBRARIES}
@@ -77,6 +79,7 @@ target_include_directories(WebRTCPluginTest
   .
   ../WebRTCPlugin
   ${CMAKE_SOURCE_DIR}/unity/include
+  ${CMAKE_SOURCE_DIR}/gl3w
   ${WEBRTC_INCLUDE_DIR}
   ${OPENGL_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIRS}

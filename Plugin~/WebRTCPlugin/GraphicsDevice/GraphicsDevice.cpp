@@ -68,14 +68,14 @@ bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device)
 #if defined(SUPPORT_OPENGL_CORE)
         m_device = new OpenGLGraphicsDevice();
 #endif
+        break;
     }
     default: {
-        DebugError("Unsupported Unity Renderer: %d", m_rendererType);
+        DebugError("Unsupported Unity Renderer: %d", rendererType);
         return false;
     }
     }
-    m_device->InitV();
-    return true;
+    return m_device->InitV();
 }
 
 //---------------------------------------------------------------------------------------------------------------------

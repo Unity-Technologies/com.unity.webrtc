@@ -14,8 +14,12 @@ OpenGLGraphicsDevice::~OpenGLGraphicsDevice() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void OpenGLGraphicsDevice::InitV() {
+bool OpenGLGraphicsDevice::InitV() {
     GLenum err = glewInit();
+    if (GLEW_OK != err)
+    {
+        return false;
+    }
 #if _DEBUG
     GLuint unusedIds = 0;
     glEnable(GL_DEBUG_OUTPUT);
@@ -26,7 +30,9 @@ void OpenGLGraphicsDevice::InitV() {
     if (err != GLEW_OK)
     {
         LogPrint("OpenGL initialize failed");
+        return false;
     }
+    return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------

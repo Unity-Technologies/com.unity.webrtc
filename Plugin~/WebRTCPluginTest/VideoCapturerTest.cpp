@@ -13,20 +13,22 @@ class VideoCapturerTest : public D3D11GraphicsDeviceTestBase
 {
 protected:
     IEncoder* encoder_ = nullptr;
-    IGraphicsDevice* device_ = nullptr;
+    //IGraphicsDevice* device_ = nullptr;
     const int width = 256;
     const int height = 256;
     std::unique_ptr<NvVideoCapturer> capturer;
 
     void SetUp() override {
+        /*
         UnityGfxRenderer unityGfxRenderer;
         void* pGraphicsDevice;
         std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
         GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
-        device_ = GraphicsDevice::GetInstance().GetDevice();
-        EXPECT_NE(nullptr, device_);
+        m_device_ = GraphicsDevice::GetInstance().GetDevice();
+        */
+        EXPECT_NE(nullptr, m_device);
 
-        EncoderFactory::GetInstance().Init(width, height, device_);
+        EncoderFactory::GetInstance().Init(width, height, m_device);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
 
@@ -38,13 +40,13 @@ protected:
     }
 };
 TEST_P(VideoCapturerTest, InitializeAndFinalize) {
-    capturer->InitializeEncoder(device_);
+    capturer->InitializeEncoder(m_device);
     capturer->FinalizeEncoder();
 }
 
 TEST_P(VideoCapturerTest, EncodeVideoData) {
-    capturer->InitializeEncoder(device_);
-    auto tex = device_->CreateDefaultTextureV(width, height);
+    capturer->InitializeEncoder(m_device);
+    auto tex = m_device->CreateDefaultTextureV(width, height);
     capturer->SetFrameBuffer(tex->GetEncodeTexturePtrV());
     capturer->EncodeVideoData();
     capturer->FinalizeEncoder();
