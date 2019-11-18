@@ -5,6 +5,11 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
+Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
+Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
+Microsoft::WRL::ComPtr<ID3D11Device> pD3DDevice;
+Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3DDeviceContext;
+
 void D3D11GraphicsDeviceTestBase::SetUp()
 {
     auto hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void **>(pFactory.GetAddressOf()));
@@ -27,9 +32,12 @@ void D3D11GraphicsDeviceTestBase::TearDown()
 }
 #else
 
-void GraphicsDeviceTestBase::SetUp()
+void D3D11GraphicsDeviceTestBase::SetUp()
 {
+}
 
+void D3D11GraphicsDeviceTestBase::TearDown()
+{
 }
 
 #endif

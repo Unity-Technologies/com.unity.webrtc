@@ -6,15 +6,25 @@
 
 using namespace WebRTC;
 
-class D3D11GraphicsDeviceTest : public D3D11GraphicsDeviceTestBase {};
+class D3D11GraphicsDeviceTest : public D3D11GraphicsDeviceTestBase {
+protected:
+    UnityGfxRenderer unityGfxRenderer;
+    void *pGraphicsDevice;
+    void SetUp() override
+    {
+        std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
+    }
+};
 
-TEST_F(D3D11GraphicsDeviceTest, InitAndShutdown) {
-    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+
+
+TEST_P(D3D11GraphicsDeviceTest, InitAndShutdown) {
+    GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
     GraphicsDevice::GetInstance().Shutdown();
 }
 
-TEST_F(D3D11GraphicsDeviceTest, CreateDefaultTextureV) {
-    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+TEST_P(D3D11GraphicsDeviceTest, CreateDefaultTextureV) {
+    GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
     auto device = GraphicsDevice::GetInstance().GetDevice();
     EXPECT_NE(nullptr, device);
     auto width = 256;
@@ -25,8 +35,8 @@ TEST_F(D3D11GraphicsDeviceTest, CreateDefaultTextureV) {
     GraphicsDevice::GetInstance().Shutdown();
 }
 
-TEST_F(D3D11GraphicsDeviceTest, CopyResourceV) {
-    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+TEST_P(D3D11GraphicsDeviceTest, CopyResourceV) {
+    GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
     auto device = GraphicsDevice::GetInstance().GetDevice();
     EXPECT_NE(nullptr, device);
     const auto width = 256;
@@ -38,8 +48,8 @@ TEST_F(D3D11GraphicsDeviceTest, CopyResourceV) {
     GraphicsDevice::GetInstance().Shutdown();
 }
 
-TEST_F(D3D11GraphicsDeviceTest, CopyResourceNativeV) {
-    GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+TEST_P(D3D11GraphicsDeviceTest, CopyResourceNativeV) {
+    GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
     auto device = GraphicsDevice::GetInstance().GetDevice();
     EXPECT_NE(nullptr, device);
     const auto width = 256;
@@ -51,8 +61,8 @@ TEST_F(D3D11GraphicsDeviceTest, CopyResourceNativeV) {
     GraphicsDevice::GetInstance().Shutdown();
 }
 
-TEST_P(GraphicsDeviceTestBase, Hoge)
-{
-    UnityGfxRenderer renderer = std::get<0>(GetParam());
-    void* device = std::get<1>(GetParam());
-}
+INSTANTIATE_TEST_CASE_P(
+        GraphicsDeviceParameters,
+        D3D11GraphicsDeviceTest,
+        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+);

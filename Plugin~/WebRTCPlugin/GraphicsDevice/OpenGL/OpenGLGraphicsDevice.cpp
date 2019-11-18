@@ -81,16 +81,16 @@ bool OpenGLGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
             srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
             dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
             width, height, 1);
+    return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void OpenGLGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
+bool OpenGLGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
     if (dest->GetNativeTexturePtrV() == nativeTexturePtr)
-        return;
+        return false;
 
-    //[Note-sin: 2019-10-30] Do we need to implement this for RenderStreaming ?
-    DebugWarning("OpenGLGraphicsDevice: CopyResourceFromNativeV() is not supported");
 
+    return true;
 }
 
 } //end namespace

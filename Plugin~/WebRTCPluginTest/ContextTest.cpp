@@ -1,5 +1,4 @@
 ﻿#include "pch.h"
-#include <wrl/client.h>
 #include "D3D11GraphicsDeviceTestBase.h"
 #include "../unity/include/IUnityGraphics.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
@@ -20,9 +19,12 @@ protected:
     std::unique_ptr<Context> context;
 
     void SetUp() override {
-        D3D11GraphicsDeviceTestBase::SetUp();
+        //D3D11GraphicsDeviceTestBase::SetUp();
 
-        GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+        UnityGfxRenderer unityGfxRenderer;
+        void* pGraphicsDevice;
+        std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
+        GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
         device_ = GraphicsDevice::GetInstance().GetDevice();
         EXPECT_NE(nullptr, device_);
 
@@ -37,12 +39,12 @@ protected:
         D3D11GraphicsDeviceTestBase::TearDown();
     }
 };
-TEST_F(ContextTest, InitializeAndFinalizeEncoder) {
+TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     context->InitializeEncoder(device_);
     context->FinalizerEncoder();
 }
 
-TEST_F(ContextTest, CreateAndDeleteVideoStream) {
+TEST_P(ContextTest, CreateAndDeleteVideoStream) {
     context->InitializeEncoder(device_);
     auto tex = device_->CreateDefaultTextureV(width, height);
     const auto stream = context->CreateVideoStream(tex->GetEncodeTexturePtrV(), width, height);
@@ -50,20 +52,26 @@ TEST_F(ContextTest, CreateAndDeleteVideoStream) {
     context->FinalizerEncoder();
 }
 
-TEST_F(ContextTest, CreateAndDeleteAudioStream) {
+TEST_P(ContextTest, CreateAndDeleteAudioStream) {
     const auto stream = context->CreateAudioStream();
     context->DeleteAudioStream(stream);
 }
 
-TEST_F(ContextTest, CreateAndDeletePeerConnection) {
+TEST_P(ContextTest, CreateAndDeletePeerConnection) {
     const auto connection = context->CreatePeerConnection();
     context->DeletePeerConnection(connection);
 }
 
-TEST_F(ContextTest, CreateAndDeleteDataChannel) {
+TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     const auto connection = context->CreatePeerConnection();
     RTCDataChannelInit init;
     const auto channel = context->CreateDataChannel(connection, "test", init);
     context->DeleteDataChannel(channel);
     context->DeletePeerConnection(connection);
 }
+
+INSTANTIATE_TEST_CASE_P(
+        GraphicsDeviceParameters,
+        ContextTest,
+        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+        );

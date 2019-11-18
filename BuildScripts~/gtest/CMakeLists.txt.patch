@@ -1,0 +1,10 @@
+@@ -99,6 +99,9 @@ if (DEFINED CMAKE_VERSION AND NOT "${CMA
+   target_include_directories(gtest_main INTERFACE "${gtest_SOURCE_DIR}/include")
+ endif()
+ 
++target_include_directories(gtest      PRIVATE "${LIBCXX_INCLUDE_DIRS}")
++target_include_directories(gtest_main PRIVATE "${LIBCXX_INCLUDE_DIRS}")
++
+ ########################################################################
+ #
+ # Install rules

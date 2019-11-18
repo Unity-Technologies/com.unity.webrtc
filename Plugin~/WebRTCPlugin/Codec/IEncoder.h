@@ -21,7 +21,7 @@ namespace WebRTC {
         virtual void EncodeFrame() = 0;
         virtual bool IsSupported() const = 0;
         virtual void SetIdrFrame() = 0;
-        virtual uint64_t GetCurrentFrameCount() = 0;
+        virtual uint64 GetCurrentFrameCount() = 0;
         sigslot::signal1<std::vector<uint8_t>&> CaptureFrame;
     };
 }

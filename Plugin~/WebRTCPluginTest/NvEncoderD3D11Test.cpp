@@ -1,5 +1,4 @@
 ﻿#include "pch.h"
-#include <wrl/client.h>
 #include "D3D11GraphicsDeviceTestBase.h"
 #include "../unity/include/IUnityGraphics.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
@@ -16,9 +15,10 @@ protected:
     IGraphicsDevice* device_ = nullptr;
 
     void SetUp() override {
-        D3D11GraphicsDeviceTestBase::SetUp();
-
-        GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+        UnityGfxRenderer unityGfxRenderer;
+        void* pGraphicsDevice;
+        std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
+        GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
         device_ = GraphicsDevice::GetInstance().GetDevice();
         EXPECT_NE(nullptr, device_);
 
@@ -33,11 +33,11 @@ protected:
         D3D11GraphicsDeviceTestBase::TearDown();
     }
 };
-TEST_F(NvEncoderD3D11Test, IsSupported) {
+TEST_P(NvEncoderD3D11Test, IsSupported) {
     EXPECT_TRUE(encoder_->IsSupported());
 }
 
-TEST_F(NvEncoderD3D11Test, CopyBuffer) {
+TEST_P(NvEncoderD3D11Test, CopyBuffer) {
     const auto width = 256;
     const auto height = 256;
     auto tex = device_->CreateDefaultTextureV(width, height);
@@ -45,9 +45,15 @@ TEST_F(NvEncoderD3D11Test, CopyBuffer) {
     EXPECT_TRUE(result);
 }
 
-TEST_F(NvEncoderD3D11Test, EncodeFrame) {
+TEST_P(NvEncoderD3D11Test, EncodeFrame) {
     auto before = encoder_->GetCurrentFrameCount();
     encoder_->EncodeFrame();
     const auto after = encoder_->GetCurrentFrameCount();
     EXPECT_EQ(before + 1, after);
 }
+
+INSTANTIATE_TEST_CASE_P(
+        GraphicsDeviceParameters,
+        NvEncoderD3D11Test,
+        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+);

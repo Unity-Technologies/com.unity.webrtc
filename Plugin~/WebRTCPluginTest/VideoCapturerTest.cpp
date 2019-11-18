@@ -1,5 +1,4 @@
 ﻿#include "pch.h"
-#include <wrl/client.h>
 #include "D3D11GraphicsDeviceTestBase.h"
 #include "../unity/include/IUnityGraphics.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
@@ -20,9 +19,10 @@ protected:
     std::unique_ptr<NvVideoCapturer> capturer;
 
     void SetUp() override {
-        D3D11GraphicsDeviceTestBase::SetUp();
-
-        GraphicsDevice::GetInstance().Init(kUnityGfxRendererD3D11, pD3DDevice.Get());
+        UnityGfxRenderer unityGfxRenderer;
+        void* pGraphicsDevice;
+        std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
+        GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
         device_ = GraphicsDevice::GetInstance().GetDevice();
         EXPECT_NE(nullptr, device_);
 
@@ -37,15 +37,21 @@ protected:
         D3D11GraphicsDeviceTestBase::TearDown();
     }
 };
-TEST_F(VideoCapturerTest, InitializeAndFinalize) {
+TEST_P(VideoCapturerTest, InitializeAndFinalize) {
     capturer->InitializeEncoder(device_);
     capturer->FinalizeEncoder();
 }
 
-TEST_F(VideoCapturerTest, EncodeVideoData) {
+TEST_P(VideoCapturerTest, EncodeVideoData) {
     capturer->InitializeEncoder(device_);
     auto tex = device_->CreateDefaultTextureV(width, height);
     capturer->SetFrameBuffer(tex->GetEncodeTexturePtrV());
     capturer->EncodeVideoData();
     capturer->FinalizeEncoder();
 }
+
+INSTANTIATE_TEST_CASE_P(
+        GraphicsDeviceParameters,
+        VideoCapturerTest,
+        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+);

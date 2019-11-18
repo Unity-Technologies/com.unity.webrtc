@@ -25,6 +25,8 @@ if(APPLE OR UNIX)
   target_compile_features(WebRTCPluginTest PRIVATE cxx_std_14)
 endif()
 
+find_package(OpenGL REQUIRED)
+find_package(X11 REQUIRED)
 find_package(GTest REQUIRED)
 include(GoogleTest)
 
@@ -33,7 +35,6 @@ if(APPLE)
     PRIVATE
     WEBRTC_MAC
     WEBRTC_POSIX
-    #      GLEW_STATIC
     )
   target_link_libraries(WebRTCPluginTest
     PRIVATE
@@ -56,14 +57,18 @@ elseif(UNIX)
     WEBRTC_POSIX
     GLEW_STATIC
     )
+
   target_link_libraries(WebRTCPluginTest
     PRIVATE
     ${WEBRTC_LIBRARIES}
     ${GLEW_STATIC_LIBRARY}
     ${OPENGL_LIBRARIES}
+    ${X11_LIBRARIES}
+    ${CMAKE_DL_LIBS}
     ${LIBCXX_LIBRARIES}
-    GTest::GTest
-    GTest::Main
+    ${GTEST_MAIN_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
     )
 endif()
 
@@ -75,8 +80,8 @@ target_include_directories(WebRTCPluginTest
   ${WEBRTC_INCLUDE_DIR}
   ${OPENGL_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIRS}
-  ${LIBCXX_INCLUDE_DIRS}
   ${GTEST_INCLUDE_DIRS}
+  ${LIBCXX_INCLUDE_DIRS}
 )
 
 gtest_add_tests(TARGET WebRTCPluginTest)
