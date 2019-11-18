@@ -38,6 +38,9 @@ namespace WebRTC
         static CodecInitializationResult InitializationResult();
         static CodecInitializationResult LoadCodec();
         static void UnloadCodec();
+        static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
+        static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
+        static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
 
         void SetRate(uint32 rate) override;
         void UpdateSettings() override;
@@ -71,9 +74,6 @@ namespace WebRTC
         NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
         ITexture2D* renderTextures[bufferedFrameNum];
-        static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
-        static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
-        static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;

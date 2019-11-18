@@ -129,7 +129,7 @@ namespace WebRTC
 #if defined(_WIN32)
         NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress(module, "NvEncodeAPIGetMaxSupportedVersion");
 #else
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(hModule, "NvEncodeAPIGetMaxSupportedVersion");
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(module, "NvEncodeAPIGetMaxSupportedVersion");
 #endif
 
         uint32_t version = 0;

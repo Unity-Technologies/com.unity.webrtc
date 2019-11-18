@@ -38,14 +38,14 @@ void OpenGLGraphicsDevice::ShutdownV() {
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 
-        GLuint texture;
-        glGenTextures(1, &texture);
+        GLuint tex;
+        glGenTextures(1, &tex);
         glBindTexture(GL_TEXTURE_2D, tex);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
         glBindTexture(GL_TEXTURE_2D, 0);
-        pitch = GetWidthInBytes(format, width);
+        //pitch = GetWidthInBytes(format, w);
         glBindTexture(GL_TEXTURE_2D, 0);
-        return new OpenGLTexture2D(w,h,texture);
+        return new OpenGLTexture2D(w, h, &tex);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -57,9 +57,11 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, ui
 
 
 //---------------------------------------------------------------------------------------------------------------------
-void OpenGLGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
+bool OpenGLGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     auto nativeDest = reinterpret_cast<GLuint*>(dest->GetNativeTexturePtrV());
     auto nativeSrc = reinterpret_cast<GLuint*>(src->GetNativeTexturePtrV());
+    auto width = dest->GetWidth();
+    auto height  = dest->GetHeight();
 
     GLuint srcName = *nativeSrc;
     GLuint dstName = *nativeDest;

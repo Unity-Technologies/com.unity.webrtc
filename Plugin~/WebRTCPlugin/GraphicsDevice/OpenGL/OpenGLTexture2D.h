@@ -12,7 +12,8 @@ public:
     OpenGLTexture2D(uint32_t w, uint32_t h, GLuint* tex);
 
     virtual ~OpenGLTexture2D() {
-        SAFE_RELEASE(m_texture);
+        glDeleteTextures(1 , m_texture);
+        m_texture;
     }
 
     inline virtual void* GetNativeTexturePtrV();

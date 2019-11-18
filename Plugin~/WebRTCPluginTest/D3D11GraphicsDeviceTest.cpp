@@ -50,3 +50,9 @@ TEST_F(D3D11GraphicsDeviceTest, CopyResourceNativeV) {
     EXPECT_FALSE(device->CopyResourceFromNativeV(dst, dst->GetNativeTexturePtrV()));
     GraphicsDevice::GetInstance().Shutdown();
 }
+
+TEST_P(GraphicsDeviceTestBase, Hoge)
+{
+    UnityGfxRenderer renderer = std::get<0>(GetParam());
+    void* device = std::get<1>(GetParam());
+}

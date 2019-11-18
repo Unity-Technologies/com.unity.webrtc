@@ -1,7 +1,9 @@
 ﻿#include "pch.h"
+#include "D3D11GraphicsDeviceTestBase.h"
+
+#if defined(_WIN32)
 #include <d3d11.h>
 #include <wrl/client.h>
-#include "D3D11GraphicsDeviceTestBase.h"
 
 void D3D11GraphicsDeviceTestBase::SetUp()
 {
@@ -23,3 +25,11 @@ void D3D11GraphicsDeviceTestBase::SetUp()
 void D3D11GraphicsDeviceTestBase::TearDown()
 {
 }
+#else
+
+void GraphicsDeviceTestBase::SetUp()
+{
+
+}
+
+#endif

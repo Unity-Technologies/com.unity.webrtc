@@ -2,7 +2,7 @@
 #include "nvEncodeAPI.h"
 #include "NvEncoderD3D11.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
-#include "GraphicsDevice/D3D11/D3D11Texture2D.h"
+#include "GraphicsDevice/ITexture2D.h"
 
 namespace WebRTC
 {

@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
 #include "GraphicsDevice.h"
-#include "WebRTCConstants.h" //NUM_TEXTURES_FOR_BUFFERING
-#include "IGraphicsDevice.h"
 
 //Graphics
 #if defined(SUPPORT_D3D11) || defined(SUPPORT_D3D12)
