@@ -21,18 +21,24 @@ make glew.lib.static
 find include -name "*.h" -print | cpio -pd "$SOLUTION_DIR/glew"
 find lib -name "*.a" -print | cpio -pd "$SOLUTION_DIR/glew"
 
-# WORKAROUND 
 # Install googletest
-# sudo apt install -y googletest=1.8.0-6
-# cd /usr/src/googletest
-# sudo patch "googletest/cmake/internal_utils.cmake" < "$SOLUTION_DIR/BuildScripts~/gtest/internal_utils.cmake.patch"
-# sudo patch "googletest/CMakeLists.txt"             < "$SOLUTION_DIR/BuildScripts~/gtest/CMakeLists.txt.patch"
-# sudo cmake -Dcxx_no_rtti=ON \
-#            -DCMAKE_CXX_FLAGS=-nostdinc++ \
-#            .
-# sudo make
-# sudo cp googletest/*.a /usr/lib
-# sudo cp googlemock/*.a /usr/lib
+wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
+tar -zxvf release-1.8.0.tar.gz
+cd googletest-release-1.8.0
+patch "googletest/cmake/internal_utils.cmake" < "$SOLUTION_DIR/../BuildScripts~/gtest/internal_utils.cmake.patch"
+patch "googletest/CMakeLists.txt"             < "$SOLUTION_DIR/../BuildScripts~/gtest/googletest_CMakeLists.txt.patch"
+patch "googlemock/CMakeLists.txt"             < "$SOLUTION_DIR/../BuildScripts~/gtest/googlemock_CMakeLists.txt.patch"
+cmake -Dcxx_no_rtti=ON \
+      -DCMAKE_CXX_FLAGS=-nostdinc++ \
+      -DCMAKE_C_COMPILER="clang" \
+      -DCMAKE_CXX_COMPILER="clang++" \
+      .
+make
+mkdir -p "$SOLUTION_DIR/gtest/lib"
+cp googlemock/*.a "$SOLUTION_DIR/gtest/lib"
+cp googlemock/gtest/*.a "$SOLUTION_DIR/gtest/lib"
+cd googlemock; find include -name "*.h" -print | cpio -pd "$SOLUTION_DIR/gtest"; cd -;
+cd googletest; find include -name "*.h" -print | cpio -pd "$SOLUTION_DIR/gtest"; cd -;
 
 # Build UnityRenderStreaming Plugin 
 cd $SOLUTION_DIR

@@ -28,7 +28,13 @@ endif()
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(X11 REQUIRED)
-find_package(GTest REQUIRED)
+
+#find_package(GTest REQUIRED)
+set(GTEST_DIR "${CMAKE_SOURCE_DIR}/gtest")
+set(GTEST_INCLUDE_DIRS ${GTEST_DIR}/include)
+set(GTEST_LIBRARIES ${GTEST_DIR}/lib/gtest.a)
+set(GTEST_MAIN_LIBRARIES ${GTEST_DIR}/lib/gtest_main.a)
+
 include(GoogleTest)
 
 if(APPLE)
