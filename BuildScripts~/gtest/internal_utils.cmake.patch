@@ -1,14 +1,4 @@
-@@ -51,6 +51,9 @@ macro(config_compiler_and_linker)
-     find_package(Threads)
-   endif()
- 
-+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
-+  find_package(LibCXX REQUIRED)
-+
-   fix_default_compiler_settings_()
-   if (MSVC)
-     # Newlines inside flags variables break CMake's NMake generator.
-@@ -155,6 +158,7 @@ function(cxx_library_with_type name type
+@@ -155,6 +155,7 @@ function(cxx_library_with_type name type
        PROPERTIES
        COMPILE_DEFINITIONS "GTEST_CREATE_SHARED_LIBRARY=1")
    endif()
