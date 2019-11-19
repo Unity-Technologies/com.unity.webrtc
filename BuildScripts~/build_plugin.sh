@@ -13,6 +13,7 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 sudo apt install -y libc++-dev libc++abi-dev
 
 # Install glew static library
+cd $SOLUTION_DIR
 wget https://downloads.sourceforge.net/glew/glew-2.1.0.tgz
 tar -xvzf glew-2.1.0.tgz
 cd $SOLUTION_DIR/glew-2.1.0
