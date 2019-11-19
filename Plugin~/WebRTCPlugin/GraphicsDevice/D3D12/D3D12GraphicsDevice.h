@@ -10,7 +10,7 @@ class D3D12GraphicsDevice : public IGraphicsDevice{
 public:
     D3D12GraphicsDevice(ID3D12Device* nativeDevice);
     virtual ~D3D12GraphicsDevice();
-    virtual void InitV();
+    virtual bool InitV();
     virtual void ShutdownV();
     inline virtual void* GetEncodeDevicePtrV();
 

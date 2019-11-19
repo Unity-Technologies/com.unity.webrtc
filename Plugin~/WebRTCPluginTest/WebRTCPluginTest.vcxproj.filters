@@ -4,9 +4,6 @@
     <ClCompile Include="GraphicsDeviceTest.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
-    <ClCompile Include="D3D11GraphicsDeviceTestBase.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
     <ClCompile Include="NvEncoderTest.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
@@ -76,11 +73,11 @@
     <ClCompile Include="ContextTest.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsDeviceTestBase.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3D11GraphicsDeviceTestBase.h">
-      <Filter>Test Files</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Test Files</Filter>
     </ClInclude>
@@ -170,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h">
       <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDeviceTestBase.h">
+      <Filter>Test Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

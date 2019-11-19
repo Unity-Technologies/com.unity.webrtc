@@ -27,7 +27,7 @@ D3D12GraphicsDevice::~D3D12GraphicsDevice() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void D3D12GraphicsDevice::InitV() {
+bool D3D12GraphicsDevice::InitV() {
 
     ID3D11Device* legacyDevice;
     ID3D11DeviceContext* legacyContext;
@@ -48,6 +48,7 @@ void D3D12GraphicsDevice::InitV() {
 
     legacyDevice->GetImmediateContext(&legacyContext);
     legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
+    return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------

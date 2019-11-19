@@ -66,7 +66,7 @@
     <ClInclude Include="..\WebRTCPlugin\WebRTCConstants.h" />
     <ClInclude Include="..\WebRTCPlugin\WebRTCMacros.h" />
     <ClInclude Include="..\WebRTCPlugin\WebRTCPlugin.h" />
-    <ClInclude Include="D3D11GraphicsDeviceTestBase.h" />
+    <ClInclude Include="GraphicsDeviceTestBase.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -91,7 +91,7 @@
     <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />
     <ClCompile Include="ContextTest.cpp" />
     <ClCompile Include="GraphicsDeviceTest.cpp" />
-    <ClCompile Include="D3D11GraphicsDeviceTestBase.cpp" />
+    <ClCompile Include="GraphicsDeviceTestBase.cpp" />
     <ClCompile Include="NvEncoderTest.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -161,7 +161,7 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WEBRTC_WIN;NOMINMAX;X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WEBRTC_WIN;NOMINMAX;X64;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
