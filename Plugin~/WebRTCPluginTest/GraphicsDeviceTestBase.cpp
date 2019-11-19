@@ -55,7 +55,7 @@ std::tuple<UnityGfxRenderer, void*> GraphicsDeviceTestBase::CreateParameter()
 #if defined(WIN32)
     auto unityGfxRenderer = kUnityGfxRendererD3D11;
 #else
-    auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;;
+    auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;
 #endif
     return std::make_tuple(unityGfxRenderer, CreateDevice());
 }
