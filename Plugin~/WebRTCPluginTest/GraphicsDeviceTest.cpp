@@ -39,7 +39,7 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-        GraphicsDeviceParameters,
-        GraphicsDeviceTest,
-        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+    GraphicsDeviceParameters,
+    GraphicsDeviceTest,
+    testing::Values(GraphicsDeviceTestBase::CreateParameter())
 );

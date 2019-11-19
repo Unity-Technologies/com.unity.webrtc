@@ -45,7 +45,7 @@ TEST_P(VideoCapturerTest, EncodeVideoData) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-        GraphicsDeviceParameters,
-        VideoCapturerTest,
-        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+    GraphicsDeviceParameters,
+    VideoCapturerTest,
+    testing::Values(GraphicsDeviceTestBase::CreateParameter())
 );

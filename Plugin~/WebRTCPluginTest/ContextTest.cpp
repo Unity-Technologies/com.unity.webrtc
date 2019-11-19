@@ -64,7 +64,7 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-        GraphicsDeviceParameters,
-        ContextTest,
-        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
-        );
+    GraphicsDeviceParameters,
+    ContextTest,
+    testing::Values(GraphicsDeviceTestBase::CreateParameter())
+);

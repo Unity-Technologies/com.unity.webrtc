@@ -13,7 +13,7 @@ Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
 Microsoft::WRL::ComPtr<ID3D11Device> pD3DDevice;
 Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3DDeviceContext;
 
-void GraphicsDeviceTestBase::SetUp()
+void* CreateDevice()
 {
     auto hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void **>(pFactory.GetAddressOf()));
     EXPECT_TRUE(SUCCEEDED(hr));
@@ -29,9 +29,7 @@ void GraphicsDeviceTestBase::SetUp()
 
     EXPECT_TRUE(SUCCEEDED(hr));
     EXPECT_NE(nullptr, pD3DDevice.Get());
-}
-void GraphicsDeviceTestBase::TearDown()
-{
+    return pD3DDevice.Get();
 }
 #else
 
@@ -39,28 +37,41 @@ void GraphicsDeviceTestBase::TearDown()
 
 static bool s_glutInitialized;
 
-void GraphicsDeviceTestBase::SetUp()
+void* CreateDevice()
 {
-    UnityGfxRenderer unityGfxRenderer;
-    void* pGraphicsDevice;
-    std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
-
-    if(!s_glutInitialized)
+    if (!s_glutInitialized)
     {
         int argc = 0;
         glutInit(&argc, nullptr);
         s_glutInitialized = true;
         glutCreateWindow("test");
     }
+    return nullptr;
+}
+#endif
+
+std::tuple<UnityGfxRenderer, void*> GraphicsDeviceTestBase::CreateParameter()
+{
+#if defined(WIN32)
+    auto unityGfxRenderer = kUnityGfxRendererD3D11;
+#else
+    auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;;
+#endif
+    return std::make_tuple(unityGfxRenderer, CreateDevice());
+}
+
+
+void GraphicsDeviceTestBase::SetUp()
+{
+    UnityGfxRenderer unityGfxRenderer;
+    void* pGraphicsDevice;
+    std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
 
     ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice));
     m_device = GraphicsDevice::GetInstance().GetDevice();
     ASSERT_NE(nullptr, m_device);
 }
-
 void GraphicsDeviceTestBase::TearDown()
 {
     GraphicsDevice::GetInstance().Shutdown();
 }
-
-#endif

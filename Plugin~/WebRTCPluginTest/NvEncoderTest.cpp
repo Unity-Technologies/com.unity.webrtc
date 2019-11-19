@@ -46,7 +46,7 @@ TEST_P(NvEncoderTest, EncodeFrame) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-        GraphicsDeviceParameters,
-        NvEncoderTest,
-        testing::Values(std::make_tuple(kUnityGfxRendererOpenGLCore, nullptr))
+    GraphicsDeviceParameters,
+    NvEncoderTest,
+    testing::Values(GraphicsDeviceTestBase::CreateParameter())
 );
