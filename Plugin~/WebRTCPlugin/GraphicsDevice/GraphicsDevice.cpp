@@ -38,6 +38,7 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
             break;
         }
         case kUnityGfxRendererOpenGLCore: {
+            break;
         }
         default: {
             DebugError("Unsupported Unity Renderer: %d", m_rendererType);

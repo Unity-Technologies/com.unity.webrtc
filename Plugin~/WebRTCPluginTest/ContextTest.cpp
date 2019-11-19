@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
-#include "D3D11GraphicsDeviceTestBase.h"
-#include "../unity/include/IUnityGraphics.h"
+#include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
@@ -9,26 +8,20 @@
 
 using namespace WebRTC;
 
-class ContextTest : public D3D11GraphicsDeviceTestBase
+class ContextTest : public GraphicsDeviceTestBase
 {
 protected:
     IEncoder* encoder_ = nullptr;
-    IGraphicsDevice* device_ = nullptr;
+//    IGraphicsDevice* device_ = nullptr;
     const int width = 256;
     const int height = 256;
     std::unique_ptr<Context> context;
 
     void SetUp() override {
-        //D3D11GraphicsDeviceTestBase::SetUp();
+        GraphicsDeviceTestBase::SetUp();
+        EXPECT_NE(nullptr, m_device);
 
-        UnityGfxRenderer unityGfxRenderer;
-        void* pGraphicsDevice;
-        std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
-        GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
-        device_ = GraphicsDevice::GetInstance().GetDevice();
-        EXPECT_NE(nullptr, device_);
-
-        EncoderFactory::GetInstance().Init(width, height, device_);
+        EncoderFactory::GetInstance().Init(width, height, m_device);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
 
@@ -36,17 +29,17 @@ protected:
     }
     void TearDown() override {
         EncoderFactory::GetInstance().Shutdown();
-        D3D11GraphicsDeviceTestBase::TearDown();
+        GraphicsDeviceTestBase::TearDown();
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    context->InitializeEncoder(device_);
+    context->InitializeEncoder(m_device);
     context->FinalizerEncoder();
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoStream) {
-    context->InitializeEncoder(device_);
-    auto tex = device_->CreateDefaultTextureV(width, height);
+    context->InitializeEncoder(m_device);
+    auto tex = m_device->CreateDefaultTextureV(width, height);
     const auto stream = context->CreateVideoStream(tex->GetEncodeTexturePtrV(), width, height);
     context->DeleteVideoStream(stream);
     context->FinalizerEncoder();

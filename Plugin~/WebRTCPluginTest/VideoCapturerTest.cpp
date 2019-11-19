@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
-#include "D3D11GraphicsDeviceTestBase.h"
-#include "../unity/include/IUnityGraphics.h"
-#include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
+#include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
 #include "../WebRTCPlugin/Codec/IEncoder.h"
@@ -9,7 +7,7 @@
 
 using namespace WebRTC;
 
-class VideoCapturerTest : public D3D11GraphicsDeviceTestBase
+class VideoCapturerTest : public GraphicsDeviceTestBase
 {
 protected:
     IEncoder* encoder_ = nullptr;
@@ -19,13 +17,7 @@ protected:
     std::unique_ptr<NvVideoCapturer> capturer;
 
     void SetUp() override {
-        /*
-        UnityGfxRenderer unityGfxRenderer;
-        void* pGraphicsDevice;
-        std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
-        GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice);
-        m_device_ = GraphicsDevice::GetInstance().GetDevice();
-        */
+        GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
         EncoderFactory::GetInstance().Init(width, height, m_device);
@@ -36,7 +28,7 @@ protected:
     }
     void TearDown() override {
         EncoderFactory::GetInstance().Shutdown();
-        D3D11GraphicsDeviceTestBase::TearDown();
+        GraphicsDeviceTestBase::TearDown();
     }
 };
 TEST_P(VideoCapturerTest, InitializeAndFinalize) {

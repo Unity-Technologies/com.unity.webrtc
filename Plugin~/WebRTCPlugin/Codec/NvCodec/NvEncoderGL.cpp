@@ -24,7 +24,7 @@ namespace WebRTC {
         uint32_t chromaHeight = GetNumChromaPlanes(format) * GetChromaHeight(format, height);
 
         auto tex = m_device->CreateDefaultTextureV(width, height);
-        pResource->texture = *static_cast<GLuint*>(tex->GetEncodeTexturePtrV());
+        pResource->texture = (GLuint)(size_t)(tex->GetEncodeTexturePtrV());
         pResource->target = GL_TEXTURE_2D;
         return pResource;
     }

@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "D3D11GraphicsDeviceTestBase.h"
+#include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 
 using namespace WebRTC;
@@ -13,7 +13,7 @@ Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
 Microsoft::WRL::ComPtr<ID3D11Device> pD3DDevice;
 Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3DDeviceContext;
 
-void D3D11GraphicsDeviceTestBase::SetUp()
+void GraphicsDeviceTestBase::SetUp()
 {
     auto hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void **>(pFactory.GetAddressOf()));
     EXPECT_TRUE(SUCCEEDED(hr));
@@ -30,29 +30,35 @@ void D3D11GraphicsDeviceTestBase::SetUp()
     EXPECT_TRUE(SUCCEEDED(hr));
     EXPECT_NE(nullptr, pD3DDevice.Get());
 }
-void D3D11GraphicsDeviceTestBase::TearDown()
+void GraphicsDeviceTestBase::TearDown()
 {
 }
 #else
 
 #include <GL/glut.h>
 
-void D3D11GraphicsDeviceTestBase::SetUp()
+static bool s_glutInitialized;
+
+void GraphicsDeviceTestBase::SetUp()
 {
     UnityGfxRenderer unityGfxRenderer;
     void* pGraphicsDevice;
     std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
 
-    int argc = 0;
-    glutInit(&argc, nullptr);
-    glutCreateWindow("test");
+    if(!s_glutInitialized)
+    {
+        int argc = 0;
+        glutInit(&argc, nullptr);
+        s_glutInitialized = true;
+        glutCreateWindow("test");
+    }
 
     ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice));
     m_device = GraphicsDevice::GetInstance().GetDevice();
     ASSERT_NE(nullptr, m_device);
 }
 
-void D3D11GraphicsDeviceTestBase::TearDown()
+void GraphicsDeviceTestBase::TearDown()
 {
     GraphicsDevice::GetInstance().Shutdown();
 }
