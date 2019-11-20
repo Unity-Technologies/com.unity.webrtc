@@ -4,7 +4,6 @@
 
 namespace WebRTC {
 
-
 class ITexture2D;
 
 class IGraphicsDevice {
