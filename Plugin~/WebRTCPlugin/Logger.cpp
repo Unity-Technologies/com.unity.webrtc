@@ -34,7 +34,7 @@ namespace WebRTC
         }
     }
 
-#if !defined(_WIN32)
+#if defined(SUPPORT_OPENGL_CORE)
     void OnOpenGLDebugMessage(
             GLenum source,
             GLenum type,

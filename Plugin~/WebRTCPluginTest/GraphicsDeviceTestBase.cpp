@@ -4,7 +4,7 @@
 
 using namespace WebRTC;
 
-#if defined(_WIN32)
+#if defined(SUPPORT_D3D11)
 #include <d3d11.h>
 #include <wrl/client.h>
 
@@ -52,7 +52,7 @@ void* CreateDevice()
 
 std::tuple<UnityGfxRenderer, void*> GraphicsDeviceTestBase::CreateParameter()
 {
-#if defined(WIN32)
+#if defined(SUPPORT_D3D11)
     auto unityGfxRenderer = kUnityGfxRendererD3D11;
 #else
     auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;
