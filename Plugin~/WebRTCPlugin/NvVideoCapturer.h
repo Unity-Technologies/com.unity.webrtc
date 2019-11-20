@@ -1,8 +1,10 @@
 ﻿#pragma once
-#include "NvEncoder.h"
 
 namespace WebRTC
 {
+    class IEncoder;
+    class ITexture2D;
+    class IGraphicsDevice;
     class NvVideoCapturer : public cricket::VideoCapturer
     {
     public:
@@ -17,7 +19,6 @@ namespace WebRTC
         virtual void Stop() override
         {
             captureStopped = true;
-            nvEncoder.reset();
         }
         // Check if the video capturer is running.
         virtual bool IsRunning() override
@@ -31,15 +32,14 @@ namespace WebRTC
             return false;
         }
         void StartEncoder();
-        void SetFrameBuffer(UnityFrameBuffer* frameBuffer);
-        void InitializeEncoder();
+        void SetFrameBuffer(void* frameBuffer);
+        bool InitializeEncoder(IGraphicsDevice* device);
         void FinalizeEncoder();
         void SetKeyFrame();
         void SetSize(int32 width, int32 height);
         void SetRate(uint32 rate);
         void CaptureFrame(std::vector<uint8>& data);
-        bool CopyRenderTexture(void*& dst, UnityFrameBuffer*& src);
-        bool CaptureStarted() { return captureStarted; }
+        bool CaptureStarted() const { return captureStarted; }
     private:
         // subclasses override this virtual method to provide a vector of fourccs, in
         // order of preference, that are expected by the media engine.
@@ -48,9 +48,9 @@ namespace WebRTC
             fourccs->push_back(cricket::FOURCC_H264);
             return true;
         }
-        UnityFrameBuffer* unityRT = nullptr;
+        void* unityRT = nullptr;
 
-        std::unique_ptr<NvEncoder> nvEncoder;
+        IEncoder* encoder_;
 
         //just fake info
         int32 width = 1280;

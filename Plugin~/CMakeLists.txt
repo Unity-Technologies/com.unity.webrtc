@@ -13,10 +13,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(WebRTC REQUIRED)
 if(APPLE)
   find_package(Framework REQUIRED)
+  find_package(GLEW 2.1.0 REQUIRED)
 elseif(UNIX)
-  find_package(GLEW2.1 REQUIRED)
   find_package(LibCXX REQUIRED)
+  find_package(GLEW2.1 REQUIRED)
 endif()
 include(AddPlugin)
 
+enable_testing()
 add_subdirectory(WebRTCPlugin)
+
+# WORKAROUND
+# add_subdirectory(WebRTCPluginTest)

@@ -253,9 +253,9 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
-            NativeMethods.RegisterDebugLog(null);
             s_context.Dispose();
             s_context = null;
+            NativeMethods.RegisterDebugLog(null);
         }
 
         internal static string GetModuleName()
@@ -335,7 +335,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void StopMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern CodecInitializationResult GetCodecInitializationResult();
+        public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]

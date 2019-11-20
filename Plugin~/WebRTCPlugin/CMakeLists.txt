@@ -1,4 +1,17 @@
-file(GLOB sources *.cpp *.h)
+file(GLOB sources
+  *.cpp
+  *.h
+  GraphicsDevice/*.h
+  GraphicsDevice/*.cpp
+  GraphicsDevice/OpenGL/*.h
+  GraphicsDevice/OpenGL/*.cpp
+  Codec/*.h
+  Codec/*.cpp
+  Codec/NvCodec/NvEncoder.cpp
+  Codec/NvCodec/NvEncoder.h
+  Codec/NvCodec/NvEncoderGL.cpp
+  Codec/NvCodec/NvEncoderGL.h
+)
 
 add_plugin(webrtc
   SOURCES ${sources}
@@ -19,10 +32,11 @@ elseif(APPLE OR UNIX)
 endif()
 
 if(APPLE)
-  target_compile_definitions(webrtc 
+  target_compile_definitions(webrtc
     PRIVATE
       WEBRTC_MAC
       WEBRTC_POSIX
+#      GLEW_STATIC
   )
   target_link_libraries(webrtc
      PRIVATE
@@ -54,6 +68,7 @@ endif()
 
 target_include_directories(webrtc
   PRIVATE
+    .
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}

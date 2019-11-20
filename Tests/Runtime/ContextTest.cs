@@ -25,7 +25,18 @@ class ContextTest
     [Category("Context")]
     public void Context_CreateAndDelete()
     {
-    	Context.Create();
+    	var context = Context.Create();
+        context.Dispose();
+    }
+
+    [Test]
+    [Category("Context")]
+    public void Context_GetCodecInitializationResult()
+    {
+        var context = Context.Create();
+        var result = context.GetCodecInitializationResult();
+        Assert.AreEqual(CodecInitializationResult.Success, result); 
+        context.Dispose();
     }
 
     [Test]
@@ -35,6 +46,7 @@ class ContextTest
         var context = Context.Create();
         var peerPtr = context.CreatePeerConnection();
         context.DeletePeerConnection(peerPtr);
+        context.Dispose();
     }
 
     [Test]
@@ -47,5 +59,6 @@ class ContextTest
         var channelPtr = context.CreateDataChannel(peerPtr, "test", ref init);
         context.DeleteDataChannel(channelPtr);
         context.DeletePeerConnection(peerPtr);
+        context.Dispose();
     }
 }

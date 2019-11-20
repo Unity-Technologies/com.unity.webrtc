@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include "DummyAudioDevice.h"
-#include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
-
+#include "Codec/IEncoder.h"
 
 namespace WebRTC
 {
     class Context;
     class PeerSDPObserver;
+    class IGraphicsDevice;
     class ContextManager
     {
     public:
@@ -17,20 +17,13 @@ namespace WebRTC
         Context* GetContext(int uid);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
-        CodecInitializationResult GetCodecInitializationResult() const;
 
     public:
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
-        std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
         void* hModule = nullptr;
     private:
         ~ContextManager();
-        CodecInitializationResult InitializeAndTryNvEnc();
-        CodecInitializationResult LoadNvEncApi();
-        CodecInitializationResult TryNvEnc();
-
-        CodecInitializationResult codecInitializationResult;
         std::map<int, ContextPtr> m_contexts;
         static ContextManager s_instance;
     };
@@ -39,24 +32,25 @@ namespace WebRTC
     {
     public:
         explicit Context(int uid = -1);
-        webrtc::MediaStreamInterface* CreateVideoStream(UnityFrameBuffer* frameBuffer, int width, int height);
+        ~Context();
+
+        CodecInitializationResult GetCodecInitializationResult();
+        webrtc::MediaStreamInterface* CreateVideoStream(void* frameBuffer, int width, int height);
         void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamInterface* CreateAudioStream();
         void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
-        ~Context();
-
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
 
         // You must call these methods on Rendering thread.
-        void InitializeEncoder();
+        bool InitializeEncoder(IGraphicsDevice* device);
         void EncodeFrame();
-        void FinalizerEncoder();
+        void FinalizeEncoder();
         //
 
         void StopCapturer() { nvVideoCapturer->Stop(); }
-        void ProcessAudioData(const float* data, int32 size) { audioDevice->ProcessAudioData(data, size); }
+        void ProcessAudioData(const float* data, int32 size);
 
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
         void DeleteDataChannel(DataChannelObject* obj);
@@ -76,7 +70,7 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
         //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
         std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
-        std::map<UnityFrameBuffer*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
+        std::map<const void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver

@@ -10,8 +10,23 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 7z x -aoa webrtc.zip -o%SOLUTION_DIR%\webrtc
 
 echo -------------------
-echo Build UnityRenderStreaming Plugin 
+echo Install nuget
+choco install nuget.commandline
 
-MSBuild %SOLUTION_DIR%\UnityRenderStreamingPlugin.sln -t:Rebuild -p:Configuration=Release
+echo -------------------
+echo Install nuget packages
+nuget restore %SOLUTION_DIR%\WebRTCPlugin.sln
+if not %errorlevel% == 0 exit 1
+
+echo -------------------
+echo Build com.unity.webrtc Plugin 
+
+MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Rebuild -p:Configuration=Release
+if not %errorlevel% == 0 exit 1
+
+echo -------------------
+echo Test com.unity.webrtc Plugin 
+
+%SOLUTION_DIR%\x64\Release\WebRTCPluginTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------
