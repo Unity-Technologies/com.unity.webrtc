@@ -177,7 +177,6 @@
     <ClInclude Include="Codec\IEncoder.h" />
     <ClInclude Include="Codec\NvCodec\nvEncodeAPI.h" />
     <ClInclude Include="Codec\NvCodec\NvEncoder.h" />
-    <ClInclude Include="Codec\NvCodec\NvEncoderD3D11.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="DataChannelObject.h" />
     <ClInclude Include="DummyAudioDevice.h" />
@@ -187,6 +186,7 @@
     <ClInclude Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="GraphicsDevice\GraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\GraphicsDeviceType.h" />
     <ClInclude Include="GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="Logger.h" />
@@ -200,7 +200,6 @@
     <ClCompile Include="Callback.cpp" />
     <ClCompile Include="Codec\EncoderFactory.cpp" />
     <ClCompile Include="Codec\NvCodec\NvEncoder.cpp" />
-    <ClCompile Include="Codec\NvCodec\NvEncoderD3D11.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DataChannelObject.cpp" />
     <ClCompile Include="DummyAudioDevice.cpp" />

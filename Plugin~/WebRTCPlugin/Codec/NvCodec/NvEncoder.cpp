@@ -1,8 +1,9 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "NvEncoder.h"
 #include "Context.h"
 #include <cstring>
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
 
 #if _WIN32
 #else
@@ -15,12 +16,25 @@ namespace WebRTC
     static std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
     static CodecInitializationResult initializationResult = CodecInitializationResult::NotInitialized;
 
-    NvEncoder::NvEncoder(
-        NV_ENC_DEVICE_TYPE type,
-        NV_ENC_INPUT_RESOURCE_TYPE inputType,
-        int width, int height, IGraphicsDevice* device)
-    : width(width), height(height), m_device(device), m_inputType(inputType)
+    NvEncoder::NvEncoder(int width, int height, IGraphicsDevice* device)
+    : width(width), height(height), m_device(device)
     {
+        NV_ENC_DEVICE_TYPE type = NV_ENC_DEVICE_TYPE_DIRECTX;
+
+        switch (device->GetDeviceType()) {
+            case GRAPHICS_DEVICE_D3D11: {
+                type = NV_ENC_DEVICE_TYPE_DIRECTX;
+                m_inputType =NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
+                break;
+            }
+            case GRAPHICS_DEVICE_OPENGL: {
+                type = NV_ENC_DEVICE_TYPE_OPENGL;
+                m_inputType =NV_ENC_INPUT_RESOURCE_TYPE_OPENGL_TEX;
+                break;
+            }
+        }
+       
+
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
         checkf(width > 0 && height > 0, "Invalid width or height!");
         bool result = true;
@@ -92,6 +106,9 @@ namespace WebRTC
         result = NV_RESULT(errorCode);
         checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
 #pragma endregion
+
+        InitEncoderResources();
+        isNvEncoderSupported = true;
     }
     NvEncoder::~NvEncoder()
     {
@@ -331,10 +348,9 @@ namespace WebRTC
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            void* buffer = AllocateInputBuffer();
-            renderTextures[i] = CreateTexture2DFromInputBuffer(buffer);
+            renderTextures[i] = m_device->CreateDefaultTextureV(width, height);
             Frame& frame = bufferedFrames[i];
-            frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
+            frame.inputFrame.registeredResource = RegisterResource(m_inputType, renderTextures[i]->GetNativeTexturePtrV());
             frame.inputFrame.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
             MapResources(frame.inputFrame);
             frame.outputFrame = InitializeBitstreamBuffer();

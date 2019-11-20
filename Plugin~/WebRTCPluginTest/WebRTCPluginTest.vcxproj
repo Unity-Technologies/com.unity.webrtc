@@ -45,7 +45,6 @@
     <ClInclude Include="..\WebRTCPlugin\Codec\IEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\nvEncodeAPI.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h" />
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
     <ClInclude Include="..\WebRTCPlugin\DataChannelObject.h" />
     <ClInclude Include="..\WebRTCPlugin\DummyAudioDevice.h" />
@@ -73,7 +72,6 @@
     <ClCompile Include="..\WebRTCPlugin\Callback.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\EncoderFactory.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Context.cpp" />
     <ClCompile Include="..\WebRTCPlugin\DataChannelObject.cpp" />
     <ClCompile Include="..\WebRTCPlugin\DummyAudioDevice.cpp" />

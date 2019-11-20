@@ -2,13 +2,7 @@
 #include "IEncoder.h"
 #include "EncoderFactory.h"
 
-#if defined(SUPPORT_OPENGL_CORE)
-#include "NvCodec/NvEncoderGL.h"
-#endif
-
-#if defined(SUPPORT_D3D11)
-#include "NvCodec/NvEncoderD3D11.h"
-#endif
+#include "NvCodec/NvEncoder.h"
 
 
 namespace WebRTC {
@@ -23,14 +17,7 @@ namespace WebRTC {
     }
     void EncoderFactory::Init(int width, int height, IGraphicsDevice* device)
     {
-#if defined(SUPPORT_OPENGL_CORE)
-        m_encoder = std::make_unique<NvEncoderGL>(width, height, device);
-#endif
-
-#if defined(SUPPORT_D3D11)
-        m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
-#endif
-
+        m_encoder = std::make_unique<NvEncoder>(width, height, device);
     }
     void EncoderFactory::Shutdown()
     {

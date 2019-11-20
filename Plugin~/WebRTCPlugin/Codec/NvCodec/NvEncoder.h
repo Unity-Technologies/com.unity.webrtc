@@ -29,10 +29,7 @@ namespace WebRTC
             std::atomic<bool> isEncoding = { false };
         };
     public:
-        NvEncoder(
-            NV_ENC_DEVICE_TYPE type,
-            NV_ENC_INPUT_RESOURCE_TYPE inputType,
-            int width, int height, IGraphicsDevice* device);
+        NvEncoder(int width, int height, IGraphicsDevice* device);
         virtual ~NvEncoder();
 
         static CodecInitializationResult InitializationResult();
@@ -59,9 +56,6 @@ namespace WebRTC
         void InitEncoderResources();
         void ReleaseEncoderResources();
         bool isNvEncoderSupported = false;
-
-        virtual void* AllocateInputBuffer() = 0;
-        virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) = 0;
 
     private:
         void ReleaseFrameInputBuffer(Frame& frame);

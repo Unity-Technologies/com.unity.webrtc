@@ -95,14 +95,14 @@
     <ClInclude Include="Codec\NvCodec\NvEncoder.h">
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
-    <ClInclude Include="Codec\NvCodec\NvEncoderD3D11.h">
-      <Filter>Codec\NvCodec</Filter>
-    </ClInclude>
     <ClInclude Include="Codec\EncoderFactory.h">
       <Filter>Codec</Filter>
     </ClInclude>
     <ClInclude Include="Codec\IEncoder.h">
       <Filter>Codec</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\GraphicsDeviceType.h">
+      <Filter>GraphicsDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +155,6 @@
       <Filter>GraphicsDevice\D3D12</Filter>
     </ClCompile>
     <ClCompile Include="Codec\NvCodec\NvEncoder.cpp">
-      <Filter>Codec\NvCodec</Filter>
-    </ClCompile>
-    <ClCompile Include="Codec\NvCodec\NvEncoderD3D11.cpp">
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
     <ClCompile Include="Codec\EncoderFactory.cpp">

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "GraphicsDevice/GraphicsDeviceType.h"
+
 namespace WebRTC {
 
 class ITexture2D;
@@ -16,6 +18,7 @@ public:
     virtual void* GetEncodeDevicePtrV() = 0;
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) = 0;
+    virtual GraphicsDeviceType GetDeviceType() = 0;
 
 };
 

@@ -64,9 +64,6 @@
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp">
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
-    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp">
-      <Filter>Codec\NvCodec</Filter>
-    </ClCompile>
     <ClCompile Include="VideoCapturerTest.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
@@ -163,9 +160,6 @@
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h">
-      <Filter>Codec\NvCodec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h">
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsDeviceTestBase.h">
