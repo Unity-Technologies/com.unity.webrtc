@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
-#include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
 #include "../WebRTCPlugin/Codec/IEncoder.h"
@@ -12,7 +11,6 @@ class ContextTest : public GraphicsDeviceTestBase
 {
 protected:
     IEncoder* encoder_ = nullptr;
-//    IGraphicsDevice* device_ = nullptr;
     const int width = 256;
     const int height = 256;
     std::unique_ptr<Context> context;

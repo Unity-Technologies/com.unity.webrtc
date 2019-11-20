@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDevice.h"
 
 //Graphics
@@ -12,6 +12,10 @@
 #endif
 
 #include "Vulkan/VulkanGraphicsDevice.h"
+
+#if defined(SUPPORT_METAL)
+#include "Metal/MetalGraphicsDevice.h"
+#endif
 
 namespace WebRTC {
 
@@ -89,6 +93,12 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
         );
         break;
     }
+    case kUnityGfxRendererMetal: {
+#if defined(SUPPORT_METAL)
+        m_device = new MetalGraphicsDevice();
+#endif
+            break;
+        }
     default: {
         DebugError("Unsupported Unity Renderer: %d", rendererType);
         return false;

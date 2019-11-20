@@ -15,6 +15,8 @@ file(GLOB sources
   ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
   ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
   ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
+  ../WebRTCPlugin/GraphicsDevice/Metal/*.h
+  ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
   ../WebRTCPlugin/Codec/*.h
   ../WebRTCPlugin/Codec/*.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
@@ -25,7 +27,30 @@ file(GLOB sources
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
 )
 
-add_executable(WebRTCPluginTest ${sources})
+if(APPLE)
+  file(GLOB append_source
+#   ../WebRTCPlugin/GraphicsDevice/Metal/*.h
+#   ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+#   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
+#   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
+  )
+  set(source source append_source)
+elseif(UNIX)
+  file(GLOB append_source
+   ../WebRTCPlugin/GraphicsDevice/OpenGL/*.h
+   ../WebRTCPlugin/GraphicsDevice/OpenGL/*.cpp
+   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
+   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
+  )
+
+  set(source source append_source)
+endif()
+
+
+
+
+
+add_executable(WebRTCPluginTest ${sources} ../unity/include/IUnityGraphicsMetal.h)
 
 if(APPLE OR UNIX)
   message(STATUS "macos or linux")
@@ -37,6 +62,9 @@ find_package(GTest REQUIRED)
 include(GoogleTest)
 
 if(APPLE)
+  set(CMAKE_C_FLAGS "-x objective-c")
+  set(CMAKE_CXX_FLAGS "-x objective-c++")
+
   target_compile_definitions(WebRTCPluginTest
     PRIVATE
     WEBRTC_MAC
@@ -47,13 +75,17 @@ if(APPLE)
     ${WEBRTC_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${FRAMEWORK_LIBS}
-    GTest::GTest
-    GTest::Main
+    ${GTEST_MAIN_LIBRARIES}
+    ${GTEST_LIBRARIES}
     )
+
+  target_include_directories(WebRTCPluginTest
+    PRIVATE
+
+  )
 elseif(UNIX)
   find_package(OpenGL REQUIRED)
   find_package(GLUT REQUIRED)
-
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 
   target_compile_definitions(WebRTCPluginTest
@@ -78,6 +110,7 @@ elseif(UNIX)
     PRIVATE
     ${CUDA_INCLUDE_DIRS}
     )
+    gtest_add_tests(TARGET WebRTCPluginTest)
 endif()
 
 target_include_directories(WebRTCPluginTest
@@ -89,5 +122,3 @@ target_include_directories(WebRTCPluginTest
   ${OPENGL_INCLUDE_DIR}
   ${GTEST_INCLUDE_DIRS}
 )
-
-gtest_add_tests(TARGET WebRTCPluginTest)

@@ -4,7 +4,6 @@ export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.we
 export SOLUTION_DIR=$(pwd)/Plugin~
 
 # Download LibWebRTC 
-
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 

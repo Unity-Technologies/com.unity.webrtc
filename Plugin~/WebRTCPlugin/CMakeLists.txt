@@ -14,6 +14,8 @@ file(GLOB sources
   GraphicsDevice/Vulkan/*.cpp
   GraphicsDevice/Vulkan/Cuda/*.h
   GraphicsDevice/Vulkan/Cuda/*.cpp
+  GraphicsDevice/Metal/*.h
+  GraphicsDevice/Metal/*.mm
   Codec/*.h
   Codec/*.cpp
   Codec/NvCodec/NvEncoder.cpp
@@ -43,6 +45,10 @@ elseif(APPLE OR UNIX)
 endif()
 
 if(APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
+  set(CMAKE_C_FLAGS "-x objective-c")
+  set(CMAKE_CXX_FLAGS "-x objective-c++")
+
   target_compile_definitions(webrtc
     PRIVATE
       WEBRTC_MAC

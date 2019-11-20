@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
+#include "../WebRTCPlugin/PlatformBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 
 using namespace WebRTC;
@@ -31,8 +32,17 @@ void* CreateDevice()
     EXPECT_NE(nullptr, pD3DDevice.Get());
     return pD3DDevice.Get();
 }
-#else
+#elif defined(SUPPORT_METAL)
 
+//#include "Unity/IUnityGraphicsMetal.h"
+#import <Metal/Metal.h>
+
+void* CreateDevice()
+{
+    return nullptr;
+}
+
+#else
 #include <GL/glut.h>
 
 static bool s_glutInitialized;
