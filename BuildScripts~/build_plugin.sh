@@ -8,9 +8,9 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install libc++, libc++abi googletest
+# Install libc++, libc++abi googletest clang
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
-sudo apt install -y libc++-dev libc++abi-dev googletest
+sudo apt install -y libc++-dev libc++abi-dev googletest clang
 
 # Install glew static library
 cd $SOLUTION_DIR
