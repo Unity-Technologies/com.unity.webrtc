@@ -218,7 +218,7 @@ namespace Unity.WebRTC
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             //rts[0] for render target, rts[1] for flip and WebRTC source
             rts[0] = new RenderTexture(width, height, 24, format);
-            rts[1] = new RenderTexture(width, height, 24, format);
+            rts[1] = new RenderTexture(width, height,  0, format);
             rts[0].Create();
             rts[1].Create();
             camCopyRts.Add(rts);
