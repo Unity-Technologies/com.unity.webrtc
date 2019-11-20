@@ -74,7 +74,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
             s_context->EncodeFrame();
             return;
         case VideoStreamRenderEventID::Finalize:
-            s_context->FinalizerEncoder();
+            s_context->FinalizeEncoder();
             GraphicsDevice::GetInstance().Shutdown();
             return;
         default:

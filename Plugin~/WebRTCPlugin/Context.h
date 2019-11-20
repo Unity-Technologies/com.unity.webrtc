@@ -46,7 +46,7 @@ namespace WebRTC
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IGraphicsDevice* device);
         void EncodeFrame();
-        void FinalizerEncoder();
+        void FinalizeEncoder();
         //
 
         void StopCapturer() { nvVideoCapturer->Stop(); }

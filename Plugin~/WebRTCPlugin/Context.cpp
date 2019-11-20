@@ -170,7 +170,7 @@ namespace WebRTC
     {
         nvVideoCapturer->EncodeVideoData();
     }
-    void Context::FinalizerEncoder()
+    void Context::FinalizeEncoder()
     {
         nvVideoCapturer->FinalizeEncoder();
     }
