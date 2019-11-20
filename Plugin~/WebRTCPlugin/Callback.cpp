@@ -18,7 +18,7 @@ namespace WebRTC
     IGraphicsDevice* s_device;
 }
 using namespace WebRTC;
-//get d3d11 device
+
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch (eventType)

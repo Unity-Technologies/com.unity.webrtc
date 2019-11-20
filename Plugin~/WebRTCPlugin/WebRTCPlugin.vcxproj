@@ -74,16 +74,24 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>webrtc</TargetName>
     <OutDir>..\..\Runtime\Plugins\x86_64</OutDir>
+    <IncludePath>C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>webrtc</TargetName>
+    <IncludePath>C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
