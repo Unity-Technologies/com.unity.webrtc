@@ -34,7 +34,7 @@ protected:
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     context->InitializeEncoder(m_device);
-    context->FinalizerEncoder();
+    context->FinalizeEncoder();
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoStream) {
@@ -42,7 +42,7 @@ TEST_P(ContextTest, CreateAndDeleteVideoStream) {
     auto tex = m_device->CreateDefaultTextureV(width, height);
     const auto stream = context->CreateVideoStream(tex->GetEncodeTexturePtrV(), width, height);
     context->DeleteVideoStream(stream);
-    context->FinalizerEncoder();
+    context->FinalizeEncoder();
 }
 
 TEST_P(ContextTest, CreateAndDeleteAudioStream) {
