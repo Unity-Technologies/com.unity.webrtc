@@ -8,9 +8,9 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install libc++, libc++abi libgtest
+# Install libc++, libc++abi googletest
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
-sudo apt install -y libc++-dev libc++abi-dev
+sudo apt install -y libc++-dev libc++abi-dev googletest
 
 # Install glew static library
 cd $SOLUTION_DIR
@@ -21,20 +21,23 @@ make glew.lib.static
 find include -name "*.h" -print | cpio -pd "$SOLUTION_DIR/glew"
 find lib -name "*.a" -print | cpio -pd "$SOLUTION_DIR/glew"
 
-# WORKAROUND 
 # Install googletest
-# sudo apt install -y googletest=1.8.0-6
-# cd /usr/src/googletest
-# sudo patch "googletest/cmake/internal_utils.cmake" < "$SOLUTION_DIR/BuildScripts~/gtest/internal_utils.cmake.patch"
-# sudo patch "googletest/CMakeLists.txt"             < "$SOLUTION_DIR/BuildScripts~/gtest/CMakeLists.txt.patch"
-# sudo cmake -Dcxx_no_rtti=ON \
-#            -DCMAKE_CXX_FLAGS=-nostdinc++ \
-#            .
-# sudo make
-# sudo cp googletest/*.a /usr/lib
-# sudo cp googlemock/*.a /usr/lib
+cd /usr/src/googletest
+sudo cmake -Dcxx_no_rtti=ON \
+           -DCMAKE_C_COMPILER="clang" \
+           -DCMAKE_CXX_COMPILER="clang++" \
+           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+           CMakeLists.txt
+sudo make
+sudo cp googlemock/*.a "/usr/lib"
+sudo cp googlemock/gtest/*.a "/usr/lib"
 
 # Build UnityRenderStreaming Plugin 
-cd $SOLUTION_DIR
-cmake .
+cd "$SOLUTION_DIR"
+cmake -DCMAKE_C_COMPILER="clang" \
+      -DCMAKE_CXX_COMPILER="clang++" \
+      .
 make
+
+# Run UnitTest
+"$SOLUTION_DIR/WebRTCPluginTest/WebRTCPluginTest"

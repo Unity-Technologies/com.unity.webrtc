@@ -22,6 +22,4 @@ include(AddPlugin)
 
 enable_testing()
 add_subdirectory(WebRTCPlugin)
-
-# WORKAROUND
-# add_subdirectory(WebRTCPluginTest)
+add_subdirectory(WebRTCPluginTest)
