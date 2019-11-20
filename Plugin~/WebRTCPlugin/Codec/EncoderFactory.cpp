@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "IEncoder.h"
 #include "EncoderFactory.h"
-#include "NvCodec/NvEncoder.h"
 
 #if defined(SUPPORT_OPENGL_CORE)
 #include "NvCodec/NvEncoderGL.h"
@@ -41,5 +40,4 @@ namespace WebRTC {
     {
         return m_encoder.get();
     }
-
 }

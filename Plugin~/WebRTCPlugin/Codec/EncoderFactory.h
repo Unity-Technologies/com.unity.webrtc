@@ -13,6 +13,9 @@ namespace WebRTC {
         void Shutdown();
         IEncoder *GetEncoder() const;
     private:
+        EncoderFactory() = default;
+        EncoderFactory(EncoderFactory const&) = delete;
+        EncoderFactory& operator=(EncoderFactory const&) = delete;
         std::unique_ptr<IEncoder> m_encoder = nullptr;
     };
 }
