@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/PlatformBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
@@ -64,8 +64,10 @@ std::tuple<UnityGfxRenderer, void*> GraphicsDeviceTestBase::CreateParameter()
 {
 #if defined(SUPPORT_D3D11)
     auto unityGfxRenderer = kUnityGfxRendererD3D11;
-#else
+#elif defined(SUPPORT_OPENGL_CORE)
     auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;
+#elif defined(SUPPORT_METAL)
+    auto unityGfxRenderer = kUnityGfxRendererMetal;
 #endif
     return std::make_tuple(unityGfxRenderer, CreateDevice());
 }
