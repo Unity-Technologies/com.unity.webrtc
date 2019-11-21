@@ -10,16 +10,16 @@ class D3D11GraphicsDevice : public IGraphicsDevice{
 public:
     D3D11GraphicsDevice(ID3D11Device* nativeDevice);
     virtual ~D3D11GraphicsDevice();
-    virtual bool InitV();
-    virtual void ShutdownV();
-    inline virtual void* GetEncodeDevicePtrV();
-    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h);
-    virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h);
-    virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
-    virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
-    virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
-    inline virtual GraphicsDeviceType GetDeviceType();
-    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex);
+    virtual bool InitV() override;
+    virtual void ShutdownV() override;
+    inline virtual void* GetEncodeDevicePtrV() override;
+    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h) override;
+    virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h) override;
+    virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) override;
+    virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+    virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+    inline virtual GraphicsDeviceType GetDeviceType() override;
+    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
 private:
     ID3D11Device* m_d3d11Device;
