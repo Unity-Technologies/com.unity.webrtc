@@ -19,12 +19,14 @@ public:
     virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
+    inline virtual GraphicsDeviceType GetDeviceType();
 
 private:
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
 };
 
 void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }
+GraphicsDeviceType OpenGLGraphicsDevice::GetDeviceType() { return GRAPHICS_DEVICE_OPENGL; }
 
 //---------------------------------------------------------------------------------------------------------------------
 }
