@@ -1,3 +1,8 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(webrtc-plugin)
+
+
 file(GLOB sources
   *.cpp
   *.h
@@ -46,10 +51,7 @@ if(APPLE)
      ${FRAMEWORK_LIBS}
   )
 elseif(UNIX)
-  set(CMAKE_C_COMPILER_ID Clang)
-  set(CMAKE_CXX_COMPILER_ID Clang)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 
   target_compile_definitions(webrtc
     PRIVATE
@@ -62,7 +64,6 @@ elseif(UNIX)
     ${WEBRTC_LIBRARIES}
     ${GLEW_STATIC_LIBRARY}
     ${OPENGL_LIBRARIES}
-    ${LIBCXX_LIBRARIES}
   )
 endif()
 
@@ -73,5 +74,4 @@ target_include_directories(webrtc
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIRS}
-    ${LIBCXX_INCLUDE_DIRS}
 )

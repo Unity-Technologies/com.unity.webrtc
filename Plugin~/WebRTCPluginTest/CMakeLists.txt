@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+project(webrtc-test)
+
 file(GLOB sources
   *.cpp
   *.h
@@ -47,10 +49,7 @@ if(APPLE)
     GTest::Main
     )
 elseif(UNIX)
-  set(CMAKE_C_COMPILER_ID Clang)
-  set(CMAKE_CXX_COMPILER_ID Clang)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 
   target_compile_definitions(WebRTCPluginTest
     PRIVATE
@@ -67,7 +66,6 @@ elseif(UNIX)
     ${GLUT_LIBRARY}
     ${X11_LIBRARIES}
     ${CMAKE_DL_LIBS}
-    ${LIBCXX_LIBRARIES}
     ${GTEST_MAIN_LIBRARIES}
     ${GTEST_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
@@ -84,7 +82,6 @@ target_include_directories(WebRTCPluginTest
   ${OPENGL_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIRS}
   ${GTEST_INCLUDE_DIRS}
-  ${LIBCXX_INCLUDE_DIRS}
 )
 
 gtest_add_tests(TARGET WebRTCPluginTest)
