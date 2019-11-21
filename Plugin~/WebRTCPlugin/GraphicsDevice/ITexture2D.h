@@ -2,7 +2,7 @@
 
 namespace WebRTC {
 
-struct ITexture2D {
+class ITexture2D {
 public:
     //[TODO-Sin: 2019-19-11] ITexture2D should not be created directly, but should be called using
     //GraphicsDevice->CreateDefaultTexture

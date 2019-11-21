@@ -14,7 +14,8 @@ namespace WebRTC {
 
     class IEncoder {
     public:
-        virtual ~IEncoder() {};
+        virtual ~IEncoder() {};        
+        virtual void InitV() = 0;   //Can throw exception. 
         virtual void SetRate(uint32_t rate) = 0;
         virtual void UpdateSettings() = 0;
         virtual bool CopyBuffer(void* frame) = 0;

@@ -35,6 +35,7 @@ namespace WebRTC
             int width, int height, IGraphicsDevice* device);
         virtual ~NvEncoder();
 
+        virtual void InitV() override;
         static CodecInitializationResult InitializationResult();
         static CodecInitializationResult LoadCodec();
         static void UnloadCodec();
@@ -54,16 +55,18 @@ namespace WebRTC
         int height = 1080;
         int pitch = 0;
         IGraphicsDevice* m_device;
+
+        NV_ENC_DEVICE_TYPE m_deviceType;
         NV_ENC_INPUT_RESOURCE_TYPE m_inputType;
 
-        void InitEncoderResources();
-        void ReleaseEncoderResources();
         bool isNvEncoderSupported = false;
 
-        virtual void* AllocateInputBuffer() = 0;
-        virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) = 0;
+        virtual void* AllocateInputResourceV(ITexture2D* tex) = 0;
 
     private:
+        void InitEncoderResources();
+        void ReleaseEncoderResources();
+
         void ReleaseFrameInputBuffer(Frame& frame);
         void ProcessEncodedFrame(Frame& frame);
         NV_ENC_REGISTERED_PTR RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE type, void *pBuffer);

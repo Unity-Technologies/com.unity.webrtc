@@ -10,6 +10,7 @@
 #include "NvCodec/NvEncoderD3D11.h"
 #endif
 
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace WebRTC {
 
@@ -21,16 +22,31 @@ namespace WebRTC {
     {
         return m_encoder.get() != nullptr;
     }
+
+    //Can throw exception. The caller is expected to catch it.
     void EncoderFactory::Init(int width, int height, IGraphicsDevice* device)
     {
-#if defined(SUPPORT_OPENGL_CORE)
-        m_encoder = std::make_unique<NvEncoderGL>(width, height, device);
-#endif
-
+        const GraphicsDeviceType deviceType = device->GetDeviceType();
+        switch (deviceType) {
 #if defined(SUPPORT_D3D11)
-        m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+            case GRAPHICS_DEVICE_D3D11: {
+                m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+                break;
+            }
 #endif
+#if defined(SUPPORT_OPENGL_CORE)
+            case GRAPHICS_DEVICE_OPENGL: {
+                m_encoder = std::make_unique<NvEncoderGL>(width, height, device);
+                break;
+            }
+#endif
+            default: {
+                throw std::invalid_argument("Invalid device to initialize NvEncoder");
+                break;
+            }           
+        }
 
+        m_encoder->InitV();
     }
     void EncoderFactory::Shutdown()
     {

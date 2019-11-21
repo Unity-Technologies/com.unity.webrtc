@@ -4,7 +4,7 @@
 
 namespace WebRTC {
 
-struct ITexture2D;
+class ITexture2D;
 
 //Singleton
 class GraphicsDevice {

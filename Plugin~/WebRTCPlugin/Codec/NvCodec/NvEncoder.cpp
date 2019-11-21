@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "NvEncoder.h"
 #include "Context.h"
 #include <cstring>
@@ -16,13 +16,16 @@ namespace WebRTC
     static CodecInitializationResult initializationResult = CodecInitializationResult::NotInitialized;
 
     NvEncoder::NvEncoder(
-        NV_ENC_DEVICE_TYPE type,
-        NV_ENC_INPUT_RESOURCE_TYPE inputType,
-        int width, int height, IGraphicsDevice* device)
-    : width(width), height(height), m_device(device), m_inputType(inputType)
+        const NV_ENC_DEVICE_TYPE type,
+        const NV_ENC_INPUT_RESOURCE_TYPE inputType,
+        const int width, const int height, IGraphicsDevice* device)
+    : width(width), height(height), m_device(device), m_deviceType(type), m_inputType(inputType)
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
-        checkf(width > 0 && height > 0, "Invalid width or height!");
+        checkf(width > 0 && height > 0, "Invalid width or height!");        
+    }
+
+    void NvEncoder::InitV()  {
         bool result = true;
         if (initializationResult == CodecInitializationResult::NotInitialized)
         {
@@ -34,13 +37,13 @@ namespace WebRTC
         }
 #pragma region open an encode session
         //open an encode session
-        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncdoeSessionExParams = { 0 };
-        openEncdoeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
+        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncodeSessionExParams = { 0 };
+        openEncodeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
 
-        openEncdoeSessionExParams.device = device->GetEncodeDevicePtrV();
-        openEncdoeSessionExParams.deviceType = type;
-        openEncdoeSessionExParams.apiVersion = NVENCAPI_VERSION;
-        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncdoeSessionExParams, &pEncoderInterface);
+        openEncodeSessionExParams.device = m_device->GetEncodeDevicePtrV();
+        openEncodeSessionExParams.deviceType = m_deviceType;
+        openEncodeSessionExParams.apiVersion = NVENCAPI_VERSION;
+        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &pEncoderInterface);
         checkf(NV_RESULT(errorCode), StringFormat("Unable to open NvEnc encode session %d", errorCode).c_str());
 #pragma endregion
 #pragma region set initialization parameters
@@ -92,6 +95,10 @@ namespace WebRTC
         result = NV_RESULT(errorCode);
         checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
 #pragma endregion
+
+        InitEncoderResources();
+        isNvEncoderSupported = true;
+
     }
     NvEncoder::~NvEncoder()
     {
@@ -331,8 +338,9 @@ namespace WebRTC
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            void* buffer = AllocateInputBuffer();
-            renderTextures[i] = CreateTexture2DFromInputBuffer(buffer);
+            renderTextures[i] = m_device->CreateDefaultTextureV(width, height);
+            void* buffer = AllocateInputResourceV(renderTextures[i]);
+
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
             frame.inputFrame.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
