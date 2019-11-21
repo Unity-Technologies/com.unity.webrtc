@@ -4,11 +4,10 @@
 #include "WebRTCConstants.h"
 
 namespace WebRTC {
-
-
+    class MTLDevice;
     class MetalGraphicsDevice : public IGraphicsDevice{
     public:
-        MetalGraphicsDevice();
+        MetalGraphicsDevice(void* device);
         virtual ~MetalGraphicsDevice();
 
         virtual bool InitV();
@@ -19,6 +18,8 @@ namespace WebRTC {
         virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
+    private:
+        MTLDevice* m_device;
     };
 
     void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }

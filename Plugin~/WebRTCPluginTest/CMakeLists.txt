@@ -25,14 +25,16 @@ file(GLOB sources
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
+  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
+  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
 )
 
 if(APPLE)
   file(GLOB append_source
-#   ../WebRTCPlugin/GraphicsDevice/Metal/*.h
-#   ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
-#   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
-#   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
+   #../WebRTCPlugin/GraphicsDevice/Metal/*.h
+   #../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+   #../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
+   #../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
   )
   set(source source append_source)
 elseif(UNIX)

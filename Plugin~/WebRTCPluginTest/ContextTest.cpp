@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
@@ -56,6 +56,7 @@ TEST_P(ContextTest, CreateAndDeletePeerConnection) {
 TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     const auto connection = context->CreatePeerConnection();
     RTCDataChannelInit init;
+    init.protocol = "";
     const auto channel = context->CreateDataChannel(connection, "test", init);
     context->DeleteDataChannel(channel);
     context->DeletePeerConnection(connection);

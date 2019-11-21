@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "IEncoder.h"
 #include "Context.h"
 #include "EncoderFactory.h"
@@ -15,6 +15,9 @@
 #include "NvCodec/NvEncoderCuda.h"
 
 #include "GraphicsDevice/IGraphicsDevice.h"
+#if defined(SUPPORT_METAL)
+#include "VideoToolbox/VTEncoderMetal.h"
+#endif
 
 namespace WebRTC {
 
@@ -60,6 +63,10 @@ namespace WebRTC {
         }
 
         m_encoder->InitV();
+#if defined(SUPPORT_METAL)
+        m_encoder = std::make_unique<VTEncoderMetal>(width, height, device);
+#endif
+
     }
     void EncoderFactory::Shutdown()
     {

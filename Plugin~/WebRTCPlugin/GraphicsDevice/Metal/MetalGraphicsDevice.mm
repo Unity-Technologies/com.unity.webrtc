@@ -1,10 +1,13 @@
 #include "pch.h"
 #include "MetalGraphicsDevice.h"
 #include "MetalTexture2D.h"
+#import <Metal/Metal.h>
 
 namespace WebRTC {
 
-    MetalGraphicsDevice::MetalGraphicsDevice() {
+    MetalGraphicsDevice::MetalGraphicsDevice(void* device)
+        : m_device(static_cast<MTLDevice*>(device))
+    {
     }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -23,7 +26,12 @@ namespace WebRTC {
 
 //---------------------------------------------------------------------------------------------------------------------
     ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
-        return nullptr;
+        MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
+        textureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+        textureDescriptor.width = w;
+        textureDescriptor.height = h;
+        id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
+        return new MetalTexture2D(w, h, texture);
     }
 
 //---------------------------------------------------------------------------------------------------------------------

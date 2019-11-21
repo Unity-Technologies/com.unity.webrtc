@@ -5,9 +5,10 @@
 
 namespace WebRTC {
 
+    class MTLTexture;
     struct MetalTexture2D : ITexture2D {
     public:
-        void* m_texture;
+        MTLTexture* m_texture;
 
         MetalTexture2D(uint32_t w, uint32_t h, void* tex);
 

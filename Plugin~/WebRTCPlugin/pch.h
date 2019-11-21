@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #pragma region webRTC related
 #include "api/mediastreaminterface.h"
 #include "api/peerconnectioninterface.h"
@@ -77,6 +77,10 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
+
+#if defined(SUPPORT_METAL)
+#include "IUnityGraphicsMetal.h"
 #endif
 
 #include "IUnityGraphics.h"
