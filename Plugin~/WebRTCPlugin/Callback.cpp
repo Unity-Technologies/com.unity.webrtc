@@ -25,7 +25,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
     case kUnityGfxDeviceEventInitialize:
     {
-        GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
         break;
     }
     case kUnityGfxDeviceEventShutdown:
