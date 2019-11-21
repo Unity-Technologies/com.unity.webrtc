@@ -42,7 +42,7 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         }
         case kUnityGfxRendererVulkan : {
             UnityVulkanInstance vulkan = unityInterface->Get<IUnityGraphicsVulkan>()->Instance();
-            return Init(m_rendererType, reinterpret_cast<void*>(&vulkan));
+            return Init(rendererType, reinterpret_cast<void*>(&vulkan));
         }
         default: {
             DebugError("Unsupported Unity Renderer: %d", m_rendererType);
