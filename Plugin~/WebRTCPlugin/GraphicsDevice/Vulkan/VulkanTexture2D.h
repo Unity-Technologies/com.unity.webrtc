@@ -17,6 +17,7 @@ public:
     bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device); 
     void Shutdown(); 
 
+    //[TODO-sin: 2019-11-21] Native and Texture are probably used the other way around
     inline virtual void* GetNativeTexturePtrV() override;
     inline virtual const void* GetNativeTexturePtrV() const override;
     inline virtual void* GetEncodeTexturePtrV() override;

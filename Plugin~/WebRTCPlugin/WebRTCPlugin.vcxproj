@@ -204,6 +204,7 @@
     <ClInclude Include="GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaContext.h" />
     <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaImage.h" />
+    <ClInclude Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\Vulkan\VulkanTexture2D.h" />
     <ClInclude Include="GraphicsDevice\Vulkan\VulkanUtility.h" />
     <ClInclude Include="Logger.h" />
@@ -233,6 +234,7 @@
     <ClCompile Include="GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaContext.cpp" />
     <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaImage.cpp" />
+    <ClCompile Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp" />
     <ClCompile Include="GraphicsDevice\Vulkan\VulkanTexture2D.cpp" />
     <ClCompile Include="GraphicsDevice\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="Logger.cpp" />
