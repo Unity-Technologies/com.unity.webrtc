@@ -7,11 +7,13 @@
 namespace WebRTC {
 
 VulkanGraphicsDevice::VulkanGraphicsDevice( const VkInstance instance, const VkPhysicalDevice physicalDevice,
-    const VkDevice device, const VkQueue graphicsQueue)
+    const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex)
     : m_instance (instance)
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
+    , m_queueFamilyIndex(queueFamilyIndex)
+    , m_commandPool(VK_NULL_HANDLE)
 {
 }
 
@@ -20,12 +22,15 @@ bool VulkanGraphicsDevice::InitV() {
     if (CUDA_SUCCESS!=m_cudaContext.Init(m_instance, m_physicalDevice))
         return false;
 
-    return true;
+    return (VK_SUCCESS == CreateCommandPool());
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 void VulkanGraphicsDevice::ShutdownV() {
+    VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
+
     m_cudaContext.Shutdown();
 }
 
@@ -60,6 +65,16 @@ bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
 bool VulkanGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
     //[TODO-sin: 2019-11-20] Fix this
     return false;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+VkResult VulkanGraphicsDevice::CreateCommandPool() {
+    VkCommandPoolCreateInfo poolInfo = {};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = m_queueFamilyIndex;
+    poolInfo.flags = 0; 
+
+    return vkCreateCommandPool(m_device, &poolInfo, m_allocator, &m_commandPool);
 }
 
 } //end namespace

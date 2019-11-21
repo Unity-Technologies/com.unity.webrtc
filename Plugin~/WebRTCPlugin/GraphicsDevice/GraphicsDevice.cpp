@@ -82,7 +82,8 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device)
             vulkan->instance,
             vulkan->physicalDevice,
             vulkan->device,
-            vulkan->graphicsQueue
+            vulkan->graphicsQueue,
+            vulkan->queueFamilyIndex
         );
         break;
     }
