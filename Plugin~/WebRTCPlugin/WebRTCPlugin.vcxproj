@@ -185,6 +185,7 @@
     <ClInclude Include="Codec\IEncoder.h" />
     <ClInclude Include="Codec\NvCodec\nvEncodeAPI.h" />
     <ClInclude Include="Codec\NvCodec\NvEncoder.h" />
+    <ClInclude Include="Codec\NvCodec\NvEncoderCuda.h" />
     <ClInclude Include="Codec\NvCodec\NvEncoderD3D11.h" />
     <ClInclude Include="Codec\SoftwareCodec\SoftwareEncoder.h" />
     <ClInclude Include="Context.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="Callback.cpp" />
     <ClCompile Include="Codec\EncoderFactory.cpp" />
     <ClCompile Include="Codec\NvCodec\NvEncoder.cpp" />
+    <ClCompile Include="Codec\NvCodec\NvEncoderCuda.cpp" />
     <ClCompile Include="Codec\NvCodec\NvEncoderD3D11.cpp" />
     <ClCompile Include="Codec\SoftwareCodec\SoftwareEncoder.cpp" />
     <ClCompile Include="Context.cpp" />

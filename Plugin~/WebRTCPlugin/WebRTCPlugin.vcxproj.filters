@@ -112,6 +112,8 @@
     </ClInclude>
     <ClInclude Include="Codec\SoftwareCodec\SoftwareEncoder.h">
       <Filter>Codec\SoftwareCodec</Filter>
+    <ClInclude Include="Codec\NvCodec\NvEncoderCuda.h">
+      <Filter>Codec\NvCodec</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +179,8 @@
     </ClCompile>
     <ClCompile Include="Codec\SoftwareCodec\SoftwareEncoder.cpp">
       <Filter>Codec\SoftwareCodec</Filter>
+    <ClCompile Include="Codec\NvCodec\NvEncoderCuda.cpp">
+      <Filter>Codec\NvCodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
