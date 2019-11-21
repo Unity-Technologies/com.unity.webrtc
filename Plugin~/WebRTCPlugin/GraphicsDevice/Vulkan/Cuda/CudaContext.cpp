@@ -12,11 +12,6 @@ CudaContext::CudaContext() : m_context(nullptr) {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-CudaContext::~CudaContext() {
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-
 CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice) {
 
     CUdevice dev;
@@ -60,9 +55,7 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
     }
 
     result = cuCtxCreate(&m_context, 0, dev);
-    if (result != CUDA_SUCCESS) {
-        return result;
-    }
+    return result;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
