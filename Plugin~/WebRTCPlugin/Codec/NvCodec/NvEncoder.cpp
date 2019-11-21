@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "NvEncoder.h"
 #include "Context.h"
 #include <cstring>
@@ -92,6 +92,10 @@ namespace WebRTC
         result = NV_RESULT(errorCode);
         checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
 #pragma endregion
+
+        InitEncoderResources();
+        isNvEncoderSupported = true;
+
     }
     NvEncoder::~NvEncoder()
     {
@@ -331,8 +335,9 @@ namespace WebRTC
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            void* buffer = AllocateInputBuffer();
-            renderTextures[i] = CreateTexture2DFromInputBuffer(buffer);
+            renderTextures[i] = m_device->CreateDefaultTextureV(width, height);
+            void* buffer = AllocateInputResourceV(renderTextures[i]);
+
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
             frame.inputFrame.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;

@@ -60,8 +60,7 @@ namespace WebRTC
         void ReleaseEncoderResources();
         bool isNvEncoderSupported = false;
 
-        virtual void* AllocateInputBuffer() = 0;
-        virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) = 0;
+        virtual void* AllocateInputResourceV(ITexture2D* tex) = 0;
 
     private:
         void ReleaseFrameInputBuffer(Frame& frame);

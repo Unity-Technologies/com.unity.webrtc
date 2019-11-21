@@ -187,6 +187,7 @@
     <ClInclude Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="GraphicsDevice\GraphicsDevice.h" />
+    <ClInclude Include="GraphicsDevice\GraphicsDeviceType.h" />
     <ClInclude Include="GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="Logger.h" />

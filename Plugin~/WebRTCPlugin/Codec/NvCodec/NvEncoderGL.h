@@ -7,7 +7,6 @@ namespace WebRTC {
         NvEncoderGL(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
         virtual ~NvEncoderGL();
     protected:
-        virtual void* AllocateInputBuffer() override;
-        virtual ITexture2D* CreateTexture2DFromInputBuffer(void* buffer) override;
+        void* AllocateInputResourceV(ITexture2D* tex);
     };
 }
