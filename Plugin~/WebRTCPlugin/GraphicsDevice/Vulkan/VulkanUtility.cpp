@@ -185,8 +185,174 @@ void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory
         return nullptr;
     }
 
-    return (void *)handle;
+    return reinterpret_cast<void*>(handle);
 }
 #endif
+
+//---------------------------------------------------------------------------------------------------------------------
+
+VkCommandBuffer VulkanUtility::BeginOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool) {
+    //Create a command buffer to copy
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; //used only once
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+   
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+
+//Uses vkQueueWaitIdle to synchronize
+void  VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
+                                                  const VkQueue queue, VkCommandBuffer commandBuffer)
+{
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(queue);
+
+    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+   
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+
+void VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
+                                          const VkImage image, const VkFormat format, 
+                                          const VkImageLayout oldLayout, const VkPipelineStageFlags oldStage,
+                                          const VkImageLayout newLayout, const VkPipelineStageFlags newStage) 
+{ 
+
+    const VkCommandBuffer commandBuffer = BeginOneTimeCommandBuffer(device, commandPool);
+
+    VkImageMemoryBarrier barrier = {};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //for transferring queue family ownership
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    
+    barrier.image = image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1; //No mip map
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+	switch (oldLayout) 	{
+	    case VK_IMAGE_LAYOUT_UNDEFINED:
+	        // undefined (or does not matter). Only valid as initial layout
+		    // No flags required.
+		    barrier.srcAccessMask = 0;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_PREINITIALIZED:
+		    // Image is preinitialized. Only valid as initial layout for linear images, preserves memory contents
+		    // Make sure host writes have been finished
+		    barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		    // Image is a color attachment
+		    // Make sure any writes to the color buffer have been finished
+		    barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+		    // Image is a depth/stencil attachment
+		    // Make sure any writes to the depth/stencil buffer have been finished
+		    barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		    // Image is a transfer source 
+		    // Make sure any reads from the image have been finished
+		    barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		    // Image is a transfer destination
+		    // Make sure any writes to the image have been finished
+		    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		    // Image is read by a shader
+		    // Make sure any shader reads from the image have been finished
+		    barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		    break;
+	    default:
+		    // Other source layouts aren't handled (yet)
+		    break;
+	}
+
+	switch (newLayout) 	{
+	    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		    // Image will be used as a transfer destination
+		    // Make sure any writes to the image have been finished
+		    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		    // Image will be used as a transfer source
+		    // Make sure any reads from the image have been finished
+		    barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		    // Image will be used as a color attachment
+		    // Make sure any writes to the color buffer have been finished
+		    barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+		    // Image layout will be used as a depth/stencil attachment
+		    // Make sure any writes to depth/stencil buffer have been finished
+		    barrier.dstAccessMask = barrier.dstAccessMask | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		    break;
+
+	    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		    // Image will be read in a shader (sampler, input attachment)
+		    // Make sure any writes to the image have been finished
+		    if (barrier.srcAccessMask == 0) {
+			    barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+		    }
+		    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		    break;
+	    default:
+		    // Other source layouts aren't handled (yet)
+		    break;
+	}
+
+
+
+    vkCmdPipelineBarrier(
+        commandBuffer,
+        oldStage, newStage,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrier
+    );
+
+    EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+}
+
 
 } //end namespace
