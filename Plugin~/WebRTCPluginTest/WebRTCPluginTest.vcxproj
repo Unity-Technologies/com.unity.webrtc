@@ -34,7 +34,18 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(ProjectDir)..\webrtc\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\webrtc\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64;C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\webrtc\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64;C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\unity\include\IUnityGraphics.h" />
@@ -45,6 +56,7 @@
     <ClInclude Include="..\WebRTCPlugin\Codec\IEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\nvEncodeAPI.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
@@ -74,6 +86,7 @@
     <ClCompile Include="..\WebRTCPlugin\Callback.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\EncoderFactory.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Context.cpp" />
@@ -125,6 +138,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>cuda.lib;vulkan-1.lib;jsoncpp.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -141,6 +155,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>cuda.lib;vulkan-1.lib;jsoncpp.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,6 +172,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalDependencies>cuda.lib;vulkan-1.lib;jsoncpp.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -174,7 +190,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>jsoncpp.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cuda.lib;vulkan-1.lib;jsoncpp.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

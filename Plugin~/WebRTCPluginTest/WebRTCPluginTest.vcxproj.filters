@@ -78,6 +78,8 @@
     </ClCompile>
     <ClCompile Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.cpp">
       <Filter>Codec\SoftwareCodec</Filter>
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp">
+      <Filter>Codec\NvCodec</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +178,8 @@
     </ClInclude>
     <ClInclude Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.h">
       <Filter>Codec\SoftwareCodec</Filter>
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.h">
+      <Filter>Codec\NvCodec</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
