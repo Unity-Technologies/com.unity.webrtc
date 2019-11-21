@@ -46,6 +46,7 @@ namespace WebRTC {
             }           
         }
 
+        m_encoder->InitV();
     }
     void EncoderFactory::Shutdown()
     {
