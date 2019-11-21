@@ -12,8 +12,8 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( const VkInstance instance, const VkP
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
-    , m_queueFamilyIndex(queueFamilyIndex)
     , m_commandPool(VK_NULL_HANDLE)
+    , m_queueFamilyIndex(queueFamilyIndex)
 {
 }
 
@@ -46,12 +46,6 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
         return nullptr;
     }
     return vulkanTexture;
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
-    //[TODO-sin: 2019-11-20] Fix this
-    return CreateDefaultTextureV(w,h);
 }
 
 

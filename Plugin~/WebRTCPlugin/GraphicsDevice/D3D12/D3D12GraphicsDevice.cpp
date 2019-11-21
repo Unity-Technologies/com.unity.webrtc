@@ -64,19 +64,15 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+
 ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
     assert(false && "CreateCPUReadTextureV need to implement on D3D12");
     return nullptr;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
-    return CreateSharedD3D12Texture(w,h);
-}
 
-
-//---------------------------------------------------------------------------------------------------------------------
-bool D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
+    bool D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     //[TODO-sin: 2019-10-15] Implement copying native resource
     return true;
 }

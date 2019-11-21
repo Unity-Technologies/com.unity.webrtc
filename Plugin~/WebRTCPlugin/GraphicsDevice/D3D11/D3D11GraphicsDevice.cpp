@@ -61,14 +61,6 @@ ITexture2D* D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
     return new D3D11Texture2D(w, h, texture);
 }
 
-//---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
-    assert(nullptr!=nativeTexturePtr);
-    ID3D11Texture2D* texPtr = reinterpret_cast<ID3D11Texture2D*>(nativeTexturePtr);
-    texPtr->AddRef();
-    return new D3D11Texture2D(w,h,texPtr);
-}
-
 
 //---------------------------------------------------------------------------------------------------------------------
 bool D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {

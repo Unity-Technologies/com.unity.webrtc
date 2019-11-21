@@ -17,7 +17,6 @@ public:
     virtual void ShutdownV() override;
     inline virtual void* GetEncodeDevicePtrV() override;
     virtual ITexture2D* CreateDefaultTextureV(const uint32_t w, const uint32_t h) override;
-    virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) override;
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() override;
