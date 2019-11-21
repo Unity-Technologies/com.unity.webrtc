@@ -70,6 +70,11 @@
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.h" />
     <ClInclude Include="..\WebRTCPlugin\Logger.h" />
     <ClInclude Include="..\WebRTCPlugin\NvVideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\pch.h" />
@@ -100,6 +105,11 @@
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Logger.cpp" />
     <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />

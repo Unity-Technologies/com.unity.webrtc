@@ -81,6 +81,21 @@
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp">
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -181,6 +196,21 @@
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.h">
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Test Files">
@@ -212,6 +242,11 @@
     </Filter>
     <Filter Include="Codec\SoftwareCodec">
       <UniqueIdentifier>{596e6b9f-04ef-4f13-ab8e-b5aff82a0330}</UniqueIdentifier>
+    <Filter Include="GraphicsDevice\Vulkan">
+      <UniqueIdentifier>{a0b43056-d1ef-4d73-b913-011ceb7556ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\Vulkan\Cuda">
+      <UniqueIdentifier>{367ab684-7fc6-415b-bb58-6f4b8727d109}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

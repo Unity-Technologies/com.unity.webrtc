@@ -11,6 +11,8 @@
 #include "OpenGL/OpenGLGraphicsDevice.h"
 #endif
 
+#include "Vulkan/VulkanGraphicsDevice.h"
+
 namespace WebRTC {
 
 GraphicsDevice& GraphicsDevice::GetInstance() {
@@ -21,37 +23,40 @@ GraphicsDevice& GraphicsDevice::GetInstance() {
 //---------------------------------------------------------------------------------------------------------------------
 
 bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
-
-    m_rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
-    void* device = nullptr;
-    switch (m_rendererType) {
-        case kUnityGfxRendererD3D11: {
+    const UnityGfxRenderer rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
+    switch (rendererType) {
 #if defined(SUPPORT_D3D11)
-            device = unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice();
-#endif
-            break;
+        case kUnityGfxRendererD3D11: {
+            void* device = unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice();
+            return Init(rendererType, device);
         }
-        case kUnityGfxRendererD3D12: {
+#endif
 #if defined(SUPPORT_D3D12)
-            device = unityInterface->Get<IUnityGraphicsD3D12>()->GetDevice();
-#endif
-            break;
+        case kUnityGfxRendererD3D12: {
+            void* device = unityInterface->Get<IUnityGraphicsD3D12>()->GetDevice();
+            return Init(rendererType, device);
         }
+#endif
         case kUnityGfxRendererOpenGLCore: {
-            break;
+            return Init(rendererType, nullptr);
+        }
+        case kUnityGfxRendererVulkan : {
+            UnityVulkanInstance vulkan = unityInterface->Get<IUnityGraphicsVulkan>()->Instance();
+            return Init(m_rendererType, reinterpret_cast<void*>(&vulkan));
         }
         default: {
             DebugError("Unsupported Unity Renderer: %d", m_rendererType);
             return false;
         }
     }
-    return Init(m_rendererType, device);
+    return false;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device)
+bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device)
 {
+    m_rendererType = rendererType;
     switch (rendererType) {
     case kUnityGfxRendererD3D11: {
 #if defined(SUPPORT_D3D11)
@@ -69,6 +74,16 @@ bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device)
 #if defined(SUPPORT_OPENGL_CORE)
         m_device = new OpenGLGraphicsDevice();
 #endif
+        break;
+    }
+    case kUnityGfxRendererVulkan: {
+        const UnityVulkanInstance* vulkan = reinterpret_cast<const UnityVulkanInstance*>(device);
+        m_device = new VulkanGraphicsDevice(
+            vulkan->instance,
+            vulkan->physicalDevice,
+            vulkan->device,
+            vulkan->graphicsQueue
+        );
         break;
     }
     default: {

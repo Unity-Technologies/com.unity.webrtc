@@ -132,6 +132,9 @@
     <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaImage.h">
       <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -210,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaImage.cpp">
       <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

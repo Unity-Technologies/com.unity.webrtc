@@ -20,8 +20,8 @@ public:
     virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) override;
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+    inline virtual GraphicsDeviceType GetDeviceType() override;
 private:
-    const UnityVulkanInstance* m_unityVulkan;
 
     VkInstance  m_instance;
     VkPhysicalDevice m_physicalDevice;
@@ -35,6 +35,7 @@ private:
 //---------------------------------------------------------------------------------------------------------------------
 
 void* VulkanGraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_cudaContext.GetContext()); }
+GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() { return GRAPHICS_DEVICE_VULKAN; }
 
 
 
