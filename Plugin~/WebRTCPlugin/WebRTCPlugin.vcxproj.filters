@@ -126,6 +126,12 @@
     <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaContext.h">
       <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\VulkanTexture2D.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaImage.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -197,6 +203,12 @@
       <Filter>GraphicsDevice\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaContext.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\VulkanTexture2D.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaImage.cpp">
       <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
     </ClCompile>
   </ItemGroup>

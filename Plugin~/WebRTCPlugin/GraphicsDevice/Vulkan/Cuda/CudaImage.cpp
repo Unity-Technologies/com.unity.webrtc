@@ -17,12 +17,6 @@ CudaImage::CudaImage() : m_array(nullptr), m_mipmapArray(nullptr), m_extMemory(n
 
 //---------------------------------------------------------------------------------------------------------------------
 
-CudaImage::~CudaImage()
-{
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-
 CUresult CudaImage::Init(const VkDevice device, const VulkanTexture2D* texture) {
     int fd = -1;
     CUresult result = CUDA_SUCCESS;
@@ -39,14 +33,14 @@ CUresult CudaImage::Init(const VkDevice device, const VulkanTexture2D* texture) 
 #else
     memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32;
 #endif
-    memDesc.handle.fd = (int)(uintptr_t)p;
+    memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(p));
     memDesc.size = texture->GetTextureImageMemorySize();
 
     if ((result=cuImportExternalMemory(&m_extMemory, &memDesc)) != CUDA_SUCCESS) {
         return result;
     }
 
-    VkExtent2D extent = { texture->GetWidth(), texture->GetHeight() };
+    const VkExtent2D extent = { texture->GetWidth(), texture->GetHeight() };
 
     CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
     arrayDesc.Width = extent.width;
@@ -73,7 +67,7 @@ CUresult CudaImage::Init(const VkDevice device, const VulkanTexture2D* texture) 
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void CudaImage::CleanUp() {
+void CudaImage::Shutdown() {
     m_array = nullptr;
 
     if (nullptr != m_mipmapArray) {

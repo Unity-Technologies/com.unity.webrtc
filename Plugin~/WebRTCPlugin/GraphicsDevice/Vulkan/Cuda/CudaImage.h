@@ -15,10 +15,10 @@ class CudaImage
 {
 public:
     CudaImage();
-    ~CudaImage();
+    ~CudaImage() = default;
     CUresult Init(const VkDevice device, const VulkanTexture2D* texture);
-    void CleanUp();
-    inline CUarray GetArray();
+    void Shutdown();
+    inline CUarray GetArray() const;
 
 
 private:
@@ -28,6 +28,6 @@ private:
 };
 
 //---------------------------------------------------------------------------------------------------------------------
-    inline CUarray CudaImage::GetArray() { return m_array; }
+    inline CUarray CudaImage::GetArray() const { return m_array; }
 
 } //end namespace

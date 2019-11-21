@@ -12,7 +12,7 @@ namespace WebRTC {
     }
 
     void* NvEncoderCuda::AllocateInputResourceV(ITexture2D* tex) {
-        return tex->GetEncodeTexturePtrV();
+        return tex->GetNativeTexturePtrV();
     }
 
 }
