@@ -36,7 +36,11 @@ public:
     static void DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
                                         const VkImage image, VkFormat format, 
                                         const VkImageLayout oldLayout, const VkPipelineStageFlags oldStage,
-                                        const VkImageLayout newLayout, const VkPipelineStageFlags newStage); 
+                                        const VkImageLayout newLayout, const VkPipelineStageFlags newStage);
+
+    static void CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
+               const VkImage srcImage, const VkImage dstImage,
+               const uint32_t width, const uint32_t height);
 
 };
 } //end namespace

@@ -22,7 +22,8 @@ public:
     inline virtual void* GetEncodeTexturePtrV() override;
     inline virtual const void* GetEncodeTexturePtrV() const override;
 
-    inline VkImageView GetImageView() const;
+    inline VkImage      GetImage() const;
+    inline VkImageView  GetImageView() const;
     inline VkDeviceMemory GetTextureImageMemory() const;
     inline VkDeviceSize GetTextureImageMemorySize() const;
 
@@ -46,6 +47,7 @@ const void* VulkanTexture2D::GetNativeTexturePtrV() const { return m_textureImag
 void* VulkanTexture2D::GetEncodeTexturePtrV() { return m_cudaImage.GetArray(); }
 const void* VulkanTexture2D::GetEncodeTexturePtrV() const { return m_cudaImage.GetArray(); }
 
+VkImage         VulkanTexture2D::GetImage() const               { return m_textureImage; }
 VkImageView     VulkanTexture2D::GetImageView() const           { return m_textureImageView; }
 VkDeviceMemory  VulkanTexture2D::GetTextureImageMemory() const  { return m_textureImageMemory; }
 VkDeviceSize    VulkanTexture2D::GetTextureImageMemorySize() const { return m_textureImageMemorySize; }

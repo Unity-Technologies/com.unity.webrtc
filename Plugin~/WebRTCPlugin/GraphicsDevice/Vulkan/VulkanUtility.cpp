@@ -60,7 +60,7 @@ VkDeviceSize VulkanUtility::CreateImage(const VkPhysicalDevice physicalDevice, c
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.flags = 0; // Optional
     if (vkCreateImage(device, &imageInfo, allocator, image) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create image!");
+        return 0;
     }
 
     VkMemoryRequirements memRequirements;
@@ -340,8 +340,6 @@ void VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkComma
 		    break;
 	}
 
-
-
     vkCmdPipelineBarrier(
         commandBuffer,
         oldStage, newStage,
@@ -352,6 +350,27 @@ void VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkComma
     );
 
     EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
+               const VkImage srcImage, const VkImage dstImage,
+               const uint32_t width, const uint32_t height) 
+{
+    const VkCommandBuffer commandBuffer = BeginOneTimeCommandBuffer(device,commandPool);
+
+    //Start copy
+	VkImageCopy copyRegion{};
+	copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+	copyRegion.srcOffset = { 0, 0, 0 };
+	copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+	copyRegion.dstOffset = { 0, 0, 0 };
+	copyRegion.extent = { width, height, 1 };
+	vkCmdCopyImage(commandBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+
+    EndAndSubmitOneTimeCommandBuffer(device,commandPool,queue,commandBuffer);
 }
 
 

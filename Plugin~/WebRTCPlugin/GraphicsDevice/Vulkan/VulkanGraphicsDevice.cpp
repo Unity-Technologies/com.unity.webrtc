@@ -3,6 +3,7 @@
 #include "VulkanTexture2D.h"
 
 #include "vulkan/vulkan.h"
+#include "VulkanUtility.h"
 
 namespace WebRTC {
 
@@ -45,14 +46,48 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
         delete (vulkanTexture);
         return nullptr;
     }
+
+    //Transition to dest
+    VulkanUtility::DoImageLayoutTransition(m_device, m_commandPool, m_graphicsQueue, 
+        vulkanTexture->GetImage(), VK_FORMAT_R8G8B8A8_UNORM, 
+        VK_IMAGE_LAYOUT_UNDEFINED, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT
+    );
+
     return vulkanTexture;
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
-    //[TODO-sin: 2019-11-20] Fix this
-    return false;
+
+    VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
+    VulkanTexture2D* srcTexture = reinterpret_cast<VulkanTexture2D*>(src);
+    if (destTexture == srcTexture)
+        return false;
+    if (destTexture == nullptr || srcTexture == nullptr)
+        return false;
+
+    //Transition the src texture layout. 
+    VulkanUtility::DoImageLayoutTransition(m_device, m_commandPool, m_graphicsQueue, 
+        srcTexture->GetImage(), VK_FORMAT_R8G8B8A8_UNORM, 
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT
+    );
+
+    //[TODO-sin: 2019-11-21] Optimize so that we don't do vkQueueWaitIdle multiple times here
+    //The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, so no transition
+    VulkanUtility::CopyImage(m_device, m_commandPool, m_graphicsQueue,
+        srcTexture->GetImage(), destTexture->GetImage(), srcTexture->GetWidth(), srcTexture->GetHeight());
+
+    //transition the src texture layout back to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+    VulkanUtility::DoImageLayoutTransition(m_device, m_commandPool, m_graphicsQueue, 
+        srcTexture->GetImage(), VK_FORMAT_R8G8B8A8_UNORM, 
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT
+    );
+
+    return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
