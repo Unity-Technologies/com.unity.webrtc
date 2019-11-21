@@ -17,7 +17,6 @@ public:
     bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device); 
     void Shutdown(); 
 
-    //[TODO-sin: 2019-11-21] Native and Texture are probably used the other way around
     inline virtual void* GetNativeTexturePtrV() override;
     inline virtual const void* GetNativeTexturePtrV() const override;
     inline virtual void* GetEncodeTexturePtrV() override;
@@ -42,10 +41,10 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* VulkanTexture2D::GetNativeTexturePtrV() { return m_cudaImage.GetArray(); }
-const void* VulkanTexture2D::GetNativeTexturePtrV() const { return m_cudaImage.GetArray(); };
-void* VulkanTexture2D::GetEncodeTexturePtrV() { return m_textureImage; }
-const void* VulkanTexture2D::GetEncodeTexturePtrV() const { return m_textureImage; }
+void* VulkanTexture2D::GetNativeTexturePtrV() { return  m_textureImage; }
+const void* VulkanTexture2D::GetNativeTexturePtrV() const { return m_textureImage; };
+void* VulkanTexture2D::GetEncodeTexturePtrV() { return m_cudaImage.GetArray(); }
+const void* VulkanTexture2D::GetEncodeTexturePtrV() const { return m_cudaImage.GetArray(); }
 
 VkImageView     VulkanTexture2D::GetImageView() const           { return m_textureImageView; }
 VkDeviceMemory  VulkanTexture2D::GetTextureImageMemory() const  { return m_textureImageMemory; }
