@@ -269,6 +269,7 @@ namespace Unity.WebRTC
             {
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
+                case UnityEngine.Rendering.GraphicsDeviceType.Vulkan:
                     return RenderTextureFormat.BGRA32;
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore:
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:

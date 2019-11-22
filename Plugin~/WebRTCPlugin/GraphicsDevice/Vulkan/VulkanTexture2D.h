@@ -25,6 +25,7 @@ public:
     inline VkImage      GetImage() const;
     inline VkDeviceMemory GetTextureImageMemory() const;
     inline VkDeviceSize GetTextureImageMemorySize() const;
+    inline VkFormat     GetTextureFormat() const;
 
 private:
     VkImage             m_textureImage;
@@ -33,6 +34,7 @@ private:
     VkDevice            m_device;
 
     CudaImage           m_cudaImage;
+    VkFormat            m_textureFormat;
 
     const VkAllocationCallbacks* m_allocator = nullptr;
 
@@ -48,6 +50,7 @@ const void* VulkanTexture2D::GetEncodeTexturePtrV() const { return m_cudaImage.G
 VkImage         VulkanTexture2D::GetImage() const               { return m_textureImage; }
 VkDeviceMemory  VulkanTexture2D::GetTextureImageMemory() const  { return m_textureImageMemory; }
 VkDeviceSize    VulkanTexture2D::GetTextureImageMemorySize() const { return m_textureImageMemorySize; }
+VkFormat        VulkanTexture2D::GetTextureFormat() const       { return m_textureFormat; }
 
 } //end namespace
 
