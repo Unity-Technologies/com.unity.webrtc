@@ -8,7 +8,7 @@ namespace WebRTC {
 //---------------------------------------------------------------------------------------------------------------------
 
 VulkanTexture2D::VulkanTexture2D(const uint32_t w, const uint32_t h) : ITexture2D(w,h),
-    m_textureImage(VK_NULL_HANDLE), m_textureImageMemory(VK_NULL_HANDLE), m_textureImageView(VK_NULL_HANDLE),
+    m_textureImage(VK_NULL_HANDLE), m_textureImageMemory(VK_NULL_HANDLE),
     m_textureImageMemorySize(0), m_device(VK_NULL_HANDLE)
 {
 }
@@ -25,7 +25,6 @@ VulkanTexture2D::~VulkanTexture2D() {
 void VulkanTexture2D::Shutdown()
 {
     //[TODO-sin: 2019-11-20] Create an explicit Shutdown(device) function
-    VULKAN_SAFE_DESTROY_IMAGE_VIEW(m_device, m_textureImageView, m_allocator);
     VULKAN_SAFE_DESTROY_IMAGE(m_device, m_textureImage, m_allocator);
     VULKAN_SAFE_FREE_MEMORY(m_device, m_textureImageMemory, m_allocator);
     m_textureImageMemorySize = 0;
@@ -50,12 +49,6 @@ bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice
     if (m_textureImageMemorySize <= 0) {
         return false;
     }
-
-    m_textureImageView = VulkanUtility::CreateImageView(device, 
-        m_allocator, m_textureImage, VK_FORMAT_R8G8B8A8_UNORM);
-
-    if (VK_NULL_HANDLE == m_textureImageView)
-        return false;
 
     return (CUDA_SUCCESS == m_cudaImage.Init(m_device, this));
 
