@@ -306,9 +306,8 @@ namespace WebRTC
 
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE inputType, void *buffer)
     {
-        NV_ENC_REGISTER_RESOURCE registerResource = { 0 };
-        auto bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
-        registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
+        NV_ENC_REGISTER_RESOURCE registerResource = { NV_ENC_REGISTER_RESOURCE_VER };
+        const auto bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
         registerResource.resourceType = inputType;
         registerResource.resourceToRegister = buffer;
 
@@ -316,9 +315,11 @@ namespace WebRTC
             LogPrint("resource is not initialized");
         registerResource.width = width;
         registerResource.height = height;
-        if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY) {
-            registerResource.pitch = GetWidthInBytes(bufferFormat, width);
-            
+        if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY)
+        {
+            registerResource.pitch = GetWidthInBytes(bufferFormat, width);          
+        } else{
+            registerResource.pitch = width;            
         }
         registerResource.bufferFormat = bufferFormat;
         registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;

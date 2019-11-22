@@ -46,7 +46,7 @@ CUresult CudaImage::Init(const VkDevice device, const VulkanTexture2D* texture) 
     arrayDesc.Width = extent.width;
     arrayDesc.Height = extent.height;
     arrayDesc.Depth = 0; /* CUDA 2D arrays are defined to have depth 0 */
-    arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT8;
+    arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT32;
     arrayDesc.NumChannels = 1;
     arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST |
                       CUDA_ARRAY3D_COLOR_ATTACHMENT;

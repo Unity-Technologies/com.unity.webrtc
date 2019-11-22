@@ -42,7 +42,7 @@ bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice
     const bool EXPORT_HANDLE = true;
     m_textureImageMemorySize = VulkanUtility::CreateImage(physicalDevice,device,m_allocator, m_width, m_height,
         VK_IMAGE_TILING_OPTIMAL,
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+        VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,VK_FORMAT_R8G8B8A8_UNORM, &m_textureImage,&m_textureImageMemory,
         EXPORT_HANDLE
     );
