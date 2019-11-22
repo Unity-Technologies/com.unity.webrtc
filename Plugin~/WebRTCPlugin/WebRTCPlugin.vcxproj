@@ -182,6 +182,8 @@
   <ItemGroup>
     <ClInclude Include="..\unity\include\IUnityGraphics.h" />
     <ClInclude Include="..\unity\include\IUnityGraphicsD3D11.h" />
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h" />
+    <ClInclude Include="..\unity\include\IUnityGraphicsVulkan.h" />
     <ClInclude Include="..\unity\include\IUnityInterface.h" />
     <ClInclude Include="Codec\EncoderFactory.h" />
     <ClInclude Include="Codec\IEncoder.h" />

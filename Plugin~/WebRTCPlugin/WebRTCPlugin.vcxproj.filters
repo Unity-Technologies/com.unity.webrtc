@@ -135,6 +135,12 @@
     <ClInclude Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.h">
       <Filter>GraphicsDevice\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h">
+      <Filter>Header Files\Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphicsVulkan.h">
+      <Filter>Header Files\Unity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
