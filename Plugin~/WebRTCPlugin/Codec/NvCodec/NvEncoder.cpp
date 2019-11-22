@@ -316,7 +316,10 @@ namespace WebRTC
             LogPrint("resource is not initialized");
         registerResource.width = width;
         registerResource.height = height;
-        registerResource.pitch = GetWidthInBytes(bufferFormat, width);
+        if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY) {
+            registerResource.pitch = GetWidthInBytes(bufferFormat, width);
+            
+        }
         registerResource.bufferFormat = bufferFormat;
         registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;
         errorCode = pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource);
