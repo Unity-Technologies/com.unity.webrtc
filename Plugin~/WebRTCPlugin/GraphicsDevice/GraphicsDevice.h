@@ -13,7 +13,7 @@ class GraphicsDevice {
         static GraphicsDevice& GetInstance();
         bool IsInitialized() const { return m_device != nullptr; }
         bool Init(IUnityInterfaces* unityInterface);
-        bool Init(UnityGfxRenderer rendererType, void* device);
+        bool Init(UnityGfxRenderer rendererType, void* device,IUnityInterface* unityInterface);
         void Shutdown();
         IGraphicsDevice* GetDevice() { return m_device; }
 

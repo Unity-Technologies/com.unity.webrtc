@@ -9,7 +9,8 @@ namespace WebRTC {
 
 class VulkanGraphicsDevice : public IGraphicsDevice{
 public:
-    VulkanGraphicsDevice( const VkInstance instance, const VkPhysicalDevice physicalDevice, const VkDevice device,
+    VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
+        const VkPhysicalDevice physicalDevice, const VkDevice device,
         const VkQueue graphicsQueue, const uint32_t queueFamilyIndex);
 
     virtual ~VulkanGraphicsDevice() = default;
@@ -24,11 +25,12 @@ private:
 
     VkResult CreateCommandPool();
 
-    VkInstance      m_instance;
-    VkPhysicalDevice m_physicalDevice;
-    VkDevice        m_device;
-    VkQueue         m_graphicsQueue;
-    VkCommandPool   m_commandPool;
+    IUnityGraphicsVulkan*   m_unityVulkan;
+    VkInstance              m_instance;
+    VkPhysicalDevice        m_physicalDevice;
+    VkDevice                m_device;
+    VkQueue                 m_graphicsQueue;
+    VkCommandPool           m_commandPool;
 
     CudaContext m_cudaContext;
     uint32_t m_queueFamilyIndex;

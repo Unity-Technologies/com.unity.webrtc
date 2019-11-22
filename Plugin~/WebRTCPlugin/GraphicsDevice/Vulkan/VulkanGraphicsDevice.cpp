@@ -2,14 +2,17 @@
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
 
+#include "IUnityGraphicsVulkan.h"
 #include "vulkan/vulkan.h"
 #include "VulkanUtility.h"
 
 namespace WebRTC {
 
-VulkanGraphicsDevice::VulkanGraphicsDevice( const VkInstance instance, const VkPhysicalDevice physicalDevice,
+VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
+    const VkPhysicalDevice physicalDevice,
     const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex)
-    : m_instance (instance)
+    : m_unityVulkan(unityVulkan)
+    , m_instance (instance)
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
@@ -92,31 +95,26 @@ bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
 
 //---------------------------------------------------------------------------------------------------------------------
 bool VulkanGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
+    if (nullptr == dest || nullptr == nativeTexturePtr)
+        return false;
+
     VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
-    const VkImage srcImage = reinterpret_cast<VkImage>(nativeTexturePtr);
-    if (destTexture->GetImage() == srcImage)
+    UnityVulkanImage unityVulkanImage;
+    VkImageSubresource subResource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
+
+    if (!m_unityVulkan->AccessTexture(nativeTexturePtr, &subResource, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_READ_BIT, kUnityVulkanResourceAccess_PipelineBarrier,
+        &unityVulkanImage))
+    {
         return false;
-    if (destTexture == nullptr || srcImage == nullptr)
+    }
+
+    if (destTexture->GetImage() == unityVulkanImage.image)
         return false;
 
-    //Transition the src texture layout. 
-    VulkanUtility::DoImageLayoutTransition(m_device, m_commandPool, m_graphicsQueue, 
-        srcImage, VK_FORMAT_R8G8B8A8_UNORM, 
-        VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT
-    );
-
-    //[TODO-sin: 2019-11-21] Optimize so that we don't do vkQueueWaitIdle multiple times here
     //The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, so no transition for destTex
     VulkanUtility::CopyImage(m_device, m_commandPool, m_graphicsQueue,
-        srcImage, destTexture->GetImage(), destTexture->GetWidth(), destTexture->GetHeight());
-
-    //transition the src texture layout back to VK_IMAGE_LAYOUT_GENERAL
-    VulkanUtility::DoImageLayoutTransition(m_device, m_commandPool, m_graphicsQueue, 
-        srcImage, VK_FORMAT_R8G8B8A8_UNORM, 
-        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
-    );
+        unityVulkanImage.image, destTexture->GetImage(), destTexture->GetWidth(), destTexture->GetHeight());
 
     return true;
 }
