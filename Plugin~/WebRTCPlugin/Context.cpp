@@ -1,9 +1,10 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "WebRTCPlugin.h"
 #include "Context.h"
 #include "GraphicsDevice/GraphicsDevice.h"
-#include "Codec/NvCodec/NvEncoder.h"
+#include "Codec/EncoderFactory.h"
 #include "DummyVideoEncoder.h"
+
 
 namespace WebRTC
 {
@@ -25,11 +26,7 @@ namespace WebRTC
     }
     CodecInitializationResult Context::GetCodecInitializationResult()
     {
-        if (NvEncoder::InitializationResult() == CodecInitializationResult::NotInitialized)
-        {
-            return NvEncoder::LoadCodec();
-        }
-        return NvEncoder::InitializationResult();
+        return nvVideoCapturer->GetCodecInitializationResult();
     }
 
     void ContextManager::SetCurContext(Context* context)
@@ -48,8 +45,6 @@ namespace WebRTC
 
     ContextManager::~ContextManager()
     {
-        NvEncoder::UnloadCodec();
-
         if (m_contexts.size()) {
             DebugWarning("%lu remaining context(s) registered", m_contexts.size());
         }

@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 
@@ -17,6 +17,19 @@ TEST_P(GraphicsDeviceTest, CreateDefaultTextureV) {
     auto height = 256;
     auto tex = m_device->CreateDefaultTextureV(width, height);
     EXPECT_TRUE(tex->IsSize(width, height));
+    EXPECT_NE(nullptr, tex->GetEncodeTexturePtrV());
+    EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
+    EXPECT_FALSE(tex->IsSize(0, 0));
+}
+
+TEST_P(GraphicsDeviceTest, CreateDefaultTextureFromNativeV) {
+    auto width = 256;
+    auto height = 256;
+    auto origin = m_device->CreateDefaultTextureV(width, height);
+    auto tex = m_device->CreateDefaultTextureFromNativeV(width, height, origin->GetNativeTexturePtrV());
+    EXPECT_TRUE(tex->IsSize(width, height));
+    EXPECT_NE(nullptr, tex->GetEncodeTexturePtrV());
+    EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
     EXPECT_FALSE(tex->IsSize(0, 0));
 }
 

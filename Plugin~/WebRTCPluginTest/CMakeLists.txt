@@ -19,12 +19,19 @@ file(GLOB sources
   ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
   ../WebRTCPlugin/Codec/*.h
   ../WebRTCPlugin/Codec/*.cpp
+<<<<<<< HEAD
   ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
+=======
+#  ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
+#  ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
+  ../WebRTCPlugin/GraphicsDevice/Metal/*.h
+  ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+>>>>>>> Added VideoToolbox
   ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
   ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
 )

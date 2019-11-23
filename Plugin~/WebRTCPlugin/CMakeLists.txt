@@ -8,6 +8,7 @@ file(GLOB sources
   *.h
   GraphicsDevice/*.h
   GraphicsDevice/*.cpp
+<<<<<<< HEAD
   GraphicsDevice/OpenGL/*.h
   GraphicsDevice/OpenGL/*.cpp
   GraphicsDevice/Vulkan/*.h
@@ -24,6 +25,20 @@ file(GLOB sources
   Codec/NvCodec/NvEncoderGL.h
   Codec/NvCodec/NvEncoderCuda.cpp
   Codec/NvCodec/NvEncoderCuda.h
+=======
+  ../WebRTCPlugin/GraphicsDevice/Metal/*.h
+  ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
+  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
+#  GraphicsDevice/OpenGL/*.h
+#  GraphicsDevice/OpenGL/*.cpp
+  Codec/*.h
+  Codec/*.cpp
+#  Codec/NvCodec/NvEncoder.cpp
+#  Codec/NvCodec/NvEncoder.h
+#  Codec/NvCodec/NvEncoderGL.cpp
+#  Codec/NvCodec/NvEncoderGL.h
+>>>>>>> Added VideoToolbox
 )
 
 add_plugin(webrtc

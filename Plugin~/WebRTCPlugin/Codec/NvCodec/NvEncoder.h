@@ -46,10 +46,11 @@ namespace WebRTC
         void SetRate(uint32 rate) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
-        void EncodeFrame() override;
+        bool EncodeFrame() override;
         bool IsSupported() const override { return isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
-        uint64 GetCurrentFrameCount()  override { return frameCount; }
+        uint64 GetCurrentFrameCount() const override { return frameCount; }
+        CodecInitializationResult GetCodecInitializationResult() const override { return InitializationResult(); }
     protected:
         int width = 1920;
         int height = 1080;

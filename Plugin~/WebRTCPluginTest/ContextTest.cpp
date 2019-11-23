@@ -31,8 +31,11 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    context->InitializeEncoder(m_device);
+    EXPECT_EQ(CodecInitializationResult::NotInitialized, context->GetCodecInitializationResult());
+    EXPECT_TRUE(context->InitializeEncoder(m_device));
+    EXPECT_EQ(CodecInitializationResult::Success, context->GetCodecInitializationResult());
     context->FinalizeEncoder();
+    EXPECT_EQ(CodecInitializationResult::NotInitialized, context->GetCodecInitializationResult());
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoStream) {

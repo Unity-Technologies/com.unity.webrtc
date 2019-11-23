@@ -34,12 +34,11 @@ void* CreateDevice()
 }
 #elif defined(SUPPORT_METAL)
 
-//#include "Unity/IUnityGraphicsMetal.h"
 #import <Metal/Metal.h>
 
 void* CreateDevice()
 {
-    return nullptr;
+    return MTLCreateSystemDefaultDevice();
 }
 
 #else

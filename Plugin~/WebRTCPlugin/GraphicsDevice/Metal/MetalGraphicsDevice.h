@@ -5,6 +5,7 @@
 
 namespace WebRTC {
     class MTLDevice;
+    class MTLTexture;
     class MetalGraphicsDevice : public IGraphicsDevice{
     public:
         MetalGraphicsDevice(void* device);
@@ -19,10 +20,11 @@ namespace WebRTC {
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
     private:
-        MTLDevice* m_device;
+        id<MTLDevice> m_device;
+        bool CopyTexture(id<MTLTexture> dest, id<MTLTexture> src);
     };
 
-    void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }
+    void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device; }
 
 //---------------------------------------------------------------------------------------------------------------------
 }

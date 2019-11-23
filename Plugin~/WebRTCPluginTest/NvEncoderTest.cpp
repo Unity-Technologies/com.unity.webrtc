@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
@@ -40,7 +40,7 @@ TEST_P(NvEncoderTest, CopyBuffer) {
 
 TEST_P(NvEncoderTest, EncodeFrame) {
     auto before = encoder_->GetCurrentFrameCount();
-    encoder_->EncodeFrame();
+    EXPECT_TRUE(encoder_->EncodeFrame());
     const auto after = encoder_->GetCurrentFrameCount();
     EXPECT_EQ(before + 1, after);
 }

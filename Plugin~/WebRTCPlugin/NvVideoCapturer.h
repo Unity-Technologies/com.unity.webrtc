@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
+
+#include "Codec/IEncoder.h"
 
 namespace WebRTC
 {
-    class IEncoder;
     class ITexture2D;
     class IGraphicsDevice;
     class NvVideoCapturer : public cricket::VideoCapturer
@@ -40,6 +41,7 @@ namespace WebRTC
         void SetRate(uint32 rate);
         void CaptureFrame(webrtc::VideoFrame& videoFrame);
         bool CaptureStarted() const { return captureStarted; }
+        CodecInitializationResult GetCodecInitializationResult() const;
     private:
         // subclasses override this virtual method to provide a vector of fourccs, in
         // order of preference, that are expected by the media engine.

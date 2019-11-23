@@ -233,7 +233,7 @@ namespace WebRTC
     }
 
     //entry for encoding a frame
-    void NvEncoder::EncodeFrame()
+    bool NvEncoder::EncodeFrame()
     {
         UpdateSettings();
         uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;

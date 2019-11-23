@@ -5,10 +5,12 @@ namespace WebRTC {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-    MetalTexture2D::MetalTexture2D(uint32_t w, uint32_t h, void* tex) : ITexture2D(w,h)
-            , m_texture(static_cast<MTLTexture*>(tex))
+    MetalTexture2D::MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex) : ITexture2D(w,h)
+            , m_texture(tex)
     {
-
     }
 
+    MetalTexture2D::~MetalTexture2D()
+    {
+    }
 } //end namespace
