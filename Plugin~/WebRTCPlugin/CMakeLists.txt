@@ -75,6 +75,8 @@ if(APPLE)
      ${OPENGL_LIBRARIES}
      ${FRAMEWORK_LIBS}
   )
+  set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR})
+  set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR})
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 

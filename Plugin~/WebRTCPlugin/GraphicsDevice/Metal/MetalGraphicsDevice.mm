@@ -83,6 +83,10 @@ namespace WebRTC {
                         destinationSlice:0
                         destinationLevel:0
                         destinationOrigin:outTxtOrigin];
+        [commandEncoder endEncoding];
+        [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
+
         return true;
     }
 }

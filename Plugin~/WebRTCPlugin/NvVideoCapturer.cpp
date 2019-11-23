@@ -23,7 +23,11 @@ namespace WebRTC
                 LogPrint("CopyRenderTexture Failed");
                 return;
             }
-            encoder_->EncodeFrame();
+            if(!encoder_->EncodeFrame()) {
+                LogPrint("EncodeFrame Failed");
+                return;
+            }
+            LogPrint("Hello");
         }
         else
         {

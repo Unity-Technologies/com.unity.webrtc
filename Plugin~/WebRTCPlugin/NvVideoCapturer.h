@@ -52,7 +52,7 @@ namespace WebRTC
         }
         void* unityRT = nullptr;
 
-        IEncoder* encoder_;
+        IEncoder* encoder_ = nullptr;
 
         //just fake info
         int32 width = 1280;

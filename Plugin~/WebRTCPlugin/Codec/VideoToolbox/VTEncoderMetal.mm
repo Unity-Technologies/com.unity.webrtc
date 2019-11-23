@@ -40,6 +40,7 @@ namespace WebRTC {
     
         if (status != noErr)
         {
+            NSLog(@"VTCompressionSessionCreate failed %d", status);
             // return false;
         }
     
@@ -84,6 +85,11 @@ namespace WebRTC {
 
     VTEncoderMetal::~VTEncoderMetal()
     {
+        OSStatus status = VTCompressionSessionCompleteFrames(encoderSession, kCMTimeInvalid);
+        if (status != noErr)
+        {
+            NSLog(@"VTCompressionSessionCompleteFrames failed %d", status);
+        }
     }
     void VTEncoderMetal::SetRate(uint32_t rate)
     {
@@ -107,7 +113,6 @@ namespace WebRTC {
 
         CMTime presentationTimeStamp = CMTimeMake(frameCount, 1000);
         VTEncodeInfoFlags flags;
-    
         OSStatus status = VTCompressionSessionEncodeFrame(encoderSession,
                                                           pixelBuffers[bufferIndexToWrite],
                                                           presentationTimeStamp,
