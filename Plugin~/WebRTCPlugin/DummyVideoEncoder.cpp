@@ -56,8 +56,13 @@ namespace WebRTC
         }
         webrtc::CodecSpecificInfo codecInfo;
         codecInfo.codecType = webrtc::kVideoCodecH264;
-        callback->OnEncodedImage(encodedImage, &codecInfo, &fragHeader);
-        return 0;
+        auto result = callback->OnEncodedImage(encodedImage, &codecInfo, &fragHeader);
+        if(result.error != webrtc::EncodedImageCallback::Result::OK)
+        {
+            LogPrint("Encode callback failed %d", result.error);
+            return WEBRTC_VIDEO_CODEC_ERROR;
+        }
+        return WEBRTC_VIDEO_CODEC_OK;
     }
 
     int32_t DummyVideoEncoder::SetRateAllocation(const webrtc::VideoBitrateAllocation& allocation, uint32_t framerate)
