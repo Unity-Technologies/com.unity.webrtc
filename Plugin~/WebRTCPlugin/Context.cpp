@@ -141,6 +141,7 @@ namespace WebRTC
 
     Context::~Context()
     {
+        dataChannels.clear();
         clients.clear();
         peerConnectionFactory = nullptr;
         audioTrack = nullptr;

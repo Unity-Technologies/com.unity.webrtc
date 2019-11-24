@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Codec/IEncoder.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include <VideoToolbox/VideoToolbox.h>
@@ -23,6 +23,7 @@ namespace WebRTC {
         IGraphicsDevice* m_device;
         ITexture2D* renderTextures[bufferedFrameNum];
         CVPixelBufferRef pixelBuffers[bufferedFrameNum];
+        std::vector<uint8> encodedBuffers[bufferedFrameNum];
 
         VTCompressionSessionRef encoderSession;
     };

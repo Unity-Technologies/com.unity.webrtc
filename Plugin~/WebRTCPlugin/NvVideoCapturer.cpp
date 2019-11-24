@@ -27,7 +27,6 @@ namespace WebRTC
                 LogPrint("EncodeFrame Failed");
                 return;
             }
-            LogPrint("Hello");
         }
         else
         {

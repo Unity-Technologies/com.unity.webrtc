@@ -5,28 +5,32 @@
 
 namespace WebRTC {
 
-    void callbackCompressed(void *outputCallbackRefCon,
-                            void *sourceFrameRefCon,
-                            OSStatus status,
-                            VTEncodeInfoFlags infoFlags,
-                            CMSampleBufferRef sampleBuffer)
+    void VTCompressionOutputCallback(void *outputCallbackRefCon,
+                                     void *sourceFrameRefCon,
+                                     OSStatus status,
+                                     VTEncodeInfoFlags infoFlags,
+                                     CMSampleBufferRef sampleBuffer)
     {
-        NSLog(@"didCompressH264 called with status %d infoFlags %d", (int)status, (int)infoFlags);
-        if (status != noErr) return;
-        
-        if (!CMSampleBufferDataIsReady(sampleBuffer))
+        if (status != noErr)
         {
-            NSLog(@"didCompressH264 data is not ready ");
+            NSLog(@"callbackCompressed returns failed %d", status);
             return;
         }
-        auto encoder = reinterpret_cast<VTEncoderMetal*>(sourceFrameRefCon);
+        if (!CMSampleBufferDataIsReady(sampleBuffer))
+        {
+            NSLog(@"callbackCompressed data is not ready ");
+            return;
+        }
+    
+        VTEncoderMetal* encoder = reinterpret_cast<VTEncoderMetal*>(outputCallbackRefCon);
+        std::vector<uint8>* encodedFrame = reinterpret_cast<std::vector<uint8>*>(sourceFrameRefCon);
+    
         CMBlockBufferRef dataBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
-        std::vector<uint8> encodedFrame;
         size_t length = CMBlockBufferGetDataLength(dataBuffer);
-        encodedFrame.resize(length);
-        status = CMBlockBufferGetDataPointer(dataBuffer, 0, nil, nil, (char **)(encodedFrame.data()));
+        encodedFrame->resize(length);
+        status = CMBlockBufferGetDataPointer(dataBuffer, 0, nil, nil, (char **)(encodedFrame->data()));
         if (status != noErr) return;
-        encoder->CaptureFrame(encodedFrame);
+        encoder->CaptureFrame(*encodedFrame);
     }
 
     VTEncoderMetal::VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device)
@@ -35,7 +39,7 @@ namespace WebRTC {
         OSStatus status = VTCompressionSessionCreate(NULL, nWidth, nHeight,
                                                      kCMVideoCodecType_H264,
                                                      NULL, NULL, NULL,
-                                                     callbackCompressed, (__bridge void*)(this),
+                                                     VTCompressionOutputCallback, (__bridge void*)(this),
                                                      &encoderSession);
     
         if (status != noErr)
@@ -117,7 +121,7 @@ namespace WebRTC {
                                                           pixelBuffers[bufferIndexToWrite],
                                                           presentationTimeStamp,
                                                           kCMTimeInvalid,
-                                                          NULL, this, &flags);
+                                                          NULL, (void*)&encodedBuffers[bufferIndexToWrite], &flags);
     
         if (status != noErr)
         {
