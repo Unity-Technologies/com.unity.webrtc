@@ -177,7 +177,7 @@ namespace WebRTC {
                                                                textureCache,
                                                                pixelBuffers[i],
                                                                nil,
-                                                               MTLPixelFormatBGRA8Unorm,
+                                                               MTLPixelFormatBGRA8Unorm_sRGB,
                                                                m_width, m_height, 0,
                                                                &imageTexture);
             if(result != kCVReturnSuccess)

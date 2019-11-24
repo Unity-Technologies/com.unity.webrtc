@@ -2,10 +2,9 @@
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
+#include <Metal/Metal.h>
 
 namespace WebRTC {
-    class MTLDevice;
-    class MTLTexture;
     class MetalGraphicsDevice : public IGraphicsDevice{
     public:
         MetalGraphicsDevice(void* device);
@@ -21,6 +20,7 @@ namespace WebRTC {
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
     private:
         id<MTLDevice> m_device;
+        id<MTLCommandQueue> m_commandQueue;
         bool CopyTexture(id<MTLTexture> dest, id<MTLTexture> src);
     };
 

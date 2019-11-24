@@ -8,11 +8,12 @@ namespace WebRTC {
     MetalGraphicsDevice::MetalGraphicsDevice(void* device)
         : m_device((__bridge id<MTLDevice>)device)
     {
+        m_commandQueue = [m_device newCommandQueue];
     }
 
 //---------------------------------------------------------------------------------------------------------------------
     MetalGraphicsDevice::~MetalGraphicsDevice() {
-
+        [m_commandQueue release];
     }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ namespace WebRTC {
 //---------------------------------------------------------------------------------------------------------------------
     ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+        textureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
         textureDescriptor.width = w;
         textureDescriptor.height = h;
         id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
@@ -63,8 +64,7 @@ namespace WebRTC {
         if(dest == src)
             return false;
 
-        id<MTLCommandQueue> commandQueue = [m_device newCommandQueue];
-        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLCommandBuffer> commandBuffer = [m_commandQueue commandBuffer];
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
 
         NSUInteger width = src.width;
