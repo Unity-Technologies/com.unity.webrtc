@@ -18,7 +18,9 @@ publish_com.unity.webrtc_github_release:
       only:
         - /^(v|V)?\d+\.\d+\.\d+(-preview(\.\d+)?)?$/
   dependencies:
-    - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
+{% for platform in platforms %}
+    - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc_{{ platform.name }}
+{% endfor %}    
 
 publish_libwebrtc_github_release:
   name: Publish libwebrtc {{ webrtc_version.name }} to Github Release
