@@ -8,6 +8,7 @@
 
 #if defined(SUPPORT_D3D11)
 #include "NvCodec/NvEncoderD3D11.h"
+#include "SoftwareCodec/SoftwareEncoder.h"
 #endif
 
 #include "GraphicsDevice/IGraphicsDevice.h"
@@ -30,7 +31,11 @@ namespace WebRTC {
         switch (deviceType) {
 #if defined(SUPPORT_D3D11)
             case GRAPHICS_DEVICE_D3D11: {
+#if USE_SOFTWARE_ENCODER
+                m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+#else
                 m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+#endif // USE_SOFTWARE_ENCODER
                 break;
             }
 #endif

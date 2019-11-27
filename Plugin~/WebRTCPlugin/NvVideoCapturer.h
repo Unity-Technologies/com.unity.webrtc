@@ -38,7 +38,7 @@ namespace WebRTC
         void SetKeyFrame();
         void SetSize(int32 width, int32 height);
         void SetRate(uint32 rate);
-        void CaptureFrame(std::vector<uint8>& data);
+        void CaptureFrame(webrtc::VideoFrame& videoFrame);
         bool CaptureStarted() const { return captureStarted; }
     private:
         // subclasses override this virtual method to provide a vector of fourccs, in

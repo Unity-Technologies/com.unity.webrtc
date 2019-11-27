@@ -127,19 +127,35 @@ namespace WebRTC
         audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
+
+#if USE_SOFTWARE_ENCODER
+        peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+                                workerThread.get(),
+                                workerThread.get(),
+                                signalingThread.get(),
+                                audioDevice,
+                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
+                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                webrtc::CreateBuiltinVideoEncoderFactory(),
+                                webrtc::CreateBuiltinVideoDecoderFactory(),
+                                nullptr,
+                                nullptr);
+#else
         auto dummyVideoEncoderFactory = std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
 
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
-            workerThread.get(),
-            workerThread.get(),
-            signalingThread.get(),
-            audioDevice,
-            webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-            webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
-            std::move(dummyVideoEncoderFactory),
-            webrtc::CreateBuiltinVideoDecoderFactory(),
-            nullptr,
-            nullptr);
+                                workerThread.get(),
+                                workerThread.get(),
+                                signalingThread.get(),
+                                audioDevice,
+                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
+                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                std::move(dummyVideoEncoderFactory),
+                                webrtc::CreateBuiltinVideoDecoderFactory(),
+                                nullptr,
+                                nullptr);
+#endif
+
     }
 
     Context::~Context()

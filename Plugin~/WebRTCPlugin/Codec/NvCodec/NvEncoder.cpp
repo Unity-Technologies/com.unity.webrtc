@@ -295,7 +295,13 @@ namespace WebRTC
         checkf(NV_RESULT(errorCode), StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
         frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
-        CaptureFrame(frame.encodedFrame);
+
+
+        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, frame.encodedFrame);
+        int64 timestamp = rtc::TimeMillis();
+        webrtc::VideoFrame videoFrame{buffer, webrtc::VideoRotation::kVideoRotation_0, timestamp};
+        videoFrame.set_ntp_time_ms(timestamp);
+        CaptureFrame(videoFrame);
     }
 
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE inputType, void *buffer)

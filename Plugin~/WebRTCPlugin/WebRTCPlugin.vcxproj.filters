@@ -27,6 +27,9 @@
     <Filter Include="Codec\NvCodec">
       <UniqueIdentifier>{fa14041b-dd0a-4710-8ac8-fdee674cf69c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Codec\SoftwareCodec">
+      <UniqueIdentifier>{b80f35b9-875a-4438-a7a0-68cb531ead5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebRTCPlugin.h">
@@ -107,6 +110,9 @@
     <ClInclude Include="GraphicsDevice\GraphicsDeviceType.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Codec\SoftwareCodec\SoftwareEncoder.h">
+      <Filter>Codec\SoftwareCodec</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WebRTCPlugin.cpp">
@@ -168,6 +174,9 @@
     </ClCompile>
     <ClCompile Include="NvVideoCapturer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Codec\SoftwareCodec\SoftwareEncoder.cpp">
+      <Filter>Codec\SoftwareCodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
