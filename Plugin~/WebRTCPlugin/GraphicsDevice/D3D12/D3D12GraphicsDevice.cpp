@@ -64,12 +64,6 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D12GraphicsDevice::CreateStagingTextureV(uint32_t w, uint32_t h) {
-
-    return NULL;
-}
-
-//---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
     return CreateSharedD3D12Texture(w,h);
 }
@@ -89,11 +83,6 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
 
     //[TODO-sin: 2019-10-30] Implement copying native resource
     return true;
-}
-
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
-{
-    return NULL;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
