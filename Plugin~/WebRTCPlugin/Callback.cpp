@@ -29,7 +29,11 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     }
     case kUnityGfxDeviceEventShutdown:
     {
-        s_context->FinalizeEncoder();
+        if(s_context != nullptr)
+        {
+            s_context->FinalizeEncoder();
+            s_context = nullptr;
+        }
         GraphicsDevice::GetInstance().Shutdown();
 
         //UnityPluginUnload not called normally
