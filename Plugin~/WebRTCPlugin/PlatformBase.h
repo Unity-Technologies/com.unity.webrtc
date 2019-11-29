@@ -55,17 +55,17 @@
 #ifndef SUPPORT_VULKAN
 #define SUPPORT_VULKAN 0
 #endif
-#elif UNITY_OSX || UNITY_LINUX
+#elif UNITY_LINUX
+#define SUPPORT_OPENGL_UNIFIED 1
+#define SUPPORT_OPENGL_CORE 1
+#define SUPPORT_VULKAN 1
+#elif UNITY_OSX
 #define SUPPORT_OPENGL_UNIFIED 1
 #define SUPPORT_OPENGL_CORE 1
 #endif
 
 #if UNITY_IPHONE || UNITY_OSX
 #define SUPPORT_METAL 1
-#endif
-
-#if UNITY_LINUX
-#define SUPPORT_VULKAN 1
 #endif
 
 // COM-like Release macro
