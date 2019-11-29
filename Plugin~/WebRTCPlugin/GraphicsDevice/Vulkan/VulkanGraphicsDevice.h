@@ -20,7 +20,7 @@ public:
     virtual ITexture2D* CreateDefaultTextureV(const uint32_t w, const uint32_t h) override;
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-    inline virtual GraphicsDeviceType GetDeviceType() override;
+    inline virtual GraphicsDeviceType GetDeviceType() const override;
 private:
 
     VkResult CreateCommandPool();
@@ -42,7 +42,7 @@ private:
 //---------------------------------------------------------------------------------------------------------------------
 
 void* VulkanGraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_cudaContext.GetContext()); }
-GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() { return GRAPHICS_DEVICE_VULKAN; }
+GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_VULKAN; }
 
 
 

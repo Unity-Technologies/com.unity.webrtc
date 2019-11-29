@@ -20,14 +20,14 @@ public:
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex);
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
-    inline virtual GraphicsDeviceType GetDeviceType();
+    inline virtual GraphicsDeviceType GetDeviceType() const;
 
 private:
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
 };
 
 void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }
-GraphicsDeviceType OpenGLGraphicsDevice::GetDeviceType() { return GRAPHICS_DEVICE_OPENGL; }
+GraphicsDeviceType OpenGLGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_OPENGL; }
 
 //---------------------------------------------------------------------------------------------------------------------
 }
