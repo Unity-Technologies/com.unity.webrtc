@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include "GraphicsDevice/ITexture2D.h"
-#include "d3d11.h"
-
 #include "WebRTCMacros.h"
 #include "Cuda/CudaImage.h"
 
