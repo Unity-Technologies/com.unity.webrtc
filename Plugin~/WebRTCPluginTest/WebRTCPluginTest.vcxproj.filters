@@ -76,6 +76,9 @@
     <ClCompile Include="GraphicsDeviceTestBase.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.cpp">
+      <Filter>Codec\SoftwareCodec</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -171,6 +174,9 @@
     <ClInclude Include="GraphicsDeviceTestBase.h">
       <Filter>Test Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.h">
+      <Filter>Codec\SoftwareCodec</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Test Files">
@@ -199,6 +205,9 @@
     </Filter>
     <Filter Include="Codec\NvCodec">
       <UniqueIdentifier>{d79c0b00-9c97-4666-b84c-948f57798297}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codec\SoftwareCodec">
+      <UniqueIdentifier>{596e6b9f-04ef-4f13-ab8e-b5aff82a0330}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
