@@ -161,6 +161,9 @@
     <ClInclude Include="VideoCapturer.h" />
     <ClInclude Include="VideoCaptureTrackSource.h" />
     <ClInclude Include="VideoTrackSource.h" />
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h">
+      <Filter>Header Files\Unity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GraphicsDevice">

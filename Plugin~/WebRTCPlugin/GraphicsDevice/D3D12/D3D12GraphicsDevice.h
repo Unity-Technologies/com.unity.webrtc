@@ -1,14 +1,17 @@
-﻿#pragma once
+#pragma once
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
 
 namespace WebRTC {
 
+#define DefPtr(_a) _COM_SMARTPTR_TYPEDEF(_a, __uuidof(_a))
+DefPtr(ID3D12CommandAllocator);
+DefPtr(ID3D12GraphicsCommandList4);
 
 class D3D12GraphicsDevice : public IGraphicsDevice{
 public:
-    D3D12GraphicsDevice(ID3D12Device* nativeDevice);
+    explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface );
     virtual ~D3D12GraphicsDevice();
     virtual bool InitV() override;
     virtual void ShutdownV() override;
@@ -32,6 +35,12 @@ private:
     ID3D11Device5* m_d3d11Device;
     ID3D11DeviceContext4* m_d3d11Context;
 
+
+    //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
+    ID3D12CommandAllocatorPtr m_commandAllocator;
+    ID3D12GraphicsCommandList4Ptr m_commandList;
+    IUnityGraphicsD3D12v5* m_unityInterface;
+
 };
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -44,6 +53,6 @@ GraphicsDeviceType D3D12GraphicsDevice::GetDeviceType() const { return GRAPHICS_
 
 //---------------------------------------------------------------------------------------------------------------------
 //[Note-sin: 2019-10-30]
-//Since NVEncoder does not support DX12, we copy the texture from DX12 resource to DX11 resource first (GPU), and then
-//pass it to NVidia
+//Since NVEncoder does not support DX12, we use a DX12 resource that can be shared with DX11, and then pass it
+//the DX11 resource to NVidia Encoder
 

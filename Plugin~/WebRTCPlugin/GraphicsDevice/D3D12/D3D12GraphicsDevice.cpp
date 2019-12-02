@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
 
@@ -14,8 +14,11 @@ const D3D12_HEAP_PROPERTIES DEFAULT_HEAP_PROPS = {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice) : m_d3d12Device(nativeDevice)
+D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
+    : m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
+    , m_unityInterface(unityInterface)
+
 {
 }
 
@@ -48,11 +51,17 @@ bool D3D12GraphicsDevice::InitV() {
 
     legacyDevice->GetImmediateContext(&legacyContext);
     legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
+
+
+    m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
+    m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
+
     return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::ShutdownV() {
+    m_commandAllocator->Release();
     SAFE_RELEASE(m_d3d11Device);
     SAFE_RELEASE(m_d3d11Context);
 }
@@ -79,11 +88,26 @@ ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
 
 //---------------------------------------------------------------------------------------------------------------------
 bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
-    ID3D12Resource* src = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
-    if (dest->GetNativeTexturePtrV() == src)
+    ID3D12Resource* nativeDest = reinterpret_cast<ID3D12Resource*>(dest->GetNativeTexturePtrV());
+    ID3D12Resource* nativeSrc = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
+    if (nativeSrc == nativeDest)
+        return false;
+    if (nativeSrc == nullptr || nativeDest == nullptr)
         return false;
 
-    //[TODO-sin: 2019-10-30] Implement copying native resource
+    m_commandList->CopyResource(nativeDest, nativeSrc);
+    m_unityInterface->ExecuteCommandList(m_commandList,0,nullptr);
+
+
+    ID3D12Fence* fence = m_unityInterface->GetFrameFence();
+    const uint64_t nextFrameFenceValue = m_unityInterface->GetNextFrameFenceValue();
+    if (fence->GetCompletedValue() < nextFrameFenceValue ) {
+		const HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+        fence->SetEventOnCompletion(nextFrameFenceValue, eventHandle);
+		WaitForSingleObject(eventHandle, INFINITE);
+        CloseHandle(eventHandle);        
+    }
+
     return true;
 }
 
@@ -110,8 +134,8 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
     desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
 
-    D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
-    D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON; //D3D12_RESOURCE_STATE_COPY_DEST
+    const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
+    const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON; //D3D12_RESOURCE_STATE_COPY_DEST
 
 
     ID3D12Resource* nativeTex = nullptr;

@@ -36,10 +36,9 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
             IUnityGraphicsD3D11* deviceInterface = unityInterface->Get<IUnityGraphicsD3D11>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
-#endif
 #if defined(SUPPORT_D3D12)
         case kUnityGfxRendererD3D12: {
-            IUnityGraphicsD3D12* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12>();
+            IUnityGraphicsD3D12* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12v5>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
 #endif
@@ -65,12 +64,15 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
             return false;
         }
     }
-    return false;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUnityInterface* unityInterface)
+=======
+bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device, IUnityInterfaces* unityInterface)
+>>>>>>> Hacks to support DX12. doesn't work yet
 {
     m_rendererType = rendererType;
     switch (rendererType) {
@@ -82,7 +84,7 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
     }
     case kUnityGfxRendererD3D12: {
 #if defined(SUPPORT_D3D12)
-        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device));
+        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device),  unityInterface->Get<IUnityGraphicsD3D12v5>());
 #endif
         break;
     }

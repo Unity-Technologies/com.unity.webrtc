@@ -26,7 +26,7 @@ public:
 private:
     ID3D12Resource* m_nativeTexture;
     HANDLE m_sharedHandle;
-    ID3D11Texture2D* m_sharedTexture;
+    ID3D11Texture2D* m_sharedTexture;   //Shared between DX11 and DX12
 };
 
 //---------------------------------------------------------------------------------------------------------------------

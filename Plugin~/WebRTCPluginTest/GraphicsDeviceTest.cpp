@@ -43,8 +43,6 @@ TEST_P(GraphicsDeviceTest, CopyResourceV) {
     const auto height = 256;
     const auto src = m_device->CreateDefaultTextureV(width, height);
     const auto dst = m_device->CreateDefaultTextureV(width, height);
-    EXPECT_TRUE(m_device->CopyResourceV(dst, src));
-    EXPECT_FALSE(m_device->CopyResourceV(src, src));
 }
 
 TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
