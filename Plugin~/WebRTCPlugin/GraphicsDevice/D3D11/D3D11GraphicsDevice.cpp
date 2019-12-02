@@ -98,6 +98,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITe
 {
     D3D11_MAPPED_SUBRESOURCE resource;
     HRESULT hr = m_d3d11Context->Map((ID3D11Resource*)tex->GetNativeTexturePtrV(), 0, D3D11_MAP_READ, 0, &resource);
+    assert(hr== S_OK);
 
     int width = tex->GetWidth();
     int height = tex->GetHeight();

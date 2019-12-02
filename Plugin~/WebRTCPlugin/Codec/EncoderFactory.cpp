@@ -8,8 +8,8 @@
 
 #if defined(SUPPORT_D3D11)
 #include "NvCodec/NvEncoderD3D11.h"
-#include "SoftwareCodec/SoftwareEncoder.h"
 #endif
+#include "SoftwareCodec/SoftwareEncoder.h"
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 
