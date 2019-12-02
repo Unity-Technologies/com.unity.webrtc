@@ -27,18 +27,19 @@ public:
 
     static void* GetExportHandle(const VkDevice device, const VkDeviceMemory memory);
 
-    static VkCommandBuffer BeginOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool);
+    static VkResult BeginOneTimeCommandBufferInto(const VkDevice device, const VkCommandPool commandPool,
+        VkCommandBuffer* commandBuffer);
 
     //Uses vkQueueWaitIdle to synchronize
-    static void  EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
+    static VkResult EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
                                                   const VkQueue queue, VkCommandBuffer commandBuffer);
 
-    static void DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
+    static VkResult DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
                                         const VkImage image, VkFormat format, 
                                         const VkImageLayout oldLayout, const VkPipelineStageFlags oldStage,
                                         const VkImageLayout newLayout, const VkPipelineStageFlags newStage);
 
-    static void CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
+    static VkResult CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
                const VkImage srcImage, const VkImage dstImage,
                const uint32_t width, const uint32_t height);
 

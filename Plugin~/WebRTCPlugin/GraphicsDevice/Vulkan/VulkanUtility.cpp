@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "VulkanUtility.h"
+#include "WebRTCMacros.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -87,7 +88,8 @@ VkDeviceSize VulkanUtility::CreateImage(const VkPhysicalDevice physicalDevice, c
         return 0;
     }
 
-    vkBindImageMemory(device, *image, *imageMemory, 0);
+    VULKAN_CHECK_FAILVALUE(vkBindImageMemory(device, *image, *imageMemory, 0), 0);
+
     return memRequirements.size;
 }
 
@@ -191,7 +193,9 @@ void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory
 
 //---------------------------------------------------------------------------------------------------------------------
 
-VkCommandBuffer VulkanUtility::BeginOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool) {
+VkResult VulkanUtility::BeginOneTimeCommandBufferInto(const VkDevice device, const VkCommandPool commandPool,
+    VkCommandBuffer* commandBuffer)
+{
     //Create a command buffer to copy
     VkCommandBufferAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -199,22 +203,21 @@ VkCommandBuffer VulkanUtility::BeginOneTimeCommandBuffer(const VkDevice device, 
     allocInfo.commandPool = commandPool;
     allocInfo.commandBufferCount = 1;
 
-    VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+    vkAllocateCommandBuffers(device, &allocInfo, commandBuffer);
 
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; //used only once
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
-    return commandBuffer;
-   
+    VULKAN_CHECK(vkBeginCommandBuffer(*commandBuffer, &beginInfo));
+
+    return VK_SUCCESS;   
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 //Uses vkQueueWaitIdle to synchronize
-void  VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
+VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
                                                   const VkQueue queue, VkCommandBuffer commandBuffer)
 {
     vkEndCommandBuffer(commandBuffer);
@@ -224,22 +227,23 @@ void  VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, con
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
-    vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(queue);
+    VULKAN_CHECK(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+    VULKAN_CHECK(vkQueueWaitIdle(queue));
 
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
-   
+
+    return VK_SUCCESS;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
+VkResult VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
                                           const VkImage image, const VkFormat format, 
                                           const VkImageLayout oldLayout, const VkPipelineStageFlags oldStage,
                                           const VkImageLayout newLayout, const VkPipelineStageFlags newStage) 
 { 
-
-    const VkCommandBuffer commandBuffer = BeginOneTimeCommandBuffer(device, commandPool);
+    VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+    VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer));
 
     VkImageMemoryBarrier barrier = {};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -349,15 +353,17 @@ void VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkComma
         1, &barrier
     );
 
-    EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+    return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
+
+VkResult VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
                const VkImage srcImage, const VkImage dstImage,
                const uint32_t width, const uint32_t height) 
 {
-    const VkCommandBuffer commandBuffer = BeginOneTimeCommandBuffer(device,commandPool);
+    VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+    VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer));
 
     //Start copy
 	VkImageCopy copyRegion{};
@@ -370,7 +376,7 @@ void VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool command
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 
-    EndAndSubmitOneTimeCommandBuffer(device,commandPool,queue,commandBuffer);
+    return EndAndSubmitOneTimeCommandBuffer(device,commandPool,queue,commandBuffer);
 }
 
 

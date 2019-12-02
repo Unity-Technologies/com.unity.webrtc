@@ -30,3 +30,17 @@
         obj = VK_NULL_HANDLE; \
     } \
 }
+
+#define VULKAN_CHECK(api) { \
+    const VkResult result = api; \
+    if (VK_SUCCESS != result) { \
+        return result; \
+    } \
+}
+
+#define VULKAN_CHECK_FAILVALUE(api, failValue) { \
+    const VkResult result = api; \
+    if (VK_SUCCESS != result) { \
+        return failValue; \
+    } \
+}
