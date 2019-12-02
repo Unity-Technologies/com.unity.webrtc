@@ -22,6 +22,7 @@ namespace WebRTC
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
         void* hModule = nullptr;
+        static const bool s_use_software_encoder = true;
     private:
         ~ContextManager();
         std::map<int, ContextPtr> m_contexts;

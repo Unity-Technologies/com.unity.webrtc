@@ -24,7 +24,7 @@ namespace WebRTC
     private:
         IGraphicsDevice* m_device;
         ITexture2D* m_encodeTex;
-        int width = 1920;
-        int height = 1080;
+        int m_width = 1920;
+        int m_height = 1080;
     };
 }

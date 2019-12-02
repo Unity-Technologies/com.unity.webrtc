@@ -31,27 +31,6 @@ namespace WebRTC
         }
     }
 
-//    void NvVideoCapturer::CaptureFrame(std::vector<uint8>& data)
-//    {
-//#if 1
-//        rtc::scoped_refptr<webrtc::I420Buffer> buffer(webrtc::I420Buffer::Create(width, height));
-//        webrtc::I420Buffer::SetBlack(buffer);
-//
-//        uint8_t* pY = buffer->MutableDataY();
-//        memset((void*)pY, 0xff, sizeof(uint8_t) * 100);
-//
-//
-//        webrtc::VideoFrame frame = webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer).set_rotation(webrtc::kVideoRotation_0).set_timestamp_us(0).build();
-//        OnFrame(frame, width, height);
-//#else
-//        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, data);
-//        int64 timestamp = rtc::TimeMillis();
-//        webrtc::VideoFrame videoFrame{buffer, webrtc::VideoRotation::kVideoRotation_0, timestamp};
-//        videoFrame.set_ntp_time_ms(timestamp);
-//        OnFrame(videoFrame, width, height);
-//#endif
-//    }
-
     void NvVideoCapturer::CaptureFrame(webrtc::VideoFrame& videoFrame)
     {
         OnFrame(videoFrame, width, height);

@@ -11,14 +11,14 @@
 
 namespace WebRTC
 {
-    SoftwareEncoder::SoftwareEncoder(int _width, int _height, IGraphicsDevice* device) : width(_width), height(_height), m_device(device)
+    SoftwareEncoder::SoftwareEncoder(int _width, int _height, IGraphicsDevice* device) : m_width(_width), m_height(_height), m_device(device)
     {
 
     }
 
     void SoftwareEncoder::InitV()
     {
-        m_encodeTex = m_device->CreateStagingTextureV(width, height);
+        m_encodeTex = m_device->CreateCPUReadTextureV(m_width, m_height);
     }
 
     bool SoftwareEncoder::CopyBuffer(void* frame)

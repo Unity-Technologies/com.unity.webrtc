@@ -53,6 +53,12 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+    assert(false && "CreateCPUReadTextureV need to implement on OpenGL");
+    return NULL;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
     assert(nullptr!=nativeTexturePtr);
     auto texPtr = reinterpret_cast<GLuint*>(nativeTexturePtr);
@@ -105,6 +111,12 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
             dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
             width, height, 1);
     return true;
+}
+
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+{
+    assert(false && "ConvertRGBToI420 need to implement on OpenGL");
+    return NULL;
 }
 
 } //end namespace

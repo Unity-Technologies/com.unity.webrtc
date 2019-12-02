@@ -64,6 +64,12 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+    assert(false && "CreateCPUReadTextureV need to implement on D3D12");
+    return NULL;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
     return CreateSharedD3D12Texture(w,h);
 }
@@ -124,6 +130,12 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     }
 
     return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
+}
+
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+{
+    assert(false && "ConvertRGBToI420 need to implement on D3D12");
+    return NULL;
 }
 
 
