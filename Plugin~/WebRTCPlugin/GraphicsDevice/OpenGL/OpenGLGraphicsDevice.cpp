@@ -113,7 +113,7 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
     return true;
 }
 
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
 {
     assert(false && "ConvertRGBToI420 need to implement on OpenGL");
     return NULL;
