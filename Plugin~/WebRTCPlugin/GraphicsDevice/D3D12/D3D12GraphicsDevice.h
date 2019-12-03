@@ -41,6 +41,7 @@ private:
     ID3D12GraphicsCommandList4Ptr m_commandList;
     IUnityGraphicsD3D12v5* m_unityInterface;
 
+    uint64_t m_NextFenceValue = 1;
 };
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
+#include "WebRTCPlugin.h"
+#include "Logger.h"
 
 namespace WebRTC {
 
@@ -96,12 +98,25 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
         return false;
     if (nativeSrc == nullptr || nativeDest == nullptr)
         return false;
-    m_commandList->Reset();
+    m_commandList->Reset(m_commandAllocator, nullptr);
     m_commandList->CopyResource(nativeDest, nativeSrc);
-    const uint64_t fenceValue = m_unityInterface->ExecuteCommandList(m_commandList,0,nullptr);
-    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, m_commandList);
+    m_commandList->Close();
+
+    ID3D12CommandList* cmdList[] = { m_commandList };
+    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
+
     ID3D12Fence* fence = m_unityInterface->GetFrameFence();
-    if (fenceValue < fence->GetCompletedValue() ) {
+    //const uint64_t fenceValue = m_unityInterface->ExecuteCommandList(m_commandList, 0 , nullptr);
+    //const uint64_t nextFrameFenceValue = m_unityInterface->GetNextFrameFenceValue();
+    //const uint64_t completedValue = fence->GetCompletedValue();
+
+    auto fenceValue = m_NextFenceValue;
+    m_unityInterface->GetCommandQueue()->Signal(fence, m_NextFenceValue++);
+
+
+    LogPrint("FenceValue: %d, NextValue: %d, CompletedValue: %d", fenceValue, fenceValue, fenceValue);
+
+    if (fence->GetCompletedValue() < fenceValue) {
 		const HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
         fence->SetEventOnCompletion(fenceValue, eventHandle);
 		WaitForSingleObject(eventHandle, INFINITE);
@@ -135,15 +150,18 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
 
     const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
-    const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON; //D3D12_RESOURCE_STATE_COPY_DEST
+    const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
 
     ID3D12Resource* nativeTex = nullptr;
-    m_d3d12Device->CreateCommittedResource(&DEFAULT_HEAP_PROPS, flags, &desc, initialState, nullptr, IID_PPV_ARGS(&nativeTex));
+    HRESULT hr = m_d3d12Device->CreateCommittedResource(&DEFAULT_HEAP_PROPS, flags, &desc, initialState, nullptr, IID_PPV_ARGS(&nativeTex));
+    if (!SUCCEEDED(hr)) {
+        return nullptr;
+    }
 
     ID3D11Texture2D* sharedTex = nullptr;
     HANDLE handle = nullptr;   
-    HRESULT hr = m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle);
+    hr = m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle);
     if (SUCCEEDED(hr)) {
         //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
         hr = m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex));
