@@ -55,7 +55,7 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) 
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
     assert(false && "CreateCPUReadTextureV need to implement on OpenGL");
-    return NULL;
+    return nullptr;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
 rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
 {
     assert(false && "ConvertRGBToI420 need to implement on OpenGL");
-    return NULL;
+    return nullptr;
 }
 
 } //end namespace

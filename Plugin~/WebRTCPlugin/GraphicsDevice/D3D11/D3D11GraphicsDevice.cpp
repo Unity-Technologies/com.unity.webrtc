@@ -101,7 +101,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITe
     assert(hr == S_OK);
     if (hr!=S_OK)
     {
-        return NULL;
+        return nullptr;
     }
 
     int width = tex->GetWidth();

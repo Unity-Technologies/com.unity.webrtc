@@ -34,12 +34,6 @@ typedef enum UnityGfxDeviceEventType
     kUnityGfxDeviceEventAfterReset     = 3,
 } UnityGfxDeviceEventType;
 
-typedef enum UnityEncoderType
-{
-    UnityEncoderSoftware    = 0,
-    UnityEncoderHardware    = 1,
-};
-
 typedef void (UNITY_INTERFACE_API * IUnityGraphicsDeviceEventCallback)(UnityGfxDeviceEventType eventType);
 
 // Should only be used on the rendering thread unless noted otherwise.
