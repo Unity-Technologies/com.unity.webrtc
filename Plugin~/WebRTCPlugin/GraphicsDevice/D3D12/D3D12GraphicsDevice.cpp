@@ -61,6 +61,8 @@ bool D3D12GraphicsDevice::InitV() {
 
 //---------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::ShutdownV() {
+    m_unityInterface = nullptr;
+    m_commandList->Release();
     m_commandAllocator->Release();
     SAFE_RELEASE(m_d3d11Device);
     SAFE_RELEASE(m_d3d11Context);
@@ -94,16 +96,14 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
         return false;
     if (nativeSrc == nullptr || nativeDest == nullptr)
         return false;
-
+    m_commandList->Reset();
     m_commandList->CopyResource(nativeDest, nativeSrc);
-    m_unityInterface->ExecuteCommandList(m_commandList,0,nullptr);
-
-
+    const uint64_t fenceValue = m_unityInterface->ExecuteCommandList(m_commandList,0,nullptr);
+    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, m_commandList);
     ID3D12Fence* fence = m_unityInterface->GetFrameFence();
-    const uint64_t nextFrameFenceValue = m_unityInterface->GetNextFrameFenceValue();
-    if (fence->GetCompletedValue() < nextFrameFenceValue ) {
+    if (fenceValue < fence->GetCompletedValue() ) {
 		const HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-        fence->SetEventOnCompletion(nextFrameFenceValue, eventHandle);
+        fence->SetEventOnCompletion(fenceValue, eventHandle);
 		WaitForSingleObject(eventHandle, INFINITE);
         CloseHandle(eventHandle);        
     }
