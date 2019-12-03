@@ -128,34 +128,19 @@ namespace WebRTC
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
 
-        if (!ContextManager::s_use_software_encoder)
-        {
-            auto dummyVideoEncoderFactory = std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
+        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = ContextManager::s_use_software_encoder ? webrtc::CreateBuiltinVideoEncoderFactory() : std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
 
-            peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
-                                    workerThread.get(),
-                                    workerThread.get(),
-                                    signalingThread.get(),
-                                    audioDevice,
-                                    webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-                                    webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
-                                    std::move(dummyVideoEncoderFactory),
-                                    webrtc::CreateBuiltinVideoDecoderFactory(),
-                                    nullptr,
-                                    nullptr);
-        }else{
-            peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
-                                    workerThread.get(),
-                                    workerThread.get(),
-                                    signalingThread.get(),
-                                    audioDevice,
-                                    webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-                                    webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
-                                    webrtc::CreateBuiltinVideoEncoderFactory(),
-                                    webrtc::CreateBuiltinVideoDecoderFactory(),
-                                    nullptr,
-                                    nullptr);
-        }
+        peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+                                workerThread.get(),
+                                workerThread.get(),
+                                signalingThread.get(),
+                                audioDevice,
+                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
+                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                std::move(videoEncoderFactory),
+                                webrtc::CreateBuiltinVideoDecoderFactory(),
+                                nullptr,
+                                nullptr);
     }
 
     Context::~Context()
