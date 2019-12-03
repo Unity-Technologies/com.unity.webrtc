@@ -74,24 +74,24 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>webrtc</TargetName>
     <OutDir>..\..\Runtime\Plugins\x86_64</OutDir>
-    <IncludePath>$(CUDA_INCLUDE_PATH);$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(CUDA_LIB_PATH);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(CUDA_PATH)\lib\$(Platform);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(CUDA_PATH)\lib\$(Platform);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>webrtc</TargetName>
-    <IncludePath>$(CUDA_INCLUDE_PATH);$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(CUDA_LIB_PATH);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(CUDA_PATH)\lib\$(Platform);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(CUDA_PATH)\lib\$(Platform);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
