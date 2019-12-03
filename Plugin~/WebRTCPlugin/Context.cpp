@@ -8,6 +8,7 @@
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
+    bool ContextManager::s_use_software_encoder = false;
 
     Context* ContextManager::GetContext(int uid)
     {

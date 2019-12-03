@@ -1,4 +1,4 @@
-// Unity Native Plugin API copyright © 2015 Unity Technologies ApS
+﻿// Unity Native Plugin API copyright © 2015 Unity Technologies ApS
 //
 // Licensed under the Unity Companion License for Unity - dependent projects--see[Unity Companion License](http://www.unity3d.com/legal/licenses/Unity_Companion_License).
 //
@@ -33,6 +33,12 @@ typedef enum UnityGfxDeviceEventType
     kUnityGfxDeviceEventBeforeReset    = 2,
     kUnityGfxDeviceEventAfterReset     = 3,
 } UnityGfxDeviceEventType;
+
+typedef enum UnityEncoderType
+{
+    UnityEncoderSoftware    = 0,
+    UnityEncoderHardware    = 1,
+};
 
 typedef void (UNITY_INTERFACE_API * IUnityGraphicsDeviceEventCallback)(UnityGfxDeviceEventType eventType);
 
