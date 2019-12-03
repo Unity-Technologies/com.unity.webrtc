@@ -14,6 +14,8 @@
 
 #include "NvCodec/NvEncoderCuda.h"
 
+#include "NvCodec/NvEncoderD3D12.h"
+
 #include "GraphicsDevice/IGraphicsDevice.h"
 #if defined(SUPPORT_METAL)
 #include "VideoToolbox/VTEncoderMetal.h"
@@ -53,6 +55,12 @@ namespace WebRTC {
                 } else {
                     m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
                 }
+                break;
+            }
+#endif
+#if defined(SUPPORT_D3D12)
+            case GRAPHICS_DEVICE_D3D12: {
+                m_encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
                 break;
             }
 #endif
