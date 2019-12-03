@@ -19,7 +19,6 @@ public:
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) = 0;
     virtual GraphicsDeviceType GetDeviceType() const = 0;
-    virtual GraphicsDeviceType GetDeviceType() = 0;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) = 0;
 
 };

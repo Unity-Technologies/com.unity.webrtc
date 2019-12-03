@@ -64,6 +64,12 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
     return vulkanTexture;
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height) {
+    assert(false && "CreateCPUReadTextureV() for Vulkan is not implemented yet");
+    return nullptr;
+    
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
@@ -144,6 +150,12 @@ VkResult VulkanGraphicsDevice::CreateCommandPool() {
     poolInfo.flags = 0; 
 
     return vkCreateCommandPool(m_device, &poolInfo, m_allocator, &m_commandPool);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(ITexture2D* tex) {
+    assert(false && "ConvertRGBToI420() for Vulkan is not implemented yet");
+    return nullptr;    
 }
 
 } //end namespace
