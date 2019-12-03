@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "IEncoder.h"
+#include "Context.h"
 #include "EncoderFactory.h"
 
 #if defined(SUPPORT_OPENGL_CORE)
@@ -9,6 +10,7 @@
 #if defined(SUPPORT_D3D11)
 #include "NvCodec/NvEncoderD3D11.h"
 #endif
+#include "SoftwareCodec/SoftwareEncoder.h"
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 
@@ -30,7 +32,12 @@ namespace WebRTC {
         switch (deviceType) {
 #if defined(SUPPORT_D3D11)
             case GRAPHICS_DEVICE_D3D11: {
-                m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+                if (!ContextManager::s_use_software_encoder)
+                {
+                    m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+                } else {
+                    m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                }
                 break;
             }
 #endif

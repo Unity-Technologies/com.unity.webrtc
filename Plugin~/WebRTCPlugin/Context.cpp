@@ -8,6 +8,7 @@
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
+    bool ContextManager::s_use_software_encoder = false;
 
     Context* ContextManager::GetContext(int uid)
     {
@@ -127,19 +128,20 @@ namespace WebRTC
         audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
-        auto dummyVideoEncoderFactory = std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
+
+        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = ContextManager::s_use_software_encoder ? webrtc::CreateBuiltinVideoEncoderFactory() : std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
 
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
-            workerThread.get(),
-            workerThread.get(),
-            signalingThread.get(),
-            audioDevice,
-            webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-            webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
-            std::move(dummyVideoEncoderFactory),
-            webrtc::CreateBuiltinVideoDecoderFactory(),
-            nullptr,
-            nullptr);
+                                workerThread.get(),
+                                workerThread.get(),
+                                signalingThread.get(),
+                                audioDevice,
+                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
+                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                std::move(videoEncoderFactory),
+                                webrtc::CreateBuiltinVideoDecoderFactory(),
+                                nullptr,
+                                nullptr);
     }
 
     Context::~Context()

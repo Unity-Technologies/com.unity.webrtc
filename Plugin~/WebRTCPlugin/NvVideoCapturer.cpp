@@ -31,14 +31,11 @@ namespace WebRTC
         }
     }
 
-    void NvVideoCapturer::CaptureFrame(std::vector<uint8>& data)
+    void NvVideoCapturer::CaptureFrame(webrtc::VideoFrame& videoFrame)
     {
-        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, data);
-        int64 timestamp = rtc::TimeMillis();
-        webrtc::VideoFrame videoFrame{buffer, webrtc::VideoRotation::kVideoRotation_0, timestamp};
-        videoFrame.set_ntp_time_ms(timestamp);
         OnFrame(videoFrame, width, height);
     }
+
     void NvVideoCapturer::StartEncoder()
     {
         captureStarted = true;

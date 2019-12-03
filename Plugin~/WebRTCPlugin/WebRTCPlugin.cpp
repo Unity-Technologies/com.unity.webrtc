@@ -31,6 +31,21 @@ namespace WebRTC
 
 extern "C"
 {
+    UNITY_INTERFACE_EXPORT void SetEncoderType(UnityEncoderType encoderType)
+    {
+        switch (encoderType)
+        {
+        case UnityEncoderSoftware:
+            ContextManager::s_use_software_encoder = true;
+            break;
+        case UnityEncoderHardware:
+            ContextManager::s_use_software_encoder = false;
+            break;
+        default:
+            break;
+        }
+    }
+
     UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)
     {
         return context->GetCodecInitializationResult();

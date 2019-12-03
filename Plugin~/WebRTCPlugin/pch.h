@@ -123,4 +123,10 @@ namespace WebRTC
     using int64 = signed long long;
 
     const uint32 bufferedFrameNum = 3;
+
+    typedef enum UnityEncoderType
+    {
+        UnityEncoderSoftware = 0,
+        UnityEncoderHardware = 1,
+    };
 }
