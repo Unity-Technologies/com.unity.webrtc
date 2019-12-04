@@ -11,6 +11,8 @@
 #include "OpenGL/OpenGLGraphicsDevice.h"
 #endif
 
+#include "Vulkan/VulkanGraphicsDevice.h"
+
 namespace WebRTC {
 
 GraphicsDevice& GraphicsDevice::GetInstance() {
@@ -21,37 +23,41 @@ GraphicsDevice& GraphicsDevice::GetInstance() {
 //---------------------------------------------------------------------------------------------------------------------
 
 bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
-
-    m_rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
-    void* device = nullptr;
-    switch (m_rendererType) {
-        case kUnityGfxRendererD3D11: {
+    const UnityGfxRenderer rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
+    switch (rendererType) {
 #if defined(SUPPORT_D3D11)
-            device = unityInterface->Get<IUnityGraphicsD3D11>()->GetDevice();
-#endif
-            break;
+        case kUnityGfxRendererD3D11: {
+            IUnityGraphicsD3D11* deviceInterface = unityInterface->Get<IUnityGraphicsD3D11>();
+            return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
-        case kUnityGfxRendererD3D12: {
+#endif
 #if defined(SUPPORT_D3D12)
-            device = unityInterface->Get<IUnityGraphicsD3D12>()->GetDevice();
-#endif
-            break;
+        case kUnityGfxRendererD3D12: {
+            IUnityGraphicsD3D12* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12>();
+            return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
+#endif
         case kUnityGfxRendererOpenGLCore: {
-            break;
+            return Init(rendererType, nullptr, nullptr);
+        }
+        case kUnityGfxRendererVulkan : {
+            IUnityGraphicsVulkan* deviceInterface = unityInterface->Get<IUnityGraphicsVulkan>();
+            UnityVulkanInstance vulkan = deviceInterface->Instance();
+            return Init(rendererType, reinterpret_cast<void*>(&vulkan), deviceInterface);
         }
         default: {
             DebugError("Unsupported Unity Renderer: %d", m_rendererType);
             return false;
         }
     }
-    return Init(m_rendererType, device);
+    return false;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device)
+bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUnityInterface* unityInterface)
 {
+    m_rendererType = rendererType;
     switch (rendererType) {
     case kUnityGfxRendererD3D11: {
 #if defined(SUPPORT_D3D11)
@@ -69,6 +75,18 @@ bool GraphicsDevice::Init(UnityGfxRenderer rendererType, void* device)
 #if defined(SUPPORT_OPENGL_CORE)
         m_device = new OpenGLGraphicsDevice();
 #endif
+        break;
+    }
+    case kUnityGfxRendererVulkan: {
+        const UnityVulkanInstance* vulkan = reinterpret_cast<const UnityVulkanInstance*>(device);
+        m_device = new VulkanGraphicsDevice(
+            reinterpret_cast<IUnityGraphicsVulkan*>(unityInterface),
+            vulkan->instance,
+            vulkan->physicalDevice,
+            vulkan->device,
+            vulkan->graphicsQueue,
+            vulkan->queueFamilyIndex
+        );
         break;
     }
     default: {

@@ -76,11 +76,12 @@
 #if defined(SUPPORT_OPENGL_CORE)
 #include <GL/glew.h>
 #endif
-#if defined(SUPPORT_VULKAN)
-//#include "IUnityGraphicsVulkan.h"
-#endif
 
 #include "IUnityGraphics.h"
+
+#if defined(SUPPORT_VULKAN)
+#include "IUnityGraphicsVulkan.h"
+#endif
 
 namespace WebRTC
 {

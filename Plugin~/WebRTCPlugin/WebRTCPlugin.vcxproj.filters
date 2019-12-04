@@ -29,6 +29,11 @@
     </Filter>
     <Filter Include="Codec\SoftwareCodec">
       <UniqueIdentifier>{b80f35b9-875a-4438-a7a0-68cb531ead5e}</UniqueIdentifier>
+    <Filter Include="GraphicsDevice\Vulkan">
+      <UniqueIdentifier>{1a7b60aa-85b3-4bbe-b21b-1e9790c171a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\Vulkan\Cuda">
+      <UniqueIdentifier>{1952dca2-95cc-4652-bc78-5e615debb379}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +117,29 @@
     </ClInclude>
     <ClInclude Include="Codec\SoftwareCodec\SoftwareEncoder.h">
       <Filter>Codec\SoftwareCodec</Filter>
+    <ClInclude Include="Codec\NvCodec\NvEncoderCuda.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\VulkanUtility.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaContext.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\VulkanTexture2D.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaImage.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h">
+      <Filter>Header Files\Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphicsVulkan.h">
+      <Filter>Header Files\Unity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +205,23 @@
     </ClCompile>
     <ClCompile Include="Codec\SoftwareCodec\SoftwareEncoder.cpp">
       <Filter>Codec\SoftwareCodec</Filter>
+    <ClCompile Include="Codec\NvCodec\NvEncoderCuda.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\VulkanUtility.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaContext.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\VulkanTexture2D.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaImage.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -12,6 +12,8 @@
 #endif
 #include "SoftwareCodec/SoftwareEncoder.h"
 
+#include "NvCodec/NvEncoderCuda.h"
+
 #include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace WebRTC {
@@ -47,6 +49,10 @@ namespace WebRTC {
                 break;
             }
 #endif
+            case GRAPHICS_DEVICE_VULKAN: {
+                m_encoder = std::make_unique<NvEncoderCuda>(width, height, device);
+                break;
+            }
             default: {
                 throw std::invalid_argument("Invalid device to initialize NvEncoder");
                 break;

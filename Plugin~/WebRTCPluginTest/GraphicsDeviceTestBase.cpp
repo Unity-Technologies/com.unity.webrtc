@@ -67,7 +67,7 @@ void GraphicsDeviceTestBase::SetUp()
     void* pGraphicsDevice;
     std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
 
-    ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice));
+    ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, nullptr));
     m_device = GraphicsDevice::GetInstance().GetDevice();
     ASSERT_NE(nullptr, m_device);
 }

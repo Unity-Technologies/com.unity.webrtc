@@ -18,18 +18,22 @@ namespace WebRTC
     IGraphicsDevice* s_device;
 }
 using namespace WebRTC;
-//get d3d11 device
+
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch (eventType)
     {
     case kUnityGfxDeviceEventInitialize:
     {
-        GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
+        if(s_context != nullptr)
+        {
+            s_context->FinalizeEncoder();
+            s_context = nullptr;
+        }
         GraphicsDevice::GetInstance().Shutdown();
 
         //UnityPluginUnload not called normally

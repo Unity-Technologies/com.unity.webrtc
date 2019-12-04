@@ -10,12 +10,18 @@ file(GLOB sources
   GraphicsDevice/*.cpp
   GraphicsDevice/OpenGL/*.h
   GraphicsDevice/OpenGL/*.cpp
+  GraphicsDevice/Vulkan/*.h
+  GraphicsDevice/Vulkan/*.cpp
+  GraphicsDevice/Vulkan/Cuda/*.h
+  GraphicsDevice/Vulkan/Cuda/*.cpp
   Codec/*.h
   Codec/*.cpp
   Codec/NvCodec/NvEncoder.cpp
   Codec/NvCodec/NvEncoder.h
   Codec/NvCodec/NvEncoderGL.cpp
   Codec/NvCodec/NvEncoderGL.h
+  Codec/NvCodec/NvEncoderCuda.cpp
+  Codec/NvCodec/NvEncoderCuda.h
 )
 
 add_plugin(webrtc
@@ -64,7 +70,13 @@ elseif(UNIX)
     ${WEBRTC_LIBRARIES}
     ${GLEW_STATIC_LIBRARY}
     ${OPENGL_LIBRARIES}
+    ${Vulkan_LIBRARY}
+    cuda
   )
+  target_include_directories(webrtc
+    PRIVATE
+    ${CUDA_INCLUDE_DIRS}
+    )
 endif()
 
 target_include_directories(webrtc

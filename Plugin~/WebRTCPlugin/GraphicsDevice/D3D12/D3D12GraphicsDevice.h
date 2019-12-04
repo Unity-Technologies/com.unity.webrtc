@@ -10,17 +10,16 @@ class D3D12GraphicsDevice : public IGraphicsDevice{
 public:
     D3D12GraphicsDevice(ID3D12Device* nativeDevice);
     virtual ~D3D12GraphicsDevice();
-    virtual bool InitV();
-    virtual void ShutdownV();
-    inline virtual void* GetEncodeDevicePtrV();
+    virtual bool InitV() override;
+    virtual void ShutdownV() override;
+    inline virtual void* GetEncodeDevicePtrV() override;
 
-    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h);
-    virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height);
-    virtual ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
-    virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
-    virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
-    inline virtual GraphicsDeviceType GetDeviceType();
-    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex);
+    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h) override;
+    virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height) override;
+    virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+    virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+    inline virtual GraphicsDeviceType GetDeviceType() const override;
+    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
 private:
 
@@ -39,7 +38,7 @@ private:
 
 //use D3D11. See notes below
 void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
-GraphicsDeviceType D3D12GraphicsDevice::GetDeviceType() { return GRAPHICS_DEVICE_D3D12; }
+GraphicsDeviceType D3D12GraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_D3D12; }
 
 }
 

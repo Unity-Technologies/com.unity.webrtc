@@ -11,14 +11,13 @@ class GraphicsDevice {
 
     public:
         static GraphicsDevice& GetInstance();
-        bool IsInitialized() { return m_device != nullptr; }
+        bool IsInitialized() const { return m_device != nullptr; }
         bool Init(IUnityInterfaces* unityInterface);
-        bool Init(UnityGfxRenderer rendererType, void* device);
+        bool Init(UnityGfxRenderer rendererType, void* device,IUnityInterface* unityInterface);
         void Shutdown();
         IGraphicsDevice* GetDevice() { return m_device; }
 
         inline ITexture2D* CreateDefaultTexture(uint32_t w , uint32_t h );
-        inline ITexture2D* CreateDefaultTextureFromNative(uint32_t width, uint32_t height, void* nativeTexturePtr);
 
         inline void* GetEncodeDevicePtr();
         inline void CopyResource(ITexture2D* dest, ITexture2D* src);
@@ -26,8 +25,8 @@ class GraphicsDevice {
 
     private:
         GraphicsDevice();
-        GraphicsDevice(GraphicsDevice const&);              
-        void operator=(GraphicsDevice const&);
+        GraphicsDevice(GraphicsDevice const&) = delete;              
+        void operator=(GraphicsDevice const&) = delete;
 
         UnityGfxRenderer m_rendererType;
         IGraphicsDevice* m_device = nullptr;
@@ -44,10 +43,6 @@ void GraphicsDevice::CopyResource(ITexture2D* dest, ITexture2D* src) { m_device-
 void GraphicsDevice::CopyResourceFromNative(ITexture2D* dest, void* nativeTexturePtr) {
     m_device->CopyResourceFromNativeV(dest, nativeTexturePtr);
 };
-
-ITexture2D* GraphicsDevice::CreateDefaultTextureFromNative(uint32_t width, uint32_t height, void* nativeTexturePtr) {
-    return m_device->CreateDefaultTextureFromNativeV(width, height, nativeTexturePtr);
-}
 
 
 

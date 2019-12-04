@@ -11,12 +11,18 @@ file(GLOB sources
   ../WebRTCPlugin/GraphicsDevice/*.cpp
   ../WebRTCPlugin/GraphicsDevice/OpenGL/*.h
   ../WebRTCPlugin/GraphicsDevice/OpenGL/*.cpp
+  ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
+  ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
+  ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
+  ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
   ../WebRTCPlugin/Codec/*.h
   ../WebRTCPlugin/Codec/*.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
   ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
+  ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
+  ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
 )
 
 add_executable(WebRTCPluginTest ${sources})
@@ -69,6 +75,13 @@ elseif(UNIX)
     ${GTEST_MAIN_LIBRARIES}
     ${GTEST_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
+#    ${CUDA_LIBRARY}
+    ${Vulkan_LIBRARY}
+    cuda
+    )
+  target_include_directories(WebRTCPluginTest
+    PRIVATE
+    ${CUDA_INCLUDE_DIRS}
     )
 endif()
 

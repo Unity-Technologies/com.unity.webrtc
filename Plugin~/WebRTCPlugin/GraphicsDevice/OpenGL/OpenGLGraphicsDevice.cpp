@@ -58,13 +58,6 @@ ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) 
     return nullptr;
 }
 
-//---------------------------------------------------------------------------------------------------------------------
-ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr) {
-    assert(nullptr!=nativeTexturePtr);
-    auto texPtr = reinterpret_cast<GLuint*>(nativeTexturePtr);
-    return new OpenGLTexture2D(w, h, texPtr);
-}
-
 
 //---------------------------------------------------------------------------------------------------------------------
 bool OpenGLGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
