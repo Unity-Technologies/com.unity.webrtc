@@ -15,11 +15,6 @@ OpenGLGraphicsDevice::~OpenGLGraphicsDevice() {
 
 //---------------------------------------------------------------------------------------------------------------------
 bool OpenGLGraphicsDevice::InitV() {
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        return false;
-    }
 #if _DEBUG
     GLuint unusedIds = 0;
     glEnable(GL_DEBUG_OUTPUT);
@@ -27,11 +22,6 @@ bool OpenGLGraphicsDevice::InitV() {
     glDebugMessageCallback(OnOpenGLDebugMessage, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
 #endif
-    if (err != GLEW_OK)
-    {
-        LogPrint("OpenGL initialize failed");
-        return false;
-    }
     return true;
 }
 
@@ -44,12 +34,12 @@ void OpenGLGraphicsDevice::ShutdownV() {
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 
-        GLuint tex;
-        glGenTextures(1, &tex);
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        return new OpenGLTexture2D(w, h, &tex);
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return new OpenGLTexture2D(w, h, &tex);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
