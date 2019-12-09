@@ -47,12 +47,10 @@ if(APPLE)
     PRIVATE
       WEBRTC_MAC
       WEBRTC_POSIX
-#      GLEW_STATIC
   )
   target_link_libraries(webrtc
      PRIVATE
      ${WEBRTC_LIBRARIES}
-     ${GLEW_LIBRARIES}
      ${OPENGL_LIBRARIES}
      ${FRAMEWORK_LIBS}
   )
@@ -63,13 +61,11 @@ elseif(UNIX)
     PRIVATE
       WEBRTC_LINUX
       WEBRTC_POSIX
-      GLEW_STATIC
   )
   target_link_libraries(webrtc
     PRIVATE
     ${WEBRTC_LIBRARIES}
-    ${GLEW_STATIC_LIBRARY}
-    ${OPENGL_LIBRARIES}
+    ${OPENGL_opengl_LIBRARY}
     ${Vulkan_LIBRARY}
     cuda
   )
@@ -85,5 +81,4 @@ target_include_directories(webrtc
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
-    ${GLEW_INCLUDE_DIRS}
 )

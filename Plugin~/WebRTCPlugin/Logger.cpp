@@ -5,10 +5,6 @@
 #include "WebRTCPlugin.h"
 #endif
 
-#if defined(SUPPORT_OPENGL_CORE)
-#include <GL/glew.h>
-#endif
-
 namespace WebRTC
 {
     void LogPrint(const char* fmt, ...)
