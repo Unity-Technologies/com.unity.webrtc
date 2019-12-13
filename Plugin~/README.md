@@ -1,31 +1,122 @@
-# プラグイン
+# ネイティブプラグイン
 
-`com.unity.webrtc` が依存するネイティブプラグインのビルド及び配置の方法について説明します。
+`com.unity.webrtc` はネイティブプラグインを使用しています。
+ネイティブプラグインのビルド及び配置の方法について説明します。
+
+## 開発環境
+
+開発環境を構築するため、依存ライブラリをインストールします。
+
+### 依存ライブラリのインストール (Windows)
+
+Windows 環境では、インストールに [chocolatey](https://chocolatey.org/) を使用します。
+
+```powershell
+# install CUDA
+choco install cuda --version=10.1
+
+# install Windows SDK
+choco install -y vcredist2010 vcredist2013 vcredist140 windows-sdk-10-version-1809-all
+
+# install Vulkan
+choco install -y wget
+wget https://vulkan.lunarg.com/sdk/download/1.1.121.2/windows/VulkanSDK-1.1.121.2-Installer.exe -O C:/Windows/Temp/VulkanSDK.exe
+C:/Windows/Temp/VulkanSDK.exe /S
+
+# Setting up environment variables
+setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
+setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
+```
+
+### 依存ライブラリのインストール (Ubuntu18.04)
+
+Ubuntu18.04 での開発環境の構築手順を以下に示します。
+
+```bash
+# Install libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
+sudo apt-get install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
+
+# Install CUDA SDK
+sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.1.243-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1804_10.1.243-1_amd64.deb
+sudo apt update
+sudo apt install -y cuda
+```
+
+### 依存ライブラリのインストール (MacOS)
+
+TBD.
 
 ### libwebrtc の組み込み
 
-プラグインは **libwebrtc** に依存しているため、ビルドするために libwebrtc をスタティックリンクする必要があります。Github Release ページに `webrtc-win.zip` を配置しています。
- <img src="../Packages/com.unity.webrtc/Documentation~/images/libwebrtc_github_release.png" width=600 align=center>
+プラグインは [libwebrtc](https://chromium.googlesource.com/external/webrtc/) に依存しているため、ビルドの際にリンクする必要があります。[Github Release](https://github.com/Unity-Technologies/com.unity.webrtc/releases) にライブラリを配置しています。もし自身でビルドする場合は、`BuildScript~` フォルダ以下にスクリプトを配置しています。
 
-zip ファイルを展開後、Plugin フォルダ直下に配置します。
+ <img src="../Documentation~/images/libwebrtc_github_release.png" width=600 align=center>
 
-<img src="../Packages/com.unity.webrtc/Documentation~/images/deploy_libwebrtc.png" width=500 align=center>
+Github Release から該当バージョンの zip ファイルをダウンロードします。
+zip ファイルを展開後、`Plugin~` フォルダ直下に配置します。
 
-### 開発環境
-
-version 1.0 現在、ビルドは **Visual Studio 2017** を利用しています。
+<img src="../Documentation~/images/deploy_libwebrtc.png" width=500 align=center>
 
 ### プロジェクトの設定
 
-プラグインの開発を行うためには、個別の環境に合わせて`WebRTCPlugin` プロジェクトのプロパティを変更する必要があります。
+Windows の場合、`WebRTCPlugin.sln` を **Visual Studio 2017** で開いてください。
+
+Linux の場合、 コンパイラに `clang` を使用します。そのため、CLion を利用する際には CMake の設定画面で `clang` の利用を指定します。
+
+### デバッグ
+
+プラグインのデバッグを行うためには、個別の環境に合わせて`WebRTCPlugin` プロジェクトのプロパティを変更する必要があります。
 
 `Command` に Unity の実行ファイルパス、`Command Arguments` にプロジェクトパスを指定してください。この設定を行うことで、デバッグ実行時に Unity エディタが起動し、ブレークポイントが有効になります。
 
-<img src="../Packages/com.unity.webrtc/Documentation~/images/command_config_vs2017.png" width=600 align=center>
+<img src="../Documentation~/images/command_config_vs2017.png" width=600 align=center>
+
+### 単体テスト
+
+ネイティブプラグインの単体テストに [gtest](https://github.com/google/googletest) を使用しています。
+
+#### Linux の場合
+`gtest` を以下のコマンドでインストールします。テストコードに [freeglut](http://freeglut.sourceforge.net/) を使用するため、同様にインストールします。
+
+```
+# Install googletest
+sudo apt install googletest
+
+# Install freeglut
+sudo apt install freeglut3-dev
+
+# Build googletest
+cd /usr/src/googletest
+sudo cmake -Dcxx_no_rtti=ON \
+           -DCMAKE_C_COMPILER="clang" \
+           -DCMAKE_CXX_COMPILER="clang++" \
+           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+           CMakeLists.txt
+sudo make
+sudo cp googlemock/*.a "/usr/lib"
+sudo cp googlemock/gtest/*.a "/usr/lib"	           
+```
+
+#### Windows の場合
+Visual Studio のメニューから `Manage NuGet Packages` を選択して GUI でインストールすることが可能です。
+あるいは以下をコマンド実行することでも可能です。
+
+```cmd
+choco install nuget.commandline
+nuget restore WebRTCPlugin.sln
+``` 
+
+Visual Studio を利用している場合は、テストエクスプローラー上でテスト項目を確認できます。
+
+#### Mac の場合
+
+TBD.
 
 ### プラグインの配置
 
-ビルド実行すると、`webrtc.dll` が `Packages\com.unity.webrtc\Runtime\Plugins\x86_64` に配置されます。このとき Unity のインスペクタ上で以下の設定になっていることを確認してください。
+ビルドを実行すると、`webrtc.dll` が `Packages\com.unity.webrtc\Runtime\Plugins\x86_64` に配置されます(Linux の場合は `libwebrtc.so`)。このとき Unity のインスペクタ上で以下の設定になっていることを確認してください。
 
-<img src="../Packages/com.unity.webrtc/Documentation~/images/inspector_webrtc_plugin.png" width=600 align=center>
+<img src="../Documentation~/images/inspector_webrtc_plugin.png" width=400 align=center>
 
