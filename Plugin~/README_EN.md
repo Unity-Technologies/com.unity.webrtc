@@ -4,9 +4,9 @@ This guide will cover building and deploying the native plugin `com.unity.webrtc
 
 ## Developing environment
 
-Install dependencies libraries to make developing environment.
+Install dependencies to make development environment.
 
-### How to install dependencies libraries (Windows)
+### How to install dependencies (Windows)
 
 On windows, [chocolatey](https://chocolatey.org/) is used to install.
 
@@ -27,7 +27,7 @@ setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
 setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
 ```
 
-### How to install dependencies libraries (Ubuntu18.04)
+### How to install dependencies (Ubuntu18.04)
 
 The below commands shows the build process developing environment on Ubuntu18.04.
 
@@ -43,7 +43,7 @@ sudo apt update
 sudo apt install -y cuda
 ```
 
-### How to install dependencies libraries (MacOS)
+### How to install dependencies (MacOS)
 
 TBD.
 
