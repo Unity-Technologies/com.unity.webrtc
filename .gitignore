@@ -339,6 +339,18 @@ MigrationBackup/
 
 # CMake
 cmake-build-*/
+Plugin~/cmake_install.cmake
+Plugin~/CMakeFiles/*
+Plugin~/CMakeScripts/*
+Plugin~/WebRTCPlugin/cmake_install.cmake
+Plugin~/WebRTCPlugin/CMakeFiles/*
+Plugin~/WebRTCPlugin/CMakeScripts/*
+Plugin~/WebRTCPluginTest/cmake_install.cmake
+Plugin~/WebRTCPluginTest/CMakeScripts/*
+
+# XCode 
+Plugin~/webrtc.xcodeproj/*
+Plugin~/WebRTCPlugin/webrtc-plugin.xcodeproj/*
 
 # Unity Folder 
 [Ll]ibrary/
