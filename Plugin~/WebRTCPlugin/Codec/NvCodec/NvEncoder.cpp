@@ -242,7 +242,7 @@ namespace WebRTC
         //no free buffer, skip this frame
         if (frame.isEncoding)
         {
-            return;
+            return false;
         }
         frame.isEncoding = true;
 #pragma endregion
@@ -268,6 +268,7 @@ namespace WebRTC
 #pragma endregion
         ProcessEncodedFrame(frame);
         frameCount++;
+        return true;
     }
 
     //get encoded frame
