@@ -22,11 +22,10 @@ TEST_P(GraphicsDeviceTest, CreateDefaultTextureV) {
     EXPECT_FALSE(tex->IsSize(0, 0));
 }
 
-TEST_P(GraphicsDeviceTest, CreateDefaultTextureFromNativeV) {
+TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
     auto width = 256;
     auto height = 256;
-    auto origin = m_device->CreateDefaultTextureV(width, height);
-    auto tex = m_device->CreateDefaultTextureFromNativeV(width, height, origin->GetNativeTexturePtrV());
+    auto tex = m_device->CreateCPUReadTextureV(width, height);
     EXPECT_TRUE(tex->IsSize(width, height));
     EXPECT_NE(nullptr, tex->GetEncodeTexturePtrV());
     EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
