@@ -13,8 +13,6 @@ if(APPLE)
         GraphicsDevice/Metal/*.mm
         Codec/*.h
         Codec/*.cpp
-        Codec/NvCodec/NvEncoder.cpp
-        Codec/NvCodec/NvEncoder.h
         ../WebRTCPlugin/GraphicsDevice/Metal/*.h
         ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
 #        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
