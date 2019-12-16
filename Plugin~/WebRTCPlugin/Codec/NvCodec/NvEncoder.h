@@ -49,7 +49,7 @@ namespace WebRTC
         bool EncodeFrame() override;
         bool IsSupported() const override { return isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
-        uint64 GetCurrentFrameCount() const override { return frameCount; }
+        virtual uint64 GetCurrentFrameCount() const override { return frameCount; }
         CodecInitializationResult GetCodecInitializationResult() const override { return InitializationResult(); }
     protected:
         int width = 1920;

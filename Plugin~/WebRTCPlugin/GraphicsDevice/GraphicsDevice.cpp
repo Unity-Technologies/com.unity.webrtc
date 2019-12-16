@@ -55,10 +55,8 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 #endif
         case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
-            device = unityInterface->Get<IUnityGraphicsMetal>()->MetalDevice();
-            if(device == nullptr) {
-                return false;
-            }
+            IUnityGraphicsMetal* deviceInterface = unityInterface->Get<IUnityGraphicsMetal>();
+            return Init(rendererType, deviceInterface->MetalDevice(), deviceInterface);
 #endif
             break;
         }
