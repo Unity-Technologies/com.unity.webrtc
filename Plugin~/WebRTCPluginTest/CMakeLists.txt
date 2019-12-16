@@ -2,39 +2,45 @@ cmake_minimum_required(VERSION 3.10)
 
 project(webrtc-test)
 
-file(GLOB sources
-  *.cpp
-  *.h
-  ../WebRTCPlugin/*h
-  ../WebRTCPlugin/*cpp
-  ../WebRTCPlugin/GraphicsDevice/*.h
-  ../WebRTCPlugin/GraphicsDevice/*.cpp
-  ../WebRTCPlugin/GraphicsDevice/OpenGL/*.h
-  ../WebRTCPlugin/GraphicsDevice/OpenGL/*.cpp
-  ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
-  ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
-  ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
-  ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
-  ../WebRTCPlugin/GraphicsDevice/Metal/*.h
-  ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
-  ../WebRTCPlugin/Codec/*.h
-  ../WebRTCPlugin/Codec/*.cpp
-<<<<<<< HEAD
-  ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
-  ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
-  ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
-  ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
-  ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
-  ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
-=======
-#  ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
-#  ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
-  ../WebRTCPlugin/GraphicsDevice/Metal/*.h
-  ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
->>>>>>> Added VideoToolbox
-  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
-  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
-)
+if(APPLE)
+    file(GLOB sources
+        *.cpp
+        *.h
+        GraphicsDevice/*.h
+        GraphicsDevice/*.cpp
+        GraphicsDevice/Metal/*.h
+        GraphicsDevice/Metal/*.mm
+        Codec/*.h
+        Codec/*.cpp
+        Codec/NvCodec/NvEncoder.cpp
+        Codec/NvCodec/NvEncoder.h
+        ../WebRTCPlugin/GraphicsDevice/Metal/*.h
+        ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+#        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
+#        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
+    )
+elseif(UNIX)
+    file(GLOB sources
+        *.cpp
+        *.h
+        GraphicsDevice/*.h
+        GraphicsDevice/*.cpp
+        GraphicsDevice/OpenGL/*.h
+        GraphicsDevice/OpenGL/*.cpp
+        GraphicsDevice/Vulkan/*.h
+        GraphicsDevice/Vulkan/*.cpp
+        GraphicsDevice/Vulkan/Cuda/*.h
+        GraphicsDevice/Vulkan/Cuda/*.cpp
+        Codec/*.h
+        Codec/*.cpp
+        Codec/NvCodec/NvEncoder.cpp
+        Codec/NvCodec/NvEncoder.h
+        Codec/NvCodec/NvEncoderGL.cpp
+        Codec/NvCodec/NvEncoderGL.h
+        Codec/NvCodec/NvEncoderCuda.cpp
+        Codec/NvCodec/NvEncoderCuda.h
+    )
+endif()
 
 if(APPLE)
   file(GLOB append_source
