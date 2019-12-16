@@ -131,7 +131,7 @@ namespace WebRTC
 
     const uint32 bufferedFrameNum = 3;
 
-    typedef enum UnityEncoderType
+    enum UnityEncoderType
     {
         UnityEncoderSoftware = 0,
         UnityEncoderHardware = 1,

@@ -69,7 +69,7 @@ namespace WebRTC
     public:
         std::vector<uint8>& buffer;
 
-        FrameBuffer(int width, int height, std::vector<uint8>& data) : frameWidth(width), frameHeight(height), buffer(data) {}
+        FrameBuffer(int width, int height, std::vector<uint8>& data) : buffer(data), frameWidth(width), frameHeight(height)  {}
 
         //webrtc::VideoFrameBuffer pure virtual functions
         // This function specifies in what pixel format the data is stored in.

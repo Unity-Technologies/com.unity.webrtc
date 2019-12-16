@@ -82,11 +82,11 @@ namespace WebRTC
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;
         //10Mbps
-        int bitRate = 10000000;
+        uint32_t bitRate = 10000000;
         //100Mbps
-        int lastBitRate = 100000000;
+        uint32_t lastBitRate = 100000000;
         //5Mbps
-        const int minBitRate = 5000000;
-        int frameRate = 45;
+        const uint32_t minBitRate = 5000000;
+        uint32_t frameRate = 45;
     };
 }
