@@ -3,43 +3,51 @@ cmake_minimum_required(VERSION 3.10)
 project(webrtc-plugin)
 
 
-file(GLOB sources
-  *.cpp
-  *.h
-  GraphicsDevice/*.h
-  GraphicsDevice/*.cpp
-<<<<<<< HEAD
-  GraphicsDevice/OpenGL/*.h
-  GraphicsDevice/OpenGL/*.cpp
-  GraphicsDevice/Vulkan/*.h
-  GraphicsDevice/Vulkan/*.cpp
-  GraphicsDevice/Vulkan/Cuda/*.h
-  GraphicsDevice/Vulkan/Cuda/*.cpp
-  GraphicsDevice/Metal/*.h
-  GraphicsDevice/Metal/*.mm
-  Codec/*.h
-  Codec/*.cpp
-  Codec/NvCodec/NvEncoder.cpp
-  Codec/NvCodec/NvEncoder.h
-  Codec/NvCodec/NvEncoderGL.cpp
-  Codec/NvCodec/NvEncoderGL.h
-  Codec/NvCodec/NvEncoderCuda.cpp
-  Codec/NvCodec/NvEncoderCuda.h
-=======
-  ../WebRTCPlugin/GraphicsDevice/Metal/*.h
-  ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
-  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
-  ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
-#  GraphicsDevice/OpenGL/*.h
-#  GraphicsDevice/OpenGL/*.cpp
-  Codec/*.h
-  Codec/*.cpp
-#  Codec/NvCodec/NvEncoder.cpp
-#  Codec/NvCodec/NvEncoder.h
-#  Codec/NvCodec/NvEncoderGL.cpp
-#  Codec/NvCodec/NvEncoderGL.h
->>>>>>> Added VideoToolbox
-)
+if(APPLE)
+    file(GLOB sources
+        *.cpp
+        *.h
+        GraphicsDevice/*.h
+        GraphicsDevice/*.cpp
+        GraphicsDevice/OpenGL/*.h
+        GraphicsDevice/OpenGL/*.cpp
+        GraphicsDevice/Metal/*.h
+        GraphicsDevice/Metal/*.mm
+        Codec/*.h
+        Codec/*.cpp
+        Codec/NvCodec/NvEncoder.cpp
+        Codec/NvCodec/NvEncoder.h
+        Codec/NvCodec/NvEncoderGL.cpp
+        Codec/NvCodec/NvEncoderGL.h
+        ../WebRTCPlugin/GraphicsDevice/Metal/*.h
+        ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
+        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
+    )
+elseif(UNIX)
+    file(GLOB sources
+        *.cpp
+        *.h
+        GraphicsDevice/*.h
+        GraphicsDevice/*.cpp
+        GraphicsDevice/OpenGL/*.h
+        GraphicsDevice/OpenGL/*.cpp
+        GraphicsDevice/Vulkan/*.h
+        GraphicsDevice/Vulkan/*.cpp
+        GraphicsDevice/Vulkan/Cuda/*.h
+        GraphicsDevice/Vulkan/Cuda/*.cpp
+        Codec/*.h
+        Codec/*.cpp
+        Codec/NvCodec/NvEncoder.cpp
+        Codec/NvCodec/NvEncoder.h
+        Codec/NvCodec/NvEncoderGL.cpp
+        Codec/NvCodec/NvEncoderGL.h
+        Codec/NvCodec/NvEncoderCuda.cpp
+        Codec/NvCodec/NvEncoderCuda.h
+    )
+endif()
+
+
 
 add_plugin(webrtc
   SOURCES ${sources}
