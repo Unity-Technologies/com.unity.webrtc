@@ -11,15 +11,6 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
 sudo apt install -y libc++-dev libc++abi-dev googletest clang freeglut3-dev
 
-# Install glew static library
-cd $SOLUTION_DIR
-wget https://downloads.sourceforge.net/glew/glew-2.1.0.tgz
-tar -xvzf glew-2.1.0.tgz
-cd $SOLUTION_DIR/glew-2.1.0
-make glew.lib.static
-find include -name "*.h" -print | cpio -pd "$SOLUTION_DIR/glew"
-find lib -name "*.a" -print | cpio -pd "$SOLUTION_DIR/glew"
-
 # Install googletest
 cd /usr/src/googletest
 sudo cmake -Dcxx_no_rtti=ON \

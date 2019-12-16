@@ -13,10 +13,8 @@ if(APPLE)
         GraphicsDevice/Metal/*.mm
         Codec/*.h
         Codec/*.cpp
-        ../WebRTCPlugin/GraphicsDevice/Metal/*.h
-        ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
-#        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
-#        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
+#       Codec/VideoToolbox/VTEncoderMetal.mm
+#       Codec/VideoToolbox/VTEncoderMetal.h
     )
 elseif(UNIX)
     file(GLOB sources
