@@ -108,5 +108,55 @@ namespace WebRTC {
     }
 
 //---------------------------------------------------------------------------------------------------------------------
+    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex){
+        id<MTLTexture> nativeTex = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
+        const uint32_t BYTES_PER_HEIGHT = 4;
+        const uint32_t width  = tex->GetWidth();
+        const uint32_t height = tex->GetHeight();
+        const uint32_t bufferSize = width * tex->GetHeight() * BYTES_PER_HEIGHT;
+        
+
+        std::vector<uint8_t> buffer;
+        buffer.resize(bufferSize);
+        if (nil == nativeTex)
+            return nullptr;
+        
+        [nativeTex getBytes:buffer.data() bytesPerRow:width*4 fromRegion:MTLRegionMake2D(0,0,width,height) mipmapLevel:0];
+
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
+
+        int yIndex = 0;
+        int uIndex = 0;
+        int vIndex = 0;
+
+        uint8_t* yuv_y = i420_buffer->MutableDataY();
+        uint8_t* yuv_u = i420_buffer->MutableDataU();
+        uint8_t* yuv_v = i420_buffer->MutableDataV();
+
+        for (uint32_t i = 0; i < height; i++) {
+            for (uint32_t j = 0; j < width; j++) {
+                int R, G, B, Y, U, V;
+                int startIndex = i * width + j * BYTES_PER_HEIGHT;
+                B = buffer[startIndex + 0];
+                G = buffer[startIndex + 1];
+                R = buffer[startIndex + 2];
+                
+                //[TODO-sin: 2019-12-16] Turn this into a common function
+                Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
+                U = ((-38 * R - 74 * G + 112 * B + 128) >> 8) + 128;
+                V = ((112 * R - 94 * G - 18 * B + 128) >> 8) + 128;
+
+                yuv_y[yIndex++] = (uint8_t)((Y < 0) ? 0 : ((Y > 255) ? 255 : Y));
+                if (i % 2 == 0 && j % 2 == 0)
+                {
+                    yuv_u[uIndex++] = (uint8_t)((U < 0) ? 0 : ((U > 255) ? 255 : U));
+                    yuv_v[vIndex++] = (uint8_t)((V < 0) ? 0 : ((V > 255) ? 255 : V));
+                }
+            }
+        }
+
+        return i420_buffer;
+
+    }
 
 }

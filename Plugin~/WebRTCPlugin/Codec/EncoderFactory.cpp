@@ -52,10 +52,12 @@ namespace WebRTC {
                 break;
             }
 #endif
+#if defined(SUPPORT_VULKAN)
             case GRAPHICS_DEVICE_VULKAN: {
                 m_encoder = std::make_unique<NvEncoderCuda>(width, height, device);
                 break;
             }
+#endif            
             default: {
                 throw std::invalid_argument("Invalid device to initialize NvEncoder");
                 break;
@@ -64,7 +66,8 @@ namespace WebRTC {
 
         m_encoder->InitV();
 #if defined(SUPPORT_METAL)
-        m_encoder = std::make_unique<VTEncoderMetal>(width, height, device);
+        m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+//        m_encoder = std::make_unique<VTEncoderMetal>(width, height, device);
 #endif
 
     }
