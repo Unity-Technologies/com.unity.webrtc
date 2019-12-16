@@ -9,14 +9,14 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 
 # Install googletest
 git clone https://github.com/google/googletest.git
-cd /usr/src/googletest
-sudo cmake -Dcxx_no_rtti=ON \
-           -DCMAKE_C_COMPILER="clang" \
-           -DCMAKE_CXX_COMPILER="clang++" \
-           -DCMAKE_C_FLAGS="-x objective-c" \
-           -DCMAKE_CXX_FLAGS="-stdlib=libc++ -x objective-c" \
-           CMakeLists.txt
-sudo make
+cd googletest
+mkdir build
+cd build
+cmake ..
+make
+make install
+
+
 sudo cp googlemock/*.a "/usr/lib"
 sudo cp googlemock/gtest/*.a "/usr/lib"
 
