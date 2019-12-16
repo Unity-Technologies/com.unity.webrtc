@@ -11,7 +11,9 @@
 #include "OpenGL/OpenGLGraphicsDevice.h"
 #endif
 
+#if defined(SUPPORT_VULKAN)
 #include "Vulkan/VulkanGraphicsDevice.h"
+#endif
 
 #if defined(SUPPORT_METAL)
 #include "Metal/MetalGraphicsDevice.h"
@@ -44,11 +46,13 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         case kUnityGfxRendererOpenGLCore: {
             return Init(rendererType, nullptr, nullptr);
         }
+#if defined(SUPPORT_VULKAN)
         case kUnityGfxRendererVulkan : {
             IUnityGraphicsVulkan* deviceInterface = unityInterface->Get<IUnityGraphicsVulkan>();
             UnityVulkanInstance vulkan = deviceInterface->Instance();
             return Init(rendererType, reinterpret_cast<void*>(&vulkan), deviceInterface);
         }
+#endif
         case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
             device = unityInterface->Get<IUnityGraphicsMetal>()->MetalDevice();
@@ -90,6 +94,7 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
 #endif
         break;
     }
+#if defined(SUPPORT_VULKAN)
     case kUnityGfxRendererVulkan: {
         const UnityVulkanInstance* vulkan = reinterpret_cast<const UnityVulkanInstance*>(device);
         m_device = new VulkanGraphicsDevice(
@@ -102,6 +107,7 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
         );
         break;
     }
+#endif
     case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
         m_device = new MetalGraphicsDevice(device);

@@ -9,20 +9,16 @@ if(APPLE)
         *.h
         GraphicsDevice/*.h
         GraphicsDevice/*.cpp
-        GraphicsDevice/OpenGL/*.h
-        GraphicsDevice/OpenGL/*.cpp
         GraphicsDevice/Metal/*.h
         GraphicsDevice/Metal/*.mm
         Codec/*.h
         Codec/*.cpp
         Codec/NvCodec/NvEncoder.cpp
         Codec/NvCodec/NvEncoder.h
-        Codec/NvCodec/NvEncoderGL.cpp
-        Codec/NvCodec/NvEncoderGL.h
         ../WebRTCPlugin/GraphicsDevice/Metal/*.h
         ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
-        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
-        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
+#        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.mm
+#        ../WebRTCPlugin/Codec/VideoToolbox/VTEncoderMetal.h
     )
 elseif(UNIX)
     file(GLOB sources
