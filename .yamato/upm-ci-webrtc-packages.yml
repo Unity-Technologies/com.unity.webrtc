@@ -30,16 +30,18 @@ platforms:
         platform: playmode
       - backend: mono
         platform: standalone
-  - name: mac
-    type: Unity::VM::osx
-    image: package-ci/mac:stable
+  - name: macos
+    type: Unity::metal::macmini
+    image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     prepack_command: BuildScripts~/build_plugin_mac.sh
-    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
+    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle
     test_params:
       - backend: mono
         platform: playmode
       - backend: mono
+        platform: standalone
+      - backend: il2cpp
         platform: standalone
 
 packages:

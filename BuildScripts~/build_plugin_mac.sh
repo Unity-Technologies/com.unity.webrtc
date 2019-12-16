@@ -3,6 +3,9 @@
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M72/webrtc-mac.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 
+# Install cmake
+brew install cmake
+
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
@@ -10,15 +13,9 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # Install googletest
 git clone https://github.com/google/googletest.git
 cd googletest
-mkdir build
-cd build
-cmake ..
+cmake .
 make
-make install
-
-
-sudo cp googlemock/*.a "/usr/lib"
-sudo cp googlemock/gtest/*.a "/usr/lib"
+sudo make install
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
