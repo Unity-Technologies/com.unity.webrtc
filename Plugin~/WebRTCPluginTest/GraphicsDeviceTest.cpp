@@ -22,6 +22,7 @@ TEST_P(GraphicsDeviceTest, CreateDefaultTextureV) {
     EXPECT_FALSE(tex->IsSize(0, 0));
 }
 
+#if defined(SUPPORT_SOFTWARE_ENCODER)
 TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
     auto width = 256;
     auto height = 256;
@@ -31,6 +32,7 @@ TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
     EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
     EXPECT_FALSE(tex->IsSize(0, 0));
 }
+#endif
 
 TEST_P(GraphicsDeviceTest, CopyResourceV) {
     const auto width = 256;
