@@ -2,34 +2,34 @@ cmake_minimum_required(VERSION 3.10)
 
 project(webrtc-plugin)
 
+# Common source files
+file(GLOB sources
+    *.cpp
+    *.h
+    GraphicsDevice/*.h
+    GraphicsDevice/*.cpp
+    Codec/*.h
+    Codec/*.cpp
+)
 
+# Apple/Unix specific source files
 if(APPLE)
-    file(GLOB sources
-        *.cpp
-        *.h
-        GraphicsDevice/*.h
-        GraphicsDevice/*.cpp
+    file(GLOB append_source
         GraphicsDevice/Metal/*.h
         GraphicsDevice/Metal/*.mm
-        Codec/*.h
-        Codec/*.cpp
-#       Codec/VideoToolbox/VTEncoderMetal.mm
-#       Codec/VideoToolbox/VTEncoderMetal.h
+        #Codec/VideoToolbox/VTEncoderMetal.mm
+        #Codec/VideoToolbox/VTEncoderMetal.h
     )
+
+    list (APPEND sources ${append_source})
 elseif(UNIX)
-    file(GLOB sources
-        *.cpp
-        *.h
-        GraphicsDevice/*.h
-        GraphicsDevice/*.cpp
+    file(GLOB append_source
         GraphicsDevice/OpenGL/*.h
         GraphicsDevice/OpenGL/*.cpp
         GraphicsDevice/Vulkan/*.h
         GraphicsDevice/Vulkan/*.cpp
         GraphicsDevice/Vulkan/Cuda/*.h
         GraphicsDevice/Vulkan/Cuda/*.cpp
-        Codec/*.h
-        Codec/*.cpp
         Codec/NvCodec/NvEncoder.cpp
         Codec/NvCodec/NvEncoder.h
         Codec/NvCodec/NvEncoderGL.cpp
@@ -37,6 +37,7 @@ elseif(UNIX)
         Codec/NvCodec/NvEncoderCuda.cpp
         Codec/NvCodec/NvEncoderCuda.h
     )
+    list (APPEND sources ${append_source})
 endif()
 
 
