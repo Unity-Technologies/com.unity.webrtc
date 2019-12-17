@@ -31,9 +31,9 @@ platforms:
       - backend: mono
         platform: standalone
   - name: macos
-    type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode
-    flavor: m1.mac
+    type: Unity::VM::osx
+    image: package-ci/mac:stable
+    flavor: b1.large
     prepack_command: BuildScripts~/build_plugin_mac.sh
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle
     test_params:
