@@ -33,7 +33,7 @@ platforms:
   - name: macos
     type: Unity::VM::osx
     image: package-ci/mac:stable
-    flavor: b1.large
+    flavor: m1.mac
     prepack_command: BuildScripts~/build_plugin_mac.sh
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle
     test_params:
