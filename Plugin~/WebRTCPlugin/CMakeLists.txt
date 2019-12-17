@@ -17,6 +17,8 @@ if(APPLE)
     file(GLOB append_source
         GraphicsDevice/Metal/*.h
         GraphicsDevice/Metal/*.mm
+        Codec/SoftwareCodec/*.h
+        Codec/SoftwareCodec/*.cpp
         #Codec/VideoToolbox/VTEncoderMetal.mm
         #Codec/VideoToolbox/VTEncoderMetal.h
     )

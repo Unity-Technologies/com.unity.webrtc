@@ -19,6 +19,8 @@ if(APPLE)
     file(GLOB append_source
         ../WebRTCPlugin/GraphicsDevice/Metal/*.h
         ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
+        ../WebRTCPlugin/Codec/SoftwareCodec/*.h
+        ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
         #Codec/VideoToolbox/VTEncoderMetal.mm
         #Codec/VideoToolbox/VTEncoderMetal.h
     )
@@ -26,6 +28,8 @@ if(APPLE)
     list (APPEND sources ${append_source})
 elseif(UNIX)
     file(GLOB append_source
+        NvCodec/*.h
+        NvCodec/*.cpp
         ../WebRTCPlugin/GraphicsDevice/OpenGL/*.h
         ../WebRTCPlugin/GraphicsDevice/OpenGL/*.cpp
         ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
