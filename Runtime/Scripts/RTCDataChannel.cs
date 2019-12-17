@@ -86,6 +86,9 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (null == WebRTC.Table)
+                    return;
+
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onClose();
             }, null);

@@ -287,7 +287,12 @@ namespace Unity.WebRTC
 
         internal static Context Context { get { return s_context; } }
         internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
-        internal static Hashtable Table { get { return s_context.table; } }
+
+        internal static Hashtable Table { get
+            {
+                return (null == s_context) ? null : s_context.table;
+            }
+        }
 
         public static bool HWEncoderSupport
         {
