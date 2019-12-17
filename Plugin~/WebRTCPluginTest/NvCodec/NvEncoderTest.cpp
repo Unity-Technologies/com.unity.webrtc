@@ -1,5 +1,5 @@
-#include "pch.h"
-#include "GraphicsDeviceTestBase.h"
+﻿#include "pch.h"
+#include "../GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
 #include "../WebRTCPlugin/Codec/IEncoder.h"
