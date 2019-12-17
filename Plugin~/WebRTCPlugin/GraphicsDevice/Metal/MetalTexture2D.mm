@@ -12,5 +12,6 @@ namespace WebRTC {
 
     MetalTexture2D::~MetalTexture2D()
     {
+        [m_texture release];
     }
 } //end namespace

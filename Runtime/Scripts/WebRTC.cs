@@ -275,6 +275,8 @@ namespace Unity.WebRTC
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
                     return RenderTextureFormat.ARGB32;
+                case UnityEngine.Rendering.GraphicsDeviceType.Metal:
+                    return RenderTextureFormat.BGRA32;
             }
             return RenderTextureFormat.Default;
         }

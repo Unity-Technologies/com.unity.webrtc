@@ -5,15 +5,16 @@
 
 namespace WebRTC {
 
-    MetalGraphicsDevice::MetalGraphicsDevice(void* device)
-        : m_device((__bridge id<MTLDevice>)device)
+    MetalGraphicsDevice::MetalGraphicsDevice(id<MTLDevice>  device, IUnityGraphicsMetal* unityGraphicsMetal)
+        : m_device(device)
+        , m_unityGraphicsMetal(unityGraphicsMetal)
     {
-        m_commandQueue = [m_device newCommandQueue];
     }
 
 //---------------------------------------------------------------------------------------------------------------------
     MetalGraphicsDevice::~MetalGraphicsDevice() {
-        [m_commandQueue release];
+        m_device = nil;
+        m_unityGraphicsMetal = nullptr;
     }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -65,17 +66,19 @@ namespace WebRTC {
     {
         if(dest == src)
             return false;
+        
+        m_unityGraphicsMetal->EndCurrentCommandEncoder();
 
-        id<MTLCommandBuffer> commandBuffer = [m_commandQueue commandBuffer];
+        id<MTLCommandBuffer> commandBuffer = m_unityGraphicsMetal->CurrentCommandBuffer();
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
-
+        
         NSUInteger width = src.width;
         NSUInteger height = src.height;
 
         MTLSize inTxtSize = MTLSizeMake(width, height, 1);
         MTLOrigin inTxtOrigin = MTLOriginMake(0, 0, 0);
         MTLOrigin outTxtOrigin = MTLOriginMake(0, 0, 0);
-    
+            
         [commandEncoder copyFromTexture:src
                         sourceSlice:0
                         sourceLevel:0
@@ -86,8 +89,10 @@ namespace WebRTC {
                         destinationLevel:0
                         destinationOrigin:outTxtOrigin];
         [commandEncoder endEncoding];
-        [commandBuffer commit];
-        [commandBuffer waitUntilCompleted];
+        commandEncoder = nil;
+        m_unityGraphicsMetal->EndCurrentCommandEncoder();
+        //[commandBuffer commit];
+        //[commandBuffer waitUntilCompleted];
 
         return true;
     }

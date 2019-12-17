@@ -7,7 +7,7 @@
 namespace WebRTC {
     class MetalGraphicsDevice : public IGraphicsDevice{
     public:
-        MetalGraphicsDevice(void* device);
+        MetalGraphicsDevice(id<MTLDevice> device, IUnityGraphicsMetal* unityGraphicsMetal);
         virtual ~MetalGraphicsDevice();
 
         virtual bool InitV() override;
@@ -25,8 +25,9 @@ namespace WebRTC {
         
     private:
         id<MTLDevice> m_device;
-        id<MTLCommandQueue> m_commandQueue;
+        
         bool CopyTexture(id<MTLTexture> dest, id<MTLTexture> src);
+        IUnityGraphicsMetal* m_unityGraphicsMetal;
     };
 
     void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device; }

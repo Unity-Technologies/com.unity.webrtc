@@ -56,7 +56,7 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
             IUnityGraphicsMetal* deviceInterface = unityInterface->Get<IUnityGraphicsMetal>();
-            return Init(rendererType, deviceInterface->MetalDevice(), deviceInterface);
+            return Init(rendererType, nullptr, deviceInterface);
 #endif
             break;
         }
@@ -106,12 +106,13 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
         break;
     }
 #endif
-    case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
-        m_device = new MetalGraphicsDevice(device);
+    case kUnityGfxRendererMetal: {
+        IUnityGraphicsMetal* metalUnityInterface = reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
+        m_device = new MetalGraphicsDevice(metalUnityInterface->MetalDevice(), metalUnityInterface);
+        break;
+    }
 #endif
-            break;
-        }
     default: {
         DebugError("Unsupported Unity Renderer: %d", rendererType);
         return false;
