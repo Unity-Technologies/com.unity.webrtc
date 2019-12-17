@@ -7,11 +7,23 @@ PluginImporter:
   iconMap: {}
   executionOrder: {}
   defineConstraints: []
-  isPreloaded: 0
+  isPreloaded: 1
   isOverridable: 1
   isExplicitlyReferenced: 0
   validateReferences: 1
   platformData:
+  - first:
+      '': Any
+    second:
+      enabled: 0
+      settings:
+        Exclude Editor: 0
+        Exclude Linux: 0
+        Exclude Linux64: 0
+        Exclude LinuxUniversal: 0
+        Exclude OSXUniversal: 0
+        Exclude Win: 0
+        Exclude Win64: 0
   - first:
       Any: 
     second:
@@ -20,10 +32,11 @@ PluginImporter:
   - first:
       Editor: Editor
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: x86_64
         DefaultValueInitialized: true
+        OS: AnyOS
   - first:
       Facebook: Win
     second:
@@ -39,7 +52,7 @@ PluginImporter:
   - first:
       Standalone: Linux
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: None
   - first:
@@ -53,17 +66,17 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: x86_64
+        CPU: AnyCPU
   - first:
       Standalone: OSXUniversal
     second:
-      enabled: 0
+      enabled: 1
       settings:
-        CPU: x86_64
+        CPU: AnyCPU
   - first:
       Standalone: Win
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: None
   - first:
