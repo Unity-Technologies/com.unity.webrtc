@@ -56,7 +56,7 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
             IUnityGraphicsMetal* deviceInterface = unityInterface->Get<IUnityGraphicsMetal>();
-            return Init(rendererType, nullptr, deviceInterface);
+            return Init(rendererType, deviceInterface->MetalDevice(), deviceInterface);
 #endif
             break;
         }
@@ -108,8 +108,9 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
 #endif
 #if defined(SUPPORT_METAL)
     case kUnityGfxRendererMetal: {
+        id<MTLDevice> metalDevice = reinterpret_cast<id<MTLDevice>>(device);
         IUnityGraphicsMetal* metalUnityInterface = reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
-        m_device = new MetalGraphicsDevice(metalUnityInterface->MetalDevice(), metalUnityInterface);
+        m_device = new MetalGraphicsDevice(metalDevice, metalUnityInterface);
         break;
     }
 #endif

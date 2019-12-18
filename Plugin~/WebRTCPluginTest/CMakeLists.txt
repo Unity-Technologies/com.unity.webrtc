@@ -78,6 +78,7 @@ if(APPLE)
 
     target_include_directories(WebRTCPluginTest
         PRIVATE
+        ..
     )
 elseif(UNIX)
     find_package(OpenGL REQUIRED)
@@ -104,6 +105,7 @@ elseif(UNIX)
     )
     target_include_directories(WebRTCPluginTest
         PRIVATE
+        ..
         ${CUDA_INCLUDE_DIRS}
     )
 endif()
