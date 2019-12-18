@@ -31,7 +31,7 @@ platforms:
       - backend: mono
         platform: standalone
   - name: macos
-    type: Unity::VM::osx
+    type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     prepack_command: BuildScripts~/build_plugin_mac.sh
