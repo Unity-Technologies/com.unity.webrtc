@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "MetalGraphicsDevice.h"
 #include "MetalTexture2D.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 #import <Metal/Metal.h>
 
 namespace WebRTC {
@@ -70,7 +71,7 @@ namespace WebRTC {
         m_unityGraphicsMetal->EndCurrentCommandEncoder();
 
         id<MTLCommandBuffer> commandBuffer = m_unityGraphicsMetal->CurrentCommandBuffer();
-        id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+        id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         
         NSUInteger width = src.width;
         NSUInteger height = src.height;
@@ -79,7 +80,7 @@ namespace WebRTC {
         MTLOrigin inTxtOrigin = MTLOriginMake(0, 0, 0);
         MTLOrigin outTxtOrigin = MTLOriginMake(0, 0, 0);
             
-        [commandEncoder copyFromTexture:src
+        [blit copyFromTexture:src
                         sourceSlice:0
                         sourceLevel:0
                         sourceOrigin:inTxtOrigin
@@ -88,11 +89,13 @@ namespace WebRTC {
                         destinationSlice:0
                         destinationLevel:0
                         destinationOrigin:outTxtOrigin];
-        [commandEncoder endEncoding];
-        commandEncoder = nil;
+        
+        //[TODO-sin: 2019-12-18] We don't need this if we are not using software encoding
+        [blit synchronizeResource:dest];
+        
+        [blit endEncoding];
+        blit = nil;
         m_unityGraphicsMetal->EndCurrentCommandEncoder();
-        //[commandBuffer commit];
-        //[commandBuffer waitUntilCompleted];
 
         return true;
     }
@@ -115,10 +118,12 @@ namespace WebRTC {
 //---------------------------------------------------------------------------------------------------------------------
     rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex){
         id<MTLTexture> nativeTex = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
-        const uint32_t BYTES_PER_HEIGHT = 4;
+        const uint32_t BYTES_PER_PIXEL = 4;
+        
         const uint32_t width  = tex->GetWidth();
         const uint32_t height = tex->GetHeight();
-        const uint32_t bufferSize = width * tex->GetHeight() * BYTES_PER_HEIGHT;
+        const uint32_t bytesPerRow = width * BYTES_PER_PIXEL;
+        const uint32_t bufferSize = bytesPerRow * height;
         
 
         std::vector<uint8_t> buffer;
@@ -126,39 +131,12 @@ namespace WebRTC {
         if (nil == nativeTex)
             return nullptr;
         
-        [nativeTex getBytes:buffer.data() bytesPerRow:width*4 fromRegion:MTLRegionMake2D(0,0,width,height) mipmapLevel:0];
+        [nativeTex getBytes:buffer.data() bytesPerRow:bytesPerRow fromRegion:MTLRegionMake2D(0,0,width,height) mipmapLevel:0];
 
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
-
-        int yIndex = 0;
-        int uIndex = 0;
-        int vIndex = 0;
-
-        uint8_t* yuv_y = i420_buffer->MutableDataY();
-        uint8_t* yuv_u = i420_buffer->MutableDataU();
-        uint8_t* yuv_v = i420_buffer->MutableDataV();
-
-        for (uint32_t i = 0; i < height; i++) {
-            for (uint32_t j = 0; j < width; j++) {
-                int R, G, B, Y, U, V;
-                int startIndex = i * width + j * BYTES_PER_HEIGHT;
-                B = buffer[startIndex + 0];
-                G = buffer[startIndex + 1];
-                R = buffer[startIndex + 2];
-                
-                //[TODO-sin: 2019-12-16] Turn this into a common function
-                Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
-                U = ((-38 * R - 74 * G + 112 * B + 128) >> 8) + 128;
-                V = ((112 * R - 94 * G - 18 * B + 128) >> 8) + 128;
-
-                yuv_y[yIndex++] = (uint8_t)((Y < 0) ? 0 : ((Y > 255) ? 255 : Y));
-                if (i % 2 == 0 && j % 2 == 0)
-                {
-                    yuv_u[uIndex++] = (uint8_t)((U < 0) ? 0 : ((U > 255) ? 255 : U));
-                    yuv_v[vIndex++] = (uint8_t)((V < 0) ? 0 : ((V > 255) ? 255 : V));
-                }
-            }
-        }
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
+            width, height,
+            bytesPerRow, buffer.data()
+        );
 
         return i420_buffer;
 

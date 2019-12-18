@@ -31,7 +31,7 @@ namespace WebRTC {
     };
 
     void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device; }
-GraphicsDeviceType MetalGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_METAL;}
+    GraphicsDeviceType MetalGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_METAL;}
 
 //---------------------------------------------------------------------------------------------------------------------
 }
