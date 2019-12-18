@@ -32,7 +32,7 @@ platforms:
         platform: standalone
   - name: macos
     type: Unity::VM::osx
-    image: package-ci/mac:stable
+    image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     prepack_command: BuildScripts~/build_plugin_mac.sh
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle
