@@ -9,10 +9,6 @@ rtc::scoped_refptr<webrtc::I420Buffer> GraphicsUtility::ConvertRGBToI420Buffer(c
 
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
 
-    int StrideY = i420_buffer->StrideY();
-    int StrideU = i420_buffer->StrideU();
-    int StrideV = i420_buffer->StrideV();
-
     int yIndex = 0;
     int uIndex = 0;
     int vIndex = 0;
