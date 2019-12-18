@@ -62,6 +62,9 @@
     <ClCompile Include="GraphicsDevice\Vulkan\VulkanUtility.cpp">
       <Filter>GraphicsDevice\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsDevice\GraphicsUtility.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -148,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="GraphicsDevice\Vulkan\VulkanUtility.h">
       <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice\GraphicsUtility.h">
+      <Filter>GraphicsDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

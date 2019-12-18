@@ -2,27 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\WebRTCPlugin\Callback.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\Codec\EncoderFactory.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Context.cpp" />
     <ClCompile Include="..\WebRTCPlugin\DataChannelObject.cpp" />
     <ClCompile Include="..\WebRTCPlugin\DummyAudioDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\DummyVideoEncoder.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Logger.cpp" />
     <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />
@@ -35,35 +18,66 @@
     <ClCompile Include="NvCodec\NvEncoderTest.cpp">
       <Filter>NvCodec</Filter>
     </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.cpp">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.cpp">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\Codec\EncoderFactory.cpp">
+      <Filter>Codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.cpp">
+      <Filter>Codec\SoftwareCodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.cpp">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.cpp">
+      <Filter>GraphicsDevice</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\unity\include\IUnityGraphics.h" />
-    <ClInclude Include="..\unity\include\IUnityGraphicsD3D11.h" />
-    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h" />
-    <ClInclude Include="..\unity\include\IUnityInterface.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\EncoderFactory.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\IEncoder.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\nvEncodeAPI.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h" />
-    <ClInclude Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
     <ClInclude Include="..\WebRTCPlugin\DataChannelObject.h" />
     <ClInclude Include="..\WebRTCPlugin\DummyAudioDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\DummyVideoEncoder.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.h" />
-    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.h" />
     <ClInclude Include="..\WebRTCPlugin\Logger.h" />
     <ClInclude Include="..\WebRTCPlugin\NvVideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\pch.h" />
@@ -75,6 +89,78 @@
     <ClInclude Include="..\WebRTCPlugin\WebRTCPlugin.h" />
     <ClInclude Include="GraphicsDeviceTestBase.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.h">
+      <Filter>GraphicsDevice\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaImage.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.h">
+      <Filter>GraphicsDevice\Vulkan\Cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\EncoderFactory.h">
+      <Filter>Codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphics.h">
+      <Filter>Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D11.h">
+      <Filter>Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h">
+      <Filter>Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unity\include\IUnityInterface.h">
+      <Filter>Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\IEncoder.h">
+      <Filter>Codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\nvEncodeAPI.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.h">
+      <Filter>Codec\SoftwareCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.h">
+      <Filter>GraphicsDevice\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h">
+      <Filter>GraphicsDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -82,6 +168,33 @@
   <ItemGroup>
     <Filter Include="NvCodec">
       <UniqueIdentifier>{e416654c-1cb0-4144-9a65-cb6a3c3ed85d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice">
+      <UniqueIdentifier>{122e5838-a543-4fb2-827b-767e80080224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codec">
+      <UniqueIdentifier>{bca7ca88-97ff-42b9-b36e-557aaa0ca19a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\D3D11">
+      <UniqueIdentifier>{6c29698e-ee91-4c2d-a2cc-6f2b88d20a63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\D3D12">
+      <UniqueIdentifier>{dada11e6-f682-496b-9445-3915f4225781}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\Vulkan">
+      <UniqueIdentifier>{d125d1f1-5075-46db-96ab-363f2ead6e03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsDevice\Vulkan\Cuda">
+      <UniqueIdentifier>{792f85f0-8a0c-45ec-8119-e00e908f9946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unity">
+      <UniqueIdentifier>{031f3168-dc17-49cb-9374-62f5a13ecef5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codec\NvCodec">
+      <UniqueIdentifier>{c2fe7d0b-4dae-4bdc-bf85-818f930805ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codec\SoftwareCodec">
+      <UniqueIdentifier>{c117917c-26a2-4240-8d04-4cf5c19448e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

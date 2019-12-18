@@ -68,6 +68,7 @@
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.h" />
@@ -103,6 +104,7 @@
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.cpp" />
