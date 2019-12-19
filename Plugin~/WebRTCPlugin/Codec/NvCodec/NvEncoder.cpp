@@ -13,7 +13,6 @@ namespace WebRTC
 {
     static void* s_hModule = nullptr;
     static std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
-    static CodecInitializationResult initializationResult = CodecInitializationResult::NotInitialized;
 
     NvEncoder::NvEncoder(
         const NV_ENC_DEVICE_TYPE type,
@@ -27,13 +26,13 @@ namespace WebRTC
 
     void NvEncoder::InitV()  {
         bool result = true;
-        if (initializationResult == CodecInitializationResult::NotInitialized)
+        if (m_initializationResult == CodecInitializationResult::NotInitialized)
         {
-            initializationResult = LoadCodec();
+            m_initializationResult = LoadCodec();
         }
-        if(initializationResult != CodecInitializationResult::Success)
+        if(m_initializationResult != CodecInitializationResult::Success)
         {
-            throw initializationResult;
+            throw m_initializationResult;
         }
 #pragma region open an encode session
         //open an encode session
@@ -180,12 +179,6 @@ namespace WebRTC
 #endif
             s_hModule = nullptr;
         }
-        initializationResult = CodecInitializationResult::NotInitialized;
-    }
-
-    CodecInitializationResult NvEncoder::InitializationResult()
-    {
-        return initializationResult;
     }
 
     void NvEncoder::UpdateSettings()

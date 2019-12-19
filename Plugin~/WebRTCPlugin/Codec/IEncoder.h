@@ -24,6 +24,10 @@ namespace WebRTC {
         virtual void SetIdrFrame() = 0;
         virtual uint64 GetCurrentFrameCount() const = 0;
         sigslot::signal1<webrtc::VideoFrame&> CaptureFrame;
-        virtual CodecInitializationResult GetCodecInitializationResult() const = 0;
+
+        CodecInitializationResult GetCodecInitializationResult() const { return m_initializationResult; }
+    protected:
+        CodecInitializationResult m_initializationResult = CodecInitializationResult::NotInitialized;
+
     };
 }

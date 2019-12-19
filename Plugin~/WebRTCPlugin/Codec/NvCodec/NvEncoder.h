@@ -36,7 +36,6 @@ namespace WebRTC
         virtual ~NvEncoder();
 
         virtual void InitV() override;
-        static CodecInitializationResult InitializationResult();
         static CodecInitializationResult LoadCodec();
         static void UnloadCodec();
         static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
@@ -50,7 +49,6 @@ namespace WebRTC
         bool IsSupported() const override { return isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
         virtual uint64 GetCurrentFrameCount() const override { return frameCount; }
-        CodecInitializationResult GetCodecInitializationResult() const override { return InitializationResult(); }
     protected:
         int width = 1920;
         int height = 1080;

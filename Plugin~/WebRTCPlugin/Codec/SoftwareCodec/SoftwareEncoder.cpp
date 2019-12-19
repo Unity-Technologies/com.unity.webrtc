@@ -19,6 +19,7 @@ namespace WebRTC
     void SoftwareEncoder::InitV()
     {
         m_encodeTex = m_device->CreateCPUReadTextureV(m_width, m_height);
+        m_initializationResult = CodecInitializationResult::Success;
     }
 
     bool SoftwareEncoder::CopyBuffer(void* frame)

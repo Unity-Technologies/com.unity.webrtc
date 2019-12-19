@@ -19,9 +19,7 @@ namespace WebRTC
         virtual bool EncodeFrame() override;
         virtual bool IsSupported() const override { return true; }
         virtual void SetIdrFrame() override {}
-        virtual uint64 GetCurrentFrameCount() const override { return 0; }
-        virtual CodecInitializationResult GetCodecInitializationResult() const override;
-        
+        virtual uint64 GetCurrentFrameCount() const override { return 0; }        
 
     private:
         IGraphicsDevice* m_device;
@@ -30,8 +28,7 @@ namespace WebRTC
         int m_height = 1080;
     };
 //---------------------------------------------------------------------------------------------------------------------
-    
-    CodecInitializationResult SoftwareEncoder::GetCodecInitializationResult() const { return CodecInitializationResult::Success;}
+   
     
     
 } //end namespace
