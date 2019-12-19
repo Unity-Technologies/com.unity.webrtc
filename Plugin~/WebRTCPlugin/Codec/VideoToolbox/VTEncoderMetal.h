@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Codec/IEncoder.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include <VideoToolbox/VideoToolbox.h>
@@ -15,7 +15,6 @@ namespace WebRTC {
         bool IsSupported() const override;
         void SetIdrFrame() override;
         uint64 GetCurrentFrameCount() const override { return frameCount; }
-        CodecInitializationResult GetCodecInitializationResult() const override { return CodecInitializationResult::Success; }
     private:
         uint64 frameCount = 0;
         uint64 m_width = 0;
