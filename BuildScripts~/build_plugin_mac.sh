@@ -23,5 +23,9 @@ cmake -GXcode .
 xcodebuild -scheme webrtc -configuration Release build
 xcodebuild -scheme WebRTCPluginTest -configuration Release build
 
-# Run UnitTest
-"$SOLUTION_DIR/WebRTCPluginTest/Release/WebRTCPluginTest"
+# Copy and run the test on the Metal device
+scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/WebRTCPluginTest/Release" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
+ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '~/com.unity.webrtc/WebRTCPluginTest'
+
+# Running test locally. Left as a reference
+#"$SOLUTION_DIR/WebRTCPluginTest/Release/WebRTCPluginTest"
