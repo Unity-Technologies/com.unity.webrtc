@@ -308,6 +308,10 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateSDSuccess(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateCollectStats(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string stats);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateCreateGetStats(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateSDFailure(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateSetSDSuccess(IntPtr ptr);
@@ -366,6 +370,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackCreateSD(IntPtr ptr, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionRegisterCallbackCollectStats(IntPtr ptr, DelegateCollectStats onCollectStats);
+        [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackSetSD(IntPtr ptr, DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
@@ -373,6 +379,8 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionCollectStats(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
