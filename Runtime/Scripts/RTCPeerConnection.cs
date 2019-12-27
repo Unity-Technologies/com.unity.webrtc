@@ -63,7 +63,7 @@ namespace Unity.WebRTC
         public RTCIceConnectionState IceConnectionState
         {
             get
-            { 
+            {
                 return NativeMethods.PeerConnectionIceConditionState(self);
             }
         }
@@ -342,7 +342,7 @@ namespace Unity.WebRTC
             }, null);
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateSetSDFailure))]
+        [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
         static void OnStatsDeliveredCallback(IntPtr ptr, string stats)
         {
             WebRTC.SyncContext.Post(_ =>
