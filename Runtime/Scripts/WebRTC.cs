@@ -223,10 +223,11 @@ namespace Unity.WebRTC
         private static SynchronizationContext s_syncContext;
         private static Material flipMat;
 
-        public static void Initialize()
+        public static void Initialize(EncoderType type = EncoderType.Hardware)
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create();
+            s_context.SetEncoderType(type);
             s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;

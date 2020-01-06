@@ -33,6 +33,14 @@ class NativeAPITest
     }
 
     [Test]
+    public void GetEncoderType()
+    {
+        var context = NativeMethods.ContextCreate(0);
+        Assert.AreEqual(EncoderType.Hardware, NativeMethods.ContextGetEncoderType(context));
+        NativeMethods.ContextDestroy(0);
+    }
+
+    [Test]
     public void CreateAndDeletePeerConnection()
     {
         var context = NativeMethods.ContextCreate(0);
