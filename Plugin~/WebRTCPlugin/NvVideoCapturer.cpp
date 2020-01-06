@@ -61,11 +61,11 @@ namespace WebRTC
         encoder_->SetRate(rate);
     }
 
-    bool NvVideoCapturer::InitializeEncoder(IGraphicsDevice* device)
+    bool NvVideoCapturer::InitializeEncoder(IGraphicsDevice* device, UnityEncoderType encoderType)
     {
         try
         {
-            EncoderFactory::GetInstance().Init(width, height, device);
+            EncoderFactory::GetInstance().Init(width, height, device, encoderType);
         }
         catch(std::runtime_error& exception)
         {

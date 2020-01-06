@@ -7,6 +7,12 @@ using System.Collections;
 
 namespace Unity.WebRTC
 {
+    public enum EncoderType
+    {
+        Software = 0,
+        Hardware = 1
+    }
+
     public struct RTCIceCandidate​
     {
         [MarshalAs(UnmanagedType.LPStr)]
@@ -135,8 +141,6 @@ namespace Unity.WebRTC
         public RTCSdpType type;
         [MarshalAs(UnmanagedType.LPStr)]
         public string sdp;
-
-
     }
 
     public struct RTCOfferOptions
@@ -300,6 +304,16 @@ namespace Unity.WebRTC
                 var result = Context.GetCodecInitializationResult();
                 return result == CodecInitializationResult.Success;
             }
+            set
+            {
+                if(s_context.IsNull)
+                {
+                    throw new CodecInitializationException(CodecInitializationResult.NotInitialized);
+                }
+
+                var type = value ? EncoderType.Hardware : EncoderType.Software;
+                Context.SetEncoderType(type);
+            }
         }
     }
 
@@ -419,6 +433,10 @@ namespace Unity.WebRTC
         public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern bool ContextSetEncoderType(IntPtr context, EncoderType type);
+        [DllImport(WebRTC.Lib)]
+        public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]

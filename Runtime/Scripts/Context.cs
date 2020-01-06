@@ -71,6 +71,16 @@ namespace Unity.WebRTC
             return NativeMethods.ContextGetCodecInitializationResult(self);
         }
 
+        public bool SetEncoderType(EncoderType type)
+        {
+            return NativeMethods.ContextSetEncoderType(self, type);
+        }
+
+        public EncoderType GetEncoderType()
+        {
+            return NativeMethods.ContextGetEncoderType(self);
+        }
+
         public IntPtr CreatePeerConnection()
         {
             return NativeMethods.ContextCreatePeerConnection(self);

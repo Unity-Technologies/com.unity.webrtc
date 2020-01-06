@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "WebRTCPlugin.h"
 #include "PeerConnectionObject.h"
 #include "Context.h"
@@ -31,19 +31,14 @@ namespace WebRTC
 
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT void SetEncoderType(UnityEncoderType encoderType)
+    UNITY_INTERFACE_EXPORT bool ContextSetEncoderType(Context* context, UnityEncoderType encoderType)
     {
-        switch (encoderType)
-        {
-        case UnityEncoderSoftware:
-            ContextManager::s_use_software_encoder = true;
-            break;
-        case UnityEncoderHardware:
-            ContextManager::s_use_software_encoder = false;
-            break;
-        default:
-            break;
-        }
+        return context->SetEncoderType(encoderType);
+    }
+
+    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
+    {
+        return context->GetEncoderType();
     }
 
     UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)

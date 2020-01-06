@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "DummyAudioDevice.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
@@ -22,7 +22,6 @@ namespace WebRTC
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
         void* hModule = nullptr;
-        static bool s_use_software_encoder;
     private:
         ~ContextManager();
         std::map<int, ContextPtr> m_contexts;
@@ -43,6 +42,8 @@ namespace WebRTC
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
+        bool SetEncoderType(UnityEncoderType type);
+        UnityEncoderType GetEncoderType() const;
 
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IGraphicsDevice* device);
@@ -60,6 +61,7 @@ namespace WebRTC
 
     private:
         int m_uid;
+        UnityEncoderType m_encoderType;
         std::unique_ptr<rtc::Thread> workerThread;
         std::unique_ptr<rtc::Thread> signalingThread;
         std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;

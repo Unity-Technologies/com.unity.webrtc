@@ -129,7 +129,10 @@ namespace WebRTC
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
 
-        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = ContextManager::s_use_software_encoder ? webrtc::CreateBuiltinVideoEncoderFactory() : std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
+        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
+            m_encoderType == UnityEncoderType::UnityEncoderHardware ?
+            webrtc::CreateBuiltinVideoEncoderFactory() :
+            std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
 
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
                                 workerThread.get(),
@@ -161,7 +164,7 @@ namespace WebRTC
 
     bool Context::InitializeEncoder(IGraphicsDevice* device)
     {
-        if(!nvVideoCapturer->InitializeEncoder(device))
+        if(!nvVideoCapturer->InitializeEncoder(device, m_encoderType))
         {
             return false;
         }
