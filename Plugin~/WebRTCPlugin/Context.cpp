@@ -116,6 +116,7 @@ namespace WebRTC
 
     Context::Context(int uid)
         : m_uid(uid)
+        , m_encoderType(UnityEncoderType::UnityEncoderHardware)
     {
         workerThread.reset(new rtc::Thread());
         workerThread->Start();
