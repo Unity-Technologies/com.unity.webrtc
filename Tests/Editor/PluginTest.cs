@@ -15,6 +15,9 @@ public class PluginTest {
     [Test]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor)]
     public static void IsPluginLoaded() {
+
+        
+#if !UNITY_EDITOR_OSX
         // Get the current process.
         Process currentProcess = Process.GetCurrentProcess();
         var names = currentProcess.Modules
@@ -24,6 +27,7 @@ public class PluginTest {
             .ToArray();
 
         Assert.Contains(WebRTC.GetModuleName(), names);
+#endif
     }
 }
 
