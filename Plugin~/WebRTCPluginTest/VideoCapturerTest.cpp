@@ -20,7 +20,7 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        EncoderFactory::GetInstance().Init(width, height, m_device);
+        EncoderFactory::GetInstance().Init(width, height, m_device, UnityEncoderType::UnityEncoderHardware);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
 
@@ -32,12 +32,12 @@ protected:
     }
 };
 TEST_P(VideoCapturerTest, InitializeAndFinalize) {
-    capturer->InitializeEncoder(m_device);
+    capturer->InitializeEncoder(m_device, WebRTC::UnityEncoderType::UnityEncoderHardware);
     capturer->FinalizeEncoder();
 }
 
 TEST_P(VideoCapturerTest, EncodeVideoData) {
-    capturer->InitializeEncoder(m_device);
+    capturer->InitializeEncoder(m_device, WebRTC::UnityEncoderType::UnityEncoderHardware);
     auto tex = m_device->CreateDefaultTextureV(width, height);
     capturer->SetFrameBuffer(tex->GetEncodeTexturePtrV());
     capturer->EncodeVideoData();

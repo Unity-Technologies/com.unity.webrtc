@@ -8,7 +8,6 @@
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
-    bool ContextManager::s_use_software_encoder = false;
 
     Context* ContextManager::GetContext(int uid)
     {
@@ -178,6 +177,16 @@ namespace WebRTC
     void Context::FinalizeEncoder()
     {
         nvVideoCapturer->FinalizeEncoder();
+    }
+
+    bool Context::SetEncoderType(UnityEncoderType type)
+    {
+        m_encoderType = type;
+        return true;
+    }
+    UnityEncoderType Context::GetEncoderType() const
+    {
+        return m_encoderType;
     }
 
     webrtc::MediaStreamInterface* Context::CreateVideoStream(void* frameBuffer, int width, int height)
