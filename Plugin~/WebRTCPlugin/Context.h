@@ -14,7 +14,7 @@ namespace WebRTC
     public:
         static ContextManager* GetInstance() { return &s_instance; }
      
-        Context* GetContext(int uid);
+        Context* GetContext(int uid, UnityEncoderType encoderType);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
 
@@ -31,7 +31,7 @@ namespace WebRTC
     class Context
     {
     public:
-        explicit Context(int uid = -1);
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderType::UnityEncoderHardware);
         ~Context();
 
         CodecInitializationResult GetCodecInitializationResult();

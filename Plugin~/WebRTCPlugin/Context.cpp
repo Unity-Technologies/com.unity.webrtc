@@ -9,7 +9,7 @@ namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
 
-    Context* ContextManager::GetContext(int uid)
+    Context* ContextManager::GetContext(int uid, UnityEncoderType encoderType)
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
@@ -17,7 +17,7 @@ namespace WebRTC
             return it->second.get();
         }
 
-        auto ctx = new Context(uid);
+        auto ctx = new Context(uid, encoderType);
         s_instance.m_contexts[uid].reset(ctx);
         DebugLog("Register context with ID %d", uid);
         return ctx;
@@ -114,9 +114,9 @@ namespace WebRTC
     }
 #pragma warning(pop)
 
-    Context::Context(int uid)
+    Context::Context(int uid, UnityEncoderType encoderType)
         : m_uid(uid)
-        , m_encoderType(UnityEncoderType::UnityEncoderHardware)
+        , m_encoderType(encoderType)
     {
         workerThread.reset(new rtc::Thread());
         workerThread->Start();
@@ -131,8 +131,8 @@ namespace WebRTC
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            webrtc::CreateBuiltinVideoEncoderFactory() :
-            std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
+            std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer) :
+            webrtc::CreateBuiltinVideoEncoderFactory();
 
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
                                 workerThread.get(),

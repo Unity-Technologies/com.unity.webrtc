@@ -45,11 +45,6 @@ class ContextTest
     {
         var context = Context.Create();
         Assert.AreEqual(EncoderType.Hardware, context.GetEncoderType());
-        context.SetEncoderType(EncoderType.Software);
-        Assert.AreEqual(EncoderType.Software, context.GetEncoderType());
-        context.SetEncoderType(EncoderType.Hardware);
-        Assert.AreEqual(EncoderType.Hardware, context.GetEncoderType());
-        context.Dispose();
     }
 
     [Test]

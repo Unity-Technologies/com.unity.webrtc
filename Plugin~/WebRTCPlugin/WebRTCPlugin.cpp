@@ -178,9 +178,9 @@ extern "C"
         delegateSetResolution = func;
     }
 
-    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid)
+    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType)
     {
-        return ContextManager::GetInstance()->GetContext(uid);
+        return ContextManager::GetInstance()->GetContext(uid, encoderType);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDestroy(int uid)

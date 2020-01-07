@@ -226,8 +226,7 @@ namespace Unity.WebRTC
         public static void Initialize(EncoderType type = EncoderType.Hardware)
         {
             NativeMethods.RegisterDebugLog(DebugLog);
-            s_context = Context.Create();
-            s_context.SetEncoderType(type);
+            s_context = Context.Create(encoderType:type);
             s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
@@ -258,6 +257,15 @@ namespace Unity.WebRTC
 
         public static void Finalize(int id = 0)
         {
+            s_context.Dispose();
+            s_context = null;
+            NativeMethods.RegisterDebugLog(null);
+        }
+
+        public static IEnumerator FinalizeCoroutine(int id = 0)
+        {
+            s_context.FinalizeEncoder();
+            yield return new WaitForEndOfFrame();
             s_context.Dispose();
             s_context = null;
             NativeMethods.RegisterDebugLog(null);
@@ -305,16 +313,6 @@ namespace Unity.WebRTC
                 var result = Context.GetCodecInitializationResult();
                 return result == CodecInitializationResult.Success;
             }
-            set
-            {
-                if(s_context.IsNull)
-                {
-                    throw new CodecInitializationException(CodecInitializationResult.NotInitialized);
-                }
-
-                var type = value ? EncoderType.Hardware : EncoderType.Software;
-                Context.SetEncoderType(type);
-            }
         }
     }
 
@@ -355,7 +353,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreate(int uid);
+        public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDestroy(int uid);
         [DllImport(WebRTC.Lib)]
