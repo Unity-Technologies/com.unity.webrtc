@@ -1,13 +1,19 @@
 ﻿#include "pch.h"
 #include "Context.h"
 #include "PeerConnectionObject.h"
+#include "WebRTCMacros.h"
 
 namespace WebRTC
 {
-    PeerConnectionObject::PeerConnectionObject(Context& context) : context(context) {}
+    PeerConnectionObject::PeerConnectionObject(Context& context) : context(context)
+    {
+        m_statsCollectorCallback = new PeerConnectionStatsCollectorCallback(this);
+        
+    }
 
     PeerConnectionObject::~PeerConnectionObject()
     {
+        SAFE_DELETE(m_statsCollectorCallback);
         if (connection == nullptr)
         {
             return;
@@ -24,6 +30,7 @@ namespace WebRTC
             connection->Close();
         }
         connection.release();
+
     }
 
     PeerConnectionObject* Context::CreatePeerConnection()
@@ -32,7 +39,6 @@ namespace WebRTC
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
         _config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
         obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
-
         if (obj->connection == nullptr)
         {
             return nullptr;
@@ -178,6 +184,7 @@ namespace WebRTC
         }
         auto observer = PeerSDPObserver::Create(this);
         connection->SetLocalDescription(observer, _desc.release());
+
     }
 
     void PeerConnectionObject::SetRemoteDescription(const RTCSessionDescription& desc)
@@ -269,6 +276,11 @@ namespace WebRTC
         desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
+    }
+
+    void PeerConnectionObject::CollectStats()
+    {
+        connection->GetStats(m_statsCollectorCallback);
     }
 
 #pragma warning(push)

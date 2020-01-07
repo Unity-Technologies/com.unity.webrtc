@@ -6,6 +6,7 @@
 namespace WebRTC
 {
     using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
+    using DelegateCollectStats = void(*)(PeerConnectionObject*, const char*);;
     using DelegateCreateSDFailure = void(*)(PeerConnectionObject*);
     using DelegateSetSDSuccess = void(*)(PeerConnectionObject*);
     using DelegateSetSDFailure = void(*)(PeerConnectionObject*);
@@ -15,6 +16,30 @@ namespace WebRTC
     using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
+
+    //[TODO-sin: 2019-12-20] Separate to a different file.
+    class PeerConnectionStatsCollectorCallback : public virtual webrtc::RTCStatsCollectorCallback{
+    public:
+        PeerConnectionStatsCollectorCallback(PeerConnectionObject* owner) { m_owner = owner;}
+        
+        ~PeerConnectionStatsCollectorCallback() override = default;
+        void AddRef() const override {};
+        rtc::RefCountReleaseStatus Release() const override { return rtc::RefCountReleaseStatus::kOtherRefsRemained; }
+        void SetCallback(DelegateCollectStats callback) { m_collectStatsCallback = callback; }
+
+        void OnStatsDelivered(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report) override
+        {
+            if (nullptr==m_collectStatsCallback){
+                return;
+            }
+
+            const std::string json  = report->ToJson();
+            m_collectStatsCallback(m_owner, json.c_str());
+        };
+    private:
+        DelegateCollectStats m_collectStatsCallback = nullptr;
+        PeerConnectionObject* m_owner = nullptr;
+    };
 
     class PeerConnectionObject
         : public webrtc::CreateSessionDescriptionObserver
@@ -27,6 +52,7 @@ namespace WebRTC
         void Close();
         void SetLocalDescription(const RTCSessionDescription& desc);
         void GetLocalDescription(RTCSessionDescription& desc) const;
+        void CollectStats();
         void SetRemoteDescription(const RTCSessionDescription& desc);
         webrtc::RTCErrorType SetConfiguration(const std::string& config);
         void GetConfiguration(std::string& config) const;
@@ -45,6 +71,11 @@ namespace WebRTC
             onCreateSDSuccess = onSuccess;
             onCreateSDFailure = onFailure;
         }
+        void RegisterCallbackCollectStats(DelegateCollectStats getStatsCallback)
+        {
+            m_statsCollectorCallback->SetCallback(getStatsCallback);
+        }
+
         void RegisterLocalSdpReady(DelegateLocalSdpReady callback) { onLocalSdpReady = callback; }
         void RegisterIceCandidate(DelegateIceCandidate callback) { onIceCandidate = callback; }
         void RegisterIceConnectionChange(DelegateOnIceConnectionChange callback) { onIceConnectionChange = callback; };
@@ -111,5 +142,7 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection = nullptr;
     private:
         Context& context;
+        PeerConnectionStatsCollectorCallback* m_statsCollectorCallback;
+
     };
 }

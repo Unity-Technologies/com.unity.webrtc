@@ -246,6 +246,11 @@ extern "C"
         obj->SetLocalDescription(*desc);
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionCollectStats(PeerConnectionObject* obj)
+    {
+        obj->CollectStats();
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
         obj->GetLocalDescription(*desc);
@@ -279,6 +284,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnIceCandidate(PeerConnectionObject*obj, DelegateIceCandidate callback)
     {
         obj->RegisterIceCandidate(callback);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCollectStats(PeerConnectionObject* obj, DelegateCollectStats onGetStats)
+    {
+        obj->RegisterCallbackCollectStats(onGetStats);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCreateSD(PeerConnectionObject* obj, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)

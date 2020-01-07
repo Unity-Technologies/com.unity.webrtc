@@ -11,6 +11,8 @@ namespace Unity.WebRTC
 
     public class RTCPeerConnection : IDisposable
     {
+        public Action<string> OnStatsDelivered = null;
+
         private int m_id;
         private IntPtr self = IntPtr.Zero;
         private DelegateOnIceConnectionChange onIceConnectionChange;
@@ -27,6 +29,7 @@ namespace Unity.WebRTC
         private DelegateCreateSDFailure onCreateSDFailure;
         private DelegateSetSDSuccess onSetSDSuccess;
         private DelegateSetSDFailure onSetSDFailure;
+        private DelegateCollectStats m_onStatsDeliveredCallback;
 
         private RTCIceCandidateRequestAsyncOperation opIceCandidateRequest;
         private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
@@ -60,7 +63,7 @@ namespace Unity.WebRTC
         public RTCIceConnectionState IceConnectionState
         {
             get
-            { 
+            {
                 return NativeMethods.PeerConnectionIceConditionState(self);
             }
         }
@@ -221,8 +224,10 @@ namespace Unity.WebRTC
             onCreateSDFailure = new DelegateCreateSDFailure(OnFailureCreateSessionDesc);
             onSetSDSuccess = new DelegateSetSDSuccess(OnSuccessSetSessionDesc);
             onSetSDFailure = new DelegateSetSDFailure(OnFailureSetSessionDesc);
+            m_onStatsDeliveredCallback = new DelegateCollectStats(OnStatsDeliveredCallback);
             NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, onCreateSDSuccess, onCreateSDFailure);
             NativeMethods.PeerConnectionRegisterCallbackSetSD(self, onSetSDSuccess, onSetSDFailure);
+            NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, m_onStatsDeliveredCallback);
         }
 
         public void Close()
@@ -296,6 +301,12 @@ namespace Unity.WebRTC
             return m_opSetDesc;
         }
 
+        public void CollectStats()
+        {
+            m_opSetDesc = new RTCSessionDescriptionAsyncOperation();
+            NativeMethods.PeerConnectionCollectStats(self);
+        }
+
         public RTCSessionDescription GetLocalDescription()
         {
             RTCSessionDescription desc = default;
@@ -330,6 +341,18 @@ namespace Unity.WebRTC
                 connection.m_opSetDesc.Done();
             }, null);
         }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
+        static void OnStatsDeliveredCallback(IntPtr ptr, string stats)
+        {
+            WebRTC.SyncContext.Post(_ =>
+            {
+
+                RTCPeerConnection connection = WebRTC.Table[ptr] as RTCPeerConnection;
+                connection?.OnStatsDelivered?.Invoke(stats);
+            }, null);
+        }
+
     }
 
 }
