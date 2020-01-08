@@ -103,16 +103,7 @@ namespace WebRTC {
 //---------------------------------------------------------------------------------------------------------------------
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height)
     {
-        MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
-        textureDescriptor.width = width;
-        textureDescriptor.height = height;
-        textureDescriptor.allowGPUOptimizedContents = false;
-        textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeManaged ) ;
-        
-        id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
-        return new MetalTexture2D(width, height, texture);
-
+        return new MetalTexture2D(width, height, nil);
     }
 
 //---------------------------------------------------------------------------------------------------------------------

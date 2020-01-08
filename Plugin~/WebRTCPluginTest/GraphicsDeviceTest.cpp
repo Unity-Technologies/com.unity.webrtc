@@ -22,18 +22,6 @@ TEST_P(GraphicsDeviceTest, CreateDefaultTextureV) {
     EXPECT_FALSE(tex->IsSize(0, 0));
 }
 
-#if defined(SUPPORT_SOFTWARE_ENCODER)
-TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
-    auto width = 256;
-    auto height = 256;
-    auto tex = m_device->CreateCPUReadTextureV(width, height);
-    EXPECT_TRUE(tex->IsSize(width, height));
-    EXPECT_NE(nullptr, tex->GetEncodeTexturePtrV());
-    EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
-    EXPECT_FALSE(tex->IsSize(0, 0));
-}
-#endif
-
 //[Note-sin: 2019-12-19] Real Unity Interface is required for testing the following functions, and it is not 
 //possible to create a dummy Unity interface (with its command buffer) on Metal devices
 #if !defined(SUPPORT_METAL)
