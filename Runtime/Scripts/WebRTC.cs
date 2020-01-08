@@ -262,15 +262,6 @@ namespace Unity.WebRTC
             NativeMethods.RegisterDebugLog(null);
         }
 
-        public static IEnumerator FinalizeCoroutine(int id = 0)
-        {
-            s_context.FinalizeEncoder();
-            yield return new WaitForEndOfFrame();
-            s_context.Dispose();
-            s_context = null;
-            NativeMethods.RegisterDebugLog(null);
-        }
-
         internal static string GetModuleName()
         {
             return System.IO.Path.GetFileName(Lib);
