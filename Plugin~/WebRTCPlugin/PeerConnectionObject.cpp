@@ -156,8 +156,6 @@ namespace WebRTC
     {
         if (connection != nullptr)
         {
-            connection->Close();
-
             //Cleanup delegates/callbacks
             onCreateSDSuccess = nullptr;
             onCreateSDFailure = nullptr;
@@ -169,6 +167,8 @@ namespace WebRTC
             onDataChannel = nullptr;
             onRenegotiationNeeded = nullptr;
             onTrack = nullptr;
+
+            connection->Close();
         }
     }
 
