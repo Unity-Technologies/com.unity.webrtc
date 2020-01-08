@@ -38,6 +38,10 @@ class NativeAPITest
         var context = NativeMethods.ContextCreate(0, EncoderType.Hardware);
         Assert.AreEqual(EncoderType.Hardware, NativeMethods.ContextGetEncoderType(context));
         NativeMethods.ContextDestroy(0);
+
+        var context2 = NativeMethods.ContextCreate(0, EncoderType.Software);
+        Assert.AreEqual(EncoderType.Software, NativeMethods.ContextGetEncoderType(context2));
+        NativeMethods.ContextDestroy(0);
     }
 
     [Test]
