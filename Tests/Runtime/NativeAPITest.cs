@@ -3,6 +3,7 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using Unity.WebRTC;
+using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 
 class NativeAPITest
@@ -88,6 +89,9 @@ class NativeAPITest
     [UnityTest]
     public IEnumerator CallVideoEncoderMethods()
     {
+
+        Assert.IsTrue(SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal);
+
         var context = NativeMethods.ContextCreate(0);
         const int width = 1280;
         const int height = 720;
