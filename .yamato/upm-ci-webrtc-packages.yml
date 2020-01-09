@@ -13,10 +13,6 @@ platforms:
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle
     test_params:
       - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
         platform: standalone
 
 packages:
