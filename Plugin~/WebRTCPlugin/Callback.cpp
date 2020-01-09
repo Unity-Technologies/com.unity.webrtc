@@ -68,11 +68,11 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
     switch(static_cast<VideoStreamRenderEventID>(eventID))
     {
         case VideoStreamRenderEventID::Initialize:
-//            if(!GraphicsDevice::GetInstance().IsInitialized()) {
-//                GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
-//            }
-//            s_device = GraphicsDevice::GetInstance().GetDevice();
-//            s_context->InitializeEncoder(s_device);
+            if(!GraphicsDevice::GetInstance().IsInitialized()) {
+                GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
+            }
+            s_device = GraphicsDevice::GetInstance().GetDevice();
+            s_context->InitializeEncoder(s_device);
             return;
         case VideoStreamRenderEventID::Encode:
             s_context->EncodeFrame();
