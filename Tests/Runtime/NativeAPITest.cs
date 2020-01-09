@@ -101,6 +101,8 @@ class NativeAPITest
         var stream = NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
         var callback = NativeMethods.GetRenderEventFunc(context);
 
+        Assert.IsFalse(callback == IntPtr.Zero);
+
         // TODO::
         // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
         VideoEncoderMethods.InitializeEncoder(callback);
