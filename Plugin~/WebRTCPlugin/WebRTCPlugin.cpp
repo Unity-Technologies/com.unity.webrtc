@@ -180,7 +180,12 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType)
     {
-        return ContextManager::GetInstance()->GetContext(uid, encoderType);
+        auto ctx = ContextManager::GetInstance()->GetContext(uid);
+        if (ctx == nullptr)
+        {
+            ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType);
+        }
+        return ctx;
     }
 
     UNITY_INTERFACE_EXPORT void ContextDestroy(int uid)

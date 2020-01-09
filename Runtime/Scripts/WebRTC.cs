@@ -262,6 +262,11 @@ namespace Unity.WebRTC
             NativeMethods.RegisterDebugLog(null);
         }
 
+        public static EncoderType GetEncoderType()
+        {
+            return s_context.GetEncoderType();
+        }
+
         internal static string GetModuleName()
         {
             return System.IO.Path.GetFileName(Lib);

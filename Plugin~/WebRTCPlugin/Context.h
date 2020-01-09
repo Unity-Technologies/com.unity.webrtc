@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DummyAudioDevice.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
@@ -14,7 +14,8 @@ namespace WebRTC
     public:
         static ContextManager* GetInstance() { return &s_instance; }
      
-        Context* GetContext(int uid, UnityEncoderType encoderType);
+        Context* GetContext(int uid) const;
+        Context* CreateContext(int uid, UnityEncoderType encoderType);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
 

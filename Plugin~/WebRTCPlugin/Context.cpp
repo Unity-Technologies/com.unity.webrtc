@@ -9,19 +9,23 @@ namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
 
-    Context* ContextManager::GetContext(int uid, UnityEncoderType encoderType)
+    Context* ContextManager::GetContext(int uid) const
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return it->second.get();
         }
+        return nullptr;
+    }
 
+    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
+    {
         auto ctx = new Context(uid, encoderType);
         s_instance.m_contexts[uid].reset(ctx);
-        DebugLog("Register context with ID %d", uid);
         return ctx;
     }
+
     CodecInitializationResult Context::GetCodecInitializationResult()
     {
         if (NvEncoder::InitializationResult() == CodecInitializationResult::NotInitialized)
