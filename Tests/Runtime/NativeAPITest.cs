@@ -107,8 +107,8 @@ class NativeAPITest
         yield return new WaitForEndOfFrame();
         //VideoEncoderMethods.Encode(callback);
         //yield return new WaitForEndOfFrame();
-        VideoEncoderMethods.FinalizeEncoder(callback);
-        yield return new WaitForEndOfFrame();
+        //VideoEncoderMethods.FinalizeEncoder(callback);
+        //yield return new WaitForEndOfFrame();
 
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);
