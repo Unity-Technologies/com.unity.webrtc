@@ -88,7 +88,7 @@ namespace WebRTC
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         if (encoder_ == nullptr)
             return false;
-        //encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
+        encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
         return true;
     }
 
