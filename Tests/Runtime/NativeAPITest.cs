@@ -112,5 +112,6 @@ class NativeAPITest
 
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);
+        yield return null;
     }
 }
