@@ -14,8 +14,5 @@
      "description": "WebRTC sample",
      "path": "Samples~"
    }
- ],
- "dependencies": {
-   "com.unity.test-framework": "1.1.9"
- }   
+ ]  
 }
