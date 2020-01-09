@@ -473,7 +473,7 @@ namespace Unity.WebRTC
 
         public static void InitializeEncoder(IntPtr callback)
         {
-            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Initialize);
+//            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Initialize);
         }
         public static void Encode(IntPtr callback)
         {
