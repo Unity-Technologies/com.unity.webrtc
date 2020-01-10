@@ -106,7 +106,7 @@ extern "C"
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
         auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
-        for (int i = 0; i < tracksVector.size(); i++)
+        for (uint32_t i = 0; i < tracksVector.size(); i++)
         {
             tracks[i] = tracksVector[i].get();
         }
@@ -119,7 +119,7 @@ extern "C"
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
         auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
-        for (int i = 0; i < tracksVector.size(); i++)
+        for (uint32_t i = 0; i < tracksVector.size(); i++)
         {
             tracks[i] = tracksVector[i].get();
         }

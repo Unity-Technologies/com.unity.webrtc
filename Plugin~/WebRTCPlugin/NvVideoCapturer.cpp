@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "NvVideoCapturer.h"
 #include "Codec/EncoderFactory.h"
 
@@ -23,7 +23,10 @@ namespace WebRTC
                 LogPrint("CopyRenderTexture Failed");
                 return;
             }
-            encoder_->EncodeFrame();
+            if(!encoder_->EncodeFrame()) {
+                LogPrint("EncodeFrame Failed");
+                return;
+            }
         }
         else
         {
@@ -41,6 +44,16 @@ namespace WebRTC
         captureStarted = true;
         SetKeyFrame();
     }
+    CodecInitializationResult NvVideoCapturer::GetCodecInitializationResult() const
+    {
+        if(encoder_ == nullptr)
+        {
+            return CodecInitializationResult::NotInitialized;
+        }
+        return encoder_->GetCodecInitializationResult();
+    }
+
+    
     void NvVideoCapturer::SetFrameBuffer(void* frameBuffer)
     {
         unityRT = frameBuffer;
@@ -82,5 +95,6 @@ namespace WebRTC
     void NvVideoCapturer::FinalizeEncoder()
     {
         EncoderFactory::GetInstance().Shutdown();
+        encoder_ = nullptr;
     }
 }

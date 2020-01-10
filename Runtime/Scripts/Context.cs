@@ -64,6 +64,7 @@ namespace Unity.WebRTC
                 self = IntPtr.Zero;
             }
             this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         public CodecInitializationResult GetCodecInitializationResult()

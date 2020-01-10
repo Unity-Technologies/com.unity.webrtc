@@ -1,5 +1,6 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
+#include "../WebRTCPlugin/PlatformBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 
 using namespace WebRTC;
@@ -12,6 +13,8 @@ Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
 Microsoft::WRL::ComPtr<ID3D11Device> pD3DDevice;
 Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3DDeviceContext;
+
+//---------------------------------------------------------------------------------------------------------------------
 
 void* CreateDevice()
 {
@@ -31,8 +34,26 @@ void* CreateDevice()
     EXPECT_NE(nullptr, pD3DDevice.Get());
     return pD3DDevice.Get();
 }
-#else
 
+IUnityInterface* CreateUnityInterface() {
+    return nullptr;
+}
+
+#elif defined(SUPPORT_METAL)
+
+#import <Metal/Metal.h>
+#include <DummyUnityInterface/DummyUnityGraphicsMetal.h>
+
+void* CreateDevice()
+{
+    return MTLCreateSystemDefaultDevice();
+}
+
+IUnityInterface* CreateUnityInterface() {
+    return new DummyUnityGraphicsMetal();
+}
+
+#else
 #include <GL/glut.h>
 
 static bool s_glutInitialized;
@@ -48,16 +69,25 @@ void* CreateDevice()
     }
     return nullptr;
 }
+
+IUnityInterface* CreateUnityInterface() {
+    return nullptr;
+}
+
 #endif
 
-std::tuple<UnityGfxRenderer, void*> GraphicsDeviceTestBase::CreateParameter()
+//---------------------------------------------------------------------------------------------------------------------
+
+std::tuple<UnityGfxRenderer, void*, IUnityInterface*> GraphicsDeviceTestBase::CreateParameter()
 {
 #if defined(SUPPORT_D3D11)
     auto unityGfxRenderer = kUnityGfxRendererD3D11;
-#else
+#elif defined(SUPPORT_OPENGL_CORE)
     auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;
+#elif defined(SUPPORT_METAL)
+    auto unityGfxRenderer = kUnityGfxRendererMetal;
 #endif
-    return std::make_tuple(unityGfxRenderer, CreateDevice());
+    return std::make_tuple(unityGfxRenderer, CreateDevice(), CreateUnityInterface());
 }
 
 
@@ -65,9 +95,10 @@ void GraphicsDeviceTestBase::SetUp()
 {
     UnityGfxRenderer unityGfxRenderer;
     void* pGraphicsDevice;
-    std::tie(unityGfxRenderer, pGraphicsDevice) = GetParam();
+    IUnityInterface* unityInterface;
+    std::tie(unityGfxRenderer, pGraphicsDevice, unityInterface) = GetParam();
 
-    ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, nullptr));
+    ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, unityInterface));
     m_device = GraphicsDevice::GetInstance().GetDevice();
     ASSERT_NE(nullptr, m_device);
 }

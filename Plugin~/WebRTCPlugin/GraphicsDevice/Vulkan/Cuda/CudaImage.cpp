@@ -18,7 +18,6 @@ CudaImage::CudaImage() : m_array(nullptr), m_mipmapArray(nullptr), m_extMemory(n
 //---------------------------------------------------------------------------------------------------------------------
 
 CUresult CudaImage::Init(const VkDevice device, const VulkanTexture2D* texture) {
-    int fd = -1;
     CUresult result = CUDA_SUCCESS;
 
     void *p = VulkanUtility::GetExportHandle(device, texture->GetTextureImageMemory());

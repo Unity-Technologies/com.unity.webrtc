@@ -145,6 +145,9 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (null == WebRTC.Table)
+                    return;
+
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnIceConnectionChange(state);
             }, null);

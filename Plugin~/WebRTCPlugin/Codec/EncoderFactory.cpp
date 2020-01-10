@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "IEncoder.h"
 #include "Context.h"
 #include "EncoderFactory.h"
@@ -15,6 +15,9 @@
 #include "NvCodec/NvEncoderCuda.h"
 
 #include "GraphicsDevice/IGraphicsDevice.h"
+#if defined(SUPPORT_METAL)
+#include "VideoToolbox/VTEncoderMetal.h"
+#endif
 
 namespace WebRTC {
 
@@ -49,10 +52,18 @@ namespace WebRTC {
                 break;
             }
 #endif
+#if defined(SUPPORT_VULKAN)
             case GRAPHICS_DEVICE_VULKAN: {
                 m_encoder = std::make_unique<NvEncoderCuda>(width, height, device);
                 break;
             }
+#endif            
+#if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
+            case GRAPHICS_DEVICE_METAL: {
+                m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                break;
+            }
+#endif            
             default: {
                 throw std::invalid_argument("Invalid device to initialize NvEncoder");
                 break;

@@ -202,6 +202,7 @@
     <ClInclude Include="GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="GraphicsDevice\GraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\GraphicsDeviceType.h" />
+    <ClInclude Include="GraphicsDevice\GraphicsUtility.h" />
     <ClInclude Include="GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="GraphicsDevice\Vulkan\Cuda\CudaContext.h" />
@@ -232,6 +233,7 @@
     <ClCompile Include="GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp" />
     <ClCompile Include="GraphicsDevice\D3D12\D3D12Texture2D.cpp" />
     <ClCompile Include="GraphicsDevice\GraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsDevice\GraphicsUtility.cpp" />
     <ClCompile Include="GraphicsDevice\IGraphicsDevice.cpp" />
     <ClCompile Include="GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="GraphicsDevice\Vulkan\Cuda\CudaContext.cpp" />

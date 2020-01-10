@@ -19,6 +19,7 @@ namespace WebRTC
     void SoftwareEncoder::InitV()
     {
         m_encodeTex = m_device->CreateCPUReadTextureV(m_width, m_height);
+        m_initializationResult = CodecInitializationResult::Success;
     }
 
     bool SoftwareEncoder::CopyBuffer(void* frame)
@@ -27,9 +28,10 @@ namespace WebRTC
         return true;
     }
 
-    void SoftwareEncoder::EncodeFrame()
+    bool SoftwareEncoder::EncodeFrame()
     {
         webrtc::VideoFrame frame = webrtc::VideoFrame::Builder().set_video_frame_buffer(m_device->ConvertRGBToI420(m_encodeTex)).set_rotation(webrtc::kVideoRotation_0).set_timestamp_us(0).build();
         CaptureFrame(frame);
+        return true;
     }
 }

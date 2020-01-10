@@ -26,6 +26,8 @@ patch "src/BUILD.gn" < "BuildScripts~/add_jsoncpp.patch"
 gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"mac\" rtc_include_tests=false rtc_build_examples=false symbol_level=0 enable_iterator_debugging=false use_rtti=true"
 ninja -C "$OUTPUT_DIR"
 
+python ./src/tools_webrtc/libs/generate_licenses.py --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
+
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
@@ -35,6 +37,8 @@ for item in ${array[@]}; do
   find "$OUTPUT_DIR/obj" -name $item | xargs -J % cp % "$ARTIFACTS_DIR/lib"
 done
 
+cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+
 # create zip
 cd "$ARTIFACTS_DIR"
-zip -r webrtc-mac.zip lib include 
+zip -r webrtc-mac.zip lib include LICENSE.md

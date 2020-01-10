@@ -35,17 +35,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(ProjectDir)..\webrtc\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64;C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\webrtc\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64;C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\VulkanSDK\1.1.121.2\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\unity\include\IUnityGraphics.h" />
@@ -68,6 +68,7 @@
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.h" />
@@ -103,6 +104,7 @@
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\IGraphicsDevice.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\ITexture2D.cpp" />
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\Cuda\CudaContext.cpp" />
@@ -117,7 +119,7 @@
     <ClCompile Include="ContextTest.cpp" />
     <ClCompile Include="GraphicsDeviceTest.cpp" />
     <ClCompile Include="GraphicsDeviceTestBase.cpp" />
-    <ClCompile Include="NvEncoderTest.cpp" />
+    <ClCompile Include="NvCodec\NvEncoderTest.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
