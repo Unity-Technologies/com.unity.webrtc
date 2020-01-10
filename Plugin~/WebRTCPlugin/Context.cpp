@@ -128,11 +128,6 @@ namespace WebRTC
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
 
-        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
-            m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer) :
-            webrtc::CreateBuiltinVideoEncoderFactory();
-
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
         //Always use SoftwareEncoder on Mac for now.
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
