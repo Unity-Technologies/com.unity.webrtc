@@ -437,8 +437,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
-        public static extern bool ContextSetEncoderType(IntPtr context, EncoderType type);
-        [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);

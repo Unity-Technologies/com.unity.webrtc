@@ -43,7 +43,6 @@ namespace WebRTC
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
-        bool SetEncoderType(UnityEncoderType type);
         UnityEncoderType GetEncoderType() const;
 
         // You must call these methods on Rendering thread.

@@ -31,11 +31,6 @@ namespace WebRTC
 
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT bool ContextSetEncoderType(Context* context, UnityEncoderType encoderType)
-    {
-        return context->SetEncoderType(encoderType);
-    }
-
     UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
     {
         return context->GetEncoderType();

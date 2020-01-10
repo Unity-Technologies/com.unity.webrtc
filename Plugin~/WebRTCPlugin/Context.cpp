@@ -184,11 +184,6 @@ namespace WebRTC
         nvVideoCapturer->FinalizeEncoder();
     }
 
-    bool Context::SetEncoderType(UnityEncoderType type)
-    {
-        m_encoderType = type;
-        return true;
-    }
     UnityEncoderType Context::GetEncoderType() const
     {
         return m_encoderType;
