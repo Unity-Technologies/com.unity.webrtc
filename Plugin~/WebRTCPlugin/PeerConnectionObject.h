@@ -123,8 +123,7 @@ namespace WebRTC
         // This behavior is specified in section 2.2.8.2.5 of the "Set the
         // RTCSessionDescription" algorithm:
         // https://w3c.github.io/webrtc-pc/#set-description
-        void OnTrack(
-            rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver);
+        void OnTrack(rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) override;
 
         friend class DataChannelObject;
 

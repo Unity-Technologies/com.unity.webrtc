@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #pragma region webRTC related
 #include "api/mediastreaminterface.h"
 #include "api/peerconnectioninterface.h"
@@ -79,6 +79,10 @@
 #include <GL/glu.h>
 #endif
 
+#if defined(SUPPORT_METAL)
+#include "IUnityGraphicsMetal.h"
+#endif
+
 #include "IUnityGraphics.h"
 
 #if defined(SUPPORT_VULKAN)
@@ -127,7 +131,7 @@ namespace WebRTC
 
     const uint32 bufferedFrameNum = 3;
 
-    typedef enum UnityEncoderType
+    enum UnityEncoderType
     {
         UnityEncoderSoftware = 0,
         UnityEncoderHardware = 1,

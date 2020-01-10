@@ -23,7 +23,7 @@ namespace WebRTC
         encodedImage._frameType = webrtc::kVideoFrameDelta;
         std::vector<webrtc::H264::NaluIndex> naluIndices =
             webrtc::H264::FindNaluIndices(&frameDataBuffer[0], frameDataBuffer.size());
-        for (int i = 0; i < naluIndices.size(); i++)
+        for (uint32_t i = 0; i < naluIndices.size(); i++)
         {
             webrtc::H264::NaluType NALUType = webrtc::H264::ParseNaluType(frameDataBuffer[naluIndices[i].payload_start_offset]);
             if (NALUType == webrtc::H264::kIdr)
@@ -47,17 +47,21 @@ namespace WebRTC
 
         fragHeader.VerifyAndAllocateFragmentationHeader(naluIndices.size());
         fragHeader.fragmentationVectorSize = static_cast<uint16_t>(naluIndices.size());
-        for (int i = 0; i < naluIndices.size(); i++)
+        for (uint32_t i = 0; i < naluIndices.size(); i++)
         {
             webrtc::H264::NaluIndex const& NALUIndex = naluIndices[i];
             fragHeader.fragmentationOffset[i] = NALUIndex.payload_start_offset;
             fragHeader.fragmentationLength[i] = NALUIndex.payload_size;
-            webrtc::H264::NaluType NALUType = webrtc::H264::ParseNaluType(frameDataBuffer[NALUIndex.payload_start_offset]);
         }
         webrtc::CodecSpecificInfo codecInfo;
         codecInfo.codecType = webrtc::kVideoCodecH264;
-        callback->OnEncodedImage(encodedImage, &codecInfo, &fragHeader);
-        return 0;
+        auto result = callback->OnEncodedImage(encodedImage, &codecInfo, &fragHeader);
+        if(result.error != webrtc::EncodedImageCallback::Result::OK)
+        {
+            LogPrint("Encode callback failed %d", result.error);
+            return WEBRTC_VIDEO_CODEC_ERROR;
+        }
+        return WEBRTC_VIDEO_CODEC_OK;
     }
 
     int32_t DummyVideoEncoder::SetRateAllocation(const webrtc::VideoBitrateAllocation& allocation, uint32_t framerate)

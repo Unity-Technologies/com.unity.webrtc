@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDevice.h"
 
 //Graphics
@@ -11,7 +11,13 @@
 #include "OpenGL/OpenGLGraphicsDevice.h"
 #endif
 
+#if defined(SUPPORT_VULKAN)
 #include "Vulkan/VulkanGraphicsDevice.h"
+#endif
+
+#if defined(SUPPORT_METAL)
+#include "Metal/MetalGraphicsDevice.h"
+#endif
 
 namespace WebRTC {
 
@@ -40,10 +46,19 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         case kUnityGfxRendererOpenGLCore: {
             return Init(rendererType, nullptr, nullptr);
         }
+#if defined(SUPPORT_VULKAN)
         case kUnityGfxRendererVulkan : {
             IUnityGraphicsVulkan* deviceInterface = unityInterface->Get<IUnityGraphicsVulkan>();
             UnityVulkanInstance vulkan = deviceInterface->Instance();
             return Init(rendererType, reinterpret_cast<void*>(&vulkan), deviceInterface);
+        }
+#endif
+        case kUnityGfxRendererMetal: {
+#if defined(SUPPORT_METAL)
+            IUnityGraphicsMetal* deviceInterface = unityInterface->Get<IUnityGraphicsMetal>();
+            return Init(rendererType, deviceInterface->MetalDevice(), deviceInterface);
+#endif
+            break;
         }
         default: {
             DebugError("Unsupported Unity Renderer: %d", m_rendererType);
@@ -77,6 +92,7 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
 #endif
         break;
     }
+#if defined(SUPPORT_VULKAN)
     case kUnityGfxRendererVulkan: {
         const UnityVulkanInstance* vulkan = reinterpret_cast<const UnityVulkanInstance*>(device);
         m_device = new VulkanGraphicsDevice(
@@ -89,10 +105,22 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
         );
         break;
     }
+#endif
+#if defined(SUPPORT_METAL)
+    case kUnityGfxRendererMetal: {
+        id<MTLDevice> metalDevice = reinterpret_cast<id<MTLDevice>>(device);
+        IUnityGraphicsMetal* metalUnityInterface = reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
+        m_device = new MetalGraphicsDevice(metalDevice, metalUnityInterface);
+        break;
+    }
+#endif
     default: {
         DebugError("Unsupported Unity Renderer: %d", rendererType);
         return false;
     }
+    }
+    if(m_device == nullptr) {
+        return false;
     }
     return m_device->InitV();
 }

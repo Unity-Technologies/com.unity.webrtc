@@ -1,6 +1,5 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsDeviceTestBase.h"
-#include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
 #include "../WebRTCPlugin/Codec/IEncoder.h"
@@ -12,7 +11,6 @@ class ContextTest : public GraphicsDeviceTestBase
 {
 protected:
     IEncoder* encoder_ = nullptr;
-//    IGraphicsDevice* device_ = nullptr;
     const int width = 256;
     const int height = 256;
     std::unique_ptr<Context> context;
@@ -33,8 +31,11 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    context->InitializeEncoder(m_device);
+    EXPECT_EQ(CodecInitializationResult::NotInitialized, context->GetCodecInitializationResult());
+    EXPECT_TRUE(context->InitializeEncoder(m_device));
+    EXPECT_EQ(CodecInitializationResult::Success, context->GetCodecInitializationResult());
     context->FinalizeEncoder();
+    EXPECT_EQ(CodecInitializationResult::NotInitialized, context->GetCodecInitializationResult());
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoStream) {
@@ -58,6 +59,7 @@ TEST_P(ContextTest, CreateAndDeletePeerConnection) {
 TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     const auto connection = context->CreatePeerConnection();
     RTCDataChannelInit init;
+    init.protocol = "";
     const auto channel = context->CreateDataChannel(connection, "test", init);
     context->DeleteDataChannel(channel);
     context->DeletePeerConnection(connection);

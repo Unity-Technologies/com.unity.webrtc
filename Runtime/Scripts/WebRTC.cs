@@ -275,6 +275,8 @@ namespace Unity.WebRTC
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
                     return RenderTextureFormat.ARGB32;
+                case UnityEngine.Rendering.GraphicsDeviceType.Metal:
+                    return RenderTextureFormat.BGRA32;
             }
             return RenderTextureFormat.Default;
         }
@@ -287,7 +289,12 @@ namespace Unity.WebRTC
 
         internal static Context Context { get { return s_context; } }
         internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
-        internal static Hashtable Table { get { return s_context.table; } }
+
+        internal static Hashtable Table { get
+            {
+                return (null == s_context) ? null : s_context.table;
+            }
+        }
 
         public static bool HWEncoderSupport
         {

@@ -100,11 +100,11 @@ class NativeAPITest
         // TODO::
         // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
         VideoEncoderMethods.InitializeEncoder(callback);
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(1.0f);
         VideoEncoderMethods.Encode(callback);
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(1.0f);
         VideoEncoderMethods.FinalizeEncoder(callback);
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(1.0f);
 
         NativeMethods.ContextDeleteVideoStream(context, stream);
         NativeMethods.ContextDestroy(0);

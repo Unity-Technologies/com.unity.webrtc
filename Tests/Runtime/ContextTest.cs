@@ -35,7 +35,7 @@ class ContextTest
     {
         var context = Context.Create();
         var result = context.GetCodecInitializationResult();
-        Assert.AreEqual(CodecInitializationResult.Success, result); 
+        Assert.AreEqual(CodecInitializationResult.NotInitialized, result);
         context.Dispose();
     }
 

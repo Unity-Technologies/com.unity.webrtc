@@ -4,7 +4,7 @@ enable_language(CXX)
 project(webrtc)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -pg -D_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -D_DEBUG")
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)

@@ -36,7 +36,6 @@ namespace WebRTC
         virtual ~NvEncoder();
 
         virtual void InitV() override;
-        static CodecInitializationResult InitializationResult();
         static CodecInitializationResult LoadCodec();
         static void UnloadCodec();
         static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
@@ -46,10 +45,10 @@ namespace WebRTC
         void SetRate(uint32 rate) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
-        void EncodeFrame() override;
+        bool EncodeFrame() override;
         bool IsSupported() const override { return isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
-        uint64 GetCurrentFrameCount()  override { return frameCount; }
+        virtual uint64 GetCurrentFrameCount() const override { return frameCount; }
     protected:
         int width = 1920;
         int height = 1080;
@@ -81,11 +80,11 @@ namespace WebRTC
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;
         //10Mbps
-        int bitRate = 10000000;
+        uint32_t bitRate = 10000000;
         //100Mbps
-        int lastBitRate = 100000000;
+        uint32_t lastBitRate = 100000000;
         //5Mbps
-        const int minBitRate = 5000000;
-        int frameRate = 45;
+        const uint32_t minBitRate = 5000000;
+        uint32_t frameRate = 45;
     };
 }

@@ -1,9 +1,10 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "WebRTCPlugin.h"
 #include "Context.h"
 #include "GraphicsDevice/GraphicsDevice.h"
-#include "Codec/NvCodec/NvEncoder.h"
+#include "Codec/EncoderFactory.h"
 #include "DummyVideoEncoder.h"
+
 
 namespace WebRTC
 {
@@ -25,11 +26,7 @@ namespace WebRTC
     }
     CodecInitializationResult Context::GetCodecInitializationResult()
     {
-        if (NvEncoder::InitializationResult() == CodecInitializationResult::NotInitialized)
-        {
-            return NvEncoder::LoadCodec();
-        }
-        return NvEncoder::InitializationResult();
+        return nvVideoCapturer->GetCodecInitializationResult();
     }
 
     void ContextManager::SetCurContext(Context* context)
@@ -48,8 +45,6 @@ namespace WebRTC
 
     ContextManager::~ContextManager()
     {
-        NvEncoder::UnloadCodec();
-
         if (m_contexts.size()) {
             DebugWarning("%lu remaining context(s) registered", m_contexts.size());
         }
@@ -129,8 +124,13 @@ namespace WebRTC
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
         nvVideoCapturer = nvVideoCapturerUnique.get();
 
+#if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
+        //Always use SoftwareEncoder on Mac for now.
+        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
+#else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = ContextManager::s_use_software_encoder ? webrtc::CreateBuiltinVideoEncoderFactory() : std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
-
+#endif
+        
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
                                 workerThread.get(),
                                 workerThread.get(),
@@ -146,6 +146,7 @@ namespace WebRTC
 
     Context::~Context()
     {
+        dataChannels.clear();
         clients.clear();
         peerConnectionFactory = nullptr;
         audioTrack = nullptr;
