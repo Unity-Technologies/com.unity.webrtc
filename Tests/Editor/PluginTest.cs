@@ -13,11 +13,10 @@ public class PluginTest {
     /// not found "libwebrtc.so" on Linux Editor.
     /// </todo>
     [Test]
-    [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor)]
+    [UnityPlatform(RuntimePlatform.WindowsEditor)]
     public static void IsPluginLoaded() {
 
         
-#if !UNITY_EDITOR_OSX
         // Get the current process.
         Process currentProcess = Process.GetCurrentProcess();
         var names = currentProcess.Modules
@@ -27,7 +26,6 @@ public class PluginTest {
             .ToArray();
 
         Assert.Contains(WebRTC.GetModuleName(), names);
-#endif
     }
 }
 
