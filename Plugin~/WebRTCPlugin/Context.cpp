@@ -122,6 +122,9 @@ namespace WebRTC
 
         audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
         nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
+
+        //[TODO-sin: 2020-1-16] Since we are giving the pointer to peerConnectionFactory in CreateVideoStream(), 
+        //we shouldn't store the raw pointer here.
         nvVideoCapturer = nvVideoCapturerUnique.get();
 
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
