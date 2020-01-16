@@ -36,7 +36,7 @@ platforms:
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     prepack_command: BuildScripts~/build_plugin_mac.sh
-    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/Contents/MacOS/webrtc
+    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
     test_params:
       - backend: mono
       - backend: il2cpp
@@ -66,9 +66,9 @@ prepack_{{ package.name }}_{{ platform.name }}:
 pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
   agent:
-    type: Unity::VM
-    image: renderstreaming/win10:latest
-    flavor: b1.large
+    type: Unity::metal::macmini
+    image: slough-ops/macos-10.14-xcode
+    flavor: m1.mac
   commands:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
     - upm-ci package pack  
