@@ -2,6 +2,7 @@
 using System;
 using Unity.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -207,17 +208,29 @@ namespace Unity.WebRTC
     {
         internal static List<RenderTexture[]> camCopyRts = new List<RenderTexture[]>();
         internal static bool started = false;
-        public static MediaStream CaptureStream(this Camera cam, int width, int height)
+        public static MediaStream CaptureStream(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             if (camCopyRts.Count > 0)
             {
                 throw new NotImplementedException("Currently not allowed multiple MediaStream");
             }
 
+            switch (depth)
+            {
+                case RenderTextureDepth.DEPTH_16:
+                case RenderTextureDepth.DEPTH_24:
+                case RenderTextureDepth.DEPTH_32:
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException(nameof(depth), (int) depth, typeof(RenderTextureDepth));
+            }
+
+            int depthValue = (int)depth;
+
             RenderTexture[] rts = new RenderTexture[2];
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             //rts[0] for render target, rts[1] for flip and WebRTC source
-            rts[0] = new RenderTexture(width, height, 24, format);
+            rts[0] = new RenderTexture(width, height, depthValue, format);
             rts[1] = new RenderTexture(width, height,  0, format);
             rts[0].Create();
             rts[1].Create();
