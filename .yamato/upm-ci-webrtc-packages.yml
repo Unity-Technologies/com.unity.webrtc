@@ -36,7 +36,8 @@ platforms:
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     prepack_command: BuildScripts~/build_plugin_mac.sh
-    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
+    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/Contents/MacOS/webrtc
+    plist_path : Runtime/Plugins/x86_64/webrtc.bundle/Contents/Info.plist
     test_params:
       - backend: mono
       - backend: il2cpp
@@ -60,6 +61,10 @@ prepack_{{ package.name }}_{{ platform.name }}:
     {{ platform.name }}_plugin:
       paths:
         - {{ platform.plugin_path }}
+{% if platform.name = "macos" -%}
+        - {{ platform.plist_path }}
+{% endif -%}
+        
 {% endfor %}
 
 pack_{{ package.name }}:
