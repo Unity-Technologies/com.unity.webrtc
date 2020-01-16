@@ -71,6 +71,8 @@ pack_{{ package.name }}:
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - unzip -qq -o macos_plugin*
+    - rm macos_plugin*
     - upm-ci package pack  
   artifacts:
     {{ package.name }}_package:  
