@@ -60,7 +60,6 @@ prepack_{{ package.name }}_{{ platform.name }}:
     {{ platform.name }}_plugin:
       paths:
         - {{ platform.plugin_path }}
-        
 {% endfor %}
 
 pack_{{ package.name }}:
@@ -96,17 +95,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
     flavor: {{ platform.flavor }}
   commands:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
-{% if platform.name == "linux" -%}
-    - |
-      source ~/.profile
-      export DISPLAY=:0
-      cd ..
-      mv com.unity.webrtc ..
-      cd ../com.unity.webrtc
-      upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
-{% else -%}
     - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
-{% endif -%}
   triggers:
     branches:
       only:
@@ -131,6 +120,11 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
+    - |
+      cd ../
+      ls com.unity.webrtc/upm-ci~/packages/com.unity.webrtc-*.tgz | xargs tar xzvf
+      cp -rf package/ com.unity.webrtc
+      cd com.unity.webrtc
     - brew install node
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
     - git clone git@github.cds.internal.unity3d.com:unity/utr.git
@@ -162,6 +156,28 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 
 {% endif -%}
 {% endfor %}
+
+push_plugin:
+  name: Push to Github webrtc native plugin
+  agent:
+    type: Unity::VM
+    image: package-ci/ubuntu:latest
+    flavor: b1.large
+  commands:
+    {% for platform in platforms %}
+    - git add {{ platform.plugin_path }}
+    {% endfor %}
+    - git commit -m "update plugins"
+    - git push 
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+    {% for editor in editors %}
+    {% for platform in platforms %}
+    {% for param in platform.test_params %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
