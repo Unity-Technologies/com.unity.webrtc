@@ -169,16 +169,16 @@ push_plugin:
     {% for platform in platforms %}
     - git add {{ platform.plugin_path }}
     {% endfor %}
-    - git commit -m "update plugins"
+    - git commit -m "Update plugins"
     - git push origin HEAD:$GIT_BRANCH
   dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-    {% for editor in editors %}
     {% for platform in platforms %}
-    {% for param in platform.test_params %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
-    {% endfor %}
-    {% endfor %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
+#    {% for editor in editors %}
+#    {% for param in platform.test_params %}
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
+#    {% endfor %}
+#    {% endfor %}
     {% endfor %}
 
 publish_{{ package.name }}:
