@@ -174,11 +174,11 @@ push_plugin:
   dependencies:
     {% for platform in platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
-#    {% for editor in editors %}
-#    {% for param in platform.test_params %}
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
-#    {% endfor %}
-#    {% endfor %}
+    {% for editor in editors %}
+    {% for param in platform.test_params %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
+    {% endfor %}
+    {% endfor %}
     {% endfor %}
 
 publish_{{ package.name }}:
