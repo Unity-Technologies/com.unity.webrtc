@@ -9,21 +9,24 @@
 namespace WebRTC
 {
     ContextManager ContextManager::s_instance;
-    bool ContextManager::s_use_software_encoder = false;
 
-    Context* ContextManager::GetContext(int uid)
+    Context* ContextManager::GetContext(int uid) const
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return it->second.get();
         }
+        return nullptr;
+    }
 
-        auto ctx = new Context(uid);
+    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
+    {
+        auto ctx = new Context(uid, encoderType);
         s_instance.m_contexts[uid].reset(ctx);
-        DebugLog("Register context with ID %d", uid);
         return ctx;
     }
+
     CodecInitializationResult Context::GetCodecInitializationResult()
     {
         return nvVideoCapturer->GetCodecInitializationResult();
@@ -110,8 +113,9 @@ namespace WebRTC
     }
 #pragma warning(pop)
 
-    Context::Context(int uid)
+    Context::Context(int uid, UnityEncoderType encoderType)
         : m_uid(uid)
+        , m_encoderType(encoderType)
     {
         workerThread.reset(new rtc::Thread());
         workerThread->Start();
@@ -131,9 +135,12 @@ namespace WebRTC
         //Always use SoftwareEncoder on Mac for now.
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
 #else
-        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = ContextManager::s_use_software_encoder ? webrtc::CreateBuiltinVideoEncoderFactory() : std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer);
+        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
+            m_encoderType == UnityEncoderType::UnityEncoderHardware ?
+            std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer) :
+            webrtc::CreateBuiltinVideoEncoderFactory();
 #endif
-        
+
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
                                 workerThread.get(),
                                 workerThread.get(),
@@ -165,7 +172,7 @@ namespace WebRTC
 
     bool Context::InitializeEncoder(IGraphicsDevice* device)
     {
-        if(!nvVideoCapturer->InitializeEncoder(device))
+        if(!nvVideoCapturer->InitializeEncoder(device, m_encoderType))
         {
             return false;
         }
@@ -179,6 +186,11 @@ namespace WebRTC
     void Context::FinalizeEncoder()
     {
         nvVideoCapturer->FinalizeEncoder();
+    }
+
+    UnityEncoderType Context::GetEncoderType() const
+    {
+        return m_encoderType;
     }
 
     webrtc::MediaStreamInterface* Context::CreateVideoStream(void* frameBuffer, int width, int height)

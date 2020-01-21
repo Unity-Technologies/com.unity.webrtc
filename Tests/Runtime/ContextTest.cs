@@ -41,6 +41,14 @@ class ContextTest
 
     [Test]
     [Category("Context")]
+    public void Context_GetSetEncoderType()
+    {
+        var context = Context.Create();
+        Assert.AreEqual(EncoderType.Hardware, context.GetEncoderType());
+    }
+
+    [Test]
+    [Category("Context")]
     public void Context_CreateAndDeletePeerConnection()
     {
         var context = Context.Create();

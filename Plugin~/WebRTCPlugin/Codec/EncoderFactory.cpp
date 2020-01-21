@@ -31,13 +31,13 @@ namespace WebRTC {
     }
 
     //Can throw exception. The caller is expected to catch it.
-    void EncoderFactory::Init(int width, int height, IGraphicsDevice* device)
+    void EncoderFactory::Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType)
     {
         const GraphicsDeviceType deviceType = device->GetDeviceType();
         switch (deviceType) {
 #if defined(SUPPORT_D3D11)
             case GRAPHICS_DEVICE_D3D11: {
-                if (!ContextManager::s_use_software_encoder)
+                if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
                     m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
                 } else {

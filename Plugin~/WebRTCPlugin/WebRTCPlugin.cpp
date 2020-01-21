@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "WebRTCPlugin.h"
 #include "PeerConnectionObject.h"
 #include "Context.h"
@@ -31,19 +31,9 @@ namespace WebRTC
 
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT void SetEncoderType(UnityEncoderType encoderType)
+    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
     {
-        switch (encoderType)
-        {
-        case UnityEncoderSoftware:
-            ContextManager::s_use_software_encoder = true;
-            break;
-        case UnityEncoderHardware:
-            ContextManager::s_use_software_encoder = false;
-            break;
-        default:
-            break;
-        }
+        return context->GetEncoderType();
     }
 
     UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)
@@ -183,9 +173,14 @@ extern "C"
         delegateSetResolution = func;
     }
 
-    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid)
+    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType)
     {
-        return ContextManager::GetInstance()->GetContext(uid);
+        auto ctx = ContextManager::GetInstance()->GetContext(uid);
+        if (ctx == nullptr)
+        {
+            ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType);
+        }
+        return ctx;
     }
 
     UNITY_INTERFACE_EXPORT void ContextDestroy(int uid)

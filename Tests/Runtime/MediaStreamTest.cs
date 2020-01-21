@@ -33,10 +33,6 @@ class MediaStreamTest
                 urls = new string[] { "stun:stun.l.google.com:19302" }
             }
         };
-        if(!WebRTC.HWEncoderSupport)
-        {
-            Assert.Pass("Test environment does not support HW encoding");
-        }
 
         var pc1Senders = new List<RTCRtpSender>();
         var pc2Senders = new List<RTCRtpSender>();

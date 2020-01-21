@@ -9,7 +9,7 @@ namespace WebRTC {
     public:
         static EncoderFactory& GetInstance();
         bool IsInitialized() const;
-        void Init(int width, int height, IGraphicsDevice* device); //Can throw exception. 
+        void Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType); //Can throw exception.
         void Shutdown();
         IEncoder *GetEncoder() const;
     private:
