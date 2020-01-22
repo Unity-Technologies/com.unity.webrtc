@@ -34,26 +34,6 @@ promotion_test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-promotion_test_trigger:
-  name: {{ yamato_name }} Promotion Tests Trigger
-  agent:
-    type: Unity::VM
-    image: package-ci/win10:stable
-    flavor: b1.large
-  artifacts:
-    {{ yamato_name }}_promotion_trigger_test_results:
-      paths:
-        - "upm-ci~/test-results/**/*"
-    packages:
-      paths:
-        - "upm-ci~/packages/**/*"
-  dependencies:
-{% for editor in test_editors %}
-{% for platform in test_platforms %}
-    - .yamato/promotion.yml#promotion_test_{{platform.name}}_{{editor.version}}
-{% endfor %}
-{% endfor %}
-
 promote:
   name: Promote {{ yamato_name }} to Production
   agent:
