@@ -6,18 +6,10 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    [TestFixture(EncoderType.Software)]
-    [TestFixture(EncoderType.Hardware)]
+    // [TestFixture(EncoderType.Software)]
+    // [TestFixture(EncoderType.Hardware)]
     class NativeAPITest
     {
-        private readonly EncoderType _encoderType;
-
-        public NativeAPITest(EncoderType encoderType)
-        {
-            _encoderType = encoderType;
-        }
-
-
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
@@ -37,33 +29,33 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CreateAndDestroyContext()
+        public void CreateAndDestroyContext([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             NativeMethods.ContextDestroy(0);
         }
 
         [Test]
-        public void GetEncoderType()
+        public void GetEncoderType([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
-            Assert.AreEqual(_encoderType, NativeMethods.ContextGetEncoderType(context));
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            Assert.AreEqual(encoderType, NativeMethods.ContextGetEncoderType(context));
             NativeMethods.ContextDestroy(0);
         }
 
         [Test]
-        public void CreateAndDeletePeerConnection()
+        public void CreateAndDeletePeerConnection([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
         }
 
         [Test]
-        public void CreateAndDeleteDataChannel()
+        public void CreateAndDeleteDataChannel([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var init = new RTCDataChannelInit(true);
             var channel = NativeMethods.ContextCreateDataChannel(context, peer, "test", ref init);
@@ -73,9 +65,9 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CreateAndDeleteVideoStream()
+        public void CreateAndDeleteVideoStream([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             const int width = 1280;
             const int height = 720;
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
@@ -88,9 +80,9 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CreateAndDeleteAudioStream()
+        public void CreateAndDeleteAudioStream([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             var stream = NativeMethods.ContextCreateAudioStream(context);
             NativeMethods.ContextDeleteAudioStream(context, stream);
             NativeMethods.ContextDestroy(0);
@@ -98,9 +90,9 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
-        public void CallGetRenderEventFunc()
+        public void CallGetRenderEventFunc([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             var callback = NativeMethods.GetRenderEventFunc(context);
             Assert.AreNotEqual(callback, IntPtr.Zero);
             NativeMethods.ContextDestroy(0);
@@ -108,9 +100,9 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
-        public IEnumerator CallVideoEncoderMethods()
+        public IEnumerator CallVideoEncoderMethods([Values] EncoderType encoderType)
         {
-            var context = NativeMethods.ContextCreate(0, _encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType);
             const int width = 1280;
             const int height = 720;
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
