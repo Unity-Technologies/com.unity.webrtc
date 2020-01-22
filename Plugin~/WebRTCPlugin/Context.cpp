@@ -14,7 +14,6 @@ namespace WebRTC
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
-            DebugLog("Using already created context with ID %d", uid);
             return it->second.get();
         }
         return nullptr;
@@ -22,6 +21,11 @@ namespace WebRTC
 
     Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
     {
+        auto it = s_instance.m_contexts.find(uid);
+        if(it != s_instance.m_contexts.end()) {
+            DebugLog("Using already created context with ID %d", uid);
+            return nullptr;
+        }
         auto ctx = new Context(uid, encoderType);
         s_instance.m_contexts[uid].reset(ctx);
         return ctx;
@@ -41,8 +45,8 @@ namespace WebRTC
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
-            DebugLog("Unregister context with ID %d", uid);
             s_instance.m_contexts.erase(it);
+            DebugLog("Unregistered context with ID %d", uid);
         }
     }
 

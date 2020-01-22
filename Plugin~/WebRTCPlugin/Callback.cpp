@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Context.h"
 #include "IUnityGraphics.h"
 #include "GraphicsDevice/GraphicsDevice.h"
@@ -58,6 +58,10 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
+    if(s_context == nullptr)
+    {
+        return;
+    }
     switch(static_cast<VideoStreamRenderEventID>(eventID))
     {
         case VideoStreamRenderEventID::Initialize:

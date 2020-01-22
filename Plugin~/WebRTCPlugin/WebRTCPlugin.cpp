@@ -176,10 +176,12 @@ extern "C"
     UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType)
     {
         auto ctx = ContextManager::GetInstance()->GetContext(uid);
-        if (ctx == nullptr)
+        if (ctx != nullptr)
         {
-            ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType);
+            DebugLog("Already created context with ID %d", uid);
+            return ctx;
         }
+        ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType);
         return ctx;
     }
 

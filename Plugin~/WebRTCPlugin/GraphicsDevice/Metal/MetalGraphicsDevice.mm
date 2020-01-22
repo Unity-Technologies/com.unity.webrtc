@@ -67,7 +67,10 @@ namespace WebRTC {
     {
         if(dest == src)
             return false;
-        
+
+        if(src.pixelFormat != dest.pixelFormat)
+            return false;
+
         m_unityGraphicsMetal->EndCurrentCommandEncoder();
 
         id<MTLCommandBuffer> commandBuffer = m_unityGraphicsMetal->CurrentCommandBuffer();
@@ -79,7 +82,7 @@ namespace WebRTC {
         MTLSize inTxtSize = MTLSizeMake(width, height, 1);
         MTLOrigin inTxtOrigin = MTLOriginMake(0, 0, 0);
         MTLOrigin outTxtOrigin = MTLOriginMake(0, 0, 0);
-            
+
         [blit copyFromTexture:src
                         sourceSlice:0
                         sourceLevel:0
