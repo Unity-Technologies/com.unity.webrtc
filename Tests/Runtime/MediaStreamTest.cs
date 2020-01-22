@@ -19,6 +19,7 @@ class MediaStreamTest
         WebRTC.Finalize();
     }
 
+    /*
     [UnityTest]
     [Timeout(5000)]
     public IEnumerator MediaStreamTest_AddAndRemoveMediaStream()
@@ -94,4 +95,5 @@ class MediaStreamTest
         yield return videoStream.FinalizeEncoder();
         videoStream.Dispose();
     }
+    */
 }
