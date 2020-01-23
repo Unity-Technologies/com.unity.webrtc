@@ -65,6 +65,7 @@ namespace WebRTC {
 
     bool MetalGraphicsDevice::CopyTexture(id<MTLTexture> dest, id<MTLTexture> src)
     {
+/*
         if(dest == src)
             return false;
 
@@ -99,7 +100,7 @@ namespace WebRTC {
         [blit endEncoding];
         blit = nil;
         m_unityGraphicsMetal->EndCurrentCommandEncoder();
-
+*/
         return true;
     }
 
