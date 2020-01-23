@@ -21,6 +21,18 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        public IEnumerator MediaStreamTest_AddAndRemoveTrack()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720);
+            yield return new WaitForSeconds(1.0f);
+            yield return videoStream.FinalizeEncoder();
+            yield return new WaitForSeconds(1.0f);
+            videoStream.Dispose();
+        }
+
+        [UnityTest]
         [Timeout(5000)]
         public IEnumerator MediaStreamTest_AddAndRemoveMediaStream()
         {
@@ -41,7 +53,7 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
             peer2.OnTrack = e => { pc2Senders.Add(peer2.AddTrack(e.Track)); };
             var videoStream = cam.CaptureStream(1280, 720);
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(1.0f);
 
             foreach (var track in videoStream.GetTracks())
             {
@@ -99,6 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.Close();
 
             yield return videoStream.FinalizeEncoder();
+            yield return new WaitForSeconds(1.0f);
             videoStream.Dispose();
         }
     }
