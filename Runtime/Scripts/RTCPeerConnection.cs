@@ -281,6 +281,8 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (null == WebRTC.Table)
+                    return;
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.m_opSessionDesc.desc.sdp = sdp;
                 connection.m_opSessionDesc.desc.type = type;
