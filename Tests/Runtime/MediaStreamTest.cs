@@ -21,6 +21,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [Timeout(5000)]
+        [UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor})] // TODO:: fix Crush bug on Yamato
         public IEnumerator MediaStreamTest_AddAndRemoveVideoStream()
         {
             var camObj = new GameObject("Camera");
@@ -119,6 +121,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor})] // TODO:: fix Crush bug on Yamato
         public IEnumerator MediaStreamTest_AddAndRemoveVideoTrack()
         {
             var camObj = new GameObject("Camera");
