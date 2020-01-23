@@ -1,4 +1,4 @@
-﻿using UnityEngine.TestTools;
+using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using Unity.WebRTC;
@@ -116,10 +116,6 @@ namespace Unity.WebRTC.RuntimeTest
             var peer2 = new RTCPeerConnection(ref config);
             RTCDataChannel channel1 = null, channel2 = null;
 
-            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(ref candidate); };
-            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
-            peer2.OnDataChannel = channel => { channel2 = channel; };
-
             var conf = new RTCDataChannelInit(true);
             channel1 = peer1.CreateDataChannel("data", ref conf);
 
@@ -137,6 +133,10 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op5;
             var op6 = peer1.SetRemoteDescription(ref op4.desc);
             yield return op6;
+
+            channel1.Dispose();
+            peer1.Dispose();
+            peer2.Dispose();
         }
     }
 }
