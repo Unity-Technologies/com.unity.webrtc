@@ -301,7 +301,7 @@ namespace Unity.WebRTC
 
         internal static Hashtable Table { get
             {
-                return (null == s_context) ? null : s_context.table;
+                return s_context?.table;
             }
         }
 

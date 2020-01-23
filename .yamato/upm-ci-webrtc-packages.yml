@@ -134,7 +134,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
     - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '/Users/bokken/Library/Python/3.7/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
     - |
-      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --scripting-backend={{ param.backend }} --loglevel=verbose --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results' 
+      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --scripting-backend={{ param.backend }} --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results' 
       UTR_RESULT=$?
       mkdir -p upm-ci~/test-results/
       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/

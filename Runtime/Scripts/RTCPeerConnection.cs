@@ -168,6 +168,8 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
+                if (null == WebRTC.Table)
+                    return;
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
                 connection.OnDataChannel(new RTCDataChannel(ptrChannel, connection));
             }, null);
