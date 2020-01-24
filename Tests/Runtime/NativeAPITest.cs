@@ -39,7 +39,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void Init()
         {
             NativeMethods.RegisterDebugLog(DebugLog);
-            encoderType = EncoderType.Software;
+            encoderType = EncoderType.Hardware;
             Debug.Log("Init");
         }
 
