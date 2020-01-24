@@ -21,6 +21,14 @@ namespace Unity.WebRTC.RuntimeTest
     {
         protected EncoderType encoderType;
 
+        private static RenderTexture CreateRenderTexture(int width, int height)
+        {
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var renderTexture = new RenderTexture(width, height, 0, format);
+            renderTexture.Create();
+            return renderTexture;
+        }
+
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         protected static void DebugLog(string str)
         {
@@ -84,13 +92,13 @@ namespace Unity.WebRTC.RuntimeTest
             var context = NativeMethods.ContextCreate(0, encoderType);
             const int width = 1280;
             const int height = 720;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var renderTexture = new RenderTexture(width, height, 0, format);
-            renderTexture.Create();
+            var renderTexture = CreateRenderTexture(width, height);
             var stream =
                 NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
             NativeMethods.ContextDeleteVideoStream(context, stream);
             NativeMethods.ContextDestroy(0);
+
+            UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
         [Test]
@@ -119,9 +127,7 @@ namespace Unity.WebRTC.RuntimeTest
             var context = NativeMethods.ContextCreate(0, encoderType);
             const int width = 1280;
             const int height = 720;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var renderTexture = new RenderTexture(width, height, 0, format);
-            renderTexture.Create();
+            var renderTexture = CreateRenderTexture(width, height);
             var stream =
                 NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
             var callback = NativeMethods.GetRenderEventFunc(context);
@@ -137,6 +143,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             NativeMethods.ContextDeleteVideoStream(context, stream);
             NativeMethods.ContextDestroy(0);
+
+            UnityEngine.Object.DestroyImmediate(renderTexture);
         }
     }
 
