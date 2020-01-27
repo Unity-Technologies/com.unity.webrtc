@@ -102,6 +102,29 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void MediaStreamGetAudioTracks()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var stream = NativeMethods.ContextCreateAudioStream(context);
+            int trackSize = 0;
+            IntPtr trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, ref trackSize);
+            Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
+            Assert.Greater(trackSize, 0);
+
+            IntPtr[] tracksPtr = new IntPtr[trackSize];
+            System.Runtime.InteropServices.Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(trackNativePtr);
+
+            for (int i = 0; i < trackSize; i++)
+            {
+                MediaStreamTrack track = new MediaStreamTrack(tracksPtr[i]);
+                Assert.True(track.Enabled);
+            }
+            NativeMethods.ContextDeleteAudioStream(context, stream);
+            NativeMethods.ContextDestroy(0);
+        }
+
+        [Test]
         public void CreateAndDeleteAudioStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
