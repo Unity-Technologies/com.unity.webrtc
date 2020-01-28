@@ -240,6 +240,7 @@ namespace Unity.WebRTC
             rts[1].Create();
             camCopyRts.Add(rts);
             cam.targetTexture = rts[0];
+            /*
             cam.gameObject.AddCleanerCallback(() =>
             {
                 CameraExtension.RemoveRt(rts);
@@ -248,6 +249,7 @@ namespace Unity.WebRTC
                 UnityEngine.Object.Destroy(rts[0]);
                 UnityEngine.Object.Destroy(rts[1]);
             });
+            */
             started = true;
 
             var stream = WebRTC.Context.CaptureVideoStream(rts[1].GetNativeTexturePtr(), width, height);

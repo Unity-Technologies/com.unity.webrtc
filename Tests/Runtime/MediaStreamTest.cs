@@ -12,12 +12,14 @@ namespace Unity.WebRTC.RuntimeTest
         public void SetUp()
         {
             WebRTC.Initialize();
+            Debug.Log("MediaStreamTest SetUp");
         }
 
         [TearDown]
         public void TearDown()
         {
             WebRTC.Finalize();
+            Debug.Log("MediaStreamTest TearDown");
         }
 
         [UnityTest]
@@ -25,17 +27,21 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor})] // TODO:: fix Crush bug on Yamato
         public IEnumerator MediaStreamTest_AddAndRemoveVideoStream()
         {
+            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 1");
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720);
             yield return new WaitForSeconds(1.0f);
+            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 2");
             Assert.AreEqual(1, videoStream.GetVideoTracks().Length);
             Assert.AreEqual(0, videoStream.GetAudioTracks().Length);
             Assert.AreEqual(1, videoStream.GetTracks().Length);
             yield return videoStream.FinalizeEncoder();
             yield return new WaitForSeconds(1.0f);
+            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 3");
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 4");
         }
 
         [Test]
