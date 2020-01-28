@@ -66,7 +66,9 @@ namespace Unity.WebRTC
 
         public YieldInstruction FinalizeEncoder()
         {
+            Debug.Log("WebRTC.Context.FinalizeEncoder 0");
             WebRTC.Context.FinalizeEncoder();
+            Debug.Log("WebRTC.Context.FinalizeEncoder 1");
             return new WaitForEndOfFrame();
         }
 
