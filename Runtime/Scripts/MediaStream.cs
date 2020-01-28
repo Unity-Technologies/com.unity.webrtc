@@ -44,13 +44,17 @@ namespace Unity.WebRTC
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+                var tracks = GetTracks();
+                foreach (var track in tracks)
+                {
+                    StopTrack(track);
+                }
                 switch (_streamType)
                 {
                     case MediaStreamType.Video:
                         WebRTC.Context.DeleteVideoStream(self);
                         break;
                     case MediaStreamType.Audio:
-                        Audio.Stop();
                         WebRTC.Context.DeleteAudioStream(self);
                         break;
                 }
