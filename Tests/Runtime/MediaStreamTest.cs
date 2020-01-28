@@ -21,8 +21,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
-        [Timeout(10000)]
-        //[UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor})] // TODO:: fix Crush bug on Yamato
+        [Timeout(5000)]
+        [UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor})] // TODO:: fix Crush bug on Yamato
         public IEnumerator MediaStreamTest_AddAndRemoveVideoStream()
         {
             var camObj = new GameObject("Camera");
@@ -50,7 +50,7 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [UnityTest]
-        [Timeout(10000)]
+        [Timeout(5000)]
         public IEnumerator MediaStreamTest_AddAndRemoveAudioTrack()
         {
             RTCConfiguration config = default;
@@ -67,7 +67,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
-        [Timeout(10000)]
+        [Timeout(5000)]
         [UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor})] // TODO:: fix Crush bug on Yamato
         public IEnumerator MediaStreamTest_AddAndRemoveVideoTrack()
         {
@@ -138,17 +138,17 @@ namespace Unity.WebRTC.RuntimeTest
 
                 var op7 = new WaitUntilWithTimeout(() =>
                     peer1.IceConnectionState == RTCIceConnectionState.Connected ||
-                    peer1.IceConnectionState == RTCIceConnectionState.Completed, 10000);
+                    peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
                 yield return op7;
                 Assert.True(op7.IsCompleted);
 
                 var op8 = new WaitUntilWithTimeout(() =>
                     peer2.IceConnectionState == RTCIceConnectionState.Connected ||
-                    peer2.IceConnectionState == RTCIceConnectionState.Completed, 10000);
+                    peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
                 yield return op8;
                 Assert.True(op7.IsCompleted);
 
-                var op9 = new WaitUntilWithTimeout(() => pc2Senders.Count > 0, 10000);
+                var op9 = new WaitUntilWithTimeout(() => pc2Senders.Count > 0, 5000);
                 yield return op9;
                 Assert.True(op9.IsCompleted);
 
