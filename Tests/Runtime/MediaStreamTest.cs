@@ -39,6 +39,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return videoStream.FinalizeEncoder();
             Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 1");
             yield return new WaitForSeconds(0.1f);
+            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 2");
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
