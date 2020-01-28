@@ -283,7 +283,9 @@ namespace Unity.WebRTC
             {
                 if (null == WebRTC.Table)
                     return;
-                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
+                if (!(WebRTC.Table[ptr] is RTCPeerConnection connection))
+                    return;
+
                 connection.m_opSessionDesc.desc.sdp = sdp;
                 connection.m_opSessionDesc.desc.type = type;
                 connection.m_opSessionDesc.Done();
