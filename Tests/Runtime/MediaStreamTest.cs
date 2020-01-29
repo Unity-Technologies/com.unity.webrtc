@@ -35,15 +35,10 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(1, videoStream.GetVideoTracks().Length);
             Assert.AreEqual(0, videoStream.GetAudioTracks().Length);
             Assert.AreEqual(1, videoStream.GetTracks().Length);
-            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 0");
-            yield return videoStream.FinalizeEncoder();
-            //Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 1");
-            //yield return new WaitForSeconds(0.1f);
-            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 1");
+            videoStream.FinalizeEncoder();
+            yield return new WaitForSeconds(0.1f);
             videoStream.Dispose();
-            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 2");
             Object.DestroyImmediate(camObj);
-            Debug.Log("MediaStreamTest_AddAndRemoveVideoStream 3");
         }
 
         [Test]
@@ -82,13 +77,13 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720);
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeersTest>().component;
             test.SetStream(videoStream);
             yield return test;
-            yield return videoStream.FinalizeEncoder();
-            yield return new WaitForSeconds(1.0f);
+            videoStream.FinalizeEncoder();
+            yield return new WaitForSeconds(0.1f);
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }

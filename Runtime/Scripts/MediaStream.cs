@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using Unity.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,12 +65,10 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        public YieldInstruction FinalizeEncoder()
+        public IEnumerator FinalizeEncoder()
         {
-            Debug.Log("WebRTC.Context.FinalizeEncoder 0");
             WebRTC.Context.FinalizeEncoder();
-            Debug.Log("WebRTC.Context.FinalizeEncoder 1");
-            return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
         }
 
         private void StopTrack(MediaStreamTrack track)
@@ -242,7 +241,6 @@ namespace Unity.WebRTC
             rts[1].Create();
             camCopyRts.Add(rts);
             cam.targetTexture = rts[0];
-            /*
             cam.gameObject.AddCleanerCallback(() =>
             {
                 CameraExtension.RemoveRt(rts);
@@ -251,7 +249,6 @@ namespace Unity.WebRTC
                 UnityEngine.Object.Destroy(rts[0]);
                 UnityEngine.Object.Destroy(rts[1]);
             });
-            */
             started = true;
 
             var stream = WebRTC.Context.CaptureVideoStream(rts[1].GetNativeTexturePtr(), width, height);
