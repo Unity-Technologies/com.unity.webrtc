@@ -65,10 +65,9 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        public IEnumerator FinalizeEncoder()
+        public void FinalizeEncoder()
         {
             WebRTC.Context.FinalizeEncoder();
-            yield return new WaitForEndOfFrame();
         }
 
         private void StopTrack(MediaStreamTrack track)
