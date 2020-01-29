@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.1.0] - 2020-01-10
 
 - Added: IL2CPP support
-- Added: Linux OpenGL support
-- Added: Mac OS software encoder support
-- Added: Windows software encoder support
+- Added: Linux OpenGL hardware encoder support
+- Added: Mac OS Metal software encoder support
+- Added: Windows DirectX11 software encoder support
 
 ## [1.0.1] - 2019-09-22
 
