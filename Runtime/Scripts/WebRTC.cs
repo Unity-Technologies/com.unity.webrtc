@@ -7,6 +7,12 @@ using System.Collections;
 
 namespace Unity.WebRTC
 {
+    public enum EncoderType
+    {
+        Software = 0,
+        Hardware = 1
+    }
+
     public struct RTCIceCandidate​
     {
         [MarshalAs(UnmanagedType.LPStr)]
@@ -135,8 +141,6 @@ namespace Unity.WebRTC
         public RTCSdpType type;
         [MarshalAs(UnmanagedType.LPStr)]
         public string sdp;
-
-
     }
 
     public struct RTCOfferOptions
@@ -219,10 +223,10 @@ namespace Unity.WebRTC
         private static SynchronizationContext s_syncContext;
         private static Material flipMat;
 
-        public static void Initialize()
+        public static void Initialize(EncoderType type = EncoderType.Hardware)
         {
             NativeMethods.RegisterDebugLog(DebugLog);
-            s_context = Context.Create();
+            s_context = Context.Create(encoderType:type);
             s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
@@ -256,6 +260,11 @@ namespace Unity.WebRTC
             s_context.Dispose();
             s_context = null;
             NativeMethods.RegisterDebugLog(null);
+        }
+
+        public static EncoderType GetEncoderType()
+        {
+            return s_context.GetEncoderType();
         }
 
         internal static string GetModuleName()
@@ -292,7 +301,7 @@ namespace Unity.WebRTC
 
         internal static Hashtable Table { get
             {
-                return (null == s_context) ? null : s_context.table;
+                return s_context?.table;
             }
         }
 
@@ -351,7 +360,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreate(int uid);
+        public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDestroy(int uid);
         [DllImport(WebRTC.Lib)]
@@ -434,6 +443,8 @@ namespace Unity.WebRTC
         public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]

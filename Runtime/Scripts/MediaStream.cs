@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using Unity.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -44,13 +45,17 @@ namespace Unity.WebRTC
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+                var tracks = GetTracks();
+                foreach (var track in tracks)
+                {
+                    StopTrack(track);
+                }
                 switch (_streamType)
                 {
                     case MediaStreamType.Video:
                         WebRTC.Context.DeleteVideoStream(self);
                         break;
                     case MediaStreamType.Audio:
-                        Audio.Stop();
                         WebRTC.Context.DeleteAudioStream(self);
                         break;
                 }
@@ -60,10 +65,9 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        public YieldInstruction FinalizeEncoder()
+        public void FinalizeEncoder()
         {
             WebRTC.Context.FinalizeEncoder();
-            return new WaitForEndOfFrame();
         }
 
         private void StopTrack(MediaStreamTrack track)

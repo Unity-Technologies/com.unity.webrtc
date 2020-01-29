@@ -14,7 +14,8 @@ namespace WebRTC
     public:
         static ContextManager* GetInstance() { return &s_instance; }
      
-        Context* GetContext(int uid);
+        Context* GetContext(int uid) const;
+        Context* CreateContext(int uid, UnityEncoderType encoderType);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
 
@@ -22,7 +23,6 @@ namespace WebRTC
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
         void* hModule = nullptr;
-        static bool s_use_software_encoder;
     private:
         ~ContextManager();
         std::map<int, ContextPtr> m_contexts;
@@ -32,7 +32,7 @@ namespace WebRTC
     class Context
     {
     public:
-        explicit Context(int uid = -1);
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderType::UnityEncoderHardware);
         ~Context();
 
         CodecInitializationResult GetCodecInitializationResult();
@@ -43,6 +43,7 @@ namespace WebRTC
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
+        UnityEncoderType GetEncoderType() const;
 
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IGraphicsDevice* device);
@@ -60,6 +61,7 @@ namespace WebRTC
 
     private:
         int m_uid;
+        UnityEncoderType m_encoderType;
         std::unique_ptr<rtc::Thread> workerThread;
         std::unique_ptr<rtc::Thread> signalingThread;
         std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;

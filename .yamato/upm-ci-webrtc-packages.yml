@@ -103,7 +103,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
       except:
       - "master"
   artifacts:
-    {{ package.name }}_il2cpp_{{ editor.version }}_{{ platform.name }}_test_results: 
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ platform.name }}_test_results: 
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:

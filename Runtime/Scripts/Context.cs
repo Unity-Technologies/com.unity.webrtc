@@ -27,9 +27,9 @@ namespace Unity.WebRTC
             return v;
         }
 
-        public static Context Create(int id = 0)
+        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware)
         {
-            var ptr = NativeMethods.ContextCreate(id);
+            var ptr = NativeMethods.ContextCreate(id, encoderType);
             return new Context(ptr, id);
         }
 
@@ -70,6 +70,11 @@ namespace Unity.WebRTC
         public CodecInitializationResult GetCodecInitializationResult()
         {
             return NativeMethods.ContextGetCodecInitializationResult(self);
+        }
+        
+        public EncoderType GetEncoderType()
+        {
+            return NativeMethods.ContextGetEncoderType(self);
         }
 
         public IntPtr CreatePeerConnection()
