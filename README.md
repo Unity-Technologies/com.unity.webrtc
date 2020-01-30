@@ -1,6 +1,6 @@
 # WebRTC for Unity
 
-<img src="https://img.shields.io/badge/unity-2019.1-green.svg?style=flat-square" alt="unity 2019.1"><img src="https://img.shields.io/badge/unity-2019.2-green.svg?style=flat-square" alt="unity 2019.2"><img src="https://img.shields.io/badge/unity-2019.3-green.svg?style=flat-square" alt="unity 2019.3">
+<img src="https://img.shields.io/badge/unity-2019.3-green.svg?style=flat-square" alt="unity 2019.3">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -26,14 +26,18 @@ To install the package, download WebRTC for Unity from the package manager. See 
 
 This version of the package is compatible with the following versions of the Unity Editor:
 
-- Unity 2019.1 and later
-- Currently supports `windows64 DirectX11` and `Linux OpenGL`.
+- Unity 2019.3 and later
 
-| Platform    | Support Graphics API | Details                      |
-| ----------- | -------------------- | ---------------------------- |
-| Windows X64 | DirectX11            | Require NVIDIA Graphics card | 
-| Linux X64   | OpenGL4.5            | Require NVIDIA Graphics card |
-| MacOS       |                      |                              |
+| Platform    | Graphics API | Hardware Encoder                                  | Software Encoder   |
+| ----------- | ------------ | ------------------------------------------------- | ------------------ |
+| Windows X64 | DirectX11    | :white_check_mark: (Require NVIDIA Graphics card) | :white_check_mark: |  
+| Windows X64 | DirectX12    |                                                   |                    |  
+| Windows X64 | OpenGL       |                                                   |                    |
+| Windows X64 | Vulkan       |                                                   |                    |  
+| Linux X64   | OpenGL       | :white_check_mark: (Require NVIDIA Graphics card) |                    |
+| Linux X64   | Vulkan       |                                                   |                    |
+| MacOS       | OpenGL       |                                                   |                    |
+| MacOS       | Metal        |                                                   | :white_check_mark: |
 
 On Linux, `libc++1` `libc++abi1` packages should be installed.
 
@@ -60,6 +64,16 @@ This package uses GPU hardware acceleration for video encoding, so it only runs 
 │   ├── gl3w
 │   ├── unity
 │   ├── WebRTCPlugin
+│   │   ├── Codec
+│   │   │   ├── NvCodec
+│   │   │   ├── SoftwareCodec
+│   │   │   └── VideoToolbox
+│   │   └── GraphicsDevice
+│   │       ├── D3D11
+│   │       ├── D3D12
+│   │       ├── Metal
+│   │       ├── OpenGL
+│   │       └── Vulkan
 │   └── WebRTCPluginTest
 ├── Runtime
 │   ├── Plugins
@@ -71,6 +85,13 @@ This package uses GPU hardware acceleration for video encoding, so it only runs 
 │   ├── Editor
 │   └── Runtime
 └── WebRTC~
+    ├── Assets
+    ├── Packages
+    │   └── com.unity.webrtc
+    │       ├── Editor
+    │       ├── Runtime
+    │       └── Tests
+    └── ProjectSettings
 ```
 
 ### Samples

@@ -1,7 +1,7 @@
 # ネイティブプラグイン
 
 `com.unity.webrtc` はネイティブプラグインを使用しています。
-ネイティブプラグインのビルド及び配置の方法について説明します。
+ネイティブプラグインのビルド及び配置方法について説明します。
 
 ## 開発環境
 
@@ -26,6 +26,10 @@ C:/Windows/Temp/VulkanSDK.exe /S
 # Setting up environment variables
 setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
 setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
+
+# Install nuget packages
+choco install nuget.commandline
+nuget restore Plugin~/WebRTCPlugin.sln
 ```
 
 ### 依存ライブラリのインストール (Ubuntu18.04)
@@ -33,8 +37,8 @@ setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
 Ubuntu18.04 での開発環境の構築手順を以下に示します。
 
 ```bash
-# Install libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
-sudo apt-get install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
+# Install cmake libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev googletest
+sudo apt-get install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev googletest
 
 # Install CUDA SDK
 sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
@@ -46,11 +50,21 @@ sudo apt install -y cuda
 
 ### 依存ライブラリのインストール (MacOS)
 
-TBD.
+```bash
+# Install cmake
+brew install cmake
+
+# Install googletest
+git clone https://github.com/google/googletest.git
+cd googletest
+cmake .
+make
+sudo make install
+```
 
 ### libwebrtc の組み込み
 
-プラグインは [libwebrtc](https://chromium.googlesource.com/external/webrtc/) に依存しているため、ビルドの際にリンクする必要があります。[Github Release](https://github.com/Unity-Technologies/com.unity.webrtc/releases) にライブラリを配置しています。もし自身でビルドする場合は、`BuildScript~` フォルダ以下にスクリプトを配置しています。
+プラグインは [libwebrtc](https://chromium.googlesource.com/external/webrtc/) に依存しているため、ビルドの際にリンクする必要があります。[Github Release](https://github.com/Unity-Technologies/com.unity.webrtc/releases) にライブラリを配置しています。ライブラリを独自でビルドする場合は、`BuildScript~` フォルダ以下にスクリプトを配置しています。
 
  <img src="../Documentation~/images/libwebrtc_github_release.png" width=600 align=center>
 
@@ -65,17 +79,28 @@ Windows の場合、`WebRTCPlugin.sln` を **Visual Studio 2017** で開いて�
 
 Linux の場合、 コンパイラに `clang` を使用します。そのため、CLion を利用する際には CMake の設定画面で `clang` の利用を指定します。
 
-### デバッグ
+Mac OS の場合、コンパイラに `clang` を使用します。以下のコマンドを実行して XCode プロジェクトを作成します。
 
-プラグインのデバッグを行うためには、個別の環境に合わせて`WebRTCPlugin` プロジェクトのプロパティを変更する必要があります。
+```bash
+cd Plugins~/
+cmake -GXcode .
+```
 
-`Command` に Unity の実行ファイルパス、`Command Arguments` にプロジェクトパスを指定してください。この設定を行うことで、デバッグ実行時に Unity エディタが起動し、ブレークポイントが有効になります。
+`webrtc.xcodeproj` が生成されるので、これを **XCode** で開くことができます。
+
+## デバッグ
+
+プラグインのデバッグを行うためには、個別の環境に合わせ、`WebRTCPlugin` プロジェクトのプロパティを変更する必要があります。
+
+### Visual Studio の場合
+
+Visual Studio の場合、`Debugging` の項目を設定します。`Command` に Unity の実行ファイルパス、`Command Arguments` にプロジェクトパスを指定します。こうすることで、デバッグ実行時に Unity エディタが起動し、ブレークポイントが有効になります。
 
 <img src="../Documentation~/images/command_config_vs2017.png" width=600 align=center>
 
-### 単体テスト
+### ネイティブテスト
 
-ネイティブプラグインの単体テストに [gtest](https://github.com/google/googletest) を使用しています。
+ネイティブプラグインの単体テストに [gtest](https://github.com/google/googletest) を使用しています。gtest は多くのプラットフォームで動作し、いくつかの IDE のテストランナーでサポートされているため、プラグインのテストに適しています。
 
 #### Linux の場合
 `gtest` を以下のコマンドでインストールします。テストコードに [freeglut](http://freeglut.sourceforge.net/) を使用するため、同様にインストールします。
@@ -109,14 +134,24 @@ nuget restore WebRTCPlugin.sln
 ``` 
 
 Visual Studio を利用している場合は、テストエクスプローラー上でテスト項目を確認できます。
+<img src="../Documentation~/images/libwebrtc_gtest_vs2017.png" width=400 align=center>
+
 
 #### Mac の場合
 
-TBD.
+XCode のテストランナーは gtest に対応していません。
 
-### プラグインの配置
+## プラグインの配置
 
-ビルドを実行すると、`webrtc.dll` が `Packages\com.unity.webrtc\Runtime\Plugins\x86_64` に配置されます(Linux の場合は `libwebrtc.so`)。このとき Unity のインスペクタ上で以下の設定になっていることを確認してください。
+ビルドを実行すると、`Packages\com.unity.webrtc\Runtime\Plugins\x86_64` フォルダに以下のファイルを配置します。
+
+| Platform    | Plugin filename      |
+| ----------- | -------------------- |
+| Windows X64 | `webrtc.dll`         |
+| Linux X64   | `libwebrtc.so`       |
+| MacOS       | `webrtc.bundle`      |
+
+Unity プロジェクトを開き、Unity のインスペクタ上で以下の設定になっていることを確認してください。`Plugin load settings` がオフの状態だと、正しく動作しない場合があります。
 
 <img src="../Documentation~/images/inspector_webrtc_plugin.png" width=400 align=center>
 
