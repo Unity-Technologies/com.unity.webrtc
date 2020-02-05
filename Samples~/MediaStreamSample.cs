@@ -73,13 +73,11 @@ public class MediaStreamSample : MonoBehaviour
         pc1OnNegotiationNeeded = new DelegateOnNegotiationNeeded(() => { StartCoroutine(Pc1OnNegotiationNeeded()); });
         if (!WebRTC.HWEncoderSupport)
         {
-            addTracksButton.interactable = false;
-            callButton.interactable = false;
-            infoText.text = "Current GPU doesn't support Nvidia Encoder";
+            infoText.text = "Current GPU doesn't support encoder";
         }
         else
         {
-            infoText.text = "Current GPU supports Nvidia Encoder";
+            infoText.text = "Current GPU supports encoder";
         }
     }
 
