@@ -251,7 +251,6 @@ namespace Unity.WebRTC
                     }
                     Context.Encode();
                 }
-                Audio.Update();
             }
         }
 

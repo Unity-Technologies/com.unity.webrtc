@@ -273,78 +273,23 @@ namespace Unity.WebRTC
     public static class Audio
     {
         private static bool started = false;
-        private static AudioInput audioInput = new AudioInput();
         public static MediaStream CaptureStream()
         {
-            audioInput.BeginRecording();
             started = true;
             return new MediaStream(WebRTC.Context.CreateAudioStream());
         }
-        public static void Update()
+        public static void Update(float[] audioData, int channels)
         {
             if (started)
             {
-                audioInput.UpdateAudio();
+                NativeMethods.ProcessAudio(audioData, audioData.Length);
             }
         }
         public static void Stop()
         {
             if (started)
             {
-                AudioRenderer.Stop();
                 started = false;
-            }
-        }
-    }
-    public class AudioInput
-    {
-        private ushort channelCount;
-        private NativeArray<float> buffer;
-
-        public void BeginRecording()
-        {
-
-            switch (AudioSettings.speakerMode)
-            {
-                case AudioSpeakerMode.Mono:
-                    channelCount = 1;
-                    break;
-                case AudioSpeakerMode.Stereo:
-                    channelCount = 2;
-                    break;
-                case AudioSpeakerMode.Quad:
-                    channelCount = 4;
-                    break;
-                case AudioSpeakerMode.Surround:
-                    channelCount = 5;
-                    break;
-                case AudioSpeakerMode.Mode5point1:
-                    channelCount = 6;
-                    break;
-                case AudioSpeakerMode.Mode7point1:
-                    channelCount = 7;
-                    break;
-                case AudioSpeakerMode.Prologic:
-                    channelCount = 2;
-                    break;
-                default:
-                    channelCount = 1;
-                    break;
-            }
-            AudioRenderer.Start();
-        }
-
-        public void UpdateAudio()
-        {
-            var sampleCountFrame = AudioRenderer.GetSampleCountForCaptureFrame();
-            //process Stereo mode only(Prologic mode also have 2 channel)
-            if (AudioSettings.speakerMode == AudioSpeakerMode.Stereo)
-            {
-                buffer = new NativeArray<float>((int)sampleCountFrame * (int)channelCount, Allocator.Temp);
-                AudioRenderer.Render(buffer);
-                float[] audioData = buffer.ToArray();
-                NativeMethods.ProcessAudio(audioData, audioData.Length);
-                buffer.Dispose();
             }
         }
     }
