@@ -114,7 +114,7 @@ namespace Unity.WebRTC.RuntimeTest
             config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
-            RTCDataChannel channel1 = null, channel2 = null;
+            RTCDataChannel channel1 = null;
 
             var conf = new RTCDataChannelInit(true);
             channel1 = peer1.CreateDataChannel("data", ref conf);
