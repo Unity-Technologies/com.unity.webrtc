@@ -14,7 +14,7 @@ using Unity.WebRTC;
 
 ### 初期化
 
-`WebRTC` の利用時には初期化を行うために、 `WebRTC.Initialize()`を呼び出してください。また、終了時には `WebRTC.Finalize()` を呼び出します。
+`WebRTC` の利用時には初期化を行うために、 `WebRTC.Initialize()`を呼び出します。終了時には `WebRTC.Finalize()` を呼び出します。
 
 ```CSharp
 public class MyPlayerScript : MonoBehaviour
@@ -23,6 +23,20 @@ public class MyPlayerScript : MonoBehaviour
     {
         // Initialize WebRTC
         WebRTC.Initialize();
+    }
+}
+```
+
+なお、デフォルトではエンコーダーはハードウェアを使用します。ハードウェアエンコーダーを利用しない場合、初期化時に `EncoderType.Software` を指定します。
+初期化後にエンコーダーを変更することはできません。
+
+```CSharp
+public class MyPlayerScript : MonoBehaviour
+{
+    private void Awake()
+    {
+        // Initialize WebRTC with software encoder
+        WebRTC.Initialize(EncoderType.Software);
     }
 }
 ```

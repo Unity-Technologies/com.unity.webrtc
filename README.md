@@ -30,10 +30,10 @@ This version of the package is compatible with the following versions of the Uni
 
 | Platform    | Graphics API | Hardware Encoder                                  | Software Encoder   |
 | ----------- | ------------ | ------------------------------------------------- | ------------------ |
-| Windows X64 | DirectX11    | :white_check_mark: (Require NVIDIA Graphics card) | :white_check_mark: |  
-| Windows X64 | DirectX12    |                                                   |                    |  
+| Windows X64 | DirectX11    | :white_check_mark: (Require NVIDIA Graphics card) | :white_check_mark: | 
+| Windows X64 | DirectX12    |                                                   |                    | 
 | Windows X64 | OpenGL       |                                                   |                    |
-| Windows X64 | Vulkan       |                                                   |                    |  
+| Windows X64 | Vulkan       |                                                   |                    | 
 | Linux X64   | OpenGL       | :white_check_mark: (Require NVIDIA Graphics card) |                    |
 | Linux X64   | Vulkan       |                                                   |                    |
 | MacOS       | OpenGL       |                                                   |                    |
