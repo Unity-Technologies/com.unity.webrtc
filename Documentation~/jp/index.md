@@ -1,6 +1,6 @@
 # WebRTC
 
-![WebRTC header](../images/webrtc_header.jpg)
+![WebRTC header](../images/webrtc_header.png)
 
 WebRTC for Unity は、 [WebRTC](https://webrtc.org) を Unity で利用可能にするためのパッケージです。
 

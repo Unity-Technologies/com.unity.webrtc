@@ -1,6 +1,6 @@
 # WebRTC 
 
-![WebRTC header](images/webrtc_header.jpg)
+![WebRTC header](images/webrtc_header.png)
 
 ## What is WebRTC
 
