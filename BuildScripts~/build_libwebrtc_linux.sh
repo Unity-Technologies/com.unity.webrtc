@@ -6,7 +6,7 @@ then
 fi
 
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=72
+export WEBRTC_VERSION=3987 #M80Bnrach
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 

@@ -5,7 +5,8 @@ git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools
 )
 
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=72
+REM M80Bnrach
+set WEBRTC_VERSION=3987
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set CPPFLAGS=/WX-
 set GYP_GENERATORS=ninja,msvs-ninja
