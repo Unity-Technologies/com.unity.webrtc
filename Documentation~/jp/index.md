@@ -13,16 +13,16 @@ WebRTC for Unity は、 [WebRTC](https://webrtc.org) を Unity で利用可能�
 
 - **Unity 2019.3**
 
-| Platform    | Graphics API | Hardware Encoder                                         | Software Encoder   |
-| ----------- | ------------ | ----------------------------------------------------     | ------------------ |
-| Windows x64 | DirectX11    | :white_check_mark: (**NVIDIA のグラフィックスカード**が必要) | :white_check_mark: | 
-| Windows x64 | DirectX12    |                                                          |                    | 
-| Windows x64 | OpenGL       |                                                          |                    |
-| Windows x64 | Vulkan       |                                                          |                    | 
-| Linux x64   | OpenGL       | :white_check_mark: (**NVIDIA のグラフィックスカード**が必要) |                    |
-| Linux x64   | Vulkan       |                                                          |                    |
-| MacOS       | OpenGL       |                                                          |                    |
-| MacOS       | Metal        |                                                          | :white_check_mark: |
+| Platform    | Graphics API | Hardware Encoder                                                                                                            | Software Encoder   |
+| ----------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| Windows x64 | DirectX11    | :white_check_mark: (NVIDIA の[グラフィックスカード](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)が必要) | :white_check_mark: | 
+| Windows x64 | DirectX12    |                                                                                                                             |                    | 
+| Windows x64 | OpenGL       |                                                                                                                             |                    |
+| Windows x64 | Vulkan       |                                                                                                                             |                    | 
+| Linux x64   | OpenGL       | :white_check_mark: (NVIDIA の[グラフィックスカード](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)が必要) |                    |
+| Linux x64   | Vulkan       |                                                                                                                             |                    |
+| MacOS       | OpenGL       |                                                                                                                             |                    |
+| MacOS       | Metal        |                                                                                                                             | :white_check_mark: |
 
 対応している NVIDIA のグラフィックスカードについては、[NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder) のページをご覧ください。
 
