@@ -39,10 +39,11 @@ namespace WebRTC
 
         if (lastBitrate.get_sum_kbps() > 0)
         {
-            //SetRateAllocation(lastBitrate, 30);
+            RateControlParameters param(lastBitrate, 30);
+            SetRates(param);
         }
-        //encodedImage._buffer = &frameDataBuffer[0];
-        //encodedImage._length = encodedImage._size = frameDataBuffer.size();
+
+        encodedImage.set_buffer(&frameDataBuffer[0], frameDataBuffer.size());
 
         fragHeader.VerifyAndAllocateFragmentationHeader(naluIndices.size());
         fragHeader.fragmentationVectorSize = static_cast<uint16_t>(naluIndices.size());
