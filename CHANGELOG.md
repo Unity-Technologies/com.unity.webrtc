@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added: Linux OpenGL hardware encoder support
 - Added: Mac OS Metal software encoder support
 - Added: Windows DirectX11 software encoder support
+- Changed: Changed "Audio.Update" method to public
 
 ## [1.0.1] - 2019-09-22
 
