@@ -10,12 +10,7 @@
 
  // Implementation file of class VideoCapturer.
 
-#include <algorithm>
-
-#include "api/video/i420_buffer.h"
-#include "api/video/video_frame.h"
-#include "rtc_base/logging.h"
-
+#include "pch.h"
 #include "VideoCapturer.h"
 
 namespace WebRTC {
@@ -33,7 +28,7 @@ namespace WebRTC {
     // Implementation of class VideoCapturer
     /////////////////////////////////////////////////////////////////////
     VideoCapturer::VideoCapturer() : apply_rotation_(false) {
-        thread_checker_.DetachFromThread();
+        sequence_checker_.Detach();
         Construct();
     }
 
@@ -52,7 +47,7 @@ namespace WebRTC {
     }
 
     bool VideoCapturer::StartCapturing(const cricket::VideoFormat& capture_format) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         CaptureState result = Start(capture_format);
         const bool success = (result == CS_RUNNING) || (result == CS_STARTING);
         if (!success) {
@@ -72,14 +67,14 @@ namespace WebRTC {
         const std::vector<cricket::VideoFormat>& formats) {
         // This method is OK to call during initialization on a separate thread.
         RTC_DCHECK(capture_state_ == CS_STOPPED ||
-            thread_checker_.CalledOnValidThread());
+            sequence_checker_.IsCurrent());
         supported_formats_ = formats;
         UpdateFilteredSupportedFormats();
     }
 
     bool VideoCapturer::GetBestCaptureFormat(const cricket::VideoFormat& format,
         cricket::VideoFormat* best_format) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         // TODO(fbarchard): Directly support max_format.
         UpdateFilteredSupportedFormats();
         const std::vector<cricket::VideoFormat>* supported_formats = GetSupportedFormats();
@@ -119,7 +114,7 @@ namespace WebRTC {
     }
 
     void VideoCapturer::ConstrainSupportedFormats(const cricket::VideoFormat& max_format) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         max_format_.reset(new cricket::VideoFormat(max_format));
         RTC_LOG(LS_VERBOSE) << " ConstrainSupportedFormats " << max_format.ToString();
         UpdateFilteredSupportedFormats();
@@ -138,7 +133,7 @@ namespace WebRTC {
 
     void VideoCapturer::RemoveSink(
         rtc::VideoSinkInterface<webrtc::VideoFrame>* sink) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         broadcaster_.RemoveSink(sink);
         OnSinkWantsChanged(broadcaster_.wants());
     }
@@ -146,13 +141,13 @@ namespace WebRTC {
     void VideoCapturer::AddOrUpdateSink(
         rtc::VideoSinkInterface<webrtc::VideoFrame>* sink,
         const rtc::VideoSinkWants& wants) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         broadcaster_.AddOrUpdateSink(sink, wants);
         OnSinkWantsChanged(broadcaster_.wants());
     }
 
     void VideoCapturer::OnSinkWantsChanged(const rtc::VideoSinkWants& wants) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         apply_rotation_ = wants.rotation_applied;
 
         if (video_adapter()) {
@@ -234,7 +229,7 @@ namespace WebRTC {
     }
 
     void VideoCapturer::SetCaptureState(CaptureState state) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         if (state == capture_state_) {
             // Don't trigger a state changed callback if the state hasn't changed.
             return;
@@ -252,7 +247,7 @@ namespace WebRTC {
     //                otherwise, we use preference.
     int64_t VideoCapturer::GetFormatDistance(const cricket::VideoFormat& desired,
         const cricket::VideoFormat& supported) {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         int64_t distance = kMaxDistance;
 
         // Check fourcc.
@@ -367,7 +362,7 @@ namespace WebRTC {
     }
 
     bool VideoCapturer::ShouldFilterFormat(const cricket::VideoFormat& format) const {
-        RTC_DCHECK(thread_checker_.CalledOnValidThread());
+        RTC_DCHECK(sequence_checker_.IsCurrent());
         if (!enable_camera_list_) {
             return false;
         }

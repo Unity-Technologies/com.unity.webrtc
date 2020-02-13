@@ -247,6 +247,7 @@ namespace WebRTC {
         void UpdateInputSize(int width, int height);
 
         rtc::ThreadChecker thread_checker_;
+        webrtc::SequenceChecker sequence_checker_;
         std::string id_;
         CaptureState capture_state_;
         std::unique_ptr<cricket::VideoFormat> capture_format_;

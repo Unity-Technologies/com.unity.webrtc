@@ -4,7 +4,9 @@
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "Codec/EncoderFactory.h"
 #include "DummyVideoEncoder.h"
-
+#include "VideoCapturer.h"
+#include "VideoCaptureTrackSource.h"
+#include "VideoTrackSource.h"
 
 namespace WebRTC
 {
@@ -61,9 +63,17 @@ namespace WebRTC
     void Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
         config = webrtc::PeerConnectionInterface::RTCConfiguration{};
-        Json::Reader jsonReader;
+        Json::CharReaderBuilder builder;
+        const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
         Json::Value configJson;
-        jsonReader.parse(str, configJson);
+        Json::String err;
+        bool ok = reader->parse(str.c_str(), str.c_str() + static_cast<int>(str.length()), &configJson, &err);
+        if (!ok)
+        {
+            //json parse faild.
+            return;
+        }
+
         Json::Value iceServersJson = configJson["iceServers"];
         if (!iceServersJson)
             return;
@@ -121,9 +131,9 @@ namespace WebRTC
         : m_uid(uid)
         , m_encoderType(encoderType)
     {
-        workerThread.reset(new rtc::Thread());
+        workerThread.reset(rtc::Thread::Create().get());
         workerThread->Start();
-        signalingThread.reset(new rtc::Thread());
+        signalingThread.reset(rtc::Thread::Create().get());
         signalingThread->Start();
 
         rtc::InitializeSSL();
@@ -199,9 +209,10 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateVideoStream(void* frameBuffer, int width, int height)
     {
+        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(webrtc::VideoCapturerTrackSource::Create(workerThread.get(), std::move(nvVideoCapturerUnique), false));
+
         //TODO: label and stream id should be maintained in some way for multi-stream
-        auto videoTrack = peerConnectionFactory->CreateVideoTrack(
-            "video", peerConnectionFactory->CreateVideoSource(std::move(nvVideoCapturerUnique)));
+        auto videoTrack = peerConnectionFactory->CreateVideoTrack("video", source);
 
         videoTracks[frameBuffer] = videoTrack;
 

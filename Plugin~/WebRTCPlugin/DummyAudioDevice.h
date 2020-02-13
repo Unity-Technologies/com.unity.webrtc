@@ -1,4 +1,6 @@
-﻿#pragma once
+#pragma once
+
+#include "api/task_queue/default_task_queue_factory.h"
 
 namespace WebRTC
 {
@@ -24,7 +26,7 @@ namespace WebRTC
         // Main initialization and termination
         virtual int32 Init() override
         {
-            deviceBuffer = std::make_unique<webrtc::AudioDeviceBuffer>();
+            deviceBuffer = std::make_unique<webrtc::AudioDeviceBuffer>(webrtc::CreateDefaultTaskQueueFactory().get());
             started = true;
             return 0;
         }

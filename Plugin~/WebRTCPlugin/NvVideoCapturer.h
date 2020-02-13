@@ -1,20 +1,21 @@
 #pragma once
 
 #include "Codec/IEncoder.h"
+#include "VideoCapturer.h"
 
 namespace WebRTC
 {
     class ITexture2D;
     class IGraphicsDevice;
-    class NvVideoCapturer : public cricket::VideoCapturer
+    class NvVideoCapturer : public VideoCapturer
     {
     public:
         NvVideoCapturer();
         void EncodeVideoData();
         // Start the video capturer with the specified capture format.
-        virtual cricket::CaptureState Start(const cricket::VideoFormat& Format) override
+        virtual CaptureState Start(const cricket::VideoFormat& Format) override
         {
-            return cricket::CS_RUNNING;
+            return WebRTC::CS_RUNNING;
         }
         // Stop the video capturer.
         virtual void Stop() override

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 namespace WebRTC
 {
@@ -26,10 +26,9 @@ namespace WebRTC
         // will be returned to the user through the encode complete callback.
         virtual int32_t Encode(
             const webrtc::VideoFrame& frame,
-            const webrtc::CodecSpecificInfo* codec_specific_info,
-            const std::vector<webrtc::FrameType>* frame_types) override;
+            const std::vector<webrtc::VideoFrameType>* frame_types) override;
         // Default fallback: Just use the sum of bitrates as the single target rate.
-        virtual int32_t SetRateAllocation(const webrtc::VideoBitrateAllocation& allocation, uint32_t framerate) override;
+        virtual void SetRates(const RateControlParameters& parameters) override;
     private:
         webrtc::EncodedImageCallback* callback = nullptr;
         webrtc::EncodedImage encodedImage;

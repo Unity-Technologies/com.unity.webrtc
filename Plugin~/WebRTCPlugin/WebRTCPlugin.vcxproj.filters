@@ -65,6 +65,9 @@
     <ClCompile Include="GraphicsDevice\GraphicsUtility.cpp">
       <Filter>GraphicsDevice</Filter>
     </ClCompile>
+    <ClCompile Include="VideoCapturer.cpp" />
+    <ClCompile Include="VideoCaptureTrackSource.cpp" />
+    <ClCompile Include="VideoTrackSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -155,6 +158,9 @@
     <ClInclude Include="GraphicsDevice\GraphicsUtility.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="VideoCapturer.h" />
+    <ClInclude Include="VideoCaptureTrackSource.h" />
+    <ClInclude Include="VideoTrackSource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GraphicsDevice">
