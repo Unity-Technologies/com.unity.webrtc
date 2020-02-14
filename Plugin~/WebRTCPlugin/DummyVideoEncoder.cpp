@@ -43,7 +43,8 @@ namespace WebRTC
             SetRates(param);
         }
 
-        encodedImage.set_buffer(&frameDataBuffer[0], frameDataBuffer.size());
+        encodedImage.set_buffer(&frameDataBuffer[0], frameDataBuffer.capacity());
+        encodedImage.set_size(frameDataBuffer.size());
 
         fragHeader.VerifyAndAllocateFragmentationHeader(naluIndices.size());
         fragHeader.fragmentationVectorSize = static_cast<uint16_t>(naluIndices.size());
