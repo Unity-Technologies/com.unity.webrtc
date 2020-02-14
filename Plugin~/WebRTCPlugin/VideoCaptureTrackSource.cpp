@@ -52,9 +52,9 @@ namespace {
 
 }  // anonymous namespace
 
-namespace webrtc {
+namespace WebRTC {
 
-    rtc::scoped_refptr<VideoTrackSourceInterface> VideoCapturerTrackSource::Create(
+    rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> VideoCapturerTrackSource::Create(
         rtc::Thread* worker_thread,
         std::unique_ptr<WebRTC::VideoCapturer> capturer,
         bool remote) {

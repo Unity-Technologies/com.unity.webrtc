@@ -26,22 +26,16 @@
  // The state is set depending on the result of starting the capturer.
  // If the constraint can't be met or the capturer fails to start, the state
  // transition to kEnded, otherwise it transitions to kLive.
-namespace webrtc {
 
+namespace webrtc {
     class MediaConstraintsInterface;
+ }
+
+namespace WebRTC {
 
     class VideoCapturerTrackSource : public VideoTrackSource,
         public sigslot::has_slots<> {
     public:
-        // Creates an instance of VideoCapturerTrackSource from |capturer|.
-        // |constraints| can be NULL and in that case the camera is opened using a
-        // default resolution.
-        //static rtc::scoped_refptr<VideoTrackSourceInterface> Create(
-        //    rtc::Thread* worker_thread,
-        //    std::unique_ptr<WebRTC::VideoCapturer> capturer,
-        //    const webrtc::MediaConstraintsInterface* constraints,
-        //    bool remote);
-
         static rtc::scoped_refptr<VideoTrackSourceInterface> Create(
             rtc::Thread* worker_thread,
             std::unique_ptr<WebRTC::VideoCapturer> capturer,
@@ -60,7 +54,7 @@ namespace webrtc {
             bool remote);
         virtual ~VideoCapturerTrackSource();
 
-        rtc::VideoSourceInterface<VideoFrame>* source() override {
+        rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {
             return video_capturer_.get();
         }
 

@@ -17,11 +17,11 @@
 #include "rtc_base/system/rtc_export.h"
 #include "rtc_base/thread_checker.h"
 
-namespace webrtc {
+namespace WebRTC {
 
     // VideoTrackSource is a convenience base class for implementations of
     // VideoTrackSourceInterface.
-    class RTC_EXPORT VideoTrackSource : public Notifier<VideoTrackSourceInterface> {
+    class RTC_EXPORT VideoTrackSource : public webrtc::Notifier<webrtc::VideoTrackSourceInterface> {
     public:
         explicit VideoTrackSource(bool remote);
         void SetState(SourceState new_state);
@@ -36,12 +36,12 @@ namespace webrtc {
 
         bool GetStats(Stats* stats) override { return false; }
 
-        void AddOrUpdateSink(rtc::VideoSinkInterface<VideoFrame>* sink,
+        void AddOrUpdateSink(rtc::VideoSinkInterface<webrtc::VideoFrame>* sink,
             const rtc::VideoSinkWants& wants) override;
-        void RemoveSink(rtc::VideoSinkInterface<VideoFrame>* sink) override;
+        void RemoveSink(rtc::VideoSinkInterface<webrtc::VideoFrame>* sink) override;
 
     protected:
-        virtual rtc::VideoSourceInterface<VideoFrame>* source() = 0;
+        virtual rtc::VideoSourceInterface<webrtc::VideoFrame>* source() = 0;
 
     private:
         webrtc::SequenceChecker sequence_checker_;

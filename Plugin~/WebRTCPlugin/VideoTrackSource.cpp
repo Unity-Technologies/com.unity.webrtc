@@ -11,7 +11,7 @@
 #include "pch.h"
 #include "VideoTrackSource.h"
 
-namespace webrtc {
+namespace WebRTC {
 
     VideoTrackSource::VideoTrackSource(
         bool remote)
@@ -27,13 +27,13 @@ namespace webrtc {
     }
 
     void VideoTrackSource::AddOrUpdateSink(
-        rtc::VideoSinkInterface<VideoFrame>* sink,
+        rtc::VideoSinkInterface<webrtc::VideoFrame>* sink,
         const rtc::VideoSinkWants& wants) {
         RTC_DCHECK(sequence_checker_.IsCurrent());
         source()->AddOrUpdateSink(sink, wants);
     }
 
-    void VideoTrackSource::RemoveSink(rtc::VideoSinkInterface<VideoFrame>* sink) {
+    void VideoTrackSource::RemoveSink(rtc::VideoSinkInterface<webrtc::VideoFrame>* sink) {
         RTC_DCHECK(sequence_checker_.IsCurrent());
         source()->RemoveSink(sink);
     }
