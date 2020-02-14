@@ -25,6 +25,12 @@ This version of the package is compatible with the following versions of the Uni
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
 
+> [!NOTE]
+> On Linux, `libc++1` `libc++abi1` packages should be installed.
+> Please install like command below 
+>
+> ``` sudo apt install -y libc++1 libc++abi1 ```
+
 ## Installation
 To install the package, download WebRTC for Unity from the package manager. See the [documentation](https://docs.unity3d.com/Manual/upm-ui.html) for details on how to use the package manager. 
 

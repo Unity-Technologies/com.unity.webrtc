@@ -191,9 +191,9 @@ Call `Audio`'s `Update` method in `MonoBehaviour`'s `OnAudioFilterRead`.
 ```
 
 > [!NOTE]
-> To use `OnAudioFilterRead` method, Please add to `GameObject` which attached `AudioListener` component.
+> To use `OnAudioFilterRead` method, please add it to the `GameObject` which has `AudioListener` component.
 
-Also, it can be other way to use `AudioRenderer`.
+Another way would be to use `AudioRenderer`.
 
 ```csharp
 

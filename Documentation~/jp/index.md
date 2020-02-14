@@ -26,6 +26,12 @@ WebRTC for Unity は、 [WebRTC](https://webrtc.org) を Unity で利用可能�
 
 対応している NVIDIA のグラフィックスカードについては、[NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder) のページをご覧ください。
 
+> [!NOTE]
+> Linux で動作させる場合は、 `libc++1` `libc++abi1` をインストールする必要があります。
+>
+> ``` sudo apt install -y libc++1 libc++abi1 ```
+
+
 ## インストール方法
 パッケージをインストールするためには、パッケージマネージャーから WebRTC for Unity を検索しインストールします。パッケージマネージャーの利用方法は[ドキュメント](https://docs.unity3d.com/Manual/upm-ui.html)を参照してください。
 
