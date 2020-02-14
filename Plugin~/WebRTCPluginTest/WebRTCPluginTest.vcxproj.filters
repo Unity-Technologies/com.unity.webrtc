@@ -72,6 +72,9 @@
     <ClCompile Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.cpp">
       <Filter>GraphicsDevice</Filter>
     </ClCompile>
+    <ClCompile Include="..\WebRTCPlugin\VideoCapturer.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\VideoCaptureTrackSource.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\VideoTrackSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
@@ -161,6 +164,9 @@
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\VideoCapturer.h" />
+    <ClInclude Include="..\WebRTCPlugin\VideoCaptureTrackSource.h" />
+    <ClInclude Include="..\WebRTCPlugin\VideoTrackSource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

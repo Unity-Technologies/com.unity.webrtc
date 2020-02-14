@@ -201,7 +201,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)..\WebRTCPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\generated;$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)..\WebRTCPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
