@@ -4,7 +4,7 @@ using System;
 
 namespace Unity.WebRTC
 {
-    public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
+    public delegate void DelegateOnIceCandidate(RTCIceCandidate​ candidate);
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
     public delegate void DelegateOnNegotiationNeeded();
     public delegate void DelegateOnTrack(RTCTrackEvent e);
@@ -135,7 +135,7 @@ namespace Unity.WebRTC
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                var candidate = new RTCIceCandidate { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
+                var candidate = new RTCIceCandidate​ { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
                 connection.OnIceCandidate(candidate);
             }, null);
         }

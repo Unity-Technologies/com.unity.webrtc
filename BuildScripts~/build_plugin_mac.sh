@@ -13,6 +13,7 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # Install googletest
 git clone https://github.com/google/googletest.git
 cd googletest
+git checkout 6f5fd0d7199b9a19faa9f499ecc266e6ae0329e7
 cmake .
 make
 sudo make install

@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.WebRTC;
 using UnityEngine.UI;
 using System.Text;
-using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(AudioListener))]
 public class MediaStreamSample : MonoBehaviour
 {
 #pragma warning disable 0649
@@ -17,10 +18,10 @@ public class MediaStreamSample : MonoBehaviour
     [SerializeField] private RawImage RtImage;
 #pragma warning restore 0649
 
-    private RTCPeerConnection pc1, pc2;
+    private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders, pc2Senders;
-    private Unity.WebRTC.MediaStream audioStream, videoStream;
-    private RTCDataChannel dataChannel, remoteDataChannel;
+    private MediaStream audioStream, videoStream;
+    private RTCDataChannel remoteDataChannel;
     private Coroutine sdpCheck;
     private string msg;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
@@ -30,16 +31,16 @@ public class MediaStreamSample : MonoBehaviour
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private StringBuilder trackInfos;
-    private bool videoUpdateStarted = false;
+    private bool videoUpdateStarted;
 
-    private RTCOfferOptions OfferOptions = new RTCOfferOptions
+    private RTCOfferOptions _offerOptions = new RTCOfferOptions
     {
         iceRestart = false,
         offerToReceiveAudio = true,
         offerToReceiveVideo = false
     };
 
-    private RTCAnswerOptions AnswerOptions = new RTCAnswerOptions
+    private RTCAnswerOptions _answerOptions = new RTCAnswerOptions
     {
         iceRestart = false,
     };
@@ -47,9 +48,9 @@ public class MediaStreamSample : MonoBehaviour
     private void Awake()
     {
         WebRTC.Initialize();
-        callButton.onClick.AddListener(() => { Call(); });
-        addTracksButton.onClick.AddListener(() => { AddTracks(); });
-        removeTracksButton.onClick.AddListener(() => { RemoveTracks(); });
+        callButton.onClick.AddListener(Call);
+        addTracksButton.onClick.AddListener(AddTracks);
+        removeTracksButton.onClick.AddListener(RemoveTracks);
     }
 
     private void OnDestroy()
@@ -65,33 +66,27 @@ public class MediaStreamSample : MonoBehaviour
         pc2Senders = new List<RTCRtpSender>();
         callButton.interactable = true;
 
-        pc1OnIceConnectionChange = new DelegateOnIceConnectionChange(state => { OnIceConnectionChange(pc1, state); });
-        pc2OnIceConnectionChange = new DelegateOnIceConnectionChange(state => { OnIceConnectionChange(pc2, state); });
-        pc1OnIceCandidate = new DelegateOnIceCandidate(candidate => { OnIceCandidate(pc1, candidate); });
-        pc2OnIceCandidate = new DelegateOnIceCandidate(candidate => { OnIceCandidate(pc1, candidate); });
-        pc2Ontrack = new DelegateOnTrack(e => { OnTrack(pc2, e); });
-        pc1OnNegotiationNeeded = new DelegateOnNegotiationNeeded(() => { StartCoroutine(Pc1OnNegotiationNeeded()); });
-        if (!WebRTC.HWEncoderSupport)
-        {
-            infoText.text = "Current GPU doesn't support encoder";
-        }
-        else
-        {
-            infoText.text = "Current GPU supports encoder";
-        }
+        pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
+        pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
+        pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
+        pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
+        pc2Ontrack = e => { OnTrack(_pc2, e); };
+        pc1OnNegotiationNeeded = () => { StartCoroutine(Pc1OnNegotiationNeeded()); };
+        infoText.text = !WebRTC.HWEncoderSupport ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
     }
 
-    RTCConfiguration GetSelectedSdpSemantics()
+    private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new RTCIceServer[]
+        config.iceServers = new[]
         {
-            new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:19302" } }
+            new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } }
         };
 
         return config;
     }
-    void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
+
+    private void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
     {
         switch (state)
         {
@@ -120,13 +115,13 @@ public class MediaStreamSample : MonoBehaviour
                 Debug.Log($"{GetName(pc)} IceConnectionState: Max");
                 break;
             default:
-                break;
+                throw new ArgumentOutOfRangeException(nameof(state), state, null);
         }
     }
     IEnumerator Pc1OnNegotiationNeeded()
     {
         Debug.Log("pc1 createOffer start");
-        var op = pc1.CreateOffer(ref OfferOptions);
+        var op = _pc1.CreateOffer(ref _offerOptions);
         yield return op;
 
         if (!op.isError)
@@ -138,32 +133,16 @@ public class MediaStreamSample : MonoBehaviour
             OnCreateSessionDescriptionError(op.error);
         }
     }
-    void Pc1OnIceConnectinChange(RTCIceConnectionState state)
-    {
-        OnIceConnectionChange(pc1, state);
-    }
-    void Pc2OnIceConnectionChange(RTCIceConnectionState state)
-    {
-        OnIceConnectionChange(pc2, state);
-    }
 
-    void Pc1OnIceCandidate(RTCIceCandidate candidate)
-    {
-        OnIceCandidate(pc1, candidate);
-    }
-    void Pc2OnIceCandidate(RTCIceCandidate candidate)
-    {
-        OnIceCandidate(pc2, candidate);
-    }
-    public void AddTracks() 
+    private void AddTracks() 
     {
         foreach (var track in audioStream.GetTracks())
         {
-            pc1Senders.Add (pc1.AddTrack(track));  
+            pc1Senders.Add (_pc1.AddTrack(track));  
         }
         foreach(var track in videoStream.GetTracks())
         {
-            pc1Senders.Add(pc1.AddTrack(track));
+            pc1Senders.Add(_pc1.AddTrack(track));
         }
         if(!videoUpdateStarted)
         {
@@ -174,15 +153,15 @@ public class MediaStreamSample : MonoBehaviour
         removeTracksButton.interactable = true;
     }
 
-    public void RemoveTracks()
+    private void RemoveTracks()
     {
         foreach(var sender in pc1Senders)
         {
-            pc1.RemoveTrack(sender);
+            _pc1.RemoveTrack(sender);
         }
         foreach (var sender in pc2Senders)
         {
-            pc2.RemoveTrack(sender);
+            _pc2.RemoveTrack(sender);
         }
         pc1Senders.Clear();
         pc2Senders.Clear();
@@ -192,41 +171,37 @@ public class MediaStreamSample : MonoBehaviour
         infoText.text = "";
     }
 
-    void Call()
+    private void Call()
     {
         callButton.interactable = false;
         Debug.Log("GetSelectedSdpSemantics");
         var configuration = GetSelectedSdpSemantics();
-        pc1 = new RTCPeerConnection(ref configuration);
+        _pc1 = new RTCPeerConnection(ref configuration);
         Debug.Log("Created local peer connection object pc1");
-        pc1.OnIceCandidate = pc1OnIceCandidate;
-        pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
-        pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
-        pc2 = new RTCPeerConnection(ref configuration);
+        _pc1.OnIceCandidate = pc1OnIceCandidate;
+        _pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
+        _pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
+        _pc2 = new RTCPeerConnection(ref configuration);
         Debug.Log("Created remote peer connection object pc2");
-        pc2.OnIceCandidate = pc2OnIceCandidate;
-        pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
-        pc2.OnTrack = pc2Ontrack;
+        _pc2.OnIceCandidate = pc2OnIceCandidate;
+        _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
+        _pc2.OnTrack = pc2Ontrack;
 
         RTCDataChannelInit conf = new RTCDataChannelInit(true);
-        dataChannel = pc1.CreateDataChannel("data", ref conf);
+        _pc1.CreateDataChannel("data", ref conf);
         audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720);
         RtImage.texture = cam.targetTexture;
  
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="pc"></param>
-    /// <param name="streamEvent"></param>
-    void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
+    
+    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");
     }
-    void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
+
+    private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
     {
         pc2Senders.Add(pc.AddTrack(e.Track));
         trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
@@ -235,26 +210,26 @@ public class MediaStreamSample : MonoBehaviour
         infoText.text = trackInfos.ToString();
     }
 
-    string GetName(RTCPeerConnection pc)
+    private string GetName(RTCPeerConnection pc)
     {
-        return (pc == pc1) ? "pc1" : "pc2";
+        return (pc == _pc1) ? "pc1" : "pc2";
     }
 
-    RTCPeerConnection GetOtherPc(RTCPeerConnection pc)
+    private RTCPeerConnection GetOtherPc(RTCPeerConnection pc)
     {
-        return (pc == pc1) ? pc2 : pc1;
+        return (pc == _pc1) ? _pc2 : _pc1;
     }
 
-    IEnumerator OnCreateOfferSuccess(RTCSessionDescription desc)
+    private IEnumerator OnCreateOfferSuccess(RTCSessionDescription desc)
     {
         Debug.Log($"Offer from pc1\n{desc.sdp}");
         Debug.Log("pc1 setLocalDescription start");
-        var op = pc1.SetLocalDescription(ref desc);
+        var op = _pc1.SetLocalDescription(ref desc);
         yield return op;
 
         if (!op.isError)
         {
-            OnSetLocalSuccess(pc1);
+            OnSetLocalSuccess(_pc1);
         }
         else
         {
@@ -262,11 +237,11 @@ public class MediaStreamSample : MonoBehaviour
         }
 
         Debug.Log("pc2 setRemoteDescription start");
-        var op2 = pc2.SetRemoteDescription(ref desc);
+        var op2 = _pc2.SetRemoteDescription(ref desc);
         yield return op2;
         if (!op2.isError)
         {
-            OnSetRemoteSuccess(pc2);
+            OnSetRemoteSuccess(_pc2);
         }
         else
         {
@@ -277,7 +252,7 @@ public class MediaStreamSample : MonoBehaviour
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
 
-        var op3 = pc2.CreateAnswer(ref AnswerOptions);
+        var op3 = _pc2.CreateAnswer(ref _answerOptions);
         yield return op3;
         if (!op3.isError)
         {
@@ -288,15 +263,23 @@ public class MediaStreamSample : MonoBehaviour
             OnCreateSessionDescriptionError(op3.error); 
         }
     }
+    
+    private void OnAudioFilterRead(float[] data, int channels)
+    {
+        Audio.Update(data, data.Length);
+    }
 
-    void OnSetLocalSuccess(RTCPeerConnection pc)
+    private void OnSetLocalSuccess(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} SetLocalDescription complete");
     }
 
-    void OnSetSessionDescriptionError(ref RTCError error) { }
+    static void OnSetSessionDescriptionError(ref RTCError error)
+    {
+        Debug.LogError($"Error Detail Type: {error.errorDetail}");
+    }
 
-    void OnSetRemoteSuccess(RTCPeerConnection pc)
+    private void OnSetRemoteSuccess(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} SetRemoteDescription complete");
     }
@@ -305,12 +288,12 @@ public class MediaStreamSample : MonoBehaviour
     {
         Debug.Log($"Answer from pc2:\n{desc.sdp}");
         Debug.Log("pc2 setLocalDescription start");
-        var op = pc2.SetLocalDescription(ref desc);
+        var op = _pc2.SetLocalDescription(ref desc);
         yield return op;
 
         if (!op.isError)
         {
-            OnSetLocalSuccess(pc2);
+            OnSetLocalSuccess(_pc2);
         }
         else
         {
@@ -319,11 +302,11 @@ public class MediaStreamSample : MonoBehaviour
 
         Debug.Log("pc1 setRemoteDescription start");
 
-        var op2 = pc1.SetRemoteDescription(ref desc);
+        var op2 = _pc1.SetRemoteDescription(ref desc);
         yield return op2;
         if (!op2.isError)
         {
-            OnSetRemoteSuccess(pc1);
+            OnSetRemoteSuccess(_pc1);
         }
         else
         {
@@ -331,18 +314,8 @@ public class MediaStreamSample : MonoBehaviour
         }
     }
 
-    void OnAddIceCandidateSuccess(RTCPeerConnection pc)
+    private static void OnCreateSessionDescriptionError(RTCError error)
     {
-        Debug.Log($"{GetName(pc)} addIceCandidate success");
-    }
-
-    void OnAddIceCandidateError(RTCPeerConnection pc, RTCError error)
-    {
-        Debug.Log($"{GetName(pc)} failed to add ICE Candidate: ${error}");
-    }
-
-    void OnCreateSessionDescriptionError(RTCError e)
-    {
-
+        Debug.LogError($"Error Detail Type: {error.errorDetail}");
     }
 }

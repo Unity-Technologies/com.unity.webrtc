@@ -28,16 +28,16 @@ This version of the package is compatible with the following versions of the Uni
 
 - Unity 2019.3 and later
 
-| Platform    | Graphics API | Hardware Encoder                                  | Software Encoder   |
-| ----------- | ------------ | ------------------------------------------------- | ------------------ |
-| Windows X64 | DirectX11    | :white_check_mark: (Require NVIDIA Graphics card) | :white_check_mark: |  
-| Windows X64 | DirectX12    |                                                   |                    |  
-| Windows X64 | OpenGL       |                                                   |                    |
-| Windows X64 | Vulkan       |                                                   |                    |  
-| Linux X64   | OpenGL       | :white_check_mark: (Require NVIDIA Graphics card) |                    |
-| Linux X64   | Vulkan       |                                                   |                    |
-| MacOS       | OpenGL       |                                                   |                    |
-| MacOS       | Metal        |                                                   | :white_check_mark: |
+| Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
+| ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
+| Windows x64 | DirectX11    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
+| Windows x64 | DirectX12    |                                                                                                                          |                    | 
+| Windows x64 | OpenGL       |                                                                                                                          |                    |
+| Windows x64 | Vulkan       |                                                                                                                          |                    | 
+| Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
+| Linux x64   | Vulkan       |                                                 	                                                                        |                    |
+| MacOS       | OpenGL       |                                                 	                                                                        |                    |
+| MacOS       | Metal        |                                                 	                                                                        | :white_check_mark: |
 
 On Linux, `libc++1` `libc++abi1` packages should be installed.
 
@@ -111,7 +111,6 @@ The package contains the following 3 samples.
 | `1.0`   | [M72](https://groups.google.com/forum/#!msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
 | `1.1`   | [M72](https://groups.google.com/forum/#!msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
 | `2.0`   | [M79](https://groups.google.com/forum/#!msg/discuss-webrtc/X8q5Ae9VKco/oEiGuteoBAAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
-| `2.1`   |                                                                                      | - MacOS support <br>                                              |
 
 ## Licenses
 

@@ -153,6 +153,68 @@ private void OnDestroy()
 }
 ```
 
+### Audio Streaming
+
+Use the `Audio`'s `CaptureStream()` to use `MediaStream` in order to capture the audio stream. 
+
+```csharp
+audioStream = Audio.CaptureStream();
+```
+
+Add audio track to the peer. Get the instance of `RTCRtpSender` to use for disposing of the media.
+
+```csharp
+    var senders = new List<RTCRtpSender>();
+    foreach (var track in audioStream.GetTracks())
+    {
+        var sender = localConnection.AddTrack(track);
+        senders.Add(sender);
+    }
+```
+
+Call `RemoveTrack` method to dispose of the media.
+
+```csharp
+    foreach(var sender in senders)
+    {
+        localConnection.RemoveTrack(sender);
+    }
+```
+
+Call `Audio`'s `Update` method in `MonoBehaviour`'s `OnAudioFilterRead`.
+
+```csharp
+    private void OnAudioFilterRead(float[] data, int channels)
+    {
+        Audio.Update(data, data.Length);
+    }
+```
+
+> [!NOTE]
+> To use `OnAudioFilterRead` method, please add it to the `GameObject` which has `AudioListener` component.
+
+Another way would be to use `AudioRenderer`.
+
+```csharp
+
+    private void Start()
+    {
+        AudioRenderer.Start();
+    }
+
+    private void Update()
+    {
+        var sampleCountFrame = AudioRenderer.GetSampleCountForCaptureFrame();
+        var channelCount = 2; // AudioSettings.speakerMode == Stereo
+        var length = sampleCountFrame * channelCount;
+        var buffer = new NativeArray<float>(length, Allocator.Temp);
+        AudioRenderer.Render(buffer);
+        Audio.Update(buffer.ToArray(), buffer.Length);
+        buffer.Dispose();
+    }
+
+```
+
 ### Video Streaming
 
 Use the `Camera`'s `CaptureStream()` to use `MediaStream` in order to capture the video stream. 
