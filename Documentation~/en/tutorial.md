@@ -172,8 +172,6 @@ Add audio track to the peer. Get the instance of `RTCRtpSender` to use for dispo
     }
 ```
 
-メディアの破棄は、 `RemoveTrack` メソッドを使用します。
-
 Call `RemoveTrack` method to dispose of the media.
 
 ```csharp
