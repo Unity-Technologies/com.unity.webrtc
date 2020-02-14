@@ -209,7 +209,7 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateVideoStream(void* frameBuffer, int width, int height)
     {
-        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(webrtc::VideoCapturerTrackSource::Create(workerThread.get(), std::move(nvVideoCapturerUnique), false));
+        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(nvVideoCapturerUnique), false));
 
         //TODO: label and stream id should be maintained in some way for multi-stream
         auto videoTrack = peerConnectionFactory->CreateVideoTrack("video", source);
