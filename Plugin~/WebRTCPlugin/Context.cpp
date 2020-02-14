@@ -131,9 +131,9 @@ namespace WebRTC
         : m_uid(uid)
         , m_encoderType(encoderType)
     {
-        workerThread.reset(rtc::Thread::Create().get());
+        workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         workerThread->Start();
-        signalingThread.reset(rtc::Thread::Create().get());
+        signalingThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         signalingThread->Start();
 
         rtc::InitializeSSL();
