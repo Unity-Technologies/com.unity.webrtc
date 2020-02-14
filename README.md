@@ -8,12 +8,11 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Documentation
 
-- [English](./Documentation~/index.md)
-- [Japanese]( ./Documentation~/jp/index.md)
+- [English](https://docs.unity3d.com/Packages/com.unity.webrtc@1.1/manual/index.html)
+- [Japanese](https://docs.unity3d.com/Packages/com.unity.webrtc@1.1/manual/jp/index.html)
 
 ### Guide
 
-- [Tutorial](./Documentation~/en/tutorial.md)
 - [Build plugin](Plugin~/README.md)
 
 ## Installation
@@ -106,11 +105,11 @@ The package contains the following 3 samples.
 
 ## Roadmap
 
-| Version | libwebrtc version                                                                    | Focus                                                             |
-| ------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| `1.0`   | [M72](https://groups.google.com/forum/#!msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
-| `1.1`   | [M72](https://groups.google.com/forum/#!msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
-| `2.0`   | [M79](https://groups.google.com/forum/#!msg/discuss-webrtc/X8q5Ae9VKco/oEiGuteoBAAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
+| Version | libwebrtc version                                                              | Focus                                                             |
+| ------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `1.0`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
+| `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
+| `2.0`   | [M80](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
 
 ## Licenses
 
