@@ -266,8 +266,8 @@ namespace WebRTC {
 #ifdef WEBRTC_LINUX
                     // For HD avoid YU12 which is a software conversion and has 2 bugs
                     // b/7326348 b/6960899.  Reenable when fixed.
-                    if (supported.height >= 720 && (supported_fourcc == FOURCC_YU12 ||
-                        supported_fourcc == FOURCC_YV12)) {
+                    if (supported.height >= 720 && (supported_fourcc == cricket::FOURCC_YU12 ||
+                        supported_fourcc == cricket::FOURCC_YV12)) {
                         delta_fourcc += kYU12Penalty;
                     }
 #endif
