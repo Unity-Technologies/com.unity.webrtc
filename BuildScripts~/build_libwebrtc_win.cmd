@@ -26,7 +26,7 @@ cmd /k gclient.bat sync -f
 REM change jsoncpp static library
 powershell -File ".\BuildScripts~\ReplaceText.ps1" "src\third_party\jsoncpp\BUILD.gn" "source_set" "static_library"
 
-cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" symbol_level=0 enable_iterator_debugging=false"
+cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
 REM add json.obj in link list of webrtc.ninja
 powershell -File ".\BuildScripts~\ReplaceText.ps1" "%OUTPUT_DIR%\obj\webrtc.ninja" "obj/rtc_base/rtc_base/crc32.obj" "obj/rtc_base/rtc_base/crc32.obj obj/rtc_base/rtc_json/json.obj"
