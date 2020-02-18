@@ -20,7 +20,8 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraph
     : m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
     , m_unityInterface(unityInterface)
-
+    , m_copyResourceFence(nullptr)
+    , m_copyResourceEventHandle(nullptr)
 {
 }
 
@@ -54,9 +55,11 @@ bool D3D12GraphicsDevice::InitV() {
     legacyDevice->GetImmediateContext(&legacyContext);
     legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
 
-
     m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
     m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
+    m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
+
+	m_copyResourceEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     return true;
 }
@@ -68,19 +71,15 @@ void D3D12GraphicsDevice::ShutdownV() {
     m_commandAllocator->Release();
     SAFE_RELEASE(m_d3d11Device);
     SAFE_RELEASE(m_d3d11Context);
+    SAFE_RELEASE(m_copyResourceFence);
+    SAFE_CLOSE_HANDLE(m_copyResourceEventHandle);
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 
     return CreateSharedD3D12Texture(w,h);
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-
-ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
-    assert(false && "CreateCPUReadTextureV need to implement on D3D12");
-    return nullptr;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -98,30 +97,18 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
         return false;
     if (nativeSrc == nullptr || nativeDest == nullptr)
         return false;
-    m_commandList->Reset(m_commandAllocator, nullptr);
+    
+    m_commandList->Reset(m_commandAllocator, nullptr); 
     m_commandList->CopyResource(nativeDest, nativeSrc);
     m_commandList->Close();
 
     ID3D12CommandList* cmdList[] = { m_commandList };
     m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
 
-    ID3D12Fence* fence = m_unityInterface->GetFrameFence();
-    //const uint64_t fenceValue = m_unityInterface->ExecuteCommandList(m_commandList, 0 , nullptr);
-    //const uint64_t nextFrameFenceValue = m_unityInterface->GetNextFrameFenceValue();
-    //const uint64_t completedValue = fence->GetCompletedValue();
-
-    auto fenceValue = m_NextFenceValue;
-    m_unityInterface->GetCommandQueue()->Signal(fence, m_NextFenceValue++);
-
-
-    LogPrint("FenceValue: %d, NextValue: %d, CompletedValue: %d", fenceValue, fenceValue, fenceValue);
-
-    if (fence->GetCompletedValue() < fenceValue) {
-		const HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-        fence->SetEventOnCompletion(fenceValue, eventHandle);
-		WaitForSingleObject(eventHandle, INFINITE);
-        CloseHandle(eventHandle);        
-    }
+    m_unityInterface->GetCommandQueue()->Signal(m_copyResourceFence, m_nextFenceValue);
+    m_copyResourceFence->SetEventOnCompletion(m_nextFenceValue, m_copyResourceEventHandle);
+	WaitForSingleObject(m_copyResourceEventHandle, INFINITE);
+    ++m_nextFenceValue;
 
     return true;
 }
@@ -170,6 +157,14 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+    assert(false && "CreateCPUReadTextureV need to implement on D3D12");
+    return nullptr;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
 {
     assert(false && "ConvertRGBToI420 need to implement on D3D12");
