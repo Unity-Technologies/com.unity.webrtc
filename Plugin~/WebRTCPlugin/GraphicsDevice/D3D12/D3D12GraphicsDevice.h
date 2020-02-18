@@ -46,7 +46,7 @@ private:
 	HANDLE m_copyResourceEventHandle;
 
 
-    uint64_t m_nextFenceValue = 1;
+    uint64_t m_copyResourceFenceValue = 1;
 };
 
 //---------------------------------------------------------------------------------------------------------------------

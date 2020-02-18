@@ -105,10 +105,10 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
     ID3D12CommandList* cmdList[] = { m_commandList };
     m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
 
-    m_unityInterface->GetCommandQueue()->Signal(m_copyResourceFence, m_nextFenceValue);
-    m_copyResourceFence->SetEventOnCompletion(m_nextFenceValue, m_copyResourceEventHandle);
+    m_unityInterface->GetCommandQueue()->Signal(m_copyResourceFence, m_copyResourceFenceValue);
+    m_copyResourceFence->SetEventOnCompletion(m_copyResourceFenceValue, m_copyResourceEventHandle);
 	WaitForSingleObject(m_copyResourceEventHandle, INFINITE);
-    ++m_nextFenceValue;
+    ++m_copyResourceFenceValue;
 
     return true;
 }
