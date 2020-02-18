@@ -60,7 +60,12 @@ namespace WebRTC {
 #endif
 #if defined(SUPPORT_D3D12)
             case GRAPHICS_DEVICE_D3D12: {
-                m_encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
+                if (encoderType == UnityEncoderType::UnityEncoderHardware)
+                {
+                    m_encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
+                } else {
+                    m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                }
                 break;
             }
 #endif
