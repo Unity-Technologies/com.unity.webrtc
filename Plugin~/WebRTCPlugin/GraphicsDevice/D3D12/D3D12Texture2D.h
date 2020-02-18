@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "GraphicsDevice/ITexture2D.h"
 #include "d3d11.h"
@@ -18,10 +18,10 @@ public:
         SAFE_RELEASE(m_nativeTexture);
     }
 
-    inline virtual void* GetNativeTexturePtrV();
-    inline virtual const void* GetNativeTexturePtrV() const;
-    inline virtual void* GetEncodeTexturePtrV();
-    inline virtual const void* GetEncodeTexturePtrV() const;
+    inline virtual void* GetNativeTexturePtrV() override;
+    inline virtual const void* GetNativeTexturePtrV() const override;
+    inline virtual void* GetEncodeTexturePtrV() override;
+    inline virtual const void* GetEncodeTexturePtrV() const override;
 
 private:
     ID3D12Resource* m_nativeTexture;
