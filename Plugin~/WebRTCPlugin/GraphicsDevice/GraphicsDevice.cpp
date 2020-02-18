@@ -65,6 +65,7 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
             return false;
         }
     }
+    return false;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
