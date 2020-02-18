@@ -193,6 +193,7 @@
     <ClInclude Include="Codec\NvCodec\NvEncoder.h" />
     <ClInclude Include="Codec\NvCodec\NvEncoderCuda.h" />
     <ClInclude Include="Codec\NvCodec\NvEncoderD3D11.h" />
+    <ClInclude Include="Codec\NvCodec\NvEncoderD3D12.h" />
     <ClInclude Include="Codec\SoftwareCodec\SoftwareEncoder.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="DataChannelObject.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="Codec\NvCodec\NvEncoder.cpp" />
     <ClCompile Include="Codec\NvCodec\NvEncoderCuda.cpp" />
     <ClCompile Include="Codec\NvCodec\NvEncoderD3D11.cpp" />
+    <ClCompile Include="Codec\NvCodec\NvEncoderD3D12.cpp" />
     <ClCompile Include="Codec\SoftwareCodec\SoftwareEncoder.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DataChannelObject.cpp" />
