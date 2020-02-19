@@ -23,11 +23,14 @@ cd ..
 
 cmd /k gclient.bat sync -f
 
+# add jsoncpp
+cmd patch "src\BUILD.gn" < "BuildScripts~\add_jsoncpp.patch"
+
 REM install pywin32
 cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32
 
 REM change jsoncpp static library
-powershell -File ".\BuildScripts~\ReplaceText.ps1" "src\third_party\jsoncpp\BUILD.gn" "source_set" "static_library"
+REM powershell -File ".\BuildScripts~\ReplaceText.ps1" "src\third_party\jsoncpp\BUILD.gn" "source_set" "static_library"
 
 cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
