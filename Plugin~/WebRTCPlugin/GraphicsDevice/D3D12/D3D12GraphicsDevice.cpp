@@ -14,6 +14,13 @@ const D3D12_HEAP_PROPERTIES DEFAULT_HEAP_PROPS = {
     0
 };
 
+const D3D12_HEAP_PROPERTIES READBACK_HEAP_PROPS = {
+    D3D12_HEAP_TYPE_READBACK,
+    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
+    D3D12_MEMORY_POOL_UNKNOWN,
+    0,
+    0
+};
 //---------------------------------------------------------------------------------------------------------------------
 
 D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
@@ -85,7 +92,7 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 //---------------------------------------------------------------------------------------------------------------------
 
     bool D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
-    //[TODO-sin: 2019-10-15] Implement copying native resource
+    //[Note-sin: 2020-2-19] This function is currently not required by RenderStreaming. Delete?
     return true;
 }
 
@@ -105,10 +112,7 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
     ID3D12CommandList* cmdList[] = { m_commandList };
     m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
 
-    m_unityInterface->GetCommandQueue()->Signal(m_copyResourceFence, m_copyResourceFenceValue);
-    m_copyResourceFence->SetEventOnCompletion(m_copyResourceFenceValue, m_copyResourceEventHandle);
-	WaitForSingleObject(m_copyResourceEventHandle, INFINITE);
-    ++m_copyResourceFenceValue;
+    WaitForFence(m_copyResourceFence,m_copyResourceEventHandle, &m_copyResourceFenceValue);
 
     return true;
 }
@@ -155,6 +159,14 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     }
 
     return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue) {
+    m_unityInterface->GetCommandQueue()->Signal(fence, *fenceValue);
+    fence->SetEventOnCompletion(*fenceValue, handle);
+    WaitForSingleObject(handle, INFINITE);
+    ++(*fenceValue);       
 }
 
 //----------------------------------------------------------------------------------------------------------------------

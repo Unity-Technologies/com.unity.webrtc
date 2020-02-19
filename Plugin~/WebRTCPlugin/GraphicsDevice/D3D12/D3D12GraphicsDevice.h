@@ -28,6 +28,7 @@ public:
 private:
 
     ITexture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
+    void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
 
     ID3D12Device* m_d3d12Device;
     //ID3D12DeviceContext* m_d3d12Context;
