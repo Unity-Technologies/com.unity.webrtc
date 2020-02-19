@@ -218,6 +218,10 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
         return nullptr;
 
 
+
+    const uint32_t width = tex->GetWidth();
+    const uint32_t height = tex->GetHeight();
+
     ID3D12Resource*  nativeTexSrc = reinterpret_cast<ID3D12Resource*>(tex->GetNativeTexturePtrV());
     assert(nullptr != nativeTexSrc);
     if (nullptr == nativeTexSrc){
@@ -236,7 +240,37 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
         srcBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
         m_commandList->ResourceBarrier(1, &srcBarrier);
     }
-    m_commandList->CopyResource(readbackResource, nativeTexSrc);
+
+    D3D12_PLACED_SUBRESOURCE_FOOTPRINT fp;
+    {
+        //[TODO-sin: 2020-2-19] Clean this up
+        D3D12_RESOURCE_DESC origDesc{};
+        origDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        origDesc.Alignment = 0;
+        origDesc.Width = width;
+        origDesc.Height = height;
+        origDesc.DepthOrArraySize = 1;
+        origDesc.MipLevels = 1;
+        origDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; //We only support this format which has 4 bytes -> DX12_BYTES_PER_PIXEL
+        origDesc.SampleDesc.Count = 1;
+        origDesc.SampleDesc.Quality = 0;
+        origDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        origDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+        origDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
+        UINT nrow;
+        UINT64 rowsize, size;
+        m_d3d12Device->GetCopyableFootprints(&origDesc,0,1,0, &fp,&nrow,&rowsize,&size);        
+    }
+
+    D3D12_TEXTURE_COPY_LOCATION td,ts;
+    td.pResource =readbackResource;
+    td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    td.PlacedFootprint = fp;
+    ts.pResource = nativeTexSrc;
+    ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    ts.SubresourceIndex = 0;
+    m_commandList->CopyTextureRegion(&td,0,0,0,&ts,nullptr);
+
     {
         D3D12_RESOURCE_BARRIER srcBarrier;
         srcBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -255,10 +289,6 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
     WaitForFence(m_convertRGBFence,m_convertRGBEventHandle, &m_convertRGBFenceValue);
 
 
-    const uint32_t width = tex->GetWidth();
-    const uint32_t height = tex->GetHeight();
-    const uint32_t bufferSize = width *  height* DX12_BYTES_PER_PIXEL; 
-
     //Map
     uint8* data{};
     const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
@@ -267,17 +297,15 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
         return nullptr;
     }
 
-    const uint32_t rowToRowInBytes = bufferSize / height;
-    LogPrint("Map Ok. Width: %u, height: %u, BufferSize: %u, RowToRowInBytes: %u", width, height, bufferSize, rowToRowInBytes);
-
-    //rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-    //    width, height,rowToRowInBytes, static_cast<uint8_t*>(data)
-    //);
+    const uint32_t rowToRowInBytes = width *  DX12_BYTES_PER_PIXEL;
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
+        width, height,rowToRowInBytes, static_cast<uint8_t*>(data)
+    );
 
     D3D12_RANGE emptyRange{ 0, 0 };
     readbackResource->Unmap(0,&emptyRange);
 
-    return nullptr; //i420_buffer
+    return i420_buffer; //i420_buffer
 }
 
 
