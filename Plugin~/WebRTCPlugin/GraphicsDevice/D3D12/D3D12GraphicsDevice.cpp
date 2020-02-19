@@ -21,6 +21,9 @@ const D3D12_HEAP_PROPERTIES READBACK_HEAP_PROPS = {
     0,
     0
 };
+
+const uint32_t DX12_BYTES_PER_PIXEL = 4; //Only support DXGI_FORMAT_B8G8R8A8_UNORM
+
 //---------------------------------------------------------------------------------------------------------------------
 
 D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
@@ -119,7 +122,7 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
 
 //---------------------------------------------------------------------------------------------------------------------
 
-ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h) {
+D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h) {
     //[Note-sin: 2019-10-30] Taken from RaytracedHardShadow
     // note: sharing textures with d3d11 requires some flags and restrictions:
     // - MipLevels must be 1
@@ -133,7 +136,7 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     desc.Height = h;
     desc.DepthOrArraySize = 1;
     desc.MipLevels = 1;
-    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; //We only support this format which has 4 bytes -> DX12_BYTES_PER_PIXEL
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -172,7 +175,29 @@ void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64
 //----------------------------------------------------------------------------------------------------------------------
 
 ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
-    return CreateSharedD3D12Texture(w,h);
+    D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
+
+    //Create the readback buffer for the texture.
+    D3D12_RESOURCE_DESC desc{};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    desc.Alignment = 0;
+    desc.Width = w * h * DX12_BYTES_PER_PIXEL;
+    desc.Height= 1;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_UNKNOWN;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    ID3D12Resource* readbackResource = nullptr;
+    const HRESULT hr = m_d3d12Device->CreateCommittedResource(&READBACK_HEAP_PROPS, D3D12_HEAP_FLAG_NONE,
+        &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackResource)
+    );
+    tex->SetReadbackResource(readbackResource);
+
+    return tex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

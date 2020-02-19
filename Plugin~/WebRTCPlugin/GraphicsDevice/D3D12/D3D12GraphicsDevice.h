@@ -2,6 +2,7 @@
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
+#include "D3D12Texture2D.h"
 
 namespace WebRTC {
 
@@ -27,7 +28,7 @@ public:
 
 private:
 
-    ITexture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
+    WebRTC::D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
     void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
 
     ID3D12Device* m_d3d12Device;
