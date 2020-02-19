@@ -24,7 +24,7 @@ cd ..
 cmd /k gclient.bat sync -f
 
 # add jsoncpp
-cmd patch "src\BUILD.gn" < "BuildScripts~\add_jsoncpp.patch"
+patch "src\BUILD.gn" < "BuildScripts~\add_jsoncpp.patch"
 
 REM install pywin32
 cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32
