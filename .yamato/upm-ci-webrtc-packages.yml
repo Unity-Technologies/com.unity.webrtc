@@ -169,7 +169,7 @@ push_plugin:
     {% for platform in platforms %}
     - git add {{ platform.plugin_path }}
     {% endfor %}
-    - git commit -m "Update plugins"
+    - git commit -m "[skip ci] Update plugins"
     - git push origin HEAD:$GIT_BRANCH
   dependencies:
     {% for platform in platforms %}
