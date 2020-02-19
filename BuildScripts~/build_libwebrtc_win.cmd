@@ -4,7 +4,7 @@ if not exist depot_tools (
 git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 )
 
-set PATH=%PATH%;%cd%\depot_tools
+set PATH=%cd%\depot_tools;%PATH%
 set WEBRTC_VERSION=72
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set CPPFLAGS=/WX-
@@ -22,6 +22,9 @@ cmd /k git.bat checkout -b my_branch refs/remotes/branch-heads/%WEBRTC_VERSION%
 cd ..
 
 cmd /k gclient.bat sync -f
+
+REM install pywin32
+cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32
 
 REM change jsoncpp static library
 powershell -File ".\BuildScripts~\ReplaceText.ps1" "src\third_party\jsoncpp\BUILD.gn" "source_set" "static_library"
