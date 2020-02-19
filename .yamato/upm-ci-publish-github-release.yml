@@ -3,6 +3,7 @@
 platforms:
   - name: win
   - name: linux
+  - name: macos 
 ---
 publish_com.unity.webrtc_github_release:
   name: Publish com.unity.webrtc to Github Release
