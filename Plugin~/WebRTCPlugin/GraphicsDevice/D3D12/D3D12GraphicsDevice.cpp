@@ -3,6 +3,7 @@
 #include "D3D12Texture2D.h"
 #include "WebRTCPlugin.h"
 #include "Logger.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 
 namespace WebRTC {
 
@@ -32,7 +33,8 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraph
     , m_unityInterface(unityInterface)
     , m_copyResourceFence(nullptr)
     , m_copyResourceEventHandle(nullptr)
-{
+    , m_convertRGBFence(nullptr)
+    , m_convertRGBEventHandle(nullptr){
 }
 
 
@@ -68,8 +70,9 @@ bool D3D12GraphicsDevice::InitV() {
     m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
     m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
     m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
-
 	m_copyResourceEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
+    m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_convertRGBFence));
+    m_convertRGBEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     return true;
 }
@@ -83,7 +86,8 @@ void D3D12GraphicsDevice::ShutdownV() {
     SAFE_RELEASE(m_d3d11Context);
     SAFE_RELEASE(m_copyResourceFence);
     SAFE_CLOSE_HANDLE(m_copyResourceEventHandle);
-
+    SAFE_RELEASE(m_convertRGBFence);
+    SAFE_CLOSE_HANDLE(m_convertRGBEventHandle);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -201,10 +205,79 @@ ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
 {
-    assert(false && "ConvertRGBToI420 need to implement on D3D12");
-    return nullptr;
+    D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
+    assert(nullptr != tex);
+    if (nullptr == tex)
+        return nullptr;
+
+    ID3D12Resource* readbackResource = tex->GetReadbackResource();
+    assert(nullptr != readbackResource);
+    if (nullptr == readbackResource) //the texture has to be prepared for CPU access
+        return nullptr;
+
+
+    ID3D12Resource*  nativeTexSrc = reinterpret_cast<ID3D12Resource*>(tex->GetNativeTexturePtrV());
+    assert(nullptr != nativeTexSrc);
+    if (nullptr == nativeTexSrc){
+        return nullptr;
+    }
+
+    //Change src state, copy, change src state back, and Wait
+    m_commandList->Reset(m_commandAllocator, nullptr);
+    {
+        D3D12_RESOURCE_BARRIER srcBarrier;
+        srcBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        srcBarrier.Flags =  D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        srcBarrier.Transition.pResource = nativeTexSrc;
+        srcBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        srcBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        srcBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        m_commandList->ResourceBarrier(1, &srcBarrier);
+    }
+    m_commandList->CopyResource(readbackResource, nativeTexSrc);
+    {
+        D3D12_RESOURCE_BARRIER srcBarrier;
+        srcBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        srcBarrier.Flags =  D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        srcBarrier.Transition.pResource = nativeTexSrc;
+        srcBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        srcBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+        srcBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        m_commandList->ResourceBarrier(1, &srcBarrier);
+        
+    }
+    m_commandList->Close();
+
+    ID3D12CommandList* cmdList[] = { m_commandList };
+    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
+    WaitForFence(m_convertRGBFence,m_convertRGBEventHandle, &m_convertRGBFenceValue);
+
+
+    const uint32_t width = tex->GetWidth();
+    const uint32_t height = tex->GetHeight();
+    const uint32_t bufferSize = width *  height* DX12_BYTES_PER_PIXEL; 
+
+    //Map
+    uint8* data{};
+    const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
+    assert(hr == S_OK);
+    if (hr!=S_OK) {
+        return nullptr;
+    }
+
+    const uint32_t rowToRowInBytes = bufferSize / height;
+    LogPrint("Map Ok. Width: %u, height: %u, BufferSize: %u, RowToRowInBytes: %u", width, height, bufferSize, rowToRowInBytes);
+
+    //rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
+    //    width, height,rowToRowInBytes, static_cast<uint8_t*>(data)
+    //);
+
+    D3D12_RANGE emptyRange{ 0, 0 };
+    readbackResource->Unmap(0,&emptyRange);
+
+    return nullptr; //i420_buffer
 }
 
 
