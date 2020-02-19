@@ -30,7 +30,11 @@ namespace WebRTC
 
     bool SoftwareEncoder::EncodeFrame()
     {
-        webrtc::VideoFrame frame = webrtc::VideoFrame::Builder().set_video_frame_buffer(m_device->ConvertRGBToI420(m_encodeTex)).set_rotation(webrtc::kVideoRotation_0).set_timestamp_us(0).build();
+        const rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer = m_device->ConvertRGBToI420(m_encodeTex);
+        if (nullptr == i420Buffer)
+            return false;
+
+        webrtc::VideoFrame frame = webrtc::VideoFrame::Builder().set_video_frame_buffer(i420Buffer).set_rotation(webrtc::kVideoRotation_0).set_timestamp_us(0).build();
         CaptureFrame(frame);
         return true;
     }

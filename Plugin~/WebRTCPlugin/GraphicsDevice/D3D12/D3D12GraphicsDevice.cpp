@@ -160,8 +160,7 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
 //----------------------------------------------------------------------------------------------------------------------
 
 ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
-    assert(false && "CreateCPUReadTextureV need to implement on D3D12");
-    return nullptr;
+    return CreateSharedD3D12Texture(w,h);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
