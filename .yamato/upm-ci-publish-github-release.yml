@@ -2,7 +2,11 @@
 
 platforms:
   - name: win
+    artifact_filename: webrtc-win.zip
   - name: linux
+    artifact_filename: webrtc-linux.zip
+  - name: macos 
+    artifact_filename: webrtc-mac.zip
 ---
 publish_com.unity.webrtc_github_release:
   name: Publish com.unity.webrtc to Github Release
@@ -31,7 +35,7 @@ publish_libwebrtc_github_release:
   commands:
     - npm install github-release-cli -g
     {% for platform in platforms %}
-    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/webrtc-{{ platform.name }}.zip"
+    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/{{ platform.artifact_filename }}"
     {% endfor %}
   triggers:
     tags:

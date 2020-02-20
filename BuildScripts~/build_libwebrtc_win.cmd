@@ -23,10 +23,13 @@ cd ..
 
 cmd /k gclient.bat sync -f
 
-REM change jsoncpp static library
-powershell -File ".\BuildScripts~\ReplaceText.ps1" "src\third_party\jsoncpp\BUILD.gn" "source_set" "static_library"
+REM add jsoncpp
+patch "src\BUILD.gn" < "BuildScripts~\add_jsoncpp.patch"
 
-cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" symbol_level=0 enable_iterator_debugging=false"
+REM install pywin32
+cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32
+
+cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
 REM add json.obj in link list of webrtc.ninja
 powershell -File ".\BuildScripts~\ReplaceText.ps1" "%OUTPUT_DIR%\obj\webrtc.ninja" "obj/rtc_base/rtc_base/crc32.obj" "obj/rtc_base/rtc_base/crc32.obj obj/rtc_base/rtc_json/json.obj"
@@ -49,7 +52,7 @@ xcopy src\*.h %ARTIFACTS_DIR%\include /C /S /I /F /H
 
 REM copy lib
 mkdir %ARTIFACTS_DIR%\lib
-for %%G in (webrtc.lib audio_decoder_opus.lib webrtc_opus.lib jsoncpp.lib) do forfiles /P "%cd%\%OUTPUT_DIR%" /S /M %%G /C "cmd /c copy @path %ARTIFACTS_DIR%\lib"
+for %%G in (webrtc.lib audio_decoder_opus.lib webrtc_opus.lib) do forfiles /P "%cd%\%OUTPUT_DIR%" /S /M %%G /C "cmd /c copy @path %ARTIFACTS_DIR%\lib"
 
 REM copy license
 copy %OUTPUT_DIR%\LICENSE.md %ARTIFACTS_DIR%
