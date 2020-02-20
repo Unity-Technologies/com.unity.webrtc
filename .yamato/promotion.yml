@@ -29,7 +29,7 @@ promotion_test_{{ platform.name }}_{{ editor.version }}:
         - "upm-ci~/test-results/**/*"
   dependencies:
 {% for package in packages %}
-    - .yamato/upm-ci-{{ yamato_name }}-packages.yml#pack_{{ package.name }}_{{ platform.name }}
+    - .yamato/upm-ci-{{ yamato_name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 {% endfor %}
 {% endfor %}
