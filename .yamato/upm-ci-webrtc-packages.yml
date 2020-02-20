@@ -15,6 +15,8 @@ platforms:
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
     test_params:
       - backend: mono
+        platform: editmode
+      - backend: mono
         platform: playmode
       - backend: mono
         platform: standalone
@@ -27,6 +29,8 @@ platforms:
     prepack_command: BuildScripts~/build_plugin.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
     test_params:
+      - backend: mono
+        platform: editmode
       - backend: mono
         platform: playmode
       - backend: mono
@@ -190,10 +194,6 @@ publish_{{ package.name }}:
   commands:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
     - upm-ci package publish  
-  triggers:
-    tags:
-      only:
-        - /^(r|R)(c|C)-\d+\.\d+\.\d+(-preview(\.\d+)?)?$/
   artifacts:  
     {{ package.name }}_artifacts.zip:
       paths:
@@ -206,5 +206,29 @@ publish_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
+    {% endfor %}
+
+publish_dry_run_{{ package.name }}:
+  name: Publish Dry Run {{ package.packagename }}
+  agent:
+    type: Unity::VM
+    image: package-ci/win10:stable
+    flavor: b1.large
+  commands:
+    - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - upm-ci package publish --dry-run
+  triggers:
+    tags:
+      only:
+        - /^(r|R)(c|C)-\d+\.\d+\.\d+(-preview(\.\d+)?)?$/
+  artifacts:  
+    {{ package.name }}_artifacts.zip:
+      paths:
+        - "upm-ci~/packages/*.tgz"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+    {% for editor in editors %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}
     {% endfor %}
 {% endfor %}
