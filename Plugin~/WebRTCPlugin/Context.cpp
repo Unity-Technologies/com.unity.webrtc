@@ -22,7 +22,7 @@ namespace WebRTC
     Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
     {
         auto it = s_instance.m_contexts.find(uid);
-        if(it != s_instance.m_contexts.end()) {
+        if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }

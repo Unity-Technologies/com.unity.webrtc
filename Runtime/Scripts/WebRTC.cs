@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections.Concurrent;
@@ -304,16 +304,24 @@ namespace Unity.WebRTC
             }
         }
 
-        public static bool HWEncoderSupport
+        public static bool SupportHardwareEncoder
         {
             get
             {
-                if(s_context.IsNull)
+                return NativeMethods.GetHardwareEncoderSupport();
+            }
+        }
+
+        public static CodecInitializationResult CodecInitializationResult
+        {
+            get
+            {
+                if (s_context.IsNull)
                 {
-                    throw new CodecInitializationException(CodecInitializationResult.NotInitialized);
+                    return CodecInitializationResult.NotInitialized;
                 }
                 var result = Context.GetCodecInitializationResult();
-                return result == CodecInitializationResult.Success;
+                return result;
             }
         }
     }
@@ -356,6 +364,8 @@ namespace Unity.WebRTC
         public static extern void StopMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]

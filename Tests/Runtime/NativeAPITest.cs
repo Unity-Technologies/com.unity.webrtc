@@ -9,14 +9,15 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class NativeAPITestWithSoftwareEncoder : NativeAPITestWithHardwareEncoder
     {
-        [SetUp]
-        public new void Init()
+        [OneTimeSetUp]
+        public new void OneTimeInit()
         {
-            NativeMethods.RegisterDebugLog(DebugLog);
             encoderType = EncoderType.Software;
         }
+
     }
 
+    [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
     class NativeAPITestWithHardwareEncoder
     {
         protected EncoderType encoderType;
@@ -39,15 +40,18 @@ namespace Unity.WebRTC.RuntimeTest
         public void Init()
         {
             NativeMethods.RegisterDebugLog(DebugLog);
-            encoderType = EncoderType.Hardware;
-            Debug.Log("Init");
         }
 
         [TearDown]
         public void CleanUp()
         {
             NativeMethods.RegisterDebugLog(null);
-            Debug.Log("CleanUp");
+        }
+
+        [OneTimeSetUp]
+        public void OneTimeInit()
+        {
+            encoderType = EncoderType.Hardware;
         }
 
         [Test]
@@ -171,6 +175,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 
+    [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
     class NativeAPITestWithHardwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithHardwareEncoder, IPrebuildSetup
     {
@@ -185,7 +190,7 @@ namespace Unity.WebRTC.RuntimeTest
     }
 
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
-    class NativeAPITestWithSoftwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithHardwareEncoder, IPrebuildSetup
+    class NativeAPITestWithSoftwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithSoftwareEncoder, IPrebuildSetup
     {
         public void Setup()
         {

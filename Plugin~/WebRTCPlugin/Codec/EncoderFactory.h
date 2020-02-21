@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "IEncoder.h"
 
@@ -8,6 +8,7 @@ namespace WebRTC {
     class EncoderFactory {
     public:
         static EncoderFactory& GetInstance();
+        static bool GetHardwareEncoderSupport();
         bool IsInitialized() const;
         void Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType); //Can throw exception.
         void Shutdown();
