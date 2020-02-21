@@ -7,18 +7,18 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    class NativeAPITestWithSoftwareEncoder : NativeAPITestWithHardwareEncoder
+    [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
+    class NativeAPITestWithHardwareEncoder : NativeAPITestWithSoftwareEncoder
     {
         [OneTimeSetUp]
         public new void OneTimeInit()
         {
-            encoderType = EncoderType.Software;
+            encoderType = EncoderType.Hardware;
         }
 
     }
 
-    [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
-    class NativeAPITestWithHardwareEncoder
+    class NativeAPITestWithSoftwareEncoder
     {
         protected EncoderType encoderType;
 
@@ -51,7 +51,7 @@ namespace Unity.WebRTC.RuntimeTest
         [OneTimeSetUp]
         public void OneTimeInit()
         {
-            encoderType = EncoderType.Hardware;
+            encoderType = EncoderType.Software;
         }
 
         [Test]
