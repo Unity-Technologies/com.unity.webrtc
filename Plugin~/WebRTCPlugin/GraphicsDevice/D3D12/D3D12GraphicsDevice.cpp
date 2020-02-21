@@ -17,8 +17,7 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraph
     , m_unityInterface(unityInterface)
     , m_copyResourceFence(nullptr)
     , m_copyResourceEventHandle(nullptr)
-    , m_convertRGBFence(nullptr)
-    , m_convertRGBEventHandle(nullptr){
+{
 }
 
 
@@ -55,8 +54,6 @@ bool D3D12GraphicsDevice::InitV() {
     m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
     m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
 	m_copyResourceEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
-    m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_convertRGBFence));
-    m_convertRGBEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     return true;
 }
@@ -70,8 +67,6 @@ void D3D12GraphicsDevice::ShutdownV() {
     SAFE_RELEASE(m_d3d11Context);
     SAFE_RELEASE(m_copyResourceFence);
     SAFE_CLOSE_HANDLE(m_copyResourceEventHandle);
-    SAFE_RELEASE(m_convertRGBFence);
-    SAFE_CLOSE_HANDLE(m_convertRGBEventHandle);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -88,7 +83,13 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
+bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* nativeTexturePtr) {
+
+    D3D12Texture2D* dest = reinterpret_cast<D3D12Texture2D*>(baseDest);
+    assert(nullptr != dest);
+    if (nullptr == dest)
+        return false;
+
     ID3D12Resource* nativeDest = reinterpret_cast<ID3D12Resource*>(dest->GetNativeTexturePtrV());
     ID3D12Resource* nativeSrc = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
     if (nativeSrc == nativeDest)
@@ -98,6 +99,23 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
     
     m_commandList->Reset(m_commandAllocator, nullptr); 
     m_commandList->CopyResource(nativeDest, nativeSrc);
+
+    //for CPU accessible texture
+    ID3D12Resource* readbackResource = dest->GetReadbackResource();
+    if (nullptr!=readbackResource){
+        //Change dest state, copy, change dest state back
+        Barrier(nativeDest,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_SOURCE);
+        const D3D12ResourceFootprint* resFP = dest->GetNativeTextureFootprint();
+        D3D12_TEXTURE_COPY_LOCATION td,ts;
+        td.pResource =readbackResource;
+        td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+        td.PlacedFootprint = resFP->Footprint;
+        ts.pResource = nativeDest;
+        ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        ts.SubresourceIndex = 0;
+        m_commandList->CopyTextureRegion(&td,0,0,0,&ts,nullptr);
+        Barrier(nativeDest,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);        
+    }
     m_commandList->Close();
 
     ID3D12CommandList* cmdList[] = { m_commandList };
@@ -201,33 +219,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
 
     const uint32_t width = tex->GetWidth();
     const uint32_t height = tex->GetHeight();
-
-    ID3D12Resource*  nativeTexSrc = reinterpret_cast<ID3D12Resource*>(tex->GetNativeTexturePtrV());
-    assert(nullptr != nativeTexSrc);
-    if (nullptr == nativeTexSrc){
-        return nullptr;
-    }
-
-    m_commandList->Reset(m_commandAllocator, nullptr);
-
-    //Change src state, copy, change src state back
-    Barrier(nativeTexSrc,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_SOURCE);
     const D3D12ResourceFootprint* resFP = tex->GetNativeTextureFootprint();
-    D3D12_TEXTURE_COPY_LOCATION td,ts;
-    td.pResource =readbackResource;
-    td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-    td.PlacedFootprint = resFP->Footprint;
-    ts.pResource = nativeTexSrc;
-    ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-    ts.SubresourceIndex = 0;
-    m_commandList->CopyTextureRegion(&td,0,0,0,&ts,nullptr);
-    Barrier(nativeTexSrc,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);
-
-    //Close and wait
-    m_commandList->Close();
-    ID3D12CommandList* cmdList[] = { m_commandList };
-    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
-    WaitForFence(m_convertRGBFence,m_convertRGBEventHandle, &m_convertRGBFenceValue);
 
     //Map to read from CPU
     uint8* data{};

@@ -46,15 +46,10 @@ private:
     ID3D12GraphicsCommandList4Ptr m_commandList;
     IUnityGraphicsD3D12v5* m_unityInterface;
 
-    //Fence to copy resource on GPU
+    //Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
     ID3D12Fence* m_copyResourceFence;
 	HANDLE m_copyResourceEventHandle;
     uint64_t m_copyResourceFenceValue = 1;
-
-    //Fence to copy resource to CPU (for converting RGB)
-    ID3D12Fence* m_convertRGBFence;
-    HANDLE m_convertRGBEventHandle;
-    uint64_t m_convertRGBFenceValue = 1;
 };
 
 //---------------------------------------------------------------------------------------------------------------------
