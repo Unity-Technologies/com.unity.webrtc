@@ -119,8 +119,9 @@ namespace WebRTC
         {
             return CodecInitializationResult::DriverNotInstalled;
         }
-
+#if defined(_WIN32)
         HMODULE module = (HMODULE)s_hModule;
+#endif
 
         using NvEncodeAPIGetMaxSupportedVersion_Type = NVENCSTATUS(NVENCAPI *)(uint32_t*);
 #if defined(_WIN32)
