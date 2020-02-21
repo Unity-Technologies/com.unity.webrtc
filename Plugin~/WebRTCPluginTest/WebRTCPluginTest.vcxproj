@@ -66,7 +66,9 @@
     <ClInclude Include="..\WebRTCPlugin\DummyVideoEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Constants.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12ResourceFootprint.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h" />

@@ -1,29 +1,13 @@
 #include "pch.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
+#include "D3D12Constants.h" //DEFAULT_HEAP_PROPS
+
 #include "WebRTCPlugin.h"
 #include "Logger.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 namespace WebRTC {
-
-const D3D12_HEAP_PROPERTIES DEFAULT_HEAP_PROPS = {
-    D3D12_HEAP_TYPE_DEFAULT,
-    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-    D3D12_MEMORY_POOL_UNKNOWN,
-    0,
-    0
-};
-
-const D3D12_HEAP_PROPERTIES READBACK_HEAP_PROPS = {
-    D3D12_HEAP_TYPE_READBACK,
-    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-    D3D12_MEMORY_POOL_UNKNOWN,
-    0,
-    0
-};
-
-const uint32_t DX12_BYTES_PER_PIXEL = 4; //Only support DXGI_FORMAT_B8G8R8A8_UNORM
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -150,9 +134,10 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
     const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
     const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
-
     ID3D12Resource* nativeTex = nullptr;
-    HRESULT hr = m_d3d12Device->CreateCommittedResource(&DEFAULT_HEAP_PROPS, flags, &desc, initialState, nullptr, IID_PPV_ARGS(&nativeTex));
+    HRESULT hr = m_d3d12Device->CreateCommittedResource(&D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
+        nullptr, IID_PPV_ARGS(&nativeTex)
+    );
     if (!SUCCEEDED(hr)) {
         return nullptr;
     }
@@ -178,29 +163,26 @@ void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64
 
 //----------------------------------------------------------------------------------------------------------------------
 
+void D3D12GraphicsDevice::Barrier(ID3D12Resource* res,
+                                  const D3D12_RESOURCE_STATES stateBefore, const D3D12_RESOURCE_STATES stateAfter,
+                                  const UINT subresource)
+{
+    D3D12_RESOURCE_BARRIER barrier;
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags =  D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = res;
+    barrier.Transition.StateBefore = stateBefore;
+    barrier.Transition.StateAfter = stateAfter;
+    barrier.Transition.Subresource = subresource;
+    m_commandList->ResourceBarrier(1, &barrier);
+    
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
     D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
-
-    //Create the readback buffer for the texture.
-    D3D12_RESOURCE_DESC desc{};
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    desc.Alignment = 0;
-    desc.Width = w * h * DX12_BYTES_PER_PIXEL;
-    desc.Height= 1;
-    desc.DepthOrArraySize = 1;
-    desc.MipLevels = 1;
-    desc.Format = DXGI_FORMAT_UNKNOWN;
-    desc.SampleDesc.Count = 1;
-    desc.SampleDesc.Quality = 0;
-    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-    ID3D12Resource* readbackResource = nullptr;
-    const HRESULT hr = m_d3d12Device->CreateCommittedResource(&READBACK_HEAP_PROPS, D3D12_HEAP_FLAG_NONE,
-        &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackResource)
-    );
-    tex->SetReadbackResource(readbackResource);
-
+    tex->CreateReadbackResource(m_d3d12Device);
     return tex;
 }
 
@@ -217,8 +199,6 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
     if (nullptr == readbackResource) //the texture has to be prepared for CPU access
         return nullptr;
 
-
-
     const uint32_t width = tex->GetWidth();
     const uint32_t height = tex->GetHeight();
 
@@ -228,68 +208,28 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
         return nullptr;
     }
 
-    //Change src state, copy, change src state back, and Wait
     m_commandList->Reset(m_commandAllocator, nullptr);
-    {
-        D3D12_RESOURCE_BARRIER srcBarrier;
-        srcBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        srcBarrier.Flags =  D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        srcBarrier.Transition.pResource = nativeTexSrc;
-        srcBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-        srcBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-        srcBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        m_commandList->ResourceBarrier(1, &srcBarrier);
-    }
 
-    D3D12_PLACED_SUBRESOURCE_FOOTPRINT fp;
-    {
-        //[TODO-sin: 2020-2-19] Clean this up
-        D3D12_RESOURCE_DESC origDesc{};
-        origDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-        origDesc.Alignment = 0;
-        origDesc.Width = width;
-        origDesc.Height = height;
-        origDesc.DepthOrArraySize = 1;
-        origDesc.MipLevels = 1;
-        origDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; //We only support this format which has 4 bytes -> DX12_BYTES_PER_PIXEL
-        origDesc.SampleDesc.Count = 1;
-        origDesc.SampleDesc.Quality = 0;
-        origDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        origDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-        origDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
-        UINT nrow;
-        UINT64 rowsize, size;
-        m_d3d12Device->GetCopyableFootprints(&origDesc,0,1,0, &fp,&nrow,&rowsize,&size);        
-    }
-
+    //Change src state, copy, change src state back
+    Barrier(nativeTexSrc,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_SOURCE);
+    const D3D12ResourceFootprint* resFP = tex->GetNativeTextureFootprint();
     D3D12_TEXTURE_COPY_LOCATION td,ts;
     td.pResource =readbackResource;
     td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-    td.PlacedFootprint = fp;
+    td.PlacedFootprint = resFP->Footprint;
     ts.pResource = nativeTexSrc;
     ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
     ts.SubresourceIndex = 0;
     m_commandList->CopyTextureRegion(&td,0,0,0,&ts,nullptr);
+    Barrier(nativeTexSrc,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);
 
-    {
-        D3D12_RESOURCE_BARRIER srcBarrier;
-        srcBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        srcBarrier.Flags =  D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        srcBarrier.Transition.pResource = nativeTexSrc;
-        srcBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
-        srcBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-        srcBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        m_commandList->ResourceBarrier(1, &srcBarrier);
-        
-    }
+    //Close and wait
     m_commandList->Close();
-
     ID3D12CommandList* cmdList[] = { m_commandList };
     m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
     WaitForFence(m_convertRGBFence,m_convertRGBEventHandle, &m_convertRGBFenceValue);
 
-
-    //Map
+    //Map to read from CPU
     uint8* data{};
     const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
     assert(hr == S_OK);
@@ -297,17 +237,14 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
         return nullptr;
     }
 
-    const uint32_t rowToRowInBytes = width *  DX12_BYTES_PER_PIXEL;
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-        width, height,rowToRowInBytes, static_cast<uint8_t*>(data)
+        width, height, static_cast<uint32_t>(resFP->RowSize), static_cast<uint8_t*>(data)
     );
 
     D3D12_RANGE emptyRange{ 0, 0 };
     readbackResource->Unmap(0,&emptyRange);
 
-    return i420_buffer; //i420_buffer
+    return i420_buffer; 
 }
-
-
 
 } //end namespace

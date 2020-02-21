@@ -30,9 +30,11 @@ private:
 
     WebRTC::D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
     void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
+    void Barrier(ID3D12Resource* res,
+        const D3D12_RESOURCE_STATES stateBefore, const D3D12_RESOURCE_STATES stateAfter,
+        const UINT subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
     ID3D12Device* m_d3d12Device;
-    //ID3D12DeviceContext* m_d3d12Context;
 
     //[Note-sin: 2019-10-30] sharing res from d3d12 to d3d11 require d3d11.1. Fence is supported in d3d11.4 or newer.
     ID3D11Device5* m_d3d11Device;

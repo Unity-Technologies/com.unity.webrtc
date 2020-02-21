@@ -167,15 +167,18 @@
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h">
       <Filter>GraphicsDevice</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="..\WebRTCPlugin\VideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoCaptureTrackSource.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoTrackSource.h" />
-=======
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D12.h">
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
->>>>>>> Adding NvEncoderD3D12
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12ResourceFootprint.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Constants.h">
+      <Filter>GraphicsDevice\D3D12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
