@@ -219,7 +219,6 @@ namespace Unity.WebRTC
         internal const string Lib = "webrtc";
 #endif
         private static Context s_context;
-        private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
         private static Material flipMat;
 
@@ -227,7 +226,6 @@ namespace Unity.WebRTC
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create(encoderType:type);
-            s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
             var flipShader = Resources.Load<Shader>("Flip");
@@ -254,7 +252,7 @@ namespace Unity.WebRTC
             }
         }
 
-        public static void Finalize(int id = 0)
+        public static void Finalize()
         {
             s_context.Dispose();
             s_context = null;
