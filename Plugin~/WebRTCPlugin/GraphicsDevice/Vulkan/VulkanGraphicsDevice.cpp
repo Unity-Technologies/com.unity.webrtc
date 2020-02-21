@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
 
@@ -7,6 +7,8 @@
 #include "VulkanUtility.h"
 
 namespace WebRTC {
+
+static void* s_hModule = nullptr;
 
 VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
     const VkPhysicalDevice physicalDevice,
@@ -23,6 +25,22 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, c
 
 //---------------------------------------------------------------------------------------------------------------------
 bool VulkanGraphicsDevice::InitV() {
+
+    if (s_hModule == nullptr)
+    {
+        // dll delay load
+#if defined(_WIN32)
+        HMODULE module = LoadLibrary(TEXT("vulkan-1.dll"));
+        if (module == nullptr)
+        {
+            LogPrint("vulkan-1.dll is not found. Please be sure the environment supports vulkan API.");
+            return false;
+        }
+        s_hModule = module;
+#else
+#endif
+    }
+
     if (CUDA_SUCCESS!=m_cudaContext.Init(m_instance, m_physicalDevice))
         return false;
 
@@ -34,8 +52,16 @@ bool VulkanGraphicsDevice::InitV() {
 
 void VulkanGraphicsDevice::ShutdownV() {
     VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
-
     m_cudaContext.Shutdown();
+
+    if (s_hModule)
+    {
+#if _WIN32
+        FreeLibrary((HMODULE)s_hModule);
+#else
+#endif
+        s_hModule = nullptr;
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------

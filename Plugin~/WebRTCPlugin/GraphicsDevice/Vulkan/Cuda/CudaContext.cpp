@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #include "CudaContext.h"
 
@@ -7,12 +7,30 @@
 
 namespace WebRTC {
 
+static void* s_hModule = nullptr;
+
 CudaContext::CudaContext() : m_context(nullptr) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice) {
+
+    // dll check
+    if (s_hModule == nullptr)
+    {
+        // dll delay load
+#if defined(_WIN32)
+        HMODULE module = LoadLibrary(TEXT("nvcuda.dll"));
+        if (module == nullptr)
+        {
+            LogPrint("nvcuda.dll is not found. Please be sure the environment supports CUDA API.");
+            return CUDA_ERROR_NOT_FOUND;
+        }
+        s_hModule = module;
+#else
+#endif
+    }
 
     CUdevice dev;
     bool foundDevice = true;
@@ -64,6 +82,14 @@ void CudaContext::Shutdown() {
     if (nullptr != m_context) {
         cuCtxDestroy(m_context);
         m_context = nullptr;
+    }
+    if (s_hModule)
+    {
+#if _WIN32
+        FreeLibrary((HMODULE)s_hModule);
+#else
+#endif
+        s_hModule = nullptr;
     }
 }
 
