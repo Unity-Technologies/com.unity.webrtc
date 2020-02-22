@@ -14,8 +14,7 @@ fetch webrtc
 
 cd src
 git config --system core.longpaths true
-git branch -r
-git checkout -b my_branch "refs/remotes/branch-heads/$WEBRTC_VERSION"
+git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
 cd ..
 
 gclient sync -f
@@ -23,8 +22,12 @@ gclient sync -f
 # add jsoncpp
 patch "src/BUILD.gn" < "BuildScripts~/add_jsoncpp.patch"
 
-gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"mac\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_rtti=true"
+gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"mac\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false"
+
 ninja -C "$OUTPUT_DIR"
+ninja -C "$OUTPUT_DIR" builtin_audio_decoder_factory default_task_queue_factory native_api default_codec_factory_objc peerconnection videocapture_objc
+
+/usr/bin/ar -rcT "$OUTPUT_DIR/libwebrtc.a" `find $OUTPUT_DIR/obj/. -name '*.o'`
 
 python ./src/tools_webrtc/libs/generate_licenses.py --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
 
