@@ -14,8 +14,7 @@ fetch webrtc
 
 cd src
 git config --system core.longpaths true
-git branch -r
-git checkout -b my_branch "refs/remotes/branch-heads/$WEBRTC_VERSION"
+git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
 cd ..
 
 gclient sync -f
@@ -26,6 +25,8 @@ patch "src/BUILD.gn" < "BuildScripts~/add_jsoncpp.patch"
 gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"linux\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_rtti=true rtc_use_x11=false"
 ninja -C "$OUTPUT_DIR"
 
+./src/third_party/llvm-build/Release+Asserts/bin/llvm-ar -rc "$OUTPUT_DIR/libwebrtc.a" `find $OUTPUT_DIR/obj/. -name '*.o'`
+
 python ./src/tools_webrtc/libs/generate_licenses.py --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
@@ -34,7 +35,7 @@ find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 mkdir "$ARTIFACTS_DIR/lib"
 array=("libwebrtc.a")
 for item in ${array[@]}; do
-  find "$OUTPUT_DIR/obj" -name $item | xargs -I % cp % "$ARTIFACTS_DIR/lib"
+  find "$OUTPUT_DIR" -name $item | xargs -I % cp % "$ARTIFACTS_DIR/lib"
 done
 
 cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"

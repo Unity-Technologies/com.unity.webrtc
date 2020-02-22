@@ -37,7 +37,7 @@ find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 mkdir "$ARTIFACTS_DIR/lib"
 array=("libwebrtc.a")
 for item in ${array[@]}; do
-  find "$OUTPUT_DIR/obj" -name $item | xargs -J % cp % "$ARTIFACTS_DIR/lib"
+  find "$OUTPUT_DIR" -name $item | xargs -J % cp % "$ARTIFACTS_DIR/lib"
 done
 
 cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
