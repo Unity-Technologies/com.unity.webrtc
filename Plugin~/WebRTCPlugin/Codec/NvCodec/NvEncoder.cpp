@@ -119,15 +119,11 @@ namespace WebRTC
         {
             return CodecInitializationResult::DriverNotInstalled;
         }
-#if defined(_WIN32)
-        HMODULE module = (HMODULE)s_hModule;
-#endif
-
         using NvEncodeAPIGetMaxSupportedVersion_Type = NVENCSTATUS(NVENCAPI *)(uint32_t*);
 #if defined(_WIN32)
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress(module, "NvEncodeAPIGetMaxSupportedVersion");
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress(s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
 #else
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(module, "NvEncodeAPIGetMaxSupportedVersion");
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
 #endif
 
         uint32_t version = 0;
@@ -141,9 +137,9 @@ namespace WebRTC
 
         using NvEncodeAPICreateInstance_Type = NVENCSTATUS(NVENCAPI *)(NV_ENCODE_API_FUNCTION_LIST*);
 #if defined(_WIN32)
-        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)GetProcAddress(module, "NvEncodeAPICreateInstance");
+        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)GetProcAddress(s_hModule, "NvEncodeAPICreateInstance");
 #else
-        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)dlsym(module, "NvEncodeAPICreateInstance");
+        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)dlsym(s_hModule, "NvEncodeAPICreateInstance");
 #endif
 
         if (!NvEncodeAPICreateInstance)
