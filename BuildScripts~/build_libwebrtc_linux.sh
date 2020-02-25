@@ -22,7 +22,8 @@ gclient sync -f
 # add jsoncpp
 patch "src/BUILD.gn" < "BuildScripts~/add_jsoncpp.patch"
 
-gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"linux\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_rtti=true rtc_use_x11=false"
+gn gen "$OUTPUT_DIR" --root="src" --args="is_debug=false target_os=\"linux\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false"
+
 ninja -C "$OUTPUT_DIR"
 
 ./src/third_party/llvm-build/Release+Asserts/bin/llvm-ar -rc "$OUTPUT_DIR/libwebrtc.a" `find $OUTPUT_DIR/obj/. -name '*.o'`
