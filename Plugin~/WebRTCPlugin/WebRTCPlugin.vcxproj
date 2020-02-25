@@ -145,7 +145,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;WEBRTCPLUGIN_EXPORTS;WEBRTC_WIN;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\generated;$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
