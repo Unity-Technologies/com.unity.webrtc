@@ -45,14 +45,14 @@ namespace Unity.WebRTC.RuntimeTest
             config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
-            RTCDataChannel channel1 = null, channel2 = null;
+            RTCDataChannel channel2 = null;
 
             peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(ref candidate); };
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
             peer2.OnDataChannel = channel => { channel2 = channel; };
 
             var conf = new RTCDataChannelInit(true);
-            channel1 = peer1.CreateDataChannel("data", ref conf);
+            var channel1 = peer1.CreateDataChannel("data", ref conf);
 
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
@@ -86,7 +86,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(channel1.Label, channel2.Label);
             Assert.AreEqual(channel1.Id, channel2.Id);
 
-            string message1 = "hello";
+            const string message1 = "hello";
             string message2 = null;
             channel2.OnMessage = bytes => { message2 = System.Text.Encoding.UTF8.GetString(bytes); };
             channel1.Send(message1);

@@ -25,6 +25,16 @@ namespace WebRTC {
         static EncoderFactory factory;
         return factory;
     }
+
+    bool EncoderFactory::GetHardwareEncoderSupport()
+    {
+#if defined(SUPPORT_METAL)
+        return false;
+#else
+        return NvEncoder::LoadModule();
+#endif
+    }
+
     bool EncoderFactory::IsInitialized() const
     {
         return m_encoder.get() != nullptr;

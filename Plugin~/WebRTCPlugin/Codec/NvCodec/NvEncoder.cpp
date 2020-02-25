@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "NvEncoder.h"
 #include "Context.h"
 #include <cstring>
@@ -114,28 +114,16 @@ namespace WebRTC
     {
         pNvEncodeAPI = std::make_unique<NV_ENCODE_API_FUNCTION_LIST>();
         pNvEncodeAPI->version = NV_ENCODE_API_FUNCTION_LIST_VER;
-#if defined(_WIN32)
-#if defined(_WIN64)
-        HMODULE module = LoadLibrary(TEXT("nvEncodeAPI64.dll"));
-#else
-        HMODULE module = LoadLibrary(TEXT("nvEncodeAPI.dll"));
-#endif
-#else
-        void *module = dlopen("libnvidia-encode.so.1", RTLD_LAZY);
-#endif
 
-        if (module == nullptr)
+        if (!LoadModule())
         {
-            LogPrint("NVENC library file is not found. Please ensure NV driver is installed");
             return CodecInitializationResult::DriverNotInstalled;
         }
-        s_hModule = module;
-
         using NvEncodeAPIGetMaxSupportedVersion_Type = NVENCSTATUS(NVENCAPI *)(uint32_t*);
 #if defined(_WIN32)
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress(module, "NvEncodeAPIGetMaxSupportedVersion");
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress((HMODULE)s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
 #else
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(module, "NvEncodeAPIGetMaxSupportedVersion");
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
 #endif
 
         uint32_t version = 0;
@@ -149,9 +137,9 @@ namespace WebRTC
 
         using NvEncodeAPICreateInstance_Type = NVENCSTATUS(NVENCAPI *)(NV_ENCODE_API_FUNCTION_LIST*);
 #if defined(_WIN32)
-        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)GetProcAddress(module, "NvEncodeAPICreateInstance");
+        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)GetProcAddress((HMODULE)s_hModule, "NvEncodeAPICreateInstance");
 #else
-        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)dlsym(module, "NvEncodeAPICreateInstance");
+        NvEncodeAPICreateInstance_Type NvEncodeAPICreateInstance = (NvEncodeAPICreateInstance_Type)dlsym(s_hModule, "NvEncodeAPICreateInstance");
 #endif
 
         if (!NvEncodeAPICreateInstance)
@@ -168,7 +156,31 @@ namespace WebRTC
         return CodecInitializationResult::Success;
     }
 
-    void NvEncoder::UnloadCodec()
+    bool NvEncoder::LoadModule()
+    {
+        if (s_hModule != nullptr)
+            return true;
+
+#if defined(_WIN32)
+#if defined(_WIN64)
+        HMODULE module = LoadLibrary(TEXT("nvEncodeAPI64.dll"));
+#else
+        HMODULE module = LoadLibrary(TEXT("nvEncodeAPI.dll"));
+#endif
+#else
+        void *module = dlopen("libnvidia-encode.so.1", RTLD_LAZY);
+#endif
+
+        if (module == nullptr)
+        {
+            LogPrint("NVENC library file is not found. Please ensure NV driver is installed");
+            return false;
+        }
+        s_hModule = module;
+        return true;
+    }
+
+    void NvEncoder::UnloadModule()
     {
         if (s_hModule)
         {

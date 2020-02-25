@@ -37,10 +37,6 @@ publish_libwebrtc_github_release:
     {% for platform in platforms %}
     - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/{{ platform.artifact_filename }}"
     {% endfor %}
-  triggers:
-    tags:
-      only:
-        - /^(v|V)?\d+\.\d+\.\d+(-preview(\.\d+)?)?$/
   dependencies:
     {% for platform in platforms %}
     - .yamato/upm-ci-libwebrtc.yml#build_{{ platform.name }}

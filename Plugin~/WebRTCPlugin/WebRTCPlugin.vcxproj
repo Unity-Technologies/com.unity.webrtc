@@ -117,6 +117,7 @@
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <DelayLoadDLLs>nvcuda.dll;vulkan-1.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -156,6 +157,7 @@
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <OutputFile>..\..\Packages\com.unity.webrtc\Runtime\Plugins\x86_64\$(TargetName)$(TargetExt)</OutputFile>
+      <DelayLoadDLLs>nvcuda.dll;vulkan-1.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

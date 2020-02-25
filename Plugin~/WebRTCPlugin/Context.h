@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "DummyAudioDevice.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
@@ -22,7 +22,6 @@ namespace WebRTC
     public:
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
-        void* hModule = nullptr;
     private:
         ~ContextManager();
         std::map<int, ContextPtr> m_contexts;

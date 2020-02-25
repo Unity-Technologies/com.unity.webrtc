@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections.Concurrent;
@@ -219,7 +219,6 @@ namespace Unity.WebRTC
         internal const string Lib = "webrtc";
 #endif
         private static Context s_context;
-        private static IntPtr s_renderCallback;
         private static SynchronizationContext s_syncContext;
         private static Material flipMat;
 
@@ -227,7 +226,6 @@ namespace Unity.WebRTC
         {
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create(encoderType:type);
-            s_renderCallback = s_context.GetRenderEventFunc();
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
             var flipShader = Resources.Load<Shader>("Flip");
@@ -254,7 +252,7 @@ namespace Unity.WebRTC
             }
         }
 
-        public static void Finalize(int id = 0)
+        public static void Finalize()
         {
             s_context.Dispose();
             s_context = null;
@@ -304,16 +302,24 @@ namespace Unity.WebRTC
             }
         }
 
-        public static bool HWEncoderSupport
+        public static bool SupportHardwareEncoder
         {
             get
             {
-                if(s_context.IsNull)
+                return NativeMethods.GetHardwareEncoderSupport();
+            }
+        }
+
+        public static CodecInitializationResult CodecInitializationResult
+        {
+            get
+            {
+                if (s_context.IsNull)
                 {
-                    throw new CodecInitializationException(CodecInitializationResult.NotInitialized);
+                    return CodecInitializationResult.NotInitialized;
                 }
                 var result = Context.GetCodecInitializationResult();
-                return result == CodecInitializationResult.Success;
+                return result;
             }
         }
     }
@@ -356,6 +362,8 @@ namespace Unity.WebRTC
         public static extern void StopMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]

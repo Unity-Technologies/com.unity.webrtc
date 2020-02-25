@@ -2,6 +2,7 @@
 #include "WebRTCPlugin.h"
 #include "PeerConnectionObject.h"
 #include "Context.h"
+#include "Codec/EncoderFactory.h"
 
 using namespace WebRTC;
 namespace WebRTC
@@ -34,6 +35,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
     {
         return context->GetEncoderType();
+    }
+
+    UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
+    {
+        return EncoderFactory::GetHardwareEncoderSupport();
     }
 
     UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)

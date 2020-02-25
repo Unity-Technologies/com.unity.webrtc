@@ -52,7 +52,6 @@ namespace WebRTC
         }
         return encoder_->GetCodecInitializationResult();
     }
-
     
     void NvVideoCapturer::SetFrameBuffer(void* frameBuffer)
     {
