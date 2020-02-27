@@ -9,8 +9,8 @@ using testing::Values;
 class GraphicsDeviceTestBase : public testing::TestWithParam<tuple<UnityGfxRenderer, UnityEncoderType> > {
 
 protected:
-    virtual void SetUp() override;
-    virtual void TearDown() override;
+    void SetUp() override;
+    void TearDown() override;
     WebRTC::IGraphicsDevice* m_device;
     UnityEncoderType encoderType;
 };
