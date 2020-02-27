@@ -78,25 +78,13 @@ IUnityInterface* CreateUnityInterface() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<UnityGfxRenderer, void*, IUnityInterface*> GraphicsDeviceTestBase::CreateParameter()
-{
-#if defined(SUPPORT_D3D11)
-    auto unityGfxRenderer = kUnityGfxRendererD3D11;
-#elif defined(SUPPORT_OPENGL_CORE)
-    auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;
-#elif defined(SUPPORT_METAL)
-    auto unityGfxRenderer = kUnityGfxRendererMetal;
-#endif
-    return std::make_tuple(unityGfxRenderer, CreateDevice(), CreateUnityInterface());
-}
-
-
 void GraphicsDeviceTestBase::SetUp()
 {
     UnityGfxRenderer unityGfxRenderer;
-    void* pGraphicsDevice;
-    IUnityInterface* unityInterface;
-    std::tie(unityGfxRenderer, pGraphicsDevice, unityInterface) = GetParam();
+    UnityEncoderType encoderType;
+    std::tie(unityGfxRenderer, encoderType) = GetParam();
+    const auto pGraphicsDevice = CreateDevice();
+    const auto unityInterface = CreateUnityInterface();
 
     ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, unityInterface));
     m_device = GraphicsDevice::GetInstance().GetDevice();

@@ -3,11 +3,9 @@
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 
 using namespace WebRTC;
+using namespace testing;
 
 class GraphicsDeviceTest : public GraphicsDeviceTestBase {};
-
-
-
 TEST_P(GraphicsDeviceTest, GraphicsDeviceIsNotNull) {
     EXPECT_NE(nullptr, m_device);
 }
@@ -55,8 +53,5 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
 }
 #endif
 
-INSTANTIATE_TEST_CASE_P(
-    GraphicsDeviceParameters,
-    GraphicsDeviceTest,
-    testing::Values(GraphicsDeviceTestBase::CreateParameter())
-);
+INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, GraphicsDeviceTest, ValuesIn(VALUES_TEST_ENV));
+

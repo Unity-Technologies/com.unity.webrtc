@@ -6,6 +6,7 @@
 #include "../WebRTCPlugin/Context.h"
 
 using namespace WebRTC;
+using namespace testing;
 
 class ContextTest : public GraphicsDeviceTestBase
 {
@@ -65,8 +66,4 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     context->DeletePeerConnection(connection);
 }
 
-INSTANTIATE_TEST_CASE_P(
-    GraphicsDeviceParameters,
-    ContextTest,
-    testing::Values(GraphicsDeviceTestBase::CreateParameter())
-);
+INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, ValuesIn(VALUES_TEST_ENV));
