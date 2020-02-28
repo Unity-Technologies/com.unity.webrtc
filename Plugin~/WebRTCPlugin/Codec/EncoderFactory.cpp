@@ -10,11 +10,15 @@
 #if defined(SUPPORT_D3D11)
 #include "NvCodec/NvEncoderD3D11.h"
 #endif
+
+#if defined(SUPPORT_D3D12)
+#include "NvCodec/NvEncoderD3D12.h"
+#endif
+
 #include "SoftwareCodec/SoftwareEncoder.h"
 
 #include "NvCodec/NvEncoderCuda.h"
 
-#include "NvCodec/NvEncoderD3D12.h"
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #if defined(SUPPORT_METAL)
