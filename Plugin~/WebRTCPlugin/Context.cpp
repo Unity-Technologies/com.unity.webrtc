@@ -139,11 +139,6 @@ namespace WebRTC
         rtc::InitializeSSL();
 
         audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
-        nvVideoCapturerUnique = std::make_unique<NvVideoCapturer>();
-
-        //[TODO-sin: 2020-1-16] Since we are giving the pointer to peerConnectionFactory in CreateVideoStream(), 
-        //we shouldn't store the raw pointer here.
-        nvVideoCapturer = nvVideoCapturerUnique.get();
 
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
         //Always use SoftwareEncoder on Mac for now.
@@ -151,8 +146,7 @@ namespace WebRTC
 #else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<DummyVideoEncoderFactory>(nvVideoCapturer) :
-            webrtc::CreateBuiltinVideoEncoderFactory();
+            std::make_unique<DummyVideoEncoderFactory>() : webrtc::CreateBuiltinVideoEncoderFactory();
 #endif
 
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
@@ -175,8 +169,11 @@ namespace WebRTC
         peerConnectionFactory = nullptr;
         audioTrack = nullptr;
         videoTracks.clear();
-        audioStream = nullptr;
-        videoStreams.clear();
+//        audioStream = nullptr;
+//        videoStreams.clear();
+
+        videoCapturerList.clear();
+        mediaStreamMap.clear();
 
         workerThread->Quit();
         workerThread.reset();
@@ -195,7 +192,10 @@ namespace WebRTC
     }
     void Context::EncodeFrame()
     {
-        nvVideoCapturer->EncodeVideoData();
+        for (const auto& entry : videoCapturerList)
+        {
+            entry.second->EncodeVideoData();
+        }
     }
     void Context::FinalizeEncoder()
     {
@@ -207,7 +207,45 @@ namespace WebRTC
         return m_encoderType;
     }
 
-    webrtc::MediaStreamInterface* Context::CreateVideoStream(void* frameBuffer, int width, int height)
+    webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& stream_id)
+    {
+        if (mediaStreamMap.count(stream_id) == 0)
+        {
+            mediaStreamMap[stream_id] = peerConnectionFactory->CreateLocalMediaStream(stream_id);
+        }
+
+        return mediaStreamMap[stream_id];
+    }
+
+    void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
+    {
+        auto stream_id = stream->id();
+        if (mediaStreamMap.count(stream_id) > 0)
+        {
+            mediaStreamMap.erase(stream_id);
+        }
+    }
+
+    webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
+    {
+        //void* pUnityEncoder = //pDummyVideoEncoderFactory->CreatePlatformEncoder(WebRTC::Nvidia, width, height, bitRate);
+        auto pUnityVideoCapturer = std::make_unique<NvVideoCapturer>();
+        //pUnityVideoCapturer->InitializeEncoder();
+        //pDummyVideoEncoderFactory->AddCapturer(pUnityVideoCapturer);
+
+        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(pUnityVideoCapturer), false));
+        auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, source);
+        //auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, peerConnectionFactory->CreateVideoSource(pUnityVideoCapturer));
+        pUnityVideoCapturer->SetFrameBuffer(frameBuffer);
+        pUnityVideoCapturer->StartEncoder();
+
+        // TODO:: Create dictionary to impletement StopMediaStreamTrack API
+        videoCapturerList[videoTrack] = pUnityVideoCapturer.get();
+        //mediaSteamTrackList.push_back(videoTrack);
+        return videoTrack.get();
+    }
+
+    /*
     {
         rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(nvVideoCapturerUnique), false));
 
@@ -223,13 +261,18 @@ namespace WebRTC
         nvVideoCapturer->SetSize(width, height);
         return videoStream.get();
     }
+    */
 
-    void Context::DeleteVideoStream(webrtc::MediaStreamInterface* stream)
+    void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-        auto item = std::find(videoStreams.begin(), videoStreams.end(), stream);
-        videoStreams.erase(item);
+        //auto videoTrack = static_cast<webrtc::VideoTrackInterface*>(track);
+        if(videoCapturerList.count(track) > 0)
+        {
+            videoCapturerList[track]->Stop();
+        }
     }
 
+    /*
     webrtc::MediaStreamInterface* Context::CreateAudioStream()
     {
         //avoid optimization specially for voice
@@ -244,11 +287,14 @@ namespace WebRTC
 
         return audioStream.get();
     }
+    */
 
+    /*
     void Context::DeleteAudioStream(webrtc::MediaStreamInterface* stream)
     {
         audioStream.release();
     }
+    */
 
     void Context::ProcessAudioData(const float* data, int32 size)
     {

@@ -35,10 +35,11 @@ namespace WebRTC
         ~Context();
 
         CodecInitializationResult GetCodecInitializationResult();
-        webrtc::MediaStreamInterface* CreateVideoStream(void* frameBuffer, int width, int height);
-        void DeleteVideoStream(webrtc::MediaStreamInterface* stream);
-        webrtc::MediaStreamInterface* CreateAudioStream();
-        void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
+        webrtc::MediaStreamInterface* CreateMediaStream(const std::string& stream_id);
+        void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
+//        webrtc::MediaStreamInterface* CreateAudioStream();
+//        void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
+        webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
@@ -50,7 +51,7 @@ namespace WebRTC
         void FinalizeEncoder();
         //
 
-        void StopCapturer() { nvVideoCapturer->Stop(); }
+        void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void ProcessAudioData(const float* data, int32 size);
 
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
@@ -65,13 +66,13 @@ namespace WebRTC
         std::unique_ptr<rtc::Thread> signalingThread;
         std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
-        NvVideoCapturer* nvVideoCapturer;
-        std::unique_ptr<NvVideoCapturer> nvVideoCapturerUnique;
         rtc::scoped_refptr<DummyAudioDevice> audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
-        rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
+//        rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
         //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
-        std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
+        std::map<webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> videoCapturerList;
+        std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
+//        std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
         std::map<const void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
     };
 

@@ -40,10 +40,13 @@ TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoStream) {
-    context->InitializeEncoder(m_device);
+    EXPECT_TRUE(context->InitializeEncoder(m_device));
     auto tex = m_device->CreateDefaultTextureV(width, height);
-    const auto stream = context->CreateVideoStream(tex->GetEncodeTexturePtrV(), width, height);
-    context->DeleteVideoStream(stream);
+    const auto stream = context->CreateMediaStream(tex->GetEncodeTexturePtrV(), width, height);
+    auto tex2 = m_device->CreateDefaultTextureV(width, height);
+    const auto stream2 = context->CreateMediaStream(tex2->GetEncodeTexturePtrV(), width, height);
+    context->DeleteMediaStream(stream);
+//    context->DeleteVideoStream(stream2);
     context->FinalizeEncoder();
 }
 

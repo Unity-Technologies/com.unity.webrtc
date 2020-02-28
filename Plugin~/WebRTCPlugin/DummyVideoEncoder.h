@@ -32,7 +32,6 @@ namespace WebRTC
     private:
         webrtc::EncodedImageCallback* callback = nullptr;
         webrtc::EncodedImage encodedImage;
-        webrtc::H264BitstreamParser bitstreamParser;
         webrtc::RTPFragmentationHeader fragHeader;
         webrtc::VideoBitrateAllocation lastBitrate;
     };
@@ -48,10 +47,8 @@ namespace WebRTC
         // format must be one of the supported formats by this factory.
         virtual webrtc::VideoEncoderFactory::CodecInfo QueryVideoEncoder(const webrtc::SdpVideoFormat& format) const override;
         // Creates a VideoEncoder for the specified format.
-        virtual std::unique_ptr<webrtc::VideoEncoder> CreateVideoEncoder(
-            const webrtc::SdpVideoFormat& format) override;
-        DummyVideoEncoderFactory(NvVideoCapturer* videoCapturer);
-    private:
-        NvVideoCapturer* capturer;
+        virtual std::unique_ptr<webrtc::VideoEncoder> CreateVideoEncoder(const webrtc::SdpVideoFormat& format) override;
+
+        DummyVideoEncoderFactory();
     };
 }

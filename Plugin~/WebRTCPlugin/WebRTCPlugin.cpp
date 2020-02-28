@@ -47,20 +47,24 @@ extern "C"
         return context->GetCodecInitializationResult();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, void* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* stream_id)
     {
-        return context->CreateVideoStream(rt, width, height);
+        return context->CreateMediaStream(stream_id);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
+    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStream(Context* context, webrtc::MediaStreamInterface* stream)
     {
-        context->DeleteVideoStream(stream);
+        context->DeleteMediaStream(stream);
     }
 
-    //TODO: Multi-track support
-    UNITY_INTERFACE_EXPORT void StopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* stream_id, void* rt, int32 width, int32 height, int32 bitRate)
     {
-        context->StopCapturer();
+        return context->CreateVideoTrack(stream_id, rt, width, height, bitRate);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    {
+        context->StopMediaStreamTrack(track);
     }
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateAudioStream(Context* context)
