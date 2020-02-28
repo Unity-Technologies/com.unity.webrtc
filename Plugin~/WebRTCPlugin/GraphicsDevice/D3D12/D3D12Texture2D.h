@@ -25,7 +25,7 @@ public:
     inline virtual const void* GetNativeTexturePtrV() const override;
     inline virtual void* GetEncodeTexturePtrV() override;
     inline virtual const void* GetEncodeTexturePtrV() const override;
-    void CreateReadbackResource(ID3D12Device* device);
+    HRESULT CreateReadbackResource(ID3D12Device* device);
     inline ID3D12Resource* GetReadbackResource() const;
     inline const D3D12ResourceFootprint* GetNativeTextureFootprint() const;
 

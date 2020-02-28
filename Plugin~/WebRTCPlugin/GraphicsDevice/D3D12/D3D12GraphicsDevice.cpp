@@ -200,7 +200,12 @@ void D3D12GraphicsDevice::Barrier(ID3D12Resource* res,
 
 ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
     D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
-    tex->CreateReadbackResource(m_d3d12Device);
+    const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device);
+    if (FAILED(hr)){
+        delete tex;
+        return nullptr;
+    }
+
     return tex;
 }
 

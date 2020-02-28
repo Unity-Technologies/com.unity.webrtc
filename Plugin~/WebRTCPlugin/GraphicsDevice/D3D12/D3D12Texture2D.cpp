@@ -18,7 +18,7 @@ D3D12Texture2D::D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void D3D12Texture2D::CreateReadbackResource(ID3D12Device* device) {
+HRESULT D3D12Texture2D::CreateReadbackResource(ID3D12Device* device) {
     SAFE_DELETE(m_nativeTextureFootprint);
     SAFE_RELEASE(m_readbackResource);
 
@@ -48,7 +48,7 @@ void D3D12Texture2D::CreateReadbackResource(ID3D12Device* device) {
     const HRESULT hr = device->CreateCommittedResource(&D3D12_READBACK_HEAP_PROPS, D3D12_HEAP_FLAG_NONE,
         &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_readbackResource)
     );
-    
+    return hr;
 }
 
 } //end namespace
