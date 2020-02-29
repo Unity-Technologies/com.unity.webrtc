@@ -42,10 +42,12 @@ extern "C"
         return EncoderFactory::GetHardwareEncoderSupport();
     }
 
+    /*
     UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)
     {
         return context->GetCodecInitializationResult();
     }
+    */
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* stream_id)
     {
@@ -67,14 +69,9 @@ extern "C"
         context->StopMediaStreamTrack(track);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateAudioStream(Context* context)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
     {
-        return context->CreateAudioStream();
-    }
-
-    UNITY_INTERFACE_EXPORT void ContextDeleteAudioStream(Context* context, webrtc::MediaStreamInterface* stream)
-    {
-        context->DeleteAudioStream(stream);
+        return context->CreateAudioTrack(label);
     }
 
     UNITY_INTERFACE_EXPORT void MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
@@ -217,9 +214,9 @@ extern "C"
     {
         obj->Close();
     }
-    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, const std::string streamId)
     {
-        return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), { "unity" }).value().get();
+        return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), { streamId }).value().get();
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRemoveTrack(PeerConnectionObject* obj, webrtc::RtpSenderInterface* sender)

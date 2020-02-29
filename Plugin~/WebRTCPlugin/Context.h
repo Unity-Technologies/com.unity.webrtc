@@ -31,15 +31,14 @@ namespace WebRTC
     class Context
     {
     public:
-        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderType::UnityEncoderHardware);
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
         ~Context();
 
-        CodecInitializationResult GetCodecInitializationResult();
+        //CodecInitializationResult GetCodecInitializationResult();
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& stream_id);
         void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
-//        webrtc::MediaStreamInterface* CreateAudioStream();
-//        void DeleteAudioStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
+        webrtc::MediaStreamTrackInterface* CreateAudioTrack(const std::string& label);
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
@@ -68,12 +67,10 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
-//        rtc::scoped_refptr<webrtc::MediaStreamInterface> audioStream;
         //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
         std::map<webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> videoCapturerList;
         std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
-//        std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>> videoStreams;
-        std::map<const void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
+//        std::map<const void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver
