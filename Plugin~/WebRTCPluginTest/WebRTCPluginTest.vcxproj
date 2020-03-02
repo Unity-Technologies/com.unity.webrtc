@@ -80,6 +80,9 @@
     <ClInclude Include="..\WebRTCPlugin\NvVideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\pch.h" />
     <ClInclude Include="..\WebRTCPlugin\PeerConnectionObject.h" />
+    <ClInclude Include="..\WebRTCPlugin\VideoCapturer.h" />
+    <ClInclude Include="..\WebRTCPlugin\VideoCaptureTrackSource.h" />
+    <ClInclude Include="..\WebRTCPlugin\VideoTrackSource.h" />
     <ClInclude Include="..\WebRTCPlugin\PlatformBase.h" />
     <ClInclude Include="..\WebRTCPlugin\targetver.h" />
     <ClInclude Include="..\WebRTCPlugin\WebRTCConstants.h" />
@@ -115,6 +118,9 @@
     <ClCompile Include="..\WebRTCPlugin\Logger.cpp" />
     <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\VideoCapturer.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\VideoCaptureTrackSource.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\VideoTrackSource.cpp" />
     <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />
     <ClCompile Include="ContextTest.cpp" />
     <ClCompile Include="GraphicsDeviceTest.cpp" />
@@ -195,7 +201,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)..\WebRTCPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\webrtc\include\third_party\jsoncpp\generated;$(ProjectDir)..\webrtc\include\third_party\jsoncpp\source\include;$(ProjectDir)..\webrtc\include\third_party\abseil-cpp;$(ProjectDir)..\webrtc\include;$(ProjectDir)..\unity\include;$(ProjectDir)..\WebRTCPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

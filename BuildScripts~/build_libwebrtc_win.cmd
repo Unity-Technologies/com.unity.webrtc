@@ -5,7 +5,7 @@ git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools
 )
 
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=72
+set WEBRTC_VERSION=m79
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set CPPFLAGS=/WX-
 set GYP_GENERATORS=ninja,msvs-ninja
@@ -17,8 +17,7 @@ cmd /k fetch.bat webrtc
 
 cd src
 cmd /k git.bat config --system core.longpaths true
-cmd /k git.bat branch -r
-cmd /k git.bat checkout -b my_branch refs/remotes/branch-heads/%WEBRTC_VERSION%
+cmd /k git.bat checkout  refs/remotes/branch-heads/%WEBRTC_VERSION%
 cd ..
 
 cmd /k gclient.bat sync -f

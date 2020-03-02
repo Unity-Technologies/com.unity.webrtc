@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "DummyVideoEncoder.h"
 #include "NvVideoCapturer.h"
 
@@ -6,8 +6,7 @@ namespace WebRTC
 {
     int32_t DummyVideoEncoder::Encode(
         const webrtc::VideoFrame& frame,
-        const webrtc::CodecSpecificInfo* codecSpecificInfo,
-        const std::vector<webrtc::FrameType>* frameTypes)
+        const std::vector<webrtc::VideoFrameType>* frameTypes)
     {
         FrameBuffer* frameBuffer = static_cast<FrameBuffer*>(frame.video_frame_buffer().get());
         std::vector<uint8_t>& frameDataBuffer = frameBuffer->buffer;
@@ -20,7 +19,7 @@ namespace WebRTC
         encodedImage.rotation_ = frame.rotation();
         encodedImage.content_type_ = webrtc::VideoContentType::UNSPECIFIED;
         encodedImage.timing_.flags = webrtc::VideoSendTiming::kInvalid;
-        encodedImage._frameType = webrtc::kVideoFrameDelta;
+        encodedImage._frameType = webrtc::VideoFrameType::kVideoFrameDelta;
         std::vector<webrtc::H264::NaluIndex> naluIndices =
             webrtc::H264::FindNaluIndices(&frameDataBuffer[0], frameDataBuffer.size());
         for (uint32_t i = 0; i < naluIndices.size(); i++)
@@ -28,22 +27,24 @@ namespace WebRTC
             webrtc::H264::NaluType NALUType = webrtc::H264::ParseNaluType(frameDataBuffer[naluIndices[i].payload_start_offset]);
             if (NALUType == webrtc::H264::kIdr)
             {
-                encodedImage._frameType = webrtc::kVideoFrameKey;
+                encodedImage._frameType = webrtc::VideoFrameType::kVideoFrameKey;
                 break;
             }
         }
 
-        if (encodedImage._frameType != webrtc::kVideoFrameKey && frameTypes && (*frameTypes)[0] == webrtc::kVideoFrameKey)
+        if (encodedImage._frameType != webrtc::VideoFrameType::kVideoFrameKey && frameTypes && (*frameTypes)[0] == webrtc::VideoFrameType::kVideoFrameKey)
         {
             SetKeyFrame();
         }
 
         if (lastBitrate.get_sum_kbps() > 0)
         {
-            SetRateAllocation(lastBitrate, 30);
+            RateControlParameters param(lastBitrate, 30);
+            SetRates(param);
         }
-        encodedImage._buffer = &frameDataBuffer[0];
-        encodedImage._length = encodedImage._size = frameDataBuffer.size();
+
+        encodedImage.set_buffer(&frameDataBuffer[0], frameDataBuffer.capacity());
+        encodedImage.set_size(frameDataBuffer.size());
 
         fragHeader.VerifyAndAllocateFragmentationHeader(naluIndices.size());
         fragHeader.fragmentationVectorSize = static_cast<uint16_t>(naluIndices.size());
@@ -64,12 +65,12 @@ namespace WebRTC
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    int32_t DummyVideoEncoder::SetRateAllocation(const webrtc::VideoBitrateAllocation& allocation, uint32_t framerate)
+    void DummyVideoEncoder::SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters)
     {
-        lastBitrate = allocation;
-        SetRate(allocation.get_sum_kbps() * 1000);
-        return 0;
+        lastBitrate = parameters.bitrate;
+        SetRate(parameters.bitrate.get_sum_kbps() * 1000);
     }
+
     DummyVideoEncoderFactory::DummyVideoEncoderFactory(NvVideoCapturer* videoCapturer):capturer(videoCapturer){}
     std::vector<webrtc::SdpVideoFormat> DummyVideoEncoderFactory::GetSupportedFormats() const
     {
