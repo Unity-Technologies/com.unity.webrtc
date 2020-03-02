@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System;
 
@@ -243,10 +244,15 @@ namespace Unity.WebRTC
             }
         }
 
-        public RTCRtpSender AddTrack(MediaStreamTrack track)
+        public RTCRtpSender AddTrack(MediaStreamTrack track, MediaStream stream)
         {
-            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self));
+            if(track == null || stream == null)
+            {
+                throw new ArgumentNullException("");
+            }
+            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self, stream.self));
         }
+
         public void RemoveTrack(RTCRtpSender sender)
         {
             NativeMethods.PeerConnectionRemoveTrack(self, sender.self);

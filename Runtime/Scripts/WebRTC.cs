@@ -136,6 +136,13 @@ namespace Unity.WebRTC
         Answer
     }
 
+    public enum RTCBundlePolicy
+    {
+        BundlePolicyBalanced,
+        BundlePolicyMaxBundle,
+        BundlePolicyMaxCompat
+    };
+
     public struct RTCSessionDescription
     {
         public RTCSdpType type;
@@ -185,6 +192,7 @@ namespace Unity.WebRTC
     {
         public RTCIceServer[] iceServers;
         public RTCIceTransportPolicy iceTransportPolicy;
+        public RTCBundlePolicy bundlePolicy;
     }
 
     public enum CodecInitializationResult
@@ -359,8 +367,6 @@ namespace Unity.WebRTC
     internal static class NativeMethods
     {
         [DllImport(WebRTC.Lib)]
-        public static extern void StopMediaStreamTrack(IntPtr context, IntPtr track);
-        [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern bool GetHardwareEncoderSupport();
@@ -384,6 +390,14 @@ namespace Unity.WebRTC
         public static extern IntPtr ContextCreateDataChannel(IntPtr ptr, IntPtr ptrPeer, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextCreateVideoTrack(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, IntPtr rt, int width, int height, int bitRate);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextCreateAudioTrack(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextStopMediaStreamTrack(IntPtr context, IntPtr track);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextDeleteMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetConfiguration(IntPtr ptr, ref IntPtr conf, ref int len);
         [DllImport(WebRTC.Lib)]
@@ -409,7 +423,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionAddTrack(IntPtr pc, IntPtr track);
+        public static extern IntPtr PeerConnectionAddTrack(IntPtr pc, IntPtr track, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
@@ -443,19 +459,27 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextDeleteMediaStream(IntPtr ctx, IntPtr stream);
+
+        /*
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateVideoStream(IntPtr context, IntPtr rt, int width, int height);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateAudioStream(IntPtr context);
+
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
+        */
         [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern void MediaStreamAddTrack(IntPtr stream, IntPtr track);
+        public static extern bool MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern void MediaStreamRemoveTrack(IntPtr stream, IntPtr track);
+        public static extern bool MediaStreamRemoveTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr MediaStreamGetVideoTracks(IntPtr stream, ref int length);
         [DllImport(WebRTC.Lib)]

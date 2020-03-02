@@ -46,18 +46,39 @@ TEST_P(ContextTest, CreateAndDeleteMediaStream) {
 
 
 TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
-    EXPECT_TRUE(context->InitializeEncoder(m_device));
     const auto tex = m_device->CreateDefaultTextureV(width, height);
+    EXPECT_NE(nullptr, tex);
     const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
+    EXPECT_NE(nullptr, track);
+    EXPECT_TRUE(context->InitializeEncoder(m_device));
     context->FinalizeEncoder();
+    context->DeleteMediaStreamTrack(track);
 }
 
-TEST_P(ContextTest, CreateAndDeleteAudioStream) {
-//    const auto stream = context->CreateAudioStream();
-//    context->DeleteAudioStream(stream);
-//      const auto stream = context->CreateMediaStream("audio");
-      //context->
-    context->CreateAudioTrack("audio");
+TEST_P(ContextTest, CreateAndDeleteAudioTrack) {
+    const auto track = context->CreateAudioTrack("audio");
+    context->DeleteMediaStreamTrack(track);
+}
+
+TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
+    const auto stream = context->CreateMediaStream("audiostream");
+    const auto track = context->CreateAudioTrack("audio");
+    const auto audiotrack = reinterpret_cast<webrtc::AudioTrackInterface*>(track);
+    stream->AddTrack(audiotrack);
+    stream->RemoveTrack(audiotrack);
+    context->DeleteMediaStream(stream);
+    context->DeleteMediaStreamTrack(track);
+}
+
+TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
+    const auto tex = m_device->CreateDefaultTextureV(width, height);
+    const auto stream = context->CreateMediaStream("videostream");
+    const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
+    const auto videotrack = reinterpret_cast<webrtc::AudioTrackInterface*>(track);
+    stream->AddTrack(videotrack);
+    stream->RemoveTrack(videotrack);
+    context->DeleteMediaStream(stream);
+    context->DeleteMediaStreamTrack(track);
 }
 
 TEST_P(ContextTest, CreateAndDeletePeerConnection) {

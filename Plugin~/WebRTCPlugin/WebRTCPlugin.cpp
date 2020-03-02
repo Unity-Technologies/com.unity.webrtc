@@ -59,9 +59,14 @@ extern "C"
         context->DeleteMediaStream(stream);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* stream_id, void* rt, int32 width, int32 height, int32 bitRate)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt, int32 width, int32 height, int32 bitRate)
     {
-        return context->CreateVideoTrack(stream_id, rt, width, height, bitRate);
+        return context->CreateVideoTrack(label, rt, width, height, bitRate);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    {
+        context->DeleteMediaStreamTrack(track);
     }
 
     UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
@@ -74,26 +79,26 @@ extern "C"
         return context->CreateAudioTrack(label);
     }
 
-    UNITY_INTERFACE_EXPORT void MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT bool MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
     {
         if (track->kind() == "audio")
         {
-            stream->AddTrack((webrtc::AudioTrackInterface*)track);
+            return stream->AddTrack((webrtc::AudioTrackInterface*)track);
         }
         else
         {
-            stream->AddTrack((webrtc::VideoTrackInterface*)track);
+            return stream->AddTrack((webrtc::VideoTrackInterface*)track);
         }
     }
-    UNITY_INTERFACE_EXPORT void MediaStreamRemoveTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT bool MediaStreamRemoveTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
     {
         if (track->kind() == "audio")
         {
-            stream->RemoveTrack((webrtc::AudioTrackInterface*)track);
+            return stream->RemoveTrack((webrtc::AudioTrackInterface*)track);
         }
         else
         {
-            stream->RemoveTrack((webrtc::VideoTrackInterface*)track);
+            return stream->RemoveTrack((webrtc::VideoTrackInterface*)track);
         }
     }
 
@@ -214,9 +219,15 @@ extern "C"
     {
         obj->Close();
     }
-    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, const std::string streamId)
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), { streamId }).value().get();
+        return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), {stream->id()}).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface* PeerConnectionAddTransceiver(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, webrtc::RtpTransceiverInit* init)
+    {
+        return obj->connection->AddTransceiver(track, *init).value().get();
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRemoveTrack(PeerConnectionObject* obj, webrtc::RtpSenderInterface* sender)

@@ -37,6 +37,7 @@ namespace WebRTC
         void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
         webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
         webrtc::MediaStreamTrackInterface* CreateAudioTrack(const std::string& label);
+        void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         PeerConnectionObject* CreatePeerConnection();
         PeerConnectionObject* CreatePeerConnection(const std::string& conf);
         void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
@@ -66,7 +67,8 @@ namespace WebRTC
         rtc::scoped_refptr<DummyAudioDevice> audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
         std::map<webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> videoCapturerList;
-        //std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
+        std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
+        std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> mediaSteamTrackList;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver

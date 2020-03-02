@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 
 namespace Unity.WebRTC
@@ -47,6 +47,7 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
+            UnityEngine.Debug.Log("Context Dispose");
             if (this.disposed)
             {
                 return;
@@ -65,6 +66,7 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
+            UnityEngine.Debug.Log("Context Dispose end");
         }
 
         public CodecInitializationResult GetCodecInitializationResult()
@@ -103,6 +105,7 @@ namespace Unity.WebRTC
         }
 
         // TODO:: Fix API design for multi tracks
+        /*
         public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
         {
             return NativeMethods.ContextCreateVideoStream(self, rt, width, height);
@@ -113,27 +116,61 @@ namespace Unity.WebRTC
         {
             NativeMethods.ContextDeleteVideoStream(self, stream);
         }
+        */
 
-        // TODO:: Fix API design for multi tracks
-        public IntPtr CreateAudioStream()
+        public IntPtr CreateMediaStream(string label)
         {
-            return NativeMethods.ContextCreateAudioStream(self);
+            return NativeMethods.ContextCreateMediaStream(self, label);
         }
 
-        // TODO:: Fix API design for multi tracks
-        public void DeleteAudioStream(IntPtr stream)
+        public void DeleteMediaStream(MediaStream stream)
         {
-            NativeMethods.ContextDeleteAudioStream(self, stream);
+            NativeMethods.ContextDeleteMediaStream(self, stream.self);
         }
+
+        /*
+        public MediaStream CreateAudioStream()
+        {
+            var stream = CreateMediaStream("audiostream");
+            var track = CreateAudioTrack("audio");
+            stream.AddTrack(track);
+            return stream;
+        }
+
+        public MediaStream CreateVideoStream(IntPtr rt, int width, int height, int bitrate)
+        {
+            var stream = CreateMediaStream("videostream");
+            var track = CreateVideoTrack("video", rt, width, height, bitrate);
+            NativeMethods.MediaStreamAddTrack()
+            stream.AddTrack(track);
+            return stream;
+        }
+        */
+
 
         public IntPtr GetRenderEventFunc()
         {
             return NativeMethods.GetRenderEventFunc(self);
         }
 
+        public IntPtr CreateAudioTrack(string label)
+        {
+            return NativeMethods.ContextCreateAudioTrack(self, label);
+        }
+
+        public IntPtr CreateVideoTrack(string label, IntPtr rt, int width, int height, int bitrate)
+        {
+            return NativeMethods.ContextCreateVideoTrack(self, label, rt, width, height, bitrate);
+        }
+
         public void StopMediaStreamTrack(IntPtr track)
         {
-            NativeMethods.StopMediaStreamTrack(self, track);
+            NativeMethods.ContextStopMediaStreamTrack(self, track);
+        }
+
+        public void DeleteMediaStreamTrack(IntPtr track)
+        {
+            NativeMethods.ContextDeleteMediaStreamTrack(self, track);
         }
 
         internal void InitializeEncoder()

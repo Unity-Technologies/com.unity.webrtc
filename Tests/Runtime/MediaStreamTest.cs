@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,28 +14,43 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var value = NativeMethods.GetHardwareEncoderSupport();
             WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
-            Debug.Log("MediaStreamTest SetUp");
         }
 
         [TearDown]
         public void TearDown()
         {
             WebRTC.Finalize();
-            Debug.Log("MediaStreamTest TearDown");
         }
+
+        [Test]
+        public void AddAndRemoveVideoStreamTrack()
+        {
+            var width = 256;
+            var height = 256;
+            var bitrate = 1000000;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
+            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate));
+            Assert.True(stream.AddTrack(track));
+            Assert.True(stream.RemoveTrack(track));
+            track.Dispose();
+            stream.Dispose();
+            Object.DestroyImmediate(rt);
+        }
+
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator MediaStreamTest_AddAndRemoveVideoStream()
+        public IEnumerator CameraCaptureStream()
         {
-
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720);
             yield return new WaitForSeconds(0.1f);
-            Assert.AreEqual(1, videoStream.GetVideoTracks().Length);
-            Assert.AreEqual(0, videoStream.GetAudioTracks().Length);
-            Assert.AreEqual(1, videoStream.GetTracks().Length);
+            Assert.AreEqual(1, videoStream.GetVideoTracks().Count());
+            Assert.AreEqual(0, videoStream.GetAudioTracks().Count());
+            Assert.AreEqual(1, videoStream.GetTracks().Count());
             videoStream.FinalizeEncoder();
             yield return new WaitForSeconds(0.1f);
             videoStream.Dispose();
@@ -42,19 +58,19 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void MediaStreamTest_AddAndRemoveAudioStream()
+        public void AddAndRemoveAudioStream()
         {
             var audioStream = Audio.CaptureStream();
-            Assert.AreEqual(1, audioStream.GetAudioTracks().Length);
-            Assert.AreEqual(0, audioStream.GetVideoTracks().Length);
-            Assert.AreEqual(1, audioStream.GetTracks().Length);
+            Assert.AreEqual(1, audioStream.GetAudioTracks().Count());
+            Assert.AreEqual(0, audioStream.GetVideoTracks().Count());
+            Assert.AreEqual(1, audioStream.GetTracks().Count());
             audioStream.Dispose();
         }
 
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator MediaStreamTest_AddAndRemoveAudioTrack()
+        public IEnumerator AddAndRemoveAudioMediaTrack()
         {
             RTCConfiguration config = default;
             config.iceServers = new[]
@@ -71,7 +87,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator MediaStreamTest_AddAndRemoveVideoTrack()
+        public IEnumerator InitializeAndFinalizeVideoEncoder()
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
@@ -116,11 +132,11 @@ namespace Unity.WebRTC.RuntimeTest
 
                 peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(ref candidate); };
                 peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
-                peer2.OnTrack = e => { pc2Senders.Add(peer2.AddTrack(e.Track)); };
+                peer2.OnTrack = e => { pc2Senders.Add(peer2.AddTrack(e.Track, _stream)); };
 
                 foreach (var track in _stream.GetTracks())
                 {
-                    pc1Senders.Add(peer1.AddTrack(track));
+                    pc1Senders.Add(peer1.AddTrack(track, _stream));
                 }
 
                 RTCOfferOptions options1 = default;

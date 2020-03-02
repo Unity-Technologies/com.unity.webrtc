@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
-using System.Collections;
-using Unity.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -16,12 +15,11 @@ namespace Unity.WebRTC
             Audio
         }
 
-        private IntPtr self;
-        private string id;
+        internal IntPtr self;
+        private readonly string id;
         private bool disposed;
-        private MediaStreamType _streamType;
-        private Dictionary<MediaStreamTrack, RenderTexture[]> VideoTrackToRts;
-        private List<MediaStreamTrack> AudioTracks;
+        private List<MediaStreamTrack> tracks = new List<MediaStreamTrack>();
+
 
         public string Id
         {
@@ -39,30 +37,22 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
+            UnityEngine.Debug.Log("MediaStream Dispose");
+
             if (this.disposed)
             {
+                UnityEngine.Debug.Log("MediaStream already Disposed");
                 return;
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                var tracks = GetTracks();
-                foreach (var track in tracks)
-                {
-                    StopTrack(track);
-                }
-                switch (_streamType)
-                {
-                    case MediaStreamType.Video:
-                        WebRTC.Context.DeleteVideoStream(self);
-                        break;
-                    case MediaStreamType.Audio:
-                        WebRTC.Context.DeleteAudioStream(self);
-                        break;
-                }
+                WebRTC.Context.DeleteMediaStream(this);
                 self = IntPtr.Zero;
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
+
+            UnityEngine.Debug.Log("MediaStream Dispose end");
         }
 
         public void FinalizeEncoder()
@@ -76,119 +66,58 @@ namespace Unity.WebRTC
             if (track.Kind == TrackKind.Video)
             {
                 WebRTC.Context.StopMediaStreamTrack(track.self);
-                RenderTexture[] rts = VideoTrackToRts[track];
-                if (rts != null)
-                {
-                    CameraExtension.RemoveRt(rts);
-                    rts[0].Release();
-                    rts[1].Release();
-                    UnityEngine.Object.Destroy(rts[0]);
-                    UnityEngine.Object.Destroy(rts[1]);
-                }
             }
             else
             {
                 Audio.Stop();
             }
         }
-        private RenderTexture[] GetRts(MediaStreamTrack track)
+
+        public IEnumerable<MediaStreamTrack> GetVideoTracks()
         {
-            return VideoTrackToRts[track];
+            return tracks.Where(_ => _.Kind == TrackKind.Video);
         }
-        public MediaStreamTrack[] GetTracks()
+        public IEnumerable<MediaStreamTrack> GetAudioTracks()
         {
-            MediaStreamTrack[] tracks = new MediaStreamTrack[VideoTrackToRts.Keys.Count + AudioTracks.Count];
-            AudioTracks.CopyTo(tracks, 0);
-            VideoTrackToRts.Keys.CopyTo(tracks, AudioTracks.Count);
-            return tracks;
+            return tracks.Where(_ => _.Kind == TrackKind.Audio);
         }
-        public MediaStreamTrack[] GetAudioTracks()
+        public IEnumerable<MediaStreamTrack> GetTracks()
         {
-            return AudioTracks.ToArray();
-        }
-        public MediaStreamTrack[] GetVideoTracks()
-        {
-            MediaStreamTrack[] tracks = new MediaStreamTrack[VideoTrackToRts.Keys.Count];
-            VideoTrackToRts.Keys.CopyTo(tracks, 0);
             return tracks;
         }
 
-        public void AddTrack(MediaStreamTrack track)
+        public bool AddTrack(MediaStreamTrack track)
         {
-            if(track.Kind == TrackKind.Video)
+            if(NativeMethods.MediaStreamAddTrack(self, track.self))
             {
-                VideoTrackToRts[track] = track.getRts(track);
+                tracks.Add(track);
+                return true;
             }
-            else
-            {
-                AudioTracks.Add(track);
-            }
-            NativeMethods.MediaStreamAddTrack(self, track.self);
+            return false;
         }
-        public void RemoveTrack(MediaStreamTrack track)
+        public bool RemoveTrack(MediaStreamTrack track)
         {
-            NativeMethods.MediaStreamRemoveTrack(self, track.self);
-        }
-        //for camera CaptureStream
-        internal MediaStream(RenderTexture[] rts, IntPtr ptr)
-        {
-            self = ptr;
-            WebRTC.Table.Add(self, this);
-            id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
-            _streamType = MediaStreamType.Video;
-            VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
-            AudioTracks = new List<MediaStreamTrack>();
-            //get initial tracks
-            int trackSize = 0;
-            IntPtr tracksNativePtr = NativeMethods.MediaStreamGetVideoTracks(self, ref trackSize);
-            IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(tracksNativePtr, tracksPtr, 0, trackSize);
-            //TODO: Linux compatibility
-            Marshal.FreeCoTaskMem(tracksNativePtr);
-            for (int i = 0; i < trackSize; i++)
+            if(NativeMethods.MediaStreamRemoveTrack(self, track.self))
             {
-                MediaStreamTrack track = new MediaStreamTrack(tracksPtr[i]);
-                track.stopTrack += StopTrack;
-                track.getRts += GetRts;
-                VideoTrackToRts[track] = rts;
+                tracks.Remove(track);
+                return true;
             }
+            return false;
         }
-        //for audio CaptureStream
+
         internal MediaStream(IntPtr ptr)
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
-            _streamType = MediaStreamType.Audio;
-            VideoTrackToRts = new Dictionary<MediaStreamTrack, RenderTexture[]>();
-            AudioTracks = new List<MediaStreamTrack>();
-            //get initial tracks
-            int trackSize = 0;
-            IntPtr trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(self, ref trackSize);
-            IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
-            //TODO: Linux compatibility
-            Marshal.FreeCoTaskMem(trackNativePtr);
-
-            for (int i = 0; i < trackSize; i++)
-            {
-                MediaStreamTrack track = new MediaStreamTrack(tracksPtr[i]);
-                track.stopTrack += StopTrack;
-                track.getRts += GetRts;
-                AudioTracks.Add(track);
-            }
         }
-
     }
     internal class Cleaner : MonoBehaviour
     {
         private Action onDestroy;
         private void OnDestroy()
         {
-            if (onDestroy != null)
-            {
-                onDestroy();
-            }
+            onDestroy?.Invoke();
         }
         public static void AddCleanerCallback(GameObject obj, Action callback)
         {
@@ -214,11 +143,6 @@ namespace Unity.WebRTC
         internal static bool started = false;
         public static MediaStream CaptureStream(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
-            if (camCopyRts.Count > 0)
-            {
-                throw new NotImplementedException("Currently not allowed multiple MediaStream");
-            }
-
             switch (depth)
             {
                 case RenderTextureDepth.DEPTH_16:
@@ -231,7 +155,7 @@ namespace Unity.WebRTC
 
             int depthValue = (int)depth;
 
-            RenderTexture[] rts = new RenderTexture[2];
+            var rts = new RenderTexture[2];
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             //rts[0] for render target, rts[1] for flip and WebRTC source
             rts[0] = new RenderTexture(width, height, depthValue, format);
@@ -242,7 +166,7 @@ namespace Unity.WebRTC
             cam.targetTexture = rts[0];
             cam.gameObject.AddCleanerCallback(() =>
             {
-                CameraExtension.RemoveRt(rts);
+                RemoveRt(rts);
                 rts[0].Release();
                 rts[1].Release();
                 UnityEngine.Object.Destroy(rts[0]);
@@ -250,14 +174,15 @@ namespace Unity.WebRTC
             });
             started = true;
 
-            var stream = WebRTC.Context.CaptureVideoStream(rts[1].GetNativeTexturePtr(), width, height);
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
+            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack("video", rts[1].GetNativeTexturePtr(), width, height, 1000000));
+            stream.AddTrack(track);
 
             // TODO::
             // You should initialize encoder after create stream instance.
             // This specification will change in the future.
             WebRTC.Context.InitializeEncoder();
-
-            return new MediaStream(rts, stream);
+            return stream;
         }
         public static void RemoveRt(RenderTexture[] rts)
         {
@@ -276,8 +201,13 @@ namespace Unity.WebRTC
         public static MediaStream CaptureStream()
         {
             started = true;
-            return new MediaStream(WebRTC.Context.CreateAudioStream());
+
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
+            var track = new MediaStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
+            stream.AddTrack(track);
+            return stream;
         }
+
         public static void Update(float[] audioData, int channels)
         {
             if (started)

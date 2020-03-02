@@ -168,10 +168,9 @@ namespace WebRTC
         clients.clear();
         peerConnectionFactory = nullptr;
         audioTrack = nullptr;
-//        videoTracks.clear();
-
+        mediaSteamTrackList.clear();
+        mediaStreamMap.clear();
         videoCapturerList.clear();
-        //mediaStreamMap.clear();
 
         workerThread->Quit();
         workerThread.reset();
@@ -181,13 +180,6 @@ namespace WebRTC
 
     bool Context::InitializeEncoder(IGraphicsDevice* device)
     {
-        /*
-        if(!nvVideoCapturer->InitializeEncoder(device, m_encoderType))
-        {
-            return false;
-        }
-        nvVideoCapturer->StartEncoder();
-        */
         for (const auto& entry : videoCapturerList)
         {
             if (!entry.second->InitializeEncoder(device, m_encoderType))
@@ -222,44 +214,32 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
-        return peerConnectionFactory->CreateLocalMediaStream(streamId);
-        /*
-        if (mediaStreamMap.count(streamId) == 0)
-        {
-            mediaStreamMap[streamId] = peerConnectionFactory->CreateLocalMediaStream(streamId);
-        }
-        return mediaStreamMap[streamId];
-        */
+        return peerConnectionFactory->CreateLocalMediaStream(streamId).release();
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
-        /*
-        const auto streamId = stream->id();
-        if (mediaStreamMap.count(streamId) > 0)
-        {
-            mediaStreamMap.erase(streamId);
-        }
-        */
+        stream->Release();
     }
 
     webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
     {
         //void* pUnityEncoder = //pDummyVideoEncoderFactory->CreatePlatformEncoder(WebRTC::Nvidia, width, height, bitRate);
-        auto pUnityVideoCapturer = std::make_unique<NvVideoCapturer>();
+        auto videoCapturer = std::make_unique<NvVideoCapturer>();
+        auto ptr = videoCapturer.get();
         //pUnityVideoCapturer->InitializeEncoder();
         //pDummyVideoEncoderFactory->AddCapturer(pUnityVideoCapturer);
-        pUnityVideoCapturer->SetFrameBuffer(frameBuffer);
+        videoCapturer->SetFrameBuffer(frameBuffer);
 
-        const auto source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(pUnityVideoCapturer), false));
-        const auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, source);
+        const auto source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(videoCapturer), false));
+        auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, source).release();
         //auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, peerConnectionFactory->CreateVideoSource(pUnityVideoCapturer));
         //pUnityVideoCapturer->StartEncoder();
 
         // TODO:: Create dictionary to impletement StopMediaStreamTrack API
-        // videoCapturerList[videoTrack] = pUnityVideoCapturer.get();
+        videoCapturerList[videoTrack] = ptr;
         //mediaStreamTrackList.push_back(videoTrack);
-        return videoTrack.get();
+        return videoTrack;
     }
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
@@ -279,7 +259,12 @@ namespace WebRTC
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
         //TODO: label and stream id should be maintained in some way for multi-stream
-        return peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions));
+        /*
+        auto audioTrack = peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions));
+        mediaSteamTrackList.push_back(audioTrack);
+        return audioTrack.get();
+        */
+        return peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions)).release();
     }
 
     /*
@@ -299,12 +284,10 @@ namespace WebRTC
     }
     */
 
-    /*
-    void Context::DeleteAudioStream(webrtc::MediaStreamInterface* stream)
+    void Context::DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-        audioStream.release();
+        track->Release();
     }
-    */
 
     void Context::ProcessAudioData(const float* data, int32 size)
     {
