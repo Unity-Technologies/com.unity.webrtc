@@ -2,7 +2,6 @@
 #include "DummyAudioDevice.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
-#include "Codec/IEncoder.h"
 
 namespace WebRTC
 {
@@ -18,8 +17,6 @@ namespace WebRTC
         Context* CreateContext(int uid, UnityEncoderType encoderType);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
-
-    public:
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
     private:
@@ -31,6 +28,7 @@ namespace WebRTC
     class Context
     {
     public:
+        
         explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
         ~Context();
 
@@ -67,10 +65,8 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
-        //TODO: move videoTrack to NvVideoCapturer and maintain multiple NvVideoCapturer here
         std::map<webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> videoCapturerList;
-        std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
-//        std::map<const void*, rtc::scoped_refptr<webrtc::VideoTrackInterface>> videoTracks;
+        //std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver

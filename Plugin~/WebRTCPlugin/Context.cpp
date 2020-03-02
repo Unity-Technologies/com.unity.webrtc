@@ -33,8 +33,7 @@ namespace WebRTC
     /*
     CodecInitializationResult Context::GetCodecInitializationResult()
     {
-//        return nvVideoCapturer->GetCodecInitializationResult();
-        return CodecInitializationResult::Success;
+        return nvVideoCapturer->GetCodecInitializationResult();
     }
     */
 
@@ -122,8 +121,9 @@ namespace WebRTC
             return RTCSdpType::PrAnswer;
         case webrtc::SdpType::kAnswer:
             return RTCSdpType::Answer;
+        default:
+            throw std::invalid_argument("Unknown SdpType");
         }
-        throw std::invalid_argument("Unknown SdpType");
     }
 #pragma warning(pop)
 
@@ -171,7 +171,7 @@ namespace WebRTC
 //        videoTracks.clear();
 
         videoCapturerList.clear();
-        mediaStreamMap.clear();
+        //mediaStreamMap.clear();
 
         workerThread->Quit();
         workerThread.reset();
@@ -222,20 +222,25 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
+        return peerConnectionFactory->CreateLocalMediaStream(streamId);
+        /*
         if (mediaStreamMap.count(streamId) == 0)
         {
             mediaStreamMap[streamId] = peerConnectionFactory->CreateLocalMediaStream(streamId);
         }
         return mediaStreamMap[streamId];
+        */
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
+        /*
         const auto streamId = stream->id();
         if (mediaStreamMap.count(streamId) > 0)
         {
             mediaStreamMap.erase(streamId);
         }
+        */
     }
 
     webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
@@ -256,24 +261,6 @@ namespace WebRTC
         //mediaStreamTrackList.push_back(videoTrack);
         return videoTrack.get();
     }
-
-    /*
-    {
-        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(nvVideoCapturerUnique), false));
-
-        //TODO: label and stream id should be maintained in some way for multi-stream
-        auto videoTrack = peerConnectionFactory->CreateVideoTrack("video", source);
-
-        videoTracks[frameBuffer] = videoTrack;
-
-        auto videoStream = peerConnectionFactory->CreateLocalMediaStream("video");
-        videoStream->AddTrack(videoTrack);
-        videoStreams.push_back(videoStream);
-        nvVideoCapturer->SetFrameBuffer(frameBuffer);
-        nvVideoCapturer->SetSize(width, height);
-        return videoStream.get();
-    }
-    */
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
