@@ -113,7 +113,6 @@ IUnityInterface* CreateUnityInterface() {
 void GraphicsDeviceTestBase::SetUp()
 {
     UnityGfxRenderer unityGfxRenderer;
-    UnityEncoderType encoderType;
     std::tie(unityGfxRenderer, encoderType) = GetParam();
     const auto pGraphicsDevice = CreateDevice(unityGfxRenderer);
     const auto unityInterface = CreateUnityInterface();

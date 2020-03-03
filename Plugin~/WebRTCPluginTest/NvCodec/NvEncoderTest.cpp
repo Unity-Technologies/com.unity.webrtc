@@ -18,7 +18,7 @@ protected:
 
         const auto width = 256;
         const auto height = 256;
-        EncoderFactory::GetInstance().Init(width, height, m_device, UnityEncoderType::UnityEncoderHardware);
+        EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
     }

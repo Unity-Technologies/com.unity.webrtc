@@ -12,6 +12,7 @@ protected:
     void SetUp() override;
     void TearDown() override;
     WebRTC::IGraphicsDevice* m_device;
+    UnityEncoderType encoderType;
 };
 
 static tuple<UnityGfxRenderer, UnityEncoderType> VALUES_TEST_ENV[] = {
