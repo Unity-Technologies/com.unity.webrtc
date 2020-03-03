@@ -49,7 +49,7 @@ void* CreateDeviceD3D12()
     EXPECT_NE(nullptr, pAdapter.Get());
 
     hr = D3D12CreateDevice(
-        pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pD3D12Device));
+        pAdapter.Get(), D3D_FEATURE_LEVEL_11_1, IID_PPV_ARGS(&pD3D12Device));
 
     EXPECT_TRUE(SUCCEEDED(hr));
     EXPECT_NE(nullptr, pD3D12Device.Get());
