@@ -14,8 +14,10 @@ Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
 Microsoft::WRL::ComPtr<ID3D11Device> pD3D11Device;
 Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11DeviceContext;
 
+Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter1;
 Microsoft::WRL::ComPtr<IDXGIFactory4> pFactory4;
 Microsoft::WRL::ComPtr<ID3D12Device5> pD3D12Device;
+Microsoft::WRL::ComPtr<ID3D12CommandQueue> pCommandQueue;
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -44,15 +46,23 @@ void* CreateDeviceD3D12()
     EXPECT_TRUE(SUCCEEDED(hr));
     EXPECT_NE(nullptr, pFactory4.Get());
 
-    hr = pFactory4->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter));
+    hr = pFactory4->EnumAdapters1(0, &pAdapter1);
     EXPECT_TRUE(SUCCEEDED(hr));
-    EXPECT_NE(nullptr, pAdapter.Get());
+    EXPECT_NE(nullptr, pAdapter1.Get());
 
     hr = D3D12CreateDevice(
-        pAdapter.Get(), D3D_FEATURE_LEVEL_11_1, IID_PPV_ARGS(&pD3D12Device));
-
+        pAdapter1.Get(), D3D_FEATURE_LEVEL_11_1, IID_PPV_ARGS(&pD3D12Device));
     EXPECT_TRUE(SUCCEEDED(hr));
     EXPECT_NE(nullptr, pD3D12Device.Get());
+
+    D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+    queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+    hr = pD3D12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pCommandQueue));
+    EXPECT_TRUE(SUCCEEDED(hr));
+    EXPECT_NE(nullptr, pCommandQueue.Get());
+
     return pD3D12Device.Get();
 }
 
@@ -67,9 +77,26 @@ void* CreateDevice(UnityGfxRenderer renderer)
     }
 }
 
-IUnityInterface* CreateUnityInterface() {
-    return nullptr;
+struct DummyUnityGraphicsD3D12v5 : IUnityGraphicsD3D12v5
+{
+public:
+    DummyUnityGraphicsD3D12v5(ID3D12Device5* device)
+    {
+    }
+    ID3D12CommandQueue* GetCommandQueue()
+    {
+        return pCommandQueue.Get();
+    }
+
+private:
+    ID3D12Device5* m_device;
+};
+
+IUnityInterface* CreateUnityInterface(void* device)
+{
+    return reinterpret_cast<IUnityInterface*>(new DummyUnityGraphicsD3D12v5(reinterpret_cast<ID3D12Device5*>(device)));
 }
+
 
 #elif defined(SUPPORT_METAL)
 
@@ -115,7 +142,7 @@ void GraphicsDeviceTestBase::SetUp()
     UnityGfxRenderer unityGfxRenderer;
     std::tie(unityGfxRenderer, encoderType) = GetParam();
     const auto pGraphicsDevice = CreateDevice(unityGfxRenderer);
-    const auto unityInterface = CreateUnityInterface();
+    const auto unityInterface = CreateUnityInterface(pGraphicsDevice);
 
     ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, unityInterface));
     m_device = GraphicsDevice::GetInstance().GetDevice();
