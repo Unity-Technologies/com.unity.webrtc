@@ -92,16 +92,24 @@ namespace Unity.WebRTC
     public class RTCTrackEvent
     {
         private IntPtr self;
-        private MediaStreamTrack track;
+        private readonly MediaStreamTrack track;
+        private readonly RTCRtpTransceiver transceiver;
 
         public MediaStreamTrack Track
         {
-            get => new MediaStreamTrack(NativeMethods.RtpTransceiverGetTrack(self));
-            private set { }
+            get => track;
         }
+
+        public RTCRtpTransceiver Transceiver
+        {
+            get => transceiver;
+        }
+
         internal RTCTrackEvent(IntPtr ptr)
         {
             self = ptr;
+            track = new MediaStreamTrack(NativeMethods.TransceiverGetTrack(self));
+            transceiver = new RTCRtpTransceiver(self);
         }
     }
 

@@ -52,15 +52,18 @@ namespace Unity.WebRTC
             protocol = "";
         }
     }
-    public struct RTCRtpReceiver
+    public class RTCRtpReceiver
     {
-
+        internal IntPtr self;
+        internal RTCRtpReceiver(IntPtr ptr)
+        {
+            self = ptr;
+        }
     }
 
     public class RTCRtpSender
     {
         internal IntPtr self;
-
         internal RTCRtpSender(IntPtr ptr)
         {
             self = ptr;
@@ -78,9 +81,33 @@ namespace Unity.WebRTC
 
         public RTCRtpTransceiverDirection currentDirection
         {
-            get { return NativeMethods.RTCRtpTransceiverGetCurentDirection(self); }
+            get { return NativeMethods.TransceiverGetCurentDirection(self); }
         }
 
+        public RTCRtpReceiver receiver
+        {
+            get { return new RTCRtpReceiver(NativeMethods.TransceiverGetReceiver(self));  }
+        }
+
+        public RTCRtpSender sender
+        {
+            get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self)); }
+        }
+
+        public void SetDirection(RTCRtpTransceiverDirection direction)
+        {
+            // TODO::
+            throw new NotImplementedException();
+        }
+
+        public struct RTCRtpCodecCapability
+        {
+        }
+
+        public void SetCodecPreferences(RTCRtpCodecCapability[] capabilities)
+        {
+
+        }
     }
 
     public enum RTCErrorDetailType
@@ -468,11 +495,15 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnRenegotiationNeeded(IntPtr ptr, DelegateNativeOnNegotiationNeeded callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterOnTrack(IntPtr ptr, DelegateNativeOnTrack rtpTransceiverInterface);
+        public static extern void PeerConnectionRegisterOnTrack(IntPtr ptr, DelegateNativeOnTrack callback);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr RtpTransceiverGetTrack(IntPtr rtpTransceiver);
+        public static extern IntPtr TransceiverGetTrack(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
-        public static extern RTCRtpTransceiverDirection RTCRtpTransceiverGetCurentDirection(IntPtr rtpTransceiver);
+        public static extern RTCRtpTransceiverDirection TransceiverGetCurentDirection(IntPtr transceiver);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr TransceiverGetReceiver(IntPtr transceiver);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr TransceiverGetSender(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

@@ -177,12 +177,12 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnTrack))]
-        static void PCOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface)
+        static void PCOnTrack(IntPtr ptr, IntPtr transceiver)
         {
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.OnTrack(new RTCTrackEvent(rtpTransceiverInterface));
+                connection.OnTrack(new RTCTrackEvent(transceiver));
             }, null);
         }
 
