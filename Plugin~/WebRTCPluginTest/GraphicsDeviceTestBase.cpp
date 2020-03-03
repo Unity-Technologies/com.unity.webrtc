@@ -77,26 +77,9 @@ void* CreateDevice(UnityGfxRenderer renderer)
     }
 }
 
-struct DummyUnityGraphicsD3D12v5 : IUnityGraphicsD3D12v5
-{
-public:
-    DummyUnityGraphicsD3D12v5(ID3D12Device5* device)
-    {
-    }
-    ID3D12CommandQueue* GetCommandQueue()
-    {
-        return pCommandQueue.Get();
-    }
-
-private:
-    ID3D12Device5* m_device;
-};
-
-IUnityInterface* CreateUnityInterface(void* device)
-{
-    return reinterpret_cast<IUnityInterface*>(new DummyUnityGraphicsD3D12v5(reinterpret_cast<ID3D12Device5*>(device)));
+IUnityInterface* CreateUnityInterface() {
+    return nullptr;
 }
-
 
 #elif defined(SUPPORT_METAL)
 
@@ -142,7 +125,7 @@ void GraphicsDeviceTestBase::SetUp()
     UnityGfxRenderer unityGfxRenderer;
     std::tie(unityGfxRenderer, encoderType) = GetParam();
     const auto pGraphicsDevice = CreateDevice(unityGfxRenderer);
-    const auto unityInterface = CreateUnityInterface(pGraphicsDevice);
+    const auto unityInterface = CreateUnityInterface();
 
     ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, unityInterface));
     m_device = GraphicsDevice::GetInstance().GetDevice();
