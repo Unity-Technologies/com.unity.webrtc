@@ -138,11 +138,11 @@ public class MediaStreamSample : MonoBehaviour
     {
         foreach (var track in audioStream.GetTracks())
         {
-            pc1Senders.Add (_pc1.AddTrack(track));  
+            pc1Senders.Add (_pc1.AddTrack(track, audioStream));  
         }
         foreach(var track in videoStream.GetTracks())
         {
-            pc1Senders.Add(_pc1.AddTrack(track));
+            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
         }
         if(!videoUpdateStarted)
         {
@@ -203,7 +203,7 @@ public class MediaStreamSample : MonoBehaviour
 
     private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
     {
-        pc2Senders.Add(pc.AddTrack(e.Track));
+        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
         trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
         trackInfos.Append($"Track kind: {e.Track.Kind}\r\n");
         trackInfos.Append($"Track id: {e.Track.Id}\r\n");
