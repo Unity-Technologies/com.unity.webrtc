@@ -13,6 +13,14 @@ namespace Unity.WebRTC
         Hardware = 1
     }
 
+    public enum RTCRtpTransceiverDirection
+    {
+        SendRecv,
+        SendOnly,
+        RecvOnly,
+        Inactive
+    }
+
     public struct RTCIceCandidate​
     {
         [MarshalAs(UnmanagedType.LPStr)]
@@ -49,8 +57,29 @@ namespace Unity.WebRTC
 
     }
 
-    public struct RTCRtpTransceiver
+    public class RTCRtpSender
     {
+        internal IntPtr self;
+
+        internal RTCRtpSender(IntPtr ptr)
+        {
+            self = ptr;
+        }
+    }
+
+    public class RTCRtpTransceiver
+    {
+        internal IntPtr self;
+
+        internal RTCRtpTransceiver(IntPtr ptr)
+        {
+            self = ptr;
+        }
+
+        public RTCRtpTransceiverDirection currentDirection
+        {
+            get { return NativeMethods.RTCRtpTransceiverGetCurentDirection(self); }
+        }
 
     }
 
@@ -441,7 +470,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnTrack(IntPtr ptr, DelegateNativeOnTrack rtpTransceiverInterface);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr RtpTransceiverInterfaceGetTrack(IntPtr rtpTransceiverInterface);
+        public static extern IntPtr RtpTransceiverGetTrack(IntPtr rtpTransceiver);
+        [DllImport(WebRTC.Lib)]
+        public static extern RTCRtpTransceiverDirection RTCRtpTransceiverGetCurentDirection(IntPtr rtpTransceiver);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

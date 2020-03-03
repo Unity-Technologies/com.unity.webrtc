@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "WebRTCPlugin.h"
 #include "DataChannelObject.h"
 
@@ -59,7 +59,6 @@ namespace WebRTC
         void CreateOffer(const RTCOfferOptions& options);
         void CreateAnswer(const RTCAnswerOptions& options);
         void AddIceCandidate(const RTCIceCandidate& candidate);
-        DataChannelObject* CreateDataChannel(const char* label, const RTCDataChannelInit& options);
 
         void RegisterCallbackSetSD(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
         {

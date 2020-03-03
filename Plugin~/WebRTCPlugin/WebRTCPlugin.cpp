@@ -345,9 +345,14 @@ extern "C"
     {
         obj->RegisterOnTrack(callback);
     }
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* RtpTransceiverInterfaceGetTrack(webrtc::RtpTransceiverInterface* obj)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* RtpTransceiverGetTrack(webrtc::RtpTransceiverInterface* obj)
     {
         return obj->receiver()->track().get();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverDirection RTCRtpTransceiverGetCurentDirection(webrtc::RtpTransceiverInterface* obj)
+    {
+        return obj->current_direction().value();
     }
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)

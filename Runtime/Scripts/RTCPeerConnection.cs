@@ -258,6 +258,11 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRemoveTrack(self, sender.self);
         }
 
+        public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track, MediaStream stream)
+        {
+            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(self, track.self, stream.self));
+        }
+
         public void AddIceCandidate(ref RTCIceCandidate​ candidate)
         {
             NativeMethods.PeerConnectionAddIceCandidate(self, ref candidate);
