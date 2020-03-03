@@ -1,21 +1,22 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
+#include "D3D12Constants.h" //DEFAULT_HEAP_PROPS
+
+#include "WebRTCPlugin.h"
+#include "Logger.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 
 namespace WebRTC {
 
-const D3D12_HEAP_PROPERTIES DEFAULT_HEAP_PROPS = {
-    D3D12_HEAP_TYPE_DEFAULT,
-    D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-    D3D12_MEMORY_POOL_UNKNOWN,
-    0,
-    0
-};
-
 //---------------------------------------------------------------------------------------------------------------------
 
-D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice) : m_d3d12Device(nativeDevice)
+D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
+    : m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
+    , m_unityInterface(unityInterface)
+    , m_copyResourceFence(nullptr)
+    , m_copyResourceEventHandle(nullptr)
 {
 }
 
@@ -48,13 +49,24 @@ bool D3D12GraphicsDevice::InitV() {
 
     legacyDevice->GetImmediateContext(&legacyContext);
     legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
+
+    m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
+    m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
+    m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
+	m_copyResourceEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
+
     return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::ShutdownV() {
+    m_unityInterface = nullptr;
+    m_commandList->Release();
+    m_commandAllocator->Release();
     SAFE_RELEASE(m_d3d11Device);
     SAFE_RELEASE(m_d3d11Context);
+    SAFE_RELEASE(m_copyResourceFence);
+    SAFE_CLOSE_HANDLE(m_copyResourceEventHandle);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -65,31 +77,58 @@ ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
-    assert(false && "CreateCPUReadTextureV need to implement on D3D12");
-    return nullptr;
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-
     bool D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
-    //[TODO-sin: 2019-10-15] Implement copying native resource
+    //[Note-sin: 2020-2-19] This function is currently not required by RenderStreaming. Delete?
     return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
-    ID3D12Resource* src = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
-    if (dest->GetNativeTexturePtrV() == src)
+bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* nativeTexturePtr) {
+
+    D3D12Texture2D* dest = reinterpret_cast<D3D12Texture2D*>(baseDest);
+    assert(nullptr != dest);
+    if (nullptr == dest)
         return false;
 
-    //[TODO-sin: 2019-10-30] Implement copying native resource
+    ID3D12Resource* nativeDest = reinterpret_cast<ID3D12Resource*>(dest->GetNativeTexturePtrV());
+    ID3D12Resource* nativeSrc = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
+    if (nativeSrc == nativeDest)
+        return false;
+    if (nativeSrc == nullptr || nativeDest == nullptr)
+        return false;
+    
+    m_commandList->Reset(m_commandAllocator, nullptr); 
+    m_commandList->CopyResource(nativeDest, nativeSrc);
+
+    //for CPU accessible texture
+    ID3D12Resource* readbackResource = dest->GetReadbackResource();
+    if (nullptr!=readbackResource){
+        //Change dest state, copy, change dest state back
+        Barrier(nativeDest,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_SOURCE);
+        const D3D12ResourceFootprint* resFP = dest->GetNativeTextureFootprint();
+        D3D12_TEXTURE_COPY_LOCATION td,ts;
+        td.pResource =readbackResource;
+        td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+        td.PlacedFootprint = resFP->Footprint;
+        ts.pResource = nativeDest;
+        ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        ts.SubresourceIndex = 0;
+        m_commandList->CopyTextureRegion(&td,0,0,0,&ts,nullptr);
+        Barrier(nativeDest,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);        
+    }
+    m_commandList->Close();
+
+    ID3D12CommandList* cmdList[] = { m_commandList };
+    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
+
+    WaitForFence(m_copyResourceFence,m_copyResourceEventHandle, &m_copyResourceFenceValue);
+
     return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h) {
+D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h) {
     //[Note-sin: 2019-10-30] Taken from RaytracedHardShadow
     // note: sharing textures with d3d11 requires some flags and restrictions:
     // - MipLevels must be 1
@@ -103,23 +142,27 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     desc.Height = h;
     desc.DepthOrArraySize = 1;
     desc.MipLevels = 1;
-    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; //We only support this format which has 4 bytes -> DX12_BYTES_PER_PIXEL
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
     desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
 
-    D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
-    D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON; //D3D12_RESOURCE_STATE_COPY_DEST
-
+    const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
+    const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
     ID3D12Resource* nativeTex = nullptr;
-    m_d3d12Device->CreateCommittedResource(&DEFAULT_HEAP_PROPS, flags, &desc, initialState, nullptr, IID_PPV_ARGS(&nativeTex));
+    HRESULT hr = m_d3d12Device->CreateCommittedResource(&D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
+        nullptr, IID_PPV_ARGS(&nativeTex)
+    );
+    if (!SUCCEEDED(hr)) {
+        return nullptr;
+    }
 
     ID3D11Texture2D* sharedTex = nullptr;
     HANDLE handle = nullptr;   
-    HRESULT hr = m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle);
+    hr = m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle);
     if (SUCCEEDED(hr)) {
         //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
         hr = m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex));
@@ -128,12 +171,77 @@ ITexture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h
     return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
 }
 
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
-{
-    assert(false && "ConvertRGBToI420 need to implement on D3D12");
-    return nullptr;
+//----------------------------------------------------------------------------------------------------------------------
+void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue) {
+    m_unityInterface->GetCommandQueue()->Signal(fence, *fenceValue);
+    fence->SetEventOnCompletion(*fenceValue, handle);
+    WaitForSingleObject(handle, INFINITE);
+    ++(*fenceValue);       
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 
+void D3D12GraphicsDevice::Barrier(ID3D12Resource* res,
+                                  const D3D12_RESOURCE_STATES stateBefore, const D3D12_RESOURCE_STATES stateAfter,
+                                  const UINT subresource)
+{
+    D3D12_RESOURCE_BARRIER barrier;
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags =  D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = res;
+    barrier.Transition.StateBefore = stateBefore;
+    barrier.Transition.StateAfter = stateAfter;
+    barrier.Transition.Subresource = subresource;
+    m_commandList->ResourceBarrier(1, &barrier);
+    
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+    D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
+    const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device);
+    if (FAILED(hr)){
+        delete tex;
+        return nullptr;
+    }
+
+    return tex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
+{
+    D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
+    assert(nullptr != tex);
+    if (nullptr == tex)
+        return nullptr;
+
+    ID3D12Resource* readbackResource = tex->GetReadbackResource();
+    assert(nullptr != readbackResource);
+    if (nullptr == readbackResource) //the texture has to be prepared for CPU access
+        return nullptr;
+
+    const uint32_t width = tex->GetWidth();
+    const uint32_t height = tex->GetHeight();
+    const D3D12ResourceFootprint* resFP = tex->GetNativeTextureFootprint();
+
+    //Map to read from CPU
+    uint8* data{};
+    const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
+    assert(hr == S_OK);
+    if (hr!=S_OK) {
+        return nullptr;
+    }
+
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
+        width, height, static_cast<uint32_t>(resFP->RowSize), static_cast<uint8_t*>(data)
+    );
+
+    D3D12_RANGE emptyRange{ 0, 0 };
+    readbackResource->Unmap(0,&emptyRange);
+
+    return i420_buffer; 
+}
 
 } //end namespace

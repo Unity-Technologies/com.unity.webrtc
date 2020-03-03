@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 // Standard base includes, defines that indicate our current platform, etc.
 
@@ -68,4 +68,8 @@
 // COM-like Release macro
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(a) if (a) { a->Release(); a = NULL; }
+#endif
+
+#ifndef SAFE_CLOSE_HANDLE
+#define SAFE_CLOSE_HANDLE(a) if (a) { CloseHandle(a); a = NULL; }
 #endif

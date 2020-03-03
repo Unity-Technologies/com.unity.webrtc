@@ -39,7 +39,7 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 #endif
 #if defined(SUPPORT_D3D12)
         case kUnityGfxRendererD3D12: {
-            IUnityGraphicsD3D12* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12>();
+            IUnityGraphicsD3D12v5* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12v5>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
 #endif
@@ -82,7 +82,9 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
     }
     case kUnityGfxRendererD3D12: {
 #if defined(SUPPORT_D3D12)
-        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device));
+        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device),
+            reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface)
+        );
 #endif
         break;
     }

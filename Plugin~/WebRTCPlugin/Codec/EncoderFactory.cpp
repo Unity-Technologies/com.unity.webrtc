@@ -10,9 +10,15 @@
 #if defined(SUPPORT_D3D11)
 #include "NvCodec/NvEncoderD3D11.h"
 #endif
+
+#if defined(SUPPORT_D3D12)
+#include "NvCodec/NvEncoderD3D12.h"
+#endif
+
 #include "SoftwareCodec/SoftwareEncoder.h"
 
 #include "NvCodec/NvEncoderCuda.h"
+
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #if defined(SUPPORT_METAL)
@@ -50,6 +56,17 @@ namespace WebRTC {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
                     m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+                } else {
+                    m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                }
+                break;
+            }
+#endif
+#if defined(SUPPORT_D3D12)
+            case GRAPHICS_DEVICE_D3D12: {
+                if (encoderType == UnityEncoderType::UnityEncoderHardware)
+                {
+                    m_encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
                 } else {
                     m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
                 }

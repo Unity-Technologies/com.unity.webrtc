@@ -58,6 +58,7 @@
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.h" />
+    <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D12.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
     <ClInclude Include="..\WebRTCPlugin\DataChannelObject.h" />
@@ -65,7 +66,9 @@
     <ClInclude Include="..\WebRTCPlugin\DummyVideoEncoder.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D11\D3D11Texture2D.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Constants.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12GraphicsDevice.h" />
+    <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12ResourceFootprint.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\D3D12\D3D12Texture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\GraphicsUtility.h" />
@@ -97,6 +100,7 @@
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D11.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D12.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\SoftwareCodec\SoftwareEncoder.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Context.cpp" />
     <ClCompile Include="..\WebRTCPlugin\DataChannelObject.cpp" />

@@ -68,6 +68,9 @@
     <ClCompile Include="VideoCapturer.cpp" />
     <ClCompile Include="VideoCaptureTrackSource.cpp" />
     <ClCompile Include="VideoTrackSource.cpp" />
+    <ClCompile Include="Codec\NvCodec\NvEncoderD3D12.cpp">
+      <Filter>Codec\NvCodec</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -161,6 +164,12 @@
     <ClInclude Include="VideoCapturer.h" />
     <ClInclude Include="VideoCaptureTrackSource.h" />
     <ClInclude Include="VideoTrackSource.h" />
+    <ClInclude Include="..\unity\include\IUnityGraphicsD3D12.h">
+      <Filter>Header Files\Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec\NvCodec\NvEncoderD3D12.h">
+      <Filter>Codec\NvCodec</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GraphicsDevice">
