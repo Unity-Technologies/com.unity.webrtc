@@ -20,7 +20,7 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        EncoderFactory::GetInstance().Init(width_, height_, m_device, encoderType);
+        EncoderFactory::GetInstance().Init(width_, height_, m_device, m_encoderType);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
 

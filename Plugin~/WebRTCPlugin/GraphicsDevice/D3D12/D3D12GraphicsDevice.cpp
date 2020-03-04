@@ -14,7 +14,16 @@ namespace WebRTC {
 D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
     : m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
-    , m_unityInterface(unityInterface)
+    , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
+    , m_copyResourceFence(nullptr)
+    , m_copyResourceEventHandle(nullptr)
+{
+}
+//---------------------------------------------------------------------------------------------------------------------
+D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue)
+    : m_d3d12Device(nativeDevice)
+    , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
+    , m_d3d12CommandQueue(commandQueue)
     , m_copyResourceFence(nullptr)
     , m_copyResourceEventHandle(nullptr)
 {
@@ -60,7 +69,6 @@ bool D3D12GraphicsDevice::InitV() {
 
 //---------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::ShutdownV() {
-    m_unityInterface = nullptr;
     m_commandList->Release();
     m_commandAllocator->Release();
     SAFE_RELEASE(m_d3d11Device);
@@ -119,7 +127,7 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* na
     m_commandList->Close();
 
     ID3D12CommandList* cmdList[] = { m_commandList };
-    m_unityInterface->GetCommandQueue()->ExecuteCommandLists(1, cmdList);
+    m_d3d12CommandQueue->ExecuteCommandLists(1, cmdList);
 
     WaitForFence(m_copyResourceFence,m_copyResourceEventHandle, &m_copyResourceFenceValue);
 
@@ -173,7 +181,7 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
 
 //----------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue) {
-    m_unityInterface->GetCommandQueue()->Signal(fence, *fenceValue);
+    m_d3d12CommandQueue->Signal(fence, *fenceValue);
     fence->SetEventOnCompletion(*fenceValue, handle);
     WaitForSingleObject(handle, INFINITE);
     ++(*fenceValue);       

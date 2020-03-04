@@ -8,6 +8,7 @@ using namespace WebRTC;
 #if defined(SUPPORT_D3D11)
 #include <d3d11.h>
 #include <wrl/client.h>
+#include "../WebRTCPlugin/GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
 
 Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
@@ -58,6 +59,7 @@ void* CreateDeviceD3D12()
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    queueDesc.NodeMask = 0;
 
     hr = pD3D12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pCommandQueue));
     EXPECT_TRUE(SUCCEEDED(hr));
@@ -122,16 +124,36 @@ IUnityInterface* CreateUnityInterface() {
 
 void GraphicsDeviceTestBase::SetUp()
 {
-    UnityGfxRenderer unityGfxRenderer;
-    std::tie(unityGfxRenderer, encoderType) = GetParam();
-    const auto pGraphicsDevice = CreateDevice(unityGfxRenderer);
+    std::tie(m_unityGfxRenderer, m_encoderType) = GetParam();
+    const auto pGraphicsDevice = CreateDevice(m_unityGfxRenderer);
     const auto unityInterface = CreateUnityInterface();
 
-    ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, unityInterface));
-    m_device = GraphicsDevice::GetInstance().GetDevice();
+    if (m_unityGfxRenderer == kUnityGfxRendererD3D12)
+    {
+#if defined(SUPPORT_D3D12)
+        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(pGraphicsDevice), pCommandQueue.Get());
+        ASSERT_TRUE(m_device->InitV());
+#endif
+    }
+    else
+    {
+        ASSERT_TRUE(GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, pGraphicsDevice, unityInterface));
+        m_device = GraphicsDevice::GetInstance().GetDevice();
+    }
+
     ASSERT_NE(nullptr, m_device);
 }
 void GraphicsDeviceTestBase::TearDown()
 {
-    GraphicsDevice::GetInstance().Shutdown();
+    if (m_unityGfxRenderer == kUnityGfxRendererD3D12)
+    {
+#if defined(SUPPORT_D3D12)
+        m_device->ShutdownV();
+        m_device = nullptr;
+#endif
+    }
+    else
+    {
+        GraphicsDevice::GetInstance().Shutdown();
+    }
 }

@@ -48,8 +48,8 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
     const auto height = 256;
     const auto src = m_device->CreateDefaultTextureV(width, height);
     const auto dst = m_device->CreateDefaultTextureV(width, height);
-    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst, src->GetEncodeTexturePtrV()));
-    EXPECT_FALSE(m_device->CopyResourceFromNativeV(dst, dst->GetEncodeTexturePtrV()));
+    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst, src->GetNativeTexturePtrV()));
+    EXPECT_FALSE(m_device->CopyResourceFromNativeV(dst, dst->GetNativeTexturePtrV()));
 }
 #endif
 

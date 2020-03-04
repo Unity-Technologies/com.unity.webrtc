@@ -18,7 +18,7 @@ protected:
 
         const auto width = 256;
         const auto height = 256;
-        EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
+        EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
     }
@@ -35,7 +35,7 @@ TEST_P(NvEncoderTest, CopyBuffer) {
     const auto width = 256;
     const auto height = 256;
     auto tex = m_device->CreateDefaultTextureV(width, height);
-    const auto result = encoder_->CopyBuffer(tex->GetEncodeTexturePtrV());
+    const auto result = encoder_->CopyBuffer(tex->GetNativeTexturePtrV());
     EXPECT_TRUE(result);
 }
 
