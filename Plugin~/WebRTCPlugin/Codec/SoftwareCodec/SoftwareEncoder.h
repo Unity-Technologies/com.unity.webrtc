@@ -19,14 +19,14 @@ namespace WebRTC
         virtual bool EncodeFrame() override;
         virtual bool IsSupported() const override { return true; }
         virtual void SetIdrFrame() override {}
-        virtual uint64 GetCurrentFrameCount() const override { return frameCount; }        
+        virtual uint64 GetCurrentFrameCount() const override { return m_frameCount; }        
 
     private:
         IGraphicsDevice* m_device;
         ITexture2D* m_encodeTex;
         int m_width = 1920;
         int m_height = 1080;
-        uint64 frameCount = 0;
+        uint64 m_frameCount = 0;
     };
 //---------------------------------------------------------------------------------------------------------------------
    

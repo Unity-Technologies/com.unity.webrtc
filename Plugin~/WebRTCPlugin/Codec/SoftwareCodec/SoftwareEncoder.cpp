@@ -36,7 +36,7 @@ namespace WebRTC
 
         webrtc::VideoFrame frame = webrtc::VideoFrame::Builder().set_video_frame_buffer(i420Buffer).set_rotation(webrtc::kVideoRotation_0).set_timestamp_us(0).build();
         CaptureFrame(frame);
-        frameCount++;
+        m_frameCount++;
         return true;
     }
 }
