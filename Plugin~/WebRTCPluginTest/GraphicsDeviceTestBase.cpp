@@ -11,12 +11,17 @@ using namespace WebRTC;
 
 Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
-Microsoft::WRL::ComPtr<ID3D11Device> pD3DDevice;
-Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3DDeviceContext;
+Microsoft::WRL::ComPtr<ID3D11Device> pD3D11Device;
+Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11DeviceContext;
+
+Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter1;
+Microsoft::WRL::ComPtr<IDXGIFactory4> pFactory4;
+Microsoft::WRL::ComPtr<ID3D12Device5> pD3D12Device;
+Microsoft::WRL::ComPtr<ID3D12CommandQueue> pCommandQueue;
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* CreateDevice()
+void* CreateDeviceD3D11()
 {
     auto hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void **>(pFactory.GetAddressOf()));
     EXPECT_TRUE(SUCCEEDED(hr));
@@ -28,11 +33,48 @@ void* CreateDevice()
 
     hr = D3D11CreateDevice(
         pAdapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, 0,
-        nullptr, 0, D3D11_SDK_VERSION, pD3DDevice.GetAddressOf(), nullptr, pD3DDeviceContext.GetAddressOf());
+        nullptr, 0, D3D11_SDK_VERSION, pD3D11Device.GetAddressOf(), nullptr, pD3D11DeviceContext.GetAddressOf());
 
     EXPECT_TRUE(SUCCEEDED(hr));
-    EXPECT_NE(nullptr, pD3DDevice.Get());
-    return pD3DDevice.Get();
+    EXPECT_NE(nullptr, pD3D11Device.Get());
+    return pD3D11Device.Get();
+}
+
+void* CreateDeviceD3D12()
+{
+    auto hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory4));
+    EXPECT_TRUE(SUCCEEDED(hr));
+    EXPECT_NE(nullptr, pFactory4.Get());
+
+    hr = pFactory4->EnumAdapters1(0, &pAdapter1);
+    EXPECT_TRUE(SUCCEEDED(hr));
+    EXPECT_NE(nullptr, pAdapter1.Get());
+
+    hr = D3D12CreateDevice(
+        pAdapter1.Get(), D3D_FEATURE_LEVEL_11_1, IID_PPV_ARGS(&pD3D12Device));
+    EXPECT_TRUE(SUCCEEDED(hr));
+    EXPECT_NE(nullptr, pD3D12Device.Get());
+
+    D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+    queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+    hr = pD3D12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pCommandQueue));
+    EXPECT_TRUE(SUCCEEDED(hr));
+    EXPECT_NE(nullptr, pCommandQueue.Get());
+
+    return pD3D12Device.Get();
+}
+
+void* CreateDevice(UnityGfxRenderer renderer)
+{
+    switch (renderer)
+    {
+    case kUnityGfxRendererD3D11:
+        return CreateDeviceD3D11();
+    case kUnityGfxRendererD3D12:
+        return CreateDeviceD3D12();
+    }
 }
 
 IUnityInterface* CreateUnityInterface() {
@@ -44,7 +86,7 @@ IUnityInterface* CreateUnityInterface() {
 #import <Metal/Metal.h>
 #include <DummyUnityInterface/DummyUnityGraphicsMetal.h>
 
-void* CreateDevice()
+void* CreateDevice(UnityGfxRenderer renderer)
 {
     return MTLCreateSystemDefaultDevice();
 }
@@ -58,7 +100,7 @@ IUnityInterface* CreateUnityInterface() {
 
 static bool s_glutInitialized;
 
-void* CreateDevice()
+void* CreateDevice(UnityGfxRenderer renderer)
 {
     if (!s_glutInitialized)
     {
@@ -78,25 +120,12 @@ IUnityInterface* CreateUnityInterface() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<UnityGfxRenderer, void*, IUnityInterface*> GraphicsDeviceTestBase::CreateParameter()
-{
-#if defined(SUPPORT_D3D11)
-    auto unityGfxRenderer = kUnityGfxRendererD3D11;
-#elif defined(SUPPORT_OPENGL_CORE)
-    auto unityGfxRenderer = kUnityGfxRendererOpenGLCore;
-#elif defined(SUPPORT_METAL)
-    auto unityGfxRenderer = kUnityGfxRendererMetal;
-#endif
-    return std::make_tuple(unityGfxRenderer, CreateDevice(), CreateUnityInterface());
-}
-
-
 void GraphicsDeviceTestBase::SetUp()
 {
     UnityGfxRenderer unityGfxRenderer;
-    void* pGraphicsDevice;
-    IUnityInterface* unityInterface;
-    std::tie(unityGfxRenderer, pGraphicsDevice, unityInterface) = GetParam();
+    std::tie(unityGfxRenderer, encoderType) = GetParam();
+    const auto pGraphicsDevice = CreateDevice(unityGfxRenderer);
+    const auto unityInterface = CreateUnityInterface();
 
     ASSERT_TRUE(GraphicsDevice::GetInstance().Init(unityGfxRenderer, pGraphicsDevice, unityInterface));
     m_device = GraphicsDevice::GetInstance().GetDevice();

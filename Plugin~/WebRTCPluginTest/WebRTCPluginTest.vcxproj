@@ -212,7 +212,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>cuda.lib;vulkan-1.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cuda.lib;vulkan-1.lib;webrtc.lib;webrtc_opus.lib;audio_decoder_opus.lib;Winmm.lib;Msdmo.lib;Dmoguids.lib;wmcodecdspuuid.lib;Secur32.lib;iphlpapi.lib;d3d11.lib;d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

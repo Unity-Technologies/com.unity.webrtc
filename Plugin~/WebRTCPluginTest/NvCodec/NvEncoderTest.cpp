@@ -1,10 +1,11 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "../GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 #include "../WebRTCPlugin/Codec/EncoderFactory.h"
 #include "../WebRTCPlugin/Codec/IEncoder.h"
 
 using namespace WebRTC;
+using namespace testing;
 
 class NvEncoderTest : public GraphicsDeviceTestBase
 {
@@ -17,7 +18,7 @@ protected:
 
         const auto width = 256;
         const auto height = 256;
-        EncoderFactory::GetInstance().Init(width, height, m_device, UnityEncoderType::UnityEncoderHardware);
+        EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
     }
@@ -45,8 +46,4 @@ TEST_P(NvEncoderTest, EncodeFrame) {
     EXPECT_EQ(before + 1, after);
 }
 
-INSTANTIATE_TEST_CASE_P(
-    GraphicsDeviceParameters,
-    NvEncoderTest,
-    testing::Values(GraphicsDeviceTestBase::CreateParameter())
-);
+INSTANTIATE_TEST_CASE_P( GraphicsDeviceParameters, NvEncoderTest, ValuesIn(VALUES_TEST_ENV));

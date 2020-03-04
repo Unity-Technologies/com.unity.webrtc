@@ -6,6 +6,7 @@
 #include "../WebRTCPlugin/Context.h"
 
 using namespace WebRTC;
+using namespace testing;
 
 class ContextTest : public GraphicsDeviceTestBase
 {
@@ -19,7 +20,7 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        EncoderFactory::GetInstance().Init(width, height, m_device, UnityEncoderType::UnityEncoderHardware);
+        EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
         encoder_ = EncoderFactory::GetInstance().GetEncoder();
         EXPECT_NE(nullptr, encoder_);
 
@@ -65,8 +66,4 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     context->DeletePeerConnection(connection);
 }
 
-INSTANTIATE_TEST_CASE_P(
-    GraphicsDeviceParameters,
-    ContextTest,
-    testing::Values(GraphicsDeviceTestBase::CreateParameter())
-);
+INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, ValuesIn(VALUES_TEST_ENV));
