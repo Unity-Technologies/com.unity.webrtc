@@ -20,7 +20,7 @@ protected:
 
         const auto width = 256;
         const auto height = 256;
-        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
+        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType);
         EXPECT_NE(nullptr, encoder_);
     }
     void TearDown() override {
