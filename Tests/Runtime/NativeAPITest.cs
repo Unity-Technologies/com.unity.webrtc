@@ -211,11 +211,11 @@ namespace Unity.WebRTC.RuntimeTest
 
             // TODO::
             // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
-            VideoEncoderMethods.InitializeEncoder(callback);
+            VideoEncoderMethods.InitializeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
-            VideoEncoderMethods.Encode(callback);
+            VideoEncoderMethods.Encode(callback, track);
             yield return new WaitForSeconds(1.0f);
-            VideoEncoderMethods.FinalizeEncoder(callback);
+            VideoEncoderMethods.FinalizeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
 
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);

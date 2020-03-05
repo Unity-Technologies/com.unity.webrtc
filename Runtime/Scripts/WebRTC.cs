@@ -304,14 +304,17 @@ namespace Unity.WebRTC
             {
                 // Wait until all frame rendering is done
                 yield return new WaitForEndOfFrame();
-                if (CameraExtension.started)
+                //if (CameraExtension.started)
                 {
                     //Blit is for DirectX Rendering API Only
                     foreach (var rts in CameraExtension.camCopyRts)
                     {
                         Graphics.Blit(rts[0], rts[1], flipMat);
                     }
-                    Context.Encode();
+                    foreach(var track in CameraExtension.tracks)
+                    {
+                        Context.Encode(track.self);
+                    }
                 }
             }
         }
@@ -333,7 +336,7 @@ namespace Unity.WebRTC
             return System.IO.Path.GetFileName(Lib);
         }
 
-        internal static RenderTextureFormat GetSupportedRenderTextureFormat(UnityEngine.Rendering.GraphicsDeviceType type)
+        public static RenderTextureFormat GetSupportedRenderTextureFormat(UnityEngine.Rendering.GraphicsDeviceType type)
         {
             switch (type)
             {
@@ -568,6 +571,7 @@ namespace Unity.WebRTC
 
     internal static class VideoEncoderMethods
     {
+        static UnityEngine.Rendering.CommandBuffer _command = new UnityEngine.Rendering.CommandBuffer();
         enum VideoStreamRenderEventId
         {
             Initialize = 0,
@@ -575,17 +579,23 @@ namespace Unity.WebRTC
             Finalize = 2,
         }
 
-        public static void InitializeEncoder(IntPtr callback)
+        public static void InitializeEncoder(IntPtr callback, IntPtr track)
         {
-            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Initialize);
+            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Initialize, track);
+            Graphics.ExecuteCommandBuffer(_command);
+            _command.Clear();
         }
-        public static void Encode(IntPtr callback)
+        public static void Encode(IntPtr callback, IntPtr track)
         {
-            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Encode);
+            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Encode, track);
+            Graphics.ExecuteCommandBuffer(_command);
+            _command.Clear();
         }
-        public static void FinalizeEncoder(IntPtr callback)
+        public static void FinalizeEncoder(IntPtr callback, IntPtr track)
         {
-            GL.IssuePluginEvent(callback, (int)VideoStreamRenderEventId.Finalize);
+            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Finalize, track);
+            Graphics.ExecuteCommandBuffer(_command);
+            _command.Clear();
         }
     }
 }

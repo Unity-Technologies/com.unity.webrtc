@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
+    public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
     public class MediaStream : IDisposable
     {
         enum MediaStreamType
@@ -41,7 +42,7 @@ namespace Unity.WebRTC
 
             if (this.disposed)
             {
-                UnityEngine.Debug.Log("MediaStream already Disposed");
+                Debug.Log("MediaStream already Disposed");
                 return;
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
@@ -51,13 +52,17 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
-
-            UnityEngine.Debug.Log("MediaStream Dispose end");
         }
 
-        public void FinalizeEncoder()
+        public DelegateOnAddTrack OnAddTrack
         {
-            WebRTC.Context.FinalizeEncoder();
+            get => onAddTrack;
+            set
+            {
+                onAddTrack = value;
+                selfOnAddTrack = new DelegateNativeOnAddTrack(PCOnTrack);
+                NativeMethods.MediaStreamRegisterOnAddTrack(self, selfOnAddTrack);
+            }
         }
 
         private void StopTrack(MediaStreamTrack track)
@@ -105,6 +110,10 @@ namespace Unity.WebRTC
             return false;
         }
 
+        public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
+        {
+        }
+
         internal MediaStream(IntPtr ptr)
         {
             self = ptr;
@@ -140,7 +149,29 @@ namespace Unity.WebRTC
     public static class CameraExtension
     {
         internal static List<RenderTexture[]> camCopyRts = new List<RenderTexture[]>();
+        internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
         internal static bool started = false;
+
+        public static VideoStreamTrack CaptureVideoStreamTrack(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+        {
+            switch (depth)
+            {
+                case RenderTextureDepth.DEPTH_16:
+                case RenderTextureDepth.DEPTH_24:
+                case RenderTextureDepth.DEPTH_32:
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException(nameof(depth), (int)depth, typeof(RenderTextureDepth));
+            }
+
+            int depthValue = (int)depth;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var rt = new RenderTexture(width, height, depthValue, format);
+            cam.targetTexture = rt;
+            return new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, 1000000);
+        }
+
+
         public static MediaStream CaptureStream(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             switch (depth)
@@ -181,7 +212,7 @@ namespace Unity.WebRTC
             // TODO::
             // You should initialize encoder after create stream instance.
             // This specification will change in the future.
-            WebRTC.Context.InitializeEncoder();
+            //WebRTC.Context.InitializeEncoder(track.self);
             return stream;
         }
         public static void RemoveRt(RenderTexture[] rts)

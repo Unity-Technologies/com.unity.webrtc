@@ -44,9 +44,9 @@ namespace WebRTC
         UnityEncoderType GetEncoderType() const;
 
         // You must call these methods on Rendering thread.
-        bool InitializeEncoder(IGraphicsDevice* device);
-        void EncodeFrame();
-        void FinalizeEncoder();
+        bool InitializeEncoder(IGraphicsDevice* device, webrtc::MediaStreamTrackInterface* track);
+        void EncodeFrame(webrtc::MediaStreamTrackInterface* track);
+        void FinalizeEncoder(webrtc::MediaStreamTrackInterface* track);
         //
 
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);

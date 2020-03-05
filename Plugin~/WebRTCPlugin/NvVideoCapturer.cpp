@@ -9,29 +9,27 @@ namespace WebRTC
         set_enable_video_adapter(false);
         SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));
     }
-    void NvVideoCapturer::EncodeVideoData()
+    bool NvVideoCapturer::EncodeVideoData()
     {
         if (captureStarted && !captureStopped)
         {
             if(encoder_ == nullptr)
             {
-                LogPrint("nvEncoder is null");
-                return;
+                return false;
             }
             if(!encoder_->CopyBuffer(unityRT))
             {
-                LogPrint("CopyRenderTexture Failed");
-                return;
+                return false;
             }
             if(!encoder_->EncodeFrame()) {
-                LogPrint("EncodeFrame Failed");
-                return;
+                return false;
             }
         }
         else
         {
-            LogPrint("Video capture is not started");
+            return false;
         }
+        return true;
     }
 
     void NvVideoCapturer::CaptureFrame(webrtc::VideoFrame& videoFrame)

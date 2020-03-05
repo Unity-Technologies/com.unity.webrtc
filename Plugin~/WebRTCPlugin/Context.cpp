@@ -178,33 +178,24 @@ namespace WebRTC
         signalingThread.reset();
     }
 
-    bool Context::InitializeEncoder(IGraphicsDevice* device)
+    bool Context::InitializeEncoder(IGraphicsDevice* device, webrtc::MediaStreamTrackInterface* track)
     {
-        for (const auto& entry : videoCapturerList)
+        if(videoCapturerList[track]->InitializeEncoder(device, m_encoderType))
         {
-            if (!entry.second->InitializeEncoder(device, m_encoderType))
-            {
-                return false;
-            }
-            entry.second->StartEncoder();
+            videoCapturerList[track]->StartEncoder();
         }
-
-        return true;
+        return false;
     }
-    void Context::EncodeFrame()
+    void Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
     {
-        for (const auto& entry : videoCapturerList)
+        if (!videoCapturerList[track]->EncodeVideoData())
         {
-            entry.second->EncodeVideoData();
+            ::OutputDebugStringA("hello");
         }
     }
-    void Context::FinalizeEncoder()
+    void Context::FinalizeEncoder(webrtc::MediaStreamTrackInterface* track)
     {
-        //nvVideoCapturer->FinalizeEncoder();
-        for (const auto& entry : videoCapturerList)
-        {
-            entry.second->FinalizeEncoder();
-        }
+        videoCapturerList[track]->FinalizeEncoder();
     }
 
     UnityEncoderType Context::GetEncoderType() const

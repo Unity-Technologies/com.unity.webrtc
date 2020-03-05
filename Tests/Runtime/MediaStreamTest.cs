@@ -23,6 +23,31 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void CreateAndDeleteMediaStream()
+        {
+            var stream = new MediaStream();
+            Assert.NotNull(stream);
+            stream.Dispose();
+        }
+
+        [UnityTest]
+        public IEnumerator CreateAndDeleteVideoMediaStreamTrack()
+        {
+            var width = 256;
+            var height = 256;
+            var bitrate = 1000000;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
+            yield return new WaitForSeconds(0.1f);
+            Assert.NotNull(track);
+            track.Dispose();
+            yield return new WaitForSeconds(0.1f);
+        }
+
+
+        [Test]
         public void AddAndRemoveVideoStreamTrack()
         {
             var width = 256;
@@ -51,7 +76,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(1, videoStream.GetVideoTracks().Count());
             Assert.AreEqual(0, videoStream.GetAudioTracks().Count());
             Assert.AreEqual(1, videoStream.GetTracks().Count());
-            videoStream.FinalizeEncoder();
             yield return new WaitForSeconds(0.1f);
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
@@ -97,8 +121,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(videoStream);
             yield return test;
-            videoStream.FinalizeEncoder();
-            yield return new WaitForSeconds(0.1f);
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }

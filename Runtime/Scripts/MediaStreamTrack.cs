@@ -9,7 +9,7 @@ namespace Unity.WebRTC
         internal IntPtr self;
         private TrackKind kind;
         private string id;
-        private bool disposed;
+        protected bool disposed;
         private bool enabled;
         private TrackState readyState;
         internal Action<MediaStreamTrack> stopTrack;
@@ -52,10 +52,8 @@ namespace Unity.WebRTC
             WebRTC.Table.Remove(self);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            UnityEngine.Debug.Log("MediaStreamTrack Dispose");
-
             if (this.disposed)
             {
                 return;
@@ -67,14 +65,38 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
-
-            UnityEngine.Debug.Log("MediaStreamTrack Dispose end");
         }
 
         //Disassociate track from its source(video or audio), not for destroying the track
         public void Stop()
         {
             stopTrack(this);
+        }
+    }
+
+    public class VideoStreamTrack : MediaStreamTrack
+    {
+        public VideoStreamTrack(string label, IntPtr ptr, int width, int height, int bitrate) : base(WebRTC.Context.CreateVideoTrack(label, ptr, width, height, bitrate))
+        {
+            WebRTC.Context.InitializeEncoder(self);
+            CameraExtension.tracks.Add(this);
+        }
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Context.FinalizeEncoder(self);
+                CameraExtension.tracks.Remove(this);
+                WebRTC.Context.DeleteMediaStreamTrack(self);
+                self = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 
@@ -113,5 +135,19 @@ namespace Unity.WebRTC
         }
     }
 
+    public class MediaStreamTrackEvent
+    {
+        private readonly MediaStreamTrack track;
+
+        public MediaStreamTrack Track
+        {
+            get => track;
+        }
+
+        internal MediaStreamTrackEvent(IntPtr ptr)
+        {
+            track = new MediaStreamTrack(ptr);
+        }
+    }
 }
 

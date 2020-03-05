@@ -11,7 +11,7 @@ namespace WebRTC
     {
     public:
         NvVideoCapturer();
-        void EncodeVideoData();
+        bool EncodeVideoData();
         // Start the video capturer with the specified capture format.
         virtual CaptureState Start(const cricket::VideoFormat& Format) override
         {

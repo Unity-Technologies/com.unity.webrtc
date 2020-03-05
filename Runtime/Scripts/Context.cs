@@ -173,22 +173,22 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteMediaStreamTrack(self, track);
         }
 
-        internal void InitializeEncoder()
+        internal void InitializeEncoder(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.InitializeEncoder(renderFunction);
+            VideoEncoderMethods.InitializeEncoder(renderFunction, track);
         }
 
-        internal void FinalizeEncoder()
+        internal void FinalizeEncoder(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.FinalizeEncoder(renderFunction);
+            VideoEncoderMethods.FinalizeEncoder(renderFunction, track);
         }
 
-        internal void Encode()
+        internal void Encode(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.Encode(renderFunction);
+            VideoEncoderMethods.Encode(renderFunction, track);
         }
     }
 }

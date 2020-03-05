@@ -56,26 +56,29 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
-static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
+static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if(s_context == nullptr)
     {
         return;
     }
-    switch(static_cast<VideoStreamRenderEventID>(eventID))
+    const auto track = reinterpret_cast<webrtc::MediaStreamTrackInterface*>(data);
+    const auto event = static_cast<VideoStreamRenderEventID>(eventID);
+
+    switch(event)
     {
         case VideoStreamRenderEventID::Initialize:
             if(!GraphicsDevice::GetInstance().IsInitialized()) {
                 GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
             }
             s_device = GraphicsDevice::GetInstance().GetDevice();
-            s_context->InitializeEncoder(s_device);
+            s_context->InitializeEncoder(s_device, track);
             return;
         case VideoStreamRenderEventID::Encode:
-            s_context->EncodeFrame();
+            s_context->EncodeFrame(track);
             return;
         case VideoStreamRenderEventID::Finalize:
-            s_context->FinalizeEncoder();
+            s_context->FinalizeEncoder(track);
             GraphicsDevice::GetInstance().Shutdown();
             return;
         default:
@@ -84,7 +87,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
     }
 }
 
-extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
 {
     s_context = context;
     return OnRenderEvent;
