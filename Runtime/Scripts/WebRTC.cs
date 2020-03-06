@@ -413,7 +413,7 @@ namespace Unity.WebRTC
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
     internal delegate void DelegateNativeOnNegotiationNeeded(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr rtpTransceiverInterface);
+    internal delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr transceiver);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnDataChannel(IntPtr ptr, IntPtr ptrChannel);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -422,6 +422,10 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeOnOpen(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnClose(IntPtr ptr);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateNativeMediaStreamOnAddTrack(IntPtr stream, IntPtr track);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
 
     internal static class NativeMethods
     {
@@ -551,6 +555,10 @@ namespace Unity.WebRTC
         public static extern IntPtr MediaStreamGetAudioTracks(IntPtr stream, ref int length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr MediaStreamGetID(IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr MediaStreamRegisterOnAddTrack(IntPtr stream, DelegateNativeMediaStreamOnAddTrack callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr MediaStreamRegisterOnRemoveTrack(IntPtr stream, DelegateNativeMediaStreamOnRemoveTrack callback);
         [DllImport(WebRTC.Lib)]
         public static extern TrackKind MediaStreamTrackGetKind(IntPtr track);
         [DllImport(WebRTC.Lib)]

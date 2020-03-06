@@ -8,8 +8,15 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
+    public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
+
     public class MediaStream : IDisposable
     {
+        private DelegateOnAddTrack onAddTrack;
+        private DelegateNativeMediaStreamOnAddTrack selfOnAddTrack;
+        private DelegateOnRemoveTrack onRemoveTrack;
+        private DelegateNativeMediaStreamOnRemoveTrack selfOnRemoveTrack;
+
         enum MediaStreamType
         {
             Video,
@@ -60,8 +67,19 @@ namespace Unity.WebRTC
             set
             {
                 onAddTrack = value;
-                selfOnAddTrack = new DelegateNativeOnAddTrack(PCOnTrack);
+                selfOnAddTrack = new DelegateNativeMediaStreamOnAddTrack(MediaStreamOnAddTrack);
                 NativeMethods.MediaStreamRegisterOnAddTrack(self, selfOnAddTrack);
+            }
+        }
+
+        public DelegateOnRemoveTrack OnRemoveTrack
+        {
+            get => onRemoveTrack;
+            set
+            {
+                onRemoveTrack = value;
+                selfOnRemoveTrack = new DelegateNativeMediaStreamOnRemoveTrack(MediaStreamOnRemoveTrack);
+                NativeMethods.MediaStreamRegisterOnRemoveTrack(self, selfOnRemoveTrack);
             }
         }
 
@@ -119,6 +137,26 @@ namespace Unity.WebRTC
             self = ptr;
             WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
+        static void MediaStreamOnAddTrack(IntPtr stream, IntPtr track)
+        {
+            WebRTC.SyncContext.Post(_ =>
+            {
+                var _stream = WebRTC.Table[stream] as MediaStream;
+                _stream.OnAddTrack(new MediaStreamTrackEvent(track));
+            }, null);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
+        static void MediaStreamOnRemoveTrack(IntPtr stream, IntPtr track)
+        {
+            WebRTC.SyncContext.Post(_ =>
+            {
+                var _stream = WebRTC.Table[stream] as MediaStream;
+                _stream.OnRemoveTrack(new MediaStreamTrackEvent(track));
+            }, null);
         }
     }
     internal class Cleaner : MonoBehaviour
