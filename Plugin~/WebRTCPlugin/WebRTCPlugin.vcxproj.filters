@@ -71,6 +71,7 @@
     <ClCompile Include="Codec\NvCodec\NvEncoderD3D12.cpp">
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
+    <ClCompile Include="MediaStreamObserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Codec\NvCodec\NvEncoderD3D12.h">
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
+    <ClInclude Include="MediaStreamObserver.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GraphicsDevice">

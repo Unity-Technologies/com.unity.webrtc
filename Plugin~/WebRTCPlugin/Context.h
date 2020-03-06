@@ -8,6 +8,7 @@ namespace WebRTC
     class Context;
     class PeerSDPObserver;
     class IGraphicsDevice;
+    class MediaStreamObserver;
     class ContextManager
     {
     public:
@@ -32,9 +33,12 @@ namespace WebRTC
         explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
         ~Context();
 
-        //CodecInitializationResult GetCodecInitializationResult();
+        // MediaStream
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& stream_id);
         void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
+        MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
+
+
         webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
         webrtc::MediaStreamTrackInterface* CreateAudioTrack(const std::string& label);
         void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
@@ -69,6 +73,7 @@ namespace WebRTC
         std::map<webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> videoCapturerList;
         std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> mediaSteamTrackList;
+        std::map<const webrtc::MediaStreamInterface*, MediaStreamObserver*> m_mapMediaStreamObserver;
     };
 
     class PeerSDPObserver : public webrtc::SetSessionDescriptionObserver

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "WebRTCPlugin.h"
 #include "PeerConnectionObject.h"
+#include "MediaStreamObserver.h"
 #include "Context.h"
 #include "Codec/EncoderFactory.h"
 
@@ -111,6 +112,15 @@ extern "C"
         return id;
     }
 
+    UNITY_INTERFACE_EXPORT void MediaStreamRegisterOnAddTrack(Context* context, webrtc::MediaStreamInterface* stream, DelegateMediaStreamOnAddTrack callback)
+    {
+        context->GetObserver(stream)->RegisterOnAddTrack(callback);
+    }
+
+    UNITY_INTERFACE_EXPORT void MediaStreamRegisterOnRemoveTrack(Context* context, webrtc::MediaStreamInterface* stream, DelegateMediaStreamOnRemoveTrack callback)
+    {
+        context->GetObserver(stream)->RegisterOnRemoveTrack(callback);
+    }
 
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface** MediaStreamGetVideoTracks(webrtc::MediaStreamInterface* stream, int* length)
     {

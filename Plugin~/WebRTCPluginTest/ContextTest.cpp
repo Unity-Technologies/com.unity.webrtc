@@ -32,11 +32,11 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-//    EXPECT_EQ(CodecInitializationResult::NotInitialized, context->GetCodecInitializationResult());
-    EXPECT_TRUE(context->InitializeEncoder(m_device));
-//    EXPECT_EQ(CodecInitializationResult::Success, context->GetCodecInitializationResult());
-    context->FinalizeEncoder();
-//    EXPECT_EQ(CodecInitializationResult::NotInitialized, context->GetCodecInitializationResult());
+    const auto tex = m_device->CreateDefaultTextureV(width, height);
+    EXPECT_NE(nullptr, tex);
+    const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
+    EXPECT_TRUE(context->InitializeEncoder(m_device, track));
+    context->FinalizeEncoder(track);
 }
 
 TEST_P(ContextTest, CreateAndDeleteMediaStream) {
@@ -50,8 +50,8 @@ TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
     EXPECT_NE(nullptr, tex);
     const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
     EXPECT_NE(nullptr, track);
-    EXPECT_TRUE(context->InitializeEncoder(m_device));
-    context->FinalizeEncoder();
+    EXPECT_TRUE(context->InitializeEncoder(m_device, track));
+    context->FinalizeEncoder(track);
     context->DeleteMediaStreamTrack(track);
 }
 

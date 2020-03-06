@@ -4,6 +4,7 @@
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "DummyVideoEncoder.h"
 #include "VideoCaptureTrackSource.h"
+#include "MediaStreamObserver.h"
 
 namespace WebRTC
 {
@@ -29,13 +30,6 @@ namespace WebRTC
         s_instance.m_contexts[uid].reset(ctx);
         return ctx;
     }
-
-    /*
-    CodecInitializationResult Context::GetCodecInitializationResult()
-    {
-        return nvVideoCapturer->GetCodecInitializationResult();
-    }
-    */
 
     void ContextManager::SetCurContext(Context* context)
     {
@@ -205,12 +199,24 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
-        return peerConnectionFactory->CreateLocalMediaStream(streamId).release();
+        auto stream = peerConnectionFactory->CreateLocalMediaStream(streamId);
+        auto observer = new MediaStreamObserver(stream.get());
+        stream->RegisterObserver(observer);
+        m_mapMediaStreamObserver[stream] = observer;
+        return stream.release();
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
+        auto observer = m_mapMediaStreamObserver[stream];
+        stream->UnregisterObserver(observer);
+        m_mapMediaStreamObserver.erase(stream);
         stream->Release();
+    }
+
+    WebRTC::MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
+    {
+        return m_mapMediaStreamObserver[stream];
     }
 
     webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
