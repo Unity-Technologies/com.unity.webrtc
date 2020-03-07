@@ -33,26 +33,19 @@ namespace WebRTC
 
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
-    {
-        return context->GetEncoderType();
-    }
-
     UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
     {
         return EncoderFactory::GetHardwareEncoderSupport();
     }
 
-    /*
-    UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)
+    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
     {
-        return context->GetCodecInitializationResult();
+        return context->GetEncoderType();
     }
-    */
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* stream_id)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
     {
-        return context->CreateMediaStream(stream_id);
+        return context->CreateMediaStream(streamId);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteMediaStream(Context* context, webrtc::MediaStreamInterface* stream)
@@ -84,29 +77,29 @@ extern "C"
     {
         if (track->kind() == "audio")
         {
-            return stream->AddTrack((webrtc::AudioTrackInterface*)track);
+            return stream->AddTrack(static_cast<webrtc::AudioTrackInterface*>(track));
         }
         else
         {
-            return stream->AddTrack((webrtc::VideoTrackInterface*)track);
+            return stream->AddTrack(static_cast<webrtc::VideoTrackInterface*>(track));
         }
     }
     UNITY_INTERFACE_EXPORT bool MediaStreamRemoveTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
     {
         if (track->kind() == "audio")
         {
-            return stream->RemoveTrack((webrtc::AudioTrackInterface*)track);
+            return stream->RemoveTrack(static_cast<webrtc::AudioTrackInterface*>(track));
         }
         else
         {
-            return stream->RemoveTrack((webrtc::VideoTrackInterface*)track);
+            return stream->RemoveTrack(static_cast<webrtc::VideoTrackInterface*>(track));
         }
     }
 
     UNITY_INTERFACE_EXPORT char* MediaStreamGetID(webrtc::MediaStreamInterface* stream)
     {
-        auto idStr = stream->id();
-        auto id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        const auto idStr = stream->id();
+        const auto id = static_cast<char*>(CoTaskMemAlloc(idStr.size() + sizeof(char)));
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -127,7 +120,8 @@ extern "C"
         auto tracksVector = stream->GetVideoTracks();
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
-        auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        const auto buf = CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        const auto tracks = static_cast<webrtc::MediaStreamTrackInterface**>(buf);
         for (uint32_t i = 0; i < tracksVector.size(); i++)
         {
             tracks[i] = tracksVector[i].get();
@@ -140,7 +134,8 @@ extern "C"
         auto tracksVector = stream->GetAudioTracks();
 #pragma warning(suppress: 4267)
         *length = tracksVector.size();
-        auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        const auto buf = CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
+        const auto tracks = static_cast<webrtc::MediaStreamTrackInterface**>(buf);
         for (uint32_t i = 0; i < tracksVector.size(); i++)
         {
             tracks[i] = tracksVector[i].get();
@@ -150,7 +145,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT TrackKind MediaStreamTrackGetKind(webrtc::MediaStreamTrackInterface* track)
     {
-        auto kindStr = track->kind();
+        const auto kindStr = track->kind();
         if (kindStr == "audio")
         {
             return TrackKind::Audio;
@@ -168,8 +163,8 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT char* MediaStreamTrackGetID(webrtc::MediaStreamTrackInterface* track)
     {
-        auto idStr = track->id();
-        auto id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        const auto idStr = track->id();
+        const auto id = static_cast<char*>(CoTaskMemAlloc(idStr.size() + sizeof(char)));
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -256,7 +251,7 @@ extern "C"
         obj->GetConfiguration(_conf);
 #pragma warning(suppress: 4267)
         *len = _conf.size();
-        *conf = (char*)::CoTaskMemAlloc(_conf.size() + sizeof(char));
+        *conf = static_cast<char*>(::CoTaskMemAlloc(_conf.size() + sizeof(char)));
         _conf.copy(*conf, _conf.size());
         (*conf)[_conf.size()] = '\0';
     }
@@ -382,7 +377,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelObject* dataChannelObj)
     {
         std::string tmp = dataChannelObj->GetLabel();
-        auto label = (char*)CoTaskMemAlloc(tmp.size() + sizeof(char));
+        auto label = static_cast<char*>(CoTaskMemAlloc(tmp.size() + sizeof(char)));
         tmp.copy(label, tmp.size());
         label[tmp.size()] = '\0';
         return label;

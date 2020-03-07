@@ -200,7 +200,7 @@ namespace WebRTC
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
         auto stream = peerConnectionFactory->CreateLocalMediaStream(streamId);
-        auto observer = new MediaStreamObserver(stream.get());
+        const auto observer = new MediaStreamObserver(stream.get());
         stream->RegisterObserver(observer);
         m_mapMediaStreamObserver[stream] = observer;
         return stream.release();

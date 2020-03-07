@@ -104,20 +104,6 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
-        // TODO:: Fix API design for multi tracks
-        /*
-        public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
-        {
-            return NativeMethods.ContextCreateVideoStream(self, rt, width, height);
-        }
-
-        // TODO:: Fix API design for multi tracks
-        public void DeleteVideoStream(IntPtr stream)
-        {
-            NativeMethods.ContextDeleteVideoStream(self, stream);
-        }
-        */
-
         public IntPtr CreateMediaStream(string label)
         {
             return NativeMethods.ContextCreateMediaStream(self, label);
@@ -126,6 +112,16 @@ namespace Unity.WebRTC
         public void DeleteMediaStream(MediaStream stream)
         {
             NativeMethods.ContextDeleteMediaStream(self, stream.self);
+        }
+
+        public void MediaStreamRegisterOnAddTrack(IntPtr stream, DelegateNativeMediaStreamOnAddTrack callback)
+        {
+            NativeMethods.MediaStreamRegisterOnAddTrack(self, stream, callback);
+        }
+
+        public void MediaStreamRegisterOnRemoveTrack(IntPtr stream, DelegateNativeMediaStreamOnRemoveTrack callback)
+        {
+            NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream, callback);
         }
 
         /*

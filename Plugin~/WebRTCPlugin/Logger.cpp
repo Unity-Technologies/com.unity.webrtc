@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #if defined(_DEBUG)
 #include <cstdarg>

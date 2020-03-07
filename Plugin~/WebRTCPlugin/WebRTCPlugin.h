@@ -1,5 +1,4 @@
 #pragma once
-#include "IUnityInterface.h"
 
 namespace WebRTC
 {

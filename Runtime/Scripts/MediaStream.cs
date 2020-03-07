@@ -68,7 +68,7 @@ namespace Unity.WebRTC
             {
                 onAddTrack = value;
                 selfOnAddTrack = new DelegateNativeMediaStreamOnAddTrack(MediaStreamOnAddTrack);
-                NativeMethods.MediaStreamRegisterOnAddTrack(self, selfOnAddTrack);
+                WebRTC.Context.MediaStreamRegisterOnAddTrack(self, selfOnAddTrack);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Unity.WebRTC
             {
                 onRemoveTrack = value;
                 selfOnRemoveTrack = new DelegateNativeMediaStreamOnRemoveTrack(MediaStreamOnRemoveTrack);
-                NativeMethods.MediaStreamRegisterOnRemoveTrack(self, selfOnRemoveTrack);
+                WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, selfOnRemoveTrack);
             }
         }
 

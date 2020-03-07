@@ -100,6 +100,19 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void RegisterDelegateToMediaStream()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            DelegateNativeMediaStreamOnAddTrack delegateOnAddTrack = (_stream, _track) => { };
+            DelegateNativeMediaStreamOnRemoveTrack delegateOnRemoveTrack = (_stream, _track) => { };
+            NativeMethods.MediaStreamRegisterOnAddTrack(context, stream, delegateOnAddTrack);
+            NativeMethods.MediaStreamRegisterOnRemoveTrack(context, stream, delegateOnRemoveTrack);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDestroy(0);
+        }
+
+        [Test]
         public void AddAndRemoveVideoTrackToPeerConnection()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);

@@ -30,6 +30,15 @@ namespace Unity.WebRTC.RuntimeTest
             stream.Dispose();
         }
 
+        [Test]
+        public void RegisterDelegate()
+        {
+            var stream = new MediaStream();
+            stream.OnAddTrack = e => {};
+            stream.OnRemoveTrack = e => {};
+            stream.Dispose();
+        }
+
         [UnityTest]
         public IEnumerator CreateAndDeleteVideoMediaStreamTrack()
         {
