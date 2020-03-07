@@ -35,6 +35,7 @@ namespace Unity.WebRTC
             private set { }
         }
 
+
         public TrackKind Kind { get => kind; private set { } }
         public string Id { get => id; private set { } }
 
@@ -97,6 +98,13 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
+        }
+    }
+
+    public class AudioStreamTrack : MediaStreamTrack
+    {
+        public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(label))
+        {
         }
     }
 

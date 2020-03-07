@@ -1,6 +1,7 @@
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using System.Linq;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -39,7 +40,13 @@ namespace Unity.WebRTC.RuntimeTest
         public void Construct()
         {
             var peer = new RTCPeerConnection();
+            Assert.AreEqual(0, peer.GetReceivers().Count());
+            Assert.AreEqual(0, peer.GetSenders().Count());
+            Assert.AreEqual(0, peer.GetTransceivers().Count());
+            Assert.AreEqual(RTCPeerConnectionState.New, peer.ConnectionState);
             peer.Close();
+
+            Assert.AreEqual(RTCPeerConnectionState.Closed, peer.ConnectionState);
             peer.Dispose();
         }
 
@@ -72,6 +79,22 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Close();
             peer.Dispose();
         }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void AddTransceiver()
+        {
+            var peer = new RTCPeerConnection();
+            var stream = Audio.CaptureStream();
+            var track = stream.GetAudioTracks().First();
+            Assert.AreEqual(0, peer.GetTransceivers().Count());
+            var transceiver = peer.AddTransceiver(track);
+            Assert.NotNull(transceiver);
+            Assert.Null(transceiver.CurrentDirection);
+            Assert.AreEqual(1, peer.GetTransceivers().Count());
+            Assert.NotNull(peer.GetTransceivers().First());
+        }
+
 
         [UnityTest]
         [Timeout(1000)]

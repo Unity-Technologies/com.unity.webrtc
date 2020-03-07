@@ -40,6 +40,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [Timeout(5000)]
         public IEnumerator CreateAndDeleteVideoMediaStreamTrack()
         {
             var width = 256;
@@ -56,21 +57,42 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
 
-        [Test]
-        public void AddAndRemoveVideoStreamTrack()
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator AddAndRemoveVideoStreamTrack()
         {
             var width = 256;
             var height = 256;
             var bitrate = 1000000;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
-            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate));
+            var stream = new MediaStream();
+            var track = new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
+            yield return new WaitForSeconds(0.1f);
+            Assert.AreEqual(0, stream.GetVideoTracks().Count());
             Assert.True(stream.AddTrack(track));
+            Assert.AreEqual(1, stream.GetVideoTracks().Count());
+            Assert.NotNull(stream.GetVideoTracks().First());
             Assert.True(stream.RemoveTrack(track));
+            Assert.AreEqual(0, stream.GetVideoTracks().Count());
             track.Dispose();
             stream.Dispose();
             Object.DestroyImmediate(rt);
+        }
+
+        [Test]
+        public void AddAndRemoveAudioStreamTrack()
+        {
+            var stream = new MediaStream();
+            var track = new AudioStreamTrack("audio");
+            Assert.AreEqual(0, stream.GetAudioTracks().Count());
+            Assert.True(stream.AddTrack(track));
+            Assert.AreEqual(1, stream.GetAudioTracks().Count());
+            Assert.NotNull(stream.GetAudioTracks().First());
+            Assert.True(stream.RemoveTrack(track));
+            Assert.AreEqual(0, stream.GetAudioTracks().Count());
+            track.Dispose();
+            stream.Dispose();
         }
 
 

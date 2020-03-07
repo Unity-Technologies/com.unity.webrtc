@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
@@ -79,17 +79,25 @@ namespace Unity.WebRTC
             self = ptr;
         }
 
-        public RTCRtpTransceiverDirection currentDirection
+        public RTCRtpTransceiverDirection? CurrentDirection
         {
-            get { return NativeMethods.TransceiverGetCurentDirection(self); }
+            get
+            {
+                var direction = RTCRtpTransceiverDirection.RecvOnly;
+                if (NativeMethods.TransceiverGetCurentDirection(self, ref direction))
+                {
+                    return direction;
+                }
+                return null;
+            }
         }
 
-        public RTCRtpReceiver receiver
+        public RTCRtpReceiver Receiver
         {
             get { return new RTCRtpReceiver(NativeMethods.TransceiverGetReceiver(self));  }
         }
 
-        public RTCRtpSender sender
+        public RTCRtpSender Sender
         {
             get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self)); }
         }
@@ -354,6 +362,27 @@ namespace Unity.WebRTC
             return RenderTextureFormat.Default;
         }
 
+        internal static IEnumerable<T> Deserialize<T>(IntPtr buf, int length, Func<IntPtr, T> constructor) where T : class
+        {
+            var array = new IntPtr[length];
+            Marshal.Copy(buf, array, 0, length);
+            Marshal.FreeCoTaskMem(buf);
+
+            var tracks = new List<T>();
+            foreach (var ptr in array)
+            {
+                if (WebRTC.Context.table.ContainsKey(ptr))
+                {
+                    tracks.Add(WebRTC.Context.table[ptr] as T);
+                }
+                else
+                {
+                    tracks.Add(constructor(ptr));
+                }
+            }
+            return tracks;
+        }
+
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
@@ -502,13 +531,19 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTrack(IntPtr pc, IntPtr track, IntPtr stream);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track, IntPtr stream);
+        public static extern IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
         public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, ref RTCIceCandidate​ candidate);
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionGetReceivers(IntPtr ptr, ref int length);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionGetSenders(IntPtr ptr, ref int length);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionGetTransceivers(IntPtr ptr, ref int length);
         [DllImport(WebRTC.Lib)]
         public static extern RTCIceConnectionState PeerConnectionIceConditionState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -520,7 +555,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetTrack(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
-        public static extern RTCRtpTransceiverDirection TransceiverGetCurentDirection(IntPtr transceiver);
+        public static extern bool TransceiverGetCurentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetReceiver(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
@@ -545,18 +580,6 @@ namespace Unity.WebRTC
         public static extern IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteMediaStream(IntPtr ctx, IntPtr stream);
-
-        /*
-        [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateVideoStream(IntPtr context, IntPtr rt, int width, int height);
-        [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateAudioStream(IntPtr context);
-
-        [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextDeleteVideoStream(IntPtr context, IntPtr stream);
-        [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextDeleteAudioStream(IntPtr context, IntPtr stream);
-        */
         [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]

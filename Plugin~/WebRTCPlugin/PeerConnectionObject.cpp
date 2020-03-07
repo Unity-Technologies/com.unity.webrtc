@@ -20,12 +20,12 @@ namespace WebRTC
             return;
         }
         auto senders = connection->GetSenders();
-        for (auto sender : senders)
+        for (const auto& sender : senders)
         {
             connection->RemoveTrack(sender);
         }
 
-        auto state = connection->peer_connection_state();
+        const auto state = connection->peer_connection_state();
         if (state != webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
         {
             connection->Close();
@@ -50,7 +50,7 @@ namespace WebRTC
     {
         std::string out;
         desc->ToString(&out);
-        auto type = ConvertSdpType(desc->GetType());
+        const auto type = ConvertSdpType(desc->GetType());
         if (onCreateSDSuccess != nullptr)
         {
             onCreateSDSuccess(this, type, out.c_str());
@@ -137,7 +137,7 @@ namespace WebRTC
 
     void PeerConnectionObject::Close()
     {
-        if (connection != nullptr && connection->peer_connection_state() == webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
+        if (connection != nullptr && connection->peer_connection_state() != webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
         {
             //Cleanup delegates/callbacks
             onCreateSDSuccess = nullptr;

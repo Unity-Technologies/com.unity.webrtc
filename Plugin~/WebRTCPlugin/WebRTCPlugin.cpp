@@ -32,6 +32,21 @@ namespace WebRTC
     }
 }
 
+template<class T>
+T** ConvertArray(std::vector<rtc::scoped_refptr<T>> vec, int* length)
+{
+#pragma warning(suppress: 4267)
+    *length = vec.size();
+    const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
+    const auto ret = static_cast<T**>(buf);
+    for (uint32_t i = 0; i < vec.size(); i++)
+    {
+        ret[i] = vec[i].get();
+    }
+    return ret;
+}
+
+
 extern "C"
 {
     UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
@@ -116,32 +131,14 @@ extern "C"
         context->GetObserver(stream)->RegisterOnRemoveTrack(callback);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface** MediaStreamGetVideoTracks(webrtc::MediaStreamInterface* stream, int* length)
+    UNITY_INTERFACE_EXPORT webrtc::VideoTrackInterface** MediaStreamGetVideoTracks(webrtc::MediaStreamInterface* stream, int* length)
     {
-        auto tracksVector = stream->GetVideoTracks();
-#pragma warning(suppress: 4267)
-        *length = tracksVector.size();
-        const auto buf = CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
-        const auto tracks = static_cast<webrtc::MediaStreamTrackInterface**>(buf);
-        for (uint32_t i = 0; i < tracksVector.size(); i++)
-        {
-            tracks[i] = tracksVector[i].get();
-        }
-        return tracks;
+        return ConvertArray<webrtc::VideoTrackInterface>(stream->GetVideoTracks(), length);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface** MediaStreamGetAudioTracks(webrtc::MediaStreamInterface* stream, int* length)
+    UNITY_INTERFACE_EXPORT webrtc::AudioTrackInterface** MediaStreamGetAudioTracks(webrtc::MediaStreamInterface* stream, int* length)
     {
-        auto tracksVector = stream->GetAudioTracks();
-#pragma warning(suppress: 4267)
-        *length = tracksVector.size();
-        const auto buf = CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
-        const auto tracks = static_cast<webrtc::MediaStreamTrackInterface**>(buf);
-        for (uint32_t i = 0; i < tracksVector.size(); i++)
-        {
-            tracks[i] = tracksVector[i].get();
-        }
-        return tracks;
+        return ConvertArray<webrtc::AudioTrackInterface>(stream->GetAudioTracks(), length);
     }
 
     UNITY_INTERFACE_EXPORT TrackKind MediaStreamTrackGetKind(webrtc::MediaStreamTrackInterface* track)
@@ -247,7 +244,12 @@ extern "C"
         return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), {stream->id()}).value().get();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface* PeerConnectionAddTransceiver(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, webrtc::RtpTransceiverInit* init)
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface* PeerConnectionAddTransceiver(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track)
+    {
+        return obj->connection->AddTransceiver(track).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, webrtc::RtpTransceiverInit* init)
     {
         return obj->connection->AddTransceiver(track, *init).value().get();
     }
@@ -275,14 +277,12 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
-        const auto observer = context->GetObserver(obj->connection);
-        obj->SetRemoteDescription(*desc, observer);
+        obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection));
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
-        const auto observer = context->GetObserver(obj->connection);
-        obj->SetLocalDescription(*desc, observer);
+        obj->SetLocalDescription(*desc, context->GetObserver(obj->connection));
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCollectStats(PeerConnectionObject* obj)
@@ -320,6 +320,20 @@ extern "C"
         obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
     }
 
+    UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface** PeerConnectionGetReceivers(PeerConnectionObject* obj, int* length)
+    {
+        return ConvertArray<webrtc::RtpReceiverInterface>(obj->connection->GetReceivers(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface** PeerConnectionGetSenders(PeerConnectionObject* obj, int* length)
+    {
+        return ConvertArray<webrtc::RtpSenderInterface>(obj->connection->GetSenders(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface** PeerConnectionGetTransceivers(PeerConnectionObject* obj, int* length)
+    {
+        return ConvertArray<webrtc::RtpTransceiverInterface>(obj->connection->GetTransceivers(), length);
+    }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCreateOffer(PeerConnectionObject* obj, const RTCOfferOptions* options)
     {
@@ -405,9 +419,14 @@ extern "C"
         return obj->receiver()->track().get();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverDirection TransceiverGetCurentDirection(webrtc::RtpTransceiverInterface* obj)
+    UNITY_INTERFACE_EXPORT bool TransceiverGetCurentDirection(webrtc::RtpTransceiverInterface* obj, webrtc::RtpTransceiverDirection* direction)
     {
-        return obj->current_direction().value();
+        if(obj->current_direction().has_value())
+        {
+            *direction = obj->current_direction().value();
+            return true;
+        }
+        return false;
     }
 
     UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface* TransceiverGetReceiver(webrtc::RtpTransceiverInterface* obj)

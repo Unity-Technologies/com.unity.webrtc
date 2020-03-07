@@ -20,7 +20,6 @@ namespace Unity.WebRTC
         internal IntPtr self;
         private readonly string id;
         private bool disposed;
-        private List<MediaStreamTrack> tracks = new List<MediaStreamTrack>();
 
 
         public string Id
@@ -59,7 +58,7 @@ namespace Unity.WebRTC
             set
             {
                 onAddTrack = value;
-                selfOnAddTrack = new DelegateNativeMediaStreamOnAddTrack(MediaStreamOnAddTrack);
+                selfOnAddTrack = MediaStreamOnAddTrack;
                 WebRTC.Context.MediaStreamRegisterOnAddTrack(self, selfOnAddTrack);
             }
         }
@@ -70,7 +69,7 @@ namespace Unity.WebRTC
             set
             {
                 onRemoveTrack = value;
-                selfOnRemoveTrack = new DelegateNativeMediaStreamOnRemoveTrack(MediaStreamOnRemoveTrack);
+                selfOnRemoveTrack = MediaStreamOnRemoveTrack;
                 WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, selfOnRemoveTrack);
             }
         }
@@ -90,34 +89,30 @@ namespace Unity.WebRTC
 
         public IEnumerable<MediaStreamTrack> GetVideoTracks()
         {
-            return tracks.Where(_ => _.Kind == TrackKind.Video);
+            int length = 0;
+            var buf = NativeMethods.MediaStreamGetVideoTracks(self, ref length);
+            return WebRTC.Deserialize(buf, length, ptr => new MediaStreamTrack(ptr));
         }
+
         public IEnumerable<MediaStreamTrack> GetAudioTracks()
         {
-            return tracks.Where(_ => _.Kind == TrackKind.Audio);
+            int length = 0;
+            var buf = NativeMethods.MediaStreamGetAudioTracks(self, ref length);
+            return WebRTC.Deserialize(buf, length, ptr => new MediaStreamTrack(ptr));
         }
+
         public IEnumerable<MediaStreamTrack> GetTracks()
         {
-            return tracks;
+            return GetAudioTracks().Concat(GetVideoTracks());
         }
 
         public bool AddTrack(MediaStreamTrack track)
         {
-            if(NativeMethods.MediaStreamAddTrack(self, track.self))
-            {
-                tracks.Add(track);
-                return true;
-            }
-            return false;
+            return NativeMethods.MediaStreamAddTrack(self, track.self);
         }
         public bool RemoveTrack(MediaStreamTrack track)
         {
-            if(NativeMethods.MediaStreamRemoveTrack(self, track.self))
-            {
-                tracks.Remove(track);
-                return true;
-            }
-            return false;
+            return NativeMethods.MediaStreamRemoveTrack(self, track.self);
         }
 
         public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
