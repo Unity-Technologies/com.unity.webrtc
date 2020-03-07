@@ -174,15 +174,17 @@ namespace Unity.WebRTC.RuntimeTest
                 RTCAnswerOptions options2 = default;
                 var op1 = peer1.CreateOffer(ref options1);
                 yield return op1;
-                var op2 = peer1.SetLocalDescription(ref op1.desc);
+                var desc = op1.Desc;
+                var op2 = peer1.SetLocalDescription(ref desc);
                 yield return op2;
-                var op3 = peer2.SetRemoteDescription(ref op1.desc);
+                var op3 = peer2.SetRemoteDescription(ref desc);
                 yield return op3;
                 var op4 = peer2.CreateAnswer(ref options2);
                 yield return op4;
-                var op5 = peer2.SetLocalDescription(ref op4.desc);
+                desc = op4.Desc;
+                var op5 = peer2.SetLocalDescription(ref desc);
                 yield return op5;
-                var op6 = peer1.SetRemoteDescription(ref op4.desc);
+                var op6 = peer1.SetRemoteDescription(ref desc);
                 yield return op6;
 
                 var op7 = new WaitUntilWithTimeout(() =>

@@ -17,12 +17,6 @@ namespace Unity.WebRTC
         private DelegateOnRemoveTrack onRemoveTrack;
         private DelegateNativeMediaStreamOnRemoveTrack selfOnRemoveTrack;
 
-        enum MediaStreamType
-        {
-            Video,
-            Audio
-        }
-
         internal IntPtr self;
         private readonly string id;
         private bool disposed;
@@ -45,8 +39,6 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
-            UnityEngine.Debug.Log("MediaStream Dispose");
-
             if (this.disposed)
             {
                 Debug.Log("MediaStream already Disposed");

@@ -5,6 +5,7 @@
 #include "DummyVideoEncoder.h"
 #include "VideoCaptureTrackSource.h"
 #include "MediaStreamObserver.h"
+#include "SetSessionDescriptionObserver.h"
 
 namespace WebRTC
 {
@@ -164,6 +165,7 @@ namespace WebRTC
         audioTrack = nullptr;
         mediaSteamTrackList.clear();
         mediaStreamMap.clear();
+        m_mapSetSessionDescriptionObserver.clear();
         videoCapturerList.clear();
 
         workerThread->Quit();
@@ -177,6 +179,7 @@ namespace WebRTC
         if(videoCapturerList[track]->InitializeEncoder(device, m_encoderType))
         {
             videoCapturerList[track]->StartEncoder();
+            return true;
         }
         return false;
     }
@@ -184,7 +187,6 @@ namespace WebRTC
     {
         if (!videoCapturerList[track]->EncodeVideoData())
         {
-            ::OutputDebugStringA("hello");
         }
     }
     void Context::FinalizeEncoder(webrtc::MediaStreamTrackInterface* track)
@@ -200,7 +202,7 @@ namespace WebRTC
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
         auto stream = peerConnectionFactory->CreateLocalMediaStream(streamId);
-        const auto observer = new MediaStreamObserver(stream.get());
+        const auto observer = new MediaStreamObserver(stream);
         stream->RegisterObserver(observer);
         m_mapMediaStreamObserver[stream] = observer;
         return stream.release();
@@ -208,13 +210,13 @@ namespace WebRTC
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
-        auto observer = m_mapMediaStreamObserver[stream];
+        const auto observer = m_mapMediaStreamObserver[stream];
         stream->UnregisterObserver(observer);
         m_mapMediaStreamObserver.erase(stream);
         stream->Release();
     }
 
-    WebRTC::MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
+    MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
     {
         return m_mapMediaStreamObserver[stream];
     }
@@ -316,20 +318,18 @@ namespace WebRTC
         }
     }
 
-    PeerSDPObserver* PeerSDPObserver::Create(PeerConnectionObject* obj)
+    void Context::AddObserver(const webrtc::PeerConnectionInterface* connection, const rtc::scoped_refptr<SetSessionDescriptionObserver>& observer)
     {
-        auto observer = new rtc::RefCountedObject<PeerSDPObserver>();
-        observer->m_obj = obj;
-        return observer;
+        m_mapSetSessionDescriptionObserver[connection] = observer;
     }
 
-    void PeerSDPObserver::OnSuccess()
+    void Context::RemoveObserver(const webrtc::PeerConnectionInterface* connection)
     {
-        m_obj->onSetSDSuccess(m_obj);
+        m_mapSetSessionDescriptionObserver.erase(connection);
     }
 
-    void PeerSDPObserver::OnFailure(const std::string& error)
+    SetSessionDescriptionObserver* Context::GetObserver(webrtc::PeerConnectionInterface* connection)
     {
-        m_obj->onSetSDFailure(m_obj);
+        return m_mapSetSessionDescriptionObserver[connection];
     }
 }

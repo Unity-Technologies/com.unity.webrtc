@@ -9,13 +9,15 @@ namespace Unity.WebRTC
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
     public delegate void DelegateOnNegotiationNeeded();
     public delegate void DelegateOnTrack(RTCTrackEvent e);
+    public delegate void DelegateSetSessionDescSuccess();
+    public delegate void DelegateSetSessionDescFailure();
 
     public class RTCPeerConnection : IDisposable
     {
         public Action<string> OnStatsDelivered = null;
 
         private int m_id;
-        private IntPtr self = IntPtr.Zero;
+        private IntPtr self;
         private DelegateOnIceConnectionChange onIceConnectionChange;
         private DelegateNativeOnIceConnectionChange selfOnIceConnectionChange;
         private DelegateOnIceCandidate onIceCandidate;
@@ -28,8 +30,10 @@ namespace Unity.WebRTC
         private DelegateNativeOnNegotiationNeeded selfOnNegotiationNeeded;
         private DelegateCreateSDSuccess onCreateSDSuccess;
         private DelegateCreateSDFailure onCreateSDFailure;
-        private DelegateSetSDSuccess onSetSDSuccess;
-        private DelegateSetSDFailure onSetSDFailure;
+        private DelegateSetSessionDescSuccess onSetSessionDescSuccess;
+        private DelegateNativePeerConnectionSetSessionDescSuccess selfOnPeerConnectionSetSessionDescSuccess;
+        private DelegateSetSessionDescFailure onSetSetSessionDescFailure;
+        private DelegateNativePeerConnectionSetSessionDescFailure selfOnPeerConnectionSetSessionDescFailure;
         private DelegateCollectStats m_onStatsDeliveredCallback;
 
         private RTCIceCandidateRequestAsyncOperation opIceCandidateRequest;
@@ -130,6 +134,28 @@ namespace Unity.WebRTC
             }
         }
 
+        internal DelegateSetSessionDescSuccess OnSetSessionDescriptionSuccess
+        {
+            get => onSetSessionDescSuccess;
+            set
+            {
+                onSetSessionDescSuccess = value;
+                selfOnPeerConnectionSetSessionDescSuccess = new DelegateNativePeerConnectionSetSessionDescSuccess(OnSetSessionDescSuccess);
+                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(self, selfOnPeerConnectionSetSessionDescSuccess);
+            }
+        }
+
+        internal DelegateSetSessionDescFailure OnSetSessionDescriptionFailure
+        {
+            get => onSetSetSessionDescFailure;
+            set
+            {
+                onSetSetSessionDescFailure = value;
+                selfOnPeerConnectionSetSessionDescFailure = new DelegateNativePeerConnectionSetSessionDescFailure(OnSetSessionDescFailure);
+                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(self, selfOnPeerConnectionSetSessionDescFailure);
+            }
+        }
+
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceCandidate))]
         static void PCOnIceCandidate(IntPtr ptr, string sdp, string sdpMid, int sdpMlineIndex)
         {
@@ -182,17 +208,19 @@ namespace Unity.WebRTC
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.OnTrack(new RTCTrackEvent(transceiver));
+                if (connection != null)
+                {
+                    connection.OnTrack(new RTCTrackEvent(transceiver));
+                }
             }, null);
         }
 
         public RTCConfiguration GetConfiguration()
         {
             int len = 0;
-            IntPtr ptr = IntPtr.Zero;
+            var ptr = IntPtr.Zero;
             NativeMethods.PeerConnectionGetConfiguration(self, ref ptr, ref len);
             var str = Marshal.PtrToStringAnsi(ptr, len);
-            ptr = IntPtr.Zero;
             return JsonUtility.FromJson<RTCConfiguration>(str);
         }
 
@@ -228,11 +256,8 @@ namespace Unity.WebRTC
         {
             onCreateSDSuccess = new DelegateCreateSDSuccess(OnSuccessCreateSessionDesc);
             onCreateSDFailure = new DelegateCreateSDFailure(OnFailureCreateSessionDesc);
-            onSetSDSuccess = new DelegateSetSDSuccess(OnSuccessSetSessionDesc);
-            onSetSDFailure = new DelegateSetSDFailure(OnFailureSetSessionDesc);
             m_onStatsDeliveredCallback = new DelegateCollectStats(OnStatsDeliveredCallback);
             NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, onCreateSDSuccess, onCreateSDFailure);
-            NativeMethods.PeerConnectionRegisterCallbackSetSD(self, onSetSDSuccess, onSetSDFailure);
             NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, m_onStatsDeliveredCallback);
         }
 
@@ -297,8 +322,7 @@ namespace Unity.WebRTC
                 if (!(WebRTC.Table[ptr] is RTCPeerConnection connection))
                     return;
 
-                connection.m_opSessionDesc.desc.sdp = sdp;
-                connection.m_opSessionDesc.desc.type = type;
+                connection.m_opSessionDesc.Desc = new RTCSessionDescription { sdp = sdp, type = type };
                 connection.m_opSessionDesc.Done();
             }, null);
         }
@@ -309,16 +333,16 @@ namespace Unity.WebRTC
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.m_opSessionDesc.isError = true;
+                connection.m_opSessionDesc.IsError = true;
                 connection.m_opSessionDesc.Done();
             }, null);
         }
 
-        public RTCSessionDescriptionAsyncOperation SetLocalDescription(ref RTCSessionDescription desc)
+        public RTCSetSessionDescriptionAsyncOperation SetLocalDescription(ref RTCSessionDescription desc)
         {
-            m_opSetDesc = new RTCSessionDescriptionAsyncOperation();
-            NativeMethods.PeerConnectionSetLocalDescription(self, ref desc);
-            return m_opSetDesc;
+            var op = new RTCSetSessionDescriptionAsyncOperation(this);
+            WebRTC.Context.PeerConnectionSetLocalDescription(self, ref desc);
+            return op;
         }
 
         public void CollectStats()
@@ -327,38 +351,89 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionCollectStats(self);
         }
 
-        public RTCSessionDescription GetLocalDescription()
+        public RTCSessionDescription LocalDescription
         {
-            RTCSessionDescription desc = default;
-            NativeMethods.PeerConnectionGetLocalDescription(self, ref desc);
-            return desc;
+            get
+            {
+                RTCSessionDescription desc = default;
+                NativeMethods.PeerConnectionGetLocalDescription(self, ref desc);
+                return desc;
+            }
         }
 
-        public RTCSessionDescriptionAsyncOperation SetRemoteDescription(ref RTCSessionDescription desc)
+        public RTCSessionDescription RemoteDescription
         {
-            m_opSetDesc = new RTCSessionDescriptionAsyncOperation();
-            NativeMethods.PeerConnectionSetRemoteDescription(self, ref desc);
-            return m_opSetDesc;
+            get
+            {
+                RTCSessionDescription desc = default;
+                NativeMethods.PeerConnectionGetRemoteDescription(self, ref desc);
+                return desc;
+            }
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateSetSDSuccess))]
-        static void OnSuccessSetSessionDesc(IntPtr ptr)
+        public RTCSessionDescription CurrentLocalDescription
+        {
+            get
+            {
+                RTCSessionDescription desc = default;
+                NativeMethods.PeerConnectionGetCurrentLocalDescription(self, ref desc);
+                return desc;
+            }
+        }
+
+        public RTCSessionDescription CurrentRemoteDescription
+        {
+            get
+            {
+                RTCSessionDescription desc = default;
+                NativeMethods.PeerConnectionGetCurrentRemoteDescription(self, ref desc);
+                return desc;
+            }
+        }
+        public RTCSessionDescription PendingLocalDescription
+        {
+            get
+            {
+                RTCSessionDescription desc = default;
+                NativeMethods.PeerConnectionGetPendingLocalDescription(self, ref desc);
+                return desc;
+            }
+        }
+
+        public RTCSessionDescription PendingRemoteDescription
+        {
+            get
+            {
+                RTCSessionDescription desc = default;
+                NativeMethods.PeerConnectionGetPendingRemoteDescription(self, ref desc);
+                return desc;
+            }
+        }
+
+        public RTCSetSessionDescriptionAsyncOperation SetRemoteDescription(ref RTCSessionDescription desc)
+        {
+            var op = new RTCSetSessionDescriptionAsyncOperation(this);
+            WebRTC.Context.PeerConnectionSetRemoteDescription(self, ref desc);
+            return op;
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
+        static void OnSetSessionDescSuccess(IntPtr ptr)
         {
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.m_opSetDesc.Done();
+                connection.OnSetSessionDescriptionSuccess();
             }, null);
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateSetSDFailure))]
-        static void OnFailureSetSessionDesc(IntPtr ptr)
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
+        static void OnSetSessionDescFailure(IntPtr ptr)
         {
             WebRTC.SyncContext.Post(_ =>
             {
                 var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.m_opSetDesc.isError = true;
-                connection.m_opSetDesc.Done();
+                connection.OnSetSessionDescriptionFailure();
             }, null);
         }
 

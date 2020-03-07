@@ -47,7 +47,6 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
-            UnityEngine.Debug.Log("Context Dispose");
             if (this.disposed)
             {
                 return;
@@ -66,7 +65,6 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
-            UnityEngine.Debug.Log("Context Dispose end");
         }
 
         public CodecInitializationResult GetCodecInitializationResult()
@@ -92,6 +90,25 @@ namespace Unity.WebRTC
         public void DeletePeerConnection(IntPtr ptr)
         {
             NativeMethods.ContextDeletePeerConnection(self, ptr);
+        }
+
+        public void PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        {
+            NativeMethods.PeerConnectionSetLocalDescription(self, ptr, ref desc);
+        }
+        public void PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        {
+            NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, ref desc);
+        }
+
+        public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
+        {
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self, ptr, callback);
+        }
+
+        public void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescFailure callback)
+        {
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
         }
 
         public IntPtr CreateDataChannel(IntPtr ptr, string label, ref RTCDataChannelInit options)

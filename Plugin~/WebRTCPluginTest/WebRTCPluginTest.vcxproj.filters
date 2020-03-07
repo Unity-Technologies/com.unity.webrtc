@@ -79,6 +79,7 @@
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
     <ClCompile Include="..\WebRTCPlugin\MediaStreamObserver.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\SetSessionDescriptionObserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
@@ -181,6 +182,7 @@
       <Filter>GraphicsDevice\D3D12</Filter>
     </ClInclude>
     <ClInclude Include="..\WebRTCPlugin\MediaStreamObserver.h" />
+    <ClInclude Include="..\WebRTCPlugin\SetSessionDescriptionObserver.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

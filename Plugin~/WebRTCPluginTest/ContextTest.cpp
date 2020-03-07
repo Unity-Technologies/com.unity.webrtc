@@ -82,12 +82,14 @@ TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
 }
 
 TEST_P(ContextTest, CreateAndDeletePeerConnection) {
-    const auto connection = context->CreatePeerConnection();
+    const webrtc::PeerConnectionInterface::RTCConfiguration config;
+    const auto connection = context->CreatePeerConnection(config);
     context->DeletePeerConnection(connection);
 }
 
 TEST_P(ContextTest, CreateAndDeleteDataChannel) {
-    const auto connection = context->CreatePeerConnection();
+    const webrtc::PeerConnectionInterface::RTCConfiguration config;
+    const auto connection = context->CreatePeerConnection(config);
     RTCDataChannelInit init;
     init.protocol = "";
     const auto channel = context->CreateDataChannel(connection, "test", init);

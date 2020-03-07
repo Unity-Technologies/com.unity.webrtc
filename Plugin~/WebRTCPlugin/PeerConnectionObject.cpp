@@ -2,6 +2,7 @@
 #include "Context.h"
 #include "PeerConnectionObject.h"
 #include "WebRTCMacros.h"
+#include "SetSessionDescriptionObserver.h"
 
 namespace WebRTC
 {
@@ -30,30 +31,12 @@ namespace WebRTC
             connection->Close();
         }
         connection.release();
-
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection()
+    PeerConnectionObject* Context::CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
         rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
-        webrtc::PeerConnectionInterface::RTCConfiguration _config;
-        _config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
-        obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
-        if (obj->connection == nullptr)
-        {
-            return nullptr;
-        }
-        auto ptr = obj.get();
-        clients[ptr] = std::move(obj);
-        return clients[ptr].get();
-    }
-
-    PeerConnectionObject* Context::CreatePeerConnection(const std::string& conf)
-    {
-        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
-        webrtc::PeerConnectionInterface::RTCConfiguration _config;
-        Convert(conf, _config);
-        obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
+        obj->connection = peerConnectionFactory->CreatePeerConnection(config, nullptr, nullptr, obj);
         if (obj->connection == nullptr)
         {
             return nullptr;
@@ -154,13 +137,11 @@ namespace WebRTC
 
     void PeerConnectionObject::Close()
     {
-        if (connection != nullptr)
+        if (connection != nullptr && connection->peer_connection_state() == webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
         {
             //Cleanup delegates/callbacks
             onCreateSDSuccess = nullptr;
             onCreateSDFailure = nullptr;
-            onSetSDSuccess = nullptr;
-            onSetSDFailure = nullptr;
             onLocalSdpReady = nullptr;
             onIceCandidate = nullptr;
             onIceConnectionChange = nullptr;
@@ -172,7 +153,7 @@ namespace WebRTC
         }
     }
 
-    void PeerConnectionObject::SetLocalDescription(const RTCSessionDescription& desc)
+    void PeerConnectionObject::SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer)
     {
         webrtc::SdpParseError error;
         auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error);
@@ -182,12 +163,10 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description.c_str());
             return;
         }
-        auto observer = PeerSDPObserver::Create(this);
         connection->SetLocalDescription(observer, _desc.release());
-
     }
 
-    void PeerConnectionObject::SetRemoteDescription(const RTCSessionDescription& desc)
+    void PeerConnectionObject::SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer)
     {
         webrtc::SdpParseError error;
         auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error);
@@ -197,7 +176,6 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description.c_str());
             return;
         }
-        auto observer = PeerSDPObserver::Create(this);
         connection->SetRemoteDescription(observer, _desc.release());
     }
 
@@ -266,14 +244,13 @@ namespace WebRTC
         connection->AddIceCandidate(_candidate.get());
     }
 
-    void PeerConnectionObject::GetLocalDescription(RTCSessionDescription& desc) const
+    void PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
     {
         std::string out;
-        auto current = connection->current_local_description();
-        current->ToString(&out);
+        sdp->ToString(&out);
 
-        desc.type = ConvertSdpType(current->GetType());
-        desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
+        desc.type = ConvertSdpType(sdp->GetType());
+        desc.sdp = static_cast<char*>(CoTaskMemAlloc(out.size() + 1));
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
     }

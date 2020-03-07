@@ -8,8 +8,6 @@ namespace WebRTC
     using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
     using DelegateCollectStats = void(*)(PeerConnectionObject*, const char*);;
     using DelegateCreateSDFailure = void(*)(PeerConnectionObject*);
-    using DelegateSetSDSuccess = void(*)(PeerConnectionObject*);
-    using DelegateSetSDFailure = void(*)(PeerConnectionObject*);
     using DelegateLocalSdpReady = void(*)(PeerConnectionObject*, const char*, const char*);
     using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
     using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);
@@ -50,21 +48,18 @@ namespace WebRTC
         ~PeerConnectionObject();
 
         void Close();
-        void SetLocalDescription(const RTCSessionDescription& desc);
-        void GetLocalDescription(RTCSessionDescription& desc) const;
+        void SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
+        //void GetLocalDescription(RTCSessionDescription& desc) const;
+        //void GetRemoteDescription(RTCSessionDescription& desc) const;
+        void GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
         void CollectStats();
-        void SetRemoteDescription(const RTCSessionDescription& desc);
+        void SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
         webrtc::RTCErrorType SetConfiguration(const std::string& config);
         void GetConfiguration(std::string& config) const;
         void CreateOffer(const RTCOfferOptions& options);
         void CreateAnswer(const RTCAnswerOptions& options);
         void AddIceCandidate(const RTCIceCandidate& candidate);
 
-        void RegisterCallbackSetSD(DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
-        {
-            onSetSDSuccess = onSuccess;
-            onSetSDFailure = onFailure;
-        }
         void RegisterCallbackCreateSD(DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)
         {
             onCreateSDSuccess = onSuccess;
@@ -126,11 +121,8 @@ namespace WebRTC
 
         friend class DataChannelObject;
 
-    public:
         DelegateCreateSDSuccess onCreateSDSuccess = nullptr;
         DelegateCreateSDFailure onCreateSDFailure = nullptr;
-        DelegateSetSDSuccess onSetSDSuccess = nullptr;
-        DelegateSetSDFailure onSetSDFailure = nullptr;
         DelegateIceCandidate onIceCandidate = nullptr;
         DelegateLocalSdpReady onLocalSdpReady = nullptr;
         DelegateOnIceConnectionChange onIceConnectionChange = nullptr;

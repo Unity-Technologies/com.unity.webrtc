@@ -72,6 +72,7 @@
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
     <ClCompile Include="MediaStreamObserver.cpp" />
+    <ClCompile Include="SetSessionDescriptionObserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -172,6 +173,7 @@
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
     <ClInclude Include="MediaStreamObserver.h" />
+    <ClInclude Include="SetSessionDescriptionObserver.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GraphicsDevice">

@@ -2,6 +2,7 @@
 #include "WebRTCPlugin.h"
 #include "PeerConnectionObject.h"
 #include "MediaStreamObserver.h"
+#include "SetSessionDescriptionObserver.h"
 #include "Context.h"
 #include "Codec/EncoderFactory.h"
 
@@ -207,19 +208,35 @@ extern "C"
         ContextManager::GetInstance()->DestroyContext(uid);
     }
 
-    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* ctx)
+    PeerConnectionObject* _ContextCreatePeerConnection(Context* context, const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
-        return ctx->CreatePeerConnection();
+        const auto obj = context->CreatePeerConnection(config);
+        const auto observer = WebRTC::SetSessionDescriptionObserver::Create(obj);
+        context->AddObserver(obj->connection, observer);
+        return obj;
     }
 
-    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* ctx, const char* conf)
+    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* context)
     {
-        return ctx->CreatePeerConnection(conf);
+        webrtc::PeerConnectionInterface::RTCConfiguration config;
+        config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
+        return _ContextCreatePeerConnection(context, config);
     }
-    UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* ctx, PeerConnectionObject* ptr)
+
+    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* context, const char* conf)
     {
-        ctx->DeletePeerConnection(ptr);
+        webrtc::PeerConnectionInterface::RTCConfiguration config;
+        Convert(conf, config);
+        return _ContextCreatePeerConnection(context, config);
     }
+
+    UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* context, PeerConnectionObject* obj)
+    {
+        obj->Close();
+        context->RemoveObserver(obj->connection);
+        context->DeletePeerConnection(obj);
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionClose(PeerConnectionObject* obj)
     {
         obj->Close();
@@ -256,14 +273,16 @@ extern "C"
         (*conf)[_conf.size()] = '\0';
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(PeerConnectionObject* obj, const RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
-        obj->SetRemoteDescription(*desc);
+        const auto observer = context->GetObserver(obj->connection);
+        obj->SetRemoteDescription(*desc, observer);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(PeerConnectionObject* obj, const RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
-        obj->SetLocalDescription(*desc);
+        const auto observer = context->GetObserver(obj->connection);
+        obj->SetLocalDescription(*desc, observer);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCollectStats(PeerConnectionObject* obj)
@@ -273,8 +292,34 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetLocalDescription(*desc);
+        obj->GetSessionDescription(obj->connection->local_description(), *desc);
     }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        obj->GetSessionDescription(obj->connection->remote_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetPendingLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        obj->GetSessionDescription(obj->connection->pending_local_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetPendingRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        obj->GetSessionDescription(obj->connection->pending_remote_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetCurrentLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        obj->GetSessionDescription(obj->connection->current_local_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetCurrentRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
+    }
+
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCreateOffer(PeerConnectionObject* obj, const RTCOfferOptions* options)
     {
@@ -316,9 +361,14 @@ extern "C"
         obj->RegisterCallbackCreateSD(onSuccess, onFailure);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackSetSD(PeerConnectionObject* obj, DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnSetSessionDescSuccess(Context* context, PeerConnectionObject* obj, DelegateSetSessionDescSuccess onSuccess)
     {
-        obj->RegisterCallbackSetSD(onSuccess, onFailure);
+        context->GetObserver(obj->connection)->RegisterDelegateOnSuccess(onSuccess);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnSetSessionDescFailure(Context* context, PeerConnectionObject* obj, DelegateSetSessionDescFailure onFailure)
+    {
+        context->GetObserver(obj->connection)->RegisterDelegateOnFailure(onFailure);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionAddIceCandidate(PeerConnectionObject* obj, const RTCIceCandidate* candidate)

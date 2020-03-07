@@ -217,6 +217,7 @@
     <ClInclude Include="MediaStreamObserver.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PeerConnectionObject.h" />
+    <ClInclude Include="SetSessionDescriptionObserver.h" />
     <ClInclude Include="VideoCapturer.h" />
     <ClInclude Include="VideoCaptureTrackSource.h" />
     <ClInclude Include="VideoTrackSource.h" />
@@ -258,6 +259,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="PeerConnectionObject.cpp" />
+    <ClCompile Include="SetSessionDescriptionObserver.cpp" />
     <ClCompile Include="VideoCapturer.cpp" />
     <ClCompile Include="VideoCaptureTrackSource.cpp" />
     <ClCompile Include="VideoTrackSource.cpp" />

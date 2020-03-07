@@ -13,6 +13,8 @@ namespace WebRTC
     using DelegateSetResolution = void(*)(int32*, int32*);
     using DelegateMediaStreamOnAddTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
     using DelegateMediaStreamOnRemoveTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
+    using DelegateSetSessionDescSuccess = void(*)(PeerConnectionObject*);
+    using DelegateSetSessionDescFailure = void(*)(PeerConnectionObject*);
 
     void debugLog(const char* buf);
     void SetResolution(int32* width, int32* length);
