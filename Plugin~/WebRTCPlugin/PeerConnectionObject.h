@@ -51,7 +51,7 @@ namespace WebRTC
         void SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
         //void GetLocalDescription(RTCSessionDescription& desc) const;
         //void GetRemoteDescription(RTCSessionDescription& desc) const;
-        void GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
+        bool GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
         void CollectStats();
         void SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
         webrtc::RTCErrorType SetConfiguration(const std::string& config);

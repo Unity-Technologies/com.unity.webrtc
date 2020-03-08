@@ -79,35 +79,51 @@ namespace Unity.WebRTC
             self = ptr;
         }
 
-        public RTCRtpTransceiverDirection? CurrentDirection
+        /// <summary>
+        /// 
+        /// </summary>
+        public RTCRtpTransceiverDirection CurrentDirection
         {
             get
             {
                 var direction = RTCRtpTransceiverDirection.RecvOnly;
-                if (NativeMethods.TransceiverGetCurentDirection(self, ref direction))
+                if (NativeMethods.TransceiverGetCurrentDirection(self, ref direction))
                 {
                     return direction;
                 }
-                return null;
+                throw new InvalidOperationException("Transceiver is not running");
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpReceiver Receiver
         {
             get { return new RTCRtpReceiver(NativeMethods.TransceiverGetReceiver(self));  }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpSender Sender
         {
             get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self)); }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="direction"></param>
         public void SetDirection(RTCRtpTransceiverDirection direction)
         {
             // TODO::
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public struct RTCRtpCodecCapability
         {
         }
@@ -115,6 +131,11 @@ namespace Unity.WebRTC
         public void SetCodecPreferences(RTCRtpCodecCapability[] capabilities)
         {
 
+        }
+
+        public void Stop()
+        {
+            NativeMethods.TransceiverStop(self);
         }
     }
 
@@ -505,8 +526,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr context, IntPtr connection, DelegateNativePeerConnectionSetSessionDescFailure onFailure);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterCallbackSetSD(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess onSuccess, DelegateNativePeerConnectionSetSessionDescFailure onFailure);
-        [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
@@ -515,17 +534,17 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionCollectStats(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        public static extern bool PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        public static extern bool PeerConnectionGetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetPendingLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        public static extern bool PeerConnectionGetPendingLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetPendingRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        public static extern bool PeerConnectionGetPendingRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetCurrentLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        public static extern bool PeerConnectionGetCurrentLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetCurrentRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
+        public static extern bool PeerConnectionGetCurrentRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
@@ -555,7 +574,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetTrack(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
-        public static extern bool TransceiverGetCurentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
+        public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
+        [DllImport(WebRTC.Lib)]
+        public static extern bool TransceiverStop(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetReceiver(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]

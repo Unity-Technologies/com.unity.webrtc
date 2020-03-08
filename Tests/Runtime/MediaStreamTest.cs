@@ -50,8 +50,16 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
             var track = new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
-            yield return new WaitForSeconds(0.1f);
             Assert.NotNull(track);
+            yield return new WaitForSeconds(0.1f);
+
+            // Enabled property
+            Assert.True(track.Enabled);
+            track.Enabled = false;
+            Assert.False(track.Enabled);
+
+            // ReadyState property
+            Assert.AreEqual(track.ReadyState, TrackState.Live);
             track.Dispose();
             yield return new WaitForSeconds(0.1f);
         }
@@ -69,6 +77,7 @@ namespace Unity.WebRTC.RuntimeTest
             var stream = new MediaStream();
             var track = new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
             yield return new WaitForSeconds(0.1f);
+            Assert.AreEqual(TrackKind.Video, track.Kind);
             Assert.AreEqual(0, stream.GetVideoTracks().Count());
             Assert.True(stream.AddTrack(track));
             Assert.AreEqual(1, stream.GetVideoTracks().Count());
@@ -85,6 +94,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var stream = new MediaStream();
             var track = new AudioStreamTrack("audio");
+            Assert.AreEqual(TrackKind.Audio, track.Kind);
             Assert.AreEqual(0, stream.GetAudioTracks().Count());
             Assert.True(stream.AddTrack(track));
             Assert.AreEqual(1, stream.GetAudioTracks().Count());
@@ -158,7 +168,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         public class SignalingPeersTest : MonoBehaviour, IMonoBehaviourTest
         {
-            private bool _isFinished = false;
+            private bool _isFinished;
             private MediaStream _stream;
 
             public bool IsTestFinished

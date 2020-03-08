@@ -290,34 +290,34 @@ extern "C"
         obj->CollectStats();
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetSessionDescription(obj->connection->local_description(), *desc);
+        return obj->GetSessionDescription(obj->connection->local_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetSessionDescription(obj->connection->remote_description(), *desc);
+        return obj->GetSessionDescription(obj->connection->remote_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetPendingLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetPendingLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetSessionDescription(obj->connection->pending_local_description(), *desc);
+        return obj->GetSessionDescription(obj->connection->pending_local_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetPendingRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetPendingRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetSessionDescription(obj->connection->pending_remote_description(), *desc);
+        return obj->GetSessionDescription(obj->connection->pending_remote_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetCurrentLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetCurrentLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetSessionDescription(obj->connection->current_local_description(), *desc);
+        return obj->GetSessionDescription(obj->connection->current_local_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetCurrentRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetCurrentRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
+        return obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
     }
 
     UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface** PeerConnectionGetReceivers(PeerConnectionObject* obj, int* length)
@@ -414,30 +414,36 @@ extern "C"
     {
         obj->RegisterOnTrack(callback);
     }
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* TransceiverGetTrack(webrtc::RtpTransceiverInterface* obj)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* TransceiverGetTrack(webrtc::RtpTransceiverInterface* transceiver)
     {
-        return obj->receiver()->track().get();
+        return transceiver->receiver()->track().get();
     }
 
-    UNITY_INTERFACE_EXPORT bool TransceiverGetCurentDirection(webrtc::RtpTransceiverInterface* obj, webrtc::RtpTransceiverDirection* direction)
+    UNITY_INTERFACE_EXPORT bool TransceiverGetCurrentDirection(webrtc::RtpTransceiverInterface* transceiver, webrtc::RtpTransceiverDirection* direction)
     {
-        if(obj->current_direction().has_value())
+        if(transceiver->current_direction().has_value())
         {
-            *direction = obj->current_direction().value();
+            *direction = transceiver->current_direction().value();
             return true;
         }
         return false;
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface* TransceiverGetReceiver(webrtc::RtpTransceiverInterface* obj)
+    UNITY_INTERFACE_EXPORT void TransceiverStop(webrtc::RtpTransceiverInterface* transceiver)
     {
-        return obj->receiver().get();
+        transceiver->Stop();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* TransceiverGetSender(webrtc::RtpTransceiverInterface* obj)
+    UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface* TransceiverGetReceiver(webrtc::RtpTransceiverInterface* transceiver)
     {
-        return obj->sender().get();
+        return transceiver->receiver().get();
     }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* TransceiverGetSender(webrtc::RtpTransceiverInterface* transceiver)
+    {
+        return transceiver->sender().get();
+    }
+
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)
     {
         return dataChannelObj->GetID();

@@ -44,6 +44,12 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(0, peer.GetSenders().Count());
             Assert.AreEqual(0, peer.GetTransceivers().Count());
             Assert.AreEqual(RTCPeerConnectionState.New, peer.ConnectionState);
+            Assert.That(() => Assert.NotNull(peer.LocalDescription), Throws.InvalidOperationException);
+            Assert.That(() => Assert.NotNull(peer.RemoteDescription), Throws.InvalidOperationException);
+            Assert.That(() => Assert.NotNull(peer.PendingLocalDescription), Throws.InvalidOperationException);
+            Assert.That(() => Assert.NotNull(peer.PendingRemoteDescription), Throws.InvalidOperationException);
+            Assert.That(() => Assert.NotNull(peer.CurrentLocalDescription), Throws.InvalidOperationException);
+            Assert.That(() => Assert.NotNull(peer.CurrentRemoteDescription), Throws.InvalidOperationException);
             peer.Close();
 
             Assert.AreEqual(RTCPeerConnectionState.Closed, peer.ConnectionState);
@@ -90,7 +96,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(0, peer.GetTransceivers().Count());
             var transceiver = peer.AddTransceiver(track);
             Assert.NotNull(transceiver);
-            Assert.Null(transceiver.CurrentDirection);
+            Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
             Assert.AreEqual(1, peer.GetTransceivers().Count());
             Assert.NotNull(peer.GetTransceivers().First());
         }
@@ -146,7 +152,7 @@ namespace Unity.WebRTC.RuntimeTest
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
             var conf = new RTCDataChannelInit(true);
-            var channel1 = peer1.CreateDataChannel("data", ref conf);
+            peer1.CreateDataChannel("data", ref conf);
 
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;

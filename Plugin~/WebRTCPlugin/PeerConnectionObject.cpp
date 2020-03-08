@@ -244,8 +244,10 @@ namespace WebRTC
         connection->AddIceCandidate(_candidate.get());
     }
 
-    void PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
+    bool PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
     {
+        if (sdp == nullptr)
+            return false;
         std::string out;
         sdp->ToString(&out);
 
@@ -253,6 +255,7 @@ namespace WebRTC
         desc.sdp = static_cast<char*>(CoTaskMemAlloc(out.size() + 1));
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
+        return true;
     }
 
     void PeerConnectionObject::CollectStats()

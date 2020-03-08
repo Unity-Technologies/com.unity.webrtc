@@ -1,20 +1,19 @@
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace Unity.WebRTC
 {
     public class MediaStreamTrack : IDisposable
     {
         internal IntPtr self;
-        private TrackKind kind;
-        private string id;
         protected bool disposed;
         private bool enabled;
         private TrackState readyState;
         internal Action<MediaStreamTrack> stopTrack;
-        internal Func<MediaStreamTrack, RenderTexture[]> getRts;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Enabled
         {
             get
@@ -26,25 +25,34 @@ namespace Unity.WebRTC
                 NativeMethods.MediaStreamTrackSetEnabled(self, value);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public TrackState ReadyState
         {
             get
             {
                 return NativeMethods.MediaStreamTrackGetReadyState(self);
             }
-            private set { }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public TrackKind Kind { get; }
 
-        public TrackKind Kind { get => kind; private set { } }
-        public string Id { get => id; private set { } }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Id { get; }
 
         internal MediaStreamTrack(IntPtr ptr)
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
-            kind = NativeMethods.MediaStreamTrackGetKind(self);
-            id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamTrackGetID(self));
+            Kind = NativeMethods.MediaStreamTrackGetKind(self);
+            Id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamTrackGetID(self));
         }
 
         ~MediaStreamTrack()
@@ -121,7 +129,7 @@ namespace Unity.WebRTC
 
     public class RTCTrackEvent
     {
-        private IntPtr self;
+        private readonly IntPtr self;
         private readonly MediaStreamTrack track;
         private readonly RTCRtpTransceiver transceiver;
 
