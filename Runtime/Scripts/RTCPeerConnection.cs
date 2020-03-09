@@ -55,12 +55,14 @@ namespace Unity.WebRTC
             {
                 return;
             }
-            if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 Close();
                 WebRTC.Context.DeletePeerConnection(self);
                 self = IntPtr.Zero;
             }
+
             this.disposed = true;
             GC.SuppressFinalize(this);
         }
@@ -94,6 +96,7 @@ namespace Unity.WebRTC
             var buf = NativeMethods.PeerConnectionGetSenders(self, ref length);
             return WebRTC.Deserialize(buf, length, ptr => new RTCRtpSender(ptr));
         }
+
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
             int length = 0;
@@ -111,6 +114,7 @@ namespace Unity.WebRTC
                 NativeMethods.PeerConnectionRegisterIceConnectionChange(self, selfOnIceConnectionChange);
             }
         }
+
         public DelegateOnIceCandidate OnIceCandidate
         {
             get => onIceCandidate;
@@ -121,6 +125,7 @@ namespace Unity.WebRTC
                 NativeMethods.PeerConnectionRegisterOnIceCandidate(self, selfOnIceCandidate);
             }
         }
+
         public DelegateOnDataChannel OnDataChannel
         {
             get => onDataChannel;
@@ -161,7 +166,8 @@ namespace Unity.WebRTC
             {
                 onSetSessionDescSuccess = value;
                 selfOnPeerConnectionSetSessionDescSuccess = OnSetSessionDescSuccess;
-                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(self, selfOnPeerConnectionSetSessionDescSuccess);
+                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(self,
+                    selfOnPeerConnectionSetSessionDescSuccess);
             }
         }
 
@@ -172,7 +178,8 @@ namespace Unity.WebRTC
             {
                 onSetSetSessionDescFailure = value;
                 selfOnPeerConnectionSetSessionDescFailure = OnSetSessionDescFailure;
-                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(self, selfOnPeerConnectionSetSessionDescFailure);
+                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(self,
+                    selfOnPeerConnectionSetSessionDescFailure);
             }
         }
 
@@ -183,7 +190,8 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    var candidate = new RTCIceCandidate​ { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
+                    var candidate =
+                        new RTCIceCandidate​ {candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex};
                     connection.OnIceCandidate(candidate);
                 }
             }, null);
@@ -258,6 +266,7 @@ namespace Unity.WebRTC
             {
                 throw new ArgumentException("Could not instantiate RTCPeerConnection");
             }
+
             WebRTC.Table.Add(self, this);
             InitCallback();
         }
@@ -266,10 +275,11 @@ namespace Unity.WebRTC
         {
             string configStr = JsonUtility.ToJson(config);
             self = WebRTC.Context.CreatePeerConnection(configStr);
-            if(self == IntPtr.Zero)
+            if (self == IntPtr.Zero)
             {
                 throw new ArgumentException("Could not instantiate RTCPeerConnection");
             }
+
             WebRTC.Table.Add(self, this);
             InitCallback();
         }
@@ -285,19 +295,21 @@ namespace Unity.WebRTC
 
         public void Close()
         {
-            if(self != IntPtr.Zero)
+            if (self != IntPtr.Zero)
             {
                 NativeMethods.PeerConnectionClose(self);
             }
         }
 
-        public RTCRtpSender AddTrack(MediaStreamTrack track, MediaStream stream)
+        public RTCRtpSender AddTrack(MediaStreamTrack track, MediaStream stream = null)
         {
-            if(track == null || stream == null)
+            if(track == null)
             {
                 throw new ArgumentNullException("");
             }
-            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self, stream.self));
+
+            var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
+            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self, streamId));
         }
 
         public void RemoveTrack(RTCRtpSender sender)

@@ -152,7 +152,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator InitializeAndFinalizeVideoEncoder()
+        public IEnumerator CaptureStream()
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
@@ -163,6 +163,19 @@ namespace Unity.WebRTC.RuntimeTest
             test.component.SetStream(videoStream);
             yield return test;
             videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator CaptureStreamTrack()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var track = cam.CaptureStreamTrack(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+            track.Dispose();
+            yield return new WaitForSeconds(0.1f);
             Object.DestroyImmediate(camObj);
         }
 

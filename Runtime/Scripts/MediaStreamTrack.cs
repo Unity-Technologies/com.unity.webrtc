@@ -88,7 +88,7 @@ namespace Unity.WebRTC
     {
         internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
 
-        readonly bool needFlip;
+        bool needFlip = false;
         UnityEngine.Texture source;
         UnityEngine.RenderTexture dest;
 
