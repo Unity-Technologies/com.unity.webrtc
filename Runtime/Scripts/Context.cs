@@ -141,26 +141,6 @@ namespace Unity.WebRTC
             NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream, callback);
         }
 
-        /*
-        public MediaStream CreateAudioStream()
-        {
-            var stream = CreateMediaStream("audiostream");
-            var track = CreateAudioTrack("audio");
-            stream.AddTrack(track);
-            return stream;
-        }
-
-        public MediaStream CreateVideoStream(IntPtr rt, int width, int height, int bitrate)
-        {
-            var stream = CreateMediaStream("videostream");
-            var track = CreateVideoTrack("video", rt, width, height, bitrate);
-            NativeMethods.MediaStreamAddTrack()
-            stream.AddTrack(track);
-            return stream;
-        }
-        */
-
-
         public IntPtr GetRenderEventFunc()
         {
             return NativeMethods.GetRenderEventFunc(self);
