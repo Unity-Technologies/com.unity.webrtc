@@ -200,25 +200,8 @@ namespace Unity.WebRTC
 
         public static MediaStream CaptureStream(this Camera cam, int width, int height, int bitrate, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
-/*
-            switch (depth)
-            {
-                case RenderTextureDepth.DEPTH_16:
-                case RenderTextureDepth.DEPTH_24:
-                case RenderTextureDepth.DEPTH_32:
-                    break;
-                default:
-                    throw new InvalidEnumArgumentException(nameof(depth), (int) depth, typeof(RenderTextureDepth));
-            }
-
-            int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var rt = new RenderTexture(width, height, depthValue, format);
-            rt.Create();
-*/
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
             var track = cam.CaptureStreamTrack(width, height, bitrate, depth);
-//            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate));
             stream.AddTrack(track);
             return stream;
         }
