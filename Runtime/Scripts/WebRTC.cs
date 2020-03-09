@@ -313,7 +313,7 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context;
         private static SynchronizationContext s_syncContext;
-        private static Material flipMat;
+        internal static Material flipMat;
 
         public static void Initialize(EncoderType type = EncoderType.Hardware)
         {
@@ -333,22 +333,16 @@ namespace Unity.WebRTC
             {
                 // Wait until all frame rendering is done
                 yield return new WaitForEndOfFrame();
-                //if (CameraExtension.started)
                 {
-                    //Blit is for DirectX Rendering API Only
-                    foreach (var rts in CameraExtension.camCopyRts)
+                    foreach(var track in VideoStreamTrack.tracks)
                     {
-                        Graphics.Blit(rts[0], rts[1], flipMat);
-                    }
-                    foreach(var track in CameraExtension.tracks)
-                    {
-                        Context.Encode(track.self);
+                        track.Update();
                     }
                 }
             }
         }
 
-        public static void Finalize()
+        public static void Dispose()
         {
             s_context.Dispose();
             s_context = null;

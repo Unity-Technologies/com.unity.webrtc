@@ -32,7 +32,7 @@ namespace Unity.WebRTC.RuntimeTest
         [TearDown]
         public void TearDown()
         {
-            WebRTC.Finalize();
+            WebRTC.Dispose();
         }
 
         [Test]

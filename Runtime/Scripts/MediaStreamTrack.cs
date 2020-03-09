@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -85,10 +86,72 @@ namespace Unity.WebRTC
 
     public class VideoStreamTrack : MediaStreamTrack
     {
-        public VideoStreamTrack(string label, IntPtr ptr, int width, int height, int bitrate) : base(WebRTC.Context.CreateVideoTrack(label, ptr, width, height, bitrate))
+        internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
+
+        readonly bool needFlip;
+        UnityEngine.Texture source;
+        UnityEngine.RenderTexture dest;
+
+        private static UnityEngine.RenderTexture CopyRenderTexture(UnityEngine.RenderTexture source)
+        {
+            var tex = new UnityEngine.RenderTexture(source.width, source.height, 0, source.format);
+            tex.Create();
+            return tex;
+        }
+
+        internal VideoStreamTrack(string label, UnityEngine.RenderTexture source, UnityEngine.RenderTexture dest, int width, int height, int bitrate)
+            : this(label, dest.GetNativeTexturePtr(), width, height, bitrate)
+        {
+            this.needFlip = true;
+            this.source = source;
+            this.dest = dest;
+        }
+
+        internal void Update()
+        {
+            // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
+            // note: streamed video is flipped vertical if no action was taken:
+            //  - duplicate RenderTexture from its source texture
+            //  - call Graphics.Blit command with flip material every frame
+            //  - it might be better to implement this if possible
+            if (needFlip)
+            {
+                UnityEngine.Graphics.Blit(source, dest, WebRTC.flipMat);
+            }
+            WebRTC.Context.Encode(self);
+        }
+
+        /// <summary>
+        /// Creates a new VideoStream object.
+        /// The track is created with a `source`.
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="source"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="bitrate"></param>
+        public VideoStreamTrack(string label, UnityEngine.RenderTexture source, int bitrate)
+            : this(label, source, CopyRenderTexture(source), source.width, source.height, bitrate)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new VideoStream object.
+        /// The track is created with a source texture `ptr`.
+        /// It is noted that streamed video might be flipped when not action was taken. Almost case it has no problem to use other constructor instead.
+        /// 
+        /// See Also: Texture.GetNativeTexturePtr
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="ptr"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="bitrate"></param>
+        public VideoStreamTrack(string label, IntPtr ptr, int width, int height, int bitrate)
+            : base(WebRTC.Context.CreateVideoTrack(label, ptr, width, height, bitrate))
         {
             WebRTC.Context.InitializeEncoder(self);
-            CameraExtension.tracks.Add(this);
+            tracks.Add(this);
         }
 
         public override void Dispose()
@@ -100,7 +163,7 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Context.FinalizeEncoder(self);
-                CameraExtension.tracks.Remove(this);
+                tracks.Remove(this);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 self = IntPtr.Zero;
             }

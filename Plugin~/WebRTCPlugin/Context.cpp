@@ -54,23 +54,23 @@ namespace WebRTC
         m_contexts.clear();
     }
 
-    void Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
+    bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
         config = webrtc::PeerConnectionInterface::RTCConfiguration{};
         Json::CharReaderBuilder builder;
         const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
         Json::Value configJson;
         Json::String err;
-        bool ok = reader->parse(str.c_str(), str.c_str() + static_cast<int>(str.length()), &configJson, &err);
+        auto ok = reader->parse(str.c_str(), str.c_str() + static_cast<int>(str.length()), &configJson, &err);
         if (!ok)
         {
-            //json parse faild.
-            return;
+            //json parse failed.
+            return false;
         }
 
         Json::Value iceServersJson = configJson["iceServers"];
         if (!iceServersJson)
-            return;
+            return false;
         for (auto iceServerJson : iceServersJson)
         {
             webrtc::PeerConnectionInterface::IceServer iceServer;
@@ -89,6 +89,7 @@ namespace WebRTC
             config.servers.push_back(iceServer);
         }
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
+        return true;
     }
 #pragma warning(push)
 #pragma warning(disable: 4715)
@@ -213,7 +214,6 @@ namespace WebRTC
         const auto observer = m_mapMediaStreamObserver[stream];
         stream->UnregisterObserver(observer);
         m_mapMediaStreamObserver.erase(stream);
-        stream->Release();
     }
 
     MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
@@ -223,27 +223,18 @@ namespace WebRTC
 
     webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
     {
-        //void* pUnityEncoder = //pDummyVideoEncoderFactory->CreatePlatformEncoder(WebRTC::Nvidia, width, height, bitRate);
         auto videoCapturer = std::make_unique<NvVideoCapturer>();
-        auto ptr = videoCapturer.get();
-        //pUnityVideoCapturer->InitializeEncoder();
-        //pDummyVideoEncoderFactory->AddCapturer(pUnityVideoCapturer);
+        const auto ptr = videoCapturer.get();
         videoCapturer->SetFrameBuffer(frameBuffer);
 
         const auto source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(videoCapturer), false));
-        auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, source).release();
-        //auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, peerConnectionFactory->CreateVideoSource(pUnityVideoCapturer));
-        //pUnityVideoCapturer->StartEncoder();
-
-        // TODO:: Create dictionary to impletement StopMediaStreamTrack API
+        const auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, source).release();
         videoCapturerList[videoTrack] = ptr;
-        //mediaStreamTrackList.push_back(videoTrack);
         return videoTrack;
     }
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-        //auto videoTrack = static_cast<webrtc::VideoTrackInterface*>(track);
         if(videoCapturerList.count(track) > 0)
         {
             videoCapturerList[track]->Stop();
@@ -257,35 +248,12 @@ namespace WebRTC
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
-        //TODO: label and stream id should be maintained in some way for multi-stream
-        /*
-        auto audioTrack = peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions));
-        mediaSteamTrackList.push_back(audioTrack);
-        return audioTrack.get();
-        */
         return peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions)).release();
     }
 
-    /*
-    webrtc::MediaStreamInterface* Context::CreateAudioStream()
-    {
-        //avoid optimization specially for voice
-        cricket::AudioOptions audioOptions;
-        audioOptions.auto_gain_control = false;
-        audioOptions.noise_suppression = false;
-        audioOptions.highpass_filter = false;
-        //TODO: label and stream id should be maintained in some way for multi-stream
-        audioTrack = peerConnectionFactory->CreateAudioTrack("audio", peerConnectionFactory->CreateAudioSource(audioOptions));
-        audioStream = peerConnectionFactory->CreateLocalMediaStream("audio");
-        audioStream->AddTrack(audioTrack);
-
-        return audioStream.get();
-    }
-    */
-
     void Context::DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-        track->Release();
+		// Nothing to do
     }
 
     void Context::ProcessAudioData(const float* data, int32 size)

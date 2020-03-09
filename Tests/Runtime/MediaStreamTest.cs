@@ -19,7 +19,7 @@ namespace Unity.WebRTC.RuntimeTest
         [TearDown]
         public void TearDown()
         {
-            WebRTC.Finalize();
+            WebRTC.Dispose();
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
+            var track = new VideoStreamTrack("video", rt, bitrate);
             Assert.NotNull(track);
             yield return new WaitForSeconds(0.1f);
 
@@ -75,7 +75,7 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             var stream = new MediaStream();
-            var track = new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
+            var track = new VideoStreamTrack("video", rt, bitrate);
             yield return new WaitForSeconds(0.1f);
             Assert.AreEqual(TrackKind.Video, track.Kind);
             Assert.AreEqual(0, stream.GetVideoTracks().Count());
@@ -112,7 +112,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720);
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
             yield return new WaitForSeconds(0.1f);
             Assert.AreEqual(1, videoStream.GetVideoTracks().Count());
             Assert.AreEqual(0, videoStream.GetAudioTracks().Count());
@@ -156,7 +156,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720);
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
             yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeersTest>();

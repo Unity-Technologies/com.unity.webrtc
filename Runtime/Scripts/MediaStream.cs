@@ -40,7 +40,6 @@ namespace Unity.WebRTC
         {
             if (this.disposed)
             {
-                Debug.Log("MediaStream already Disposed");
                 return;
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
@@ -127,22 +126,26 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
-        static void MediaStreamOnAddTrack(IntPtr stream, IntPtr track)
+        static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr track)
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                var _stream = WebRTC.Table[stream] as MediaStream;
-                _stream.OnAddTrack(new MediaStreamTrackEvent(track));
+                if (WebRTC.Table[ptr] is MediaStream stream)
+                {
+                    stream.OnAddTrack(new MediaStreamTrackEvent(track));
+                }
             }, null);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
-        static void MediaStreamOnRemoveTrack(IntPtr stream, IntPtr track)
+        static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr track)
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                var _stream = WebRTC.Table[stream] as MediaStream;
-                _stream.OnRemoveTrack(new MediaStreamTrackEvent(track));
+                if (WebRTC.Table[ptr] is MediaStream stream)
+                {
+                    stream.OnRemoveTrack(new MediaStreamTrackEvent(track));
+                }
             }, null);
         }
     }
@@ -171,13 +174,10 @@ namespace Unity.WebRTC
             Cleaner.AddCleanerCallback(obj, callback);
         }
     }
+
     public static class CameraExtension
     {
-        internal static List<RenderTexture[]> camCopyRts = new List<RenderTexture[]>();
-        internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
-        internal static bool started = false;
-
-        public static VideoStreamTrack CaptureVideoStreamTrack(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+        public static VideoStreamTrack CaptureVideoStreamTrack(this Camera cam, int width, int height, int bitrate, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             switch (depth)
             {
@@ -193,11 +193,11 @@ namespace Unity.WebRTC
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, depthValue, format);
             cam.targetTexture = rt;
-            return new VideoStreamTrack("video", rt.GetNativeTexturePtr(), width, height, 1000000);
+            return new VideoStreamTrack("video", rt, bitrate);
         }
 
 
-        public static MediaStream CaptureStream(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+        public static MediaStream CaptureStream(this Camera cam, int width, int height, int bitrate, RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             switch (depth)
             {
@@ -210,50 +210,19 @@ namespace Unity.WebRTC
             }
 
             int depthValue = (int)depth;
-
-            var rts = new RenderTexture[2];
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            //rts[0] for render target, rts[1] for flip and WebRTC source
-            rts[0] = new RenderTexture(width, height, depthValue, format);
-            rts[1] = new RenderTexture(width, height,  0, format);
-            rts[0].Create();
-            rts[1].Create();
-            camCopyRts.Add(rts);
-            cam.targetTexture = rts[0];
-            cam.gameObject.AddCleanerCallback(() =>
-            {
-                RemoveRt(rts);
-                rts[0].Release();
-                rts[1].Release();
-                UnityEngine.Object.Destroy(rts[0]);
-                UnityEngine.Object.Destroy(rts[1]);
-            });
-            started = true;
+            var rt = new RenderTexture(width, height, depthValue, format);
 
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
-            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack("video", rts[1].GetNativeTexturePtr(), width, height, 1000000));
+            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate));
             stream.AddTrack(track);
-
-            // TODO::
-            // You should initialize encoder after create stream instance.
-            // This specification will change in the future.
-            //WebRTC.Context.InitializeEncoder(track.self);
             return stream;
         }
-        public static void RemoveRt(RenderTexture[] rts)
-        {
-            camCopyRts.Remove(rts);
-            if (camCopyRts.Count == 0)
-            {
-                started = false;
-            }
-        }
-
     }
 
     public static class Audio
     {
-        private static bool started = false;
+        private static bool started;
         public static MediaStream CaptureStream()
         {
             started = true;

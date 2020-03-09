@@ -182,9 +182,10 @@ namespace WebRTC
     webrtc::RTCErrorType PeerConnectionObject::SetConfiguration(const std::string& config)
     {
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
-        Convert(config, _config);
+        if (!Convert(config, _config))
+            return webrtc::RTCErrorType::INVALID_PARAMETER;
 
-        webrtc::RTCError error = connection->SetConfiguration(_config);
+        const auto error = connection->SetConfiguration(_config);
         if (!error.ok())
         {
             LogPrint(error.message());
@@ -203,7 +204,7 @@ namespace WebRTC
             Json::Value jsonIceServer = Json::Value(Json::objectValue);
             jsonIceServer["username"] = iceServer.username;
             jsonIceServer["credential"] = iceServer.password;
-            jsonIceServer["credentialType"] = (int)RTCIceCredentialType::Password;
+            jsonIceServer["credentialType"] = static_cast<int>(RTCIceCredentialType::Password);
             jsonIceServer["urls"] = Json::Value(Json::arrayValue);
             for (auto url : iceServer.urls)
             {
@@ -239,7 +240,7 @@ namespace WebRTC
         }
 
         webrtc::SdpParseError error;
-        std::unique_ptr<webrtc::IceCandidateInterface> _candidate(
+        const std::unique_ptr<webrtc::IceCandidateInterface> _candidate(
             webrtc::CreateIceCandidate(candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate, &error));
         connection->AddIceCandidate(_candidate.get());
     }

@@ -354,9 +354,11 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.m_opSessionDesc.IsError = true;
-                connection.m_opSessionDesc.Done();
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    connection.m_opSessionDesc.IsError = true;
+                    connection.m_opSessionDesc.Done();
+                }
             }, null);
         }
 
@@ -369,6 +371,7 @@ namespace Unity.WebRTC
 
         public void CollectStats()
         {
+            /// TODO:: define async operation class 
             //m_opSetDesc = new RTCSessionDescriptionAsyncOperation();
             //NativeMethods.PeerConnectionCollectStats(self);
         }
@@ -462,8 +465,10 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.OnSetSessionDescriptionSuccess();
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    connection.OnSetSessionDescriptionSuccess();
+                }
             }, null);
         }
 
@@ -472,8 +477,10 @@ namespace Unity.WebRTC
         {
             WebRTC.SyncContext.Post(_ =>
             {
-                var connection = WebRTC.Table[ptr] as RTCPeerConnection;
-                connection.OnSetSessionDescriptionFailure();
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    connection.OnSetSessionDescriptionFailure();
+                }
             }, null);
         }
 

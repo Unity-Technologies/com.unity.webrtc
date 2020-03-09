@@ -89,7 +89,7 @@ namespace WebRTC
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
     };
 
-    extern void Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);
+    extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);
     extern webrtc::SdpType ConvertSdpType(RTCSdpType type);
     extern RTCSdpType ConvertSdpType(webrtc::SdpType type);
 }
