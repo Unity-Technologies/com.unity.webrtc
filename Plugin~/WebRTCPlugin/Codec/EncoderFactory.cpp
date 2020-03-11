@@ -83,7 +83,7 @@ namespace WebRTC {
 #endif            
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
             case GRAPHICS_DEVICE_METAL: {
-                m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                encoder = std::make_unique<SoftwareEncoder>(width, height, device);
                 break;
             }
 #endif            
