@@ -9,14 +9,14 @@ namespace WebRTC {
     public:
         static EncoderFactory& GetInstance();
         static bool GetHardwareEncoderSupport();
-        bool IsInitialized() const;
-        void Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType); //Can throw exception.
-        void Shutdown();
-        IEncoder *GetEncoder() const;
+        //bool IsInitialized() const;
+        std::unique_ptr<IEncoder> Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType); //Can throw exception.
+        //void Shutdown();
+        //IEncoder *GetEncoder() const;
     private:
         EncoderFactory() = default;
         EncoderFactory(EncoderFactory const&) = delete;
         EncoderFactory& operator=(EncoderFactory const&) = delete;
-        std::unique_ptr<IEncoder> m_encoder = nullptr;
+        //std::unique_ptr<IEncoder> m_encoder = nullptr;
     };
 }

@@ -26,6 +26,15 @@ namespace WebRTC
         static ContextManager s_instance;
     };
 
+    struct VideoEncoderParameter
+    {
+        int width;
+        int height;
+        UnityEncoderType type;
+
+        VideoEncoderParameter(int width, int height, UnityEncoderType type) :width(width), height(height), type(type) { }
+    };
+
     class Context
     {
     public:
@@ -64,12 +73,11 @@ namespace WebRTC
 
         
         // You must call these methods on Rendering thread.
-        bool InitializeEncoder(IGraphicsDevice* device, webrtc::MediaStreamTrackInterface* track);
+        bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
         // You must call these methods on Rendering thread.
         void EncodeFrame(webrtc::MediaStreamTrackInterface* track);
-        // You must call these methods on Rendering thread.
-        void FinalizeEncoder(webrtc::MediaStreamTrackInterface* track);
-
+        const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
+        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type);
 
         std::map<DataChannelObject*, std::unique_ptr<DataChannelObject>> dataChannels;
 
@@ -87,6 +95,7 @@ namespace WebRTC
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> mediaSteamTrackList;
         std::map<const webrtc::MediaStreamInterface*, MediaStreamObserver*> m_mapMediaStreamObserver;
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
+        std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
     };
 
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);

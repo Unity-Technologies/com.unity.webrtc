@@ -11,7 +11,7 @@ using namespace testing;
 class ContextTest : public GraphicsDeviceTestBase
 {
 protected:
-    IEncoder* encoder_ = nullptr;
+    std::unique_ptr<IEncoder> encoder_;
     const int width = 256;
     const int height = 256;
     std::unique_ptr<Context> context;
@@ -20,14 +20,12 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
-        encoder_ = EncoderFactory::GetInstance().GetEncoder();
+        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
         EXPECT_NE(nullptr, encoder_);
 
         context = std::make_unique<Context>();
     }
     void TearDown() override {
-        EncoderFactory::GetInstance().Shutdown();
         GraphicsDeviceTestBase::TearDown();
     }
 };
@@ -35,8 +33,7 @@ TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     const auto tex = m_device->CreateDefaultTextureV(width, height);
     EXPECT_NE(nullptr, tex);
     const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
-    EXPECT_TRUE(context->InitializeEncoder(m_device, track));
-    context->FinalizeEncoder(track);
+    EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
 }
 
 TEST_P(ContextTest, CreateAndDeleteMediaStream) {
@@ -50,8 +47,7 @@ TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
     EXPECT_NE(nullptr, tex);
     const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
     EXPECT_NE(nullptr, track);
-    EXPECT_TRUE(context->InitializeEncoder(m_device, track));
-    context->FinalizeEncoder(track);
+    EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
     context->DeleteMediaStreamTrack(track);
 }
 

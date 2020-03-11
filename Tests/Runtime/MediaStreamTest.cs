@@ -41,7 +41,8 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator CreateAndDeleteVideoMediaStreamTrack()
+        [Category("MediaStreamTrack")]
+        public IEnumerator MediaStreamTrackEnabled()
         {
             var width = 256;
             var height = 256;
@@ -67,13 +68,15 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator AddAndRemoveVideoStreamTrack()
+        [Category("MediaStream")]
+        public IEnumerator MediaStreamAddTrack()
         {
             var width = 256;
             var height = 256;
             var bitrate = 1000000;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt.Create();
             var stream = new MediaStream();
             var track = new VideoStreamTrack("video", rt, bitrate);
             yield return new WaitForSeconds(0.1f);
@@ -85,6 +88,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.True(stream.RemoveTrack(track));
             Assert.AreEqual(0, stream.GetVideoTracks().Count());
             track.Dispose();
+            yield return new WaitForSeconds(0.1f);
             stream.Dispose();
             Object.DestroyImmediate(rt);
         }
@@ -104,7 +108,6 @@ namespace Unity.WebRTC.RuntimeTest
             track.Dispose();
             stream.Dispose();
         }
-
 
         [UnityTest]
         [Timeout(5000)]
@@ -131,7 +134,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(1, audioStream.GetTracks().Count());
             audioStream.Dispose();
         }
-
 
         [UnityTest]
         [Timeout(5000)]

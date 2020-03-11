@@ -150,6 +150,7 @@ namespace Unity.WebRTC
         public VideoStreamTrack(string label, IntPtr ptr, int width, int height, int bitrate)
             : base(WebRTC.Context.CreateVideoTrack(label, ptr, width, height, bitrate))
         {
+            WebRTC.Context.SetVideoEncoderParameter(self, width, height, EncoderType.Hardware);
             WebRTC.Context.InitializeEncoder(self);
             tracks.Add(this);
         }

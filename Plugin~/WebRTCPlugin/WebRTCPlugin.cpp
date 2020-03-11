@@ -59,6 +59,12 @@ extern "C"
         return context->GetEncoderType();
     }
 
+    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, webrtc::MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type)
+    {
+        context->SetEncoderParameter(track, width, height, type);
+    }
+
+
     UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
     {
         return context->CreateMediaStream(streamId);

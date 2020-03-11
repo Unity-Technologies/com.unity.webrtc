@@ -10,7 +10,7 @@ using namespace testing;
 class NvEncoderTest : public GraphicsDeviceTestBase
 {
 protected:
-    IEncoder* encoder_ = nullptr;
+    std::unique_ptr<IEncoder> encoder_;
 
     void SetUp() override {
         GraphicsDeviceTestBase::SetUp();
@@ -18,12 +18,10 @@ protected:
 
         const auto width = 256;
         const auto height = 256;
-        EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
-        encoder_ = EncoderFactory::GetInstance().GetEncoder();
+        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, encoderType);
         EXPECT_NE(nullptr, encoder_);
     }
     void TearDown() override {
-        EncoderFactory::GetInstance().Shutdown();
         GraphicsDeviceTestBase::TearDown();
     }
 };

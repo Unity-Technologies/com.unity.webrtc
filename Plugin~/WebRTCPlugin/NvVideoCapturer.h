@@ -35,8 +35,7 @@ namespace WebRTC
         }
         void StartEncoder();
         void SetFrameBuffer(void* frameBuffer);
-        bool InitializeEncoder(IGraphicsDevice* device, UnityEncoderType encoderType);
-        void FinalizeEncoder();
+        void SetEncoder(IEncoder* encoder);
         void SetKeyFrame();
         void SetSize(int32 width, int32 height);
         void SetRate(uint32 rate);
@@ -53,7 +52,7 @@ namespace WebRTC
         }
         void* unityRT = nullptr;
 
-        IEncoder* encoder_ = nullptr;
+        IEncoder* encoder_;
 
         //just fake info
         int32 width = 1280;

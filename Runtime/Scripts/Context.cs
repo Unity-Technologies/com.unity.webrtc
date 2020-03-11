@@ -166,6 +166,11 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteMediaStreamTrack(self, track);
         }
 
+        public void SetVideoEncoderParameter(IntPtr track, int width, int height, EncoderType type)
+        {
+            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, type);
+        }
+
         internal void InitializeEncoder(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;

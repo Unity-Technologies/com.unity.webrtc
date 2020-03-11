@@ -1,4 +1,6 @@
 #include "pch.h"
+
+#include "Codec/EncoderFactory.h"
 #include "Context.h"
 #include "IUnityGraphics.h"
 #include "GraphicsDevice/GraphicsDevice.h"
@@ -56,6 +58,8 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
+std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> m_mapEncoder;
+
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if(s_context == nullptr)
@@ -67,23 +71,29 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 
     switch(event)
     {
-        case VideoStreamRenderEventID::Initialize:
-            if(!GraphicsDevice::GetInstance().IsInitialized()) {
+        case VideoStreamRenderEventID::Initialize: {
+            if (!GraphicsDevice::GetInstance().IsInitialized()) {
                 GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
             }
             s_device = GraphicsDevice::GetInstance().GetDevice();
-            s_context->InitializeEncoder(s_device, track);
+            const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
+            m_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, param->type);
+            s_context->InitializeEncoder(m_mapEncoder[track].get(), track);
             return;
-        case VideoStreamRenderEventID::Encode:
+        }
+        case VideoStreamRenderEventID::Encode: {
             s_context->EncodeFrame(track);
             return;
-        case VideoStreamRenderEventID::Finalize:
-            s_context->FinalizeEncoder(track);
+        }
+        case VideoStreamRenderEventID::Finalize: {
+            m_mapEncoder.erase(track);
             GraphicsDevice::GetInstance().Shutdown();
             return;
-        default:
+        }
+        default: {
             LogPrint("Unknown event id %d", eventID);
             return;
+        }
     }
 }
 

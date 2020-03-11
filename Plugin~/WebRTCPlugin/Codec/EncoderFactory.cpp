@@ -41,23 +41,19 @@ namespace WebRTC {
 #endif
     }
 
-    bool EncoderFactory::IsInitialized() const
-    {
-        return m_encoder.get() != nullptr;
-    }
-
     //Can throw exception. The caller is expected to catch it.
-    void EncoderFactory::Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType)
+    std::unique_ptr<IEncoder> EncoderFactory::Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType)
     {
+        std::unique_ptr<IEncoder> encoder;
         const GraphicsDeviceType deviceType = device->GetDeviceType();
         switch (deviceType) {
 #if defined(SUPPORT_D3D11)
             case GRAPHICS_DEVICE_D3D11: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
-                    m_encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+                    encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
                 } else {
-                    m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                    encoder = std::make_unique<SoftwareEncoder>(width, height, device);
                 }
                 break;
             }
@@ -66,22 +62,22 @@ namespace WebRTC {
             case GRAPHICS_DEVICE_D3D12: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
-                    m_encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
+                    encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
                 } else {
-                    m_encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                    encoder = std::make_unique<SoftwareEncoder>(width, height, device);
                 }
                 break;
             }
 #endif
 #if defined(SUPPORT_OPENGL_CORE)
             case GRAPHICS_DEVICE_OPENGL: {
-                m_encoder = std::make_unique<NvEncoderGL>(width, height, device);
+                encoder = std::make_unique<NvEncoderGL>(width, height, device);
                 break;
             }
 #endif
 #if defined(SUPPORT_VULKAN)
             case GRAPHICS_DEVICE_VULKAN: {
-                m_encoder = std::make_unique<NvEncoderCuda>(width, height, device);
+                encoder = std::make_unique<NvEncoderCuda>(width, height, device);
                 break;
             }
 #endif            
@@ -96,15 +92,7 @@ namespace WebRTC {
                 break;
             }           
         }
-
-        m_encoder->InitV();
-    }
-    void EncoderFactory::Shutdown()
-    {
-        m_encoder.reset();
-    }
-    IEncoder* EncoderFactory::GetEncoder() const
-    {
-        return m_encoder.get();
+        encoder->InitV();
+        return encoder;
     }
 }
