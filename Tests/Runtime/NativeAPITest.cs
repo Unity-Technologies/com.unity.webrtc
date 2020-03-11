@@ -79,22 +79,24 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
+        static void PeerConnectionSetSessionDescSuccess(IntPtr connection)
+        {
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
+        static void PeerConnectionSetSessionDescFailure(IntPtr connection)
+        {
+        }
+
         [Test]
         public void RegisterDelegateToPeerConnection()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
             var connection = NativeMethods.ContextCreatePeerConnection(context);
 
-            void DelegateNativePeerConnectionSetSessionDescSuccess(IntPtr _connection)
-            {
-            }
-
-            void DelegateNativePeerConnectionSetSessionDescFailure(IntPtr _connection)
-            {
-            }
-
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(context, connection, DelegateNativePeerConnectionSetSessionDescSuccess);
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(context, connection, DelegateNativePeerConnectionSetSessionDescFailure);
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(context, connection, PeerConnectionSetSessionDescSuccess);
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(context, connection, PeerConnectionSetSessionDescFailure);
             NativeMethods.ContextDeletePeerConnection(context, connection);
             NativeMethods.ContextDestroy(0);
         }
@@ -120,22 +122,20 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
+        static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr track) { }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
+        static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr track) { }
+
         [Test]
         public void RegisterDelegateToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
 
-            void DelegateOnAddTrack(IntPtr _stream, IntPtr _track)
-            {
-            }
-
-            void DelegateOnRemoveTrack(IntPtr _stream, IntPtr _track)
-            {
-            }
-
-            NativeMethods.MediaStreamRegisterOnAddTrack(context, stream, DelegateOnAddTrack);
-            NativeMethods.MediaStreamRegisterOnRemoveTrack(context, stream, DelegateOnRemoveTrack);
+            NativeMethods.MediaStreamRegisterOnAddTrack(context, stream, MediaStreamOnAddTrack);
+            NativeMethods.MediaStreamRegisterOnRemoveTrack(context, stream, MediaStreamOnRemoveTrack);
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDestroy(0);
         }

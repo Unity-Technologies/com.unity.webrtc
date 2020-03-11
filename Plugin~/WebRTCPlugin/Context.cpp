@@ -127,14 +127,14 @@ namespace WebRTC
         : m_uid(uid)
         , m_encoderType(encoderType)
     {
-        workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
-        workerThread->Start();
-        signalingThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
-        signalingThread->Start();
+        m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
+        m_workerThread->Start();
+        m_signalingThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
+        m_signalingThread->Start();
 
         rtc::InitializeSSL();
 
-        audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
 
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
         //Always use SoftwareEncoder on Mac for now.
@@ -145,11 +145,11 @@ namespace WebRTC
             std::make_unique<DummyVideoEncoderFactory>() : webrtc::CreateBuiltinVideoEncoderFactory();
 #endif
 
-        peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
-                                workerThread.get(),
-                                workerThread.get(),
-                                signalingThread.get(),
-                                audioDevice,
+        m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+                                m_workerThread.get(),
+                                m_workerThread.get(),
+                                m_signalingThread.get(),
+                                m_audioDevice,
                                 webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
                                 webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
                                 std::move(videoEncoderFactory),
@@ -161,31 +161,31 @@ namespace WebRTC
     Context::~Context()
     {
         dataChannels.clear();
-        clients.clear();
-        peerConnectionFactory = nullptr;
-        audioTrack = nullptr;
-        mediaSteamTrackList.clear();
-        mediaStreamMap.clear();
+        m_mapClients.clear();
+        m_peerConnectionFactory = nullptr;
+        m_audioTrack = nullptr;
+        m_mediaSteamTrackList.clear();
+        m_mapMediaStream.clear();
         m_mapSetSessionDescriptionObserver.clear();
-        videoCapturerList.clear();
+        m_mapVideoCapturer.clear();
 
-        workerThread->Quit();
-        workerThread.reset();
-        signalingThread->Quit();
-        signalingThread.reset();
+        m_workerThread->Quit();
+        m_workerThread.reset();
+        m_signalingThread->Quit();
+        m_signalingThread.reset();
     }
 
 
     bool Context::InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track)
     {
-        videoCapturerList[track]->SetEncoder(encoder);
-        videoCapturerList[track]->StartEncoder();
+        m_mapVideoCapturer[track]->SetEncoder(encoder);
+        m_mapVideoCapturer[track]->StartEncoder();
         return true;
     }
 
     void Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
     {
-        if (!videoCapturerList[track]->EncodeVideoData())
+        if (!m_mapVideoCapturer[track]->EncodeVideoData())
         {
         }
     }
@@ -205,7 +205,7 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
-        auto stream = peerConnectionFactory->CreateLocalMediaStream(streamId);
+        auto stream = m_peerConnectionFactory->CreateLocalMediaStream(streamId);
         const auto observer = new MediaStreamObserver(stream);
         stream->RegisterObserver(observer);
         m_mapMediaStreamObserver[stream] = observer;
@@ -230,17 +230,17 @@ namespace WebRTC
         const auto ptr = videoCapturer.get();
         videoCapturer->SetFrameBuffer(frameBuffer);
 
-        const auto source(WebRTC::VideoCapturerTrackSource::Create(workerThread.get(), std::move(videoCapturer), false));
-        const auto videoTrack = peerConnectionFactory->CreateVideoTrack(label, source).release();
-        videoCapturerList[videoTrack] = ptr;
+        const auto source(WebRTC::VideoCapturerTrackSource::Create(m_workerThread.get(), std::move(videoCapturer), false));
+        const auto videoTrack = m_peerConnectionFactory->CreateVideoTrack(label, source).release();
+        m_mapVideoCapturer[videoTrack] = ptr;
         return videoTrack;
     }
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-        if(videoCapturerList.count(track) > 0)
+        if(m_mapVideoCapturer.count(track) > 0)
         {
-            videoCapturerList[track]->Stop();
+            m_mapVideoCapturer[track]->Stop();
         }
     }
 
@@ -251,7 +251,7 @@ namespace WebRTC
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
-        return peerConnectionFactory->CreateAudioTrack(label, peerConnectionFactory->CreateAudioSource(audioOptions)).release();
+        return m_peerConnectionFactory->CreateAudioTrack(label, m_peerConnectionFactory->CreateAudioSource(audioOptions)).release();
     }
 
     void Context::DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
@@ -261,7 +261,7 @@ namespace WebRTC
 
     void Context::ProcessAudioData(const float* data, int32 size)
     {
-        audioDevice->ProcessAudioData(data, size);
+        m_audioDevice->ProcessAudioData(data, size);
     }
 
     DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)
@@ -279,6 +279,11 @@ namespace WebRTC
         auto ptr = dataChannelObj.get();
         dataChannels[ptr] = std::move(dataChannelObj);
         return ptr;
+    }
+
+    void Context::AddDataChannel(std::unique_ptr<DataChannelObject>& channel) {
+        const auto ptr = channel.get();
+        dataChannels[ptr] = std::move(channel);
     }
 
     void Context::DeleteDataChannel(DataChannelObject* obj)

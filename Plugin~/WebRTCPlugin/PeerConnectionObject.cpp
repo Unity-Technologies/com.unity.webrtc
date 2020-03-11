@@ -36,14 +36,14 @@ namespace WebRTC
     PeerConnectionObject* Context::CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
         rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
-        obj->connection = peerConnectionFactory->CreatePeerConnection(config, nullptr, nullptr, obj);
+        obj->connection = m_peerConnectionFactory->CreatePeerConnection(config, nullptr, nullptr, obj);
         if (obj->connection == nullptr)
         {
             return nullptr;
         }
         auto ptr = obj.get();
-        clients[ptr] = std::move(obj);
-        return clients[ptr].get();
+        m_mapClients[ptr] = std::move(obj);
+        return m_mapClients[ptr].get();
     }
 
     void PeerConnectionObject::OnSuccess(webrtc::SessionDescriptionInterface* desc)
@@ -67,16 +67,15 @@ namespace WebRTC
         }
     }
 
-    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
-    {
+    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
         auto obj = std::make_unique<DataChannelObject>(channel, *this);
-        auto ptr = obj.get();
-        context.dataChannels[ptr] = std::move(obj);
-        if (onDataChannel != nullptr)
-        {
+        const auto ptr = obj.get();
+        context.AddDataChannel(obj);
+        if (onDataChannel != nullptr) {
             onDataChannel(this, ptr);
         }
     }
+
     void PeerConnectionObject::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
     {
         std::string out;
@@ -248,9 +247,13 @@ namespace WebRTC
     bool PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
     {
         if (sdp == nullptr)
+        {
             return false;
+        }
+
         std::string out;
         sdp->ToString(&out);
+        debugLog(out.c_str());
 
         desc.type = ConvertSdpType(sdp->GetType());
         desc.sdp = static_cast<char*>(CoTaskMemAlloc(out.size() + 1));

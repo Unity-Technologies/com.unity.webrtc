@@ -44,12 +44,12 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(0, peer.GetSenders().Count());
             Assert.AreEqual(0, peer.GetTransceivers().Count());
             Assert.AreEqual(RTCPeerConnectionState.New, peer.ConnectionState);
-            Assert.That(() => Assert.NotNull(peer.LocalDescription), Throws.InvalidOperationException);
-            Assert.That(() => Assert.NotNull(peer.RemoteDescription), Throws.InvalidOperationException);
-            Assert.That(() => Assert.NotNull(peer.PendingLocalDescription), Throws.InvalidOperationException);
-            Assert.That(() => Assert.NotNull(peer.PendingRemoteDescription), Throws.InvalidOperationException);
-            Assert.That(() => Assert.NotNull(peer.CurrentLocalDescription), Throws.InvalidOperationException);
-            Assert.That(() => Assert.NotNull(peer.CurrentRemoteDescription), Throws.InvalidOperationException);
+            Assert.That(() => peer.LocalDescription, Throws.InvalidOperationException);
+            Assert.That(() => peer.RemoteDescription, Throws.InvalidOperationException);
+            Assert.That(() => peer.PendingLocalDescription, Throws.InvalidOperationException);
+            Assert.That(() => peer.PendingRemoteDescription, Throws.InvalidOperationException);
+            Assert.That(() => peer.CurrentLocalDescription, Throws.InvalidOperationException);
+            Assert.That(() => peer.CurrentRemoteDescription, Throws.InvalidOperationException);
             peer.Close();
 
             Assert.AreEqual(RTCPeerConnectionState.Closed, peer.ConnectionState);

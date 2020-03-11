@@ -65,10 +65,11 @@ namespace WebRTC
         void AddObserver(const webrtc::PeerConnectionInterface* connection, const rtc::scoped_refptr<SetSessionDescriptionObserver>& observer);
         void RemoveObserver(const webrtc::PeerConnectionInterface* connection);
         SetSessionDescriptionObserver* GetObserver(webrtc::PeerConnectionInterface* connection);
-        void DeletePeerConnection(PeerConnectionObject* obj) { clients.erase(obj); }
+        void DeletePeerConnection(PeerConnectionObject* obj) { m_mapClients.erase(obj); }
 
         // DataChannel
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
+        void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
         void DeleteDataChannel(DataChannelObject* obj);
 
         
@@ -84,15 +85,15 @@ namespace WebRTC
     private:
         int m_uid;
         UnityEncoderType m_encoderType;
-        std::unique_ptr<rtc::Thread> workerThread;
-        std::unique_ptr<rtc::Thread> signalingThread;
-        std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> clients;
-        rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
-        rtc::scoped_refptr<DummyAudioDevice> audioDevice;
-        rtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack;
-        std::map<webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> videoCapturerList;
-        std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> mediaStreamMap;
-        std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> mediaSteamTrackList;
+        std::unique_ptr<rtc::Thread> m_workerThread;
+        std::unique_ptr<rtc::Thread> m_signalingThread;
+        rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
+        rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
+        rtc::scoped_refptr<webrtc::AudioTrackInterface> m_audioTrack;
+        std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> m_mediaSteamTrackList;
+        std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
+        std::map<const webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> m_mapVideoCapturer;
+        std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> m_mapMediaStream;
         std::map<const webrtc::MediaStreamInterface*, MediaStreamObserver*> m_mapMediaStreamObserver;
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;

@@ -399,6 +399,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
@@ -453,16 +454,22 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionCollectStats(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetPendingLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetPendingRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetCurrentLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetCurrentRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc);
@@ -473,6 +480,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, ref RTCIceCandidate​ candidate);
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);
@@ -493,8 +501,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetTrack(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool TransceiverStop(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetReceiver(IntPtr transceiver);
@@ -523,8 +533,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MediaStreamRemoveTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr MediaStreamGetVideoTracks(IntPtr stream, ref int length);
@@ -543,6 +555,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr MediaStreamTrackGetID(IntPtr track);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MediaStreamTrackGetEnabled(IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamTrackSetEnabled(IntPtr track, bool enabled);
