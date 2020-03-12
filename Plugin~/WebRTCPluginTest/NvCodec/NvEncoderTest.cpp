@@ -32,7 +32,7 @@ TEST_P(NvEncoderTest, IsSupported) {
 TEST_P(NvEncoderTest, CopyBuffer) {
     const auto width = 256;
     const auto height = 256;
-    auto tex = m_device->CreateDefaultTextureV(width, height);
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     const auto result = encoder_->CopyBuffer(tex->GetEncodeTexturePtrV());
     EXPECT_TRUE(result);
 }

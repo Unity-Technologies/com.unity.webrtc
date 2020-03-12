@@ -30,11 +30,10 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    const auto tex = m_device->CreateDefaultTextureV(width, height);
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     EXPECT_NE(nullptr, tex);
-    const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
+    const auto track = context->CreateVideoTrack("video", tex.get(), 256, 256, 10000000);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
-    delete tex;
 }
 
 TEST_P(ContextTest, CreateAndDeleteMediaStream) {
@@ -44,13 +43,12 @@ TEST_P(ContextTest, CreateAndDeleteMediaStream) {
 
 
 TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
-    const auto tex = m_device->CreateDefaultTextureV(width, height);
-    EXPECT_NE(nullptr, tex);
-    const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
+    EXPECT_NE(nullptr, tex.get());
+    const auto track = context->CreateVideoTrack("video", tex.get(), 256, 256, 10000000);
     EXPECT_NE(nullptr, track);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
     context->DeleteMediaStreamTrack(track);
-    delete tex;
 }
 
 TEST_P(ContextTest, CreateAndDeleteAudioTrack) {
@@ -69,15 +67,14 @@ TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
-    const auto tex = m_device->CreateDefaultTextureV(width, height);
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     const auto stream = context->CreateMediaStream("videostream");
-    const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
-    const auto videotrack = reinterpret_cast<webrtc::AudioTrackInterface*>(track);
-    stream->AddTrack(videotrack);
-    stream->RemoveTrack(videotrack);
+    const auto track = context->CreateVideoTrack("video", tex.get(), 256, 256, 10000000);
+    const auto videoTrack = reinterpret_cast<webrtc::AudioTrackInterface*>(track);
+    stream->AddTrack(videoTrack);
+    stream->RemoveTrack(videoTrack);
     context->DeleteMediaStream(stream);
     context->DeleteMediaStreamTrack(track);
-    delete tex;
 }
 
 TEST_P(ContextTest, CreateAndDeletePeerConnection) {

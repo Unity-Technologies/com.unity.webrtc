@@ -11,9 +11,9 @@ TEST_P(GraphicsDeviceTest, GraphicsDeviceIsNotNull) {
 }
 
 TEST_P(GraphicsDeviceTest, CreateDefaultTextureV) {
-    auto width = 256;
-    auto height = 256;
-    auto tex = m_device->CreateDefaultTextureV(width, height);
+    const auto width = 256;
+    const auto height = 256;
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     EXPECT_TRUE(tex->IsSize(width, height));
     EXPECT_NE(nullptr, tex->GetEncodeTexturePtrV());
     EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
@@ -22,9 +22,9 @@ TEST_P(GraphicsDeviceTest, CreateDefaultTextureV) {
 
 #if defined(SUPPORT_SOFTWARE_ENCODER)
 TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
-    auto width = 256;
-    auto height = 256;
-    auto tex = m_device->CreateCPUReadTextureV(width, height);
+    const auto width = 256;
+    const auto height = 256;
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateCPUReadTextureV(width, height));
     EXPECT_TRUE(tex->IsSize(width, height));
     EXPECT_NE(nullptr, tex->GetEncodeTexturePtrV());
     EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
@@ -39,17 +39,18 @@ TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
 TEST_P(GraphicsDeviceTest, CopyResourceV) {
     const auto width = 256;
     const auto height = 256;
-    const auto src = m_device->CreateDefaultTextureV(width, height);
-    const auto dst = m_device->CreateDefaultTextureV(width, height);
+    const std::unique_ptr<ITexture2D> src(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr<ITexture2D> dst(m_device->CreateDefaultTextureV(width, height));
+    EXPECT_TRUE(m_device->CopyResourceV(dst.get(), src.get()));
 }
 
 TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
     const auto width = 256;
     const auto height = 256;
-    const auto src = m_device->CreateDefaultTextureV(width, height);
-    const auto dst = m_device->CreateDefaultTextureV(width, height);
-    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst, src->GetEncodeTexturePtrV()));
-    EXPECT_FALSE(m_device->CopyResourceFromNativeV(dst, dst->GetEncodeTexturePtrV()));
+    const std::unique_ptr<ITexture2D> src(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr<ITexture2D> dst(m_device->CreateDefaultTextureV(width, height));
+    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst.get(), src->GetEncodeTexturePtrV()));
+    EXPECT_FALSE(m_device->CopyResourceFromNativeV(dst.get(), dst->GetEncodeTexturePtrV()));
 }
 #endif
 
