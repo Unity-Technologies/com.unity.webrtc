@@ -53,8 +53,8 @@ namespace WebRTC
 
 
         // MediaStreamTrack
-        webrtc::MediaStreamTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
-        webrtc::MediaStreamTrackInterface* CreateAudioTrack(const std::string& label);
+        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
+        webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label);
         void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void ProcessAudioData(const float* data, int32 size);
@@ -80,8 +80,6 @@ namespace WebRTC
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
         void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type);
 
-        std::map<DataChannelObject*, std::unique_ptr<DataChannelObject>> dataChannels;
-
     private:
         int m_uid;
         UnityEncoderType m_encoderType;
@@ -91,12 +89,13 @@ namespace WebRTC
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> m_audioTrack;
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> m_mediaSteamTrackList;
-        std::map<PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
+        std::map<const PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
         std::map<const webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> m_mapVideoCapturer;
         std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> m_mapMediaStream;
-        std::map<const webrtc::MediaStreamInterface*, MediaStreamObserver*> m_mapMediaStreamObserver;
+        std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
+        std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
     };
 
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);

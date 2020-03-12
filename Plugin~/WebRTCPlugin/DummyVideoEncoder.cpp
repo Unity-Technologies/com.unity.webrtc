@@ -91,10 +91,6 @@ namespace WebRTC
 
     std::unique_ptr<webrtc::VideoEncoder> DummyVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-//        auto dummyVideoEncoder = std::make_unique<DummyVideoEncoder>();
-//        dummyVideoEncoder->SetKeyFrame.connect(capturer, &NvVideoCapturer::SetKeyFrame);
-//        dummyVideoEncoder->SetRate.connect(capturer, &NvVideoCapturer::SetRate);
-//        return dummyVideoEncoder;
         return std::make_unique<DummyVideoEncoder>();
     }
 }

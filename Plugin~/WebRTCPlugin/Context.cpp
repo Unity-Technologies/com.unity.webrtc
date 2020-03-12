@@ -160,14 +160,17 @@ namespace WebRTC
 
     Context::~Context()
     {
-        dataChannels.clear();
-        m_mapClients.clear();
         m_peerConnectionFactory = nullptr;
         m_audioTrack = nullptr;
+
         m_mediaSteamTrackList.clear();
-        m_mapMediaStream.clear();
-        m_mapSetSessionDescriptionObserver.clear();
+        m_mapClients.clear();
         m_mapVideoCapturer.clear();
+        m_mapMediaStream.clear();
+        m_mapMediaStreamObserver.clear();
+        m_mapSetSessionDescriptionObserver.clear();
+        m_mapVideoEncoderParameter.clear();
+        m_mapDataChannels.clear();
 
         m_workerThread->Quit();
         m_workerThread.reset();
@@ -205,33 +208,34 @@ namespace WebRTC
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
     {
-        auto stream = m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        const auto observer = new MediaStreamObserver(stream);
-        stream->RegisterObserver(observer);
-        m_mapMediaStreamObserver[stream] = observer;
+        rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
+            m_peerConnectionFactory->CreateLocalMediaStream(streamId);
+        m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream);
+        stream->RegisterObserver(m_mapMediaStreamObserver[stream].get());
         return stream.release();
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
-        const auto observer = m_mapMediaStreamObserver[stream];
-        stream->UnregisterObserver(observer);
+        stream->UnregisterObserver(m_mapMediaStreamObserver[stream].get());
         m_mapMediaStreamObserver.erase(stream);
     }
 
     MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
     {
-        return m_mapMediaStreamObserver[stream];
+        return m_mapMediaStreamObserver[stream].get();
     }
 
-    webrtc::MediaStreamTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
+    webrtc::VideoTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
     {
         auto videoCapturer = std::make_unique<NvVideoCapturer>();
-        const auto ptr = videoCapturer.get();
+        const std::unique_ptr<NvVideoCapturer>::pointer ptr = videoCapturer.get();
         videoCapturer->SetFrameBuffer(frameBuffer);
 
-        const auto source(WebRTC::VideoCapturerTrackSource::Create(m_workerThread.get(), std::move(videoCapturer), false));
-        const auto videoTrack = m_peerConnectionFactory->CreateVideoTrack(label, source).release();
+        const rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(
+            WebRTC::VideoCapturerTrackSource::Create(m_workerThread.get(), std::move(videoCapturer), false));
+        webrtc::VideoTrackInterface* videoTrack =
+            m_peerConnectionFactory->CreateVideoTrack(label, source).release();
         m_mapVideoCapturer[videoTrack] = ptr;
         return videoTrack;
     }
@@ -244,7 +248,7 @@ namespace WebRTC
         }
     }
 
-    webrtc::MediaStreamTrackInterface* Context::CreateAudioTrack(const std::string& label)
+    webrtc::AudioTrackInterface* Context::CreateAudioTrack(const std::string& label)
     {
         //avoid optimization specially for voice
         cricket::AudioOptions audioOptions;
@@ -256,7 +260,7 @@ namespace WebRTC
 
     void Context::DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-		// Nothing to do
+        track->Release();
     }
 
     void Context::ProcessAudioData(const float* data, int32 size)
@@ -277,20 +281,20 @@ namespace WebRTC
         auto channel = obj->connection->CreateDataChannel(label, &config);
         auto dataChannelObj = std::make_unique<DataChannelObject>(channel, *obj);
         auto ptr = dataChannelObj.get();
-        dataChannels[ptr] = std::move(dataChannelObj);
+        m_mapDataChannels[ptr] = std::move(dataChannelObj);
         return ptr;
     }
 
     void Context::AddDataChannel(std::unique_ptr<DataChannelObject>& channel) {
         const auto ptr = channel.get();
-        dataChannels[ptr] = std::move(channel);
+        m_mapDataChannels[ptr] = std::move(channel);
     }
 
     void Context::DeleteDataChannel(DataChannelObject* obj)
     {
-        if (dataChannels.count(obj) > 0)
+        if (m_mapDataChannels.count(obj) > 0)
         {
-            dataChannels.erase(obj);
+            m_mapDataChannels.erase(obj);
         }
     }
 
