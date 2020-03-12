@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System;
 
 namespace Unity.WebRTC
@@ -16,9 +16,6 @@ namespace Unity.WebRTC
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
 
-        private DelegateNativeOnMessage selfOnMessage;
-        private DelegateNativeOnOpen selfOnOpen;
-        private DelegateNativeOnClose selfOnClose;
         private int id;
         private bool disposed;
 
@@ -29,8 +26,7 @@ namespace Unity.WebRTC
             set
             {
                 onMessage = value;
-                selfOnMessage = new DelegateNativeOnMessage(DataChannelNativeOnMessage);
-                NativeMethods.DataChannelRegisterOnMessage(self, selfOnMessage);
+                NativeMethods.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
             }
         }
 
@@ -40,8 +36,7 @@ namespace Unity.WebRTC
             set
             {
                 onOpen = value;
-                selfOnOpen = new DelegateNativeOnOpen(DataChannelNativeOnOpen);
-                NativeMethods.DataChannelRegisterOnOpen(self, selfOnOpen);
+                NativeMethods.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);
             }
         }
         public DelegateOnClose OnClose
@@ -50,8 +45,7 @@ namespace Unity.WebRTC
             set
             {
                 onClose = value;
-                selfOnClose = new DelegateNativeOnClose(DataChannelNativeOnClose);
-                NativeMethods.DataChannelRegisterOnClose(self, selfOnClose);
+                NativeMethods.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
             }
         }
 

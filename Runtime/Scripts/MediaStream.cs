@@ -13,9 +13,7 @@ namespace Unity.WebRTC
     public class MediaStream : IDisposable
     {
         private DelegateOnAddTrack onAddTrack;
-        private DelegateNativeMediaStreamOnAddTrack selfOnAddTrack;
         private DelegateOnRemoveTrack onRemoveTrack;
-        private DelegateNativeMediaStreamOnRemoveTrack selfOnRemoveTrack;
 
         internal IntPtr self;
         private readonly string id;
@@ -57,8 +55,7 @@ namespace Unity.WebRTC
             set
             {
                 onAddTrack = value;
-                selfOnAddTrack = MediaStreamOnAddTrack;
-                WebRTC.Context.MediaStreamRegisterOnAddTrack(self, selfOnAddTrack);
+                WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
             }
         }
 
@@ -68,8 +65,7 @@ namespace Unity.WebRTC
             set
             {
                 onRemoveTrack = value;
-                selfOnRemoveTrack = MediaStreamOnRemoveTrack;
-                WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, selfOnRemoveTrack);
+                WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);
             }
         }
 

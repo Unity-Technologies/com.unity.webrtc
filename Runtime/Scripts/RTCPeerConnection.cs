@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
@@ -20,21 +19,14 @@ namespace Unity.WebRTC
         private int m_id;
         private IntPtr self;
         private DelegateOnIceConnectionChange onIceConnectionChange;
-        private DelegateNativeOnIceConnectionChange selfOnIceConnectionChange;
         private DelegateOnIceCandidate onIceCandidate;
-        private DelegateNativeOnIceCandidate selfOnIceCandidate;
         private DelegateOnDataChannel onDataChannel;
-        private DelegateNativeOnDataChannel selfOnDataChannel;
-        private DelegateNativeOnTrack selfOnTrack;
         private DelegateOnTrack onTrack;
         private DelegateOnNegotiationNeeded onNegotiationNeeded;
-        private DelegateNativeOnNegotiationNeeded selfOnNegotiationNeeded;
         private DelegateCreateSDSuccess onCreateSDSuccess;
         private DelegateCreateSDFailure onCreateSDFailure;
         private DelegateSetSessionDescSuccess onSetSessionDescSuccess;
-        private DelegateNativePeerConnectionSetSessionDescSuccess selfOnPeerConnectionSetSessionDescSuccess;
         private DelegateSetSessionDescFailure onSetSetSessionDescFailure;
-        private DelegateNativePeerConnectionSetSessionDescFailure selfOnPeerConnectionSetSessionDescFailure;
         private DelegateCollectStats m_onStatsDeliveredCallback;
 
         private RTCIceCandidateRequestAsyncOperation opIceCandidateRequest;
@@ -110,8 +102,7 @@ namespace Unity.WebRTC
             set
             {
                 onIceConnectionChange = value;
-                selfOnIceConnectionChange = PCOnIceConnectionChange;
-                NativeMethods.PeerConnectionRegisterIceConnectionChange(self, selfOnIceConnectionChange);
+                NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
             }
         }
 
@@ -121,8 +112,7 @@ namespace Unity.WebRTC
             set
             {
                 onIceCandidate = value;
-                selfOnIceCandidate = PCOnIceCandidate;
-                NativeMethods.PeerConnectionRegisterOnIceCandidate(self, selfOnIceCandidate);
+                NativeMethods.PeerConnectionRegisterOnIceCandidate(self, PCOnIceCandidate);
             }
         }
 
@@ -132,8 +122,7 @@ namespace Unity.WebRTC
             set
             {
                 onDataChannel = value;
-                selfOnDataChannel = PCOnDataChannel;
-                NativeMethods.PeerConnectionRegisterOnDataChannel(self, selfOnDataChannel);
+                NativeMethods.PeerConnectionRegisterOnDataChannel(self, PCOnDataChannel);
             }
         }
 
@@ -143,8 +132,7 @@ namespace Unity.WebRTC
             set
             {
                 onNegotiationNeeded = value;
-                selfOnNegotiationNeeded = PCOnNegotiationNeeded;
-                NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, selfOnNegotiationNeeded);
+                NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);
             }
         }
 
@@ -154,8 +142,7 @@ namespace Unity.WebRTC
             set
             {
                 onTrack = value;
-                selfOnTrack = PCOnTrack;
-                NativeMethods.PeerConnectionRegisterOnTrack(self, selfOnTrack);
+                NativeMethods.PeerConnectionRegisterOnTrack(self, PCOnTrack);
             }
         }
 
@@ -165,9 +152,8 @@ namespace Unity.WebRTC
             set
             {
                 onSetSessionDescSuccess = value;
-                selfOnPeerConnectionSetSessionDescSuccess = OnSetSessionDescSuccess;
                 WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(self,
-                    selfOnPeerConnectionSetSessionDescSuccess);
+                    OnSetSessionDescSuccess);
             }
         }
 
@@ -177,9 +163,8 @@ namespace Unity.WebRTC
             set
             {
                 onSetSetSessionDescFailure = value;
-                selfOnPeerConnectionSetSessionDescFailure = OnSetSessionDescFailure;
                 WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(self,
-                    selfOnPeerConnectionSetSessionDescFailure);
+                    OnSetSessionDescFailure);
             }
         }
 
