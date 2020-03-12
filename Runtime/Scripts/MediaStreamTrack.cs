@@ -92,7 +92,7 @@ namespace Unity.WebRTC
         UnityEngine.Texture source;
         UnityEngine.RenderTexture dest;
 
-        private static UnityEngine.RenderTexture CopyRenderTexture(UnityEngine.RenderTexture source)
+        private static UnityEngine.RenderTexture CreateRenderTexture(UnityEngine.RenderTexture source)
         {
             var tex = new UnityEngine.RenderTexture(source.width, source.height, 0, source.format);
             tex.Create();
@@ -131,7 +131,7 @@ namespace Unity.WebRTC
         /// <param name="height"></param>
         /// <param name="bitrate"></param>
         public VideoStreamTrack(string label, UnityEngine.RenderTexture source, int bitrate)
-            : this(label, source, CopyRenderTexture(source), source.width, source.height, bitrate)
+            : this(label, source, CreateRenderTexture(source), source.width, source.height, bitrate)
         {
         }
 

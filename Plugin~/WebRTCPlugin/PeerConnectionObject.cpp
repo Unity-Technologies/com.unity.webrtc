@@ -253,7 +253,6 @@ namespace WebRTC
 
         std::string out;
         sdp->ToString(&out);
-        debugLog(out.c_str());
 
         desc.type = ConvertSdpType(sdp->GetType());
         desc.sdp = static_cast<char*>(CoTaskMemAlloc(out.size() + 1));
