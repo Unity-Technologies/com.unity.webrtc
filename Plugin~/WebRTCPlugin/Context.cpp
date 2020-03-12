@@ -219,6 +219,7 @@ namespace WebRTC
     {
         stream->UnregisterObserver(m_mapMediaStreamObserver[stream].get());
         m_mapMediaStreamObserver.erase(stream);
+        stream->Release();
     }
 
     MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)

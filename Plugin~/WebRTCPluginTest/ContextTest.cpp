@@ -34,6 +34,7 @@ TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     EXPECT_NE(nullptr, tex);
     const auto track = context->CreateVideoTrack("video", tex, 256, 256, 10000000);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
+    delete tex;
 }
 
 TEST_P(ContextTest, CreateAndDeleteMediaStream) {
@@ -49,6 +50,7 @@ TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
     EXPECT_NE(nullptr, track);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
     context->DeleteMediaStreamTrack(track);
+    delete tex;
 }
 
 TEST_P(ContextTest, CreateAndDeleteAudioTrack) {
@@ -75,6 +77,7 @@ TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
     stream->RemoveTrack(videotrack);
     context->DeleteMediaStream(stream);
     context->DeleteMediaStreamTrack(track);
+    delete tex;
 }
 
 TEST_P(ContextTest, CreateAndDeletePeerConnection) {
