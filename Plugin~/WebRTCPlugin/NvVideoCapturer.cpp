@@ -71,5 +71,6 @@ namespace WebRTC
 
     void NvVideoCapturer::SetEncoder(IEncoder* encoder) {
         encoder_ = encoder;
+        encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
     }
 }
