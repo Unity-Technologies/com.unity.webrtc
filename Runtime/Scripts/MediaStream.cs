@@ -129,7 +129,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    stream.OnAddTrack?.Invoke(new MediaStreamTrackEvent(track));
+                    stream.onAddTrack?.Invoke(new MediaStreamTrackEvent(track));
                 }
             });
         }
@@ -141,7 +141,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    stream.OnRemoveTrack?.Invoke(new MediaStreamTrackEvent(track));
+                    stream.onRemoveTrack?.Invoke(new MediaStreamTrackEvent(track));
                 }
             });
         }

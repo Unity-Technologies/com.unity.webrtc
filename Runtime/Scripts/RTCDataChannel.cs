@@ -11,7 +11,6 @@ namespace Unity.WebRTC
     public class RTCDataChannel : IDisposable
     {
         private IntPtr self;
-        private RTCPeerConnection peerConnection;
         private DelegateOnMessage onMessage;
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
@@ -26,7 +25,6 @@ namespace Unity.WebRTC
             set
             {
                 onMessage = value;
-                NativeMethods.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
             }
         }
 
@@ -36,7 +34,6 @@ namespace Unity.WebRTC
             set
             {
                 onOpen = value;
-                NativeMethods.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);
             }
         }
         public DelegateOnClose OnClose
@@ -45,7 +42,6 @@ namespace Unity.WebRTC
             set
             {
                 onClose = value;
-                NativeMethods.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
             }
         }
 
@@ -60,8 +56,10 @@ namespace Unity.WebRTC
         {
             WebRTC.Sync(ptr, () =>
             {
-                var channel = WebRTC.Table[ptr] as RTCDataChannel;
-                channel.onMessage(msg);
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    channel.onMessage?.Invoke(msg);
+                }
             });
         }
 
@@ -70,8 +68,10 @@ namespace Unity.WebRTC
         {
             WebRTC.Sync(ptr, () =>
             {
-                var channel = WebRTC.Table[ptr] as RTCDataChannel;
-                channel.onOpen();
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    channel.onOpen?.Invoke();
+                }
             });
         }
 
@@ -80,20 +80,23 @@ namespace Unity.WebRTC
         {
             WebRTC.Sync(ptr, () =>
             {
-                if (null == WebRTC.Table)
-                    return;
-
-                var channel = WebRTC.Table[ptr] as RTCDataChannel;
-                channel.onClose();
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    channel.onClose?.Invoke();
+                }
             });
         }
+
         internal RTCDataChannel(IntPtr ptr, RTCPeerConnection peerConnection)
         {
             self = ptr;
-            this.peerConnection = peerConnection;
             WebRTC.Table.Add(self, this);
             var labelPtr = NativeMethods.DataChannelGetLabel(self);
             Label = Marshal.PtrToStringAnsi(labelPtr);
+
+            NativeMethods.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
+            NativeMethods.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);
+            NativeMethods.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
         }
 
         ~RTCDataChannel()
