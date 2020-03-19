@@ -269,7 +269,34 @@ namespace Unity.WebRTC
         {
             s_context.Dispose();
             s_context = null;
+            s_syncContext = null;
             NativeMethods.RegisterDebugLog(null);
+        }
+
+        class CallbackObject
+        {
+            public readonly IntPtr ptr;
+            public readonly Action callback;
+
+            public CallbackObject(IntPtr ptr, Action callback)
+            {
+                this.ptr = ptr;
+                this.callback = callback;
+            }
+        }
+
+        public static void Sync(IntPtr ptr, Action callback)
+        {
+            s_syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
+        }
+
+        static void SendOrPostCallback(object state)
+        {
+            var obj = state as CallbackObject;
+            if (s_context == null || !Table.ContainsKey(obj.ptr)) {
+                return;
+            }
+            obj.callback();
         }
 
         public static EncoderType GetEncoderType()
@@ -328,13 +355,7 @@ namespace Unity.WebRTC
         }
 
         internal static Context Context { get { return s_context; } }
-        internal static SynchronizationContext SyncContext { get { return s_syncContext; } }
-
-        internal static Hashtable Table { get
-            {
-                return s_context?.table;
-            }
-        }
+        internal static Hashtable Table { get { return s_context?.table; } }
 
         public static bool SupportHardwareEncoder
         {

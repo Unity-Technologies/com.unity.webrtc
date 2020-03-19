@@ -55,7 +55,6 @@ namespace Unity.WebRTC
             set
             {
                 onAddTrack = value;
-                WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
             }
         }
 
@@ -65,7 +64,6 @@ namespace Unity.WebRTC
             set
             {
                 onRemoveTrack = value;
-                WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);
             }
         }
 
@@ -119,30 +117,33 @@ namespace Unity.WebRTC
             self = ptr;
             WebRTC.Table.Add(self, this);
             id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(self));
+
+            WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
+            WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
         static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr track)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    stream.OnAddTrack(new MediaStreamTrackEvent(track));
+                    stream.OnAddTrack?.Invoke(new MediaStreamTrackEvent(track));
                 }
-            }, null);
+            });
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
         static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr track)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    stream.OnRemoveTrack(new MediaStreamTrackEvent(track));
+                    stream.OnRemoveTrack?.Invoke(new MediaStreamTrackEvent(track));
                 }
-            }, null);
+            });
         }
     }
     internal class Cleaner : MonoBehaviour

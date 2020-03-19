@@ -58,34 +58,34 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
         static void DataChannelNativeOnMessage(IntPtr ptr, byte[] msg, int len)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onMessage(msg);
-            }, null);
+            });
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnOpen))]
         static void DataChannelNativeOnOpen(IntPtr ptr)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onOpen();
-            }, null);
+            });
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnClose))]
         static void DataChannelNativeOnClose(IntPtr ptr)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
                 if (null == WebRTC.Table)
                     return;
 
                 var channel = WebRTC.Table[ptr] as RTCDataChannel;
                 channel.onClose();
-            }, null);
+            });
         }
         internal RTCDataChannel(IntPtr ptr, RTCPeerConnection peerConnection)
         {
