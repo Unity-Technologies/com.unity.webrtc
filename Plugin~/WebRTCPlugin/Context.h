@@ -30,9 +30,7 @@ namespace WebRTC
     {
         int width;
         int height;
-        UnityEncoderType type;
-
-        VideoEncoderParameter(int width, int height, UnityEncoderType type) :width(width), height(height), type(type) { }
+        VideoEncoderParameter(int width, int height) :width(width), height(height) { }
     };
 
     class Context
@@ -76,9 +74,9 @@ namespace WebRTC
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
         // You must call these methods on Rendering thread.
-        void EncodeFrame(webrtc::MediaStreamTrackInterface* track);
+        bool EncodeFrame(webrtc::MediaStreamTrackInterface* track);
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
-        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type);
+        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height);
 
     private:
         int m_uid;

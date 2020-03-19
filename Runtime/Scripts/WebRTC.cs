@@ -430,7 +430,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height, EncoderType type);
+        public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetConfiguration(IntPtr ptr, ref IntPtr conf, ref int len);
         [DllImport(WebRTC.Lib)]

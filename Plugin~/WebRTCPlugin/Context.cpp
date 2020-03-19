@@ -193,12 +193,14 @@ namespace WebRTC
         }
     }
 
-    const VideoEncoderParameter* Context::GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track) {
+    const VideoEncoderParameter* Context::GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track)
+    {
         return m_mapVideoEncoderParameter[track].get();
     }
 
-    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type) {
-        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height, type);
+    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height)
+    {
+        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height);
     }
 
     UnityEncoderType Context::GetEncoderType() const
