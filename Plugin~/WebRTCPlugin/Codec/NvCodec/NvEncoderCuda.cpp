@@ -7,7 +7,7 @@
 namespace WebRTC {
 
     NvEncoderCuda::NvEncoderCuda(const uint32_t nWidth, const uint32_t nHeight, IGraphicsDevice* device) :
-        NvEncoder(NV_ENC_DEVICE_TYPE_CUDA, NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY, nWidth, nHeight, device)
+        NvEncoder(NV_ENC_DEVICE_TYPE_CUDA, NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY, NV_ENC_BUFFER_FORMAT_ARGB, nWidth, nHeight, device)
     {
     }
 

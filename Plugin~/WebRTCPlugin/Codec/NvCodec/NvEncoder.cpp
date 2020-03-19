@@ -17,8 +17,9 @@ namespace WebRTC
     NvEncoder::NvEncoder(
         const NV_ENC_DEVICE_TYPE type,
         const NV_ENC_INPUT_RESOURCE_TYPE inputType,
+        const NV_ENC_BUFFER_FORMAT bufferFormat,
         const int width, const int height, IGraphicsDevice* device)
-    : width(width), height(height), m_device(device), m_deviceType(type), m_inputType(inputType)
+    : width(width), height(height), m_device(device), m_deviceType(type), m_inputType(inputType), m_bufferFormat(bufferFormat)
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
         checkf(width > 0 && height > 0, "Invalid width or height!");        
@@ -313,7 +314,6 @@ namespace WebRTC
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE inputType, void *buffer)
     {
         NV_ENC_REGISTER_RESOURCE registerResource = { NV_ENC_REGISTER_RESOURCE_VER };
-        const auto bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
         registerResource.resourceType = inputType;
         registerResource.resourceToRegister = buffer;
 
@@ -323,11 +323,11 @@ namespace WebRTC
         registerResource.height = height;
         if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY)
         {
-            registerResource.pitch = GetWidthInBytes(bufferFormat, width);          
+            registerResource.pitch = GetWidthInBytes(m_bufferFormat, width);          
         } else{
             registerResource.pitch = width;            
         }
-        registerResource.bufferFormat = bufferFormat;
+        registerResource.bufferFormat = m_bufferFormat;
         registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;
         errorCode = pNvEncodeAPI->nvEncRegisterResource(pEncoderInterface, &registerResource);
         checkf(NV_RESULT(errorCode), StringFormat("nvEncRegisterResource error is %d", errorCode).c_str());
@@ -359,7 +359,7 @@ namespace WebRTC
 
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
-            frame.inputFrame.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
+            frame.inputFrame.bufferFormat = m_bufferFormat;
             MapResources(frame.inputFrame);
             frame.outputFrame = InitializeBitstreamBuffer();
         }
