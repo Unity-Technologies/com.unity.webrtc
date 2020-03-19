@@ -88,13 +88,13 @@ namespace Unity.WebRTC
     {
         internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
 
-        bool needFlip = false;
-        UnityEngine.Texture source;
-        UnityEngine.RenderTexture dest;
+        readonly bool m_needFlip = false;
+        readonly UnityEngine.Texture m_sourceTexture;
+        readonly UnityEngine.RenderTexture m_destTexture;
 
-        private static UnityEngine.RenderTexture CreateRenderTexture(UnityEngine.RenderTexture source)
+        private static UnityEngine.RenderTexture CreateRenderTexture(int width, int height, UnityEngine.RenderTextureFormat format)
         {
-            var tex = new UnityEngine.RenderTexture(source.width, source.height, 0, source.format);
+            var tex = new UnityEngine.RenderTexture(width, height, 0, format);
             tex.Create();
             return tex;
         }
@@ -102,9 +102,9 @@ namespace Unity.WebRTC
         internal VideoStreamTrack(string label, UnityEngine.RenderTexture source, UnityEngine.RenderTexture dest, int width, int height, int bitrate)
             : this(label, dest.GetNativeTexturePtr(), width, height, bitrate)
         {
-            this.needFlip = true;
-            this.source = source;
-            this.dest = dest;
+            m_needFlip = true;
+            m_sourceTexture = source;
+            m_destTexture = dest;
         }
 
         internal void Update()
@@ -114,9 +114,9 @@ namespace Unity.WebRTC
             //  - duplicate RenderTexture from its source texture
             //  - call Graphics.Blit command with flip material every frame
             //  - it might be better to implement this if possible
-            if (needFlip)
+            if (m_needFlip)
             {
-                UnityEngine.Graphics.Blit(source, dest, WebRTC.flipMat);
+                UnityEngine.Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
             }
             WebRTC.Context.Encode(self);
         }
@@ -131,7 +131,7 @@ namespace Unity.WebRTC
         /// <param name="height"></param>
         /// <param name="bitrate"></param>
         public VideoStreamTrack(string label, UnityEngine.RenderTexture source, int bitrate)
-            : this(label, source, CreateRenderTexture(source), source.width, source.height, bitrate)
+            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width, source.height, bitrate)
         {
         }
 
@@ -193,25 +193,25 @@ namespace Unity.WebRTC
 
     public class RTCTrackEvent
     {
-        private readonly IntPtr self;
-        private readonly MediaStreamTrack track;
-        private readonly RTCRtpTransceiver transceiver;
+        private readonly IntPtr m_self;
+        private readonly MediaStreamTrack m_track;
+        private readonly RTCRtpTransceiver m_transceiver;
 
         public MediaStreamTrack Track
         {
-            get => track;
+            get => m_track;
         }
 
         public RTCRtpTransceiver Transceiver
         {
-            get => transceiver;
+            get => m_transceiver;
         }
 
         internal RTCTrackEvent(IntPtr ptr)
         {
-            self = ptr;
-            track = new MediaStreamTrack(NativeMethods.TransceiverGetTrack(self));
-            transceiver = new RTCRtpTransceiver(self);
+            m_self = ptr;
+            m_track = new MediaStreamTrack(NativeMethods.TransceiverGetTrack(m_self));
+            m_transceiver = new RTCRtpTransceiver(m_self);
         }
     }
 
