@@ -186,11 +186,9 @@ namespace WebRTC
         return true;
     }
 
-    void Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
+    bool Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
     {
-        if (!m_mapVideoCapturer[track]->EncodeVideoData())
-        {
-        }
+        return m_mapVideoCapturer[track]->EncodeVideoData();
     }
 
     const VideoEncoderParameter* Context::GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track)

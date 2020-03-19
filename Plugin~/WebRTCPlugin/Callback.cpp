@@ -71,21 +71,29 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 
     switch(event)
     {
-        case VideoStreamRenderEventID::Initialize: {
-            if (!GraphicsDevice::GetInstance().IsInitialized()) {
+        case VideoStreamRenderEventID::Initialize:
+        {
+            if (!GraphicsDevice::GetInstance().IsInitialized())
+            {
                 GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
             }
             s_device = GraphicsDevice::GetInstance().GetDevice();
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
-            m_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, param->type);
+            const UnityEncoderType encoderType = s_context->GetEncoderType();
+            m_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
             s_context->InitializeEncoder(m_mapEncoder[track].get(), track);
             return;
         }
-        case VideoStreamRenderEventID::Encode: {
-            s_context->EncodeFrame(track);
+        case VideoStreamRenderEventID::Encode:
+        {
+            if(!s_context->EncodeFrame(track))
+            {
+                LogPrint("Encode frame failed");
+            }
             return;
         }
-        case VideoStreamRenderEventID::Finalize: {
+        case VideoStreamRenderEventID::Finalize:
+        {
             m_mapEncoder.erase(track);
             GraphicsDevice::GetInstance().Shutdown();
             return;
