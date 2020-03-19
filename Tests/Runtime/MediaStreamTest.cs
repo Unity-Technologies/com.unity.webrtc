@@ -63,6 +63,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(track.ReadyState, TrackState.Live);
             track.Dispose();
             yield return new WaitForSeconds(0.1f);
+
+            Object.DestroyImmediate(rt);
         }
 
 
