@@ -9,6 +9,7 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 
 # Install libc++, libc++abi googletest clang glut
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
+sudo apt update
 sudo apt install -y libc++-dev libc++abi-dev googletest clang freeglut3-dev
 
 # Install googletest
