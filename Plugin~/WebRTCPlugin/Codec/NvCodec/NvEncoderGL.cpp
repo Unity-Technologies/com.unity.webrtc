@@ -7,7 +7,7 @@
 namespace WebRTC {
 
     NvEncoderGL::NvEncoderGL(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device) :
-        NvEncoder(NV_ENC_DEVICE_TYPE_OPENGL, NV_ENC_INPUT_RESOURCE_TYPE_OPENGL_TEX, nWidth, nHeight, device)
+        NvEncoder(NV_ENC_DEVICE_TYPE_OPENGL, NV_ENC_INPUT_RESOURCE_TYPE_OPENGL_TEX, NV_ENC_BUFFER_FORMAT_ABGR, nWidth, nHeight, device)
     {
     }
 
