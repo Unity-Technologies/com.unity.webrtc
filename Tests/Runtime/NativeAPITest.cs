@@ -179,8 +179,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.Greater(trackSize, 0);
 
             IntPtr[] tracksPtr = new IntPtr[trackSize];
-            System.Runtime.InteropServices.Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
-            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(trackNativePtr);
+            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            Marshal.FreeCoTaskMem(trackNativePtr);
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -202,8 +202,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.Greater(trackSize, 0);
 
             IntPtr[] tracksPtr = new IntPtr[trackSize];
-            System.Runtime.InteropServices.Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
-            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(trackNativePtr);
+            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            Marshal.FreeCoTaskMem(trackNativePtr);
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -220,6 +220,7 @@ namespace Unity.WebRTC.RuntimeTest
             var streamId = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(stream));
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
@@ -265,6 +266,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(1.0f);
 
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
