@@ -32,6 +32,7 @@ namespace WebRTC
         NvEncoder(
             NV_ENC_DEVICE_TYPE type,
             NV_ENC_INPUT_RESOURCE_TYPE inputType,
+            NV_ENC_BUFFER_FORMAT bufferFormat,
             int width, int height, IGraphicsDevice* device);
         virtual ~NvEncoder();
 
@@ -58,6 +59,7 @@ namespace WebRTC
 
         NV_ENC_DEVICE_TYPE m_deviceType;
         NV_ENC_INPUT_RESOURCE_TYPE m_inputType;
+        NV_ENC_BUFFER_FORMAT m_bufferFormat;
 
         bool isNvEncoderSupported = false;
 
