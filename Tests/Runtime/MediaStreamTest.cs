@@ -147,10 +147,10 @@ namespace Unity.WebRTC.RuntimeTest
                 new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
             };
             var audioStream = Audio.CaptureStream();
-
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(audioStream);
             yield return test;
+            test.component.Dispose();
             audioStream.Dispose();
         }
 
@@ -166,6 +166,9 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(videoStream);
             yield return test;
+            test.component.CoroutineWebRTCUpdate();
+            yield return 0;
+            test.component.Dispose();
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
@@ -185,17 +188,21 @@ namespace Unity.WebRTC.RuntimeTest
 
         public class SignalingPeersTest : MonoBehaviour, IMonoBehaviourTest
         {
-            private bool _isFinished;
-            private MediaStream _stream;
+            private bool m_isFinished;
+            private MediaStream m_stream;
+            List<RTCRtpSender> pc1Senders;
+            List<RTCRtpSender> pc2Senders;
+            RTCPeerConnection peer1;
+            RTCPeerConnection peer2;
 
             public bool IsTestFinished
             {
-                get { return _isFinished; }
+                get { return m_isFinished; }
             }
 
             public void SetStream(MediaStream stream)
             {
-                _stream = stream;
+                m_stream = stream;
             }
 
             IEnumerator Start()
@@ -205,18 +212,40 @@ namespace Unity.WebRTC.RuntimeTest
                 {
                     new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
                 };
-                var pc1Senders = new List<RTCRtpSender>();
-                var pc2Senders = new List<RTCRtpSender>();
-                var peer1 = new RTCPeerConnection(ref config);
-                var peer2 = new RTCPeerConnection(ref config);
 
-                peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(ref candidate); };
-                peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
-                peer2.OnTrack = e => { pc2Senders.Add(peer2.AddTrack(e.Track, _stream)); };
+                pc1Senders = new List<RTCRtpSender>();
+                pc2Senders = new List<RTCRtpSender>();
+                peer1 = new RTCPeerConnection(ref config);
+                peer2 = new RTCPeerConnection(ref config);
 
-                foreach (var track in _stream.GetTracks())
+                RTCIceConnectionState pc1IceState = RTCIceConnectionState.Max;
+
+                peer1.OnIceConnectionChange = state => { pc1IceState = state; };
+
+                peer1.OnIceCandidate = candidate =>
                 {
-                    pc1Senders.Add(peer1.AddTrack(track, _stream));
+                    Assert.NotNull(candidate);
+                    Assert.NotNull(candidate.candidate);
+                    peer2.AddIceCandidate(ref candidate);
+                };
+                peer2.OnIceCandidate = candidate =>
+                {
+                    Assert.NotNull(candidate);
+                    Assert.NotNull(candidate.candidate);
+                    peer1.AddIceCandidate(ref candidate);
+                };
+                peer2.OnTrack = e =>
+                {
+                    Assert.NotNull(e);
+                    Assert.NotNull(e.Track);
+                    Assert.NotNull(e.Receiver);
+                    Assert.NotNull(e.Transceiver);
+                    pc2Senders.Add(peer2.AddTrack(e.Track, m_stream));
+                };
+
+                foreach (var track in m_stream.GetTracks())
+                {
+                    pc1Senders.Add(peer1.AddTrack(track, m_stream));
                 }
 
                 RTCOfferOptions options1 = default;
@@ -252,6 +281,17 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return op9;
                 Assert.True(op9.IsCompleted);
 
+                Assert.AreEqual(RTCIceConnectionState.Connected, pc1IceState);
+                m_isFinished = true;
+            }
+
+            public Coroutine CoroutineWebRTCUpdate()
+            {
+                return StartCoroutine(WebRTC.Update());
+            }
+
+            public void Dispose()
+            {
                 foreach (var sender in pc1Senders)
                 {
                     peer1.RemoveTrack(sender);
@@ -264,8 +304,6 @@ namespace Unity.WebRTC.RuntimeTest
                 pc1Senders.Clear();
                 peer1.Close();
                 peer2.Close();
-
-                _isFinished = true;
             }
         }
     }

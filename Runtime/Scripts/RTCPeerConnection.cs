@@ -29,7 +29,6 @@ namespace Unity.WebRTC
         private DelegateSetSessionDescFailure onSetSetSessionDescFailure;
         private DelegateCollectStats m_onStatsDeliveredCallback;
 
-        private RTCIceCandidateRequestAsyncOperation opIceCandidateRequest;
         private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
         private RTCSessionDescriptionAsyncOperation m_opSetRemoteDesc;
 

@@ -53,6 +53,10 @@ namespace Unity.WebRTC.RuntimeTest
 
             var conf = new RTCDataChannelInit(true);
             var channel1 = peer1.CreateDataChannel("data", ref conf);
+            bool channel1Opened = false;
+            bool channel1Closed = false;
+            channel1.OnOpen = () => { channel1Opened = true; };
+            channel1.OnClose = () => { channel1Closed = true; };
 
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
@@ -85,6 +89,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op9;
             Assert.True(op9.IsCompleted);
 
+            Assert.True(channel1Opened);
             Assert.AreEqual(channel1.Label, channel2.Label);
             Assert.AreEqual(channel1.Id, channel2.Id);
 
@@ -107,8 +112,11 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(message3, message4);
 
             channel1.Close();
-            channel2.Close();
+            var op12 = new WaitUntilWithTimeout(() => channel1Closed, 5000);
+            yield return op12;
+            Assert.True(op12.IsCompleted);
 
+            channel2.Close();
             peer1.Close();
             peer2.Close();
         }

@@ -213,16 +213,6 @@ namespace Unity.WebRTC
         EncoderInitializationFailed
     }
 
-    public class CodecInitializationException : Exception
-    {
-        public CodecInitializationResult result { get; private set; }
-
-        internal CodecInitializationException(CodecInitializationResult result)
-        {
-            this.result = result;
-        }
-    }
-
     public static class WebRTC
     {
 #if UNITY_EDITOR_OSX
@@ -333,19 +323,24 @@ namespace Unity.WebRTC
             Marshal.Copy(buf, array, 0, length);
             Marshal.FreeCoTaskMem(buf);
 
-            var tracks = new List<T>();
+            var list = new List<T>();
             foreach (var ptr in array)
             {
-                if (WebRTC.Context.table.ContainsKey(ptr))
-                {
-                    tracks.Add(WebRTC.Context.table[ptr] as T);
-                }
-                else
-                {
-                    tracks.Add(constructor(ptr));
-                }
+                list.Add(FindOrCreate(ptr, constructor));
             }
-            return tracks;
+            return list;
+        }
+
+        internal static T FindOrCreate<T>(IntPtr ptr, Func<IntPtr, T> constructor) where T : class
+        {
+            if (Context.table.ContainsKey(ptr))
+            {
+                return Context.table[ptr] as T;
+            }
+            else
+            {
+                return constructor(ptr);
+            }
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]

@@ -146,31 +146,6 @@ namespace Unity.WebRTC
             });
         }
     }
-    internal class Cleaner : MonoBehaviour
-    {
-        private Action onDestroy;
-        private void OnDestroy()
-        {
-            onDestroy?.Invoke();
-        }
-        public static void AddCleanerCallback(GameObject obj, Action callback)
-        {
-            Cleaner cleaner = obj.GetComponent<Cleaner>();
-            if (!cleaner)
-            {
-                cleaner = obj.AddComponent<Cleaner>();
-                cleaner.hideFlags = HideFlags.HideAndDontSave;
-            }
-            cleaner.onDestroy += callback;
-        }
-    }
-    internal static class CleanerExtensions
-    {
-        public static void AddCleanerCallback(this GameObject obj, Action callback)
-        {
-            Cleaner.AddCleanerCallback(obj, callback);
-        }
-    }
 
     public static class CameraExtension
     {

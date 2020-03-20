@@ -166,6 +166,7 @@ namespace Unity.WebRTC
                 WebRTC.Context.FinalizeEncoder(self);
                 tracks.Remove(this);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
+                UnityEngine.Object.DestroyImmediate(m_destTexture);
                 self = IntPtr.Zero;
             }
             this.disposed = true;
@@ -193,40 +194,33 @@ namespace Unity.WebRTC
 
     public class RTCTrackEvent
     {
-        private readonly IntPtr m_self;
-        private readonly MediaStreamTrack m_track;
-        private readonly RTCRtpTransceiver m_transceiver;
+        public MediaStreamTrack Track { get; }
 
-        public MediaStreamTrack Track
+        public RTCRtpTransceiver Transceiver { get; }
+
+        public RTCRtpReceiver Receiver
         {
-            get => m_track;
+            get
+            {
+                return Transceiver.Receiver;
+            }
         }
 
-        public RTCRtpTransceiver Transceiver
+        internal RTCTrackEvent(IntPtr ptrTransceiver)
         {
-            get => m_transceiver;
-        }
-
-        internal RTCTrackEvent(IntPtr ptr)
-        {
-            m_self = ptr;
-            m_track = new MediaStreamTrack(NativeMethods.TransceiverGetTrack(m_self));
-            m_transceiver = new RTCRtpTransceiver(m_self);
+            IntPtr ptrTrack = NativeMethods.TransceiverGetTrack(ptrTransceiver);
+            Track = WebRTC.FindOrCreate(ptrTrack, ptr => new MediaStreamTrack(ptr));
+            Transceiver = new RTCRtpTransceiver(ptrTransceiver);
         }
     }
 
     public class MediaStreamTrackEvent
     {
-        private readonly MediaStreamTrack track;
+        public MediaStreamTrack Track { get; }
 
-        public MediaStreamTrack Track
+        internal MediaStreamTrackEvent(IntPtr ptrTrack)
         {
-            get => track;
-        }
-
-        internal MediaStreamTrackEvent(IntPtr ptr)
-        {
-            track = new MediaStreamTrack(ptr);
+            Track = WebRTC.FindOrCreate(ptrTrack, ptr => new MediaStreamTrack(ptr));
         }
     }
 }
