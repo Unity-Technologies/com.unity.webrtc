@@ -448,7 +448,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetConfiguration(IntPtr ptr, ref IntPtr conf, ref int len);
+        public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferOptions options);
         [DllImport(WebRTC.Lib)]

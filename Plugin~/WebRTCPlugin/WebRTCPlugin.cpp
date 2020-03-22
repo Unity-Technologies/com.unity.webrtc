@@ -50,6 +50,15 @@ T** ConvertArray(std::vector<rtc::scoped_refptr<T>> vec, int* length)
     return ret;
 }
 
+char* ConvertString(const std::string str)
+{
+    const int size = str.size();
+    char* ret = static_cast<char*>(CoTaskMemAlloc(size + sizeof(char)));
+    str.copy(ret, size);
+    ret[size] = '\0';
+    return ret;
+}
+
 extern "C"
 {
     UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
@@ -123,11 +132,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT char* MediaStreamGetID(MediaStreamInterface* stream)
     {
-        const auto idStr = stream->id();
-        const auto id = static_cast<char*>(CoTaskMemAlloc(idStr.size() + sizeof(char)));
-        idStr.copy(id, idStr.size());
-        id[idStr.size()] = '\0';
-        return id;
+        return ConvertString(stream->id());
     }
 
     UNITY_INTERFACE_EXPORT void MediaStreamRegisterOnAddTrack(Context* context, MediaStreamInterface* stream, DelegateMediaStreamOnAddTrack callback)
@@ -170,11 +175,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT char* MediaStreamTrackGetID(MediaStreamTrackInterface* track)
     {
-        const auto idStr = track->id();
-        const auto id = static_cast<char*>(CoTaskMemAlloc(idStr.size() + sizeof(char)));
-        idStr.copy(id, idStr.size());
-        id[idStr.size()] = '\0';
-        return id;
+        return ConvertString(track->id());
     }
 
     UNITY_INTERFACE_EXPORT bool MediaStreamTrackGetEnabled(MediaStreamTrackInterface* track)
@@ -273,15 +274,11 @@ extern "C"
         return obj->SetConfiguration(std::string(conf));
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetConfiguration(PeerConnectionObject* obj, char** conf, int* len)
+    UNITY_INTERFACE_EXPORT char* PeerConnectionGetConfiguration(PeerConnectionObject* obj)
     {
-        std::string _conf;
-        obj->GetConfiguration(_conf);
-#pragma warning(suppress: 4267)
-        *len = _conf.size();
-        *conf = static_cast<char*>(::CoTaskMemAlloc(_conf.size() + sizeof(char)));
-        _conf.copy(*conf, _conf.size());
-        (*conf)[_conf.size()] = '\0';
+        std::string str;
+        obj->GetConfiguration(str);
+        return ConvertString(str);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
@@ -460,11 +457,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelObject* dataChannelObj)
     {
-        std::string tmp = dataChannelObj->GetLabel();
-        auto label = static_cast<char*>(CoTaskMemAlloc(tmp.size() + sizeof(char)));
-        tmp.copy(label, tmp.size());
-        label[tmp.size()] = '\0';
-        return label;
+        return ConvertString(dataChannelObj->GetLabel());
     }
 
     UNITY_INTERFACE_EXPORT void DataChannelSend(DataChannelObject* dataChannelObj, const char* msg)

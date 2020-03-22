@@ -232,9 +232,8 @@ namespace Unity.WebRTC
         public RTCConfiguration GetConfiguration()
         {
             int len = 0;
-            var ptr = IntPtr.Zero;
-            NativeMethods.PeerConnectionGetConfiguration(self, ref ptr, ref len);
-            var str = Marshal.PtrToStringAnsi(ptr, len);
+            IntPtr ptr = NativeMethods.PeerConnectionGetConfiguration(self);
+            var str = Marshal.PtrToStringAnsi(ptr);
             return JsonUtility.FromJson<RTCConfiguration>(str);
         }
 
