@@ -217,11 +217,6 @@ namespace Unity.WebRTC.RuntimeTest
                 pc2Senders = new List<RTCRtpSender>();
                 peer1 = new RTCPeerConnection(ref config);
                 peer2 = new RTCPeerConnection(ref config);
-
-                RTCIceConnectionState pc1IceState = RTCIceConnectionState.Max;
-
-                peer1.OnIceConnectionChange = state => { pc1IceState = state; };
-
                 peer1.OnIceCandidate = candidate =>
                 {
                     Assert.NotNull(candidate);
@@ -281,7 +276,6 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return op9;
                 Assert.True(op9.IsCompleted);
 
-                Assert.AreEqual(RTCIceConnectionState.Connected, pc1IceState);
                 m_isFinished = true;
             }
 
