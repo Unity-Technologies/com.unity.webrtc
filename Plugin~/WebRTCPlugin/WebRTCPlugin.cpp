@@ -39,10 +39,7 @@ T** ConvertArray(std::vector<rtc::scoped_refptr<T>> vec, int* length)
     *length = vec.size();
     const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
     const auto ret = static_cast<T**>(buf);
-    for (uint32_t i = 0; i < vec.size(); i++)
-    {
-        ret[i] = vec[i].get();
-    }
+    std::copy(vec.begin(), vec.end(), ret);
     return ret;
 }
 
