@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,7 +56,7 @@ public class MediaStreamSample : MonoBehaviour
     private void OnDestroy()
     {
         Audio.Stop();
-        WebRTC.Finalize();
+        WebRTC.Dispose();
     }
 
     private void Start()
@@ -124,13 +124,13 @@ public class MediaStreamSample : MonoBehaviour
         var op = _pc1.CreateOffer(ref _offerOptions);
         yield return op;
 
-        if (!op.isError)
+        if (!op.IsError)
         {
-            yield return StartCoroutine(OnCreateOfferSuccess(op.desc));
+            yield return StartCoroutine(OnCreateOfferSuccess(op.Desc));
         }
         else
         {
-            OnCreateSessionDescriptionError(op.error);
+            OnCreateSessionDescriptionError(op.Error);
         }
     }
 
@@ -138,11 +138,11 @@ public class MediaStreamSample : MonoBehaviour
     {
         foreach (var track in audioStream.GetTracks())
         {
-            pc1Senders.Add (_pc1.AddTrack(track));  
+            pc1Senders.Add (_pc1.AddTrack(track, audioStream));  
         }
         foreach(var track in videoStream.GetTracks())
         {
-            pc1Senders.Add(_pc1.AddTrack(track));
+            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
         }
         if(!videoUpdateStarted)
         {
@@ -190,7 +190,7 @@ public class MediaStreamSample : MonoBehaviour
         RTCDataChannelInit conf = new RTCDataChannelInit(true);
         _pc1.CreateDataChannel("data", ref conf);
         audioStream = Audio.CaptureStream();
-        videoStream = cam.CaptureStream(1280, 720);
+        videoStream = cam.CaptureStream(1280, 720, 1000000);
         RtImage.texture = cam.targetTexture;
  
     }
@@ -203,7 +203,7 @@ public class MediaStreamSample : MonoBehaviour
 
     private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
     {
-        pc2Senders.Add(pc.AddTrack(e.Track));
+        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
         trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
         trackInfos.Append($"Track kind: {e.Track.Kind}\r\n");
         trackInfos.Append($"Track id: {e.Track.Id}\r\n");
@@ -227,25 +227,27 @@ public class MediaStreamSample : MonoBehaviour
         var op = _pc1.SetLocalDescription(ref desc);
         yield return op;
 
-        if (!op.isError)
+        if (!op.IsError)
         {
             OnSetLocalSuccess(_pc1);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op.error);
+            var error = op.Error;
+            OnSetSessionDescriptionError(ref error);
         }
 
         Debug.Log("pc2 setRemoteDescription start");
         var op2 = _pc2.SetRemoteDescription(ref desc);
         yield return op2;
-        if (!op2.isError)
+        if (!op2.IsError)
         {
             OnSetRemoteSuccess(_pc2);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op2.error);
+            var error = op2.Error;
+            OnSetSessionDescriptionError(ref error);
         }
         Debug.Log("pc2 createAnswer start");
         // Since the 'remote' side has no media stream we need
@@ -254,13 +256,13 @@ public class MediaStreamSample : MonoBehaviour
 
         var op3 = _pc2.CreateAnswer(ref _answerOptions);
         yield return op3;
-        if (!op3.isError)
+        if (!op3.IsError)
         {
-            yield return OnCreateAnswerSuccess(op3.desc);
+            yield return OnCreateAnswerSuccess(op3.Desc);
         }
         else
         {
-            OnCreateSessionDescriptionError(op3.error); 
+            OnCreateSessionDescriptionError(op3.Error); 
         }
     }
     
@@ -291,26 +293,28 @@ public class MediaStreamSample : MonoBehaviour
         var op = _pc2.SetLocalDescription(ref desc);
         yield return op;
 
-        if (!op.isError)
+        if (!op.IsError)
         {
             OnSetLocalSuccess(_pc2);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op.error);
+            var error = op.Error;
+            OnSetSessionDescriptionError(ref error);
         }
 
         Debug.Log("pc1 setRemoteDescription start");
 
         var op2 = _pc1.SetRemoteDescription(ref desc);
         yield return op2;
-        if (!op2.isError)
+        if (!op2.IsError)
         {
             OnSetRemoteSuccess(_pc1);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op2.error);
+            var error = op2.Error;
+            OnSetSessionDescriptionError(ref error);
         }
     }
 

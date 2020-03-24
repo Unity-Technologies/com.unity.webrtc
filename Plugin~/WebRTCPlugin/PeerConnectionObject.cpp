@@ -2,6 +2,7 @@
 #include "Context.h"
 #include "PeerConnectionObject.h"
 #include "WebRTCMacros.h"
+#include "SetSessionDescriptionObserver.h"
 
 namespace WebRTC
 {
@@ -19,55 +20,37 @@ namespace WebRTC
             return;
         }
         auto senders = connection->GetSenders();
-        for (auto sender : senders)
+        for (const auto& sender : senders)
         {
             connection->RemoveTrack(sender);
         }
 
-        auto state = connection->peer_connection_state();
+        const auto state = connection->peer_connection_state();
         if (state != webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
         {
             connection->Close();
         }
         connection.release();
-
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection()
+    PeerConnectionObject* Context::CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
         rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
-        webrtc::PeerConnectionInterface::RTCConfiguration _config;
-        _config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
-        obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
+        obj->connection = m_peerConnectionFactory->CreatePeerConnection(config, nullptr, nullptr, obj);
         if (obj->connection == nullptr)
         {
             return nullptr;
         }
         auto ptr = obj.get();
-        clients[ptr] = std::move(obj);
-        return clients[ptr].get();
-    }
-
-    PeerConnectionObject* Context::CreatePeerConnection(const std::string& conf)
-    {
-        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
-        webrtc::PeerConnectionInterface::RTCConfiguration _config;
-        Convert(conf, _config);
-        obj->connection = peerConnectionFactory->CreatePeerConnection(_config, nullptr, nullptr, obj);
-        if (obj->connection == nullptr)
-        {
-            return nullptr;
-        }
-        auto ptr = obj.get();
-        clients[ptr] = std::move(obj);
-        return clients[ptr].get();
+        m_mapClients[ptr] = std::move(obj);
+        return m_mapClients[ptr].get();
     }
 
     void PeerConnectionObject::OnSuccess(webrtc::SessionDescriptionInterface* desc)
     {
         std::string out;
         desc->ToString(&out);
-        auto type = ConvertSdpType(desc->GetType());
+        const auto type = ConvertSdpType(desc->GetType());
         if (onCreateSDSuccess != nullptr)
         {
             onCreateSDSuccess(this, type, out.c_str());
@@ -84,16 +67,15 @@ namespace WebRTC
         }
     }
 
-    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
-    {
+    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
         auto obj = std::make_unique<DataChannelObject>(channel, *this);
-        auto ptr = obj.get();
-        context.dataChannels[ptr] = std::move(obj);
-        if (onDataChannel != nullptr)
-        {
+        const auto ptr = obj.get();
+        context.AddDataChannel(obj);
+        if (onDataChannel != nullptr) {
             onDataChannel(this, ptr);
         }
     }
+
     void PeerConnectionObject::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
     {
         std::string out;
@@ -154,13 +136,11 @@ namespace WebRTC
 
     void PeerConnectionObject::Close()
     {
-        if (connection != nullptr)
+        if (connection != nullptr && connection->peer_connection_state() != webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
         {
             //Cleanup delegates/callbacks
             onCreateSDSuccess = nullptr;
             onCreateSDFailure = nullptr;
-            onSetSDSuccess = nullptr;
-            onSetSDFailure = nullptr;
             onLocalSdpReady = nullptr;
             onIceCandidate = nullptr;
             onIceConnectionChange = nullptr;
@@ -172,7 +152,7 @@ namespace WebRTC
         }
     }
 
-    void PeerConnectionObject::SetLocalDescription(const RTCSessionDescription& desc)
+    void PeerConnectionObject::SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer)
     {
         webrtc::SdpParseError error;
         auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error);
@@ -182,12 +162,10 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description.c_str());
             return;
         }
-        auto observer = PeerSDPObserver::Create(this);
         connection->SetLocalDescription(observer, _desc.release());
-
     }
 
-    void PeerConnectionObject::SetRemoteDescription(const RTCSessionDescription& desc)
+    void PeerConnectionObject::SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer)
     {
         webrtc::SdpParseError error;
         auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error);
@@ -197,16 +175,16 @@ namespace WebRTC
             DebugLog("SdpParseError:\n%s", error.description.c_str());
             return;
         }
-        auto observer = PeerSDPObserver::Create(this);
         connection->SetRemoteDescription(observer, _desc.release());
     }
 
     webrtc::RTCErrorType PeerConnectionObject::SetConfiguration(const std::string& config)
     {
         webrtc::PeerConnectionInterface::RTCConfiguration _config;
-        Convert(config, _config);
+        if (!Convert(config, _config))
+            return webrtc::RTCErrorType::INVALID_PARAMETER;
 
-        webrtc::RTCError error = connection->SetConfiguration(_config);
+        const auto error = connection->SetConfiguration(_config);
         if (!error.ok())
         {
             LogPrint(error.message());
@@ -225,7 +203,7 @@ namespace WebRTC
             Json::Value jsonIceServer = Json::Value(Json::objectValue);
             jsonIceServer["username"] = iceServer.username;
             jsonIceServer["credential"] = iceServer.password;
-            jsonIceServer["credentialType"] = (int)RTCIceCredentialType::Password;
+            jsonIceServer["credentialType"] = static_cast<int>(RTCIceCredentialType::Password);
             jsonIceServer["urls"] = Json::Value(Json::arrayValue);
             for (auto url : iceServer.urls)
             {
@@ -261,21 +239,26 @@ namespace WebRTC
         }
 
         webrtc::SdpParseError error;
-        std::unique_ptr<webrtc::IceCandidateInterface> _candidate(
+        const std::unique_ptr<webrtc::IceCandidateInterface> _candidate(
             webrtc::CreateIceCandidate(candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate, &error));
         connection->AddIceCandidate(_candidate.get());
     }
 
-    void PeerConnectionObject::GetLocalDescription(RTCSessionDescription& desc) const
+    bool PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
     {
-        std::string out;
-        auto current = connection->current_local_description();
-        current->ToString(&out);
+        if (sdp == nullptr)
+        {
+            return false;
+        }
 
-        desc.type = ConvertSdpType(current->GetType());
-        desc.sdp = (char*)CoTaskMemAlloc(out.size() + 1);
+        std::string out;
+        sdp->ToString(&out);
+
+        desc.type = ConvertSdpType(sdp->GetType());
+        desc.sdp = static_cast<char*>(CoTaskMemAlloc(out.size() + 1));
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
+        return true;
     }
 
     void PeerConnectionObject::CollectStats()

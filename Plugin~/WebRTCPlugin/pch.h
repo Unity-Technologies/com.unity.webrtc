@@ -57,6 +57,10 @@
 #include "common_video/h264/h264_common.h"
 
 #include "media/base/video_broadcaster.h"
+
+#include "pc/media_stream_observer.h"
+
+
 #pragma endregion
 
 #include "PlatformBase.h"

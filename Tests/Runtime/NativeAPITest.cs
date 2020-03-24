@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -78,6 +79,28 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
+        static void PeerConnectionSetSessionDescSuccess(IntPtr connection)
+        {
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
+        static void PeerConnectionSetSessionDescFailure(IntPtr connection)
+        {
+        }
+
+        [Test]
+        public void RegisterDelegateToPeerConnection()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var connection = NativeMethods.ContextCreatePeerConnection(context);
+
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(context, connection, PeerConnectionSetSessionDescSuccess);
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(context, connection, PeerConnectionSetSessionDescFailure);
+            NativeMethods.ContextDeletePeerConnection(context, connection);
+            NativeMethods.ContextDestroy(0);
+        }
+
         [Test]
         public void CreateAndDeleteDataChannel()
         {
@@ -91,49 +114,116 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CreateAndDeleteVideoStream()
+        public void CreateAndDeleteMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDestroy(0);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
+        static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr track) { }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
+        static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr track) { }
+
+        [Test]
+        public void RegisterDelegateToMediaStream()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+
+            NativeMethods.MediaStreamRegisterOnAddTrack(context, stream, MediaStreamOnAddTrack);
+            NativeMethods.MediaStreamRegisterOnRemoveTrack(context, stream, MediaStreamOnRemoveTrack);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDestroy(0);
+        }
+
+        [Test]
+        public void AddAndRemoveVideoTrackToPeerConnection()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var peer = NativeMethods.ContextCreatePeerConnection(context);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            var streamId = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(stream));
             const int width = 1280;
             const int height = 720;
+            const int bitrate = 1000000;
             var renderTexture = CreateRenderTexture(width, height);
-            var stream =
-                NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
-            NativeMethods.ContextDeleteVideoStream(context, stream);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr(), width, height, bitrate);
+            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
-
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
         [Test]
-        public void MediaStreamGetAudioTracks()
+        public void AddAndRemoveVideoTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
-            var stream = NativeMethods.ContextCreateAudioStream(context);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            const int width = 1280;
+            const int height = 720;
+            const int bitrate = 1000000;
+            var renderTexture = CreateRenderTexture(width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr(), width, height, bitrate);
+            NativeMethods.MediaStreamAddTrack(stream, track);
+
             int trackSize = 0;
-            IntPtr trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, ref trackSize);
+            var trackNativePtr = NativeMethods.MediaStreamGetVideoTracks(stream, ref trackSize);
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
             IntPtr[] tracksPtr = new IntPtr[trackSize];
-            System.Runtime.InteropServices.Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
-            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(trackNativePtr);
+            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            Marshal.FreeCoTaskMem(trackNativePtr);
 
-            for (int i = 0; i < trackSize; i++)
-            {
-                MediaStreamTrack track = new MediaStreamTrack(tracksPtr[i]);
-                Assert.True(track.Enabled);
-            }
-            NativeMethods.ContextDeleteAudioStream(context, stream);
+            NativeMethods.MediaStreamRemoveTrack(stream, track);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDestroy(0);
+            UnityEngine.Object.DestroyImmediate(renderTexture);
+        }
+
+        [Test]
+        public void AddAndRemoveAudioTrackToMediaStream()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
+            NativeMethods.MediaStreamAddTrack(stream, track);
+            int trackSize = 0;
+            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, ref trackSize);
+            Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
+            Assert.Greater(trackSize, 0);
+
+            IntPtr[] tracksPtr = new IntPtr[trackSize];
+            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            Marshal.FreeCoTaskMem(trackNativePtr);
+
+            NativeMethods.MediaStreamRemoveTrack(stream, track);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDestroy(0);
         }
 
         [Test]
-        public void CreateAndDeleteAudioStream()
+        public void AddAndRemoveAudioTrack()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
-            var stream = NativeMethods.ContextCreateAudioStream(context);
-            NativeMethods.ContextDeleteAudioStream(context, stream);
+            var peer = NativeMethods.ContextCreatePeerConnection(context);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            var streamId = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(stream));
+            var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
+            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
         }
 
@@ -152,25 +242,34 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator CallVideoEncoderMethods()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
+            var peer = NativeMethods.ContextCreatePeerConnection(context);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            var streamId = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamGetID(stream));
+
             const int width = 1280;
             const int height = 720;
+            const int bitrate = 1000000;
             var renderTexture = CreateRenderTexture(width, height);
-            var stream =
-                NativeMethods.ContextCreateVideoStream(context, renderTexture.GetNativeTexturePtr(), width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr(), width, height, bitrate);
+            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+
             var callback = NativeMethods.GetRenderEventFunc(context);
 
             // TODO::
             // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
-            VideoEncoderMethods.InitializeEncoder(callback);
+            NativeMethods.ContextSetVideoEncoderParameter(context, track, width, height);
+            VideoEncoderMethods.InitializeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
-            VideoEncoderMethods.Encode(callback);
+            VideoEncoderMethods.Encode(callback, track);
             yield return new WaitForSeconds(1.0f);
-            VideoEncoderMethods.FinalizeEncoder(callback);
+            VideoEncoderMethods.FinalizeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
 
-            NativeMethods.ContextDeleteVideoStream(context, stream);
+            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
-
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
     }

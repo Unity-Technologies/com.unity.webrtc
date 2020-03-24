@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 
 namespace Unity.WebRTC
@@ -92,6 +92,25 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
+        public void PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        {
+            NativeMethods.PeerConnectionSetLocalDescription(self, ptr, ref desc);
+        }
+        public void PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        {
+            NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, ref desc);
+        }
+
+        public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
+        {
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self, ptr, callback);
+        }
+
+        public void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescFailure callback)
+        {
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
+        }
+
         public IntPtr CreateDataChannel(IntPtr ptr, string label, ref RTCDataChannelInit options)
         {
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, ref options);
@@ -102,28 +121,24 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
-        // TODO:: Fix API design for multi tracks
-        public IntPtr CaptureVideoStream(IntPtr rt, int width, int height)
+        public IntPtr CreateMediaStream(string label)
         {
-            return NativeMethods.ContextCreateVideoStream(self, rt, width, height);
+            return NativeMethods.ContextCreateMediaStream(self, label);
         }
 
-        // TODO:: Fix API design for multi tracks
-        public void DeleteVideoStream(IntPtr stream)
+        public void DeleteMediaStream(MediaStream stream)
         {
-            NativeMethods.ContextDeleteVideoStream(self, stream);
+            NativeMethods.ContextDeleteMediaStream(self, stream.self);
         }
 
-        // TODO:: Fix API design for multi tracks
-        public IntPtr CreateAudioStream()
+        public void MediaStreamRegisterOnAddTrack(IntPtr stream, DelegateNativeMediaStreamOnAddTrack callback)
         {
-            return NativeMethods.ContextCreateAudioStream(self);
+            NativeMethods.MediaStreamRegisterOnAddTrack(self, stream, callback);
         }
 
-        // TODO:: Fix API design for multi tracks
-        public void DeleteAudioStream(IntPtr stream)
+        public void MediaStreamRegisterOnRemoveTrack(IntPtr stream, DelegateNativeMediaStreamOnRemoveTrack callback)
         {
-            NativeMethods.ContextDeleteAudioStream(self, stream);
+            NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream, callback);
         }
 
         public IntPtr GetRenderEventFunc()
@@ -131,27 +146,47 @@ namespace Unity.WebRTC
             return NativeMethods.GetRenderEventFunc(self);
         }
 
+        public IntPtr CreateAudioTrack(string label)
+        {
+            return NativeMethods.ContextCreateAudioTrack(self, label);
+        }
+
+        public IntPtr CreateVideoTrack(string label, IntPtr rt, int width, int height, int bitrate)
+        {
+            return NativeMethods.ContextCreateVideoTrack(self, label, rt, width, height, bitrate);
+        }
+
         public void StopMediaStreamTrack(IntPtr track)
         {
-            NativeMethods.StopMediaStreamTrack(self, track);
+            NativeMethods.ContextStopMediaStreamTrack(self, track);
         }
 
-        internal void InitializeEncoder()
+        public void DeleteMediaStreamTrack(IntPtr track)
         {
-            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.InitializeEncoder(renderFunction);
+            NativeMethods.ContextDeleteMediaStreamTrack(self, track);
         }
 
-        internal void FinalizeEncoder()
+        public void SetVideoEncoderParameter(IntPtr track, int width, int height)
         {
-            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.FinalizeEncoder(renderFunction);
+            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height);
         }
 
-        internal void Encode()
+        internal void InitializeEncoder(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.Encode(renderFunction);
+            VideoEncoderMethods.InitializeEncoder(renderFunction, track);
+        }
+
+        internal void FinalizeEncoder(IntPtr track)
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.FinalizeEncoder(renderFunction, track);
+        }
+
+        internal void Encode(IntPtr track)
+        {
+            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
+            VideoEncoderMethods.Encode(renderFunction, track);
         }
     }
 }

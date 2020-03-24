@@ -1,4 +1,6 @@
 #include "pch.h"
+
+#include "Codec/EncoderFactory.h"
 #include "Context.h"
 #include "IUnityGraphics.h"
 #include "GraphicsDevice/GraphicsDevice.h"
@@ -56,35 +58,54 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
-static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
+std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> m_mapEncoder;
+
+static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if(s_context == nullptr)
     {
         return;
     }
-    switch(static_cast<VideoStreamRenderEventID>(eventID))
+    const auto track = reinterpret_cast<webrtc::MediaStreamTrackInterface*>(data);
+    const auto event = static_cast<VideoStreamRenderEventID>(eventID);
+
+    switch(event)
     {
         case VideoStreamRenderEventID::Initialize:
-            if(!GraphicsDevice::GetInstance().IsInitialized()) {
+        {
+            if (!GraphicsDevice::GetInstance().IsInitialized())
+            {
                 GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
             }
             s_device = GraphicsDevice::GetInstance().GetDevice();
-            s_context->InitializeEncoder(s_device);
+            const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
+            const UnityEncoderType encoderType = s_context->GetEncoderType();
+            m_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
+            s_context->InitializeEncoder(m_mapEncoder[track].get(), track);
             return;
+        }
         case VideoStreamRenderEventID::Encode:
-            s_context->EncodeFrame();
+        {
+            if(!s_context->EncodeFrame(track))
+            {
+                LogPrint("Encode frame failed");
+            }
             return;
+        }
         case VideoStreamRenderEventID::Finalize:
-            s_context->FinalizeEncoder();
+        {
+            m_mapEncoder.erase(track);
             GraphicsDevice::GetInstance().Shutdown();
             return;
-        default:
+        }
+        default: {
             LogPrint("Unknown event id %d", eventID);
             return;
+        }
     }
 }
 
-extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
 {
     s_context = context;
     return OnRenderEvent;

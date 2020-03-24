@@ -4,34 +4,30 @@
 
 namespace WebRTC
 {
-    NvVideoCapturer::NvVideoCapturer()
-    {
+    NvVideoCapturer::NvVideoCapturer() {
         set_enable_video_adapter(false);
         SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));
     }
-    void NvVideoCapturer::EncodeVideoData()
-    {
-        if (captureStarted && !captureStopped)
-        {
-            if(encoder_ == nullptr)
-            {
-                LogPrint("nvEncoder is null");
-                return;
+
+    bool NvVideoCapturer::EncodeVideoData() {
+        if (captureStarted && !captureStopped) {
+            if(encoder_ == nullptr) {
+                LogPrint("encoder is null");
+                return false;
             }
-            if(!encoder_->CopyBuffer(unityRT))
-            {
-                LogPrint("CopyRenderTexture Failed");
-                return;
+            if(!encoder_->CopyBuffer(unityRT)) {
+                LogPrint("Copy texture buffer is failed");
+                return false;
             }
             if(!encoder_->EncodeFrame()) {
-                LogPrint("EncodeFrame Failed");
-                return;
+                LogPrint("Encode frame is failed");
+                return false;
             }
         }
-        else
-        {
-            LogPrint("Video capture is not started");
+        else {
+            return false;
         }
+        return true;
     }
 
     void NvVideoCapturer::CaptureFrame(webrtc::VideoFrame& videoFrame)
@@ -73,27 +69,8 @@ namespace WebRTC
         encoder_->SetRate(rate);
     }
 
-    bool NvVideoCapturer::InitializeEncoder(IGraphicsDevice* device, UnityEncoderType encoderType)
-    {
-        try
-        {
-            EncoderFactory::GetInstance().Init(width, height, device, encoderType);
-        }
-        catch(std::runtime_error& exception)
-        {
-            LogPrint(exception.what());
-            return false;
-        }
-        encoder_ = EncoderFactory::GetInstance().GetEncoder();
-        if (encoder_ == nullptr)
-            return false;
+    void NvVideoCapturer::SetEncoder(IEncoder* encoder) {
+        encoder_ = encoder;
         encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
-        return true;
-    }
-
-    void NvVideoCapturer::FinalizeEncoder()
-    {
-        EncoderFactory::GetInstance().Shutdown();
-        encoder_ = nullptr;
     }
 }

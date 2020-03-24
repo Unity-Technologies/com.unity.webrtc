@@ -16,7 +16,7 @@ namespace Unity.WebRTC.RuntimeTest
         [TearDown]
         public void TearDown()
         {
-            WebRTC.Finalize();
+            WebRTC.Dispose();
         }
 
 
@@ -53,20 +53,26 @@ namespace Unity.WebRTC.RuntimeTest
 
             var conf = new RTCDataChannelInit(true);
             var channel1 = peer1.CreateDataChannel("data", ref conf);
+            bool channel1Opened = false;
+            bool channel1Closed = false;
+            channel1.OnOpen = () => { channel1Opened = true; };
+            channel1.OnClose = () => { channel1Closed = true; };
 
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
             var op1 = peer1.CreateOffer(ref options1);
             yield return op1;
-            var op2 = peer1.SetLocalDescription(ref op1.desc);
+            var desc = op1.Desc;
+            var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
-            var op3 = peer2.SetRemoteDescription(ref op1.desc);
+            var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
             var op4 = peer2.CreateAnswer(ref options2);
             yield return op4;
-            var op5 = peer2.SetLocalDescription(ref op4.desc);
+            desc = op4.Desc;
+            var op5 = peer2.SetLocalDescription(ref desc);
             yield return op5;
-            var op6 = peer1.SetRemoteDescription(ref op4.desc);
+            var op6 = peer1.SetRemoteDescription(ref desc);
             yield return op6;
 
             var op7 = new WaitUntilWithTimeout(
@@ -83,6 +89,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op9;
             Assert.True(op9.IsCompleted);
 
+            Assert.True(channel1Opened);
             Assert.AreEqual(channel1.Label, channel2.Label);
             Assert.AreEqual(channel1.Id, channel2.Id);
 
@@ -105,8 +112,11 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(message3, message4);
 
             channel1.Close();
-            channel2.Close();
+            var op12 = new WaitUntilWithTimeout(() => channel1Closed, 5000);
+            yield return op12;
+            Assert.True(op12.IsCompleted);
 
+            channel2.Close();
             peer1.Close();
             peer2.Close();
         }

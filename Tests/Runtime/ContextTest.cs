@@ -24,7 +24,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("Context")]
-        public void Context_CreateAndDelete()
+        public void CreateAndDelete()
         {
             var context = Context.Create();
             context.Dispose();
@@ -32,17 +32,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("Context")]
-        public void Context_GetCodecInitializationResult()
-        {
-            var context = Context.Create();
-            var result = context.GetCodecInitializationResult();
-            Assert.AreEqual(CodecInitializationResult.NotInitialized, result);
-            context.Dispose();
-        }
-
-        [Test]
-        [Category("Context")]
-        public void Context_GetSetEncoderType()
+        public void GetSetEncoderType()
         {
             var context = Context.Create();
             Assert.AreEqual(EncoderType.Hardware, context.GetEncoderType());
@@ -51,7 +41,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("Context")]
-        public void Context_CreateAndDeletePeerConnection()
+        public void CreateAndDeletePeerConnection()
         {
             var context = Context.Create();
             var peerPtr = context.CreatePeerConnection();
@@ -61,7 +51,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("Context")]
-        public void Context_CreateAndDeleteDataChannel()
+        public void CreateAndDeleteDataChannel()
         {
             var context = Context.Create();
             var peerPtr = context.CreatePeerConnection();
@@ -69,6 +59,22 @@ namespace Unity.WebRTC.RuntimeTest
             var channelPtr = context.CreateDataChannel(peerPtr, "test", ref init);
             context.DeleteDataChannel(channelPtr);
             context.DeletePeerConnection(peerPtr);
+            context.Dispose();
+        }
+
+        [Test]
+        [Category("Context")]
+        public void CreateAndDeleteVideoTrack()
+        {
+            var context = Context.Create();
+            var width = 256;
+            var height = 256;
+            var bitrate = 1000000;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = context.CreateVideoTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
+            context.DeleteMediaStreamTrack(track);
             context.Dispose();
         }
     }

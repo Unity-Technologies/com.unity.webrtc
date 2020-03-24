@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System;
 
 namespace Unity.WebRTC
@@ -11,14 +11,10 @@ namespace Unity.WebRTC
     public class RTCDataChannel : IDisposable
     {
         private IntPtr self;
-        private RTCPeerConnection peerConnection;
         private DelegateOnMessage onMessage;
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
 
-        private DelegateNativeOnMessage selfOnMessage;
-        private DelegateNativeOnOpen selfOnOpen;
-        private DelegateNativeOnClose selfOnClose;
         private int id;
         private bool disposed;
 
@@ -29,8 +25,6 @@ namespace Unity.WebRTC
             set
             {
                 onMessage = value;
-                selfOnMessage = new DelegateNativeOnMessage(DataChannelNativeOnMessage);
-                NativeMethods.DataChannelRegisterOnMessage(self, selfOnMessage);
             }
         }
 
@@ -40,8 +34,6 @@ namespace Unity.WebRTC
             set
             {
                 onOpen = value;
-                selfOnOpen = new DelegateNativeOnOpen(DataChannelNativeOnOpen);
-                NativeMethods.DataChannelRegisterOnOpen(self, selfOnOpen);
             }
         }
         public DelegateOnClose OnClose
@@ -50,8 +42,6 @@ namespace Unity.WebRTC
             set
             {
                 onClose = value;
-                selfOnClose = new DelegateNativeOnClose(DataChannelNativeOnClose);
-                NativeMethods.DataChannelRegisterOnClose(self, selfOnClose);
             }
         }
 
@@ -64,42 +54,49 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
         static void DataChannelNativeOnMessage(IntPtr ptr, byte[] msg, int len)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
-                var channel = WebRTC.Table[ptr] as RTCDataChannel;
-                channel.onMessage(msg);
-            }, null);
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    channel.onMessage?.Invoke(msg);
+                }
+            });
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnOpen))]
         static void DataChannelNativeOnOpen(IntPtr ptr)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
-                var channel = WebRTC.Table[ptr] as RTCDataChannel;
-                channel.onOpen();
-            }, null);
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    channel.onOpen?.Invoke();
+                }
+            });
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnClose))]
         static void DataChannelNativeOnClose(IntPtr ptr)
         {
-            WebRTC.SyncContext.Post(_ =>
+            WebRTC.Sync(ptr, () =>
             {
-                if (null == WebRTC.Table)
-                    return;
-
-                var channel = WebRTC.Table[ptr] as RTCDataChannel;
-                channel.onClose();
-            }, null);
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    channel.onClose?.Invoke();
+                }
+            });
         }
+
         internal RTCDataChannel(IntPtr ptr, RTCPeerConnection peerConnection)
         {
             self = ptr;
-            this.peerConnection = peerConnection;
             WebRTC.Table.Add(self, this);
             var labelPtr = NativeMethods.DataChannelGetLabel(self);
             Label = Marshal.PtrToStringAnsi(labelPtr);
+
+            NativeMethods.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
+            NativeMethods.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);
+            NativeMethods.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
         }
 
         ~RTCDataChannel()

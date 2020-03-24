@@ -214,8 +214,10 @@
     <ClInclude Include="GraphicsDevice\Vulkan\VulkanTexture2D.h" />
     <ClInclude Include="GraphicsDevice\Vulkan\VulkanUtility.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MediaStreamObserver.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PeerConnectionObject.h" />
+    <ClInclude Include="SetSessionDescriptionObserver.h" />
     <ClInclude Include="VideoCapturer.h" />
     <ClInclude Include="VideoCaptureTrackSource.h" />
     <ClInclude Include="VideoTrackSource.h" />
@@ -249,6 +251,7 @@
     <ClCompile Include="GraphicsDevice\Vulkan\VulkanTexture2D.cpp" />
     <ClCompile Include="GraphicsDevice\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MediaStreamObserver.cpp" />
     <ClCompile Include="NvVideoCapturer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -256,6 +259,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="PeerConnectionObject.cpp" />
+    <ClCompile Include="SetSessionDescriptionObserver.cpp" />
     <ClCompile Include="VideoCapturer.cpp" />
     <ClCompile Include="VideoCaptureTrackSource.cpp" />
     <ClCompile Include="VideoTrackSource.cpp" />

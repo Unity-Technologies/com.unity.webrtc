@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
@@ -44,7 +44,7 @@ public class PeerConnectionSample : MonoBehaviour
             pc1.Close();
         if (pc1 != null)
             pc2.Close();
-        WebRTC.Finalize();
+        WebRTC.Dispose();
     }
 
     private void Start()
@@ -62,7 +62,7 @@ public class PeerConnectionSample : MonoBehaviour
         {
             yield return new WaitForSeconds(1);
 
-            var desc = pc1.GetLocalDescription();
+            var desc = pc1.LocalDescription;
             Debug.Log($"pc1 sdp: {desc.sdp}");
         }
     }
@@ -100,13 +100,13 @@ public class PeerConnectionSample : MonoBehaviour
         var op = pc1.CreateOffer(ref OfferOptions);
         yield return op;
 
-        if (!op.isError)
+        if (!op.IsError)
         {
-            yield return StartCoroutine(OnCreateOfferSuccess(op.desc));
+            yield return StartCoroutine(OnCreateOfferSuccess(op.Desc));
         }
         else
         {
-            OnCreateSessionDescriptionError(op.error);
+            OnCreateSessionDescriptionError(op.Error);
         }
         sdpCheck = StartCoroutine(Loop());
     }
@@ -164,25 +164,27 @@ public class PeerConnectionSample : MonoBehaviour
         var op = pc1.SetLocalDescription(ref desc);
         yield return op;
 
-        if (!op.isError)
+        if (!op.IsError)
         {
             OnSetLocalSuccess(pc1);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op.error);
+            var error = op.Error;
+            OnSetSessionDescriptionError(ref error);
         }
 
         Debug.Log("pc2 setRemoteDescription start");
         var op2 = pc2.SetRemoteDescription(ref desc);
         yield return op2;
-        if (!op2.isError)
+        if (!op2.IsError)
         {
             OnSetRemoteSuccess(pc2);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op2.error);
+            var error = op2.Error;
+            OnSetSessionDescriptionError(ref error);
         }
         Debug.Log("pc2 createAnswer start");
         // Since the 'remote' side has no media stream we need
@@ -191,13 +193,13 @@ public class PeerConnectionSample : MonoBehaviour
 
         var op3 = pc2.CreateAnswer(ref AnswerOptions);
         yield return op3;
-        if (!op3.isError)
+        if (!op3.IsError)
         {
-            yield return OnCreateAnswerSuccess(op3.desc);
+            yield return OnCreateAnswerSuccess(op3.Desc);
         }
         else
         {
-            OnCreateSessionDescriptionError(op3.error);
+            OnCreateSessionDescriptionError(op3.Error);
         }
     }
 
@@ -220,26 +222,28 @@ public class PeerConnectionSample : MonoBehaviour
         var op = pc2.SetLocalDescription(ref desc);
         yield return op;
 
-        if (!op.isError)
+        if (!op.IsError)
         {
             OnSetLocalSuccess(pc2);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op.error);
+            var error = op.Error;
+            OnSetSessionDescriptionError(ref error);
         }
 
         Debug.Log("pc1 setRemoteDescription start");
 
         var op2 = pc1.SetRemoteDescription(ref desc);
         yield return op2;
-        if (!op2.isError)
+        if (!op2.IsError)
         {
             OnSetRemoteSuccess(pc1);
         }
         else
         {
-            OnSetSessionDescriptionError(ref op2.error);
+            var error = op2.Error;
+            OnSetSessionDescriptionError(ref error);
         }
     }
 

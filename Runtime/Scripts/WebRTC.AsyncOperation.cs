@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -6,17 +6,18 @@ namespace Unity.WebRTC
     /// <inheritdoc />
     /// <summary>
     /// </summary>
-    public class RTCSessionDescriptionAsyncOperation : CustomYieldInstruction
+    public class AsyncOperationBase : CustomYieldInstruction
     {
-        public bool isError;
-        public RTCError error;
-        public RTCSessionDescription desc;
-        public bool isDone;
+        public RTCError Error { get; internal set; }
+
+        public bool IsError { get; internal set; }
+        public bool IsDone { get; internal set; }
+
         public override bool keepWaiting
         {
             get
             {
-                if (isDone)
+                if (IsDone)
                 {
                     return false;
                 }
@@ -29,46 +30,29 @@ namespace Unity.WebRTC
 
         internal void Done()
         {
-            isDone = true;
+            IsDone = true;
         }
     }
 
-    public class RTCIceCandidateRequestAsyncOperation : CustomYieldInstruction
+    public class RTCSessionDescriptionAsyncOperation : AsyncOperationBase
     {
-        public bool isError { get; private set;  }
-        public RTCError error { get; private set; }
-        public bool isDone { get; private set;  }
-
-        public override bool keepWaiting
-        {
-            get
-            {
-                return isDone;
-            }
-        }
-
-        public void Done()
-        {
-            isDone = true;
-        }
+        public RTCSessionDescription Desc { get; internal set; }
     }
-    public class RTCAsyncOperation : CustomYieldInstruction
+
+    public class RTCSetSessionDescriptionAsyncOperation : AsyncOperationBase
     {
-        public bool isError { get; private set; }
-        public RTCError error { get; private set; }
-        public bool isDone { get; private set; }
-
-        public override bool keepWaiting
+        internal RTCSetSessionDescriptionAsyncOperation(RTCPeerConnection connection)
         {
-            get
+            connection.OnSetSessionDescriptionSuccess = () =>
             {
-                return isDone;
-            }
-        }
-
-        public void Done()
-        {
-            isDone = true;
+                IsError = false;
+                this.Done();
+            };
+            connection.OnSetSessionDescriptionFailure = () =>
+            {
+                IsError = true;
+                this.Done();
+            };
         }
     }
 }

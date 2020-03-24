@@ -71,7 +71,8 @@ namespace WebRTC
         SetRate(parameters.bitrate.get_sum_kbps() * 1000);
     }
 
-    DummyVideoEncoderFactory::DummyVideoEncoderFactory(NvVideoCapturer* videoCapturer):capturer(videoCapturer){}
+    DummyVideoEncoderFactory::DummyVideoEncoderFactory() {}
+
     std::vector<webrtc::SdpVideoFormat> DummyVideoEncoderFactory::GetSupportedFormats() const
     {
         const absl::optional<std::string> profileLevelId =
@@ -87,12 +88,9 @@ namespace WebRTC
     {
         return CodecInfo{ true, false };
     }
-    std::unique_ptr<webrtc::VideoEncoder> DummyVideoEncoderFactory::CreateVideoEncoder(
-        const webrtc::SdpVideoFormat& format)
+
+    std::unique_ptr<webrtc::VideoEncoder> DummyVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-        auto dummyVideoEncoder = std::make_unique<DummyVideoEncoder>();
-        dummyVideoEncoder->SetKeyFrame.connect(capturer, &NvVideoCapturer::SetKeyFrame);
-        dummyVideoEncoder->SetRate.connect(capturer, &NvVideoCapturer::SetRate);
-        return dummyVideoEncoder;
+        return std::make_unique<DummyVideoEncoder>();
     }
 }

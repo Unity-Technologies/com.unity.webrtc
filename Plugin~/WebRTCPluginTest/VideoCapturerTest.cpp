@@ -11,7 +11,7 @@ using namespace testing;
 class VideoCapturerTest : public GraphicsDeviceTestBase
 {
 protected:
-    IEncoder* encoder_ = nullptr;
+    std::unique_ptr<IEncoder> encoder_;
     const int width_ = 256;
     const int height_ = 256;
     std::unique_ptr<NvVideoCapturer> capturer_;
@@ -20,29 +20,25 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        EncoderFactory::GetInstance().Init(width_, height_, m_device, encoderType);
-        encoder_ = EncoderFactory::GetInstance().GetEncoder();
+        encoder_ = EncoderFactory::GetInstance().Init(width_, height_, m_device, encoderType);
         EXPECT_NE(nullptr, encoder_);
 
         capturer_ = std::make_unique<NvVideoCapturer>();
     }
 
     void TearDown() override {
-        EncoderFactory::GetInstance().Shutdown();
         GraphicsDeviceTestBase::TearDown();
     }
 };
-TEST_P(VideoCapturerTest, InitializeAndFinalize) {
-    capturer_->InitializeEncoder(m_device, UnityEncoderHardware);
-    capturer_->FinalizeEncoder();
+TEST_P(VideoCapturerTest, SetEncoder) {
+    capturer_->SetEncoder(encoder_.get());
 }
 
 TEST_P(VideoCapturerTest, EncodeVideoData) {
-    capturer_->InitializeEncoder(m_device, UnityEncoderHardware);
+    capturer_->SetEncoder(encoder_.get());
     auto tex = m_device->CreateDefaultTextureV(width_, height_);
     capturer_->SetFrameBuffer(tex->GetEncodeTexturePtrV());
     capturer_->EncodeVideoData();
-    capturer_->FinalizeEncoder();
 }
 
 INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, VideoCapturerTest, ValuesIn(VALUES_TEST_ENV));

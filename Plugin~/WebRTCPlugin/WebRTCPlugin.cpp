@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "WebRTCPlugin.h"
 #include "PeerConnectionObject.h"
+#include "MediaStreamObserver.h"
+#include "SetSessionDescriptionObserver.h"
 #include "Context.h"
 #include "Codec/EncoderFactory.h"
 
@@ -30,111 +32,121 @@ namespace WebRTC
     }
 }
 
+template<class T>
+T** ConvertArray(std::vector<rtc::scoped_refptr<T>> vec, int* length)
+{
+#pragma warning(suppress: 4267)
+    *length = vec.size();
+    const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
+    const auto ret = static_cast<T**>(buf);
+    std::copy(vec.begin(), vec.end(), ret);
+    return ret;
+}
+
+
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
-    {
-        return context->GetEncoderType();
-    }
-
     UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
     {
         return EncoderFactory::GetHardwareEncoderSupport();
     }
 
-    UNITY_INTERFACE_EXPORT CodecInitializationResult ContextGetCodecInitializationResult(Context* context)
+    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
     {
-        return context->GetCodecInitializationResult();
+        return context->GetEncoderType();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateVideoStream(Context* context, void* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, webrtc::MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type)
     {
-        return context->CreateVideoStream(rt, width, height);
+        context->SetEncoderParameter(track, width, height);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextDeleteVideoStream(Context* context, webrtc::MediaStreamInterface* stream)
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
     {
-        context->DeleteVideoStream(stream);
+        return context->CreateMediaStream(streamId);
     }
 
-    //TODO: Multi-track support
-    UNITY_INTERFACE_EXPORT void StopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStream(Context* context, webrtc::MediaStreamInterface* stream)
     {
-        context->StopCapturer();
+        context->DeleteMediaStream(stream);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamInterface* ContextCreateAudioStream(Context* context)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt, int32 width, int32 height, int32 bitRate)
     {
-        return context->CreateAudioStream();
+        return context->CreateVideoTrack(label, rt, width, height, bitRate);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextDeleteAudioStream(Context* context, webrtc::MediaStreamInterface* stream)
+    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
     {
-        context->DeleteAudioStream(stream);
+        context->DeleteMediaStreamTrack(track);
     }
 
-    UNITY_INTERFACE_EXPORT void MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, webrtc::MediaStreamTrackInterface* track)
+    {
+        context->StopMediaStreamTrack(track);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
+    {
+        return context->CreateAudioTrack(label);
+    }
+
+    UNITY_INTERFACE_EXPORT bool MediaStreamAddTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
     {
         if (track->kind() == "audio")
         {
-            stream->AddTrack((webrtc::AudioTrackInterface*)track);
+            return stream->AddTrack(static_cast<webrtc::AudioTrackInterface*>(track));
         }
         else
         {
-            stream->AddTrack((webrtc::VideoTrackInterface*)track);
+            return stream->AddTrack(static_cast<webrtc::VideoTrackInterface*>(track));
         }
     }
-    UNITY_INTERFACE_EXPORT void MediaStreamRemoveTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT bool MediaStreamRemoveTrack(webrtc::MediaStreamInterface* stream, webrtc::MediaStreamTrackInterface* track)
     {
         if (track->kind() == "audio")
         {
-            stream->RemoveTrack((webrtc::AudioTrackInterface*)track);
+            return stream->RemoveTrack(static_cast<webrtc::AudioTrackInterface*>(track));
         }
         else
         {
-            stream->RemoveTrack((webrtc::VideoTrackInterface*)track);
+            return stream->RemoveTrack(static_cast<webrtc::VideoTrackInterface*>(track));
         }
     }
 
     UNITY_INTERFACE_EXPORT char* MediaStreamGetID(webrtc::MediaStreamInterface* stream)
     {
-        auto idStr = stream->id();
-        auto id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        const auto idStr = stream->id();
+        const auto id = static_cast<char*>(CoTaskMemAlloc(idStr.size() + sizeof(char)));
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
     }
 
-
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface** MediaStreamGetVideoTracks(webrtc::MediaStreamInterface* stream, int* length)
+    UNITY_INTERFACE_EXPORT void MediaStreamRegisterOnAddTrack(Context* context, webrtc::MediaStreamInterface* stream, DelegateMediaStreamOnAddTrack callback)
     {
-        auto tracksVector = stream->GetVideoTracks();
-#pragma warning(suppress: 4267)
-        *length = tracksVector.size();
-        auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
-        for (uint32_t i = 0; i < tracksVector.size(); i++)
-        {
-            tracks[i] = tracksVector[i].get();
-        }
-        return tracks;
+        context->GetObserver(stream)->RegisterOnAddTrack(callback);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface** MediaStreamGetAudioTracks(webrtc::MediaStreamInterface* stream, int* length)
+    UNITY_INTERFACE_EXPORT void MediaStreamRegisterOnRemoveTrack(Context* context, webrtc::MediaStreamInterface* stream, DelegateMediaStreamOnRemoveTrack callback)
     {
-        auto tracksVector = stream->GetAudioTracks();
-#pragma warning(suppress: 4267)
-        *length = tracksVector.size();
-        auto tracks = (webrtc::MediaStreamTrackInterface**)CoTaskMemAlloc(sizeof(webrtc::MediaStreamTrackInterface*) * tracksVector.size());
-        for (uint32_t i = 0; i < tracksVector.size(); i++)
-        {
-            tracks[i] = tracksVector[i].get();
-        }
-        return tracks;
+        context->GetObserver(stream)->RegisterOnRemoveTrack(callback);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::VideoTrackInterface** MediaStreamGetVideoTracks(webrtc::MediaStreamInterface* stream, int* length)
+    {
+        return ConvertArray<webrtc::VideoTrackInterface>(stream->GetVideoTracks(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::AudioTrackInterface** MediaStreamGetAudioTracks(webrtc::MediaStreamInterface* stream, int* length)
+    {
+        return ConvertArray<webrtc::AudioTrackInterface>(stream->GetAudioTracks(), length);
     }
 
     UNITY_INTERFACE_EXPORT TrackKind MediaStreamTrackGetKind(webrtc::MediaStreamTrackInterface* track)
     {
-        auto kindStr = track->kind();
+        const auto kindStr = track->kind();
         if (kindStr == "audio")
         {
             return TrackKind::Audio;
@@ -152,8 +164,8 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT char* MediaStreamTrackGetID(webrtc::MediaStreamTrackInterface* track)
     {
-        auto idStr = track->id();
-        auto id = (char*)CoTaskMemAlloc(idStr.size() + sizeof(char));
+        const auto idStr = track->id();
+        const auto id = static_cast<char*>(CoTaskMemAlloc(idStr.size() + sizeof(char)));
         idStr.copy(id, idStr.size());
         id[idStr.size()] = '\0';
         return id;
@@ -196,26 +208,53 @@ extern "C"
         ContextManager::GetInstance()->DestroyContext(uid);
     }
 
-    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* ctx)
+    PeerConnectionObject* _ContextCreatePeerConnection(Context* context, const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
-        return ctx->CreatePeerConnection();
+        const auto obj = context->CreatePeerConnection(config);
+        const auto observer = WebRTC::SetSessionDescriptionObserver::Create(obj);
+        context->AddObserver(obj->connection, observer);
+        return obj;
     }
 
-    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* ctx, const char* conf)
+    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* context)
     {
-        return ctx->CreatePeerConnection(conf);
+        webrtc::PeerConnectionInterface::RTCConfiguration config;
+        config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
+        return _ContextCreatePeerConnection(context, config);
     }
-    UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* ctx, PeerConnectionObject* ptr)
+
+    UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* context, const char* conf)
     {
-        ctx->DeletePeerConnection(ptr);
+        webrtc::PeerConnectionInterface::RTCConfiguration config;
+        Convert(conf, config);
+        return _ContextCreatePeerConnection(context, config);
     }
+
+    UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* context, PeerConnectionObject* obj)
+    {
+        obj->Close();
+        context->RemoveObserver(obj->connection);
+        context->DeletePeerConnection(obj);
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionClose(PeerConnectionObject* obj)
     {
         obj->Close();
     }
-    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track)
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, const char* streamId)
     {
-        return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), { "unity" }).value().get();
+        return obj->connection->AddTrack(rtc::scoped_refptr <webrtc::MediaStreamTrackInterface>(track), { streamId }).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface* PeerConnectionAddTransceiver(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track)
+    {
+        return obj->connection->AddTransceiver(track).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(PeerConnectionObject* obj, webrtc::MediaStreamTrackInterface* track, webrtc::RtpTransceiverInit* init)
+    {
+        return obj->connection->AddTransceiver(track, *init).value().get();
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRemoveTrack(PeerConnectionObject* obj, webrtc::RtpSenderInterface* sender)
@@ -234,19 +273,19 @@ extern "C"
         obj->GetConfiguration(_conf);
 #pragma warning(suppress: 4267)
         *len = _conf.size();
-        *conf = (char*)::CoTaskMemAlloc(_conf.size() + sizeof(char));
+        *conf = static_cast<char*>(::CoTaskMemAlloc(_conf.size() + sizeof(char)));
         _conf.copy(*conf, _conf.size());
         (*conf)[_conf.size()] = '\0';
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(PeerConnectionObject* obj, const RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
-        obj->SetRemoteDescription(*desc);
+        obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection));
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(PeerConnectionObject* obj, const RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
-        obj->SetLocalDescription(*desc);
+        obj->SetLocalDescription(*desc, context->GetObserver(obj->connection));
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCollectStats(PeerConnectionObject* obj)
@@ -254,9 +293,49 @@ extern "C"
         obj->CollectStats();
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
     {
-        obj->GetLocalDescription(*desc);
+        return obj->GetSessionDescription(obj->connection->local_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        return obj->GetSessionDescription(obj->connection->remote_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetPendingLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        return obj->GetSessionDescription(obj->connection->pending_local_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetPendingRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        return obj->GetSessionDescription(obj->connection->pending_remote_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetCurrentLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        return obj->GetSessionDescription(obj->connection->current_local_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT bool PeerConnectionGetCurrentRemoteDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)
+    {
+        return obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface** PeerConnectionGetReceivers(PeerConnectionObject* obj, int* length)
+    {
+        return ConvertArray<webrtc::RtpReceiverInterface>(obj->connection->GetReceivers(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface** PeerConnectionGetSenders(PeerConnectionObject* obj, int* length)
+    {
+        return ConvertArray<webrtc::RtpSenderInterface>(obj->connection->GetSenders(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpTransceiverInterface** PeerConnectionGetTransceivers(PeerConnectionObject* obj, int* length)
+    {
+        return ConvertArray<webrtc::RtpTransceiverInterface>(obj->connection->GetTransceivers(), length);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCreateOffer(PeerConnectionObject* obj, const RTCOfferOptions* options)
@@ -299,9 +378,14 @@ extern "C"
         obj->RegisterCallbackCreateSD(onSuccess, onFailure);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackSetSD(PeerConnectionObject* obj, DelegateSetSDSuccess onSuccess, DelegateSetSDFailure onFailure)
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnSetSessionDescSuccess(Context* context, PeerConnectionObject* obj, DelegateSetSessionDescSuccess onSuccess)
     {
-        obj->RegisterCallbackSetSD(onSuccess, onFailure);
+        context->GetObserver(obj->connection)->RegisterDelegateOnSuccess(onSuccess);
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnSetSessionDescFailure(Context* context, PeerConnectionObject* obj, DelegateSetSessionDescFailure onFailure)
+    {
+        context->GetObserver(obj->connection)->RegisterDelegateOnFailure(onFailure);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionAddIceCandidate(PeerConnectionObject* obj, const RTCIceCandidate* candidate)
@@ -333,9 +417,34 @@ extern "C"
     {
         obj->RegisterOnTrack(callback);
     }
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* RtpTransceiverInterfaceGetTrack(webrtc::RtpTransceiverInterface* obj)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* TransceiverGetTrack(webrtc::RtpTransceiverInterface* transceiver)
     {
-        return obj->receiver()->track().get();
+        return transceiver->receiver()->track().get();
+    }
+
+    UNITY_INTERFACE_EXPORT bool TransceiverGetCurrentDirection(webrtc::RtpTransceiverInterface* transceiver, webrtc::RtpTransceiverDirection* direction)
+    {
+        if(transceiver->current_direction().has_value())
+        {
+            *direction = transceiver->current_direction().value();
+            return true;
+        }
+        return false;
+    }
+
+    UNITY_INTERFACE_EXPORT void TransceiverStop(webrtc::RtpTransceiverInterface* transceiver)
+    {
+        transceiver->Stop();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpReceiverInterface* TransceiverGetReceiver(webrtc::RtpTransceiverInterface* transceiver)
+    {
+        return transceiver->receiver().get();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::RtpSenderInterface* TransceiverGetSender(webrtc::RtpTransceiverInterface* transceiver)
+    {
+        return transceiver->sender().get();
     }
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)
@@ -346,7 +455,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelObject* dataChannelObj)
     {
         std::string tmp = dataChannelObj->GetLabel();
-        auto label = (char*)CoTaskMemAlloc(tmp.size() + sizeof(char));
+        auto label = static_cast<char*>(CoTaskMemAlloc(tmp.size() + sizeof(char)));
         tmp.copy(label, tmp.size());
         label[tmp.size()] = '\0';
         return label;

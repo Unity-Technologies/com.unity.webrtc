@@ -1,5 +1,4 @@
-﻿#pragma once
-#include "IUnityInterface.h"
+#pragma once
 
 namespace WebRTC
 {
@@ -12,8 +11,10 @@ namespace WebRTC
 
     using DelegateDebugLog = void(*)(const char*);
     using DelegateSetResolution = void(*)(int32*, int32*);
-    using DelegateRTCPeerConnectionOnTrack = void(*)();
-    using DelegateRTCPeerConnectionOnConnectionStateChange = void(*)();
+    using DelegateMediaStreamOnAddTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
+    using DelegateMediaStreamOnRemoveTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
+    using DelegateSetSessionDescSuccess = void(*)(PeerConnectionObject*);
+    using DelegateSetSessionDescFailure = void(*)(PeerConnectionObject*);
 
     void debugLog(const char* buf);
     void SetResolution(int32* width, int32* length);
