@@ -8,7 +8,7 @@ namespace unity
 {
 namespace webrtc
 {
-    
+    namespace webrtc = ::webrtc;
     class MetalGraphicsDevice : public IGraphicsDevice{
     public:
         MetalGraphicsDevice(id<MTLDevice> device, IUnityGraphicsMetal* unityGraphicsMetal);

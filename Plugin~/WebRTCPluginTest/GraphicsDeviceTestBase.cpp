@@ -89,6 +89,11 @@ IUnityInterface* CreateUnityInterface() {
 #import <Metal/Metal.h>
 #include <DummyUnityInterface/DummyUnityGraphicsMetal.h>
 
+namespace unity
+{
+namespace webrtc
+{
+
 void* CreateDevice(UnityGfxRenderer renderer)
 {
     return MTLCreateSystemDefaultDevice();
