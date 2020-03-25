@@ -8,6 +8,8 @@ namespace unity
 namespace webrtc
 {
 
+namespace webrtc = ::webrtc;
+
 class OpenGLGraphicsDevice : public IGraphicsDevice{
 public:
     OpenGLGraphicsDevice();
