@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "VulkanUtility.h"
 #include "WebRTCMacros.h"
 
@@ -13,7 +13,10 @@
 #define EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE    VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR
 #endif
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 //
 bool VulkanUtility::FindMemoryTypeInto(const VkPhysicalDevice physicalDevice, uint32_t typeFilter,
@@ -379,5 +382,5 @@ VkResult VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool com
     return EndAndSubmitOneTimeCommandBuffer(device,commandPool,queue,commandBuffer);
 }
 
-
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

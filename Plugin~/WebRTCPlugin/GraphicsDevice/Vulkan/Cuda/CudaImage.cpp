@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "CudaImage.h"
 
 #include <sstream> //ostringstream
@@ -6,8 +6,10 @@
 #include "GraphicsDevice/Vulkan/VulkanTexture2D.h"
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"    //GetExportHandle()
 
-namespace WebRTC {
-
+namespace unity
+{
+namespace webrtc
+{
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -81,4 +83,5 @@ void CudaImage::Shutdown() {
 
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

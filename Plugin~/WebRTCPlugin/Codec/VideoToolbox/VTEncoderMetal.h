@@ -3,7 +3,11 @@
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include <VideoToolbox/VideoToolbox.h>
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
+
     class VTEncoderMetal : public IEncoder{
     public:
         VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
@@ -26,4 +30,6 @@ namespace WebRTC {
 
         VTCompressionSessionRef encoderSession;
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

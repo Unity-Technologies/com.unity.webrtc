@@ -1,9 +1,14 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "D3D11GraphicsDevice.h"
 #include "D3D11Texture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
+
+namespace webrtc = ::webrtc;
 
 D3D11GraphicsDevice::D3D11GraphicsDevice(ID3D11Device* nativeDevice) : m_d3d11Device(nativeDevice)
 {
@@ -106,12 +111,11 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITe
     const uint32_t height = tex->GetHeight();
 
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-        width, height,
-        resource.RowPitch, static_cast<uint8_t*>(resource.pData)
+        width, height, resource.RowPitch, static_cast<uint8_t*>(resource.pData)
     );
 
     m_d3d11Context->Unmap(nativeTex, 0);
     return i420_buffer;
 }
-
-} //end namespace
+} //end namespace webrtc
+} //end namespace unity

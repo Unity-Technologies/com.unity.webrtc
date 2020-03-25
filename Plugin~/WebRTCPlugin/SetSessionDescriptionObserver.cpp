@@ -2,8 +2,11 @@
 #include "SetSessionDescriptionObserver.h"
 #include "PeerConnectionObject.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     rtc::scoped_refptr<SetSessionDescriptionObserver> SetSessionDescriptionObserver::Create(PeerConnectionObject* connection)
     {
         return new rtc::RefCountedObject<SetSessionDescriptionObserver>(connection);
@@ -39,4 +42,6 @@ namespace WebRTC
             delegate(m_connection);
         }
     }
-}
+    
+} // end namespace webrtc
+} // end namespace unity

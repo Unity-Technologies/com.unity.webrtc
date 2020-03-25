@@ -2,7 +2,10 @@
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 OpenGLGraphicsDevice::OpenGLGraphicsDevice()
 {
@@ -102,4 +105,5 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     return nullptr;
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

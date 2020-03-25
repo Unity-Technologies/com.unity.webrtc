@@ -1,9 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include <cuda.h>
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 class CudaContext {
 public:
@@ -20,4 +23,5 @@ private:
 
 inline CUcontext CudaContext::GetContext() const { return m_context; }
 
-} //end namespace;
+} // end namespace webrtc
+} // end namespace unity

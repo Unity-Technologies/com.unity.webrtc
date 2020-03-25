@@ -30,7 +30,7 @@
 #include "rtc_base/thread_checker.h"
 #include "rtc_base/timestamp_aligner.h"
 
-namespace WebRTC {
+namespace cricket {
 
     // Current state of the capturer.
     enum CaptureState {

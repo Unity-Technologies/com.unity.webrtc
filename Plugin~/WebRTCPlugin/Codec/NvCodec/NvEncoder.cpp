@@ -9,8 +9,11 @@
 #include <dlfcn.h>
 #endif
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     static void* s_hModule = nullptr;
     static std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
 
@@ -456,4 +459,6 @@ namespace WebRTC
                 return 0;
         }
     }
-}
+    
+} // end namespace webrtc
+} // end namespace unity

@@ -17,7 +17,7 @@
 #include "rtc_base/system/rtc_export.h"
 #include "rtc_base/thread_checker.h"
 
-namespace WebRTC {
+namespace webrtc {
 
     // VideoTrackSource is a convenience base class for implementations of
     // VideoTrackSourceInterface.
@@ -49,5 +49,4 @@ namespace WebRTC {
         SourceState state_;
         const bool remote_;
     };
-
-}
+} // end namespace webrtc

@@ -3,8 +3,11 @@
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     class Context;
     class IGraphicsDevice;
     class MediaStreamObserver;
@@ -99,4 +102,6 @@ namespace WebRTC
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);
     extern webrtc::SdpType ConvertSdpType(RTCSdpType type);
     extern RTCSdpType ConvertSdpType(webrtc::SdpType type);
-}
+
+} // end namespace webrtc
+} // end namespace unity

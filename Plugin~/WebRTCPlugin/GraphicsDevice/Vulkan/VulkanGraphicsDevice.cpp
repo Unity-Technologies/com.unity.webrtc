@@ -6,7 +6,10 @@
 #include "vulkan/vulkan.h"
 #include "VulkanUtility.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 static void* s_hModule = nullptr;
 
@@ -184,4 +187,5 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(IT
     return nullptr;    
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

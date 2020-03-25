@@ -5,7 +5,10 @@
 
 #include "WebRTCMacros.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 struct D3D11Texture2D : ITexture2D {
 public:
@@ -31,6 +34,5 @@ const void* D3D11Texture2D::GetNativeTexturePtrV() const { return m_texture; };
 void* D3D11Texture2D::GetEncodeTexturePtrV() { return m_texture; }
 const void* D3D11Texture2D::GetEncodeTexturePtrV() const { return m_texture; }
 
-} //end namespace
-
-
+} // end namespace webrtc
+} // end namespace unity

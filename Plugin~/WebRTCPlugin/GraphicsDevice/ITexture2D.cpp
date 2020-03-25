@@ -1,11 +1,13 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "ITexture2D.h"
 
-namespace WebRTC {
-
+namespace unity
+{
+namespace webrtc
+{
 
 ITexture2D::~ITexture2D() {
-
 }
 
-}
+} // end namespace webrtc
+} // end namespace unity

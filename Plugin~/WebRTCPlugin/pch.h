@@ -94,8 +94,11 @@
 #include "IUnityGraphicsVulkan.h"
 #endif
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     void LogPrint(const char* fmt, ...);
     void LogPrint(const wchar_t* fmt, ...);
     void checkf(bool result, const char* msg);
@@ -141,4 +144,6 @@ namespace WebRTC
         UnityEncoderSoftware = 0,
         UnityEncoderHardware = 1,
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

@@ -3,11 +3,14 @@
 #include "../WebRTCPlugin/PlatformBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 
-using namespace WebRTC;
-
 #if defined(SUPPORT_D3D11)
 #include <d3d11.h>
 #include <wrl/client.h>
+
+namespace unity
+{
+namespace webrtc
+{
 
 Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
@@ -135,3 +138,6 @@ void GraphicsDeviceTestBase::TearDown()
 {
     GraphicsDevice::GetInstance().Shutdown();
 }
+
+} // end namespace webrtc
+} // end namespace unity

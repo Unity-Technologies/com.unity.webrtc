@@ -30,14 +30,14 @@ namespace {
         {320, 240, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
         {320, 180, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY} };
 
-    webrtc::MediaSourceInterface::SourceState GetReadyState(WebRTC::CaptureState state) {
+    webrtc::MediaSourceInterface::SourceState GetReadyState(cricket::CaptureState state) {
         switch (state) {
-        case WebRTC::CS_STARTING:
+        case cricket::CS_STARTING:
             return webrtc::MediaSourceInterface::kInitializing;
-        case WebRTC::CS_RUNNING:
+        case cricket::CS_RUNNING:
             return webrtc::MediaSourceInterface::kLive;
-        case WebRTC::CS_FAILED:
-        case WebRTC::CS_STOPPED:
+        case cricket::CS_FAILED:
+        case cricket::CS_STOPPED:
             return webrtc::MediaSourceInterface::kEnded;
         default:
             RTC_NOTREACHED() << "GetReadyState unknown state";
@@ -52,11 +52,12 @@ namespace {
 
 }  // anonymous namespace
 
-namespace WebRTC {
+namespace webrtc
+{
 
     rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> VideoCapturerTrackSource::Create(
         rtc::Thread* worker_thread,
-        std::unique_ptr<WebRTC::VideoCapturer> capturer,
+        std::unique_ptr<cricket::VideoCapturer> capturer,
         bool remote) {
         RTC_DCHECK(worker_thread != NULL);
         RTC_DCHECK(capturer != nullptr);
@@ -69,7 +70,7 @@ namespace WebRTC {
 
     VideoCapturerTrackSource::VideoCapturerTrackSource(
         rtc::Thread* worker_thread,
-        std::unique_ptr<WebRTC::VideoCapturer> capturer,
+        std::unique_ptr<cricket::VideoCapturer> capturer,
         bool remote)
         : VideoTrackSource(remote),
         signaling_thread_(rtc::Thread::Current()),
@@ -113,7 +114,7 @@ namespace WebRTC {
 
         // Start the camera with our best guess.
         if (!worker_thread_->Invoke<bool>(
-            RTC_FROM_HERE, rtc::Bind(&WebRTC::VideoCapturer::StartCapturing,
+            RTC_FROM_HERE, rtc::Bind(&cricket::VideoCapturer::StartCapturing,
                 video_capturer_.get(), format_))) {
             SetState(kEnded);
             return;
@@ -134,13 +135,13 @@ namespace WebRTC {
         started_ = false;
         worker_thread_->Invoke<void>(
             RTC_FROM_HERE,
-            rtc::Bind(&WebRTC::VideoCapturer::Stop, video_capturer_.get()));
+            rtc::Bind(&cricket::VideoCapturer::Stop, video_capturer_.get()));
     }
 
     // OnStateChange listens to the cricket::VideoCapturer::SignalStateChange.
     void VideoCapturerTrackSource::OnStateChange(
-        WebRTC::VideoCapturer* capturer,
-        WebRTC::CaptureState capture_state) {
+        cricket::VideoCapturer* capturer,
+        cricket::CaptureState capture_state) {
         if (rtc::Thread::Current() != signaling_thread_) {
             // Use rtc::Unretained, because we don't want this to capture a reference
             // to ourselves. If our destructor is called while this task is executing,
@@ -157,5 +158,4 @@ namespace WebRTC {
             SetState(GetReadyState(capture_state));
         }
     }
-
 }  // namespace webrtc

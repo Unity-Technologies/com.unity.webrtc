@@ -1,6 +1,9 @@
-﻿#pragma once
+#pragma once
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 class VulkanUtility {
 
@@ -44,6 +47,8 @@ public:
                const uint32_t width, const uint32_t height);
 
 };
-} //end namespace
+
+} // end namespace webrtc
+} // end namespace unity
 
 

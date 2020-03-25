@@ -3,11 +3,12 @@
 #include "D3D12Texture2D.h"
 #include "D3D12Constants.h" //DEFAULT_HEAP_PROPS
 
-#include "WebRTCPlugin.h"
-#include "Logger.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -244,4 +245,5 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
     return i420_buffer; 
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

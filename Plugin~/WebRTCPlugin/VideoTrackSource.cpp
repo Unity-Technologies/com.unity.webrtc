@@ -11,7 +11,7 @@
 #include "pch.h"
 #include "VideoTrackSource.h"
 
-namespace WebRTC {
+namespace webrtc {
 
     VideoTrackSource::VideoTrackSource(
         bool remote)
@@ -38,4 +38,4 @@ namespace WebRTC {
         source()->RemoveSink(sink);
     }
 
-}  //  namespace webrtc
+} // end namespace webrtc

@@ -1,6 +1,9 @@
 #pragma once
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 enum GraphicsDeviceType {
     GRAPHICS_DEVICE_D3D11   = 0,
@@ -10,4 +13,5 @@ enum GraphicsDeviceType {
     GRAPHICS_DEVICE_VULKAN  = 30,
 };
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

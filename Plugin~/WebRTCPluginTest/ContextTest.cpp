@@ -5,8 +5,10 @@
 #include "../WebRTCPlugin/Codec/IEncoder.h"
 #include "../WebRTCPlugin/Context.h"
 
-using namespace WebRTC;
-using namespace testing;
+namespace unity
+{
+namespace webrtc
+{
 
 class ContextTest : public GraphicsDeviceTestBase
 {
@@ -92,5 +94,7 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     context->DeleteDataChannel(channel);
     context->DeletePeerConnection(connection);
 }
+INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
 
-INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, ValuesIn(VALUES_TEST_ENV));
+} // end namespace webrtc
+} // end namespace unity

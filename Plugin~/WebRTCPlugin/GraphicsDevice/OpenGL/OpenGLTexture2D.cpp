@@ -1,7 +1,10 @@
 ﻿#include "pch.h"
 #include "OpenGLTexture2D.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -11,4 +14,5 @@ OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h, GLuint* tex) : ITexture
 
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

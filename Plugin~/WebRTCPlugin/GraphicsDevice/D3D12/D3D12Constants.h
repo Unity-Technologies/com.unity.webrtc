@@ -2,7 +2,11 @@
 
 #include "d3d12.h"
 
-namespace WebRTC {
+
+namespace unity
+{
+namespace webrtc
+{
 
 const D3D12_HEAP_PROPERTIES D3D12_DEFAULT_HEAP_PROPS = {
     D3D12_HEAP_TYPE_DEFAULT,
@@ -20,7 +24,7 @@ const D3D12_HEAP_PROPERTIES D3D12_READBACK_HEAP_PROPS = {
     0
 };
 
-
-} //end namespace
+} //end namespace webrtc
+} //end namespace unity
 
 

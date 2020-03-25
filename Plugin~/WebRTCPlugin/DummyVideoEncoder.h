@@ -1,7 +1,12 @@
 #pragma once
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
+    namespace webrtc = ::webrtc;
+
     class NvVideoCapturer;
     class DummyVideoEncoder : public webrtc::VideoEncoder
     {
@@ -51,4 +56,6 @@ namespace WebRTC
 
         DummyVideoEncoderFactory();
     };
-}
+
+} // end namespace webrtc
+} // end namespace unity

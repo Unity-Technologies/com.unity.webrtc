@@ -4,8 +4,11 @@
 #include "WebRTCMacros.h"
 #include "SetSessionDescriptionObserver.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     PeerConnectionObject::PeerConnectionObject(Context& context) : context(context)
     {
         m_statsCollectorCallback = new PeerConnectionStatsCollectorCallback(this);
@@ -312,7 +315,8 @@ namespace WebRTC
             return RTCPeerConnectionState::New;
         }
         throw std::invalid_argument("Unknown peer connection type");
-    }
+    } 
 #pragma warning(pop)
-}
-
+    
+} // end namespace webrtc
+} // end namespace unity

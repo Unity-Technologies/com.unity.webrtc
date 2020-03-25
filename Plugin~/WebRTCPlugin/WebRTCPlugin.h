@@ -1,7 +1,12 @@
 #pragma once
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
+    namespace webrtc = ::webrtc;
+
     class Context;
     class PeerConnectionObject;
     enum class RTCSdpType;
@@ -155,4 +160,6 @@ namespace WebRTC
     {
         bool iceRestart;
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

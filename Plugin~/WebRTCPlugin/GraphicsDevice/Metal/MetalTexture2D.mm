@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "MetalTexture2D.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -14,4 +17,6 @@ namespace WebRTC {
     {
         [m_texture release];
     }
-} //end namespace
+    
+} // end namespace webrtc
+} // end namespace unity

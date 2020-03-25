@@ -2,8 +2,13 @@
 
 #include "api/task_queue/default_task_queue_factory.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
+    namespace webrtc = ::webrtc;
+
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
@@ -294,4 +299,6 @@ namespace WebRTC
         std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
     };
-}
+
+} // end namespace webrtc
+} // end namespace unity

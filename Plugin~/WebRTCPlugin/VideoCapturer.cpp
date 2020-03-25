@@ -13,7 +13,7 @@
 #include "pch.h"
 #include "VideoCapturer.h"
 
-namespace WebRTC {
+namespace cricket {
 
     namespace {
 
@@ -378,5 +378,4 @@ namespace WebRTC {
         input_width_ = width;
         input_height_ = height;
     }
-
 }  // namespace cricket

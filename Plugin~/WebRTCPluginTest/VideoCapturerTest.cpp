@@ -5,8 +5,10 @@
 #include "../WebRTCPlugin/Codec/IEncoder.h"
 #include "../WebRTCPlugin/NvVideoCapturer.h"
 
-using namespace WebRTC;
-using namespace testing;
+namespace unity
+{
+namespace webrtc
+{
 
 class VideoCapturerTest : public GraphicsDeviceTestBase
 {
@@ -41,4 +43,7 @@ TEST_P(VideoCapturerTest, EncodeVideoData) {
     capturer_->EncodeVideoData();
 }
 
-INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, VideoCapturerTest, ValuesIn(VALUES_TEST_ENV));
+INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, VideoCapturerTest, testing::ValuesIn(VALUES_TEST_ENV));
+
+} // end namespace webrtc
+} // end namespace unity

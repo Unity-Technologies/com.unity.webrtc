@@ -1,15 +1,18 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "IGraphicsDevice.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 IGraphicsDevice::IGraphicsDevice() {
-
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 IGraphicsDevice::~IGraphicsDevice() {
 }
-}
 
+} // end namespace webrtc
+} // end namespace unity

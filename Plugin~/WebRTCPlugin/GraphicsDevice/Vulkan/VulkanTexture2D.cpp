@@ -1,9 +1,12 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "VulkanTexture2D.h"
 
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -55,5 +58,5 @@ bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice
 
 }
 
-
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

@@ -1,8 +1,11 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "DummyAudioDevice.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     void DummyAudioDevice::ProcessAudioData(const float* data, int32 size)
     {
         if (started && isRecording)
@@ -22,4 +25,6 @@ namespace WebRTC
             }
         }
     }
-}
+
+} // end namespace webrtc
+} // end namespace unity

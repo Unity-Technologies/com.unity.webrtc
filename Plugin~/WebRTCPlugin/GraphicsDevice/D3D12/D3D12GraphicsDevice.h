@@ -4,7 +4,12 @@
 #include "WebRTCConstants.h"
 #include "D3D12Texture2D.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
+
+namespace webrtc = ::webrtc;
 
 #define DefPtr(_a) _COM_SMARTPTR_TYPEDEF(_a, __uuidof(_a))
 DefPtr(ID3D12CommandAllocator);
@@ -28,7 +33,7 @@ public:
 
 private:
 
-    WebRTC::D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
+    D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
     void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
     void Barrier(ID3D12Resource* res,
         const D3D12_RESOURCE_STATES stateBefore, const D3D12_RESOURCE_STATES stateAfter,
@@ -58,7 +63,8 @@ private:
 void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
 GraphicsDeviceType D3D12GraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_D3D12; }
 
-}
+} // end namespace webrtc
+} // end namespace unity
 
 //---------------------------------------------------------------------------------------------------------------------
 //[Note-sin: 2019-10-30]

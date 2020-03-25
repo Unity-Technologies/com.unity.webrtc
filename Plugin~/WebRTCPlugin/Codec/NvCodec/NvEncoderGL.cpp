@@ -4,7 +4,10 @@
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
     NvEncoderGL::NvEncoderGL(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device) :
         NvEncoder(NV_ENC_DEVICE_TYPE_OPENGL, NV_ENC_INPUT_RESOURCE_TYPE_OPENGL_TEX, NV_ENC_BUFFER_FORMAT_ABGR, nWidth, nHeight, device)
@@ -22,4 +25,5 @@ namespace WebRTC {
         return pResource;
     }
 
-}
+} // end namespace webrtc
+} // end namespace unity 

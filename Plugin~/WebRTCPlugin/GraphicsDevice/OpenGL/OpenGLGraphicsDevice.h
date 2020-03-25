@@ -3,8 +3,10 @@
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
 
-namespace WebRTC {
-
+namespace unity
+{
+namespace webrtc
+{
 
 class OpenGLGraphicsDevice : public IGraphicsDevice{
 public:
@@ -30,4 +32,5 @@ void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }
 GraphicsDeviceType OpenGLGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_OPENGL; }
 
 //---------------------------------------------------------------------------------------------------------------------
-}
+} // end namespace webrtc
+} // end namespace unity
