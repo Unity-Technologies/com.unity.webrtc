@@ -33,7 +33,7 @@ namespace webrtc {
 
 namespace webrtc {
 
-    class VideoCapturerTrackSource : public webrtc::VideoTrackSource,
+    class VideoCapturerTrackSource : public unity::webrtc::VideoTrackSource,
         public sigslot::has_slots<> {
     public:
         static rtc::scoped_refptr<VideoTrackSourceInterface> Create(

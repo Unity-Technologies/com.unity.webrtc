@@ -11,6 +11,7 @@
 #include "pch.h"
 #include "VideoTrackSource.h"
 
+namespace unity {
 namespace webrtc {
 
     VideoTrackSource::VideoTrackSource(
@@ -39,3 +40,4 @@ namespace webrtc {
     }
 
 } // end namespace webrtc
+} // end namespace unity
