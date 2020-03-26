@@ -4,7 +4,11 @@
 #include "WebRTCConstants.h"
 #include <Metal/Metal.h>
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
+    namespace webrtc = ::webrtc;
     class MetalGraphicsDevice : public IGraphicsDevice{
     public:
         MetalGraphicsDevice(id<MTLDevice> device, IUnityGraphicsMetal* unityGraphicsMetal);
@@ -34,4 +38,6 @@ namespace WebRTC {
     GraphicsDeviceType MetalGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_METAL;}
 
 //---------------------------------------------------------------------------------------------------------------------
-}
+
+} // end namespace webrtc
+} // end namespace unity

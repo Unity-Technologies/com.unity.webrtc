@@ -1,7 +1,12 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GraphicsUtility.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
+
+namespace webrtc = ::webrtc;
 
 rtc::scoped_refptr<webrtc::I420Buffer> GraphicsUtility::ConvertRGBToI420Buffer(const uint32_t width, const uint32_t height,
     const uint32_t rowToRowInBytes, const uint8_t* srcData)
@@ -43,5 +48,6 @@ rtc::scoped_refptr<webrtc::I420Buffer> GraphicsUtility::ConvertRGBToI420Buffer(c
 
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity
 

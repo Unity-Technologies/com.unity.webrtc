@@ -2,7 +2,10 @@
 
 #include "GraphicsDevice/GraphicsDeviceType.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 class ITexture2D;
 
@@ -21,8 +24,9 @@ public:
 
     //Required for software encoding
     virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height) = 0;
-    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) = 0;
+    virtual rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) = 0;
 
 };
 
-}
+} // end namespace webrtc
+} // end namespace unity

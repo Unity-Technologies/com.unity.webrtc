@@ -7,8 +7,11 @@
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     ContextManager ContextManager::s_instance;
 
     Context* ContextManager::GetContext(int uid) const
@@ -234,7 +237,7 @@ namespace WebRTC
         videoCapturer->SetFrameBuffer(frameBuffer);
 
         const rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(
-            WebRTC::VideoCapturerTrackSource::Create(m_workerThread.get(), std::move(videoCapturer), false));
+            webrtc::VideoCapturerTrackSource::Create(m_workerThread.get(), std::move(videoCapturer), false));
         webrtc::VideoTrackInterface* videoTrack =
             m_peerConnectionFactory->CreateVideoTrack(label, source).release();
         m_mapVideoCapturer[videoTrack] = ptr;
@@ -313,4 +316,6 @@ namespace WebRTC
     {
         return m_mapSetSessionDescriptionObserver[connection];
     }
-}
+
+} // end namespace webrtc
+} // end namespace unity

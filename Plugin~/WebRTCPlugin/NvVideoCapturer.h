@@ -3,19 +3,22 @@
 #include "Codec/IEncoder.h"
 #include "VideoCapturer.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     class ITexture2D;
     class IGraphicsDevice;
-    class NvVideoCapturer : public VideoCapturer
+    class NvVideoCapturer : public cricket::VideoCapturer
     {
     public:
         NvVideoCapturer();
         bool EncodeVideoData();
         // Start the video capturer with the specified capture format.
-        virtual CaptureState Start(const cricket::VideoFormat& Format) override
+        virtual cricket::CaptureState Start(const cricket::VideoFormat& Format) override
         {
-            return WebRTC::CS_RUNNING;
+            return cricket::CS_RUNNING;
         }
         // Stop the video capturer.
         virtual void Stop() override
@@ -101,4 +104,6 @@ namespace WebRTC
         int frameWidth;
         int frameHeight;
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

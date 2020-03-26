@@ -25,7 +25,10 @@
 #include "VideoToolbox/VTEncoderMetal.h"
 #endif
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
     EncoderFactory& EncoderFactory::GetInstance() {
         static EncoderFactory factory;
@@ -95,4 +98,6 @@ namespace WebRTC {
         encoder->InitV();
         return encoder;
     }
-}
+    
+} // end namespace webrtc
+} // end namespace unity

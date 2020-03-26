@@ -2,10 +2,15 @@
 
 #include "IEncoder.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
+    
     class IEncoder;
     class IGraphicsDevice;
-    class EncoderFactory {
+    class EncoderFactory
+    {
     public:
         static EncoderFactory& GetInstance();
         static bool GetHardwareEncoderSupport();
@@ -15,4 +20,6 @@ namespace WebRTC {
         EncoderFactory(EncoderFactory const&) = delete;
         EncoderFactory& operator=(EncoderFactory const&) = delete;
     };
-}
+
+} // end namespace webrtc
+} // end namespace unity

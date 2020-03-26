@@ -1,8 +1,11 @@
 #pragma once
 #include "WebRTCPlugin.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     class SetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver
     {
     public:
@@ -20,4 +23,6 @@ namespace WebRTC
         std::vector<DelegateSetSessionDescSuccess> m_vectorDelegateSetSDSuccess;
         std::vector<DelegateSetSessionDescFailure> m_vectorDelegateSetSDFailure;
     };
-}
+
+} // end namespace webrtc
+} // end namespace unity

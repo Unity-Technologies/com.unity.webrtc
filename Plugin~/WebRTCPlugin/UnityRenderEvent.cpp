@@ -12,14 +12,20 @@ enum class VideoStreamRenderEventID
     Finalize = 2
 };
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     IUnityInterfaces* s_UnityInterfaces = nullptr;
     IUnityGraphics* s_Graphics = nullptr;
     Context* s_context = nullptr;
     IGraphicsDevice* s_device;
-}
-using namespace WebRTC;
+
+} // end namespace webrtc
+} // end namespace unity
+
+using namespace unity::webrtc;
 
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
@@ -58,15 +64,15 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
-std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> m_mapEncoder;
+std::map<const ::webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> m_mapEncoder;
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
-    if(s_context == nullptr)
+    if (s_context == nullptr)
     {
         return;
     }
-    const auto track = reinterpret_cast<webrtc::MediaStreamTrackInterface*>(data);
+    const auto track = reinterpret_cast<::webrtc::MediaStreamTrackInterface*>(data);
     const auto event = static_cast<VideoStreamRenderEventID>(eventID);
 
     switch(event)

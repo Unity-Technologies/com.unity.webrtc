@@ -1,7 +1,11 @@
-﻿#pragma once
+#pragma once
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
+    namespace webrtc = ::webrtc;
     enum class CodecInitializationResult
     {
         NotInitialized,
@@ -28,6 +32,7 @@ namespace WebRTC {
         CodecInitializationResult GetCodecInitializationResult() const { return m_initializationResult; }
     protected:
         CodecInitializationResult m_initializationResult = CodecInitializationResult::NotInitialized;
-
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

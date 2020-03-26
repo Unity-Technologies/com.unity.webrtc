@@ -1,10 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
 
-namespace WebRTC {
-
+namespace unity
+{
+namespace webrtc
+{
 
 class D3D11GraphicsDevice : public IGraphicsDevice{
 public:
@@ -18,7 +20,7 @@ public:
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
-    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+    virtual rtc::scoped_refptr < ::webrtc::I420Buffer > ConvertRGBToI420(ITexture2D* tex) override;
 
 private:
     ID3D11Device* m_d3d11Device;
@@ -30,5 +32,5 @@ private:
 void* D3D11GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
 GraphicsDeviceType D3D11GraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_D3D11; }
 
-
-}
+} // end namespace webrtc
+} // end namespace unity

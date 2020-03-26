@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "MediaStreamObserver.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     MediaStreamObserver::MediaStreamObserver(webrtc::MediaStreamInterface* stream) : webrtc::MediaStreamObserver(stream)
     {
         this->SignalVideoTrackAdded.connect(this, &MediaStreamObserver::OnVideoTrackAdded);
@@ -52,4 +55,6 @@ namespace WebRTC
     {
         m_listOnRemoveTrack.push_back(callback);
     }
-}
+
+} // end namespace webrtc
+} // end namespace unity

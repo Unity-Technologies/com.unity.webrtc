@@ -4,8 +4,11 @@
 #include <atomic>
 #include "Codec/IEncoder.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+    
     class IGraphicsDevice;
     class ITexture2D;
     class SoftwareEncoder : public IEncoder
@@ -29,7 +32,6 @@ namespace WebRTC
         uint64 m_frameCount = 0;
     };
 //---------------------------------------------------------------------------------------------------------------------
-   
     
-    
-} //end namespace
+} //end namespace webrtc
+} //end namespace unity

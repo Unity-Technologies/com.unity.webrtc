@@ -3,7 +3,10 @@
 #include "D3D12Texture2D.h"
 #include "D3D12Constants.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -51,4 +54,6 @@ HRESULT D3D12Texture2D::CreateReadbackResource(ID3D12Device* device) {
     return hr;
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity
+

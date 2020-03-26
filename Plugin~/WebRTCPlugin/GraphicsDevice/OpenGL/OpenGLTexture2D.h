@@ -3,7 +3,10 @@
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 struct OpenGLTexture2D : ITexture2D {
 public:
@@ -30,6 +33,5 @@ const void* OpenGLTexture2D::GetNativeTexturePtrV() const { return &m_texture; }
 void* OpenGLTexture2D::GetEncodeTexturePtrV() { return (void*)m_texture; }
 const void* OpenGLTexture2D::GetEncodeTexturePtrV() const { return (const void*)m_texture; }
 
-} //end namespace
-
-
+} // end namespace webrtd
+} // end namespace unity

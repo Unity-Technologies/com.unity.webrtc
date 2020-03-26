@@ -31,14 +31,14 @@ namespace webrtc {
     class MediaConstraintsInterface;
  }
 
-namespace WebRTC {
+namespace webrtc {
 
-    class VideoCapturerTrackSource : public VideoTrackSource,
+    class VideoCapturerTrackSource : public unity::webrtc::VideoTrackSource,
         public sigslot::has_slots<> {
     public:
         static rtc::scoped_refptr<VideoTrackSourceInterface> Create(
             rtc::Thread* worker_thread,
-            std::unique_ptr<WebRTC::VideoCapturer> capturer,
+            std::unique_ptr<cricket::VideoCapturer> capturer,
             bool remote);
 
         bool is_screencast() const final { return video_capturer_->IsScreencast(); }
@@ -50,7 +50,7 @@ namespace WebRTC {
 
     protected:
         VideoCapturerTrackSource(rtc::Thread* worker_thread,
-            std::unique_ptr<WebRTC::VideoCapturer> capturer,
+            std::unique_ptr<cricket::VideoCapturer> capturer,
             bool remote);
         virtual ~VideoCapturerTrackSource();
 
@@ -63,16 +63,16 @@ namespace WebRTC {
     private:
         void Stop();
 
-        void OnStateChange(WebRTC::VideoCapturer* capturer,
-            WebRTC::CaptureState capture_state);
+        void OnStateChange(cricket::VideoCapturer* capturer,
+            cricket::CaptureState capture_state);
 
         rtc::Thread* signaling_thread_;
         rtc::Thread* worker_thread_;
         rtc::AsyncInvoker invoker_;
-        std::unique_ptr<WebRTC::VideoCapturer> video_capturer_;
+        std::unique_ptr<cricket::VideoCapturer> video_capturer_;
         bool started_;
         cricket::VideoFormat format_;
         absl::optional<bool> needs_denoising_;
     };
 
-}
+} // end namespace webrtc

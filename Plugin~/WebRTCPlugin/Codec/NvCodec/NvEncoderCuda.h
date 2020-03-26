@@ -1,12 +1,19 @@
-﻿#pragma once
+#pragma once
 #include "NvEncoder.h"
 
-namespace WebRTC {
-    class NvEncoderCuda : public NvEncoder {
+namespace unity
+{
+namespace webrtc
+{
+
+    class NvEncoderCuda : public NvEncoder
+    {
     public:
         NvEncoderCuda(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
         virtual ~NvEncoderCuda() = default;
     protected:
         virtual void* AllocateInputResourceV(ITexture2D* tex) override;
     };
-}
+
+} // end namespace webrtc
+} // end namespace unity

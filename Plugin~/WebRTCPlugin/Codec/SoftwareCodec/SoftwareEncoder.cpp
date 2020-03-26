@@ -9,8 +9,11 @@
 #include <dlfcn.h>
 #endif
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     SoftwareEncoder::SoftwareEncoder(int _width, int _height, IGraphicsDevice* device) : m_width(_width), m_height(_height), m_device(device)
     {
 
@@ -39,4 +42,6 @@ namespace WebRTC
         m_frameCount++;
         return true;
     }
-}
+    
+} // end namespace webrtc
+} // end namespace unity

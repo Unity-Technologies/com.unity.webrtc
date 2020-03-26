@@ -5,7 +5,10 @@
 
 #include <libkern/OSByteOrder.h>
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
     class H264Info
     {
@@ -241,4 +244,6 @@ namespace WebRTC {
     {
         // Nothing to do
     }
-}
+    
+} // end namespace webrtc
+} // end namespace unity

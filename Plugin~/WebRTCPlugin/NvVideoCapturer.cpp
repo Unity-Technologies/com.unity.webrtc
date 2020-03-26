@@ -2,8 +2,11 @@
 #include "NvVideoCapturer.h"
 #include "Codec/EncoderFactory.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     NvVideoCapturer::NvVideoCapturer() {
         set_enable_video_adapter(false);
         SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));
@@ -73,4 +76,6 @@ namespace WebRTC
         encoder_ = encoder;
         encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
     }
-}
+    
+} // end namespace webrtc
+} // end namespace unity

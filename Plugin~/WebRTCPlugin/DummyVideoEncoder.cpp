@@ -2,8 +2,11 @@
 #include "DummyVideoEncoder.h"
 #include "NvVideoCapturer.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     int32_t DummyVideoEncoder::Encode(
         const webrtc::VideoFrame& frame,
         const std::vector<webrtc::VideoFrameType>* frameTypes)
@@ -93,4 +96,6 @@ namespace WebRTC
     {
         return std::make_unique<DummyVideoEncoder>();
     }
-}
+
+} // end namespace webrtc
+} // end namespace unity

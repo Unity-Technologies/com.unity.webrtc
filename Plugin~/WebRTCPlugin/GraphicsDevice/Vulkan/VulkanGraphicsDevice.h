@@ -1,11 +1,15 @@
-﻿#pragma once
+#pragma once
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
 #include "Cuda/CudaContext.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
+namespace webrtc = ::webrtc;
 
 class VulkanGraphicsDevice : public IGraphicsDevice{
 public:
@@ -47,6 +51,5 @@ private:
 void* VulkanGraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_cudaContext.GetContext()); }
 GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_VULKAN; }
 
-
-
-}
+} // end namespace webrtc
+} // end namespace unity

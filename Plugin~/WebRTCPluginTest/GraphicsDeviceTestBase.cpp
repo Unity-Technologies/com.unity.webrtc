@@ -3,11 +3,27 @@
 #include "../WebRTCPlugin/PlatformBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/GraphicsDevice.h"
 
-using namespace WebRTC;
+#if defined(SUPPORT_D3D11) // D3D11
 
-#if defined(SUPPORT_D3D11)
 #include <d3d11.h>
 #include <wrl/client.h>
+
+#elif defined(SUPPORT_METAL)  // Metal
+#import <Metal/Metal.h>
+#include <DummyUnityInterface/DummyUnityGraphicsMetal.h>
+
+#else // OpenGL
+
+#include <GL/glut.h>
+
+#endif
+
+namespace unity
+{
+namespace webrtc
+{
+
+#if defined(SUPPORT_D3D11) // D3D11
 
 Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
@@ -81,10 +97,7 @@ IUnityInterface* CreateUnityInterface() {
     return nullptr;
 }
 
-#elif defined(SUPPORT_METAL)
-
-#import <Metal/Metal.h>
-#include <DummyUnityInterface/DummyUnityGraphicsMetal.h>
+#elif defined(SUPPORT_METAL)  // Metal
 
 void* CreateDevice(UnityGfxRenderer renderer)
 {
@@ -95,8 +108,7 @@ IUnityInterface* CreateUnityInterface() {
     return new DummyUnityGraphicsMetal();
 }
 
-#else
-#include <GL/glut.h>
+#else // OpenGL
 
 static bool s_glutInitialized;
 
@@ -135,3 +147,6 @@ void GraphicsDeviceTestBase::TearDown()
 {
     GraphicsDevice::GetInstance().Shutdown();
 }
+
+} // end namespace webrtc
+} // end namespace unity

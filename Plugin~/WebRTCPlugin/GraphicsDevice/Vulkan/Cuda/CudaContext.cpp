@@ -5,7 +5,10 @@
 #include <array>
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 static void* s_hModule = nullptr;
 
@@ -93,4 +96,5 @@ void CudaContext::Shutdown() {
     }
 }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

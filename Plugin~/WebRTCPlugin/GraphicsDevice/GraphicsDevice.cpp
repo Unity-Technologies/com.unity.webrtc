@@ -19,7 +19,10 @@
 #include "Metal/MetalGraphicsDevice.h"
 #endif
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 GraphicsDevice& GraphicsDevice::GetInstance() {
     static GraphicsDevice device;
@@ -143,5 +146,5 @@ GraphicsDevice::GraphicsDevice() : m_rendererType(static_cast<UnityGfxRenderer>(
 
 }
 
-}
-
+} // end namespace webrtc
+} // end namespace unity

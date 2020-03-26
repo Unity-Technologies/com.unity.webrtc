@@ -1,6 +1,9 @@
-﻿#pragma once
+#pragma once
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 class ITexture2D {
 public:
@@ -26,5 +29,5 @@ protected:
 
 
 };
-
-}
+} // end namespace webrtc
+} // end namespace unity

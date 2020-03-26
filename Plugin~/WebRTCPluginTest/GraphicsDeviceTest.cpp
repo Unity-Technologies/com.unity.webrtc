@@ -2,8 +2,10 @@
 #include "GraphicsDeviceTestBase.h"
 #include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
 
-using namespace WebRTC;
-using namespace testing;
+namespace unity
+{
+namespace webrtc
+{
 
 class GraphicsDeviceTest : public GraphicsDeviceTestBase {};
 TEST_P(GraphicsDeviceTest, GraphicsDeviceIsNotNull) {
@@ -54,5 +56,7 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
 }
 #endif
 
-INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, GraphicsDeviceTest, ValuesIn(VALUES_TEST_ENV));
+INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, GraphicsDeviceTest, testing::ValuesIn(VALUES_TEST_ENV));
 
+} // end namespace webrtc
+} // end namespace unity

@@ -5,8 +5,11 @@
 #include "nvEncodeAPI.h"
 #include "Codec/IEncoder.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class ITexture2D;
     class IGraphicsDevice;
@@ -90,4 +93,6 @@ namespace WebRTC
         const uint32_t minBitRate = 5000000;
         uint32_t frameRate = 45;
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

@@ -1,9 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include "cuda.h"
 #include <vulkan/vulkan.h>
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 class VulkanTexture2D;
 
@@ -30,4 +33,5 @@ private:
 //---------------------------------------------------------------------------------------------------------------------
     inline CUarray CudaImage::GetArray() const { return m_array; }
 
-} //end namespace
+} // end namespace webrtc
+} // end namespace unity

@@ -79,7 +79,6 @@
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanGraphicsDevice.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanTexture2D.h" />
     <ClInclude Include="..\WebRTCPlugin\GraphicsDevice\Vulkan\VulkanUtility.h" />
-    <ClInclude Include="..\WebRTCPlugin\Logger.h" />
     <ClInclude Include="..\WebRTCPlugin\MediaStreamObserver.h" />
     <ClInclude Include="..\WebRTCPlugin\NvVideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\pch.h" />
@@ -97,7 +96,6 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\WebRTCPlugin\Callback.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\EncoderFactory.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoder.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderCuda.cpp" />

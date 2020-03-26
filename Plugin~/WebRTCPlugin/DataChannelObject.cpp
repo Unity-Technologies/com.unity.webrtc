@@ -1,8 +1,11 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "DataChannelObject.h"
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     DataChannelObject::DataChannelObject(rtc::scoped_refptr<webrtc::DataChannelInterface> channel, PeerConnectionObject& pc) : dataChannel(channel), peerConnectionObj(pc)
     {
         dataChannel->RegisterObserver(this);
@@ -55,4 +58,6 @@ namespace WebRTC
             }
         }
     }
-}
+
+} // end namespace webrtc
+} // end namespace unity

@@ -5,8 +5,11 @@
 #include "WebRTCPlugin.h"
 #endif
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     void LogPrint(const char* fmt, ...)
     {
 #if defined(_DEBUG)
@@ -114,4 +117,6 @@ namespace WebRTC
                 message);
     }
 #endif
-}
+
+} // end namespace webrtc
+} // end namespace unity

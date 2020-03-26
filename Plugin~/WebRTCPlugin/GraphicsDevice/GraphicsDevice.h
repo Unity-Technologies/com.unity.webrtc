@@ -2,13 +2,16 @@
 
 #include "IGraphicsDevice.h"
 
-namespace WebRTC {
-
+namespace unity
+{
+namespace webrtc
+{
+    
 class ITexture2D;
 
 //Singleton
-class GraphicsDevice {
-
+class GraphicsDevice
+{
     public:
         static GraphicsDevice& GetInstance();
         bool IsInitialized() const { return m_device != nullptr; }
@@ -42,6 +45,5 @@ void GraphicsDevice::CopyResourceFromNative(ITexture2D* dest, void* nativeTextur
     m_device->CopyResourceFromNativeV(dest, nativeTexturePtr);
 };
 
-
-
-}
+} // end namespace webrtc
+} // end namespace unity

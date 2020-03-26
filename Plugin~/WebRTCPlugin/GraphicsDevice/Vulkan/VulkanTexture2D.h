@@ -1,10 +1,13 @@
-﻿#pragma once
+#pragma once
 
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
 #include "Cuda/CudaImage.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
 class VulkanTexture2D : public ITexture2D {
 public:
@@ -50,6 +53,5 @@ VkDeviceMemory  VulkanTexture2D::GetTextureImageMemory() const  { return m_textu
 VkDeviceSize    VulkanTexture2D::GetTextureImageMemorySize() const { return m_textureImageMemorySize; }
 VkFormat        VulkanTexture2D::GetTextureFormat() const       { return m_textureFormat; }
 
-} //end namespace
-
-
+} // end namespace unity
+} // end namespace webrtc

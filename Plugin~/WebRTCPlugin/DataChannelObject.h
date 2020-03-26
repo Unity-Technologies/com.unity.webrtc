@@ -1,7 +1,12 @@
-﻿#pragma once
+#pragma once
 
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
+    namespace webrtc = ::webrtc;
+
     class PeerConnectionObject;
     class DataChannelObject;
     using DelegateOnMessage = void(*)(DataChannelObject*, const byte*, int);
@@ -52,7 +57,7 @@ namespace WebRTC
         void OnStateChange() override;
         //  A data buffer was successfully received.
         void OnMessage(const webrtc::DataBuffer& buffer) override;
-    public:
+
         DelegateOnMessage onMessage = nullptr;
         DelegateOnOpen onOpen = nullptr;
         DelegateOnClose onClose = nullptr;
@@ -60,4 +65,6 @@ namespace WebRTC
         rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
         PeerConnectionObject& peerConnectionObj;
     };
-}
+
+} // end namespace webrtc
+} // end namespace unity

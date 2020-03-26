@@ -2,9 +2,11 @@
 #include "WebRTCPlugin.h"
 #include "DataChannelObject.h"
 
-
-namespace WebRTC
+namespace unity
 {
+namespace webrtc
+{
+
     using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
     using DelegateCollectStats = void(*)(PeerConnectionObject*, const char*);;
     using DelegateCreateSDFailure = void(*)(PeerConnectionObject*);
@@ -133,6 +135,7 @@ namespace WebRTC
     private:
         Context& context;
         PeerConnectionStatsCollectorCallback* m_statsCollectorCallback;
-
     };
-}
+    
+} // end namespace webrtc
+} // end namespace unity

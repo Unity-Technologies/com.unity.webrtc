@@ -3,7 +3,10 @@
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
     class MTLTexture;
     struct MetalTexture2D : ITexture2D {
@@ -27,6 +30,5 @@ namespace WebRTC {
     void* MetalTexture2D::GetEncodeTexturePtrV() { return m_texture; }
     const void* MetalTexture2D::GetEncodeTexturePtrV() const { return m_texture; }
 
-} //end namespace
-
-
+} // end namespace webrtc
+} // end namespace unity

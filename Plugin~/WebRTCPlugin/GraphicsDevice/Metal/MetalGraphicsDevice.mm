@@ -4,7 +4,10 @@
 #include "GraphicsDevice/GraphicsUtility.h"
 #import <Metal/Metal.h>
 
-namespace WebRTC {
+namespace unity
+{
+namespace webrtc
+{
 
     MetalGraphicsDevice::MetalGraphicsDevice(id<MTLDevice>  device, IUnityGraphicsMetal* unityGraphicsMetal)
         : m_device(device)
@@ -140,9 +143,8 @@ namespace WebRTC {
             width, height,
             bytesPerRow, buffer.data()
         );
-
         return i420_buffer;
-
     }
 
-}
+} // end namespace webrtc
+} // end namespace unity
