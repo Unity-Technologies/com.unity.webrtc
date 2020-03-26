@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using UnityEngine.PlayerLoop;
 
 namespace Unity.WebRTC.RuntimeTest
 {
