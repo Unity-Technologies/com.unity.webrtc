@@ -276,8 +276,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT char* PeerConnectionGetConfiguration(PeerConnectionObject* obj)
     {
-        std::string str;
-        obj->GetConfiguration(str);
+        const std::string str = obj->GetConfiguration();
         return ConvertString(str);
     }
 
