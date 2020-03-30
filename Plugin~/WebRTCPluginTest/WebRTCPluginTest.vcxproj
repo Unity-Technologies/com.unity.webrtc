@@ -86,7 +86,6 @@
     <ClInclude Include="..\WebRTCPlugin\SetSessionDescriptionObserver.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoCaptureTrackSource.h" />
-    <ClInclude Include="..\WebRTCPlugin\VideoTrackSource.h" />
     <ClInclude Include="..\WebRTCPlugin\PlatformBase.h" />
     <ClInclude Include="..\WebRTCPlugin\targetver.h" />
     <ClInclude Include="..\WebRTCPlugin\WebRTCConstants.h" />
@@ -126,7 +125,6 @@
     <ClCompile Include="..\WebRTCPlugin\SetSessionDescriptionObserver.cpp" />
     <ClCompile Include="..\WebRTCPlugin\VideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\VideoCaptureTrackSource.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\VideoTrackSource.cpp" />
     <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />
     <ClCompile Include="ContextTest.cpp" />
     <ClCompile Include="GraphicsDeviceTest.cpp" />
