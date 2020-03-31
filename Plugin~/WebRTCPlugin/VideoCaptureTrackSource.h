@@ -14,10 +14,10 @@
 
 #include "api/media_stream_interface.h"
 #include "media/base/video_common.h"
+#include "pc/video_track_source.h"
 #include "rtc_base/async_invoker.h"
 #include "rtc_base/third_party/sigslot/sigslot.h"
 
-#include "VideoTrackSource.h"
 #include "VideoCapturer.h"
 
  // VideoCapturerTrackSource implements VideoTrackSourceInterface. It owns a
@@ -33,7 +33,7 @@ namespace webrtc {
 
 namespace webrtc {
 
-    class VideoCapturerTrackSource : public unity::webrtc::VideoTrackSource,
+    class VideoCapturerTrackSource : public VideoTrackSource,
         public sigslot::has_slots<> {
     public:
         static rtc::scoped_refptr<VideoTrackSourceInterface> Create(

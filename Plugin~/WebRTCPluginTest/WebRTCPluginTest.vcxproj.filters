@@ -73,7 +73,6 @@
     </ClCompile>
     <ClCompile Include="..\WebRTCPlugin\VideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\VideoCaptureTrackSource.cpp" />
-    <ClCompile Include="..\WebRTCPlugin\VideoTrackSource.cpp" />
     <ClCompile Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D12.cpp">
       <Filter>Codec\NvCodec</Filter>
     </ClCompile>
@@ -169,7 +168,6 @@
     </ClInclude>
     <ClInclude Include="..\WebRTCPlugin\VideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoCaptureTrackSource.h" />
-    <ClInclude Include="..\WebRTCPlugin\VideoTrackSource.h" />
     <ClInclude Include="..\WebRTCPlugin\Codec\NvCodec\NvEncoderD3D12.h">
       <Filter>Codec\NvCodec</Filter>
     </ClInclude>
