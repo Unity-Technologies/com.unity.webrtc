@@ -16,7 +16,7 @@ namespace webrtc
     public:
         SoftwareEncoder(int _width, int _height, IGraphicsDevice* device);
         virtual void InitV() override;
-        virtual void SetRate(uint32_t rate) override {}
+        virtual void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override {}
         virtual void UpdateSettings() override {}
         virtual bool CopyBuffer(void* frame) override;
         virtual bool EncodeFrame() override;

@@ -78,6 +78,7 @@
     </ClCompile>
     <ClCompile Include="..\WebRTCPlugin\MediaStreamObserver.cpp" />
     <ClCompile Include="..\WebRTCPlugin\SetSessionDescriptionObserver.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\UnityVideoEncoderFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WebRTCPlugin\Context.h" />
@@ -179,9 +180,7 @@
     </ClInclude>
     <ClInclude Include="..\WebRTCPlugin\MediaStreamObserver.h" />
     <ClInclude Include="..\WebRTCPlugin\SetSessionDescriptionObserver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClInclude Include="..\WebRTCPlugin\UnityVideoEncoderFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvCodec">
@@ -214,5 +213,8 @@
     <Filter Include="Codec\SoftwareCodec">
       <UniqueIdentifier>{c117917c-26a2-4240-8d04-4cf5c19448e3}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 #pragma once
 #include "DummyAudioDevice.h"
+#include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
 
@@ -36,7 +37,7 @@ namespace webrtc
         VideoEncoderParameter(int width, int height) :width(width), height(height) { }
     };
 
-    class Context
+    class Context : public IVideoEncoderObserver
     {
     public:
         
@@ -97,6 +98,9 @@ namespace webrtc
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
+
+        void SetKeyFrame(uint32_t id) override {};
+        void SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters) override {};
     };
 
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);

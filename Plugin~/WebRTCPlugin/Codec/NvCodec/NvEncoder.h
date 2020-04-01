@@ -47,7 +47,7 @@ namespace webrtc
         static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
         static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
 
-        void SetRate(uint32 rate) override;
+        void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
         bool EncodeFrame() override;
@@ -85,13 +85,12 @@ namespace webrtc
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;
-        //10Mbps
-        uint32_t bitRate = 10000000;
-        //100Mbps
-        uint32_t lastBitRate = 100000000;
-        //5Mbps
-        const uint32_t minBitRate = 5000000;
-        uint32_t frameRate = 45;
+
+        uint32_t m_frameRate = 30;
+        std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
+        bool m_settingChanged = false;
+        int m_encoderId = 0;
+        webrtc::Clock* m_clock;
     };
     
 } // end namespace webrtc

@@ -25,7 +25,9 @@ namespace webrtc
     : width(width), height(height), m_device(device), m_deviceType(type), m_inputType(inputType), m_bufferFormat(bufferFormat)
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
-        checkf(width > 0 && height > 0, "Invalid width or height!");        
+        checkf(width > 0 && height > 0, "Invalid width or height!");
+
+        m_bitrateAdjuster = std::make_unique<webrtc::BitrateAdjuster>(0.5f, 0.95f);
     }
 
     void NvEncoder::InitV()  {
@@ -220,15 +222,12 @@ namespace webrtc
             checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d", errorCode).c_str());
         }
     }
-    void NvEncoder::SetRate(uint32 rate)
+    void NvEncoder::SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters)
     {
-#pragma warning (suppress: 4018)
-        if (rate < lastBitRate)
-        {
-#pragma warning(suppress: 4018)
-            bitRate = rate > minBitRate ? rate : minBitRate;
-            lastBitRate = bitRate;
-        }
+        const uint32_t bitrate = parameters.bitrate.get_sum_bps();
+        m_bitrateAdjuster->SetTargetBitrateBps(bitrate);
+        uint32_t newBitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        double newFrameRate = parameters.framerate_fps;
     }
 
     bool NvEncoder::CopyBuffer(void* frame)
@@ -277,6 +276,7 @@ namespace webrtc
 #pragma endregion
         ProcessEncodedFrame(frame);
         frameCount++;
+        m_bitrateAdjuster->Update(frame.encodedFrame.size());
         return true;
     }
 
@@ -305,9 +305,7 @@ namespace webrtc
         checkf(NV_RESULT(errorCode), StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
         frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
-
-
-        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, frame.encodedFrame);
+        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, frame.encodedFrame, 0);
         int64 timestamp = rtc::TimeMillis();
         webrtc::VideoFrame videoFrame{buffer, webrtc::VideoRotation::kVideoRotation_0, timestamp};
         videoFrame.set_ntp_time_ms(timestamp);

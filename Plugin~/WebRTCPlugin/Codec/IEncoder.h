@@ -20,7 +20,7 @@ namespace webrtc
     public:
         virtual ~IEncoder() {};        
         virtual void InitV() = 0;   //Can throw exception. 
-        virtual void SetRate(uint32_t rate) = 0;
+        virtual void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) = 0;
         virtual void UpdateSettings() = 0;
         virtual bool CopyBuffer(void* frame) = 0;
         virtual bool EncodeFrame() = 0;

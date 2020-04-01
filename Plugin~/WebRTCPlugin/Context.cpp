@@ -6,6 +6,7 @@
 #include "VideoCaptureTrackSource.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
+#include "UnityVideoEncoderFactory.h"
 
 namespace unity
 {
@@ -145,7 +146,7 @@ namespace webrtc
 #else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<DummyVideoEncoderFactory>() : webrtc::CreateBuiltinVideoEncoderFactory();
+            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this)) : webrtc::CreateBuiltinVideoEncoderFactory();
 #endif
 
         m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
