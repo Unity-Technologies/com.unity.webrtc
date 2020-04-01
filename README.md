@@ -6,6 +6,9 @@
 
 If you are interested in the streaming solution with WebRTC, you can check [Unity Render Streaming](https://github.com/Unity-Technologies/UnityRenderStreaming). 
 
+| :warning: | So this version is in development, please do not use it. The latest version is `1.1.2`. You can check the version you are using on the Package Manager. |
+
+
 ## Documentation
 
 - [English](https://docs.unity3d.com/Packages/com.unity.webrtc@1.1/manual/index.html)

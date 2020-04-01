@@ -6,6 +6,11 @@
 
 WebRTC for Unity is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
+> [!WARNING]
+> So this version is in development, please do not use it. The latest version is `1.1.2`.
+> You can check the version you are using on the Package Manager.
+> 
+
 ## Requirements
 
 This version of the package is compatible with the following versions of the Unity Editor:

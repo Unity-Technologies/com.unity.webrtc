@@ -3,7 +3,7 @@
   "displayName": "WebRTC",
   "version": "2.0.0-preview.1",
   "unity": "2019.3",
-  "description": "The WebRTC package provides browsers and mobile applications with Real-Time Communications (RTC) capabilities.",
+  "description": "***\nWarning: So this version is in development, please do not use it. The latest version is 1.1.2.\n***\n\nThe WebRTC package provides browsers and mobile applications with Real-Time Communications (RTC) capabilities.",
   "keywords": [
     "webrtc",
     "web"
