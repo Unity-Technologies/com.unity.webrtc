@@ -202,14 +202,15 @@ namespace webrtc
     void NvEncoder::UpdateSettings()
     {
         bool settingChanged = false;
+        const uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
         if (nvEncConfig.rcParams.averageBitRate != bitRate)
         {
             nvEncConfig.rcParams.averageBitRate = bitRate;
             settingChanged = true;
         }
-        if (nvEncInitializeParams.frameRateNum != frameRate)
+        if (nvEncInitializeParams.frameRateNum != m_frameRate)
         {
-            nvEncInitializeParams.frameRateNum = frameRate;
+            nvEncInitializeParams.frameRateNum = m_frameRate;
             settingChanged = true;
         }
 
@@ -226,8 +227,7 @@ namespace webrtc
     {
         const uint32_t bitrate = parameters.bitrate.get_sum_bps();
         m_bitrateAdjuster->SetTargetBitrateBps(bitrate);
-        uint32_t newBitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
-        double newFrameRate = parameters.framerate_fps;
+        m_frameRate = parameters.framerate_fps;
     }
 
     bool NvEncoder::CopyBuffer(void* frame)
