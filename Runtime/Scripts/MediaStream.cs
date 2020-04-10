@@ -116,7 +116,7 @@ namespace Unity.WebRTC
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
-            id = NativeMethods.MediaStreamGetID(self).AsAnsiString();
+            id = NativeMethods.MediaStreamGetID(self).AsAnsiStringWithFreeMem();
 
             WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
             WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);

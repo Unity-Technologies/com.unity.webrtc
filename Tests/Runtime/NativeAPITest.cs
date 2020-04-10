@@ -146,7 +146,7 @@ namespace Unity.WebRTC.RuntimeTest
             var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
-            string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiString();
+            string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
             Assert.IsNotEmpty(streamId);
             const int width = 1280;
             const int height = 720;
@@ -218,7 +218,7 @@ namespace Unity.WebRTC.RuntimeTest
             var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
-            var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiString();
+            var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
             Assert.IsNotEmpty(streamId);
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
@@ -246,7 +246,7 @@ namespace Unity.WebRTC.RuntimeTest
             var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
-            var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiString();
+            var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
             Assert.IsNotEmpty(streamId);
             const int width = 1280;
             const int height = 720;
