@@ -101,7 +101,7 @@ namespace webrtc
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
 
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
-        std::map<const uint32_t, NvEncoder*> m_mapIdAndNvEncoder;
+        std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
 
         // todo(kazuki): remove these callback methods by moving hardware encoder instance to DummyVideoEncoder.
         //               attention point is multi-threaded opengl implementation with nvcodec.

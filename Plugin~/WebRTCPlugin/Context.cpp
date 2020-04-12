@@ -193,13 +193,9 @@ namespace webrtc
         m_mapVideoCapturer[track]->SetEncoder(encoder);
         m_mapVideoCapturer[track]->StartEncoder();
 
-        auto nvEncoder = dynamic_cast<NvEncoder*>(encoder);
-        if(nvEncoder != nullptr)
-        {
-            uint32_t id = GenerateUniqueId();
-            nvEncoder->SetEncoderId(id);
-            m_mapIdAndNvEncoder[id] = nvEncoder;
-        }
+        uint32_t id = GenerateUniqueId();
+        encoder->SetEncoderId(id);
+        m_mapIdAndEncoder[id] = encoder;
         return true;
     }
 
@@ -220,12 +216,12 @@ namespace webrtc
 
     void Context::SetKeyFrame(uint32_t id)
     {
-        m_mapIdAndNvEncoder[id]->SetIdrFrame();
+        m_mapIdAndEncoder[id]->SetIdrFrame();
     }
 
     void Context::SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters)
     {
-        m_mapIdAndNvEncoder[id]->SetRates(parameters);
+        m_mapIdAndEncoder[id]->SetRates(parameters);
     }
 
     UnityEncoderType Context::GetEncoderType() const

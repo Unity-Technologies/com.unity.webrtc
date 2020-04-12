@@ -66,8 +66,8 @@ namespace webrtc
             webrtc::H264::FindNaluIndices(&frameDataBuffer[0], frameDataBuffer.size());
         for (uint32_t i = 0; i < naluIndices.size(); i++)
         {
-            webrtc::H264::NaluType NALUType = webrtc::H264::ParseNaluType(frameDataBuffer[naluIndices[i].payload_start_offset]);
-            if (NALUType == webrtc::H264::kIdr)
+            const webrtc::H264::NaluType naluType = webrtc::H264::ParseNaluType(frameDataBuffer[naluIndices[i].payload_start_offset]);
+            if (naluType == webrtc::H264::kIdr)
             {
                 m_encodedImage._frameType = webrtc::VideoFrameType::kVideoFrameKey;
                 break;

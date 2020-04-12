@@ -54,8 +54,7 @@ namespace webrtc
         bool IsSupported() const override { return m_isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
         uint64 GetCurrentFrameCount() const override { return frameCount; }
-
-        void SetEncoderId(const uint32_t id) { m_encoderId = id; }
+        void SetEncoderId(const uint32_t id) override { m_encoderId = id; }
     protected:
         int m_width;
         int m_height;
@@ -89,7 +88,6 @@ namespace webrtc
 
         uint32_t m_frameRate = 30;
         std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
-        bool m_settingChanged = false;
         int m_encoderId = 0;
     };
     

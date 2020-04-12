@@ -7,6 +7,8 @@ namespace webrtc
 
     namespace webrtc = ::webrtc;
 
+    // todo(kazuki): this interface class is used to access hardware encoder from webrtc::VideoEncoder for controlling bitrate
+    //               remove this after webrtc::Video Encoder can access hw encoder directly.
     class IVideoEncoderObserver : public sigslot::has_slots<>
     {
     public:

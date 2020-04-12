@@ -29,6 +29,9 @@ namespace webrtc
         virtual uint64 GetCurrentFrameCount() const = 0;
         sigslot::signal1<webrtc::VideoFrame&> CaptureFrame;
 
+        // todo(kazuki): remove this virtual method after refactoring DummyVideoEncoder
+        virtual void SetEncoderId(const uint32_t id) = 0;
+
         CodecInitializationResult GetCodecInitializationResult() const { return m_initializationResult; }
     protected:
         CodecInitializationResult m_initializationResult = CodecInitializationResult::NotInitialized;

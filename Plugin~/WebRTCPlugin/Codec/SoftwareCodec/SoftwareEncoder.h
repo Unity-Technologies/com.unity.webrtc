@@ -15,14 +15,15 @@ namespace webrtc
     {
     public:
         SoftwareEncoder(int _width, int _height, IGraphicsDevice* device);
-        virtual void InitV() override;
-        virtual void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override {}
-        virtual void UpdateSettings() override {}
-        virtual bool CopyBuffer(void* frame) override;
-        virtual bool EncodeFrame() override;
-        virtual bool IsSupported() const override { return true; }
-        virtual void SetIdrFrame() override {}
-        virtual uint64 GetCurrentFrameCount() const override { return m_frameCount; }        
+        void InitV() override;
+        void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override {}
+        void UpdateSettings() override {}
+        bool CopyBuffer(void* frame) override;
+        bool EncodeFrame() override;
+        bool IsSupported() const override { return true; }
+        void SetIdrFrame() override {}
+        uint64 GetCurrentFrameCount() const override { return m_frameCount; }
+        void SetEncoderId(const uint32_t id) override {};
 
     private:
         IGraphicsDevice* m_device;
