@@ -46,11 +46,10 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var width = 256;
             var height = 256;
-            var bitrate = 1000000;
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = new VideoStreamTrack("video", rt, bitrate);
+            var track = new VideoStreamTrack("video", rt);
             Assert.NotNull(track);
             yield return new WaitForSeconds(0.1f);
 
@@ -75,12 +74,11 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var width = 256;
             var height = 256;
-            var bitrate = 1000000;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
             var stream = new MediaStream();
-            var track = new VideoStreamTrack("video", rt, bitrate);
+            var track = new VideoStreamTrack("video", rt);
             yield return new WaitForSeconds(0.1f);
             Assert.AreEqual(TrackKind.Video, track.Kind);
             Assert.AreEqual(0, stream.GetVideoTracks().Count());

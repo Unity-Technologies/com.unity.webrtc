@@ -22,7 +22,7 @@ namespace webrtc
         const NV_ENC_INPUT_RESOURCE_TYPE inputType,
         const NV_ENC_BUFFER_FORMAT bufferFormat,
         const int width, const int height, IGraphicsDevice* device)
-    : width(width), height(height), m_device(device), m_deviceType(type), m_inputType(inputType), m_bufferFormat(bufferFormat)
+    : m_width(width), m_height(height), m_device(device), m_deviceType(type), m_inputType(inputType), m_bufferFormat(bufferFormat)
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
         checkf(width > 0 && height > 0, "Invalid width or height!");
@@ -30,7 +30,8 @@ namespace webrtc
         m_bitrateAdjuster = std::make_unique<webrtc::BitrateAdjuster>(0.5f, 0.95f);
     }
 
-    void NvEncoder::InitV()  {
+    void NvEncoder::InitV()
+    {
         bool result = true;
         if (m_initializationResult == CodecInitializationResult::NotInitialized)
         {
@@ -53,13 +54,13 @@ namespace webrtc
 #pragma endregion
 #pragma region set initialization parameters
         nvEncInitializeParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
-        nvEncInitializeParams.encodeWidth = width;
-        nvEncInitializeParams.encodeHeight = height;
-        nvEncInitializeParams.darWidth = width;
-        nvEncInitializeParams.darHeight = height;
+        nvEncInitializeParams.encodeWidth = m_width;
+        nvEncInitializeParams.encodeHeight = m_height;
+        nvEncInitializeParams.darWidth = m_width;
+        nvEncInitializeParams.darHeight = m_height;
         nvEncInitializeParams.encodeGUID = NV_ENC_CODEC_H264_GUID;
         nvEncInitializeParams.presetGUID = NV_ENC_PRESET_LOW_LATENCY_HQ_GUID;
-        nvEncInitializeParams.frameRateNum = frameRate;
+        nvEncInitializeParams.frameRateNum = m_frameRate;
         nvEncInitializeParams.frameRateDen = 1;
         nvEncInitializeParams.enablePTD = 1;
         nvEncInitializeParams.reportSliceOffsets = 0;
@@ -77,7 +78,7 @@ namespace webrtc
         std::memcpy(&nvEncConfig, &presetConfig.presetCfg, sizeof(NV_ENC_CONFIG));
         nvEncConfig.profileGUID = NV_ENC_H264_PROFILE_BASELINE_GUID;
         nvEncConfig.gopLength = nvEncInitializeParams.frameRateNum;
-        nvEncConfig.rcParams.averageBitRate = bitRate;
+        nvEncConfig.rcParams.averageBitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
         nvEncConfig.encodeCodecConfig.h264Config.idrPeriod = nvEncConfig.gopLength;
 
         nvEncConfig.encodeCodecConfig.h264Config.sliceMode = 0;
@@ -102,7 +103,7 @@ namespace webrtc
 #pragma endregion
 
         InitEncoderResources();
-        isNvEncoderSupported = true;
+        m_isNvEncoderSupported = true;
 
     }
     NvEncoder::~NvEncoder()
@@ -305,7 +306,7 @@ namespace webrtc
         checkf(NV_RESULT(errorCode), StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
         frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
-        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(width, height, frame.encodedFrame, 0);
+        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(m_width, m_height, frame.encodedFrame, m_encoderId);
         int64 timestamp = rtc::TimeMillis();
         webrtc::VideoFrame videoFrame{buffer, webrtc::VideoRotation::kVideoRotation_0, timestamp};
         videoFrame.set_ntp_time_ms(timestamp);
@@ -320,13 +321,13 @@ namespace webrtc
 
         if (!registerResource.resourceToRegister)
             LogPrint("resource is not initialized");
-        registerResource.width = width;
-        registerResource.height = height;
+        registerResource.width = m_width;
+        registerResource.height = m_height;
         if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY)
         {
-            registerResource.pitch = GetWidthInBytes(m_bufferFormat, width);          
+            registerResource.pitch = GetWidthInBytes(m_bufferFormat, m_width);          
         } else{
-            registerResource.pitch = width;            
+            registerResource.pitch = m_width;            
         }
         registerResource.bufferFormat = m_bufferFormat;
         registerResource.bufferUsage = NV_ENC_INPUT_IMAGE;
@@ -355,7 +356,7 @@ namespace webrtc
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            renderTextures[i] = m_device->CreateDefaultTextureV(width, height);
+            renderTextures[i] = m_device->CreateDefaultTextureV(m_width, m_height);
             void* buffer = AllocateInputResourceV(renderTextures[i]);
 
             Frame& frame = bufferedFrames[i];

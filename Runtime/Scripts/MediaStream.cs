@@ -166,7 +166,7 @@ namespace Unity.WebRTC
             var rt = new RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
-            return new VideoStreamTrack(cam.name, rt, bitrate);
+            return new VideoStreamTrack(cam.name, rt);
         }
 
 

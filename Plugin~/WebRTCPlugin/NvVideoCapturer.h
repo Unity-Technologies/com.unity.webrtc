@@ -102,6 +102,7 @@ namespace webrtc
             return m_buffer;
         }
 
+        // todo(kazuki): remove the method by refactoring video encoding.
         // The id is for identifying encoder which encoded this frame.
         int encoderId() const
         {

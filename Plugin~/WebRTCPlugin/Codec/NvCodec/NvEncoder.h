@@ -39,7 +39,6 @@ namespace webrtc
             int width, int height, IGraphicsDevice* device);
         virtual ~NvEncoder();
 
-        virtual void InitV() override;
         static CodecInitializationResult LoadCodec();
         static bool LoadModule();
         static void UnloadModule();
@@ -47,24 +46,26 @@ namespace webrtc
         static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
         static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
 
+        void InitV() override;
         void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
         bool EncodeFrame() override;
-        bool IsSupported() const override { return isNvEncoderSupported; }
+        bool IsSupported() const override { return m_isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
-        virtual uint64 GetCurrentFrameCount() const override { return frameCount; }
+        uint64 GetCurrentFrameCount() const override { return frameCount; }
+
+        void SetEncoderId(const uint32_t id) { m_encoderId = id; }
     protected:
-        int width = 1920;
-        int height = 1080;
-        int pitch = 0;
+        int m_width;
+        int m_height;
         IGraphicsDevice* m_device;
 
         NV_ENC_DEVICE_TYPE m_deviceType;
         NV_ENC_INPUT_RESOURCE_TYPE m_inputType;
         NV_ENC_BUFFER_FORMAT m_bufferFormat;
 
-        bool isNvEncoderSupported = false;
+        bool m_isNvEncoderSupported = false;
 
         virtual void* AllocateInputResourceV(ITexture2D* tex) = 0;
 
@@ -90,7 +91,6 @@ namespace webrtc
         std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
         bool m_settingChanged = false;
         int m_encoderId = 0;
-        webrtc::Clock* m_clock;
     };
     
 } // end namespace webrtc
