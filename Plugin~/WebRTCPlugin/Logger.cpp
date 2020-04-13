@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#define _DEBUG
-
 #if defined(_DEBUG)
 #include <cstdarg>
 #include "WebRTCPlugin.h"

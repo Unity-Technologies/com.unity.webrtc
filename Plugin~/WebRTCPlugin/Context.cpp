@@ -197,14 +197,11 @@ namespace webrtc
         uint32_t id = GenerateUniqueId();
         encoder->SetEncoderId(id);
         m_mapIdAndEncoder[id] = encoder;
-        LogPrint("InitializeEncoder: %d size=%d\n", id, m_mapIdAndEncoder.size());
-
         return true;
     }
 
     bool Context::FinalizeEncoder(IEncoder* encoder)
     {
-        LogPrint("FinalizeEncoder: %d, size=%d\n", encoder->Id(), m_mapIdAndEncoder.size());
         m_mapIdAndEncoder.erase(encoder->Id());
         return true;
     }

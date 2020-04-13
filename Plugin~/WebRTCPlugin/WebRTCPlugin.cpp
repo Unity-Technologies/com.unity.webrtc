@@ -16,8 +16,6 @@ namespace webrtc
 
     void debugLog(const char* buf)
     {
-        ::OutputDebugStringA(buf);
-
         if (delegateDebugLog != nullptr)
         {
             if(rtc::ThreadManager::Instance()->IsMainThread())
