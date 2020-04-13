@@ -181,6 +181,7 @@ namespace webrtc
         m_mapSetSessionDescriptionObserver.clear();
         m_mapVideoEncoderParameter.clear();
         m_mapDataChannels.clear();
+        m_mapIdAndEncoder.clear();
 
         m_workerThread->Quit();
         m_workerThread.reset();

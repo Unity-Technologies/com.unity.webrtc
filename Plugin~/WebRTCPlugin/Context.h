@@ -1,5 +1,4 @@
 #pragma once
-#include "Codec/NvCodec/NvEncoder.h"
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
