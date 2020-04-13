@@ -77,6 +77,7 @@ namespace webrtc
         
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
+        bool FinalizeEncoder(IEncoder* encoder);
         // You must call these methods on Rendering thread.
         bool EncodeFrame(webrtc::MediaStreamTrackInterface* track);
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);

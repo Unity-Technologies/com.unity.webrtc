@@ -30,11 +30,13 @@ namespace webrtc
         sigslot::signal1<webrtc::VideoFrame&> CaptureFrame;
 
         // todo(kazuki): remove this virtual method after refactoring DummyVideoEncoder
-        virtual void SetEncoderId(const uint32_t id) = 0;
+        virtual void SetEncoderId(const uint32_t id) { m_encoderId = id;  }
+        virtual uint32_t Id() const { return m_encoderId; }
 
         CodecInitializationResult GetCodecInitializationResult() const { return m_initializationResult; }
     protected:
         CodecInitializationResult m_initializationResult = CodecInitializationResult::NotInitialized;
+        uint32_t m_encoderId;
     };
     
 } // end namespace webrtc

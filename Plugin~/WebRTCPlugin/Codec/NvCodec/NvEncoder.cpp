@@ -226,6 +226,8 @@ namespace webrtc
     }
     void NvEncoder::SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters)
     {
+        LogPrint("SetRates\n");
+
         const uint32_t bitrate = parameters.bitrate.get_sum_bps();
         m_bitrateAdjuster->SetTargetBitrateBps(bitrate);
         m_frameRate = parameters.framerate_fps;

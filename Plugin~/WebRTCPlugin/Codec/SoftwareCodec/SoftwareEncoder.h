@@ -23,7 +23,6 @@ namespace webrtc
         bool IsSupported() const override { return true; }
         void SetIdrFrame() override {}
         uint64 GetCurrentFrameCount() const override { return m_frameCount; }
-        void SetEncoderId(const uint32_t id) override {};
 
     private:
         IGraphicsDevice* m_device;
