@@ -40,6 +40,8 @@ namespace webrtc
     int32_t DummyVideoEncoder::Release()
     {
         this->callback = nullptr;
+        this->m_setKeyFrame.disconnect_all();
+        this->m_setRates.disconnect_all();
         return WEBRTC_VIDEO_CODEC_OK;
     }
 

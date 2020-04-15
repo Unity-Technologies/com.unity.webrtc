@@ -5,7 +5,7 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    public class InitializeOnLoad
+    internal class InitializeOnLoad
     {
         [RuntimeInitializeOnLoadMethod]
         static void OnLoad()
