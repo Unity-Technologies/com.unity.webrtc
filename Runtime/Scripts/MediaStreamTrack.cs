@@ -53,7 +53,7 @@ namespace Unity.WebRTC
             self = ptr;
             WebRTC.Table.Add(self, this);
             Kind = NativeMethods.MediaStreamTrackGetKind(self);
-            Id = Marshal.PtrToStringAnsi(NativeMethods.MediaStreamTrackGetID(self));
+            Id = NativeMethods.MediaStreamTrackGetID(self).AsAnsiStringWithFreeMem();
         }
 
         ~MediaStreamTrack()

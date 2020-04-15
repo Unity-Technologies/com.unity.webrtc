@@ -195,13 +195,13 @@ namespace webrtc
         return error.type();
     }
 
-    void PeerConnectionObject::GetConfiguration(std::string& config) const
+    std::string PeerConnectionObject::GetConfiguration() const
     {
         auto _config = connection->GetConfiguration();
 
         Json::Value root;
         root["iceServers"] = Json::Value(Json::arrayValue);
-        for (auto iceServer : _config.servers)
+        for (webrtc::PeerConnectionInterface::IceServer iceServer : _config.servers)
         {
             Json::Value jsonIceServer = Json::Value(Json::objectValue);
             jsonIceServer["username"] = iceServer.username;
@@ -215,7 +215,7 @@ namespace webrtc
             root["iceServers"].append(jsonIceServer);
         }
         Json::StreamWriterBuilder builder;
-        config = Json::writeString(builder, root);
+        return Json::writeString(builder, root);
     }
 
     void PeerConnectionObject::CreateOffer(const RTCOfferOptions & options)

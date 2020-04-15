@@ -91,8 +91,7 @@ namespace Unity.WebRTC
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
-            var labelPtr = NativeMethods.DataChannelGetLabel(self);
-            Label = Marshal.PtrToStringAnsi(labelPtr);
+            Label = NativeMethods.DataChannelGetLabel(self).AsAnsiStringWithFreeMem();
 
             NativeMethods.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
             NativeMethods.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);

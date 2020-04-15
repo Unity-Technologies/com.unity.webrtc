@@ -57,7 +57,7 @@ namespace webrtc
         void CollectStats();
         void SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
         webrtc::RTCErrorType SetConfiguration(const std::string& config);
-        void GetConfiguration(std::string& config) const;
+        std::string GetConfiguration() const;
         void CreateOffer(const RTCOfferOptions& options);
         void CreateAnswer(const RTCAnswerOptions& options);
         void AddIceCandidate(const RTCIceCandidate& candidate);
