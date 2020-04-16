@@ -1,12 +1,12 @@
-# データチャネル
+# Data Channel
 
-- [データチャネルの作成](#creating-datachannel)
-- [メッセージの送信](#send-message)
-- [メッセージの受信](#recv-message)
+- [Creating Data Channel](#creating-datachannel)
+- [Send Message](#send-message)
+- [Receive Message](#recv-message)
 
 データチャネル（`DataChannel`）は、文字列やバイナリをピア間で送受信するための機能です。WebSocket と同等の機能を持ちつつ、プロトコルに UDP を利用しているためハイパフォーマンスであるという特徴があります。
 
-## <a id="videotrack"/> データチャネルの作成
+## <a id="videotrack"/> Creating Data Channel
 
 データチャネルは、1つのピアに対して複数作成できます。データチャネルの作成には、まず `RTCPeerConnection` の `CreateDataChannel` メソッドを呼び出す方法があります。
 
@@ -28,7 +28,7 @@ peerConnnection.OnDataChannel = channel =>
 
 データチャネルがピア間で通信可能になったとき、 `RTCDataChannel.OnOpen` デリゲートが実行されます。また、切断したときは `RTCDataChannel.OnClose` が実行されます。
 
-## <a id="send-message"/> メッセージの送信
+## <a id="send-message"/> Send Message
 
 メッセージの送信には文字列もしくはバイナリを利用できます。 `RTCDataChannel.Send` メソッドを実行してください。
 
@@ -43,7 +43,7 @@ channel.Send(data);
 
 ```
 
-## <a id="recv-message"/> メッセージの受信
+## <a id="recv-message"/> Receive Message
 
 メッセージ受信は `RTCDataChannel.OnMessage` デリゲートを利用します。
 
