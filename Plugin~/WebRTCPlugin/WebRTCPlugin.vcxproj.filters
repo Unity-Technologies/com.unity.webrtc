@@ -72,6 +72,7 @@
     <ClCompile Include="MediaStreamObserver.cpp" />
     <ClCompile Include="SetSessionDescriptionObserver.cpp" />
     <ClCompile Include="UnityRenderEvent.cpp" />
+    <ClCompile Include="UnityVideoEncoderFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -171,6 +172,8 @@
     </ClInclude>
     <ClInclude Include="MediaStreamObserver.h" />
     <ClInclude Include="SetSessionDescriptionObserver.h" />
+    <ClInclude Include="NvVideoCapturer.h" />
+    <ClInclude Include="UnityVideoEncoderFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GraphicsDevice">

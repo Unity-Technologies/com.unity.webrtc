@@ -21,6 +21,7 @@ namespace webrtc
     IUnityGraphics* s_Graphics = nullptr;
     Context* s_context = nullptr;
     IGraphicsDevice* s_device;
+    std::map<const ::webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
 
 } // end namespace webrtc
 } // end namespace unity
@@ -33,12 +34,14 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
     case kUnityGfxDeviceEventInitialize:
     {
+        s_mapEncoder.clear();
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
         //UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
+        s_mapEncoder.clear();
         break;
     }
     case kUnityGfxDeviceEventBeforeReset:
@@ -64,8 +67,6 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
-std::map<const ::webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> m_mapEncoder;
-
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (s_context == nullptr)
@@ -86,8 +87,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             s_device = GraphicsDevice::GetInstance().GetDevice();
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
-            m_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
-            s_context->InitializeEncoder(m_mapEncoder[track].get(), track);
+            s_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
+            s_context->InitializeEncoder(s_mapEncoder[track].get(), track);
             return;
         }
         case VideoStreamRenderEventID::Encode:
@@ -100,7 +101,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         }
         case VideoStreamRenderEventID::Finalize:
         {
-            m_mapEncoder.erase(track);
+            s_context->FinalizeEncoder(s_mapEncoder[track].get());
+            s_mapEncoder.erase(track);
             GraphicsDevice::GetInstance().Shutdown();
             return;
         }

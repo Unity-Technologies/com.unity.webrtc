@@ -150,9 +150,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.IsNotEmpty(streamId);
             const int width = 1280;
             const int height = 720;
-            const int bitrate = 1000000;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr(), width, height, bitrate);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -169,9 +168,8 @@ namespace Unity.WebRTC.RuntimeTest
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             const int width = 1280;
             const int height = 720;
-            const int bitrate = 1000000;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr(), width, height, bitrate);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             NativeMethods.MediaStreamAddTrack(stream, track);
 
             int trackSize = 0;
@@ -250,9 +248,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.IsNotEmpty(streamId);
             const int width = 1280;
             const int height = 720;
-            const int bitrate = 1000000;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr(), width, height, bitrate);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             var callback = NativeMethods.GetRenderEventFunc(context);

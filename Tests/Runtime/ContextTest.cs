@@ -69,11 +69,10 @@ namespace Unity.WebRTC.RuntimeTest
             var context = Context.Create();
             var width = 256;
             var height = 256;
-            var bitrate = 1000000;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = context.CreateVideoTrack("video", rt.GetNativeTexturePtr(), width, height, bitrate);
+            var track = context.CreateVideoTrack("video", rt.GetNativeTexturePtr());
             context.DeleteMediaStreamTrack(track);
             context.Dispose();
         }

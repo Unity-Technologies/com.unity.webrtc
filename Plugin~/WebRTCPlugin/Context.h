@@ -1,5 +1,6 @@
 #pragma once
 #include "DummyAudioDevice.h"
+#include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "NvVideoCapturer.h"
 
@@ -36,7 +37,7 @@ namespace webrtc
         VideoEncoderParameter(int width, int height) :width(width), height(height) { }
     };
 
-    class Context
+    class Context : public IVideoEncoderObserver
     {
     public:
         
@@ -54,7 +55,7 @@ namespace webrtc
 
 
         // MediaStreamTrack
-        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate);
+        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label);
         void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
@@ -76,6 +77,7 @@ namespace webrtc
         
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
+        bool FinalizeEncoder(IEncoder* encoder);
         // You must call these methods on Rendering thread.
         bool EncodeFrame(webrtc::MediaStreamTrackInterface* track);
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
@@ -97,6 +99,18 @@ namespace webrtc
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
+
+        // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
+        std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
+
+        // todo(kazuki): remove these callback methods by moving hardware encoder instance to DummyVideoEncoder.
+        //               attention point is multi-threaded opengl implementation with nvcodec.
+        void SetKeyFrame(uint32_t id) override;
+        void SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters) override;
+
+        // todo(kazuki): static variable to set id each encoder.
+        static uint32_t s_encoderId;
+        static uint32_t GenerateUniqueId();
     };
 
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);

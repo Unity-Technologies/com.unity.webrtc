@@ -20,7 +20,7 @@ namespace webrtc
     public:
         virtual ~IEncoder() {};        
         virtual void InitV() = 0;   //Can throw exception. 
-        virtual void SetRate(uint32_t rate) = 0;
+        virtual void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) = 0;
         virtual void UpdateSettings() = 0;
         virtual bool CopyBuffer(void* frame) = 0;
         virtual bool EncodeFrame() = 0;
@@ -29,9 +29,14 @@ namespace webrtc
         virtual uint64 GetCurrentFrameCount() const = 0;
         sigslot::signal1<webrtc::VideoFrame&> CaptureFrame;
 
+        // todo(kazuki): remove this virtual method after refactoring DummyVideoEncoder
+        virtual void SetEncoderId(const uint32_t id) { m_encoderId = id;  }
+        virtual uint32_t Id() const { return m_encoderId; }
+
         CodecInitializationResult GetCodecInitializationResult() const { return m_initializationResult; }
     protected:
         CodecInitializationResult m_initializationResult = CodecInitializationResult::NotInitialized;
+        uint32_t m_encoderId;
     };
     
 } // end namespace webrtc

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -99,8 +100,8 @@ namespace Unity.WebRTC
             return tex;
         }
 
-        internal VideoStreamTrack(string label, UnityEngine.RenderTexture source, UnityEngine.RenderTexture dest, int width, int height, int bitrate)
-            : this(label, dest.GetNativeTexturePtr(), width, height, bitrate)
+        internal VideoStreamTrack(string label, UnityEngine.Texture source, UnityEngine.RenderTexture dest, int width, int height)
+            : this(label, dest.GetNativeTexturePtr(), width, height)
         {
             m_needFlip = true;
             m_sourceTexture = source;
@@ -129,11 +130,20 @@ namespace Unity.WebRTC
         /// <param name="source"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="bitrate"></param>
-        public VideoStreamTrack(string label, UnityEngine.RenderTexture source, int bitrate)
-            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width, source.height, bitrate)
+        public VideoStreamTrack(string label, UnityEngine.RenderTexture source)
+            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width, source.height)
         {
         }
+
+        public VideoStreamTrack(string label, UnityEngine.Texture source)
+            : this(label,
+                source,
+                CreateRenderTexture(source.width, source.height, WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType)),
+                source.width,
+                source.height)
+        {
+        }
+        
 
         /// <summary>
         /// Creates a new VideoStream object.
@@ -146,9 +156,8 @@ namespace Unity.WebRTC
         /// <param name="ptr"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="bitrate"></param>
-        public VideoStreamTrack(string label, IntPtr ptr, int width, int height, int bitrate)
-            : base(WebRTC.Context.CreateVideoTrack(label, ptr, width, height, bitrate))
+        public VideoStreamTrack(string label, IntPtr ptr, int width, int height)
+            : base(WebRTC.Context.CreateVideoTrack(label, ptr))
         {
             WebRTC.Context.SetVideoEncoderParameter(self, width, height);
             WebRTC.Context.InitializeEncoder(self);

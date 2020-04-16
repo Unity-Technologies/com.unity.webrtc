@@ -7,22 +7,33 @@ namespace unity
 namespace webrtc
 {
 
-    NvVideoCapturer::NvVideoCapturer() {
+    NvVideoCapturer::NvVideoCapturer()
+    {
         set_enable_video_adapter(false);
-        SetSupportedFormats(std::vector<cricket::VideoFormat>(1, cricket::VideoFormat(width, height, cricket::VideoFormat::FpsToInterval(framerate), cricket::FOURCC_H264)));
+        SetSupportedFormats(
+            std::vector<cricket::VideoFormat>(1,
+                cricket::VideoFormat(width,
+                    height,
+                    cricket::VideoFormat::FpsToInterval(framerate),
+                    cricket::FOURCC_H264)));
     }
 
-    bool NvVideoCapturer::EncodeVideoData() {
-        if (captureStarted && !captureStopped) {
-            if(encoder_ == nullptr) {
+    bool NvVideoCapturer::EncodeVideoData()
+    {
+        if (captureStarted && !captureStopped)
+        {
+            if(encoder_ == nullptr)
+            {
                 LogPrint("encoder is null");
                 return false;
             }
-            if(!encoder_->CopyBuffer(unityRT)) {
+            if(!encoder_->CopyBuffer(unityRT))
+            {
                 LogPrint("Copy texture buffer is failed");
                 return false;
             }
-            if(!encoder_->EncodeFrame()) {
+            if(!encoder_->EncodeFrame())
+            {
                 LogPrint("Encode frame is failed");
                 return false;
             }
@@ -67,12 +78,9 @@ namespace webrtc
     {
         encoder_->SetIdrFrame();
     }
-    void NvVideoCapturer::SetRate(uint32 rate)
-    {
-        encoder_->SetRate(rate);
-    }
 
-    void NvVideoCapturer::SetEncoder(IEncoder* encoder) {
+    void NvVideoCapturer::SetEncoder(IEncoder* encoder)
+    {
         encoder_ = encoder;
         encoder_->CaptureFrame.connect(this, &NvVideoCapturer::CaptureFrame);
     }

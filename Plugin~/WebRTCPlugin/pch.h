@@ -39,11 +39,12 @@
 #include "rtc_base/win32_socket_server.h"
 #endif
 
-#include "media/engine/internal_decoder_factory.h"
+#include "media/engine/internal_encoder_factory.h"
 #include "media/base/h264_profile_level_id.h"
 #include "media/base/adapted_video_track_source.h"
 #include "media/base/media_channel.h"
 #include "media/base/video_common.h"
+#include "media/base/video_broadcaster.h"
 
 #include "modules/video_capture/video_capture_impl.h"
 #include "modules/video_capture/video_capture_factory.h"
@@ -55,11 +56,9 @@
 
 #include "common_video/h264/h264_bitstream_parser.h"
 #include "common_video/h264/h264_common.h"
-
-#include "media/base/video_broadcaster.h"
+#include "common_video/include/bitrate_adjuster.h"
 
 #include "pc/media_stream_observer.h"
-
 
 #pragma endregion
 

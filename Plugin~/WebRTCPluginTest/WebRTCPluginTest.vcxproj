@@ -84,6 +84,7 @@
     <ClInclude Include="..\WebRTCPlugin\pch.h" />
     <ClInclude Include="..\WebRTCPlugin\PeerConnectionObject.h" />
     <ClInclude Include="..\WebRTCPlugin\SetSessionDescriptionObserver.h" />
+    <ClInclude Include="..\WebRTCPlugin\UnityVideoEncoderFactory.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoCapturer.h" />
     <ClInclude Include="..\WebRTCPlugin\VideoCaptureTrackSource.h" />
     <ClInclude Include="..\WebRTCPlugin\PlatformBase.h" />
@@ -123,6 +124,7 @@
     <ClCompile Include="..\WebRTCPlugin\NvVideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionObject.cpp" />
     <ClCompile Include="..\WebRTCPlugin\SetSessionDescriptionObserver.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\UnityVideoEncoderFactory.cpp" />
     <ClCompile Include="..\WebRTCPlugin\VideoCapturer.cpp" />
     <ClCompile Include="..\WebRTCPlugin\VideoCaptureTrackSource.cpp" />
     <ClCompile Include="..\WebRTCPlugin\WebRTCPlugin.cpp" />

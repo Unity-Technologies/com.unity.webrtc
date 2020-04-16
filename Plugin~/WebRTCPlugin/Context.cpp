@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "WebRTCPlugin.h"
 #include "Context.h"
-#include "GraphicsDevice/GraphicsDevice.h"
+
+#include "Codec/NvCodec/NvEncoder.h"
 #include "DummyVideoEncoder.h"
 #include "VideoCaptureTrackSource.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
+#include "UnityVideoEncoderFactory.h"
 
 namespace unity
 {
@@ -56,6 +58,11 @@ namespace webrtc
         }
         m_contexts.clear();
     }
+
+#pragma region open an encode session
+    uint32_t Context::s_encoderId = 0;
+    uint32_t Context::GenerateUniqueId() { return s_encoderId++; }
+#pragma endregion 
 
     bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -145,7 +152,7 @@ namespace webrtc
 #else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<DummyVideoEncoderFactory>() : webrtc::CreateBuiltinVideoEncoderFactory();
+            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this)) : webrtc::CreateBuiltinVideoEncoderFactory();
 #endif
 
         m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
@@ -174,6 +181,7 @@ namespace webrtc
         m_mapSetSessionDescriptionObserver.clear();
         m_mapVideoEncoderParameter.clear();
         m_mapDataChannels.clear();
+        m_mapIdAndEncoder.clear();
 
         m_workerThread->Quit();
         m_workerThread.reset();
@@ -181,11 +189,20 @@ namespace webrtc
         m_signalingThread.reset();
     }
 
-
     bool Context::InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track)
     {
         m_mapVideoCapturer[track]->SetEncoder(encoder);
         m_mapVideoCapturer[track]->StartEncoder();
+
+        uint32_t id = GenerateUniqueId();
+        encoder->SetEncoderId(id);
+        m_mapIdAndEncoder[id] = encoder;
+        return true;
+    }
+
+    bool Context::FinalizeEncoder(IEncoder* encoder)
+    {
+        m_mapIdAndEncoder.erase(encoder->Id());
         return true;
     }
 
@@ -202,6 +219,22 @@ namespace webrtc
     void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height)
     {
         m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height);
+    }
+
+    void Context::SetKeyFrame(uint32_t id)
+    {
+        if (m_mapIdAndEncoder.count(id))
+        {
+            m_mapIdAndEncoder[id]->SetIdrFrame();
+        }
+    }
+
+    void Context::SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters)
+    {
+        if(m_mapIdAndEncoder.count(id))
+        {
+            m_mapIdAndEncoder[id]->SetRates(parameters);
+        }
     }
 
     UnityEncoderType Context::GetEncoderType() const
@@ -230,7 +263,7 @@ namespace webrtc
         return m_mapMediaStreamObserver[stream].get();
     }
 
-    webrtc::VideoTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer, int32 width, int32 height, int32 bitRate)
+    webrtc::VideoTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer)
     {
         auto videoCapturer = std::make_unique<NvVideoCapturer>();
         const std::unique_ptr<NvVideoCapturer>::pointer ptr = videoCapturer.get();
@@ -316,6 +349,5 @@ namespace webrtc
     {
         return m_mapSetSessionDescriptionObserver[connection];
     }
-
 } // end namespace webrtc
 } // end namespace unity

@@ -151,9 +151,9 @@ namespace Unity.WebRTC
             return NativeMethods.ContextCreateAudioTrack(self, label);
         }
 
-        public IntPtr CreateVideoTrack(string label, IntPtr rt, int width, int height, int bitrate)
+        public IntPtr CreateVideoTrack(string label, IntPtr texturePtr)
         {
-            return NativeMethods.ContextCreateVideoTrack(self, label, rt, width, height, bitrate);
+            return NativeMethods.ContextCreateVideoTrack(self, label, texturePtr);
         }
 
         public void StopMediaStreamTrack(IntPtr track)

@@ -39,7 +39,6 @@ namespace webrtc
             int width, int height, IGraphicsDevice* device);
         virtual ~NvEncoder();
 
-        virtual void InitV() override;
         static CodecInitializationResult LoadCodec();
         static bool LoadModule();
         static void UnloadModule();
@@ -47,24 +46,24 @@ namespace webrtc
         static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
         static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
 
-        void SetRate(uint32 rate) override;
+        void InitV() override;
+        void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
         bool EncodeFrame() override;
-        bool IsSupported() const override { return isNvEncoderSupported; }
+        bool IsSupported() const override { return m_isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
-        virtual uint64 GetCurrentFrameCount() const override { return frameCount; }
+        uint64 GetCurrentFrameCount() const override { return frameCount; }
     protected:
-        int width = 1920;
-        int height = 1080;
-        int pitch = 0;
+        int m_width;
+        int m_height;
         IGraphicsDevice* m_device;
 
         NV_ENC_DEVICE_TYPE m_deviceType;
         NV_ENC_INPUT_RESOURCE_TYPE m_inputType;
         NV_ENC_BUFFER_FORMAT m_bufferFormat;
 
-        bool isNvEncoderSupported = false;
+        bool m_isNvEncoderSupported = false;
 
         virtual void* AllocateInputResourceV(ITexture2D* tex) = 0;
 
@@ -85,13 +84,9 @@ namespace webrtc
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;
-        //10Mbps
-        uint32_t bitRate = 10000000;
-        //100Mbps
-        uint32_t lastBitRate = 100000000;
-        //5Mbps
-        const uint32_t minBitRate = 5000000;
-        uint32_t frameRate = 45;
+
+        uint32_t m_frameRate = 30;
+        std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
     };
     
 } // end namespace webrtc
