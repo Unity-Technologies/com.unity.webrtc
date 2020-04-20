@@ -6,7 +6,7 @@ WebRTC enables streaming video between peers. It can be streaming video rendered
 
 There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding for kind of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
 
-Specifying an `EncoderType` for the `WebRTC.Initialize` method argument, it can be selected using software encoder or hardware one.
+We can select the type of encoder by specifying EncoderType in WebRTC.Initialize's method argument.
 
 ```CSharp
 // ソフトウェアエンコーダーを使用
