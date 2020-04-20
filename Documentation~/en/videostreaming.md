@@ -1,18 +1,12 @@
 # Video Streaming
 
-- [Codec](#codec)
-- [Video Track](#videotrack)
-  - [Add Track](#add-track)
-  - [Multi track](#multi-track)
+WebRTC enables streaming video between peers. It can be streaming video rendered by Unity to multiple browsers at the same time.
 
-WebRTC はピア間での映像のストリーミングを可能にします。 Unity でレンダリングされた映像を同時に複数のブラウザに配信することが可能です。
+## Codec
 
-## <a id="codec"/> Codec
+There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding for kind of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
 
-ビデオストリーミングで利用するエンコーダーには、ハードウェアで処理するものと、ソフトウェアで処理するものがあります。ハードウェアエンコーダーとしては `H.264` が利用可能です。ソフトウェアエンコーダーを利用する場合は、`VP8` あるいは `VP9` を利用します。
-
-`WebRTC.Initialize` メソッドの引数に `EncoderType` を指定することで、
-ソフトウェアエンコーダーとハードウェアエンコーダーのいずれかを選択することができます。
+Specifying an `EncoderType` for the `WebRTC.Initialize` method argument, it can be selected using software encoder or hardware one.
 
 ```CSharp
 // ソフトウェアエンコーダーを使用
