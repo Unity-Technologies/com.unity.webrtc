@@ -238,13 +238,13 @@ namespace Unity.WebRTC
                     SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
                     SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
                 {
-                    Debug.LogError($"Not Support OpenGL API on {Application.platform}");
+                    Debug.LogError($"Not Support OpenGL API on {Application.platform}.");
 #if UNITY_EDITOR
                     UnityEditor.EditorApplication.isPlaying = false;
-#else
-                    Application.Quit ();
-#endif
                     return;
+#else
+                    throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
+#endif
                 }
             }
 
