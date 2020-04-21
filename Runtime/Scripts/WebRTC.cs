@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 namespace Unity.WebRTC
 {
@@ -230,6 +231,23 @@ namespace Unity.WebRTC
 
         public static void Initialize(EncoderType type = EncoderType.Hardware)
         {
+            if (Application.platform != RuntimePlatform.LinuxEditor &&
+                Application.platform != RuntimePlatform.LinuxPlayer)
+            {
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
+                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
+                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
+                {
+                    Debug.LogError($"Not Support OpenGL API on {Application.platform}.");
+#if UNITY_EDITOR
+                    UnityEditor.EditorApplication.isPlaying = false;
+                    return;
+#else
+                    throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
+#endif
+                }
+            }
+
             NativeMethods.RegisterDebugLog(DebugLog);
             s_context = Context.Create(encoderType:type);
             NativeMethods.SetCurrentContext(s_context.self);
