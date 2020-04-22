@@ -61,6 +61,21 @@ namespace Unity.WebRTC
         {
             self = ptr;
         }
+        public RTCRtpSendParameters GetParameters()
+        {
+            NativeMethods.SenderGetParameters(self, out var ptr);
+            var parameters = (RTCRtpSendParameters)Marshal.PtrToStructure(ptr, typeof(RTCRtpSendParameters));
+            Marshal.FreeHGlobal(ptr);
+            return parameters;
+        }
+
+        public void SetParameters(RTCRtpSendParameters parameters)
+        {
+            int size = Marshal.SizeOf(parameters);
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(parameters, ptr, false);
+            NativeMethods.SenderSetParameters(self, ref ptr);
+        }
     }
 
     public enum RTCErrorDetailType
@@ -564,6 +579,11 @@ namespace Unity.WebRTC
         public static extern IntPtr TransceiverGetReceiver(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetSender(IntPtr transceiver);
+        [DllImport(WebRTC.Lib)]
+        public static extern void SenderGetParameters(IntPtr sender, out IntPtr parameters);
+        [DllImport(WebRTC.Lib)]
+        public static extern void SenderSetParameters(IntPtr sender, ref IntPtr parameters);
+
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

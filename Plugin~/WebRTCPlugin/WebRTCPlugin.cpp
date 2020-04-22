@@ -449,6 +449,35 @@ extern "C"
         return transceiver->sender().get();
     }
 
+
+    struct RTCRtpSendParameters
+    {
+        int codecsLength;
+        void* codecs;
+        int encodingsLength;
+        void* encodings;
+        char* transactionId;
+    };
+
+    UNITY_INTERFACE_EXPORT void SenderGetParameters(webrtc::RtpSenderInterface* sender, LPVOID* parameters)
+    {
+        const webrtc::RtpParameters src = sender->GetParameters();
+        *parameters = CoTaskMemAlloc(sizeof(RTCRtpSendParameters));
+
+        const auto dst = static_cast<RTCRtpSendParameters*>(*parameters);
+        dst->codecsLength = src.codecs.size();
+        dst->encodingsLength = src.encodings.size();
+        dst->transactionId = ConvertString(src.transaction_id);
+    }
+
+    UNITY_INTERFACE_EXPORT void SenderSetParameters(webrtc::RtpSenderInterface* sender, const LPVOID* parameters)
+    {
+        auto src = sender->GetParameters();
+        src.encodings[0].max_framerate = 30;
+
+        sender->SetParameters(src);
+    }
+
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)
     {
         return dataChannelObj->GetID();
