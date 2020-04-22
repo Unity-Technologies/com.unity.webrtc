@@ -231,7 +231,6 @@ namespace Unity.WebRTC
 
         public RTCConfiguration GetConfiguration()
         {
-            int len = 0;
             var str = NativeMethods.PeerConnectionGetConfiguration(self).AsAnsiStringWithFreeMem();
             return JsonUtility.FromJson<RTCConfiguration>(str);
         }
