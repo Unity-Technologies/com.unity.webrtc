@@ -1,10 +1,10 @@
-# .yamato/upm-ci-webrtc-packages.yml
+{% metadata_file .yamato/meta/environments.yml %}
+
 editors:
   - version: 2019.3  
 
 # Must be the same as the version of the sample project (WebRTC~)
 editor_mac_version: 2019.3
-
 
 platforms:
   - name: win
