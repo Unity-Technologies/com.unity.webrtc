@@ -21,7 +21,7 @@ promotion_test_{{ platform.name }}_{{ editor.version }}:
   variables:
     UPMCI_PROMOTION: 1
   commands:
-    - npm install upm-ci-utils@stable -g --registry {{ upm_registry }}
+    - npm install upm-ci-utils@stable -g --registry {{ upm.registry_url }}
     - upm-ci package test --unity-version {{ editor.version }}
   artifacts:
     {{ yamato_name }}_promotion_test_results:
@@ -43,7 +43,7 @@ promote_dry_run:
   variables:
     UPMCI_PROMOTION: 1
   commands:
-    - npm install upm-ci-utils@stable -g --registry {{ upm_registry }}
+    - npm install upm-ci-utils@stable -g --registry {{ upm.registry_url }}
     - upm-ci package promote --dry-run
   triggers:
     tags:
@@ -72,7 +72,7 @@ promote:
   variables:
     UPMCI_PROMOTION: 1
   commands:
-    - npm install upm-ci-utils@stable -g --registry {{ upm_registry }}
+    - npm install upm-ci-utils@stable -g --registry {{ upm.registry_url }}
     - upm-ci package promote
   triggers:
     tags:
