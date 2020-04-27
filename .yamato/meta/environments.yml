@@ -1,2 +1,3 @@
+upm_registry: https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
 webrtc_version:
   name: M79
