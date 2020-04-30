@@ -4,40 +4,40 @@
 - [Send Message](#send-message)
 - [Receive Message](#recv-message)
 
-データチャネル（`DataChannel`）は、文字列やバイナリをピア間で送受信するための機能です。WebSocket と同等の機能を持ちつつ、プロトコルに UDP を利用しているためハイパフォーマンスであるという特徴があります。
+The `DataChannel` feature passes text strings and binary between peers. It has the same features as WebSocket and uses UDP protocol, giving it several high performance characteristics. 
 
 ## <a id="videotrack"/> Creating Data Channel
 
-データチャネルは、1つのピアに対して複数作成できます。データチャネルの作成には、まず `RTCPeerConnection` の `CreateDataChannel` メソッドを呼び出す方法があります。
+Multiple data channels can be created for a single peer. To create a data channel, first call the `RTCPeerConnection`'s  `CreateDataChannel` method.
 
 ```CSharp
-// データチャネルの作成
+// Create the data channel
 var option = new RTCDataChannelInit(true);
 var channel = peerConnection.CreateDataChannel("test", ref option);
 ```
 
-また、他方のピアがデータチャネルを作成した場合に、コールバックとして `RTCPeerConnection.OnDataChannel` デリゲートが実行されます。
+If another peer creates a data channel, an `RTCPeerConnection.OnDataChannel` delegate will be executed as a call back.
 
 ```CSharp
-// OnDataChannel デリゲートの登録
+// Register the OnDataChannel delegate
 peerConnnection.OnDataChannel = channel => 
 {
     // ...
 }
 ```
 
-データチャネルがピア間で通信可能になったとき、 `RTCDataChannel.OnOpen` デリゲートが実行されます。また、切断したときは `RTCDataChannel.OnClose` が実行されます。
+Once the data channel is able to communicate between peers, the `RTCDataChannel.OnOpen` delegate will be executed. When the connection is closed, `RTCDataChannel.OnClose` will execute. 
 
 ## <a id="send-message"/> Send Message
 
-メッセージの送信には文字列もしくはバイナリを利用できます。 `RTCDataChannel.Send` メソッドを実行してください。
+Text strings or binary can be used for messages.  Execute the `RTCDataChannel.Send` method to do so.
 
 ```CSharp
-// 文字列を送信する
+// Send a text string
 string text = "hello";
 channel.Send(text);
 
-// バイト列を送信する
+// Send binary
 byte[] data = System.Text.Encoding.ASCII.GetBytes(text);
 channel.Send(data);
 
@@ -45,10 +45,10 @@ channel.Send(data);
 
 ## <a id="recv-message"/> Receive Message
 
-メッセージ受信は `RTCDataChannel.OnMessage` デリゲートを利用します。
+The `RTCDataChannel.OnMessage` delegate is used to receive messages.
 
 ```CSharp
-// OnMessage デリゲートの登録
+// Register OnMessage delegate
 channel.OnMessage = bytes => 
 {
     // ...
