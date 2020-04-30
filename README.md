@@ -110,6 +110,7 @@ The package contains the following 3 samples.
 | `1.0`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
 | `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
 | `2.0`   | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
+| `2.1`   | [M83](https://groups.google.com/d/msg/discuss-webrtc/EieMDYtQ9sg/7po9fl8_AgAJ) | - Profiler tool <br>- Bitrate control                      |
 
 ## Licenses
 
