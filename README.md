@@ -6,10 +6,6 @@
 
 If you are interested in the streaming solution with WebRTC, you can check [Unity Render Streaming](https://github.com/Unity-Technologies/UnityRenderStreaming). 
 
-| :warning: | So this version is in development, please do not use it. The latest version is `1.1.2`. <br/> You can check the version you are using on the Package Manager. <br/> The release date of 2.0 is planned at the end of April 2020. |
-|---|---|
-
-
 ## Documentation
 
 - [English](https://docs.unity3d.com/Packages/com.unity.webrtc@1.1/manual/index.html)
@@ -114,6 +110,7 @@ The package contains the following 3 samples.
 | `1.0`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
 | `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
 | `2.0`   | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
+| `2.1`   | [M83](https://groups.google.com/d/msg/discuss-webrtc/EieMDYtQ9sg/7po9fl8_AgAJ) | - Profiler tool <br>- Bitrate control                      |
 
 ## Licenses
 
