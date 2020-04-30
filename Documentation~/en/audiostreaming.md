@@ -6,7 +6,7 @@ In order to stream audio, first you need to get the stream instance. Call `Audio
 audioStream = Audio.CaptureStream();
 ```
 
-Add the audio track to the peer. The `RTCRtpSender` will be used when discarding media. 
+Add the audio track to the peer. `RTCRtpSender` will be used when discarding media. 
 
 ```csharp
     var senders = new List<RTCRtpSender>();
