@@ -1,12 +1,12 @@
 # Video Streaming
 
-WebRTC enables streaming video between peers. It can be streaming video rendered by Unity to multiple browsers at the same time.
+WebRTC enables streaming video between peers. It can stream video rendered by Unity to multiple browsers at the same time.
 
 ## Codec
 
-There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding for kind of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
+There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding different kinds of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
 
-We can select the type of encoder by specifying EncoderType in WebRTC.Initialize's method argument.
+We can select the type of encoder by specifying the EncoderType in WebRTC.Initialize's method argument.
 
 ```CSharp
 // Use a software encoder
@@ -14,7 +14,7 @@ WebRTC.Initialize(EncoderType.Software);
 ```
 
 > [!NOTE]
-> This option selects whether or not to use hardware.
+> This option selects whether or not to use hardware for encoding.
 > Currently, there is no way to explicitly designate a codec. 
 
 
@@ -69,7 +69,7 @@ foreach(var track in listTrack)
 }
 ```
 
-When selecting a hardware encoder, number of tracks that can be used simultaneously may be limited depending on the graphic device's limitations. Generally, up to **two tracks** can be used simultaneously with an NVIDIA Geforce card. For details, see the [NVDIA Codec SDK documentation](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix).
+When using hardware encoding, the number of tracks that can be used simultaneously may be limited depending on the graphic device's limitations. Generally, up to **two tracks** can be used simultaneously on an NVIDIA Geforce card. For details, see the [NVDIA Codec SDK documentation](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix).
 
 See the section on **Streamless tracks** under [`PeerConnection.addTrack`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack) in the MDN documentation for information on simultaneously receiving multiple tracks in the browser. 
 
