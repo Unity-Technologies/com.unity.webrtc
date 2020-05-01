@@ -12,25 +12,15 @@ namespace Unity.WebRTC
         private bool disposed;
         private IntPtr renderFunction;
 
-        public bool IsNull
-        {
-            get { return self == IntPtr.Zero; }
-        }
-
-        public static implicit operator bool(Context v)
-        {
-            return v.self != IntPtr.Zero;
-        }
-
-        public static bool ToBool(Context v)
-        {
-            return v;
-        }
-
         public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware)
         {
             var ptr = NativeMethods.ContextCreate(id, encoderType);
             return new Context(ptr, id);
+        }
+
+        public bool IsNull
+        {
+            get { return self == IntPtr.Zero; }
         }
 
         private Context(IntPtr ptr, int id)
