@@ -1,58 +1,58 @@
 # Video Streaming
 
-WebRTC enables streaming video between peers. It can be streaming video rendered by Unity to multiple browsers at the same time.
+WebRTC enables streaming video between peers. It can stream video rendered by Unity to multiple browsers at the same time.
 
 ## Codec
 
-There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding for kind of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
+There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding different kinds of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
 
-We can select the type of encoder by specifying EncoderType in WebRTC.Initialize's method argument.
+We can select the type of encoder by specifying the EncoderType in WebRTC.Initialize's method argument.
 
 ```CSharp
-// ソフトウェアエンコーダーを使用
+// Use a software encoder
 WebRTC.Initialize(EncoderType.Software);
 ```
 
 > [!NOTE]
-> このオプションはハードウェアを利用する/利用しないを選択するオプションです。
-> コーデックを明示的に指定する方法は、現在提供していません。
+> This option selects whether or not to use hardware for encoding.
+> Currently, there is no way to explicitly designate a codec. 
 
 
 
-WebRTC をサポートしている主要なブラウザでは `H.264` 及び `VP8` が利用できるため、多くのブラウザで Unity から配信されるビデオストリーミングを受信することができます。
+The major browsers that support WebRTC can use `H.264` and `VP8`, which means most browsers can recieve video streaming from Unity.
 
 ## <a id="videotrack"/> Video Track
 
-ビデオストリーミングを実装するには、ビデオトラック
- `VideoStreamTrack` のインスタンスを生成します。
+To implement video streaming, create a
+ `VideoStreamTrack` instance.
 
 ```CSharp
-// Camera からトラックを生成
+// Create a track from the Camera
 var camera = GetComponnent<Camera>();
 var track = camera.CaptureStreamTrack(1280, 720);
 ```
 
-`RenderTexture` を直接指定する方法もあります。
+There is also a way to directly assign a `RenderTexture`. 
 
 ```CSharp
-// 有効な RendertextureFormat を取得
+// Get a valid RendertextureFormat
 var gfxType = SystemInfo.graphicsDeviceType;
 var format = WebRTC.GetSupportedRenderTextureFormat(gfxType);
 
-// RenderTexture からトラックを生成
+// Create a track from the RenderTexture
 var rt = new RenderTexture(width, height, 0, format);
 var track = new VideoStreamTrack("video", renderTexture);
 ```
 
 ### <a id="add-track"/> Add Track
 
-生成したビデオトラックを `PeerConnection` のインスタンスに追加します。`AddTrack` メソッドを呼び出すことでトラックを追加できます。その後 SDP を生成するために `PeerConnection` の `CreateOffer` もしくは `CreateAnswer` を呼び出します。
+Add the created video track to the `PeerConnection` instance. The track can be added by calling the `AddTrack` method. Next, call the `PeerConnection`'s `CreateOffer` or `CreateAnswer` to create an SDP.
 
 ```CSharp
-// トラックを追加
+// Add the track
 peerConnection.AddTrack(track);
 
-// SDP を生成
+// Create the SDP
 RTCAnswerOptions options = default;
 var op = pc.CreateAnswer(ref options);
 yield return op;
@@ -60,7 +60,7 @@ yield return op;
 
 ### <a id="multi-track"/> Multi track
 
-ビデオトラックは複数同時に利用することが可能です。 `PeerConnection` の `AddTrack` メソッドを複数回呼び出してトラックを追加します。
+It's possible to use multiple video tracks simultaneously. Simply call the `PeerConnection`'s `AddTrack` method multiple times and add the tracks. 
 
 ```CSharp
 foreach(var track in listTrack)
@@ -69,7 +69,7 @@ foreach(var track in listTrack)
 }
 ```
 
-ハードウェアエンコーダーを選択している場合、グラフィックデバイスの制約によって、同時に利用可能なトラック数が制限される場合があります。一般的に NVIDIA Geforce で同時に利用可能なビデオトラック数は **2本** までです。詳しくは [NVDIA Codec SDK のドキュメント](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix) を参照してください。
+When using hardware encoding, the number of tracks that can be used simultaneously may be limited depending on the graphic device's limitations. Generally, on desktop GPUs, up to **two tracks** can be used simultaneously on an NVIDIA Geforce card (On server-grade GPUs this is typically 4). For details, see the [NVDIA Codec SDK documentation](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix).
 
-ブラウザ側でトラックを同時に受信する方法については、MDN ドキュメント [`PeerConnection.addTrack`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack) の **Streamless tracks** の項目を参照してください。
 
+See the section on **Streamless tracks** under [`PeerConnection.addTrack`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack) in the MDN documentation for information on simultaneously receiving multiple tracks in the browser. 

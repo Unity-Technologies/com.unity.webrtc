@@ -1,12 +1,12 @@
 # Audio Streaming
 
-オーディオをストリーミングするためには、はじめにストリームのインスタンスを取得します。`Audio.CaptureStream()` を呼び出してください。
+In order to stream audio, first you need to get the stream instance. Call `Audio.CaptureStream()`.
 
 ```csharp
 audioStream = Audio.CaptureStream();
 ```
 
-ピアにオーディオトラックを追加します。`RTCRtpSender` のインスタンスは、メディアを破棄する際に利用します。
+Add the audio track to the peer. `RTCRtpSender` will be used when discarding media. 
 
 ```csharp
     var senders = new List<RTCRtpSender>();
@@ -17,7 +17,7 @@ audioStream = Audio.CaptureStream();
     }
 ```
 
-メディアの破棄は、 `RemoveTrack` メソッドを使用します。
+Use the `RemoveTrack` method to discard the media.
 
 ```csharp
     foreach(var sender in senders)
@@ -26,7 +26,7 @@ audioStream = Audio.CaptureStream();
     }
 ```
 
-`MonoBehaviour` の `OnAudioFilterRead` メソッド内で、`Audio` の `Update` メソッドを呼び出してください。
+Call the `Audio`'s `Update` method inside the `MonoBehaviour`'s `OnAudioFilterRead` method.
 
 ```csharp
     private void OnAudioFilterRead(float[] data, int channels)
@@ -36,9 +36,9 @@ audioStream = Audio.CaptureStream();
 ```
 
 > [!NOTE]
-> `OnAudioFilterRead` メソッドを利用する場合は、 `AudioListener` コンポーネントと同じ GameObject に関連付ける必要があります。
+> As with the `AudioListener` component, when using the `OnAudioFilterRead` method, it must be associated with a GameObject.
 
-あるいは、`AudioRenderer` を利用する方法もあります。
+Alternatively, `AudioRenderer` can also be used.
 
 ```csharp
 
