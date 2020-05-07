@@ -34,12 +34,12 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(ProjectDir)..\webrtc\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64;C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\webrtc\lib;$(CUDA_PATH)\lib\$(Platform);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\webrtc\lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\lib\x64;C:\VulkanSDK\1.1.121.2\Lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\webrtc\lib;$(CUDA_PATH)\lib\$(Platform);$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(CUDA_PATH)\Include;$(VULKAN_SDK)\Include;$(SolutionDir);$(IncludePath)</IncludePath>
