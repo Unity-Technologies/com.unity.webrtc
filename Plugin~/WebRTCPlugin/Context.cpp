@@ -191,6 +191,11 @@ namespace webrtc
 
     bool Context::InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track)
     {
+        if (encoder->GetCodecInitializationResult() != CodecInitializationResult::Success)
+        {
+            return false;
+        }
+
         m_mapVideoCapturer[track]->SetEncoder(encoder);
         m_mapVideoCapturer[track]->StartEncoder();
 

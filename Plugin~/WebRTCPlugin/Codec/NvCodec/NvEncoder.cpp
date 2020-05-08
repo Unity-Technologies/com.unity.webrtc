@@ -50,6 +50,13 @@ namespace webrtc
         openEncodeSessionExParams.deviceType = m_deviceType;
         openEncodeSessionExParams.apiVersion = NVENCAPI_VERSION;
         errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &pEncoderInterface);
+
+        if(!NV_RESULT(errorCode))
+        {
+            m_initializationResult = CodecInitializationResult::EncoderInitializationFailed;
+            return;
+        }
+
         checkf(NV_RESULT(errorCode), StringFormat("Unable to open NvEnc encode session %d", errorCode).c_str());
 #pragma endregion
 #pragma region set initialization parameters

@@ -78,19 +78,30 @@ namespace Unity.WebRTC.RuntimeTest
             rt.Create();
             var track = new VideoStreamTrack("video", rt);
             yield return new WaitForSeconds(0.1f);
+            Debug.Log("track 1 created");
 
             var track2 = new VideoStreamTrack("video2", rt);
             yield return new WaitForSeconds(0.1f);
+            Debug.Log("track 2 created");
+
             var track3 = new VideoStreamTrack("video3", rt);
             yield return new WaitForSeconds(0.1f);
-            var track4 = new VideoStreamTrack("video4", rt);
-            yield return new WaitForSeconds(0.1f);
+            Debug.Log("track 3 created");
 
+            try
+            {
+                var track4 = new VideoStreamTrack("video4", rt);
+            }
+            catch(System.Exception e)
+            {
+
+            }
+            yield return new WaitForSeconds(0.1f);
+            Debug.Log("track 4 created");
 
             track.Dispose();
             track2.Dispose();
             track3.Dispose();
-            track4.Dispose();
             yield return new WaitForSeconds(0.1f);
 
             Object.DestroyImmediate(rt);
