@@ -161,12 +161,6 @@ namespace Unity.WebRTC
         {
             WebRTC.Context.SetVideoEncoderParameter(self, width, height);
             WebRTC.Context.InitializeEncoder(self);
-
-            // if (WebRTC.Context.GetInitializationResult(self) != CodecInitializationResult.Success)
-            // {
-            //     throw new Exception("encoder initialization faild.");
-            // }
-
             tracks.Add(this);
         }
 
@@ -178,9 +172,13 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+                Debug.Log("start dispose");
                 WebRTC.Context.FinalizeEncoder(self);
+                Debug.Log("finalize encoder");
                 tracks.Remove(this);
+                Debug.Log("remove track map");
                 WebRTC.Context.DeleteMediaStreamTrack(self);
+                Debug.Log("delete media stream track");
                 UnityEngine.Object.DestroyImmediate(m_destTexture);
                 self = IntPtr.Zero;
             }

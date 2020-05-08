@@ -395,9 +395,12 @@ namespace webrtc
         for (Frame& frame : bufferedFrames)
         {
             ReleaseFrameInputBuffer(frame);
-            errorCode = pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame);
-            checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy output buffer bit stream %d", errorCode).c_str());
-            frame.outputFrame = nullptr;
+            if(frame.outputFrame != nullptr)
+            {
+                errorCode = pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame);
+                checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy output buffer bit stream %d", errorCode).c_str());
+                frame.outputFrame = nullptr;
+            }
         }
     }
     uint32_t NvEncoder::GetNumChromaPlanes(const NV_ENC_BUFFER_FORMAT bufferFormat)
