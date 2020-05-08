@@ -90,13 +90,12 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             try
             {
                 s_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
+                s_context->InitializeEncoder(s_mapEncoder[track].get(), track);
             }
             catch (const std::exception& ex)
             {
                 LogPrint("Encoder initialization faild.");
-                return;
             }
-            s_context->InitializeEncoder(s_mapEncoder[track].get(), track);
             return;
         }
         case VideoStreamRenderEventID::Encode:
