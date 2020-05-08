@@ -229,8 +229,21 @@ namespace Unity.WebRTC
         private static SynchronizationContext s_syncContext;
         internal static Material flipMat;
 
+
+#if UNITY_EDITOR
+        static public void OnBeforeAssemblyReload()
+        {
+            Dispose();
+        }
+#endif
+
         public static void Initialize(EncoderType type = EncoderType.Hardware)
         {
+            // todo(kazuki): Add this event to avoid crash caused by hot-reload.
+            // Dispose of all before reloading assembly.
+#if UNITY_EDITOR
+            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+#endif
             if (Application.platform != RuntimePlatform.LinuxEditor &&
                 Application.platform != RuntimePlatform.LinuxPlayer)
             {
@@ -275,10 +288,17 @@ namespace Unity.WebRTC
 
         public static void Dispose()
         {
-            s_context.Dispose();
-            s_context = null;
+            if (s_context != null)
+            {
+                s_context.Dispose();
+                s_context = null;
+            }
             s_syncContext = null;
             NativeMethods.RegisterDebugLog(null);
+
+#if UNITY_EDITOR
+            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+#endif
         }
 
         class CallbackObject
