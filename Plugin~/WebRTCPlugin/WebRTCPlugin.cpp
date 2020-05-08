@@ -76,11 +76,6 @@ extern "C"
         context->SetEncoderParameter(track, width, height);
     }
 
-    UNITY_INTERFACE_EXPORT CodecInitializationResult GetInitializationResult(Context* context, MediaStreamTrackInterface* track)
-    {
-        return context->GetInitializationResult(track);
-    }
-
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
     {
         return context->CreateMediaStream(streamId);

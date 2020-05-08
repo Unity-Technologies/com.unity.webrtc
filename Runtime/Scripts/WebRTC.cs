@@ -619,6 +619,9 @@ namespace Unity.WebRTC
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
+        [DllImport(WebRTC.Lib)]
+        public static extern CodecInitializationResult GetInitializationResult(IntPtr context, IntPtr track);
+
     }
 
     internal static class VideoEncoderMethods

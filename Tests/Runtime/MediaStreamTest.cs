@@ -66,6 +66,36 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
+        [UnityTest]
+        [Timeout(5000)]
+        [Category("MediaStreamTrack")]
+        public IEnumerator MediaStreamTrackInitTest()
+        {
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack("video", rt);
+            yield return new WaitForSeconds(0.1f);
+
+            var track2 = new VideoStreamTrack("video2", rt);
+            yield return new WaitForSeconds(0.1f);
+            var track3 = new VideoStreamTrack("video3", rt);
+            yield return new WaitForSeconds(0.1f);
+            var track4 = new VideoStreamTrack("video4", rt);
+            yield return new WaitForSeconds(0.1f);
+
+
+            track.Dispose();
+            track2.Dispose();
+            track3.Dispose();
+            track4.Dispose();
+            yield return new WaitForSeconds(0.1f);
+
+            Object.DestroyImmediate(rt);
+        }
+
 
         [UnityTest]
         [Timeout(5000)]

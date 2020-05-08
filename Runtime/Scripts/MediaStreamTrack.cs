@@ -14,7 +14,7 @@ namespace Unity.WebRTC
         internal Action<MediaStreamTrack> stopTrack;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool Enabled
         {
@@ -29,7 +29,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public TrackState ReadyState
         {
@@ -40,12 +40,12 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public TrackKind Kind { get; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string Id { get; }
 
@@ -143,13 +143,13 @@ namespace Unity.WebRTC
                 source.height)
         {
         }
-        
+
 
         /// <summary>
         /// Creates a new VideoStream object.
         /// The track is created with a source texture `ptr`.
         /// It is noted that streamed video might be flipped when not action was taken. Almost case it has no problem to use other constructor instead.
-        /// 
+        ///
         /// See Also: Texture.GetNativeTexturePtr
         /// </summary>
         /// <param name="label"></param>
@@ -161,6 +161,12 @@ namespace Unity.WebRTC
         {
             WebRTC.Context.SetVideoEncoderParameter(self, width, height);
             WebRTC.Context.InitializeEncoder(self);
+
+            // if (WebRTC.Context.GetInitializationResult(self) != CodecInitializationResult.Success)
+            // {
+            //     throw new Exception("encoder initialization faild.");
+            // }
+
             tracks.Add(this);
         }
 
