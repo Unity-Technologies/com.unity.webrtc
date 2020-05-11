@@ -108,6 +108,19 @@ namespace Unity.WebRTC
             m_destTexture = dest;
         }
 
+        /// <summary>
+        /// note:
+        /// The videotrack cannot be used if the encoder has not been initialized.
+        /// Do not use it until the initialization is complete.
+        /// </summary>
+        public bool IsInitialized
+        {
+            get
+            {
+                return WebRTC.Context.GetInitializationResult(self) == CodecInitializationResult.Success;
+            }
+        }
+
         internal void Update()
         {
             // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
@@ -172,13 +185,9 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                Debug.Log("start dispose");
                 WebRTC.Context.FinalizeEncoder(self);
-                Debug.Log("finalize encoder");
                 tracks.Remove(this);
-                Debug.Log("remove track map");
                 WebRTC.Context.DeleteMediaStreamTrack(self);
-                Debug.Log("delete media stream track");
                 UnityEngine.Object.DestroyImmediate(m_destTexture);
                 self = IntPtr.Zero;
             }
