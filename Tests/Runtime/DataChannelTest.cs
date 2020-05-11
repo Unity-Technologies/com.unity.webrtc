@@ -21,7 +21,7 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
-        public void DataChannel_CreateDataChannel()
+        public void CreateDataChannel()
         {
             RTCConfiguration config = default;
             config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
@@ -37,9 +37,21 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Close();
         }
 
+        [Test]
+        public void CreateDataChannelFailed()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+            var peer = new RTCPeerConnection(ref config);
+
+            RTCDataChannelInit option1 = default;
+            Assert.Throws<System.ArgumentException>(() => peer.CreateDataChannel("test1", ref option1));
+            peer.Close();
+        }
+
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator DataChannel_EventsAreSentToOther()
+        public IEnumerator EventsAreSentToOther()
         {
             RTCConfiguration config = default;
             config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};

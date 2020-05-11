@@ -312,12 +312,14 @@ namespace webrtc
         config.ordered = options.ordered;
         config.maxRetransmitTime = options.maxRetransmitTime;
         config.maxRetransmits = options.maxRetransmits;
-        config.protocol = options.protocol;
+        config.protocol = options.protocol == nullptr ? "" : options.protocol;
         config.negotiated = options.negotiated;
 
         auto channel = obj->connection->CreateDataChannel(label, &config);
+        if (channel == nullptr)
+            return nullptr;
         auto dataChannelObj = std::make_unique<DataChannelObject>(channel, *obj);
-        auto ptr = dataChannelObj.get();
+        DataChannelObject* ptr = dataChannelObj.get();
         m_mapDataChannels[ptr] = std::move(dataChannelObj);
         return ptr;
     }
