@@ -52,6 +52,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new VideoStreamTrack("video", rt);
             Assert.NotNull(track);
             yield return new WaitForSeconds(0.1f);
+            Assert.True(track.IsInitialized);
 
             // Enabled property
             Assert.True(track.Enabled);
@@ -65,50 +66,6 @@ namespace Unity.WebRTC.RuntimeTest
 
             Object.DestroyImmediate(rt);
         }
-
-        [UnityTest]
-        [Timeout(5000)]
-        [Category("MediaStreamTrack")]
-        public IEnumerator MediaStreamTrackInitTest()
-        {
-            var width = 256;
-            var height = 256;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var rt = new RenderTexture(width, height, 0, format);
-            rt.Create();
-            var track = new VideoStreamTrack("video", rt);
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 1 created");
-
-            var track2 = new VideoStreamTrack("video2", rt);
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 2 created");
-
-            var track3 = new VideoStreamTrack("video3", rt);
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 3 created");
-
-            var track4 = new VideoStreamTrack("video4", rt);
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 4 created");
-
-            Debug.Log("track 1 dispose");
-            track.Dispose();
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 2 dispose");
-            track2.Dispose();
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 3 dispose");
-            track3.Dispose();
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("track 4 dispose");
-            track4.Dispose();
-            yield return new WaitForSeconds(0.1f);
-            Debug.Log("all track disposed");
-
-            Object.DestroyImmediate(rt);
-        }
-
 
         [UnityTest]
         [Timeout(5000)]
