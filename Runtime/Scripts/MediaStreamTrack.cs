@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Unity.WebRTC
@@ -11,7 +10,6 @@ namespace Unity.WebRTC
         protected bool disposed;
         private bool enabled;
         private TrackState readyState;
-        internal Action<MediaStreamTrack> stopTrack;
 
         /// <summary>
         /// 
@@ -76,12 +74,6 @@ namespace Unity.WebRTC
             }
             this.disposed = true;
             GC.SuppressFinalize(this);
-        }
-
-        //Disassociate track from its source(video or audio), not for destroying the track
-        public void Stop()
-        {
-            stopTrack(this);
         }
     }
 
