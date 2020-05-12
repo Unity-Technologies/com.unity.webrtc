@@ -324,7 +324,10 @@ namespace Unity.WebRTC
 
         public RTCDataChannel CreateDataChannel(string label, ref RTCDataChannelInit options)
         {
-            return new RTCDataChannel(WebRTC.Context.CreateDataChannel(self, label, ref options), this);
+            IntPtr ptr = WebRTC.Context.CreateDataChannel(self, label, ref options);
+            if (ptr == IntPtr.Zero)
+                throw new ArgumentException("RTCDataChannelInit object is incorrect.");
+            return new RTCDataChannel(ptr, this);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDSuccess))]
