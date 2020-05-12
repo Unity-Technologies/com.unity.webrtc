@@ -99,11 +99,13 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
             RTCRtpSender sender = transceiver.Sender;
             Assert.NotNull(sender);
-            RTCRtpSendParameters parameters = sender.GetParameters();
-            Assert.NotNull(parameters);
-            Assert.IsNotEmpty(parameters.TransactionId);
-            Assert.IsNotEmpty(parameters.Codecs);
-            Assert.IsNotEmpty(parameters.Encodings);
+            Assert.AreEqual(track, sender.Track);
+
+//            RTCRtpSendParameters parameters = sender.GetParameters();
+//            Assert.NotNull(parameters);
+//            Assert.IsNotEmpty(parameters.TransactionId);
+//            Assert.IsNotEmpty(parameters.Codecs);
+//            Assert.IsNotEmpty(parameters.Encodings);
             Assert.AreEqual(1, peer.GetTransceivers().Count());
             Assert.NotNull(peer.GetTransceivers().First());
         }

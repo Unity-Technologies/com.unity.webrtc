@@ -78,7 +78,7 @@ bool* ConvertArray(std::vector<bool> vec, size_t* length)
 
 char* ConvertString(const std::string str)
 {
-    size_t size = str.size();
+    const size_t size = str.size();
     char* ret = static_cast<char*>(CoTaskMemAlloc(size + sizeof(char)));
     str.copy(ret, size);
     ret[size] = '\0';
@@ -657,9 +657,9 @@ extern "C"
         char* transactionId;
     };
 
-    UNITY_INTERFACE_EXPORT void SenderGetParameters(webrtc::RtpSenderInterface* sender, LPVOID* parameters)
+    UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, LPVOID* parameters)
     {
-        const webrtc::RtpParameters src = sender->GetParameters();
+        const RtpParameters src = sender->GetParameters();
         *parameters = CoTaskMemAlloc(sizeof(RTCRtpSendParameters));
 
         const auto dst = static_cast<RTCRtpSendParameters*>(*parameters);
@@ -668,12 +668,26 @@ extern "C"
         dst->transactionId = ConvertString(src.transaction_id);
     }
 
-    UNITY_INTERFACE_EXPORT void SenderSetParameters(webrtc::RtpSenderInterface* sender, const LPVOID* parameters)
+    UNITY_INTERFACE_EXPORT void SenderSetParameters(RtpSenderInterface* sender, const LPVOID* parameters)
     {
-        auto src = sender->GetParameters();
-        src.encodings[0].max_framerate = 30;
+        // not implemented yet
+        throw;
+    }
 
+    UNITY_INTERFACE_EXPORT void SenderSetParameters2(RtpSenderInterface* sender, int framerate, int bitrate_bps)
+    {
+        RtpParameters src = sender->GetParameters();
+        for (int i = 0; i < src.encodings.size(); i++)
+        {
+            src.encodings[i].max_framerate = framerate;
+            src.encodings[i].max_bitrate_bps = bitrate_bps;
+        }
         sender->SetParameters(src);
+    }
+
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
+    {
+        return sender->track();
     }
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)

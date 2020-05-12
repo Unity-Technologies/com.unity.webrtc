@@ -153,12 +153,37 @@ namespace Unity.WebRTC.RuntimeTest
             var renderTexture = CreateRenderTexture(width, height);
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            var track2 = NativeMethods.SenderGetTrack(sender);
+            Assert.AreEqual(track, track2);
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
+        }
+
+        [Test]
+        public void SenderSetParameter()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var peer = NativeMethods.ContextCreatePeerConnection(context);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
+            Assert.IsNotEmpty(streamId);
+            const int width = 1280;
+            const int height = 720;
+            var renderTexture = CreateRenderTexture(width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
+            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+
+            NativeMethods.SenderSetParameters2(sender, 30, 100);
+
+            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeletePeerConnection(context, peer);
+            NativeMethods.ContextDestroy(0);
         }
 
         [Test]

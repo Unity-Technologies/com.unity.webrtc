@@ -77,6 +77,16 @@ namespace Unity.WebRTC
         {
             return peer.GetStats(this);
         }
+
+        public MediaStreamTrack Track
+        {
+            get
+            {
+                IntPtr ptr = NativeMethods.SenderGetTrack(self);
+                return WebRTC.FindOrCreate<MediaStreamTrack>(ptr, _ptr => new MediaStreamTrack(_ptr));
+            }
+        }
+
         public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(self, out var ptr);
@@ -85,12 +95,17 @@ namespace Unity.WebRTC
             return parameters;
         }
 
-        public void SetParameters(RTCRtpSendParameters parameters)
+        //public void SetParameters(RTCRtpSendParameters parameters)
+        //{
+        //    int size = Marshal.SizeOf(parameters);
+        //    IntPtr ptr = Marshal.AllocHGlobal(size);
+        //    Marshal.StructureToPtr(parameters, ptr, false);
+        //    NativeMethods.SenderSetParameters(self, ref ptr);
+        //}
+
+        public void SetParameters(int framerate, int bitrateBPS)
         {
-            int size = Marshal.SizeOf(parameters);
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(parameters, ptr, false);
-            NativeMethods.SenderSetParameters(self, ref ptr);
+            NativeMethods.SenderSetParameters2(self, framerate, bitrateBPS);
         }
     }
 
@@ -600,10 +615,14 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetSender(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr SenderGetTrack(IntPtr sender);
+        [DllImport(WebRTC.Lib)]
         public static extern void SenderGetParameters(IntPtr sender, out IntPtr parameters);
         [DllImport(WebRTC.Lib)]
         public static extern void SenderSetParameters(IntPtr sender, ref IntPtr parameters);
-
+        /// todo(kazuki): this is a temporary implementation.
+        [DllImport(WebRTC.Lib)]
+        public static extern void SenderSetParameters2(IntPtr sender, int framerate, int bitrateBPS);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
