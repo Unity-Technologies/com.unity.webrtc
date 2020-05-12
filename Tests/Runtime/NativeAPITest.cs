@@ -253,16 +253,14 @@ namespace Unity.WebRTC.RuntimeTest
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             var callback = NativeMethods.GetRenderEventFunc(context);
-            var initializeResult = NativeMethods.GetInitializationResult(context, track);
-            Assert.IsTrue(initializeResult == CodecInitializationResult.NotInitialized);
+            Assert.AreEqual(CodecInitializationResult.NotInitialized, NativeMethods.GetInitializationResult(context, track));
 
             // TODO::
             // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
             NativeMethods.ContextSetVideoEncoderParameter(context, track, width, height);
             VideoEncoderMethods.InitializeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
-            initializeResult = NativeMethods.GetInitializationResult(context, track);
-            Assert.IsTrue(initializeResult == CodecInitializationResult.Success);
+            Assert.AreEqual(CodecInitializationResult.Success, NativeMethods.GetInitializationResult(context, track));
 
             VideoEncoderMethods.Encode(callback, track);
             yield return new WaitForSeconds(1.0f);
