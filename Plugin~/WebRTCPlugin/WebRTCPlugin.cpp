@@ -449,13 +449,18 @@ extern "C"
         return transceiver->sender().get();
     }
 
+    struct RTCRtpEncodingParameters
+    {
+        bool active;
+        uint64_t maxBitrate;
+        uint32_t maxFramerate;
+        char* rid;
+    };
 
     struct RTCRtpSendParameters
     {
-        int codecsLength;
-        void* codecs;
-        int encodingsLength;
-        void* encodings;
+        uint32_t encodingsLength;
+        RTCRtpEncodingParameters* encodings;
         char* transactionId;
     };
 
@@ -465,8 +470,16 @@ extern "C"
         *parameters = CoTaskMemAlloc(sizeof(RTCRtpSendParameters));
 
         const auto dst = static_cast<RTCRtpSendParameters*>(*parameters);
-        dst->codecsLength = src.codecs.size();
-        dst->encodingsLength = src.encodings.size();
+        dst->encodingsLength = static_cast<uint32_t>(src.encodings.size());
+        dst->encodings = static_cast<RTCRtpEncodingParameters*>(CoTaskMemAlloc(sizeof(RTCRtpEncodingParameters) * src.encodings.size()));
+
+        for(int i = 0; i < src.encodings.size(); i++)
+        {
+            dst->encodings[i].active = src.encodings[i].active;
+            dst->encodings[i].maxBitrate = src.encodings[i].max_bitrate_bps.value();
+            dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value();
+            dst->encodings[i].rid = ConvertString(src.encodings[i].rid);
+        }
         dst->transactionId = ConvertString(src.transaction_id);
     }
 
