@@ -151,5 +151,30 @@ namespace Unity.WebRTC
             IntPtr[] array = ptr.AsIntPtrArray(length);
             return Array.ConvertAll(array, AsAnsiStringWithFreeMem);
         }
+
+        public static void ToArray<T>(this IntPtr ptr, T[] array)
+        {
+            IntPtr iter = ptr;
+            int size = Marshal.SizeOf(typeof(T));
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = (T)Marshal.PtrToStructure(iter, typeof(T));
+                iter = IntPtr.Add(iter, size);
+            }
+        }
+
+        public static IntPtr ToPtr<T>(T[] array)
+        {
+            int size = Marshal.SizeOf(typeof(T));
+            int length = size * array.Length;
+            IntPtr ptr = Marshal.AllocCoTaskMem(length);
+            IntPtr iterator = ptr;
+            for (var i = 0; i < array.Length; i++)
+            {
+                Marshal.StructureToPtr(i, iterator, false);
+                iterator = IntPtr.Add(iterator, size);
+            }
+            return ptr;
+        }
     }
 }
