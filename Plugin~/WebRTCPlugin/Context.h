@@ -46,7 +46,7 @@ namespace webrtc
 
         // Utility
         UnityEncoderType GetEncoderType() const;
-
+        CodecInitializationResult GetInitializationResult(webrtc::MediaStreamTrackInterface* track);
 
         // MediaStream
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& streamId);

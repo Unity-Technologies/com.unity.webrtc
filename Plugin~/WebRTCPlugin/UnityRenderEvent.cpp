@@ -88,7 +88,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
             s_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
-            s_context->InitializeEncoder(s_mapEncoder[track].get(), track);
+            if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
+            {
+                LogPrint("Encoder initialization faild.");
+            }
             return;
         }
         case VideoStreamRenderEventID::Encode:

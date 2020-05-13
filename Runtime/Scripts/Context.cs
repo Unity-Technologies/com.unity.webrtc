@@ -61,7 +61,7 @@ namespace Unity.WebRTC
         {
             return NativeMethods.ContextGetCodecInitializationResult(self);
         }
-        
+
         public EncoderType GetEncoderType()
         {
             return NativeMethods.ContextGetEncoderType(self);
@@ -159,6 +159,11 @@ namespace Unity.WebRTC
         public void SetVideoEncoderParameter(IntPtr track, int width, int height)
         {
             NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height);
+        }
+
+        public CodecInitializationResult GetInitializationResult(IntPtr track)
+        {
+            return NativeMethods.GetInitializationResult(self, track);
         }
 
         internal void InitializeEncoder(IntPtr track)

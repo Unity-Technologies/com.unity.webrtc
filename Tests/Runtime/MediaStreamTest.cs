@@ -52,6 +52,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new VideoStreamTrack("video", rt);
             Assert.NotNull(track);
             yield return new WaitForSeconds(0.1f);
+            Assert.True(track.IsInitialized);
 
             // Enabled property
             Assert.True(track.Enabled);
@@ -65,7 +66,6 @@ namespace Unity.WebRTC.RuntimeTest
 
             Object.DestroyImmediate(rt);
         }
-
 
         [UnityTest]
         [Timeout(5000)]

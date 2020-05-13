@@ -191,6 +191,11 @@ namespace webrtc
 
     bool Context::InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track)
     {
+        if (encoder->GetCodecInitializationResult() != CodecInitializationResult::Success)
+        {
+            return false;
+        }
+
         m_mapVideoCapturer[track]->SetEncoder(encoder);
         m_mapVideoCapturer[track]->StartEncoder();
 
@@ -240,6 +245,11 @@ namespace webrtc
     UnityEncoderType Context::GetEncoderType() const
     {
         return m_encoderType;
+    }
+
+    CodecInitializationResult Context::GetInitializationResult(webrtc::MediaStreamTrackInterface* track)
+    {
+        return m_mapVideoCapturer[track]->GetCodecInitializationResult();
     }
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)

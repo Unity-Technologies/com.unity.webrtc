@@ -486,6 +486,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height);
         [DllImport(WebRTC.Lib)]
+        public static extern CodecInitializationResult GetInitializationResult(IntPtr context, IntPtr track);
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferOptions options);
@@ -619,6 +621,7 @@ namespace Unity.WebRTC
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
+
     }
 
     internal static class VideoEncoderMethods
