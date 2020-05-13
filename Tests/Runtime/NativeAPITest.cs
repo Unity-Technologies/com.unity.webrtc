@@ -164,7 +164,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void SenderSetParameter()
+        public void SenderGetParameter()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
@@ -178,14 +178,11 @@ namespace Unity.WebRTC.RuntimeTest
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             NativeMethods.SenderGetParameters(sender, out var ptr);
-            var parameters = Marshal.PtrToStructure<RTCRtpSendParameters>(ptr);
+            var parameters = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
             Marshal.FreeHGlobal(ptr);
 
-            var encoders = parameters.Encodings;
-            Debug.Log(encoders.Length);
-            Assert.NotNull(parameters.TransactionId);
-
-            NativeMethods.SenderSetParameters2(sender, 30, 100);
+            Assert.AreNotEqual(IntPtr.Zero, parameters.encodings);
+            Assert.AreNotEqual(IntPtr.Zero, parameters.transactionId);
 
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);

@@ -452,7 +452,9 @@ extern "C"
     struct RTCRtpEncodingParameters
     {
         bool active;
+        bool hasValueMaxBitrate;
         uint64_t maxBitrate;
+        bool hasValueMaxFramerate;
         uint32_t maxFramerate;
         char* rid;
     };
@@ -476,28 +478,28 @@ extern "C"
         for(int i = 0; i < src.encodings.size(); i++)
         {
             dst->encodings[i].active = src.encodings[i].active;
-            dst->encodings[i].maxBitrate = src.encodings[i].max_bitrate_bps.value();
-            dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value();
+            dst->encodings[i].hasValueMaxBitrate = src.encodings[i].max_bitrate_bps.has_value();
+            dst->encodings[i].maxBitrate = src.encodings[i].max_bitrate_bps.value_or(0);
+            dst->encodings[i].hasValueMaxFramerate = src.encodings[i].max_framerate.has_value();
+            dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value_or(0);
             dst->encodings[i].rid = ConvertString(src.encodings[i].rid);
         }
         dst->transactionId = ConvertString(src.transaction_id);
     }
 
-    UNITY_INTERFACE_EXPORT void SenderSetParameters(RtpSenderInterface* sender, const LPVOID* parameters)
+    UNITY_INTERFACE_EXPORT void SenderSetParameters(RtpSenderInterface* sender, const RTCRtpSendParameters* src)
     {
-        // not implemented yet
-        throw;
-    }
+        RtpParameters dst = sender->GetParameters();
 
-    UNITY_INTERFACE_EXPORT void SenderSetParameters2(RtpSenderInterface* sender, int framerate, int bitrate_bps)
-    {
-        RtpParameters src = sender->GetParameters();
-        for (int i = 0; i < src.encodings.size(); i++)
+        for (int i = 0; i < dst.encodings.size(); i++)
         {
-            src.encodings[i].max_framerate = framerate;
-            src.encodings[i].max_bitrate_bps = bitrate_bps;
+            dst.encodings[i].active = src->encodings[i].active;
+			if(src->encodings[i].hasValueMaxBitrate)
+                dst.encodings[i].max_bitrate_bps = static_cast<int>(src->encodings[i].maxBitrate);
+            if (src->encodings[i].hasValueMaxFramerate)
+                dst.encodings[i].max_framerate = static_cast<int>(src->encodings[i].maxFramerate);
+            dst.encodings[i].rid = std::string(src->encodings[i].rid);
         }
-        sender->SetParameters(src);
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
