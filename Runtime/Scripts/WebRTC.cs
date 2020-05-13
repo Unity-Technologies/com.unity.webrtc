@@ -90,7 +90,7 @@ namespace Unity.WebRTC
         public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(self, out var ptr);
-            var parameters = (RTCRtpSendParameters)Marshal.PtrToStructure(ptr, typeof(RTCRtpSendParameters));
+            var parameters = (RTCRtpSendParameters)Marshal.PtrToStructure<RTCRtpSendParameters>(ptr);
             Marshal.FreeHGlobal(ptr);
             return parameters;
         }
@@ -618,8 +618,6 @@ namespace Unity.WebRTC
         public static extern IntPtr SenderGetTrack(IntPtr sender);
         [DllImport(WebRTC.Lib)]
         public static extern void SenderGetParameters(IntPtr sender, out IntPtr parameters);
-        [DllImport(WebRTC.Lib)]
-        public static extern void SenderSetParameters(IntPtr sender, ref IntPtr parameters);
         /// todo(kazuki): this is a temporary implementation.
         [DllImport(WebRTC.Lib)]
         public static extern void SenderSetParameters2(IntPtr sender, int framerate, int bitrateBPS);

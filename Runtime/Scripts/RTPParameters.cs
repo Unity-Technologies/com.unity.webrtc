@@ -7,25 +7,22 @@ namespace Unity.WebRTC
     [StructLayout(LayoutKind.Sequential)]
     public struct RTCRtpSendParameters
     {
-        internal int codecsLength;
-        internal IntPtr codecs;
         internal int encodingsLength;
         internal IntPtr encodings;
         internal IntPtr transactionId;
 
-        public RTCRtpEncodingParameters[] Codecs
-        {
-            get
-            {
-                return null;
-            }
-        }
+        RTCRtpEncodingParameters[] _encodings;
 
-        public RTCRtpCodecParameters[] Encodings
+        public RTCRtpEncodingParameters[] Encodings
         {
             get
             {
-                return null;
+                if (_encodings == null)
+                {
+                    Debug.Log(encodingsLength);
+                    //_encodings = Marshal.PtrToStructure<RTCRtpEncodingParameters[]>(encodings);
+                }
+                return _encodings;
             }
             set
             {
@@ -37,21 +34,17 @@ namespace Unity.WebRTC
         {
             get
             {
-                //Debug.Log(transactionId == IntPtr.Zero);
-                //return string.Empty;
-                return Marshal.PtrToStringAnsi(transactionId);
+                return transactionId.AsAnsiStringWithFreeMem();
             }
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct RTCRtpEncodingParameters
     {
-        public bool active;
-        public ulong maxBitrate;
-        public IntPtr rid;
-    }
-
-    public struct RTCRtpCodecParameters
-    {
+        internal bool active;
+        internal ulong maxBitrate;
+        internal uint maxFramerate;
+        internal IntPtr rid;
     }
 }

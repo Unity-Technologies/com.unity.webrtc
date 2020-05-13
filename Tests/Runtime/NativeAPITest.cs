@@ -177,6 +177,14 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
+            NativeMethods.SenderGetParameters(sender, out var ptr);
+            var parameters = Marshal.PtrToStructure<RTCRtpSendParameters>(ptr);
+            Marshal.FreeHGlobal(ptr);
+
+            var encoders = parameters.Encodings;
+            Debug.Log(encoders.Length);
+            Assert.NotNull(parameters.TransactionId);
+
             NativeMethods.SenderSetParameters2(sender, 30, 100);
 
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
