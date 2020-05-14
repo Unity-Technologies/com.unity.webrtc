@@ -216,11 +216,13 @@ namespace Unity.WebRTC.RuntimeTest
             yield return 0;
 
             var senders = test.component.GetPeer1Senders();
-            uint framerate = 30;
+            Assert.IsNotEmpty(senders);
+
             foreach(var sender in senders)
             {
                 var parameters = sender.GetParameters();
                 Assert.IsNotEmpty(parameters.Encodings);
+                const uint framerate = 30;
                 parameters.Encodings[0].maxFramerate = framerate;
                 sender.SetParameters(parameters);
                 var parameters2 = sender.GetParameters();
