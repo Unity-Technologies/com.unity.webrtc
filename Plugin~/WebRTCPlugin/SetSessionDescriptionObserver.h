@@ -14,7 +14,7 @@ namespace webrtc
         void RegisterDelegateOnFailure(DelegateSetSessionDescFailure onFailure);
 
         void OnSuccess() override;
-        void OnFailure(const std::string& error) override;
+        void OnFailure(webrtc::RTCError error) override;
     protected:
         explicit SetSessionDescriptionObserver(PeerConnectionObject * connection);
         ~SetSessionDescriptionObserver() = default;
