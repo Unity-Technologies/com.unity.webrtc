@@ -25,12 +25,15 @@ namespace Unity.WebRTC
 
     public struct RTCDataChannelInit
     {
+        [MarshalAs(UnmanagedType.U1)]
         public bool reliable;
+        [MarshalAs(UnmanagedType.U1)]
         public bool ordered;
         public int maxRetransmitTime;
         public int maxRetransmits;
         [MarshalAs(UnmanagedType.LPStr)]
         public string protocol;
+        [MarshalAs(UnmanagedType.U1)]
         public bool negotiated;
         public int id;
 
@@ -77,11 +80,13 @@ namespace Unity.WebRTC
             return new RTCRtpSendParameters(ptr);
         }
 
-        public void SetParameters(RTCRtpSendParameters parameters)
+        public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
         {
             IntPtr ptr = parameters.CreatePtr();
-            NativeMethods.SenderSetParameters(self, ptr);
+            RTCErrorType error = NativeMethods.SenderSetParameters(self, ptr);
             RTCRtpSendParameters.FreePtr(ptr);
+
+            return error;
         }
     }
 
@@ -183,13 +188,17 @@ namespace Unity.WebRTC
 
     public struct RTCOfferOptions
     {
+        [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
+        [MarshalAs(UnmanagedType.U1)]
         public bool offerToReceiveAudio;
+        [MarshalAs(UnmanagedType.U1)]
         public bool offerToReceiveVideo;
     }
 
     public struct RTCAnswerOptions
     {
+        [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
     }
 
@@ -591,7 +600,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void SenderGetParameters(IntPtr sender, out IntPtr parameters);
         [DllImport(WebRTC.Lib)]
-        public static extern void SenderSetParameters(IntPtr sender, IntPtr parameters);
+        public static extern RTCErrorType SenderSetParameters(IntPtr sender, IntPtr parameters);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -640,7 +649,7 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MediaStreamTrackGetEnabled(IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern void MediaStreamTrackSetEnabled(IntPtr track, bool enabled);
+        public static extern void MediaStreamTrackSetEnabled(IntPtr track, [MarshalAs(UnmanagedType.U1)] bool enabled);
         [DllImport(WebRTC.Lib)]
         public static extern void SetCurrentContext(IntPtr context);
         [DllImport(WebRTC.Lib)]

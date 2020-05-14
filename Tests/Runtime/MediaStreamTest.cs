@@ -223,10 +223,17 @@ namespace Unity.WebRTC.RuntimeTest
                 var parameters = sender.GetParameters();
                 Assert.IsNotEmpty(parameters.Encodings);
                 const uint framerate = 30;
+                const uint bitrate = 2000000;
+                const double scaleResolutionDownBy = 2.0;
                 parameters.Encodings[0].maxFramerate = framerate;
-                sender.SetParameters(parameters);
+                parameters.Encodings[0].maxBitrate = bitrate;
+                parameters.Encodings[0].scaleResolutionDownBy = scaleResolutionDownBy;
+                RTCErrorType error = sender.SetParameters(parameters);
+                Assert.AreEqual(RTCErrorType.None, error);
                 var parameters2 = sender.GetParameters();
-                Assert.AreEqual(framerate, parameters.Encodings[0].maxFramerate);
+                Assert.AreEqual(framerate, parameters2.Encodings[0].maxFramerate);
+                Assert.AreEqual(bitrate, parameters2.Encodings[0].maxBitrate);
+                Assert.AreEqual(scaleResolutionDownBy, parameters2.Encodings[0].scaleResolutionDownBy);
             }
 
             test.component.Dispose();
