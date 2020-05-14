@@ -101,11 +101,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.NotNull(sender);
             Assert.AreEqual(track, sender.Track);
 
-//            RTCRtpSendParameters parameters = sender.GetParameters();
-//            Assert.NotNull(parameters);
-//            Assert.IsNotEmpty(parameters.TransactionId);
-//            Assert.IsNotEmpty(parameters.Codecs);
-//            Assert.IsNotEmpty(parameters.Encodings);
+            RTCRtpSendParameters parameters = sender.GetParameters();
+            Assert.NotNull(parameters);
+            Assert.IsNotEmpty(parameters.TransactionId);
             Assert.AreEqual(1, peer.GetTransceivers().Count());
             Assert.NotNull(peer.GetTransceivers().First());
         }
