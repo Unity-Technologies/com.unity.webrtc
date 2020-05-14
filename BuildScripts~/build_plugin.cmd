@@ -1,6 +1,6 @@
 @echo off
 
-set LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M79/webrtc-win.zip
+set LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M83/webrtc-win.zip
 set SOLUTION_DIR=%cd%\Plugin~
 
 echo -------------------
