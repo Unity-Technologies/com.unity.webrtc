@@ -8,6 +8,7 @@ namespace Unity.WebRTC
         public bool active;
         public ulong? maxBitrate;
         public uint? maxFramerate;
+        public double? scaleResolutionDownBy;
         public string rid;
 
         internal RTCRtpEncodingParameters(RTCRtpEncodingParametersInternal parameter)
@@ -17,6 +18,8 @@ namespace Unity.WebRTC
                 maxBitrate = parameter.maxBitrate;
             if (parameter.hasValueMaxFramerate)
                 maxFramerate = parameter.maxFramerate;
+            if (parameter.hasValueScaleResolutionDownBy)
+                scaleResolutionDownBy = parameter.scaleResolutionDownBy;
             rid = parameter.rid.AsAnsiStringWithFreeMem();
         }
 
@@ -27,8 +30,12 @@ namespace Unity.WebRTC
             instance.hasValueMaxBitrate = maxBitrate.HasValue;
             if(maxBitrate.HasValue)
                 instance.maxBitrate = maxBitrate.Value;
+            instance.hasValueMaxFramerate = maxFramerate.HasValue;
             if (maxFramerate.HasValue)
-                instance.hasValueMaxFramerate = maxFramerate.HasValue;
+                instance.maxFramerate = maxFramerate.Value;
+            instance.hasValueScaleResolutionDownBy = scaleResolutionDownBy.HasValue;
+            if (scaleResolutionDownBy.HasValue)
+                instance.scaleResolutionDownBy = scaleResolutionDownBy.Value;
             instance.rid = Marshal.StringToCoTaskMemAnsi(rid);
             return instance;
         }
@@ -85,11 +92,17 @@ namespace Unity.WebRTC
     [StructLayout(LayoutKind.Sequential)]
     internal struct RTCRtpEncodingParametersInternal
     {
+        [MarshalAs(UnmanagedType.U1)]
         internal bool active;
+        [MarshalAs(UnmanagedType.U1)]
         internal bool hasValueMaxBitrate;
         internal ulong maxBitrate;
+        [MarshalAs(UnmanagedType.U1)]
         internal bool hasValueMaxFramerate;
         internal uint maxFramerate;
+        [MarshalAs(UnmanagedType.U1)]
+        internal bool hasValueScaleResolutionDownBy;
+        internal double scaleResolutionDownBy;
         internal IntPtr rid;
     }
 }

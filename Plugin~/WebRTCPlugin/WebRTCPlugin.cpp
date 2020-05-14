@@ -654,6 +654,8 @@ extern "C"
         uint64_t maxBitrate;
         bool hasValueMaxFramerate;
         uint32_t maxFramerate;
+        bool hasValueScaleResolutionDownBy;
+        double scaleResolutionDownBy;
         char* rid;
     };
 
@@ -678,13 +680,15 @@ extern "C"
             dst->encodings[i].maxBitrate = src.encodings[i].max_bitrate_bps.value_or(0);
             dst->encodings[i].hasValueMaxFramerate = src.encodings[i].max_framerate.has_value();
             dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value_or(0);
+            dst->encodings[i].hasValueScaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.has_value();
+            dst->encodings[i].scaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.value_or(0);
             dst->encodings[i].rid = ConvertString(src.encodings[i].rid);
         }
         dst->transactionId = ConvertString(src.transaction_id);
         *parameters = dst;
     }
 
-    UNITY_INTERFACE_EXPORT void SenderSetParameters(RtpSenderInterface* sender, const RTCRtpSendParameters* src)
+    UNITY_INTERFACE_EXPORT RTCErrorType SenderSetParameters(RtpSenderInterface* sender, const RTCRtpSendParameters* src)
     {
         RtpParameters dst = sender->GetParameters();
 
@@ -695,8 +699,12 @@ extern "C"
                 dst.encodings[i].max_bitrate_bps = static_cast<int>(src->encodings[i].maxBitrate);
             if (src->encodings[i].hasValueMaxFramerate)
                 dst.encodings[i].max_framerate = static_cast<int>(src->encodings[i].maxFramerate);
+            if (src->encodings[i].hasValueScaleResolutionDownBy)
+                dst.encodings[i].scale_resolution_down_by = static_cast<int>(src->encodings[i].scaleResolutionDownBy);
             dst.encodings[i].rid = std::string(src->encodings[i].rid);
         }
+        const ::webrtc::RTCError error = sender->SetParameters(dst);
+        return error.type();
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
