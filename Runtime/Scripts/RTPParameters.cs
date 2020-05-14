@@ -23,9 +23,8 @@ namespace Unity.WebRTC
             rid = parameter.rid.AsAnsiStringWithFreeMem();
         }
 
-        internal RTCRtpEncodingParametersInternal Create()
+        internal void CopyInternal(ref RTCRtpEncodingParametersInternal instance)
         {
-            RTCRtpEncodingParametersInternal instance = default;
             instance.active = active;
             instance.hasValueMaxBitrate = maxBitrate.HasValue;
             if(maxBitrate.HasValue)
@@ -37,7 +36,6 @@ namespace Unity.WebRTC
             if (scaleResolutionDownBy.HasValue)
                 instance.scaleResolutionDownBy = scaleResolutionDownBy.Value;
             instance.rid = Marshal.StringToCoTaskMemAnsi(rid);
-            return instance;
         }
     }
 
@@ -59,7 +57,11 @@ namespace Unity.WebRTC
 
         internal IntPtr CreatePtr()
         {
-            RTCRtpEncodingParametersInternal[] encodings = Array.ConvertAll(_encodings, _ => _.Create());
+            RTCRtpEncodingParametersInternal[] encodings = new RTCRtpEncodingParametersInternal[_encodings.Length];
+            for(int i = 0; i < _encodings.Length; i++)
+            {
+                _encodings[i].CopyInternal(ref encodings[i]);
+            }
             RTCRtpSendParametersInternal instance = default;
             instance.encodingsLength = _encodings.Length;
             instance.encodings = IntPtrExtension.ToPtr(encodings);
@@ -69,7 +71,7 @@ namespace Unity.WebRTC
             return ptr;
         }
 
-        static internal void FreePtr(IntPtr ptr)
+        static internal void DeletePtr(IntPtr ptr)
         {
             var instance = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
             Marshal.FreeCoTaskMem(instance.encodings);
