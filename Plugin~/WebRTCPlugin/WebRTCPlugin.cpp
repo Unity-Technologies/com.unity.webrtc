@@ -664,12 +664,10 @@ extern "C"
         char* transactionId;
     };
 
-    UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, LPVOID* parameters)
+    UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, RTCRtpSendParameters** parameters)
     {
         const RtpParameters src = sender->GetParameters();
-        *parameters = CoTaskMemAlloc(sizeof(RTCRtpSendParameters));
-
-        const auto dst = static_cast<RTCRtpSendParameters*>(*parameters);
+        RTCRtpSendParameters* dst = static_cast<RTCRtpSendParameters*>(CoTaskMemAlloc(sizeof(RTCRtpSendParameters)));
         dst->encodingsLength = static_cast<uint32_t>(src.encodings.size());
         dst->encodings = static_cast<RTCRtpEncodingParameters*>(CoTaskMemAlloc(sizeof(RTCRtpEncodingParameters) * src.encodings.size()));
 
@@ -683,6 +681,7 @@ extern "C"
             dst->encodings[i].rid = ConvertString(src.encodings[i].rid);
         }
         dst->transactionId = ConvertString(src.transaction_id);
+        *parameters = dst;
     }
 
     UNITY_INTERFACE_EXPORT void SenderSetParameters(RtpSenderInterface* sender, const RTCRtpSendParameters* src)
