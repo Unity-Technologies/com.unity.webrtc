@@ -100,7 +100,7 @@ namespace Unity.WebRTC
         {
             IntPtr ptr = parameters.CreatePtr();
             RTCErrorType error = NativeMethods.SenderSetParameters(self, ptr);
-            RTCRtpSendParameters.FreePtr(ptr);
+            RTCRtpSendParameters.DeletePtr(ptr);
 
             return error;
         }

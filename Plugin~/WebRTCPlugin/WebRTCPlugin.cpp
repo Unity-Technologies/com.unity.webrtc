@@ -700,7 +700,7 @@ extern "C"
             if (src->encodings[i].hasValueMaxFramerate)
                 dst.encodings[i].max_framerate = static_cast<int>(src->encodings[i].maxFramerate);
             if (src->encodings[i].hasValueScaleResolutionDownBy)
-                dst.encodings[i].scale_resolution_down_by = static_cast<int>(src->encodings[i].scaleResolutionDownBy);
+                dst.encodings[i].scale_resolution_down_by = src->encodings[i].scaleResolutionDownBy;
             dst.encodings[i].rid = std::string(src->encodings[i].rid);
         }
         const ::webrtc::RTCError error = sender->SetParameters(dst);
