@@ -172,13 +172,13 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             NativeMethods.MediaStreamAddTrack(stream, track);
 
-            int trackSize = 0;
+            uint trackSize = 0;
             var trackNativePtr = NativeMethods.MediaStreamGetVideoTracks(stream, ref trackSize);
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
             IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
             Marshal.FreeCoTaskMem(trackNativePtr);
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
@@ -195,13 +195,13 @@ namespace Unity.WebRTC.RuntimeTest
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             NativeMethods.MediaStreamAddTrack(stream, track);
-            int trackSize = 0;
+            uint trackSize = 0;
             var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, ref trackSize);
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
             IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, trackSize);
+            Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
             Marshal.FreeCoTaskMem(trackNativePtr);
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);

@@ -270,8 +270,35 @@ public class DataChannelSample : MonoBehaviour
         }
         else
         {
-            var error = op2.Error;
-            OnSetSessionDescriptionError(ref error);
+            OnSetSessionDescriptionError(ref op2.error);
+        }
+    }
+
+    IEnumerator LoopGetStats()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+
+            if (!sendButton.interactable)
+                continue;
+
+            var op1 = pc1.GetStats();
+            var op2 = pc2.GetStats();
+
+            yield return op1;
+            yield return op2;
+
+            Debug.Log("pc1");
+            foreach (var stat in op1.Value)
+            {
+                Debug.Log(stat.Type.ToString());
+            }
+            Debug.Log("pc2");
+            foreach (var stat in op2.Value)
+            {
+                Debug.Log(stat.Type.ToString());
+            }
         }
     }
 

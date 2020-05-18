@@ -14,10 +14,11 @@ namespace Unity.WebRTC
 
     public class RTCPeerConnection : IDisposable
     {
-        public Action<string> OnStatsDelivered = null;
+        internal IntPtr self;
+
+        public Action<IntPtr> OnStatsDelivered = null;
 
         private int m_id;
-        private IntPtr self;
         private DelegateOnIceConnectionChange onIceConnectionChange;
         private DelegateOnIceCandidate onIceCandidate;
         private DelegateOnDataChannel onDataChannel;
@@ -76,23 +77,23 @@ namespace Unity.WebRTC
 
         public IEnumerable<RTCRtpReceiver> GetReceivers()
         {
-            int length = 0;
+            uint length = 0;
             var buf = NativeMethods.PeerConnectionGetReceivers(self, ref length);
-            return WebRTC.Deserialize(buf, length, ptr => new RTCRtpReceiver(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpReceiver(ptr));
         }
 
         public IEnumerable<RTCRtpSender> GetSenders()
         {
-            int length = 0;
+            uint length = 0;
             var buf = NativeMethods.PeerConnectionGetSenders(self, ref length);
-            return WebRTC.Deserialize(buf, length, ptr => new RTCRtpSender(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpSender(ptr));
         }
 
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
-            int length = 0;
+            uint length = 0;
             var buf = NativeMethods.PeerConnectionGetTransceivers(self, ref length);
-            return WebRTC.Deserialize(buf, length, ptr => new RTCRtpTransceiver(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpTransceiver(ptr));
         }
 
         public DelegateOnIceConnectionChange OnIceConnectionChange
@@ -479,7 +480,7 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, string stats)
+        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr stats)
         {
             WebRTC.Sync(ptr, () =>
             {

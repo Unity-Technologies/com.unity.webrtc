@@ -217,6 +217,7 @@
     <ClInclude Include="NvVideoCapturer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PeerConnectionObject.h" />
+    <ClInclude Include="PeerConnectionStatsCollectorCallback.h" />
     <ClInclude Include="SetSessionDescriptionObserver.h" />
     <ClInclude Include="UnityVideoDecoderFactory.h" />
     <ClInclude Include="UnityVideoEncoderFactory.h" />
@@ -227,6 +228,7 @@
     <ClInclude Include="WebRTCPlugin.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PeerConnectionStatsCollectorCallback.cpp" />
     <ClCompile Include="UnityRenderEvent.cpp" />
     <ClCompile Include="Codec\EncoderFactory.cpp" />
     <ClCompile Include="Codec\NvCodec\NvEncoder.cpp" />

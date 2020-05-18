@@ -40,14 +40,27 @@ using namespace unity::webrtc;
 using namespace ::webrtc;
 
 template<class T>
-T** ConvertArray(std::vector<rtc::scoped_refptr<T>> vec, int* length)
+T** ConvertPtrArrayFromRefPtrArray(std::vector<rtc::scoped_refptr<T>> vec, size_t* length)
 {
-#pragma warning(suppress: 4267)
     *length = vec.size();
     const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
     const auto ret = static_cast<T**>(buf);
     std::copy(vec.begin(), vec.end(), ret);
     return ret;
+}
+
+template<typename T>
+T* ConvertArray(std::vector<T> vec, size_t* length)
+{
+    *length = vec.size();
+    const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
+    const auto ret = static_cast<T*>(buf);
+    for (uint32_t i = 0; i < vec.size(); i++)
+    {
+        ret[i] = vec[i];
+    }
+    return ret;
+
 }
 
 char* ConvertString(const std::string str)
@@ -149,14 +162,14 @@ extern "C"
         context->GetObserver(stream)->RegisterOnRemoveTrack(callback);
     }
 
-    UNITY_INTERFACE_EXPORT VideoTrackInterface** MediaStreamGetVideoTracks(MediaStreamInterface* stream, int* length)
+    UNITY_INTERFACE_EXPORT VideoTrackInterface** MediaStreamGetVideoTracks(MediaStreamInterface* stream, size_t* length)
     {
-        return ConvertArray<VideoTrackInterface>(stream->GetVideoTracks(), length);
+        return ConvertPtrArrayFromRefPtrArray<VideoTrackInterface>(stream->GetVideoTracks(), length);
     }
 
-    UNITY_INTERFACE_EXPORT AudioTrackInterface** MediaStreamGetAudioTracks(MediaStreamInterface* stream, int* length)
+    UNITY_INTERFACE_EXPORT AudioTrackInterface** MediaStreamGetAudioTracks(MediaStreamInterface* stream, size_t* length)
     {
-        return ConvertArray<AudioTrackInterface>(stream->GetAudioTracks(), length);
+        return ConvertPtrArrayFromRefPtrArray<AudioTrackInterface>(stream->GetAudioTracks(), length);
     }
 
     UNITY_INTERFACE_EXPORT TrackKind MediaStreamTrackGetKind(MediaStreamTrackInterface* track)
@@ -289,6 +302,137 @@ extern "C"
         obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection));
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetStats(Context* context, PeerConnectionObject* obj)
+    {
+        obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
+    }
+
+    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetList(const RTCStatsReport* report, int* length)
+    {
+        *length = report->size();
+        const auto buf = CoTaskMemAlloc(sizeof(RTCStats*) * report->size());
+        const auto ret = static_cast<const RTCStats**>(buf);
+        int i = 0;
+        for (auto it = report->begin(); it != report->end(); ++it, i++)
+        {
+            ret[i] = &*it;
+        }
+        return ret;
+    }
+
+    UNITY_INTERFACE_EXPORT const char* StatsGetJson(const RTCStats* stats)
+    {
+        return ConvertString(stats->ToJson());
+    }
+
+    UNITY_INTERFACE_EXPORT int64_t StatsGetTimestamp(const RTCStats* stats)
+    {
+        return stats->timestamp_us();
+    }
+
+    UNITY_INTERFACE_EXPORT const char* StatsGetId(const RTCStats* stats)
+    {
+        return ConvertString(stats->id());
+    }
+
+    UNITY_INTERFACE_EXPORT const char* StatsGetType(const RTCStats* stats)
+    {
+        return ConvertString(stats->type());
+    }
+
+    struct RTCStatsMember
+    {
+        RTCStatsMemberInterface::Type type;
+    };
+
+    UNITY_INTERFACE_EXPORT const RTCStatsMemberInterface** StatsGetMembers(const RTCStats* stats, size_t* length)
+    {
+        return ConvertArray(stats->Members(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT const char* StatsMemberGetName(const RTCStatsMemberInterface* member)
+    {
+        return ConvertString(std::string(member->name()));
+    }
+
+    UNITY_INTERFACE_EXPORT bool StatsMemberGetBool(const RTCStatsMemberInterface* member)
+    {
+        return *member->cast_to<::webrtc::RTCStatsMember<bool>>();
+    }
+
+    UNITY_INTERFACE_EXPORT int32_t StatsMemberGetInt(const RTCStatsMemberInterface* member)
+    {
+        return *member->cast_to<::webrtc::RTCStatsMember<int32_t>>();
+    }
+
+    UNITY_INTERFACE_EXPORT uint32_t StatsMemberGetUnsignedInt(const RTCStatsMemberInterface* member)
+    {
+        return *member->cast_to<::webrtc::RTCStatsMember<uint32_t>>();
+    }
+
+    UNITY_INTERFACE_EXPORT int64_t StatsMemberGetLong(const RTCStatsMemberInterface* member)
+    {
+        return *member->cast_to<::webrtc::RTCStatsMember<uint64_t>>();
+    }
+
+    UNITY_INTERFACE_EXPORT uint64_t StatsMemberGetUnsignedLong(const RTCStatsMemberInterface* member)
+    {
+        return *member->cast_to<::webrtc::RTCStatsMember<uint64_t>>();
+    }
+
+    UNITY_INTERFACE_EXPORT double StatsMemberGetDouble(const RTCStatsMemberInterface* member)
+    {
+        return *member->cast_to<::webrtc::RTCStatsMember<double>>();
+    }
+
+    UNITY_INTERFACE_EXPORT const char* StatsMemberGetString(const RTCStatsMemberInterface* member)
+    {
+        return ConvertString(member->ValueToString());
+    }
+
+    UNITY_INTERFACE_EXPORT bool* StatsMemberGetBoolArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        return ConvertArray(*member->cast_to<::webrtc::RTCStatsMember<std::vector<bool>>>(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT int32_t* StatsMemberGetIntArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        return ConvertArray(*member->cast_to<::webrtc::RTCStatsMember<std::vector<int>>>(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT uint32_t* StatsMemberGetUnsignedIntArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        return ConvertArray(*member->cast_to<::webrtc::RTCStatsMember<std::vector<uint32_t>>>(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT int64_t* StatsMemberGetLongArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        return ConvertArray(*member->cast_to<::webrtc::RTCStatsMember<std::vector<int64_t>>>(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT uint64_t* StatsMemberGetUnsignedLongArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        return ConvertArray(*member->cast_to<::webrtc::RTCStatsMember<std::vector<uint64_t>>>(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT double* StatsMemberGetDoubleArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        return ConvertArray(*member->cast_to<::webrtc::RTCStatsMember<std::vector<double>>>(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT const char** StatsMemberGetStringArray(const RTCStatsMemberInterface* member, size_t* length)
+    {
+        std::vector<std::string> vec = *member->cast_to<::webrtc::RTCStatsMember<std::vector<std::string>>>();
+        std::vector<const char*>  vc;
+        std::transform(vec.begin(), vec.end(), std::back_inserter(vc), ConvertString);
+        return ConvertArray(vc, length);
+    }
+
+    UNITY_INTERFACE_EXPORT RTCStatsMemberInterface::Type StatsMemberGetType(const RTCStatsMemberInterface* member)
+    {
+        return member->type();
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
         obj->SetLocalDescription(*desc, context->GetObserver(obj->connection));
@@ -329,19 +473,19 @@ extern "C"
         return obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT RtpReceiverInterface** PeerConnectionGetReceivers(PeerConnectionObject* obj, int* length)
+    UNITY_INTERFACE_EXPORT RtpReceiverInterface** PeerConnectionGetReceivers(PeerConnectionObject* obj, size_t* length)
     {
-        return ConvertArray<RtpReceiverInterface>(obj->connection->GetReceivers(), length);
+        return ConvertPtrArrayFromRefPtrArray<RtpReceiverInterface>(obj->connection->GetReceivers(), length);
     }
 
-    UNITY_INTERFACE_EXPORT RtpSenderInterface** PeerConnectionGetSenders(PeerConnectionObject* obj, int* length)
+    UNITY_INTERFACE_EXPORT RtpSenderInterface** PeerConnectionGetSenders(PeerConnectionObject* obj, size_t* length)
     {
-        return ConvertArray<RtpSenderInterface>(obj->connection->GetSenders(), length);
+        return ConvertPtrArrayFromRefPtrArray<RtpSenderInterface>(obj->connection->GetSenders(), length);
     }
 
-    UNITY_INTERFACE_EXPORT RtpTransceiverInterface** PeerConnectionGetTransceivers(PeerConnectionObject* obj, int* length)
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface** PeerConnectionGetTransceivers(PeerConnectionObject* obj, size_t* length)
     {
-        return ConvertArray<RtpTransceiverInterface>(obj->connection->GetTransceivers(), length);
+        return ConvertPtrArrayFromRefPtrArray<RtpTransceiverInterface>(obj->connection->GetTransceivers(), length);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCreateOffer(PeerConnectionObject* obj, const RTCOfferOptions* options)
@@ -374,9 +518,9 @@ extern "C"
         obj->RegisterIceCandidate(callback);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCollectStats(PeerConnectionObject* obj, DelegateCollectStats onGetStats)
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCollectStats(Context* context, DelegateCollectStats onGetStats)
     {
-        obj->RegisterCallbackCollectStats(onGetStats);
+        PeerConnectionStatsCollectorCallback::RegisterOnGetStats(onGetStats);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCreateSD(PeerConnectionObject* obj, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)

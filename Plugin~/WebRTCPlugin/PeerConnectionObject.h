@@ -1,6 +1,7 @@
 #pragma once
 #include "WebRTCPlugin.h"
 #include "DataChannelObject.h"
+#include "PeerConnectionStatsCollectorCallback.h"
 
 namespace unity
 {
@@ -8,7 +9,6 @@ namespace webrtc
 {
 
     using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
-    using DelegateCollectStats = void(*)(PeerConnectionObject*, const char*);;
     using DelegateCreateSDFailure = void(*)(PeerConnectionObject*);
     using DelegateLocalSdpReady = void(*)(PeerConnectionObject*, const char*, const char*);
     using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
@@ -16,30 +16,6 @@ namespace webrtc
     using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
-
-    //[TODO-sin: 2019-12-20] Separate to a different file.
-    class PeerConnectionStatsCollectorCallback : public virtual webrtc::RTCStatsCollectorCallback{
-    public:
-        PeerConnectionStatsCollectorCallback(PeerConnectionObject* owner) { m_owner = owner;}
-        
-        ~PeerConnectionStatsCollectorCallback() override = default;
-        void AddRef() const override {};
-        rtc::RefCountReleaseStatus Release() const override { return rtc::RefCountReleaseStatus::kOtherRefsRemained; }
-        void SetCallback(DelegateCollectStats callback) { m_collectStatsCallback = callback; }
-
-        void OnStatsDelivered(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report) override
-        {
-            if (nullptr==m_collectStatsCallback){
-                return;
-            }
-
-            const std::string json  = report->ToJson();
-            m_collectStatsCallback(m_owner, json.c_str());
-        };
-    private:
-        DelegateCollectStats m_collectStatsCallback = nullptr;
-        PeerConnectionObject* m_owner = nullptr;
-    };
 
     class PeerConnectionObject
         : public webrtc::CreateSessionDescriptionObserver
@@ -51,8 +27,6 @@ namespace webrtc
 
         void Close();
         void SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
-        //void GetLocalDescription(RTCSessionDescription& desc) const;
-        //void GetRemoteDescription(RTCSessionDescription& desc) const;
         bool GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
         void CollectStats();
         void SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
@@ -66,10 +40,6 @@ namespace webrtc
         {
             onCreateSDSuccess = onSuccess;
             onCreateSDFailure = onFailure;
-        }
-        void RegisterCallbackCollectStats(DelegateCollectStats getStatsCallback)
-        {
-            m_statsCollectorCallback->SetCallback(getStatsCallback);
         }
 
         void RegisterLocalSdpReady(DelegateLocalSdpReady callback) { onLocalSdpReady = callback; }
