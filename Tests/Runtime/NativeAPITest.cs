@@ -268,6 +268,32 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.GetRenderEventFunc(IntPtr.Zero);
         }
 
+        [Test]
+        public void RTCRtpSendParametersCreateAndDeletePtr()
+        {
+            RTCRtpSendParametersInternal parametersInternal = new RTCRtpSendParametersInternal();
+
+            int encodingsLength = 2;
+            RTCRtpEncodingParametersInternal[] encodings = new RTCRtpEncodingParametersInternal[encodingsLength];
+            for (int i = 0; i < encodingsLength; i++)
+            {
+                encodings[i].active = true;
+                encodings[i].hasValueMaxBitrate = true;
+                encodings[i].maxBitrate = 10000000;
+                encodings[i].hasValueMaxFramerate = true;
+                encodings[i].maxFramerate = 30;
+                encodings[i].hasValueScaleResolutionDownBy = true;
+                encodings[i].scaleResolutionDownBy = 1.0;
+                encodings[i].rid = Marshal.StringToCoTaskMemAnsi(string.Empty);
+            }
+            parametersInternal.transactionId = Marshal.StringToCoTaskMemAnsi(string.Empty);
+            parametersInternal.encodingsLength = encodingsLength;
+            parametersInternal.encodings = IntPtrExtension.ToPtr(encodings);
+            RTCRtpSendParameters parameter = new RTCRtpSendParameters(parametersInternal);
+            IntPtr ptr = parameter.CreatePtr();
+            RTCRtpSendParameters.DeletePtr(ptr);
+        }
+
         /// <todo>
         /// This unittest failed standalone mono 2019.3 on linux
         /// </todo>

@@ -695,7 +695,7 @@ extern "C"
         for (int i = 0; i < dst.encodings.size(); i++)
         {
             dst.encodings[i].active = src->encodings[i].active;
-			if(src->encodings[i].hasValueMaxBitrate)
+            if(src->encodings[i].hasValueMaxBitrate)
                 dst.encodings[i].max_bitrate_bps = static_cast<int>(src->encodings[i].maxBitrate);
             if (src->encodings[i].hasValueMaxFramerate)
                 dst.encodings[i].max_framerate = static_cast<int>(src->encodings[i].maxFramerate);

@@ -93,7 +93,10 @@ namespace Unity.WebRTC
         public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(self, out var ptr);
-            return new RTCRtpSendParameters(ptr);
+            RTCRtpSendParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
+            RTCRtpSendParameters parameters = new RTCRtpSendParameters(parametersInternal);
+            Marshal.FreeHGlobal(ptr);
+            return parameters;
         }
 
         public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
