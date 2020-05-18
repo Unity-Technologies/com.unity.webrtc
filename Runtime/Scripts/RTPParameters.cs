@@ -82,25 +82,25 @@ namespace Unity.WebRTC
     [StructLayout(LayoutKind.Sequential)]
     internal struct RTCRtpSendParametersInternal
     {
-        internal int encodingsLength;
-        internal IntPtr encodings;
-        internal IntPtr transactionId;
+        public int encodingsLength;
+        public IntPtr encodings;
+        public IntPtr transactionId;
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct RTCRtpEncodingParametersInternal
     {
         [MarshalAs(UnmanagedType.U1)]
-        internal bool active;
+        public bool active;
         [MarshalAs(UnmanagedType.U1)]
-        internal bool hasValueMaxBitrate;
-        internal ulong maxBitrate;
+        public bool hasValueMaxBitrate;
+        public ulong maxBitrate;
         [MarshalAs(UnmanagedType.U1)]
-        internal bool hasValueMaxFramerate;
-        internal uint maxFramerate;
+        public bool hasValueMaxFramerate;
+        public uint maxFramerate;
         [MarshalAs(UnmanagedType.U1)]
-        internal bool hasValueScaleResolutionDownBy;
-        internal double scaleResolutionDownBy;
-        internal IntPtr rid;
+        public bool hasValueScaleResolutionDownBy;
+        public double scaleResolutionDownBy;
+        public IntPtr rid;
     }
 }
