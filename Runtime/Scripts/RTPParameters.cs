@@ -41,6 +41,11 @@ namespace Unity.WebRTC
 
     public class RTCRtpSendParameters
     {
+        public string TransactionId => _transactionId;
+
+        public RTCRtpEncodingParameters[] Encodings => _encodings;
+
+
         readonly RTCRtpEncodingParameters[] _encodings;
         readonly string _transactionId;
 
@@ -73,10 +78,6 @@ namespace Unity.WebRTC
             Marshal.FreeCoTaskMem(instance.encodings);
             Marshal.FreeCoTaskMem(ptr);
         }
-
-        public string TransactionId => _transactionId;
-
-        public RTCRtpEncodingParameters[] Encodings => _encodings;
     }
 
     [StructLayout(LayoutKind.Sequential)]
