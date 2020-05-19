@@ -335,17 +335,36 @@ extern "C"
         return ConvertString(stats->id());
     }
 
-    UNITY_INTERFACE_EXPORT const char* StatsGetType(const RTCStats* stats)
+    UNITY_INTERFACE_EXPORT byte StatsGetType(const RTCStats* stats)
     {
-        return ConvertString(stats->type());
+        const std::map<std::string, byte> statsTypes =
+        {
+            { "codec", 0 },
+            { "inbound-rtp", 1 },
+            { "outbound-rtp", 2 },
+            { "remote-inbound-rtp", 3 },
+            { "remote-outbound-rtp", 4 },
+            { "media-source", 5 },
+            { "csrc", 6 },
+            { "peer-connection", 7 },
+            { "data-channel", 8 },
+            { "stream", 9 },
+            { "track", 10 },
+            { "transceiver", 11 },
+            { "sender", 12 },
+            { "receiver", 13 },
+            { "transport", 14 },
+            { "sctp-transport", 15 },
+            { "candidate-pair", 16 },
+            { "local-candidate", 17 },
+            { "remote-candidate", 18 },
+            { "certificate", 19 },
+            { "ice-server", 20 }
+        };
+
+        return statsTypes.at(stats->type());
     }
 
-    /*
-    enum RTCStatsMemberKind
-    {
-        
-    };
-    */
     struct RTCStatsMember
     {
         RTCStatsMemberInterface::Type type;

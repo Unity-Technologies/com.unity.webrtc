@@ -18,47 +18,47 @@ namespace Unity.WebRTC
     public enum RTCStatsType
     {
         [StringValue("codec")]
-        Codec,
+        Codec = 0,
         [StringValue("inbound-rtp")]
-        InboundRtp,
+        InboundRtp = 1,
         [StringValue("outbound-rtp")]
-        OutboundRtp,
+        OutboundRtp = 2,
         [StringValue("remote-inbound-rtp")]
-        RemoteInboundRtp,
+        RemoteInboundRtp = 3,
         [StringValue("remote-outbound-rtp")]
-        RemoteOutboundRtp,
+        RemoteOutboundRtp = 4,
         [StringValue("media-source")]
-        MediaSource,
+        MediaSource = 5,
         [StringValue("csrc")]
-        Csrc,
+        Csrc = 6,
         [StringValue("peer-connection")]
-        PeerConnection,
+        PeerConnection = 7,
         [StringValue("data-channel")]
-        DataChannel,
+        DataChannel = 8,
         [StringValue("stream")]
-        Stream,
+        Stream = 9,
         [StringValue("track")]
-        Track,
+        Track = 10,
         [StringValue("transceiver")]
-        Transceiver,
+        Transceiver = 11,
         [StringValue("sender")]
-        Sender,
+        Sender = 12,
         [StringValue("receiver")]
-        Receiver,
+        Receiver = 13,
         [StringValue("transport")]
-        Transport,
+        Transport = 14,
         [StringValue("sctp-transport")]
-        SctpTransport,
+        SctpTransport = 15,
         [StringValue("candidate-pair")]
-        CandidatePair,
+        CandidatePair = 16,
         [StringValue("local-candidate")]
-        LocalCandidate,
+        LocalCandidate = 17,
         [StringValue("remote-candidate")]
-        RemoteCandidate,
+        RemoteCandidate = 18,
         [StringValue("certificate")]
-        Certificate,
+        Certificate = 19,
         [StringValue("ice-server")]
-        IceServer
+        IceServer = 20,
     }
 
     static class RTCStatsTypeUtils
@@ -162,8 +162,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                string str = NativeMethods.StatsGetType(self).AsAnsiStringWithFreeMem();
-                return RTCStatsTypeUtils.Parse(str);
+                return NativeMethods.StatsGetType(self);
             }
         }
 

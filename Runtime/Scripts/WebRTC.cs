@@ -645,7 +645,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsGetId(IntPtr stats);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsGetType(IntPtr stats);
+        public static extern RTCStatsType StatsGetType(IntPtr stats);
         [DllImport(WebRTC.Lib)]
         public static extern long StatsGetTimestamp(IntPtr stats);
         [DllImport(WebRTC.Lib)]
