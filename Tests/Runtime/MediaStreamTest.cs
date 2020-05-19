@@ -185,6 +185,32 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        public IEnumerator GetStats()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeersTest>();
+            test.component.SetStream(videoStream);
+            yield return test;
+            var op = test.component.GetStats();
+            yield return op;
+            Assert.True(op.IsDone);
+            Assert.IsNotEmpty(op.Value);
+            test.component.Dispose();
+            videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
+        }
+
+
+        /// <todo>
+        /// This unittest failed standalone mono 2019.3 on linux
+        /// </todo>
+        [UnityTest]
+        [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator CaptureStreamTrack()
         {
             var camObj = new GameObject("Camera");
@@ -213,6 +239,11 @@ namespace Unity.WebRTC.RuntimeTest
             public void SetStream(MediaStream stream)
             {
                 m_stream = stream;
+            }
+
+            public RTCStatsReportAsyncOperation GetStats()
+            {
+                return peer1.GetStats();
             }
 
             IEnumerator Start()

@@ -40,7 +40,7 @@ namespace Unity.WebRTC
 
         internal RTCStatsReportAsyncOperation(RTCPeerConnection connection)
         {
-            WebRTC.Context.PeerConnectionGetStats(connection.self);
+            NativeMethods.PeerConnectionGetStats(connection.self);
 
             connection.OnStatsDelivered = ptr =>
             {

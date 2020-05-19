@@ -302,7 +302,7 @@ extern "C"
         obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection));
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetStats(Context* context, PeerConnectionObject* obj)
+    UNITY_INTERFACE_EXPORT void PeerConnectionGetStats(PeerConnectionObject* obj)
     {
         obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
     }
@@ -340,9 +340,17 @@ extern "C"
         return ConvertString(stats->type());
     }
 
+    enum RTCStatsMemberKind
+    {
+        
+    };
+
     struct RTCStatsMember
     {
         RTCStatsMemberInterface::Type type;
+        RTCStatsMemberKind kind;
+        size_t length;
+        void* value;
     };
 
     UNITY_INTERFACE_EXPORT const RTCStatsMemberInterface** StatsGetMembers(const RTCStats* stats, size_t* length)

@@ -364,11 +364,9 @@ namespace Unity.WebRTC
             return op;
         }
 
-        public void CollectStats()
+        public RTCStatsReportAsyncOperation GetStats()
         {
-            /// TODO:: define async operation class
-            //m_opSetDesc = new RTCSessionDescriptionAsyncOperation();
-            //NativeMethods.PeerConnectionCollectStats(self);
+            return new RTCStatsReportAsyncOperation(this);
         }
 
         public RTCSessionDescription LocalDescription
