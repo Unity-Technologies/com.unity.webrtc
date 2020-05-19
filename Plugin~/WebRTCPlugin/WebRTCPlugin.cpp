@@ -340,15 +340,16 @@ extern "C"
         return ConvertString(stats->type());
     }
 
+    /*
     enum RTCStatsMemberKind
     {
         
     };
-
+    */
     struct RTCStatsMember
     {
         RTCStatsMemberInterface::Type type;
-        RTCStatsMemberKind kind;
+        //RTCStatsMemberKind kind;
         size_t length;
         void* value;
     };

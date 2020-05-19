@@ -199,6 +199,17 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op;
             Assert.True(op.IsDone);
             Assert.IsNotEmpty(op.Value);
+            Assert.IsNotEmpty(op.Value.Keys);
+            Assert.IsNotEmpty(op.Value.Values);
+            Assert.Greater(op.Value.Count, 0);
+
+            foreach (var stats in op.Value)
+            {
+                Assert.NotNull(stats);
+                Assert.Greater(stats.Value.Timestamp, 0);
+                Assert.IsNotEmpty(stats.Value.Id);
+            }
+
             test.component.Dispose();
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);

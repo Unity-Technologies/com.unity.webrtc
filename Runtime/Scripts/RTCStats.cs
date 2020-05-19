@@ -225,7 +225,26 @@ namespace Unity.WebRTC
         }
     }
 
-    public class RTCStatsReport : IEnumerable<RTCStats>
+    public class RTCRtpStreamStats : RTCStats
+    {
+        internal RTCRtpStreamStats(IntPtr ptr) : base(ptr)
+        {
+        }
+
+        public string CodecId
+        {
+            get { return "";  }
+        }
+    }
+
+    public class RTCInboundRtpStreamStats : RTCStats
+    {
+        internal RTCInboundRtpStreamStats(IntPtr ptr) : base(ptr)
+        {
+        }
+    }
+
+    public class RTCStatsReport : IReadOnlyDictionary<RTCStatsType, RTCStats>
     {
         private IntPtr self;
         private readonly Dictionary<RTCStatsType, RTCStats> m_dictStats;
@@ -244,6 +263,39 @@ namespace Unity.WebRTC
             }
         }
 
+        public bool ContainsKey(RTCStatsType key)
+        {
+            return m_dictStats.ContainsKey(key);
+        }
+
+        public bool TryGetValue(RTCStatsType key, out RTCStats value)
+        {
+            return m_dictStats.TryGetValue(key, out value);
+        }
+
+        public IEnumerable<RTCStatsType> Keys
+        {
+            get
+            {
+                return m_dictStats.Keys;
+            }
+        }
+        public IEnumerable<RTCStats> Values
+        {
+            get
+            {
+                return m_dictStats.Values;
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                return m_dictStats.Count;
+            }
+        }
+
         public RTCStats this[RTCStatsType key]
         {
             get
@@ -252,9 +304,9 @@ namespace Unity.WebRTC
             }
         }
 
-        public IEnumerator<RTCStats> GetEnumerator()
+        public IEnumerator<KeyValuePair<RTCStatsType, RTCStats>> GetEnumerator()
         {
-            return m_dictStats.Values.GetEnumerator();
+            return m_dictStats.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
