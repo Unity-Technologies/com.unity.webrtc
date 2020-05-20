@@ -205,8 +205,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             foreach (RTCStats stats in op.Value.Values)
             {
-                Debug.Log("");
-                Debug.LogFormat("{0} {1}", stats.Id, stats.Type);
+                // Debug.Log("");
+                // Debug.LogFormat("{0} {1}", stats.Id, stats.Type);
 
                 Assert.NotNull(stats);
                 Assert.Greater(stats.Timestamp, 0);
