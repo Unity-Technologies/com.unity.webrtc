@@ -48,18 +48,34 @@ namespace Unity.WebRTC
     public class RTCRtpReceiver
     {
         internal IntPtr self;
-        internal RTCRtpReceiver(IntPtr ptr)
+        private RTCPeerConnection peer;
+
+        internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            this.peer = peer;
+        }
+
+        public RTCStatsReportAsyncOperation GetStats()
+        {
+            return peer.GetStats(this);
         }
     }
 
     public class RTCRtpSender
     {
         internal IntPtr self;
-        internal RTCRtpSender(IntPtr ptr)
+        private RTCPeerConnection peer;
+        
+        internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            this.peer = peer;
+        }
+
+        public RTCStatsReportAsyncOperation GetStats()
+        {
+            return peer.GetStats(this);
         }
     }
 
@@ -507,6 +523,10 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetStats(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionSenderGetStats(IntPtr ptr, IntPtr sender);
+        [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionReceiverGetStats(IntPtr sender, IntPtr receiver);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);

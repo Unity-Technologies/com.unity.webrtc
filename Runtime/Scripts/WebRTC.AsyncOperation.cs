@@ -49,6 +49,29 @@ namespace Unity.WebRTC
                 this.Done();
             };
         }
+
+        internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpSender sender)
+        {
+            NativeMethods.PeerConnectionSenderGetStats(connection.self, sender.self);
+
+            connection.OnStatsDelivered = ptr =>
+            {
+                Value = new RTCStatsReport(ptr);
+                IsError = false;
+                this.Done();
+            };
+        }
+        internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpReceiver receiver)
+        {
+            NativeMethods.PeerConnectionReceiverGetStats(connection.self, receiver.self);
+
+            connection.OnStatsDelivered = ptr =>
+            {
+                Value = new RTCStatsReport(ptr);
+                IsError = false;
+                this.Done();
+            };
+        }
     }
 
     public class RTCSessionDescriptionAsyncOperation : AsyncOperationBase

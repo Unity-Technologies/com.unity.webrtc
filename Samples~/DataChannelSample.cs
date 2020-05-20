@@ -270,7 +270,8 @@ public class DataChannelSample : MonoBehaviour
         }
         else
         {
-            OnSetSessionDescriptionError(ref op2.error);
+            var error = op2.Error;
+            OnSetSessionDescriptionError(ref error);
         }
     }
 
@@ -290,12 +291,12 @@ public class DataChannelSample : MonoBehaviour
             yield return op2;
 
             Debug.Log("pc1");
-            foreach (var stat in op1.Value)
+            foreach (var stat in op1.Value.Values)
             {
                 Debug.Log(stat.Type.ToString());
             }
             Debug.Log("pc2");
-            foreach (var stat in op2.Value)
+            foreach (var stat in op2.Value.Values)
             {
                 Debug.Log(stat.Type.ToString());
             }

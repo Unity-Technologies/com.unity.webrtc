@@ -185,7 +185,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
-        public IEnumerator GetStats()
+        public IEnumerator PeerConnectionGetStats()
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
@@ -195,7 +195,7 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(videoStream);
             yield return test;
-            var op = test.component.GetStats();
+            var op = test.component.GetPeerStats();
             yield return op;
             Assert.True(op.IsDone);
             Assert.IsNotEmpty(op.Value);
@@ -217,6 +217,28 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.NotNull(pair.Value);
                 }
             }
+
+            test.component.Dispose();
+            videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        public IEnumerator SenderGetStats()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeersTest>();
+            test.component.SetStream(videoStream);
+            yield return test;
+            var op = test.component.GetSenderStats();
+            yield return op;
+            Assert.True(op.IsDone);
 
             test.component.Dispose();
             videoStream.Dispose();
@@ -260,9 +282,14 @@ namespace Unity.WebRTC.RuntimeTest
                 m_stream = stream;
             }
 
-            public RTCStatsReportAsyncOperation GetStats()
+            public RTCStatsReportAsyncOperation GetPeerStats()
             {
                 return peer1.GetStats();
+            }
+
+            public RTCStatsReportAsyncOperation GetSenderStats()
+            {
+                return pc1Senders.First().GetStats();
             }
 
             IEnumerator Start()

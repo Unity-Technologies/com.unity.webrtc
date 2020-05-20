@@ -79,21 +79,21 @@ namespace Unity.WebRTC
         {
             uint length = 0;
             var buf = NativeMethods.PeerConnectionGetReceivers(self, ref length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpReceiver(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpReceiver(ptr, this));
         }
 
         public IEnumerable<RTCRtpSender> GetSenders()
         {
             uint length = 0;
             var buf = NativeMethods.PeerConnectionGetSenders(self, ref length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpSender(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpSender(ptr, this));
         }
 
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
             uint length = 0;
             var buf = NativeMethods.PeerConnectionGetTransceivers(self, ref length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpTransceiver(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpTransceiver(ptr, this));
         }
 
         public DelegateOnIceConnectionChange OnIceConnectionChange
@@ -225,7 +225,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnTrack(new RTCTrackEvent(transceiver));
+                    connection.OnTrack(new RTCTrackEvent(transceiver, connection));
                 }
             });
         }
@@ -291,7 +291,7 @@ namespace Unity.WebRTC
             }
 
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
-            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self, streamId));
+            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self, streamId), this);
         }
 
         public void RemoveTrack(RTCRtpSender sender)
@@ -301,7 +301,7 @@ namespace Unity.WebRTC
 
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track)
         {
-            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(self, track.self));
+            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(self, track.self), this);
         }
 
         public void AddIceCandidate(ref RTCIceCandidate​ candidate)
@@ -367,6 +367,15 @@ namespace Unity.WebRTC
         public RTCStatsReportAsyncOperation GetStats()
         {
             return new RTCStatsReportAsyncOperation(this);
+        }
+
+        internal RTCStatsReportAsyncOperation GetStats(RTCRtpSender sender)
+        {
+            return new RTCStatsReportAsyncOperation(this, sender);
+        }
+        internal RTCStatsReportAsyncOperation GetStats(RTCRtpReceiver receiver)
+        {
+            return new RTCStatsReportAsyncOperation(this, receiver);
         }
 
         public RTCSessionDescription LocalDescription

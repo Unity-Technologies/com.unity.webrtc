@@ -307,6 +307,17 @@ extern "C"
         obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionSenderGetStats(PeerConnectionObject* obj, RtpSenderInterface* sender)
+    {
+        obj->connection->GetStats(sender, PeerConnectionStatsCollectorCallback::Create(obj));
+    }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionReceiveretStats(PeerConnectionObject* obj, RtpReceiverInterface* receiver)
+    {
+        obj->connection->GetStats(receiver, PeerConnectionStatsCollectorCallback::Create(obj));
+    }
+
+
     const std::map<std::string, byte> statsTypes =
     {
         { "codec", 0 },
@@ -338,6 +349,10 @@ extern "C"
         *types = static_cast<byte*>(CoTaskMemAlloc(sizeof(byte) * report->size()));
         const auto buf = CoTaskMemAlloc(sizeof(RTCStats*) * report->size());
         const auto ret = static_cast<const RTCStats**>(buf);
+        if(report->size() == 0)
+        {
+            return ret;
+        }
         int i = 0;
         for (auto it = report->begin(); it != report->end(); ++it, i++)
         {

@@ -213,66 +213,66 @@ namespace Unity.WebRTC
             }
         }
 
-        public bool GetBool(string key)
+        internal bool GetBool(string key)
         {
             return NativeMethods.StatsMemberGetBool(m_members[key].self);
         }
-        public int GetInt(string key)
+        internal int GetInt(string key)
         {
             return NativeMethods.StatsMemberGetInt(m_members[key].self);
         }
-        public uint GetUnsignedInt(string key)
+        internal uint GetUnsignedInt(string key)
         {
             return NativeMethods.StatsMemberGetUnsignedInt(m_members[key].self);
         }
-        public long GetLong(string key)
+        internal long GetLong(string key)
         {
             return NativeMethods.StatsMemberGetLong(m_members[key].self);
         }
-        public ulong GetUnsignedLong(string key)
+        internal ulong GetUnsignedLong(string key)
         {
             return NativeMethods.StatsMemberGetUnsignedLong(m_members[key].self);
         }
-        public double GetDouble(string key)
+        internal double GetDouble(string key)
         {
             return NativeMethods.StatsMemberGetDouble(m_members[key].self);
         }
-        public string GetString(string key)
+        internal string GetString(string key)
         {
             return NativeMethods.StatsMemberGetString(m_members[key].self).AsAnsiStringWithFreeMem();
         }
-        public bool[] GetBoolArray(string key)
+        internal bool[] GetBoolArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetBoolArray(m_members[key].self, ref length).AsBoolArray((int)length);
         }
-        public int[] GetIntArray(string key)
+        internal int[] GetIntArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetIntArray(m_members[key].self, ref length).AsIntArray((int)length);
         }
 
-        public uint[] GetUnsignedIntArray(string key)
+        internal uint[] GetUnsignedIntArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetUnsignedIntArray(m_members[key].self, ref length).AsUnsignedIntArray((int)length);
         }
-        public long[] GetLongArray(string key)
+        internal long[] GetLongArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetLongArray(m_members[key].self, ref length).AsLongArray((int)length);
         }
-        public ulong[] GetUnsignedLongArray(string key)
+        internal ulong[] GetUnsignedLongArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetUnsignedLongArray(m_members[key].self, ref length).AsUnsignedLongArray((int)length);
         }
-        public double[] GetDoubleArray(string key)
+        internal double[] GetDoubleArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetDoubleArray(m_members[key].self, ref length).AsDoubleArray((int)length);
         }
-        public string[] GetStringArray(string key)
+        internal string[] GetStringArray(string key)
         {
             uint length = 0;
             return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsStringArray((int)length);
