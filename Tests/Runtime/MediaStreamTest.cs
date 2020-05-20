@@ -271,6 +271,7 @@ namespace Unity.WebRTC.RuntimeTest
             List<RTCRtpSender> pc2Senders;
             RTCPeerConnection peer1;
             RTCPeerConnection peer2;
+            RTCDataChannel dataChannel;
 
             public bool IsTestFinished
             {
@@ -304,6 +305,9 @@ namespace Unity.WebRTC.RuntimeTest
                 pc2Senders = new List<RTCRtpSender>();
                 peer1 = new RTCPeerConnection(ref config);
                 peer2 = new RTCPeerConnection(ref config);
+                RTCDataChannelInit conf = new RTCDataChannelInit(true);
+                dataChannel = peer1.CreateDataChannel("data", ref conf);
+
                 peer1.OnIceCandidate = candidate =>
                 {
                     Assert.NotNull(candidate);
@@ -388,6 +392,7 @@ namespace Unity.WebRTC.RuntimeTest
                 {
                     peer2.RemoveTrack(sender);
                 }
+                dataChannel.Dispose();
                 pc1Senders.Clear();
                 peer1.Close();
                 peer2.Close();

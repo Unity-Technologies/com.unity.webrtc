@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -643,6 +643,16 @@ namespace Unity.WebRTC
 
     public class RTCDataChannelStats : RTCStats
     {
+        public string label { get { return GetString("label"); } }
+        public string protocol { get { return GetString("protocol"); } }
+        public int datachannelid { get { return GetInt("datachannelid"); } }
+        public string state { get { return GetString("state"); } }
+        public uint messagesSent { get { return GetUnsignedInt("messagesSent"); } }
+        public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
+        public uint messagesReceived { get { return GetUnsignedInt("messagesReceived"); } }
+        public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
+
+
         internal RTCDataChannelStats(IntPtr ptr) : base(ptr)
         {
         }
@@ -669,6 +679,15 @@ namespace Unity.WebRTC
 
     public class RTCTransportStats : RTCStats
     {
+        public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
+        public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
+        public string rtcpTransportStatsId { get { return GetString("rtcpTransportStatsId"); } }
+        public string dtlsState { get { return GetString("dtlsState"); } }
+        public string selectedCandidatePairId { get { return GetString("selectedCandidatePairId"); } }
+        public string localCertificateId { get { return GetString("localCertificateId"); } }
+        public string remoteCertificateId { get { return GetString("remoteCertificateId"); } }
+        public uint selectedCandidatePairChanges { get { return GetUnsignedInt("selectedCandidatePairChanges"); } }
+
         internal RTCTransportStats(IntPtr ptr) : base(ptr)
         {
         }
