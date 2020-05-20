@@ -307,15 +307,42 @@ extern "C"
         obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
     }
 
-    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetList(const RTCStatsReport* report, int* length)
+    const std::map<std::string, byte> statsTypes =
+    {
+        { "codec", 0 },
+        { "inbound-rtp", 1 },
+        { "outbound-rtp", 2 },
+        { "remote-inbound-rtp", 3 },
+        { "remote-outbound-rtp", 4 },
+        { "media-source", 5 },
+        { "csrc", 6 },
+        { "peer-connection", 7 },
+        { "data-channel", 8 },
+        { "stream", 9 },
+        { "track", 10 },
+        { "transceiver", 11 },
+        { "sender", 12 },
+        { "receiver", 13 },
+        { "transport", 14 },
+        { "sctp-transport", 15 },
+        { "candidate-pair", 16 },
+        { "local-candidate", 17 },
+        { "remote-candidate", 18 },
+        { "certificate", 19 },
+        { "ice-server", 20 }
+    };
+
+    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetStatsList(const RTCStatsReport* report, int* length, byte** types)
     {
         *length = report->size();
+        *types = static_cast<byte*>(CoTaskMemAlloc(sizeof(byte) * report->size()));
         const auto buf = CoTaskMemAlloc(sizeof(RTCStats*) * report->size());
         const auto ret = static_cast<const RTCStats**>(buf);
         int i = 0;
         for (auto it = report->begin(); it != report->end(); ++it, i++)
         {
             ret[i] = &*it;
+            (*types)[i] = statsTypes.at(it->type());
         }
         return ret;
     }
@@ -337,41 +364,8 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT byte StatsGetType(const RTCStats* stats)
     {
-        const std::map<std::string, byte> statsTypes =
-        {
-            { "codec", 0 },
-            { "inbound-rtp", 1 },
-            { "outbound-rtp", 2 },
-            { "remote-inbound-rtp", 3 },
-            { "remote-outbound-rtp", 4 },
-            { "media-source", 5 },
-            { "csrc", 6 },
-            { "peer-connection", 7 },
-            { "data-channel", 8 },
-            { "stream", 9 },
-            { "track", 10 },
-            { "transceiver", 11 },
-            { "sender", 12 },
-            { "receiver", 13 },
-            { "transport", 14 },
-            { "sctp-transport", 15 },
-            { "candidate-pair", 16 },
-            { "local-candidate", 17 },
-            { "remote-candidate", 18 },
-            { "certificate", 19 },
-            { "ice-server", 20 }
-        };
-
         return statsTypes.at(stats->type());
     }
-
-    struct RTCStatsMember
-    {
-        RTCStatsMemberInterface::Type type;
-        //RTCStatsMemberKind kind;
-        size_t length;
-        void* value;
-    };
 
     UNITY_INTERFACE_EXPORT const RTCStatsMemberInterface** StatsGetMembers(const RTCStats* stats, size_t* length)
     {

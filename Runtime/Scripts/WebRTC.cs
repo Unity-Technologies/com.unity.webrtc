@@ -212,25 +212,6 @@ namespace Unity.WebRTC
         EncoderInitializationFailed
     }
 
-    internal enum StatsMemberType
-    {
-        Bool,    // bool
-        Int32,   // int32_t
-        Uint32,  // uint32_t
-        Int64,   // int64_t
-        Uint64,  // uint64_t
-        Double,  // double
-        String,  // std::string
-
-        SequenceBool,    // std::vector<bool>
-        SequenceInt32,   // std::vector<int32_t>
-        SequenceUint32,  // std::vector<uint32_t>
-        SequenceInt64,   // std::vector<int64_t>
-        SequenceUint64,  // std::vector<uint64_t>
-        SequenceDouble,  // std::vector<double>
-        SequenceString,  // std::vector<std::string>
-    }
-
     public static class WebRTC
     {
 #if UNITY_EDITOR_OSX
@@ -639,7 +620,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsReportGetList(IntPtr report, ref uint length);
+        public static extern IntPtr StatsReportGetStatsList(IntPtr report, ref uint length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsGetJson(IntPtr stats);
         [DllImport(WebRTC.Lib)]
