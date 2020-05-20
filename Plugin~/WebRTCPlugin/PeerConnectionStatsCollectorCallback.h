@@ -18,7 +18,7 @@ namespace webrtc
         static void RegisterOnGetStats(DelegateCollectStats callback) { s_collectStatsCallback = callback; }
     protected:
         explicit PeerConnectionStatsCollectorCallback(PeerConnectionObject* owner) { m_owner = owner; }
-        ~PeerConnectionStatsCollectorCallback() override { };
+        ~PeerConnectionStatsCollectorCallback() override = default;
     private:
         PeerConnectionObject* m_owner = nullptr;
 

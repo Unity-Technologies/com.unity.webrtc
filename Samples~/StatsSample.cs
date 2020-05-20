@@ -48,7 +48,14 @@ public class StatsSample : MonoBehaviour
         callButton.onClick.AddListener(() =>
         {
             callButton.interactable = false;
+            hangupButton.interactable = true;
             StartCoroutine(Call());
+        });
+        hangupButton.onClick.AddListener(() =>
+        {
+            callButton.interactable = true;
+            hangupButton.interactable = false;
+            Dispose();
         });
     }
 
@@ -168,6 +175,13 @@ public class StatsSample : MonoBehaviour
         {
             OnCreateSessionDescriptionError(op.Error);
         }
+    }
+
+    void Dispose()
+    {
+        dataChannel.Dispose();
+        pc1.Dispose();
+        pc2.Dispose();
     }
 
     /// <summary>

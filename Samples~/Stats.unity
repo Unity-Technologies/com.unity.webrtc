@@ -1287,7 +1287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   callButton: {fileID: 385015901}
-  hangupButton: {fileID: 0}
+  hangupButton: {fileID: 1894801812}
   text: {fileID: 1873602106}
   dropdown: {fileID: 1908622943}
 --- !u!1 &939542118
