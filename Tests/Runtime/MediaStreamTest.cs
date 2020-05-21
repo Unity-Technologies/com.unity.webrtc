@@ -223,6 +223,7 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(camObj);
         }
 
+        /*
         [UnityTest]
         [Timeout(5000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
@@ -244,6 +245,7 @@ namespace Unity.WebRTC.RuntimeTest
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
+        */
 
 
         /// <todo>
