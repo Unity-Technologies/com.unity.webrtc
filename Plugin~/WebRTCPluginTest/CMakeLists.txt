@@ -87,94 +87,96 @@ find_package(GMock REQUIRED)
 include(GoogleTest)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-    target_compile_definitions(WebRTCPluginTest
-        PRIVATE
-          WEBRTC_WIN
-          NOMINMAX
-    )
-    target_link_libraries(WebRTCPluginTest
-        PRIVATE
-        ${WEBRTC_LIBRARIES}
-        ${Vulkan_LIBRARY}
-        ${CUDA_CUDA_LIBRARY}
-        ${GTEST_MAIN_LIBRARIES}
-        ${GTEST_LIBRARIES}
-        ${GMOCK_LIBRARIES}
-        d3d11
-        d3d12
-        dxgi
-        winmm
-        Secur32
-        Msdmo
-        Dmoguids
-        wmcodecdspuuid
-    )
-    target_include_directories(WebRTCPluginTest
-        PRIVATE
-        ${CUDA_INCLUDE_DIRS}
-        ${Vulkan_INCLUDE_DIR}
-    )    
+  set(CMAKE_CXX_FLAGS_RELEASE "/MT /Zi")
+
+  target_compile_definitions(WebRTCPluginTest
+      PRIVATE
+        WEBRTC_WIN
+        NOMINMAX
+  )
+  target_link_libraries(WebRTCPluginTest
+      PRIVATE
+      ${WEBRTC_LIBRARIES}
+      ${Vulkan_LIBRARY}
+      ${CUDA_CUDA_LIBRARY}
+      ${GTEST_MAIN_LIBRARIES}
+      ${GTEST_LIBRARIES}
+      ${GMOCK_LIBRARIES}
+      d3d11
+      d3d12
+      dxgi
+      winmm
+      Secur32
+      Msdmo
+      Dmoguids
+      wmcodecdspuuid
+  )
+  target_include_directories(WebRTCPluginTest
+      PRIVATE
+      ${CUDA_INCLUDE_DIRS}
+      ${Vulkan_INCLUDE_DIR}
+  )    
+  set_target_properties( WebRTCPluginTest PROPERTIES LINK_FLAGS "/DEBUG")
 elseif(APPLE)
-    set(CMAKE_C_FLAGS "-x objective-c")
-    set(CMAKE_CXX_FLAGS "-x objective-c++")
+  set(CMAKE_C_FLAGS "-x objective-c")
+  set(CMAKE_CXX_FLAGS "-x objective-c++")
 
-    target_compile_definitions(WebRTCPluginTest
-        PRIVATE
-        WEBRTC_MAC
-        WEBRTC_POSIX
-    )
-    target_link_libraries(WebRTCPluginTest
-        PRIVATE
-        ${WEBRTC_LIBRARIES}
-        ${OPENGL_LIBRARIES}
-        ${FRAMEWORK_LIBS}
-        ${GTEST_MAIN_LIBRARIES}
-        ${GTEST_LIBRARIES}
-    )
+  target_compile_definitions(WebRTCPluginTest
+      PRIVATE
+      WEBRTC_MAC
+      WEBRTC_POSIX
+  )
+  target_link_libraries(WebRTCPluginTest
+      PRIVATE
+      ${WEBRTC_LIBRARIES}
+      ${OPENGL_LIBRARIES}
+      ${FRAMEWORK_LIBS}
+      ${GTEST_MAIN_LIBRARIES}
+      ${GTEST_LIBRARIES}
+  )
 
-    target_include_directories(WebRTCPluginTest
-        PRIVATE
-        ..
-    )
+  target_include_directories(WebRTCPluginTest
+      PRIVATE
+      ..
+  )
 elseif(UNIX)
-    find_package(OpenGL REQUIRED)
-    find_package(GLUT REQUIRED)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
+  find_package(OpenGL REQUIRED)
+  find_package(GLUT REQUIRED)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 
-    target_compile_definitions(WebRTCPluginTest
-        PRIVATE
-        WEBRTC_LINUX
-        WEBRTC_POSIX
-    )
+  target_compile_definitions(WebRTCPluginTest
+    PRIVATE
+    WEBRTC_LINUX
+    WEBRTC_POSIX
+  )
 
-    target_link_libraries(WebRTCPluginTest
-        PRIVATE
-        ${WEBRTC_LIBRARIES}
-        ${OPENGL_opengl_LIBRARY}
-        ${GLUT_LIBRARY}
-        ${CMAKE_DL_LIBS}
-        ${GTEST_MAIN_LIBRARIES}
-        ${GTEST_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${Vulkan_LIBRARY}
-        cuda
-    )
-    target_include_directories(WebRTCPluginTest
-        PRIVATE
-        ..
-        ${CUDA_INCLUDE_DIRS}
-    )
+  target_link_libraries(WebRTCPluginTest
+    PRIVATE
+    ${WEBRTC_LIBRARIES}
+    ${OPENGL_opengl_LIBRARY}
+    ${GLUT_LIBRARY}
+    ${CMAKE_DL_LIBS}
+    ${GTEST_MAIN_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Vulkan_LIBRARY}
+    cuda
+  )
+  target_include_directories(WebRTCPluginTest
+    PRIVATE
+    ..
+    ${CUDA_INCLUDE_DIRS}
+  )
 endif()
 
 gtest_add_tests(TARGET WebRTCPluginTest)
 
 target_include_directories(WebRTCPluginTest
-    PRIVATE
-    .
-    ../WebRTCPlugin
-    ${CMAKE_SOURCE_DIR}/unity/include
-    ${WEBRTC_INCLUDE_DIR}
-    ${OPENGL_INCLUDE_DIR}
-    ${GTEST_INCLUDE_DIRS}
+  PRIVATE
+  .
+  ../WebRTCPlugin
+  ${CMAKE_SOURCE_DIR}/unity/include
+  ${WEBRTC_INCLUDE_DIR}
+  ${OPENGL_INCLUDE_DIR}
+  ${GTEST_INCLUDE_DIRS}
 )
