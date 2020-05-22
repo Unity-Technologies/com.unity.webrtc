@@ -78,8 +78,8 @@ endif()
 
 # specify gtest root directory
 if(MSVC)
-  set(GTEST_ROOT "../googletest")
-  set(GMOCK_ROOT "../googletest")
+  set(GTEST_ROOT "${CMAKE_SOURCE_DIR}/googletest")
+  set(GMOCK_ROOT "${CMAKE_SOURCE_DIR}/googletest")
 endif()
 
 find_package(GTest REQUIRED)

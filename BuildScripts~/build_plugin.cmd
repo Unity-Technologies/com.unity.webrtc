@@ -33,8 +33,13 @@ cmake . -G "Visual Studio 15 2017" -A x64
 cmake --build . --config Release
 
 echo -------------------
+echo Move com.unity.webrtc Plugin
+
+copy %SOLUTION_DIR%\WebRTCPlugin\Release\webrtc.dll %SOLUTION_DIR%\..\Runtime\Plugins\x86_64
+
+echo -------------------
 echo Test com.unity.webrtc Plugin 
 
-%SOLUTION_DIR%\build64\WebRTCPluginTest\Release\WebRTCPluginTest.exe
+%SOLUTION_DIR%\WebRTCPluginTest\Release\WebRTCPluginTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------

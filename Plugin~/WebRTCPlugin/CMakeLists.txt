@@ -108,6 +108,8 @@ if(MSVC)
         ${CUDA_INCLUDE_DIRS}
         ${Vulkan_INCLUDE_DIR}
     )
+
+    set_target_properties( webrtc PROPERTIES LINK_FLAGS "/DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll")
     set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR})
     set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR})
 
