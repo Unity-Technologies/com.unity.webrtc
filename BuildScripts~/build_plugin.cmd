@@ -12,6 +12,7 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 echo -------------------
 echo Install googletest
 
+cd %SOLUTION_DIR%
 git clone https://github.com/google/googletest.git
 cd googletest
 git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
