@@ -7,7 +7,7 @@ namespace unity
 namespace webrtc
 {
 
-    NvVideoCapturer::NvVideoCapturer()
+    NvVideoCapturer::NvVideoCapturer() : encoder_(nullptr)
     {
         set_enable_video_adapter(false);
         SetSupportedFormats(
