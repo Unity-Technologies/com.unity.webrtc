@@ -87,7 +87,10 @@ find_package(GMock REQUIRED)
 include(GoogleTest)
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS_RELEASE "/MT /Zi")
+  # Use precompiled header
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT /Zi")
 
   target_compile_definitions(WebRTCPluginTest
       PRIVATE
@@ -112,22 +115,31 @@ if(MSVC)
       wmcodecdspuuid
   )
   target_include_directories(WebRTCPluginTest
-      PRIVATE
+    PRIVATE
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
   )    
-  set_target_properties( WebRTCPluginTest PROPERTIES LINK_FLAGS "/DEBUG")
+  set_target_properties( WebRTCPluginTest 
+    PROPERTIES LINK_FLAGS 
+      "/DEBUG"
+  )
+
+  # Creare precompiled header
+  set_source_files_properties(pch.cpp 
+    PROPERTIES COMPILE_FLAGS 
+      "/Yc /Ycpch.h"
+  )
 elseif(APPLE)
   set(CMAKE_C_FLAGS "-x objective-c")
   set(CMAKE_CXX_FLAGS "-x objective-c++")
 
   target_compile_definitions(WebRTCPluginTest
-      PRIVATE
+    PRIVATE
       WEBRTC_MAC
       WEBRTC_POSIX
   )
   target_link_libraries(WebRTCPluginTest
-      PRIVATE
+    PRIVATE
       ${WEBRTC_LIBRARIES}
       ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
@@ -136,7 +148,7 @@ elseif(APPLE)
   )
 
   target_include_directories(WebRTCPluginTest
-      PRIVATE
+    PRIVATE
       ..
   )
 elseif(UNIX)
@@ -146,26 +158,26 @@ elseif(UNIX)
 
   target_compile_definitions(WebRTCPluginTest
     PRIVATE
-    WEBRTC_LINUX
-    WEBRTC_POSIX
+      WEBRTC_LINUX
+      WEBRTC_POSIX
   )
 
   target_link_libraries(WebRTCPluginTest
     PRIVATE
-    ${WEBRTC_LIBRARIES}
-    ${OPENGL_opengl_LIBRARY}
-    ${GLUT_LIBRARY}
-    ${CMAKE_DL_LIBS}
-    ${GTEST_MAIN_LIBRARIES}
-    ${GTEST_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${Vulkan_LIBRARY}
-    cuda
+      ${WEBRTC_LIBRARIES}
+      ${OPENGL_opengl_LIBRARY}
+      ${GLUT_LIBRARY}
+      ${CMAKE_DL_LIBS}
+      ${GTEST_MAIN_LIBRARIES}
+      ${GTEST_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${Vulkan_LIBRARY}
+      cuda
   )
   target_include_directories(WebRTCPluginTest
     PRIVATE
-    ..
-    ${CUDA_INCLUDE_DIRS}
+      ..
+      ${CUDA_INCLUDE_DIRS}
   )
 endif()
 
@@ -173,10 +185,10 @@ gtest_add_tests(TARGET WebRTCPluginTest)
 
 target_include_directories(WebRTCPluginTest
   PRIVATE
-  .
-  ../WebRTCPlugin
-  ${CMAKE_SOURCE_DIR}/unity/include
-  ${WEBRTC_INCLUDE_DIR}
-  ${OPENGL_INCLUDE_DIR}
-  ${GTEST_INCLUDE_DIRS}
+    .
+    ../WebRTCPlugin
+    ${CMAKE_SOURCE_DIR}/unity/include
+    ${WEBRTC_INCLUDE_DIR}
+    ${OPENGL_INCLUDE_DIR}
+    ${GTEST_INCLUDE_DIRS}
 )

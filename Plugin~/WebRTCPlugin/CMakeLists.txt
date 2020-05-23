@@ -67,8 +67,6 @@ add_plugin(webrtc
   PLUGINS_DIR ${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64
 )
 
-
-
 if(MSVC)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -76,6 +74,11 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
+  # Replace /GR option to disable RTTI
+  foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+                   CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    string(REPLACE /GR /GR- "${flag_var}" "${${flag_var}}")
+  endforeach()
 elseif(APPLE OR UNIX)
   message(STATUS "macos or linux")
   target_compile_options(webrtc PRIVATE -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
@@ -83,7 +86,10 @@ elseif(APPLE OR UNIX)
 endif()
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS_RELEASE "/MT /Zi")
+  # Use precompiled header
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT /Zi")
   set(PROJECT_BINARY_DIR "../../Runtime/Plugins/x86_64")
 
   target_compile_definitions(webrtc
@@ -108,13 +114,24 @@ if(MSVC)
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
   )
-
-  #target_link_options(foo PUBLIC /DEBUG)
-  set_target_properties( webrtc PROPERTIES LINK_FLAGS "/DEBUG")
-  set_target_properties( webrtc PROPERTIES LINK_FLAGS "/DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll")
-  set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR})
-  set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR})
-
+  set_target_properties( webrtc 
+    PROPERTIES LINK_FLAGS 
+      "/DEBUG /SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+  )
+  set_target_properties( webrtc 
+    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG 
+      ${PROJECT_BINARY_DIR}
+  )
+  set_target_properties( webrtc 
+    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE 
+      ${PROJECT_BINARY_DIR}
+  )
+  
+  # Creare precompiled header
+  set_source_files_properties(pch.cpp 
+    PROPERTIES COMPILE_FLAGS 
+      "/Yc /Ycpch.h"
+  )
 elseif(APPLE)
   EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
   message( STATUS "Architecture: ${ARCHITECTURE}" )
@@ -134,8 +151,14 @@ elseif(APPLE)
       ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
   )
-  set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR})
-  set_target_properties( webrtc PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR})
+  set_target_properties( webrtc 
+    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG 
+      ${PROJECT_BINARY_DIR}
+  )
+  set_target_properties( webrtc 
+    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE 
+      ${PROJECT_BINARY_DIR}
+  )
 
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
