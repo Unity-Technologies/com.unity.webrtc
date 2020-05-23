@@ -90,7 +90,7 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT /Zi")
-  set(PROJECT_BINARY_DIR "../../Runtime/Plugins/x86_64")
+  set(PROJECT_BINARY_DIR "../../../Runtime/Plugins/x86_64")
 
   target_compile_definitions(webrtc
     PRIVATE
@@ -114,19 +114,23 @@ if(MSVC)
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
   )
+
+  # Set linker option
   set_target_properties( webrtc 
     PROPERTIES LINK_FLAGS 
       "/DEBUG /SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
   )
+
+  # Change output directory for shared library
   set_target_properties( webrtc 
-    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG 
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
       ${PROJECT_BINARY_DIR}
   )
   set_target_properties( webrtc 
-    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE 
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG
       ${PROJECT_BINARY_DIR}
   )
-  
+
   # Creare precompiled header
   set_source_files_properties(pch.cpp 
     PROPERTIES COMPILE_FLAGS 
