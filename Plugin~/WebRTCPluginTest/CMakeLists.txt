@@ -15,7 +15,29 @@ file(GLOB sources
 )
 
 # Apple/Unix specific source files
-if(APPLE)
+if(MSVC)
+    file(GLOB append_source
+        ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
+        ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
+        ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
+        ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
+        ../WebRTCPlugin/GraphicsDevice/D3D11/*.h
+        ../WebRTCPlugin/GraphicsDevice/D3D11/*.cpp
+        ../WebRTCPlugin/GraphicsDevice/D3D12/*.h
+        ../WebRTCPlugin/GraphicsDevice/D3D12/*.cpp
+        ../WebRTCPlugin/Codec/SoftwareCodec/*.h
+        ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D11.cpp
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D11.h
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D12.cpp
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D12.h
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
+        ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
+    )
+    list (APPEND sources ${append_source})
+elseif(APPLE)
     file(GLOB append_source
         ../WebRTCPlugin/GraphicsDevice/Metal/*.h
         ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
@@ -46,7 +68,6 @@ elseif(UNIX)
     list (APPEND sources ${append_source})
 endif()
 
-
 add_executable(WebRTCPluginTest ${sources} ../unity/include/IUnityGraphicsMetal.h)
 
 if(APPLE OR UNIX)
@@ -55,10 +76,46 @@ if(APPLE OR UNIX)
   target_compile_features(WebRTCPluginTest PRIVATE cxx_std_14)
 endif()
 
+# specify gtest root directory
+if(MSVC)
+  set(GTEST_ROOT "../googletest")
+  set(GMOCK_ROOT "../googletest")
+endif()
+
 find_package(GTest REQUIRED)
+find_package(GMock REQUIRED)
 include(GoogleTest)
 
-if(APPLE)
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+    target_compile_definitions(WebRTCPluginTest
+        PRIVATE
+          WEBRTC_WIN
+          NOMINMAX
+    )
+    target_link_libraries(WebRTCPluginTest
+        PRIVATE
+        ${WEBRTC_LIBRARIES}
+        ${Vulkan_LIBRARY}
+        ${CUDA_CUDA_LIBRARY}
+        ${GTEST_MAIN_LIBRARIES}
+        ${GTEST_LIBRARIES}
+        ${GMOCK_LIBRARIES}
+        d3d11
+        d3d12
+        dxgi
+        winmm
+        Secur32
+        Msdmo
+        Dmoguids
+        wmcodecdspuuid
+    )
+    target_include_directories(WebRTCPluginTest
+        PRIVATE
+        ${CUDA_INCLUDE_DIRS}
+        ${Vulkan_INCLUDE_DIR}
+    )    
+elseif(APPLE)
     set(CMAKE_C_FLAGS "-x objective-c")
     set(CMAKE_CXX_FLAGS "-x objective-c++")
 
