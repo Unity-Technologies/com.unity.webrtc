@@ -257,18 +257,24 @@ namespace Unity.WebRTC.RuntimeTest
                 RTCAnswerOptions options2 = default;
                 var op1 = peer1.CreateOffer(ref options1);
                 yield return op1;
+                Assert.False(op1.IsError);
                 var desc = op1.Desc;
                 var op2 = peer1.SetLocalDescription(ref desc);
                 yield return op2;
+                Assert.False(op2.IsError);
                 var op3 = peer2.SetRemoteDescription(ref desc);
                 yield return op3;
+                Assert.False(op3.IsError);
                 var op4 = peer2.CreateAnswer(ref options2);
                 yield return op4;
+                Assert.False(op4.IsError);
                 desc = op4.Desc;
                 var op5 = peer2.SetLocalDescription(ref desc);
                 yield return op5;
+                Assert.False(op5.IsError);
                 var op6 = peer1.SetRemoteDescription(ref desc);
                 yield return op6;
+                Assert.False(op6.IsError);
 
                 var op7 = new WaitUntilWithTimeout(() =>
                     peer1.IceConnectionState == RTCIceConnectionState.Connected ||
@@ -280,7 +286,7 @@ namespace Unity.WebRTC.RuntimeTest
                     peer2.IceConnectionState == RTCIceConnectionState.Connected ||
                     peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
                 yield return op8;
-                Assert.True(op7.IsCompleted);
+                Assert.True(op8.IsCompleted);
 
                 var op9 = new WaitUntilWithTimeout(() => pc2Senders.Count > 0, 5000);
                 yield return op9;

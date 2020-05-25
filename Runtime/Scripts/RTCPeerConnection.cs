@@ -10,7 +10,7 @@ namespace Unity.WebRTC
     public delegate void DelegateOnNegotiationNeeded();
     public delegate void DelegateOnTrack(RTCTrackEvent e);
     public delegate void DelegateSetSessionDescSuccess();
-    public delegate void DelegateSetSessionDescFailure();
+    public delegate void DelegateSetSessionDescFailure(RTCError error);
 
     public class RTCPeerConnection : IDisposable
     {
@@ -365,7 +365,7 @@ namespace Unity.WebRTC
 
         public void CollectStats()
         {
-            /// TODO:: define async operation class 
+            /// TODO:: define async operation class
             //m_opSetDesc = new RTCSessionDescriptionAsyncOperation();
             //NativeMethods.PeerConnectionCollectStats(self);
         }
@@ -467,13 +467,13 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
-        static void OnSetSessionDescFailure(IntPtr ptr)
+        static void OnSetSessionDescFailure(IntPtr ptr, RTCError error)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnSetSessionDescriptionFailure();
+                    connection.OnSetSessionDescriptionFailure(error);
                 }
             });
         }

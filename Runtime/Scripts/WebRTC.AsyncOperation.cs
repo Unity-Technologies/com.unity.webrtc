@@ -23,8 +23,8 @@ namespace Unity.WebRTC
                 }
                 else
                 {
-                    return true;  
-                }   
+                    return true;
+                }
             }
         }
 
@@ -48,9 +48,10 @@ namespace Unity.WebRTC
                 IsError = false;
                 this.Done();
             };
-            connection.OnSetSessionDescriptionFailure = () =>
+            connection.OnSetSessionDescriptionFailure = (error) =>
             {
                 IsError = true;
+                Error = error;
                 this.Done();
             };
         }
