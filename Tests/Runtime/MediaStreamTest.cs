@@ -205,9 +205,6 @@ namespace Unity.WebRTC.RuntimeTest
 
             foreach (RTCStats stats in op.Value.Values)
             {
-                // Debug.Log("");
-                // Debug.LogFormat("{0} {1}", stats.Id, stats.Type);
-
                 Assert.NotNull(stats);
                 Assert.Greater(stats.Timestamp, 0);
                 Assert.IsNotEmpty(stats.Id);
@@ -222,31 +219,6 @@ namespace Unity.WebRTC.RuntimeTest
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
-
-        /*
-        [UnityTest]
-        [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
-        public IEnumerator SenderGetStats()
-        {
-            var camObj = new GameObject("Camera");
-            var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
-
-            var test = new MonoBehaviourTest<SignalingPeersTest>();
-            test.component.SetStream(videoStream);
-            yield return test;
-            var op = test.component.GetSenderStats();
-            yield return op;
-            Assert.True(op.IsDone);
-
-            test.component.Dispose();
-            videoStream.Dispose();
-            Object.DestroyImmediate(camObj);
-        }
-        */
-
 
         /// <todo>
         /// This unittest failed standalone mono 2019.3 on linux
