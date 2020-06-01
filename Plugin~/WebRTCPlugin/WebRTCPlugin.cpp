@@ -54,7 +54,7 @@ T* ConvertArray(std::vector<T> vec, size_t* length)
 {
     *length = vec.size();
     size_t size = sizeof(T*) * vec.size();
-    LPVOID dst = CoTaskMemAlloc(size);
+    auto dst = CoTaskMemAlloc(size);
     memcpy(dst, &vec[0], size);
     return static_cast<T*>(dst);
 }
