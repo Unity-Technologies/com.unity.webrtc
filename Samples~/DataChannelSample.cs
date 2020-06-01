@@ -291,12 +291,12 @@ public class DataChannelSample : MonoBehaviour
             yield return op2;
 
             Debug.Log("pc1");
-            foreach (var stat in op1.Value.Values)
+            foreach (var stat in op1.Value.Stats.Values)
             {
                 Debug.Log(stat.Type.ToString());
             }
             Debug.Log("pc2");
-            foreach (var stat in op2.Value.Values)
+            foreach (var stat in op2.Value.Stats.Values)
             {
                 Debug.Log(stat.Type.ToString());
             }

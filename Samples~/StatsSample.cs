@@ -316,7 +316,7 @@ public class StatsSample : MonoBehaviour
             if(dropdown.options.Count == 0)
             {
                 List<string> options = new List<string>();
-                foreach (var stat in op1.Value.Values)
+                foreach (var stat in op1.Value.Stats.Values)
                 {
                     options.Add(stat.Type.ToString());
                 }
@@ -332,9 +332,9 @@ public class StatsSample : MonoBehaviour
             var currentOption = dropdown.options[currentValue].text;
 
             var type = (RTCStatsType)Enum.Parse(typeof(RTCStatsType), currentOption);
-            text.text = "Id:" + op1.Value[type].Id + "\n";
-            text.text += "Timestamp:" + op1.Value[type].Timestamp + "\n";
-            text.text += op1.Value[type].Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
+            text.text = "Id:" + op1.Value.Stats[type].Id + "\n";
+            text.text += "Timestamp:" + op1.Value.Stats[type].Timestamp + "\n";
+            text.text += op1.Value.Stats[type].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
         }
     }
 

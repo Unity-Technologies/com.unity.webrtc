@@ -198,17 +198,17 @@ namespace Unity.WebRTC.RuntimeTest
             var op = test.component.GetPeerStats();
             yield return op;
             Assert.True(op.IsDone);
-            Assert.IsNotEmpty(op.Value);
-            Assert.IsNotEmpty(op.Value.Keys);
-            Assert.IsNotEmpty(op.Value.Values);
-            Assert.Greater(op.Value.Count, 0);
+            Assert.IsNotEmpty(op.Value.Stats);
+            Assert.IsNotEmpty(op.Value.Stats.Keys);
+            Assert.IsNotEmpty(op.Value.Stats.Values);
+            Assert.Greater(op.Value.Stats.Count, 0);
 
-            foreach (RTCStats stats in op.Value.Values)
+            foreach (RTCStats stats in op.Value.Stats.Values)
             {
                 Assert.NotNull(stats);
                 Assert.Greater(stats.Timestamp, 0);
                 Assert.IsNotEmpty(stats.Id);
-                foreach(var pair in stats)
+                foreach(var pair in stats.Dict)
                 {
                     Assert.IsNotEmpty(pair.Key);
                     Assert.NotNull(pair.Value);

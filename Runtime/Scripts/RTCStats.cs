@@ -142,10 +142,11 @@ namespace Unity.WebRTC
         }
     }
 
-    public class RTCStats : IReadOnlyDictionary<string, object>
+    public class RTCStats
     {
         private IntPtr self;
         internal Dictionary<string, RTCStatsMember> m_members;
+        internal Dictionary<string, object> m_dict;
 
         public RTCStatsType Type
         {
@@ -165,51 +166,15 @@ namespace Unity.WebRTC
             get { return NativeMethods.StatsGetTimestamp(self); }
         }
 
-        public bool ContainsKey(string key)
-        {
-            return m_members.ContainsKey(key);
-        }
-
-        public bool TryGetValue(string key, out object value)
-        {
-            RTCStatsMember member;
-            if (!m_members.TryGetValue(key, out member))
-            {
-                value = null;
-                return false;
-            }
-            value = member.GetValue();
-            return true;
-        }
-
-        public IEnumerable<string> Keys
+        public IDictionary<string, object> Dict
         {
             get
             {
-                return m_members.Keys;
-            }
-        }
-        public IEnumerable<object> Values
-        {
-            get
-            {
-                return m_members.Values.Select(member => member.GetValue());
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                return m_members.Count;
-            }
-        }
-
-        public object this[string key]
-        {
-            get
-            {
-                return m_members[key].GetValue();
+                if(m_dict == null)
+                {
+                    m_dict = m_members.ToDictionary(member => member.Key, member => member.Value.GetValue());
+                }
+                return m_dict;
             }
         }
 
@@ -277,63 +242,7 @@ namespace Unity.WebRTC
             uint length = 0;
             return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsStringArray((int)length);
         }
-
-        class MemberEnumerator : IEnumerator<KeyValuePair<string, object>>
-        {
-            Dictionary<string, RTCStatsMember> m_members;
-            int m_pos;
-
-            public MemberEnumerator(Dictionary<string, RTCStatsMember> members)
-            {
-                m_members = members;
-                m_pos = -1;
-            }
-
-            public KeyValuePair<string, object> Current
-            {
-                get
-                {
-                    var member = m_members.ElementAt(m_pos);
-                    return new KeyValuePair<string, object>(member.Key, member.Value.GetValue());
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return (object)this.Current;
-                }
-            }
-
-            public bool MoveNext()
-            {
-                m_pos++;
-                if (m_pos >= m_members.Count)
-                {
-                    return false;
-                }
-                return true;
-            }
-            public void Reset()
-            {
-                m_pos = -1;
-            }
-            void IDisposable.Dispose()
-            {
-            }
-        }
-
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-        {
-            return new MemberEnumerator(m_members);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
+        
         internal RTCStats(IntPtr ptr)
         {
             self = ptr;
@@ -732,7 +641,7 @@ namespace Unity.WebRTC
         }
     }
 
-    public class RTCStatsReport : IReadOnlyDictionary<RTCStatsType, RTCStats>
+    public class RTCStatsReport
     {
         private IntPtr self;
         private readonly Dictionary<RTCStatsType, RTCStats> m_dictStats;
@@ -755,55 +664,9 @@ namespace Unity.WebRTC
             }
         }
 
-        public bool ContainsKey(RTCStatsType key)
+        public IDictionary<RTCStatsType, RTCStats> Stats
         {
-            return m_dictStats.ContainsKey(key);
-        }
-
-        public bool TryGetValue(RTCStatsType key, out RTCStats value)
-        {
-            return m_dictStats.TryGetValue(key, out value);
-        }
-
-        public IEnumerable<RTCStatsType> Keys
-        {
-            get
-            {
-                return m_dictStats.Keys;
-            }
-        }
-        public IEnumerable<RTCStats> Values
-        {
-            get
-            {
-                return m_dictStats.Values;
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                return m_dictStats.Count;
-            }
-        }
-
-        public RTCStats this[RTCStatsType key]
-        {
-            get
-            {
-                return m_dictStats[key];
-            }
-        }
-
-        public IEnumerator<KeyValuePair<RTCStatsType, RTCStats>> GetEnumerator()
-        {
-            return m_dictStats.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            get { return m_dictStats; }
         }
     }
 }

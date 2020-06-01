@@ -53,19 +53,15 @@ template<typename T>
 T* ConvertArray(std::vector<T> vec, size_t* length)
 {
     *length = vec.size();
-    const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
-    const auto ret = static_cast<T*>(buf);
-    for (uint32_t i = 0; i < vec.size(); i++)
-    {
-        ret[i] = vec[i];
-    }
-    return ret;
-
+    size_t size = sizeof(T*) * vec.size();
+    LPVOID dst = CoTaskMemAlloc(size);
+    memcpy(dst, &vec[0], size);
+    return static_cast<T*>(dst);
 }
 
 char* ConvertString(const std::string str)
 {
-    const int size = str.size();
+    size_t size = str.size();
     char* ret = static_cast<char*>(CoTaskMemAlloc(size + sizeof(char)));
     str.copy(ret, size);
     ret[size] = '\0';
@@ -343,7 +339,7 @@ extern "C"
         { "ice-server", 20 }
     };
 
-    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetStatsList(const RTCStatsReport* report, int* length, byte** types)
+    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetStatsList(const RTCStatsReport* report, size_t* length, byte** types)
     {
         *length = report->size();
         *types = static_cast<byte*>(CoTaskMemAlloc(sizeof(byte) * report->size()));
