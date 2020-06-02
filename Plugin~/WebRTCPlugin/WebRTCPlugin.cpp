@@ -55,8 +55,25 @@ T* ConvertArray(std::vector<T> vec, size_t* length)
     *length = vec.size();
     size_t size = sizeof(T*) * vec.size();
     auto dst = CoTaskMemAlloc(size);
-    memcpy(dst, &vec[0], size);
+    auto src = vec.data();
+    std::memcpy(dst, src, size);
     return static_cast<T*>(dst);
+}
+
+///
+/// avoid compile erorr for vector<bool>
+/// https://en.cppreference.com/w/cpp/container/vector_bool
+bool* ConvertArray(std::vector<bool> vec, size_t* length)
+{
+    *length = vec.size();
+    size_t size = sizeof(bool*) * vec.size();
+    auto dst = CoTaskMemAlloc(size);
+    bool* ret = static_cast<bool*>(dst);
+    for (size_t i = 0; i < vec.size(); i++)
+    {
+        ret[i] = vec[i];
+    }
+    return ret;
 }
 
 char* ConvertString(const std::string str)
