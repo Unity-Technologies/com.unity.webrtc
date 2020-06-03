@@ -43,7 +43,7 @@ bool D3D12GraphicsDevice::InitV() {
     ID3D11Device* legacyDevice;
     ID3D11DeviceContext* legacyContext;
 
-    D3D11CreateDevice(
+    ThrowIfFailed(D3D11CreateDevice(
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,
@@ -53,18 +53,26 @@ bool D3D12GraphicsDevice::InitV() {
         D3D11_SDK_VERSION,
         &legacyDevice,
         nullptr,
-        &legacyContext);
+        &legacyContext));
 
-    legacyDevice->QueryInterface(IID_PPV_ARGS(&m_d3d11Device));
+    ThrowIfFailed(legacyDevice->QueryInterface(IID_PPV_ARGS(&m_d3d11Device)));
 
     legacyDevice->GetImmediateContext(&legacyContext);
-    legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
+    ThrowIfFailed(legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context)));
 
-    m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
-    m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
-    m_d3d12Device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
-	m_copyResourceEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
+    ThrowIfFailed(m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
+    ThrowIfFailed(m_d3d12Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList)));
 
+    // Command lists are created in the recording state, but there is nothing
+    // to record yet. The main loop expects it to be closed, so close it now.
+    ThrowIfFailed(m_commandList->Close());
+
+    ThrowIfFailed(m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence)));
+    m_copyResourceEventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (m_copyResourceEventHandle == nullptr)
+    {
+        ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
+    }
     return true;
 }
 
@@ -105,32 +113,36 @@ bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* na
         return false;
     if (nativeSrc == nullptr || nativeDest == nullptr)
         return false;
-    
-    m_commandList->Reset(m_commandAllocator, nullptr); 
+
+    ThrowIfFailed(m_commandAllocator->Reset());
+    ThrowIfFailed(m_commandList->Reset(m_commandAllocator, nullptr));
+
     m_commandList->CopyResource(nativeDest, nativeSrc);
 
     //for CPU accessible texture
     ID3D12Resource* readbackResource = dest->GetReadbackResource();
-    if (nullptr!=readbackResource){
+    const D3D12ResourceFootprint* resFP = dest->GetNativeTextureFootprint();
+    if (nullptr != readbackResource)
+    {
         //Change dest state, copy, change dest state back
         Barrier(nativeDest,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_SOURCE);
-        const D3D12ResourceFootprint* resFP = dest->GetNativeTextureFootprint();
-        D3D12_TEXTURE_COPY_LOCATION td,ts;
-        td.pResource =readbackResource;
+        D3D12_TEXTURE_COPY_LOCATION td, ts;
+        td.pResource = readbackResource;
         td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
         td.PlacedFootprint = resFP->Footprint;
         ts.pResource = nativeDest;
         ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         ts.SubresourceIndex = 0;
-        m_commandList->CopyTextureRegion(&td,0,0,0,&ts,nullptr);
+        m_commandList->CopyTextureRegion(&td, 0, 0, 0, &ts, nullptr);
         Barrier(nativeDest,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);        
     }
-    m_commandList->Close();
+
+    ThrowIfFailed(m_commandList->Close());
 
     ID3D12CommandList* cmdList[] = { m_commandList };
-    m_d3d12CommandQueue->ExecuteCommandLists(1, cmdList);
+    m_d3d12CommandQueue->ExecuteCommandLists(_countof(cmdList), cmdList);
 
-    WaitForFence(m_copyResourceFence,m_copyResourceEventHandle, &m_copyResourceFenceValue);
+    WaitForFence(m_copyResourceFence, m_copyResourceEventHandle, &m_copyResourceFenceValue);
 
     return true;
 }
@@ -162,28 +174,23 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
     const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
     ID3D12Resource* nativeTex = nullptr;
-    HRESULT hr = m_d3d12Device->CreateCommittedResource(&D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
-        nullptr, IID_PPV_ARGS(&nativeTex)
-    );
-    if (!SUCCEEDED(hr)) {
-        return nullptr;
-    }
+    ThrowIfFailed(m_d3d12Device->CreateCommittedResource(&D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
+        nullptr, IID_PPV_ARGS(&nativeTex)));
 
     ID3D11Texture2D* sharedTex = nullptr;
     HANDLE handle = nullptr;   
-    hr = m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle);
-    if (SUCCEEDED(hr)) {
-        //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
-        hr = m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex));
-    }
+    ThrowIfFailed(m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
+
+    //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
+    ThrowIfFailed(m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex)));
 
     return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue) {
-    m_d3d12CommandQueue->Signal(fence, *fenceValue);
-    fence->SetEventOnCompletion(*fenceValue, handle);
+    ThrowIfFailed(m_d3d12CommandQueue->Signal(fence, *fenceValue));
+    ThrowIfFailed(fence->SetEventOnCompletion(*fenceValue, handle));
     WaitForSingleObject(handle, INFINITE);
     ++(*fenceValue);       
 }
