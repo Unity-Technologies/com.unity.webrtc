@@ -218,6 +218,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PeerConnectionObject.h" />
     <ClInclude Include="SetSessionDescriptionObserver.h" />
+    <ClInclude Include="UnityVideoDecoderFactory.h" />
     <ClInclude Include="UnityVideoEncoderFactory.h" />
     <ClInclude Include="VideoCapturer.h" />
     <ClInclude Include="VideoCaptureTrackSource.h" />
@@ -260,6 +261,7 @@
     </ClCompile>
     <ClCompile Include="PeerConnectionObject.cpp" />
     <ClCompile Include="SetSessionDescriptionObserver.cpp" />
+    <ClCompile Include="UnityVideoDecoderFactory.cpp" />
     <ClCompile Include="UnityVideoEncoderFactory.cpp" />
     <ClCompile Include="VideoCapturer.cpp" />
     <ClCompile Include="VideoCaptureTrackSource.cpp" />

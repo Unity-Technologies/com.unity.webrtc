@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M79/webrtc-mac.zip
+export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M83/webrtc-mac.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 
 # Install cmake
