@@ -22,7 +22,7 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        encoder_ = EncoderFactory::GetInstance().Init(width_, height_, m_device, encoderType);
+        encoder_ = EncoderFactory::GetInstance().Init(width_, height_, m_device, m_encoderType);
         EXPECT_NE(nullptr, encoder_);
 
         capturer_ = std::make_unique<NvVideoCapturer>();
