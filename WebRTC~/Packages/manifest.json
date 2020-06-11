@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.editorcoroutines": "1.0.0",
     "com.unity.ext.nunit": "1.0.0",
     "com.unity.ide.rider": "1.1.4",
     "com.unity.ide.vscode": "1.1.4",

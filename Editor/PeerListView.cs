@@ -34,6 +34,7 @@ namespace Unity.WebRTC.Editor
 
             OnRefreshPeerList += peerList =>
             {
+                container.Clear();
                 foreach (var peerConnection in peerList)
                 {
                     var button = new Button(() =>

@@ -242,7 +242,7 @@ namespace Unity.WebRTC
             uint length = 0;
             return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsStringArray((int)length);
         }
-        
+
         internal RTCStats(IntPtr ptr)
         {
             self = ptr;
@@ -419,7 +419,7 @@ namespace Unity.WebRTC
         public uint framesDropped { get { return GetUnsignedInt("framesDropped"); } }
         public uint framesCorrupted { get { return GetUnsignedInt("framesCorrupted"); } }
         public uint partialFramesLost { get { return GetUnsignedInt("partialFramesLost"); } }
-        public uint fullFramesLost { get { return GetUnsignedInt("decoderImplementation"); } }
+        public uint fullFramesLost { get { return GetUnsignedInt("fullFramesLost"); } }
         public double audioLevel { get { return GetDouble("audioLevel"); } }
         public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
         public double echoReturnLoss { get { return GetDouble("echoReturnLoss"); } }

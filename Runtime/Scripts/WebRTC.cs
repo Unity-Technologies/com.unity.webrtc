@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.Rendering;
 
 namespace Unity.WebRTC
@@ -66,7 +67,7 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         private RTCPeerConnection peer;
-        
+
         internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
@@ -422,6 +423,28 @@ namespace Unity.WebRTC
                 }
                 var result = Context.GetCodecInitializationResult();
                 return result;
+            }
+        }
+
+        public static IEnumerable<RTCPeerConnection> PeerList
+        {
+            get
+            {
+                var list = new List<RTCPeerConnection>();
+                if (Table?.Values != null)
+                {
+                    foreach (var value in Table?.Values)
+                    {
+                        if (value is RTCPeerConnection peer)
+                        {
+                            list.Add(peer);
+                        }
+                    }
+
+                    return list;
+                }
+
+                return null;
             }
         }
     }
