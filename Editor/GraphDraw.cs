@@ -7,6 +7,11 @@ namespace Unity.WebRTC.Editor
 {
     public class GraphDraw
     {
+        /// <summary>
+        /// example: container.Add(new IMGUIContainer(() => GraphDraw.Draw(GUILayoutUtility.GetRect(Screen.width / 2, 200), m_data)));
+        /// </summary>
+        /// <param name="area"></param>
+        /// <param name="data"></param>
         public static void Draw(Rect area, List<float> data)
         {
             // axis

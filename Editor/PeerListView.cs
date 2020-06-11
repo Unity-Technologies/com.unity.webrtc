@@ -15,16 +15,7 @@ namespace Unity.WebRTC.Editor
 
         public void Refresh()
         {
-            //var list = WebRTC.PeerList;
-            var list = new List<RTCPeerConnection>
-            {
-                new RTCPeerConnection(IntPtr.Zero),
-                new RTCPeerConnection(IntPtr.Zero),
-                new RTCPeerConnection(IntPtr.Zero),
-                new RTCPeerConnection(IntPtr.Zero),
-                new RTCPeerConnection(IntPtr.Zero),
-                new RTCPeerConnection(IntPtr.Zero),
-            };
+            var list = WebRTC.PeerList;
 
             if (list == null)
             {
@@ -37,11 +28,6 @@ namespace Unity.WebRTC.Editor
         public VisualElement Create()
         {
             var root = new VisualElement();
-
-            foreach (var peer in Enumerable.Range(0, 5))
-            {
-                root.Add(new Label($"peer list {peer}"));
-            }
 
             var container = new VisualElement();
             root.Add(container);

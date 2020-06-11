@@ -1,9 +1,14 @@
-﻿using UnityEditor;
+﻿using System;
+using System.Collections;
+using Unity.EditorCoroutines.Editor;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
+    public delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
+
     public class WebRTCInternals : EditorWindow
     {
         [MenuItem("Window/WebRTCInternals")]
@@ -13,10 +18,45 @@ namespace Unity.WebRTC.Editor
             wnd.titleContent = new GUIContent("WebRTCInternals");
         }
 
+        public event OnStatsReportHandler OnStats;
+
+        private EditorCoroutine m_editorCoroutine;
+
         private void OnEnable()
         {
             var root = this.rootVisualElement;
             root.Add(CreateStatsView());
+
+            m_editorCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(GetStatsPolling());
+        }
+
+        private void OnDisable()
+        {
+            EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+        }
+
+        IEnumerator GetStatsPolling()
+        {
+            while (true)
+            {
+                var peerList = WebRTC.PeerList;
+
+                if (peerList != null)
+                {
+                    foreach (var peer in peerList)
+                    {
+                        var op = peer.GetStats();
+                        yield return op;
+
+                        if (!op.IsError)
+                        {
+                            OnStats?.Invoke(peer, op.Value);
+                        }
+                    }
+                }
+
+                yield return new WaitForSeconds(1);
+            }
         }
 
         private VisualElement CreateStatsView()
@@ -49,7 +89,7 @@ namespace Unity.WebRTC.Editor
                 mainView.Clear();
 
                 // main stats view
-                var statsView = new PeerStatsView(newPeer);
+                var statsView = new PeerStatsView(newPeer, this);
                 mainView.Add(statsView.Create());
             };
 
