@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -732,6 +733,8 @@ namespace Unity.WebRTC.Editor
             var container = new VisualElement();
             root.Add(container);
 
+            var graphView = new CandidatePairGraphView();
+
             m_parent.OnStats += (peer, report) =>
             {
                 if (peer != m_peerConnection)
@@ -790,7 +793,12 @@ namespace Unity.WebRTC.Editor
                     $"{nameof(candidatePairStats.consentResponsesReceived)}: {candidatePairStats.consentResponsesReceived}"));
                 container.Add(new Label(
                     $"{nameof(candidatePairStats.consentResponsesSent)}: {candidatePairStats.consentResponsesSent}"));
+
+                graphView.AddInput(candidatePairStats);
             };
+
+            root.Add(graphView.Create());
+
             return root;
         }
 
