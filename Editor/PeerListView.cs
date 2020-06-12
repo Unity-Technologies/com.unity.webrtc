@@ -27,7 +27,7 @@ namespace Unity.WebRTC.Editor
 
         public VisualElement Create()
         {
-            var root = new VisualElement();
+            var root = new ScrollView();
 
             var container = new VisualElement();
             root.Add(container);

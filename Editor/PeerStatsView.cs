@@ -21,7 +21,7 @@ namespace Unity.WebRTC.Editor
 
         public VisualElement Create()
         {
-            var root = new VisualElement();
+            var root = new ScrollView();
             var list = Enum.GetValues(typeof(RTCStatsType)).Cast<RTCStatsType>().ToList();
             var popup = new PopupField<RTCStatsType>(list, 0);
             root.Add(popup);
