@@ -165,6 +165,19 @@ namespace Unity.WebRTC.Editor
 
                 container.Add(new Label($"{nameof(inboundStats.Id)}: {inboundStats.Id}"));
                 container.Add(new Label($"{nameof(inboundStats.Timestamp)}: {inboundStats.Timestamp}"));
+                container.Add(new Label($"{nameof(inboundStats.ssrc)}: {inboundStats.ssrc}"));
+                container.Add(new Label($"{nameof(inboundStats.associateStatsId)}: {inboundStats.associateStatsId}"));
+                container.Add(new Label($"{nameof(inboundStats.isRemote)}: {inboundStats.isRemote}"));
+                container.Add(new Label($"{nameof(inboundStats.mediaType)}: {inboundStats.mediaType}"));
+                container.Add(new Label($"{nameof(inboundStats.kind)}: {inboundStats.kind}"));
+                container.Add(new Label($"{nameof(inboundStats.trackId)}: {inboundStats.trackId}"));
+                container.Add(new Label($"{nameof(inboundStats.transportId)}: {inboundStats.transportId}"));
+                container.Add(new Label($"{nameof(inboundStats.codecId)}: {inboundStats.codecId}"));
+                container.Add(new Label($"{nameof(inboundStats.firCount)}: {inboundStats.firCount}"));
+                container.Add(new Label($"{nameof(inboundStats.pliCount)}: {inboundStats.pliCount}"));
+                container.Add(new Label($"{nameof(inboundStats.nackCount)}: {inboundStats.nackCount}"));
+                container.Add(new Label($"{nameof(inboundStats.sliCount)}: {inboundStats.sliCount}"));
+                container.Add(new Label($"{nameof(inboundStats.qpSum)}: {inboundStats.qpSum}"));
                 container.Add(new Label($"{nameof(inboundStats.packetsReceived)}: {inboundStats.packetsReceived}"));
                 container.Add(new Label($"{nameof(inboundStats.bytesReceived)}: {inboundStats.bytesReceived}"));
                 container.Add(
@@ -220,6 +233,19 @@ namespace Unity.WebRTC.Editor
 
                 container.Add(new Label($"{nameof(outboundStats.Id)}: {outboundStats.Id}"));
                 container.Add(new Label($"{nameof(outboundStats.Timestamp)}: {outboundStats.Timestamp}"));
+                container.Add(new Label($"{nameof(outboundStats.ssrc)}: {outboundStats.ssrc}"));
+                container.Add(new Label($"{nameof(outboundStats.associateStatsId)}: {outboundStats.associateStatsId}"));
+                container.Add(new Label($"{nameof(outboundStats.isRemote)}: {outboundStats.isRemote}"));
+                container.Add(new Label($"{nameof(outboundStats.mediaType)}: {outboundStats.mediaType}"));
+                container.Add(new Label($"{nameof(outboundStats.kind)}: {outboundStats.kind}"));
+                container.Add(new Label($"{nameof(outboundStats.trackId)}: {outboundStats.trackId}"));
+                container.Add(new Label($"{nameof(outboundStats.transportId)}: {outboundStats.transportId}"));
+                container.Add(new Label($"{nameof(outboundStats.codecId)}: {outboundStats.codecId}"));
+                container.Add(new Label($"{nameof(outboundStats.firCount)}: {outboundStats.firCount}"));
+                container.Add(new Label($"{nameof(outboundStats.pliCount)}: {outboundStats.pliCount}"));
+                container.Add(new Label($"{nameof(outboundStats.nackCount)}: {outboundStats.nackCount}"));
+                container.Add(new Label($"{nameof(outboundStats.sliCount)}: {outboundStats.sliCount}"));
+                container.Add(new Label($"{nameof(outboundStats.qpSum)}: {outboundStats.qpSum}"));
                 container.Add(new Label($"{nameof(outboundStats.mediaSourceId)}: {outboundStats.mediaSourceId}"));
                 container.Add(new Label($"{nameof(outboundStats.packetsSent)}: {outboundStats.packetsSent}"));
                 container.Add(new Label(
