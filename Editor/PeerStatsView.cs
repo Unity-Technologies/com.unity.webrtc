@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
@@ -17,7 +16,6 @@ namespace Unity.WebRTC.Editor
             m_parent = parent;
         }
 
-
         public VisualElement Create()
         {
             var root = new ScrollView();
@@ -29,7 +27,6 @@ namespace Unity.WebRTC.Editor
             root.Add(container);
             popup.RegisterValueChangedCallback(e =>
             {
-                Debug.Log($"new choose stats type is {e.newValue}");
                 container.Clear();
 
                 switch (e.newValue)

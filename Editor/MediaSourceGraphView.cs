@@ -1,53 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
     public class MediaSourceGraphView
     {
-        private List<float> widthData;
-        private List<float> heightData;
-        private List<float> framesData;
-        private List<float> framesPerSecondData;
-
-        public MediaSourceGraphView()
-        {
-            widthData = Enumerable.Repeat(0f, 300).ToList();
-            heightData = Enumerable.Repeat(0f, 300).ToList();
-            framesData = Enumerable.Repeat(0f, 300).ToList();
-            framesPerSecondData = Enumerable.Repeat(0f, 300).ToList();
-        }
+        private GraphView widthGraph = new GraphView("width");
+        private GraphView heightGraph = new GraphView("height");
+        private GraphView framesGraph = new GraphView("frames");
+        private GraphView framesPerSecondGraph = new GraphView("framesPerSecond");
 
         public void AddInput(RTCMediaSourceStats input)
         {
-            widthData.RemoveAt(0);
-            widthData.Add(input.width);
-
-            heightData.RemoveAt(0);
-            heightData.Add(input.height);
-
-            framesData.RemoveAt(0);
-            framesData.Add(input.frames);
-
-            framesPerSecondData.RemoveAt(0);
-            framesPerSecondData.Add(input.framesPerSecond);
+            var timestamp = input.Timestamp;
+            widthGraph.AddInput(timestamp, input.width);
+            heightGraph.AddInput(timestamp, input.height);
+            framesGraph.AddInput(timestamp, input.frames);
+            framesPerSecondGraph.AddInput(timestamp, input.framesPerSecond);
         }
 
         public VisualElement Create()
         {
-            var container = new VisualElement();
-            container.Add(new IMGUIContainer(() =>
-            {
-                using (new GUILayout.HorizontalScope())
-                {
-                    GraphDraw.Draw(GUILayoutUtility.GetRect(200f, 100f), ref widthData);
-                    GraphDraw.Draw(GUILayoutUtility.GetRect(200f, 100f), ref heightData);
-                    GraphDraw.Draw(GUILayoutUtility.GetRect(200f, 100f), ref framesData);
-                    GraphDraw.Draw(GUILayoutUtility.GetRect(200f, 100f), ref framesPerSecondData);
-                }
-            }));
+            var container = new VisualElement {style = {flexDirection = FlexDirection.Row, flexWrap = Wrap.Wrap}};
+            container.Add(widthGraph.Create());
+            container.Add(heightGraph.Create());
+            container.Add(framesGraph.Create());
+            container.Add(framesPerSecondGraph.Create());
             return container;
         }
     }
