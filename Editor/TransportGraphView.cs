@@ -10,7 +10,7 @@ namespace Unity.WebRTC.Editor
 
         public void AddInput(RTCTransportStats input)
         {
-            var timestamp = input.Timestamp;
+            var timestamp = input.UtcTimeStamp;
             bytesSentGraph.AddInput(timestamp, input.bytesSent);
             bytesReceivedGraph.AddInput(timestamp, input.bytesReceived);
             selectedCandidatePairChangesGraph.AddInput(timestamp, input.selectedCandidatePairChanges);

@@ -11,7 +11,7 @@ namespace Unity.WebRTC.Editor
 
         public void AddInput(RTCDataChannelStats input)
         {
-            var timestamp = input.Timestamp;
+            var timestamp = input.UtcTimeStamp;
             messageSentGraph.AddInput(timestamp, input.messagesSent);
             bytesSentGraph.AddInput(timestamp, input.bytesSent);
             messageReceivedGraph.AddInput(timestamp, input.messagesReceived);

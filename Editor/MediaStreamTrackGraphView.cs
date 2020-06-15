@@ -42,7 +42,7 @@ namespace Unity.WebRTC.Editor
 
         public void AddInput(RTCMediaStreamTrackStats input)
         {
-            var timestamp = input.Timestamp;
+            var timestamp = input.UtcTimeStamp;
             jitterBufferDelayGraph.AddInput(timestamp, (float)input.jitterBufferDelay);
             jitterBufferEmittedCountGraph.AddInput(timestamp, input.jitterBufferEmittedCount);
             frameWidthGraph.AddInput(timestamp, input.frameWidth);

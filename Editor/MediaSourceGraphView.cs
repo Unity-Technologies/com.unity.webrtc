@@ -11,7 +11,7 @@ namespace Unity.WebRTC.Editor
 
         public void AddInput(RTCMediaSourceStats input)
         {
-            var timestamp = input.Timestamp;
+            var timestamp = input.UtcTimeStamp;
             widthGraph.AddInput(timestamp, input.width);
             heightGraph.AddInput(timestamp, input.height);
             framesGraph.AddInput(timestamp, input.frames);

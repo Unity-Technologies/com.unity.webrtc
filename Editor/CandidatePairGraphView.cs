@@ -23,7 +23,7 @@ namespace Unity.WebRTC.Editor
 
         public void AddInput(RTCIceCandidatePairStats input)
         {
-            var timestamp = input.Timestamp;
+            var timestamp = input.UtcTimeStamp;
             bytesSentGraph.AddInput(timestamp, input.bytesSent);
             bytesReceivedGraph.AddInput(timestamp, input.bytesReceived);
             totalRoundTripTimeGraph.AddInput(timestamp, (float)input.totalRoundTripTime);

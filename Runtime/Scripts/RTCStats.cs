@@ -161,9 +161,17 @@ namespace Unity.WebRTC
             get { return NativeMethods.StatsGetId(self).AsAnsiStringWithFreeMem(); }
         }
 
+        /// <summary>
+        /// this timestamp is utc epoch time micro seconds.
+        /// </summary>
         public long Timestamp
         {
             get { return NativeMethods.StatsGetTimestamp(self); }
+        }
+
+        public DateTime UtcTimeStamp
+        {
+            get { return DateTimeOffset.FromUnixTimeMilliseconds(Timestamp / 1000).UtcDateTime; }
         }
 
         public IDictionary<string, object> Dict

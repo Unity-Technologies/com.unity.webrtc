@@ -29,7 +29,7 @@ namespace Unity.WebRTC.Editor
 
         public void AddInput(RTCInboundRTPStreamStats input)
         {
-            var timestamp = input.Timestamp;
+            var timestamp = input.UtcTimeStamp;
             firCountGraph.AddInput(timestamp, input.firCount);
             pliCountGraph.AddInput(timestamp, input.pliCount);
             nackCountGraph.AddInput(timestamp, input.nackCount);
