@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -148,6 +147,8 @@ namespace Unity.WebRTC.Editor
             var container = new VisualElement();
             root.Add(container);
 
+            var inboundGraph = new InboundRTPStreamGraphView();
+
             m_parent.OnStats += (peer, report) =>
             {
                 if (peer != m_peerConnection)
@@ -204,7 +205,12 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(inboundStats.contentType)}: {inboundStats.contentType}"));
                 container.Add(
                     new Label($"{nameof(inboundStats.decoderImplementation)}: {inboundStats.decoderImplementation}"));
+
+                inboundGraph.AddInput(inboundStats);
             };
+
+            root.Add(inboundGraph.Create());
+
             return root;
         }
 
@@ -215,6 +221,8 @@ namespace Unity.WebRTC.Editor
 
             var container = new VisualElement();
             root.Add(container);
+
+            var outboundGraph = new OutboundRTPStreamGraphView();
 
             m_parent.OnStats += (peer, report) =>
             {
@@ -269,7 +277,12 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(outboundStats.contentType)}: {outboundStats.contentType}"));
                 container.Add(new Label(
                     $"{nameof(outboundStats.encoderImplementation)}: {outboundStats.encoderImplementation}"));
+
+                outboundGraph.AddInput(outboundStats);
             };
+
+            root.Add(outboundGraph.Create());
+
             return root;
         }
 
@@ -339,6 +352,8 @@ namespace Unity.WebRTC.Editor
             var container = new VisualElement();
             root.Add(container);
 
+            var sourceGraph = new MediaSourceGraphView();
+
             m_parent.OnStats += (peer, report) =>
             {
                 if (peer != m_peerConnection)
@@ -364,7 +379,12 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(mediaSourceStats.frames)}: {mediaSourceStats.frames}"));
                 container.Add(
                     new Label($"{nameof(mediaSourceStats.framesPerSecond)}: {mediaSourceStats.framesPerSecond}"));
+
+                sourceGraph.AddInput(mediaSourceStats);
             };
+
+            root.Add(sourceGraph.Create());
+
             return root;
         }
 
@@ -436,6 +456,8 @@ namespace Unity.WebRTC.Editor
             var container = new VisualElement();
             root.Add(container);
 
+            var dataChannelGraph = new DataChannelGraphView();
+
             m_parent.OnStats += (peer, report) =>
             {
                 if (peer != m_peerConnection)
@@ -462,7 +484,12 @@ namespace Unity.WebRTC.Editor
                 container.Add(
                     new Label($"{nameof(dataChannelStats.messagesReceived)}: {dataChannelStats.messagesReceived}"));
                 container.Add(new Label($"{nameof(dataChannelStats.bytesReceived)}: {dataChannelStats.bytesReceived}"));
+
+                dataChannelGraph.AddInput(dataChannelStats);
             };
+
+            root.Add(dataChannelGraph.Create());
+
             return root;
         }
 
@@ -505,6 +532,8 @@ namespace Unity.WebRTC.Editor
 
             var container = new VisualElement();
             root.Add(container);
+
+            var trackGraph = new MediaStreamTrackGraphView();
 
             m_parent.OnStats += (peer, report) =>
             {
@@ -576,7 +605,12 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(trackStats.totalFramesDuration)}: {trackStats.totalFramesDuration}"));
                 container.Add(new Label(
                     $"{nameof(trackStats.sumOfSquaredFramesDuration)}: {trackStats.sumOfSquaredFramesDuration}"));
+
+                trackGraph.AddInput(trackStats);
             };
+
+            root.Add(trackGraph.Create());
+
             return root;
         }
 
@@ -655,14 +689,14 @@ namespace Unity.WebRTC.Editor
 
                 container.Clear();
                 if (!report.Stats.TryGetValue(RTCStatsType.Receiver, out var stats) ||
-                    !(stats is RTCReceiverStats outboundStats))
+                    !(stats is RTCReceiverStats receiverStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Receiver}"));
                     return;
                 }
 
-                container.Add(new Label($"{nameof(outboundStats.Id)}: {outboundStats.Id}"));
-                container.Add(new Label($"{nameof(outboundStats.Timestamp)}: {outboundStats.Timestamp}"));
+                container.Add(new Label($"{nameof(receiverStats.Id)}: {receiverStats.Id}"));
+                container.Add(new Label($"{nameof(receiverStats.Timestamp)}: {receiverStats.Timestamp}"));
             };
             return root;
         }
@@ -674,6 +708,9 @@ namespace Unity.WebRTC.Editor
 
             var container = new VisualElement();
             root.Add(container);
+
+            var transportGraph = new TransportGraphView();
+            ;
 
             m_parent.OnStats += (peer, report) =>
             {
@@ -705,7 +742,12 @@ namespace Unity.WebRTC.Editor
                     new Label($"{nameof(transportStats.remoteCertificateId)}: {transportStats.remoteCertificateId}"));
                 container.Add(new Label(
                     $"{nameof(transportStats.selectedCandidatePairChanges)}: {transportStats.selectedCandidatePairChanges}"));
+
+                transportGraph.AddInput(transportStats);
             };
+
+            root.Add(transportGraph.Create());
+
             return root;
         }
 
@@ -716,6 +758,8 @@ namespace Unity.WebRTC.Editor
 
             var container = new VisualElement();
             root.Add(container);
+
+            var transportGraph = new TransportGraphView();
 
             m_parent.OnStats += (peer, report) =>
             {
@@ -747,7 +791,12 @@ namespace Unity.WebRTC.Editor
                     new Label($"{nameof(transportStats.remoteCertificateId)}: {transportStats.remoteCertificateId}"));
                 container.Add(new Label(
                     $"{nameof(transportStats.selectedCandidatePairChanges)}: {transportStats.selectedCandidatePairChanges}"));
+
+                transportGraph.AddInput(transportStats);
             };
+
+            root.Add(transportGraph.Create());
+
             return root;
         }
 
@@ -934,9 +983,12 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(certificateStats.Id)}: {certificateStats.Id}"));
                 container.Add(new Label($"{nameof(certificateStats.Timestamp)}: {certificateStats.Timestamp}"));
                 container.Add(new Label($"{nameof(certificateStats.fingerprint)}: {certificateStats.fingerprint}"));
-                container.Add(new Label($"{nameof(certificateStats.fingerprintAlgorithm)}: {certificateStats.fingerprintAlgorithm}"));
-                container.Add(new Label($"{nameof(certificateStats.base64Certificate)}: {certificateStats.base64Certificate}"));
-                container.Add(new Label($"{nameof(certificateStats.issuerCertificateId)}: {certificateStats.issuerCertificateId}"));
+                container.Add(new Label(
+                    $"{nameof(certificateStats.fingerprintAlgorithm)}: {certificateStats.fingerprintAlgorithm}"));
+                container.Add(
+                    new Label($"{nameof(certificateStats.base64Certificate)}: {certificateStats.base64Certificate}"));
+                container.Add(new Label(
+                    $"{nameof(certificateStats.issuerCertificateId)}: {certificateStats.issuerCertificateId}"));
             };
             return root;
         }
