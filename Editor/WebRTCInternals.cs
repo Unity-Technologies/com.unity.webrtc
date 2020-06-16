@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -28,7 +29,21 @@ namespace Unity.WebRTC.Editor
             var root = this.rootVisualElement;
             root.Add(CreateStatsView());
 
-            m_editorCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(GetStatsPolling());
+            EditorApplication.playModeStateChanged += change =>
+            {
+                switch (change)
+                {
+                    case PlayModeStateChange.EnteredPlayMode:
+                        m_editorCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(GetStatsPolling());
+                        break;
+                    case PlayModeStateChange.ExitingPlayMode:
+                        EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(change), change, null);
+                }
+            };
+
         }
 
         private void OnDisable()
