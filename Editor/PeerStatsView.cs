@@ -850,6 +850,8 @@ namespace Unity.WebRTC.Editor
                 graphView.AddInput(candidatePairStats);
             };
 
+            root.Add(graphView.Create());
+
             return root;
         }
 
