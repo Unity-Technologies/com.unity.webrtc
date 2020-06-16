@@ -17,6 +17,8 @@ namespace Unity.WebRTC.Editor
             wnd.titleContent = new GUIContent("WebRTCInternals");
         }
 
+        private const int UpdateStatsInterval = 1;
+
         public event OnStatsReportHandler OnStats;
 
         private EditorCoroutine m_editorCoroutine;
@@ -54,7 +56,7 @@ namespace Unity.WebRTC.Editor
                     }
                 }
 
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(UpdateStatsInterval);
             }
         }
 
