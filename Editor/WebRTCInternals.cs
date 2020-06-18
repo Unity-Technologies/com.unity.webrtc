@@ -11,7 +11,7 @@ namespace Unity.WebRTC.Editor
 
     public class WebRTCInternals : EditorWindow
     {
-        [MenuItem("Window/WebRTCInternals")]
+        [MenuItem("Window/Analysis/WebRTCInternals")]
         public static void Show()
         {
             WebRTCInternals wnd = GetWindow<WebRTCInternals>();
@@ -39,8 +39,6 @@ namespace Unity.WebRTC.Editor
                     case PlayModeStateChange.ExitingPlayMode:
                         EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(change), change, null);
                 }
             };
 
@@ -71,7 +69,7 @@ namespace Unity.WebRTC.Editor
                     }
                 }
 
-                yield return new WaitForSeconds(UpdateStatsInterval);
+                yield return new EditorWaitForSeconds(UpdateStatsInterval);
             }
         }
 
