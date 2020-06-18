@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
+    public delegate void OnPeerListHandler(IEnumerable<RTCPeerConnection> peerList);
     public delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
 
     public class WebRTCInternals : EditorWindow
@@ -20,6 +22,7 @@ namespace Unity.WebRTC.Editor
 
         private const int UpdateStatsInterval = 1;
 
+        public event OnPeerListHandler OnPeerList;
         public event OnStatsReportHandler OnStats;
 
         private EditorCoroutine m_editorCoroutine;
@@ -57,6 +60,8 @@ namespace Unity.WebRTC.Editor
 
                 if (peerList != null)
                 {
+                    OnPeerList?.Invoke(peerList);
+
                     foreach (var peer in peerList)
                     {
                         var op = peer.GetStats();
@@ -87,14 +92,7 @@ namespace Unity.WebRTC.Editor
             container.Add(mainView);
 
             // peer connection list view
-            var peerListView = new PeerListView();
-
-            var refreshButton = new Button(() =>
-            {
-                peerListView.Refresh();
-            }) {text = "Refresh Peer List", style = { }};
-            sideView.Add(refreshButton);
-
+            var peerListView = new PeerListView(this);
 
             sideView.Add(peerListView.Create());
 

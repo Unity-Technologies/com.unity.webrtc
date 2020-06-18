@@ -1,26 +1,18 @@
-﻿using System.Collections.Generic;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public delegate void OnRefreshPeerListHandler(IEnumerable<RTCPeerConnection> peerList);
     public delegate void OnChangeSelectPeerHandler(RTCPeerConnection peer);
 
     public class PeerListView
     {
-        public event OnRefreshPeerListHandler OnRefreshPeerList;
         public event OnChangeSelectPeerHandler OnChangePeer;
 
-        public void Refresh()
+        private WebRTCInternals m_parent;
+
+        public PeerListView(WebRTCInternals parent)
         {
-            var list = WebRTC.PeerList;
-
-            if (list == null)
-            {
-                return;
-            }
-
-            OnRefreshPeerList?.Invoke(list);
+            m_parent = parent;
         }
 
         public VisualElement Create()
@@ -30,7 +22,7 @@ namespace Unity.WebRTC.Editor
             var container = new VisualElement();
             root.Add(container);
 
-            OnRefreshPeerList += peerList =>
+            m_parent.OnPeerList += peerList =>
             {
                 container.Clear();
                 foreach (var peerConnection in peerList)
