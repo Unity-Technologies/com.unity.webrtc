@@ -43,7 +43,7 @@ namespace Unity.WebRTC.Editor
                 {
                     Debug.Log(record.Value.ToJson());
                 }
-            }){text = "jsontest"});
+            }) {text = "jsontest"});
 
             EditorApplication.playModeStateChanged += change =>
             {
@@ -133,61 +133,50 @@ namespace Unity.WebRTC.Editor
     public class PeerConnectionRecord
     {
         private const int MAX_BUFFER_SIZE = 1000;
-        private List<RTCStatsReport> m_statsReportList;
+        private Dictionary<(RTCStatsType, string), Dictionary<string, List<object>>> m_report;
 
         public PeerConnectionRecord()
         {
-            m_statsReportList = new List<RTCStatsReport>();
+            m_report = new Dictionary<(RTCStatsType, string), Dictionary<string, List<object>>>();
         }
 
         public void Update(RTCStatsReport report)
         {
-            if (m_statsReportList.Count > MAX_BUFFER_SIZE)
+            foreach (var element in report.Stats)
             {
-                m_statsReportList.RemoveAt(0);
-            }
+                if (!m_report.ContainsKey(element.Key))
+                {
+                    m_report[element.Key] = new Dictionary<string, List<object>>();
+                }
 
-            m_statsReportList.Add(report);
+                foreach (var pair in element.Value.Dict)
+                {
+                    var map = m_report[element.Key];
+                    if (!map.ContainsKey(pair.Key))
+                    {
+                        map[pair.Key] = new List<object>();
+                    }
+
+                    var target = map[pair.Key];
+                    if (target.Count > MAX_BUFFER_SIZE)
+                    {
+                        target.RemoveAt(0);
+                    }
+                    target.Add(pair.Value);
+                }
+            }
         }
 
         public string ToJson()
         {
-            var map = new Dictionary<(RTCStatsType, string), List<RTCStats>>();
-            foreach (var element in m_statsReportList.SelectMany(report => report.Stats))
+            var values = m_report.SelectMany(x =>
             {
-                if (!map.ContainsKey(element.Key))
-                {
-                    map[element.Key] = new List<RTCStats>();
-                }
-
-                map[element.Key].Add(element.Value);
-            }
-
-            var hoge = map.SelectMany(x =>
-            {
-                var prefix = $"{x.Key.Item1}_{x.Key.Item2}";
-                var sorted = x.Value.OrderByDescending(y => y.Timestamp);
-                var start = sorted.First().Timestamp;
-                var end = sorted.Last().Timestamp;
-
-                var memberMap = new Dictionary<string, List<object>>();
-
-                foreach (var element in sorted.SelectMany(y => y.Dict))
-                {
-                    if (!memberMap.ContainsKey(element.Key))
-                    {
-                        memberMap[element.Key] = new List<object>();
-                    }
-
-                    memberMap[element.Key].Add(element.Value);
-                }
-
-                return memberMap.Select(y => $"{prefix}-{y.Key}:{{\"startTime\":\"{start}\", \"endTime\":\"{end}\", \"values\":\"[{string.Join(",", y.Value)}]\"}}");
+                return x.Value.Select(y =>
+                    $"\"{x.Key.Item2}-{y.Key}\":{{\"startTime\":\"{DateTime.Now}\", \"endTime\":\"{DateTime.Now}\", \"values\":\"[{string.Join(",", y.Value)}]\"}}");
             });
 
 
-
-            return $"\"stats\":{{{string.Join(",", hoge)}}}";
+            return $"\"stats\":{{{string.Join(",", values)}}}";
         }
     }
 }
