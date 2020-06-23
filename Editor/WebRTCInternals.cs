@@ -42,7 +42,7 @@ namespace Unity.WebRTC.Editor
             {
                 var hoge = string.Join(",",
                     m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
-                var json = $"{{\"PeerConnections\":{{{hoge}}}}}";
+                var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{hoge}}}, \"UserAgent\":\"UnityEditor\"}}";
                 File.WriteAllText($"{Application.dataPath}/dump.json", json);
 
             }) {text = "jsontest"});
@@ -161,7 +161,9 @@ namespace Unity.WebRTC.Editor
             var constraintsJson = "\"constraints\": \"\"";
             var configJson = $"\"rtcConfiguration\":{JsonUtility.ToJson(m_config)}";
             var statsJson = $"\"stats\":{{{string.Join(",", m_statsRecordMap.Select(x => x.Value.ToJson()))}}}";
-            return string.Join(",", constraintsJson, configJson, statsJson);
+            var url = "\"url\":\"\"";
+            var updateLog = "\"updateLog\":[]";
+            return string.Join(",", constraintsJson, configJson, statsJson, url, updateLog);
         }
     }
 
@@ -200,11 +202,33 @@ namespace Unity.WebRTC.Editor
         {
             return string.Join(",", m_memberRecord.Select(x =>
             {
-                var start = x.Value.Min(y => y.timeStamp);
-                var end = x.Value.Max(y => y.timeStamp);
-                return
-                    $"\"{m_id}-{x.Key}\":{{\"startTime\":\"{start}\", \"endTime\":\"{end}\", \"values\":\"[{string.Join(",", x.Value.Select(y => y.value))}]\"}}";
-            }));
+                var start = DateTimeOffset.FromUnixTimeMilliseconds(x.Value.Min(y => y.timeStamp)/1000).DateTime.ToUniversalTime().ToString("O");
+                var end = DateTimeOffset.FromUnixTimeMilliseconds(x.Value.Max(y => y.timeStamp)/1000).DateTime.ToUniversalTime().ToString("O");
+                var values = string.Join(",", x.Value.Select(y =>
+                {
+                    if (y.value is string z && !string.IsNullOrEmpty(z))
+                    {
+                        return $"\\\"{z}\\\"";
+                    }
+
+                    if (y.value is bool b)
+                    {
+                        return b.ToString().ToLower();
+                    }
+
+                    return y.value;
+                }).Where(y =>
+                {
+                    if (y is string z)
+                    {
+                        return !string.IsNullOrEmpty(z);
+                    }
+
+                    return y != null;
+                }));
+
+                return string.IsNullOrEmpty(values) ? "" : $"\"{m_id}-{x.Key}\":{{\"startTime\":\"{start}\", \"endTime\":\"{end}\", \"values\":\"[{values}]\"}}";
+            }).Where(x => !string.IsNullOrEmpty(x)));
         }
     }
 }
