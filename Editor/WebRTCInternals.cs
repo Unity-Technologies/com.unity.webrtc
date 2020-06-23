@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
@@ -39,10 +40,11 @@ namespace Unity.WebRTC.Editor
             root.Add(CreateStatsView());
             root.Add(new Button(() =>
             {
-                foreach (var record in m_peerConenctionDataStore)
-                {
-                    Debug.Log(record.Value.ToJson());
-                }
+                var hoge = string.Join(",",
+                    m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
+                var json = $"{{\"PeerConnections\":{{{hoge}}}}}";
+                File.WriteAllText($"{Application.dataPath}/dump.json", json);
+
             }) {text = "jsontest"});
 
             EditorApplication.playModeStateChanged += change =>
@@ -87,7 +89,7 @@ namespace Unity.WebRTC.Editor
                             var peerId = peer.GetHashCode();
                             if (!m_peerConenctionDataStore.ContainsKey(peerId))
                             {
-                                m_peerConenctionDataStore[peerId] = new PeerConnectionRecord();
+                                m_peerConenctionDataStore[peerId] = new PeerConnectionRecord(peer.GetConfiguration());
                             }
 
                             m_peerConenctionDataStore[peerId].Update(op.Value);
@@ -132,51 +134,77 @@ namespace Unity.WebRTC.Editor
 
     public class PeerConnectionRecord
     {
-        private const int MAX_BUFFER_SIZE = 1000;
-        private Dictionary<(RTCStatsType, string), Dictionary<string, List<object>>> m_report;
+        private RTCConfiguration m_config;
+        private Dictionary<(RTCStatsType, string), StatsRecord> m_statsRecordMap;
 
-        public PeerConnectionRecord()
+        public PeerConnectionRecord(RTCConfiguration config)
         {
-            m_report = new Dictionary<(RTCStatsType, string), Dictionary<string, List<object>>>();
+            m_config = config;
+            m_statsRecordMap = new Dictionary<(RTCStatsType, string), StatsRecord>();
         }
 
         public void Update(RTCStatsReport report)
         {
             foreach (var element in report.Stats)
             {
-                if (!m_report.ContainsKey(element.Key))
+                if (!m_statsRecordMap.ContainsKey(element.Key))
                 {
-                    m_report[element.Key] = new Dictionary<string, List<object>>();
+                    m_statsRecordMap[element.Key] = new StatsRecord(element.Value.Id);
                 }
 
-                foreach (var pair in element.Value.Dict)
-                {
-                    var map = m_report[element.Key];
-                    if (!map.ContainsKey(pair.Key))
-                    {
-                        map[pair.Key] = new List<object>();
-                    }
-
-                    var target = map[pair.Key];
-                    if (target.Count > MAX_BUFFER_SIZE)
-                    {
-                        target.RemoveAt(0);
-                    }
-                    target.Add(pair.Value);
-                }
+                m_statsRecordMap[element.Key].Update(element.Value.Timestamp, element.Value.Dict);
             }
         }
 
         public string ToJson()
         {
-            var values = m_report.SelectMany(x =>
+            var constraintsJson = "\"constraints\": \"\"";
+            var configJson = $"\"rtcConfiguration\":{JsonUtility.ToJson(m_config)}";
+            var statsJson = $"\"stats\":{{{string.Join(",", m_statsRecordMap.Select(x => x.Value.ToJson()))}}}";
+            return string.Join(",", constraintsJson, configJson, statsJson);
+        }
+    }
+
+    public class StatsRecord
+    {
+        private const int MAX_BUFFER_SIZE = 1000;
+        private Dictionary<string, List<(long timeStamp, object value)>> m_memberRecord;
+        private string m_id;
+
+        public StatsRecord(string id)
+        {
+            m_id = id;
+            m_memberRecord = new Dictionary<string, List<(long, object)>>();
+        }
+
+        public void Update(long timeStamp, IDictionary<string, object> record)
+        {
+            foreach (var pair in record)
             {
-                return x.Value.Select(y =>
-                    $"\"{x.Key.Item2}-{y.Key}\":{{\"startTime\":\"{DateTime.Now}\", \"endTime\":\"{DateTime.Now}\", \"values\":\"[{string.Join(",", y.Value)}]\"}}");
-            });
+                if (!m_memberRecord.ContainsKey((pair.Key)))
+                {
+                    m_memberRecord[pair.Key] = new List<(long, object)>();
+                }
 
+                var target = m_memberRecord[pair.Key];
+                if (target.Count > MAX_BUFFER_SIZE)
+                {
+                    target.RemoveAt(0);
+                }
 
-            return $"\"stats\":{{{string.Join(",", values)}}}";
+                target.Add((timeStamp, pair.Value));
+            }
+        }
+
+        public string ToJson()
+        {
+            return string.Join(",", m_memberRecord.Select(x =>
+            {
+                var start = x.Value.Min(y => y.timeStamp);
+                var end = x.Value.Max(y => y.timeStamp);
+                return
+                    $"\"{m_id}-{x.Key}\":{{\"startTime\":\"{start}\", \"endTime\":\"{end}\", \"values\":\"[{string.Join(",", x.Value.Select(y => y.value))}]\"}}";
+            }));
         }
     }
 }
