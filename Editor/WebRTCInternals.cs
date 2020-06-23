@@ -37,15 +37,16 @@ namespace Unity.WebRTC.Editor
         private void OnEnable()
         {
             var root = this.rootVisualElement;
-            root.Add(CreateStatsView());
             root.Add(new Button(() =>
             {
-                var hoge = string.Join(",",
+                var peerRecord = string.Join(",",
                     m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
-                var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{hoge}}}, \"UserAgent\":\"UnityEditor\"}}";
+                var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
                 File.WriteAllText($"{Application.dataPath}/dump.json", json);
 
-            }) {text = "jsontest"});
+            }) {text = "DumpExport"});
+
+            root.Add(CreateStatsView());
 
             EditorApplication.playModeStateChanged += change =>
             {
