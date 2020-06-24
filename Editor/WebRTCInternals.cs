@@ -119,7 +119,7 @@ namespace Unity.WebRTC.Editor
 
             var sideView = new VisualElement
             {
-                style = {borderColor = new StyleColor(Color.gray), borderRightWidth = 1, width = 250,}
+                style = {borderRightColor = new StyleColor(Color.gray), borderRightWidth = 1, width = 250,}
             };
             var mainView = new VisualElement {style = {flexGrow = 1}};
 
