@@ -6,7 +6,6 @@ using System.Linq;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
@@ -39,10 +38,22 @@ namespace Unity.WebRTC.Editor
             var root = this.rootVisualElement;
             root.Add(new Button(() =>
             {
+                if (!m_peerConenctionDataStore.Any())
+                {
+                    return;
+                }
+
+                var filePath = EditorUtility.SaveFilePanel("Save", "Assets", "dump", "json");
+
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    return;
+                }
+
                 var peerRecord = string.Join(",",
                     m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
                 var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
-                File.WriteAllText($"{Application.dataPath}/dump.json", json);
+                File.WriteAllText(filePath, json);
 
             }) {text = "DumpExport"});
 
