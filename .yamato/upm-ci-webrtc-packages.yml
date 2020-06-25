@@ -162,6 +162,8 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 {% endfor %}
 
 {% for platform in platforms %}
+{% if platform.name != "macos" -%}
+
 {% for editor in editors %}
 {% for param in platform.test_params %}
 {% if param.platform != "standalone" -%}
@@ -185,6 +187,8 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}_{{ para
 {% endif -%}
 {% endfor %}
 {% endfor %}
+
+{% endif -%}
 {% endfor %}
 
 push_plugin:
