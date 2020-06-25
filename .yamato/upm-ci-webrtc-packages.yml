@@ -194,7 +194,7 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
 codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
   agent:
-    type: Unity::VM::osx
+    type: Unity::metal::macmini
     image: package-ci/mac:stable
     flavor: m1.mac
   commands:
