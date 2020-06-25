@@ -162,8 +162,9 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 {% endfor %}
 
 {% for platform in platforms %}
-{% for editor in editors %}
+{% if platform.name != "macos" -%}
 
+{% for editor in editors %}
 codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
   agent:
@@ -185,8 +186,35 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
         - "upm-ci~/test-results/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-
 {% endfor %}
+
+{% else -%}
+
+{% for editor in editors %}
+codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
+  name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
+  agent:
+    type: Unity::VM::osx
+    image: package-ci/mac:stable
+    flavor: m1.mac
+  commands:
+    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+    - upm-ci package test -u {{ editor.version }} --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC*"
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
+  artifacts:
+    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
+      paths:
+        - "upm-ci~/test-results/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+{% endfor %}
+
+{% endif -%}
 {% endfor %}
 
 push_plugin:
