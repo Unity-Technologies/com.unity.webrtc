@@ -161,6 +161,30 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 {% endif -%}
 {% endfor %}
 
+{% for platform in platforms %}
+{% for editor in editors %}
+{% for param in platform.test_params %}
+
+codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}_{{ param.platform }}:
+  name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }} {{ param.platform }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --enable-code-coverage --code-coverage-options "generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC.*"
+  artifacts:
+    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
+      paths:
+        - "upm-ci~/test-results/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
 push_plugin:
   name: Push to Github webrtc native plugin
   agent:
