@@ -164,6 +164,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 {% for platform in platforms %}
 {% for editor in editors %}
 {% for param in platform.test_params %}
+{% if param.platform != "standalone" -%}
 
 codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}_{{ param.platform }}:
   name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }} {{ param.platform }}
@@ -181,6 +182,7 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}_{{ para
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
+{% endif -%}
 {% endfor %}
 {% endfor %}
 {% endfor %}
