@@ -199,7 +199,7 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     flavor: m1.mac
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package test -u {{ editor.version }} --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC*"
+    - upm-ci package test -u {{ editor.version }} --extra-editor-arg force-metal --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC*"
   triggers:
     branches:
       only:
