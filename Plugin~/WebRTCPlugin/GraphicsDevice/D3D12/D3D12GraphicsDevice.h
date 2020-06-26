@@ -15,9 +15,34 @@ namespace webrtc = ::webrtc;
 DefPtr(ID3D12CommandAllocator);
 DefPtr(ID3D12GraphicsCommandList4);
 
+inline std::string HrToString(HRESULT hr)
+{
+    char s_str[64] = {};
+    sprintf_s(s_str, "HRESULT of 0x%08X", static_cast<UINT>(hr));
+    return std::string(s_str);
+}
+
+class HrException : public std::runtime_error
+{
+public:
+    HrException(HRESULT hr) : std::runtime_error(HrToString(hr)), m_hr(hr) {}
+    HRESULT Error() const { return m_hr; }
+private:
+    const HRESULT m_hr;
+};
+
+inline void ThrowIfFailed(HRESULT hr)
+{
+    if (FAILED(hr))
+    {
+        throw HrException(hr);
+    }
+}
+
 class D3D12GraphicsDevice : public IGraphicsDevice{
 public:
     explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface );
+    explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue);
     virtual ~D3D12GraphicsDevice();
     virtual bool InitV() override;
     virtual void ShutdownV() override;
@@ -40,6 +65,7 @@ private:
         const UINT subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
     ID3D12Device* m_d3d12Device;
+    ID3D12CommandQueue* m_d3d12CommandQueue;
 
     //[Note-sin: 2019-10-30] sharing res from d3d12 to d3d11 require d3d11.1. Fence is supported in d3d11.4 or newer.
     ID3D11Device5* m_d3d11Device;
@@ -49,7 +75,6 @@ private:
     //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
     ID3D12CommandAllocatorPtr m_commandAllocator;
     ID3D12GraphicsCommandList4Ptr m_commandList;
-    IUnityGraphicsD3D12v5* m_unityInterface;
 
     //Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
     ID3D12Fence* m_copyResourceFence;

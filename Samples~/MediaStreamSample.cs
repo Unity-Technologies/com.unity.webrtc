@@ -134,11 +134,11 @@ public class MediaStreamSample : MonoBehaviour
         }
     }
 
-    private void AddTracks() 
+    private void AddTracks()
     {
         foreach (var track in audioStream.GetTracks())
         {
-            pc1Senders.Add (_pc1.AddTrack(track, audioStream));  
+            pc1Senders.Add (_pc1.AddTrack(track, audioStream));
         }
         foreach(var track in videoStream.GetTracks())
         {
@@ -192,9 +192,9 @@ public class MediaStreamSample : MonoBehaviour
         audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720, 1000000);
         RtImage.texture = cam.targetTexture;
- 
+
     }
-    
+
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
@@ -262,10 +262,10 @@ public class MediaStreamSample : MonoBehaviour
         }
         else
         {
-            OnCreateSessionDescriptionError(op3.Error); 
+            OnCreateSessionDescriptionError(op3.Error);
         }
     }
-    
+
     private void OnAudioFilterRead(float[] data, int channels)
     {
         Audio.Update(data, data.Length);
@@ -278,7 +278,7 @@ public class MediaStreamSample : MonoBehaviour
 
     static void OnSetSessionDescriptionError(ref RTCError error)
     {
-        Debug.LogError($"Error Detail Type: {error.errorDetail}");
+        Debug.LogError($"Error Detail Type: {error.message}");
     }
 
     private void OnSetRemoteSuccess(RTCPeerConnection pc)
@@ -320,6 +320,6 @@ public class MediaStreamSample : MonoBehaviour
 
     private static void OnCreateSessionDescriptionError(RTCError error)
     {
-        Debug.LogError($"Error Detail Type: {error.errorDetail}");
+        Debug.LogError($"Error Detail Type: {error.message}");
     }
 }

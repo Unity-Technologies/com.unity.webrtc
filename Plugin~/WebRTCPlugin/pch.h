@@ -40,6 +40,7 @@
 #endif
 
 #include "media/engine/internal_encoder_factory.h"
+#include "media/engine/internal_decoder_factory.h"
 #include "media/base/h264_profile_level_id.h"
 #include "media/base/adapted_video_track_source.h"
 #include "media/base/media_channel.h"

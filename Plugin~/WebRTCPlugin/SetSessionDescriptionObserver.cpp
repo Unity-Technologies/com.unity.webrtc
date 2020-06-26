@@ -35,11 +35,11 @@ namespace webrtc
         }
     }
 
-    void SetSessionDescriptionObserver::OnFailure(const std::string& error)
+    void SetSessionDescriptionObserver::OnFailure(webrtc::RTCError error)
     {
         for (auto delegate : m_vectorDelegateSetSDFailure)
         {
-            delegate(m_connection);
+            delegate(m_connection, error);
         }
     }
     

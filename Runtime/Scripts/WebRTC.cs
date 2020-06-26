@@ -84,12 +84,10 @@ namespace Unity.WebRTC
 
     public struct RTCError
     {
-        public RTCErrorDetailType errorDetail;
-        public long sdpLineNumber;
-        public long httpRequestStatusCode;
+        public int errorType;
+        public string message;
+        public long errorDetailType;
         public long sctpCauseCode;
-        public ulong receivedAlert;
-        public ulong sentAlert;
     }
 
     public enum RTCPeerConnectionState
@@ -425,7 +423,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativePeerConnectionSetSessionDescSuccess(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativePeerConnectionSetSessionDescFailure(IntPtr ptr);
+    internal delegate void DelegateNativePeerConnectionSetSessionDescFailure(IntPtr ptr, RTCError error);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
