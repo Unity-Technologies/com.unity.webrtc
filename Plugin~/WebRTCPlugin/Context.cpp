@@ -93,7 +93,7 @@ namespace webrtc
             {
                 iceServer.username = iceServerJson["username"].asString();
             }
-            if (!iceServerJson["username"].isNull())
+            if (!iceServerJson["credential"].isNull())
             {
                 iceServer.password = iceServerJson["credential"].asString();
             }
