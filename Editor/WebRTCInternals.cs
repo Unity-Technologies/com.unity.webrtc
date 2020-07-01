@@ -64,10 +64,10 @@ namespace Unity.WebRTC.Editor
                 switch (change)
                 {
                     case PlayModeStateChange.EnteredPlayMode:
+                        m_peerConenctionDataStore.Clear();
                         m_editorCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(GetStatsPolling());
                         break;
                     case PlayModeStateChange.ExitingPlayMode:
-                        m_peerConenctionDataStore.Clear();
                         EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
                         break;
                 }
