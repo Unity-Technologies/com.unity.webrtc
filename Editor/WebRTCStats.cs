@@ -140,6 +140,8 @@ namespace Unity.WebRTC.Editor
                 mainView.Add(statsView.Create());
             };
 
+            mainView.Add(new Label("Statistics are displayed when in play mode"));
+
             return container;
         }
     }
