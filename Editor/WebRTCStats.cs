@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using UnityEditor.Experimental;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -36,7 +38,13 @@ namespace Unity.WebRTC.Editor
         private void OnEnable()
         {
             var root = this.rootVisualElement;
-            root.Add(new Button(() =>
+
+            var toolbar = new Toolbar() {style = {alignItems = Align.FlexEnd}};
+            root.Add(toolbar);
+
+            toolbar.Add(new ToolbarSpacer(){flex = true});
+
+            var dumpButton = new ToolbarButton(() =>
             {
                 if (!m_peerConnenctionDataStore.Any())
                 {
@@ -51,13 +59,26 @@ namespace Unity.WebRTC.Editor
                 }
 
                 var peerRecord = string.Join(",",
-                    m_peerConnenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
-                var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
+                    m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
+                var json =
+                    $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
                 File.WriteAllText(filePath, json);
 
-            }) {text = "DumpExport"});
+            })
+            {
+                tooltip = "Save current webrtc stats information to a json file",
+                style =
+                {
+                    width = 20,
+                    height = 20,
+                    backgroundImage = EditorGUIUtility.Load($"{EditorResources.iconsPath}SaveAs.png") as Texture2D
+                }
+            };
+            toolbar.Add(dumpButton);
 
             root.Add(CreateStatsView());
+
+            EditorApplication.update += () => dumpButton.SetEnabled(m_peerConenctionDataStore.Any());
 
             EditorApplication.playModeStateChanged += change =>
             {
@@ -77,6 +98,7 @@ namespace Unity.WebRTC.Editor
         private void OnDisable()
         {
             EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+            m_peerConenctionDataStore.Clear();
         }
 
         IEnumerator GetStatsPolling()
