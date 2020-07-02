@@ -354,6 +354,7 @@ namespace Unity.WebRTC.Editor
             root.Add(container);
 
             var sourceGraph = new MediaSourceGraphView();
+            var graphView = sourceGraph.Create();
 
             m_parent.OnStats += (peer, report) =>
             {
@@ -375,16 +376,25 @@ namespace Unity.WebRTC.Editor
                 container.Add(
                     new Label($"{nameof(mediaSourceStats.trackIdentifier)}: {mediaSourceStats.trackIdentifier}"));
                 container.Add(new Label($"{nameof(mediaSourceStats.kind)}: {mediaSourceStats.kind}"));
-                container.Add(new Label($"{nameof(mediaSourceStats.width)}: {mediaSourceStats.width}"));
-                container.Add(new Label($"{nameof(mediaSourceStats.height)}: {mediaSourceStats.height}"));
-                container.Add(new Label($"{nameof(mediaSourceStats.frames)}: {mediaSourceStats.frames}"));
-                container.Add(
-                    new Label($"{nameof(mediaSourceStats.framesPerSecond)}: {mediaSourceStats.framesPerSecond}"));
 
-                sourceGraph.AddInput(mediaSourceStats);
+                if (mediaSourceStats.kind == "video")
+                {
+                    container.Add(new Label($"{nameof(mediaSourceStats.width)}: {mediaSourceStats.width}"));
+                    container.Add(new Label($"{nameof(mediaSourceStats.height)}: {mediaSourceStats.height}"));
+                    container.Add(new Label($"{nameof(mediaSourceStats.frames)}: {mediaSourceStats.frames}"));
+                    container.Add(
+                        new Label($"{nameof(mediaSourceStats.framesPerSecond)}: {mediaSourceStats.framesPerSecond}"));
+                    sourceGraph.AddInput(mediaSourceStats);
+                    graphView.visible = true;
+                }
+                else
+                {
+                    graphView.visible = false;
+                }
+
             };
 
-            root.Add(sourceGraph.Create());
+            root.Add(graphView);
 
             return root;
         }
