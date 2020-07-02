@@ -14,13 +14,13 @@ namespace Unity.WebRTC.Editor
 
     public delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
 
-    public class WebRTCInternals : EditorWindow
+    public class WebRTCStats : EditorWindow
     {
-        [MenuItem("Window/Analysis/WebRTCInternals")]
+        [MenuItem("Window/Analysis/WebRTC Stats")]
         public static void Show()
         {
-            WebRTCInternals wnd = GetWindow<WebRTCInternals>();
-            wnd.titleContent = new GUIContent("WebRTCInternals");
+            WebRTCStats wnd = GetWindow<WebRTCStats>();
+            wnd.titleContent = new GUIContent("WebRTC Stats");
         }
 
         private const int UpdateStatsInterval = 1;
