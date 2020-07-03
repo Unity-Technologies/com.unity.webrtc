@@ -19,7 +19,7 @@ namespace Unity.WebRTC.Editor
     public class WebRTCStats : EditorWindow
     {
         [MenuItem("Window/Analysis/WebRTC Stats")]
-        public static void Show()
+        public static void Init()
         {
             WebRTCStats wnd = GetWindow<WebRTCStats>();
             wnd.titleContent = new GUIContent("WebRTC Stats");
