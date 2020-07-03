@@ -44,6 +44,10 @@ namespace Unity.WebRTC.Editor
 
             toolbar.Add(new ToolbarSpacer(){flex = true});
 
+            var buttonContainer =
+                new VisualElement() {tooltip = "Save current webrtc stats information to a json file",};
+            toolbar.Add(buttonContainer);
+
             var dumpButton = new ToolbarButton(() =>
             {
                 if (!m_peerConnenctionDataStore.Any())
@@ -66,7 +70,6 @@ namespace Unity.WebRTC.Editor
 
             })
             {
-                tooltip = "Save current webrtc stats information to a json file",
                 style =
                 {
                     width = 20,
@@ -74,11 +77,14 @@ namespace Unity.WebRTC.Editor
                     backgroundImage = EditorGUIUtility.Load($"{EditorResources.iconsPath}SaveAs.png") as Texture2D
                 }
             };
-            toolbar.Add(dumpButton);
+            buttonContainer.Add(dumpButton);
 
             root.Add(CreateStatsView());
 
-            EditorApplication.update += () => dumpButton.SetEnabled(m_peerConenctionDataStore.Any());
+            EditorApplication.update += () =>
+            {
+                dumpButton.SetEnabled(m_peerConenctionDataStore.Any());
+            };
 
             EditorApplication.playModeStateChanged += change =>
             {
@@ -141,7 +147,7 @@ namespace Unity.WebRTC.Editor
 
             var sideView = new VisualElement
             {
-                style = {borderRightColor = new StyleColor(Color.gray), borderRightWidth = 1, width = 250,}
+                style = {borderRightColor = Color.gray, borderRightWidth = 1, width = 250,}
             };
             var mainView = new VisualElement {style = {flexGrow = 1}};
 
