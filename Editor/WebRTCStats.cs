@@ -44,11 +44,25 @@ namespace Unity.WebRTC.Editor
 
             toolbar.Add(new ToolbarSpacer(){flex = true});
 
-            var buttonContainer =
-                new VisualElement() {tooltip = "Save current webrtc stats information to a json file",};
+            var buttonContainer = new VisualElement
+            {
+                tooltip = "Save current webrtc stats information to a json file",
+                style =
+                {
+                    width = 20,
+                    height = 20,
+                    alignItems = Align.Center,
+                    alignContent  = Align.Center,
+                    justifyContent = Justify.Center,
+                    borderLeftWidth = 1,
+                    borderLeftColor = Color.black,
+                    borderRightWidth = 1,
+                    borderRightColor = Color.black,
+                }
+            };
             toolbar.Add(buttonContainer);
 
-            var dumpButton = new ToolbarButton(() =>
+            var dumpButton = new Button(() =>
             {
                 if (!m_peerConnenctionDataStore.Any())
                 {
@@ -72,8 +86,8 @@ namespace Unity.WebRTC.Editor
             {
                 style =
                 {
-                    width = 20,
-                    height = 20,
+                    width = 15,
+                    height = 15,
                     backgroundImage = EditorGUIUtility.Load($"{EditorResources.iconsPath}SaveAs.png") as Texture2D
                 }
             };
