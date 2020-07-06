@@ -77,7 +77,7 @@ This package uses GPU hardware acceleration for video encoding, so it only runs 
 ├── Runtime
 │   ├── Plugins
 │   │   └── x86_64
-│   └── Srcipts
+│   └── Scripts
 ├── Samples~
 │   └── Example
 ├── Tests
