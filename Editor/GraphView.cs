@@ -93,7 +93,9 @@ namespace Unity.WebRTC.Editor
                     new Vector2(area.xMax, area.y + y));
 
                 Handles.Label(new Vector2(area.x, area.y + y), $"{maxValue / GraphGridDivide / unitCount * (GraphGridDivide - i):0.00}{unitStr[unitIndex]}");
-                Handles.Label(new Vector2(area.x + x, area.yMax - TimeStampLabelHeight), data[dataPoint].Key.ToShortTimeString());
+                var guiSkin = GUI.skin.label;
+                guiSkin.fontSize = 10;
+                Handles.Label(new Vector2(area.x + x, area.yMax - TimeStampLabelHeight), data[dataPoint].Key.ToLocalTime().ToShortTimeString(), guiSkin);
             }
 
             // data
