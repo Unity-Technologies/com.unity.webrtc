@@ -106,7 +106,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         {
             s_context->FinalizeEncoder(s_mapEncoder[track].get());
             s_mapEncoder.erase(track);
-            GraphicsDevice::GetInstance().Shutdown();
+            if(s_mapEncoder.empty())
+            {
+                GraphicsDevice::GetInstance().Shutdown();
+            }
             return;
         }
         default: {
