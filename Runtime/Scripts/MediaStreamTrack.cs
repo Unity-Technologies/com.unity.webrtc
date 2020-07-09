@@ -11,7 +11,6 @@ namespace Unity.WebRTC
         protected bool disposed;
         private bool enabled;
         private TrackState readyState;
-        internal Action<MediaStreamTrack> stopTrack;
 
         /// <summary>
         ///
@@ -81,7 +80,7 @@ namespace Unity.WebRTC
         //Disassociate track from its source(video or audio), not for destroying the track
         public void Stop()
         {
-            stopTrack(this);
+            WebRTC.Context.StopMediaStreamTrack(self);
         }
     }
 
