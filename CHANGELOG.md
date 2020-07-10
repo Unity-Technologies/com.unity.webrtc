@@ -4,6 +4,10 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.4] - 2020-07-10
+
+- Fixed: Fix a crash bug when dispose a video track
+
 ## [2.0.3] - 2020-06-05
 
 - Fixed: Fix the memory leak when using DirectX12
