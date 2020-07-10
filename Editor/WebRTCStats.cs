@@ -39,10 +39,10 @@ namespace Unity.WebRTC.Editor
         {
             var root = this.rootVisualElement;
 
-            var toolbar = new Toolbar() {style = {alignItems = Align.FlexEnd}};
+            var toolbar = new Toolbar {style = {alignItems = Align.FlexEnd}};
             root.Add(toolbar);
 
-            toolbar.Add(new ToolbarSpacer(){flex = true});
+            toolbar.Add(new ToolbarSpacer {flex = true});
 
             var buttonContainer = new VisualElement
             {
@@ -117,7 +117,11 @@ namespace Unity.WebRTC.Editor
 
         private void OnDisable()
         {
-            EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+            if (m_editorCoroutine != null)
+            {
+                EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+            }
+
             m_peerConenctionDataStore.Clear();
         }
 
