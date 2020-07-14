@@ -10,23 +10,32 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 7z x -aoa webrtc.zip -o%SOLUTION_DIR%\webrtc
 
 echo -------------------
-echo Install nuget
-choco install nuget.commandline
+echo Install googletest
 
-echo -------------------
-echo Install nuget packages
-nuget restore %SOLUTION_DIR%\WebRTCPlugin.sln
-if not %errorlevel% == 0 exit 1
+cd %SOLUTION_DIR%
+git clone https://github.com/google/googletest.git
+cd googletest
+git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
+cmake . -G "Visual Studio 15 2017" -A x64 -B "build64"
+cmake --build build64 --config Release
+mkdir include\gtest
+xcopy /e googletest\include\gtest include\gtest
+mkdir include\gmock
+xcopy /e googlemock\include\gmock include\gmock
+mkdir lib
+xcopy /e build64\googlemock\Release lib
+xcopy /e build64\googlemock\gtest\Release lib
 
 echo -------------------
 echo Build com.unity.webrtc Plugin 
 
-MSBuild %SOLUTION_DIR%\WebRTCPlugin.sln -t:Rebuild -p:Configuration=Release
-if not %errorlevel% == 0 exit 1
+cd %SOLUTION_DIR%
+cmake . -G "Visual Studio 15 2017" -A x64
+cmake --build . --config Release
 
 echo -------------------
 echo Test com.unity.webrtc Plugin 
 
-%SOLUTION_DIR%\x64\Release\WebRTCPluginTest.exe
+%SOLUTION_DIR%\WebRTCPluginTest\Release\WebRTCPluginTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------

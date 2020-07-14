@@ -39,13 +39,17 @@ function(add_plugin name)
     if(ENABLE_DEPLOY)
         if(ENABLE_OSX_BUNDLE)
             SET(target_filename "${name}.bundle")
+        elseif(MSVC)
+            SET(target_filename "${name}.dll")
         else()
             SET(target_filename $<TARGET_FILE:${name}>)
         endif()
-        add_custom_target("Deploy${name}" ALL
-            COMMAND rm -rf ${arg_PLUGINS_DIR}/${target_filename}
-            COMMAND cp -r ${target_filename} ${arg_PLUGINS_DIR}
-            DEPENDS ${name}
-        )
+        if(APPLE OR UNIX)
+            add_custom_target("Deploy${name}" ALL
+                COMMAND rm -rf ${arg_PLUGINS_DIR}/${target_filename}
+                COMMAND cp -r ${target_filename} ${arg_PLUGINS_DIR}
+                DEPENDS ${name}
+            )
+        endif()
     endif()
 endfunction()
