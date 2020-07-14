@@ -38,6 +38,7 @@ namespace Unity.WebRTC.Editor
         private void OnEnable()
         {
             var root = this.rootVisualElement;
+            root.style.backgroundColor = EditorGUIUtility.isProSkin ? new Color(45/255f,45/255f,45/255f) : Color.white;
 
             var toolbar = new Toolbar {style = {alignItems = Align.FlexEnd}};
             root.Add(toolbar);
@@ -47,22 +48,10 @@ namespace Unity.WebRTC.Editor
             var buttonContainer = new VisualElement
             {
                 tooltip = "Save current webrtc stats information to a json file",
-                style =
-                {
-                    width = 20,
-                    height = 20,
-                    alignItems = Align.Center,
-                    alignContent  = Align.Center,
-                    justifyContent = Justify.Center,
-                    borderLeftWidth = 1,
-                    borderLeftColor = Color.black,
-                    borderRightWidth = 1,
-                    borderRightColor = Color.black,
-                }
             };
             toolbar.Add(buttonContainer);
 
-            var dumpButton = new Button(() =>
+            var dumpButton = new ToolbarButton(() =>
             {
                 if (!m_peerConnenctionDataStore.Any())
                 {
@@ -83,14 +72,7 @@ namespace Unity.WebRTC.Editor
                 File.WriteAllText(filePath, json);
 
             })
-            {
-                style =
-                {
-                    width = 15,
-                    height = 15,
-                    backgroundImage = EditorGUIUtility.Load($"{EditorResources.iconsPath}SaveAs.png") as Texture2D
-                }
-            };
+            { text = "Save"};
             buttonContainer.Add(dumpButton);
 
             root.Add(CreateStatsView());
