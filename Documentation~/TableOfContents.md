@@ -1,14 +1,14 @@
-* [WebRTC](index)
-* [Tutorial](en/tutorial)
+* [WebRTC](index.md)
+* [Tutorial](en/tutorial.md)
 * Reference
-    * [Video Streaming](en/videostreaming)
-    * [Audio Streaming](en/audiostreaming)
-    * [Data Channel](en/datachannel)
+    * [Video Streaming](en/videostreaming.md)
+    * [Audio Streaming](en/audiostreaming.md)
+    * [Data Channel](en/datachannel.md)
 * 日本語
-    * [WebRTC](jp/index)
-    * [チュートリアル](jp/tutorial)
+    * [WebRTC](jp/index.md)
+    * [チュートリアル](jp/tutorial.md)
     * リファレンス
-        * [ビデオストリーミング](jp/videostreaming)
-        * [オーディオストリーミング](jp/audiostreaming)
-        * [データチャネル](jp/datachannel)
+        * [ビデオストリーミング](jp/videostreaming.md)
+        * [オーディオストリーミング](jp/audiostreaming.md)
+        * [データチャネル](jp/datachannel.md)
         
