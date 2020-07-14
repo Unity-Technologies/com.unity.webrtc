@@ -51,7 +51,7 @@ namespace Unity.WebRTC
 
         internal RTCRtpSendParameters(RTCRtpSendParametersInternal parameters)
         {
-            RTCRtpEncodingParametersInternal[] encodings = parameters.encodings.ToArray<RTCRtpEncodingParametersInternal>(parameters.encodingsLength);
+            RTCRtpEncodingParametersInternal[] encodings = parameters.encodings.ToArray<RTCRtpEncodingParametersInternal>();
             _encodings = Array.ConvertAll(encodings, _ => new RTCRtpEncodingParameters(_));
             _transactionId = parameters.transactionId.AsAnsiStringWithFreeMem();
         }
