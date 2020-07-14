@@ -30,8 +30,8 @@ echo -------------------
 echo Build com.unity.webrtc Plugin 
 
 cd %SOLUTION_DIR%
-cmake . -G "Visual Studio 15 2017" -A x64
-cmake --build . --config Release
+cmake . -G "Visual Studio 15 2017" -A x64 -B "build64"
+cmake --build build64 --config Release
 
 echo -------------------
 echo Test com.unity.webrtc Plugin 
