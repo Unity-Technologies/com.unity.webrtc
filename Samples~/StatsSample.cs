@@ -1,17 +1,20 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
 using System;
+using System.Linq;
 
-public class DataChannelSample : MonoBehaviour
+public class StatsSample : MonoBehaviour
 {
     #pragma warning disable 0649
     [SerializeField] private Button callButton;
-    [SerializeField] private Button sendButton;
-    [SerializeField] private InputField textSend;
-    [SerializeField] private InputField textReceive;
-    #pragma warning restore 0649
+    [SerializeField] private Button hangupButton;
+    [SerializeField] private InputField text;
+    [SerializeField] private Dropdown dropdown;
+
+#pragma warning restore 0649
 
     private RTCPeerConnection pc1, pc2;
     private RTCDataChannel dataChannel, remoteDataChannel;
@@ -25,6 +28,7 @@ public class DataChannelSample : MonoBehaviour
     private DelegateOnOpen onDataChannelOpen;
     private DelegateOnClose onDataChannelClose;
     private DelegateOnDataChannel onDataChannel;
+    private int currentValue = -1;
 
     private RTCOfferOptions OfferOptions = new RTCOfferOptions
     {
@@ -41,7 +45,18 @@ public class DataChannelSample : MonoBehaviour
     private void Awake()
     {
         WebRTC.Initialize();
-        callButton.onClick.AddListener(() => { StartCoroutine(Call()); });
+        callButton.onClick.AddListener(() =>
+        {
+            callButton.interactable = false;
+            hangupButton.interactable = true;
+            StartCoroutine(Call());
+        });
+        hangupButton.onClick.AddListener(() =>
+        {
+            callButton.interactable = true;
+            hangupButton.interactable = false;
+            Dispose();
+        });
     }
 
     private void OnDestroy()
@@ -57,14 +72,16 @@ public class DataChannelSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(pc1, candidate); };
+
         onDataChannel = channel =>
         {
             remoteDataChannel = channel;
             remoteDataChannel.OnMessage = onDataChannelMessage;
         };
-        onDataChannelMessage = bytes => { textReceive.text = System.Text.Encoding.UTF8.GetString(bytes); };
-        onDataChannelOpen = ()=> { sendButton.interactable = true; };
-        onDataChannelClose = () => { sendButton.interactable = false; };
+        onDataChannelOpen = ()=> { };
+        onDataChannelClose = () => { };
+
+        StartCoroutine(LoopGetStats());
     }
 
     RTCConfiguration GetSelectedSdpSemantics()
@@ -160,6 +177,13 @@ public class DataChannelSample : MonoBehaviour
         }
     }
 
+    void Dispose()
+    {
+        dataChannel.Dispose();
+        pc1.Dispose();
+        pc2.Dispose();
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -171,10 +195,6 @@ public class DataChannelSample : MonoBehaviour
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");
     }
 
-    public void SendMsg()
-    {
-        dataChannel.Send(textSend.text);
-    }
     string GetName(RTCPeerConnection pc)
     {
         return (pc == pc1) ? "pc1" : "pc2";
@@ -281,7 +301,7 @@ public class DataChannelSample : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
 
-            if (!sendButton.interactable)
+            if (callButton.interactable)
                 continue;
 
             var op1 = pc1.GetStats();
@@ -290,16 +310,31 @@ public class DataChannelSample : MonoBehaviour
             yield return op1;
             yield return op2;
 
-            Debug.Log("pc1");
-            foreach (var stat in op1.Value.Stats.Values)
+            if(op1.IsError || op2.IsError)
+                continue;
+
+            if(dropdown.options.Count == 0)
             {
-                Debug.Log(stat.Type.ToString());
+                List<string> options = new List<string>();
+                foreach (var stat in op1.Value.Stats.Values)
+                {
+                    options.Add(stat.Type.ToString());
+                }
+                dropdown.ClearOptions();
+                dropdown.AddOptions(options);
             }
-            Debug.Log("pc2");
-            foreach (var stat in op2.Value.Stats.Values)
+
+            if(currentValue != dropdown.value)
             {
-                Debug.Log(stat.Type.ToString());
+                currentValue = dropdown.value;
             }
+
+            var currentOption = dropdown.options[currentValue].text;
+
+            var type = (RTCStatsType)Enum.Parse(typeof(RTCStatsType), currentOption);
+            text.text = "Id:" + op1.Value.Stats[type].Id + "\n";
+            text.text += "Timestamp:" + op1.Value.Stats[type].Timestamp + "\n";
+            text.text += op1.Value.Stats[type].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
         }
     }
 

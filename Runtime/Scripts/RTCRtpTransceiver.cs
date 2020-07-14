@@ -20,10 +20,12 @@ namespace Unity.WebRTC
     public class RTCRtpTransceiver
     {
         internal IntPtr self;
+        private RTCPeerConnection peer;
 
-        internal RTCRtpTransceiver(IntPtr ptr)
+        internal RTCRtpTransceiver(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            this.peer = peer;
         }
 
         /// <summary>
@@ -47,7 +49,7 @@ namespace Unity.WebRTC
         /// </summary>
         public RTCRtpReceiver Receiver
         {
-            get { return new RTCRtpReceiver(NativeMethods.TransceiverGetReceiver(self)); }
+            get { return new RTCRtpReceiver(NativeMethods.TransceiverGetReceiver(self), peer); }
         }
 
         /// <summary>
@@ -55,7 +57,7 @@ namespace Unity.WebRTC
         /// </summary>
         public RTCRtpSender Sender
         {
-            get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self)); }
+            get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self), peer); }
         }
 
         /// <summary>

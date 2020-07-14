@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Context.h"
 #include "PeerConnectionObject.h"
-#include "WebRTCMacros.h"
 #include "SetSessionDescriptionObserver.h"
 
 namespace unity
@@ -11,13 +10,10 @@ namespace webrtc
 
     PeerConnectionObject::PeerConnectionObject(Context& context) : context(context)
     {
-        m_statsCollectorCallback = new PeerConnectionStatsCollectorCallback(this);
-        
     }
 
     PeerConnectionObject::~PeerConnectionObject()
     {
-        SAFE_DELETE(m_statsCollectorCallback);
         if (connection == nullptr)
         {
             return;
