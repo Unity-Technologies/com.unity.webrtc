@@ -36,6 +36,6 @@ cmake --build build64 --config Release
 echo -------------------
 echo Test com.unity.webrtc Plugin 
 
-%SOLUTION_DIR%\WebRTCPluginTest\Release\WebRTCPluginTest.exe
+%SOLUTION_DIR%\build64\WebRTCPluginTest\Release\WebRTCPluginTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------

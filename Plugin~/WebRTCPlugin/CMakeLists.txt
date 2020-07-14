@@ -90,7 +90,7 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT /Zi")
-  set(PROJECT_BINARY_DIR "../../../Runtime/Plugins/x86_64")
+  set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
   target_compile_definitions(webrtc
     PRIVATE
@@ -142,7 +142,7 @@ elseif(APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
   set(CMAKE_C_FLAGS "-x objective-c")
   set(CMAKE_CXX_FLAGS "-x objective-c++")
-  set(PROJECT_BINARY_DIR "../../Runtime/Plugins/${ARCHITECTURE}")
+  set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/${ARCHITECTURE}")
 
   target_compile_definitions(webrtc
     PRIVATE
