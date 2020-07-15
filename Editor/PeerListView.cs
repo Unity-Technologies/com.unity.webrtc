@@ -1,3 +1,5 @@
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
@@ -30,7 +32,12 @@ namespace Unity.WebRTC.Editor
                     var button = new Button(() =>
                     {
                         OnChangePeer?.Invoke(peerConnection);
-                    }) {text = $"peer {peerConnection.GetHashCode()}"};
+                    }) {text = $"peer {peerConnection.GetHashCode()}",};
+
+                    if (EditorGUIUtility.isProSkin)
+                    {
+                        button.style.backgroundColor = new Color(70 / 255f, 70 / 255f, 70 / 255f);
+                    }
 
                     container.Add(button);
                 }
