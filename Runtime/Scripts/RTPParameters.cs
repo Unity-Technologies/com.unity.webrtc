@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -20,7 +21,8 @@ namespace Unity.WebRTC
                 maxFramerate = parameter.maxFramerate;
             if (parameter.hasValueScaleResolutionDownBy)
                 scaleResolutionDownBy = parameter.scaleResolutionDownBy;
-            rid = parameter.rid.AsAnsiStringWithFreeMem();
+            if(parameter.rid != IntPtr.Zero)
+                rid = parameter.rid.AsAnsiStringWithFreeMem();
         }
 
         internal void CopyInternal(ref RTCRtpEncodingParametersInternal instance)
@@ -35,7 +37,7 @@ namespace Unity.WebRTC
             instance.hasValueScaleResolutionDownBy = scaleResolutionDownBy.HasValue;
             if (scaleResolutionDownBy.HasValue)
                 instance.scaleResolutionDownBy = scaleResolutionDownBy.Value;
-            instance.rid = Marshal.StringToCoTaskMemAnsi(rid);
+            instance.rid = string.IsNullOrEmpty(rid) ? IntPtr.Zero : Marshal.StringToCoTaskMemAnsi(rid);
         }
     }
 
@@ -45,20 +47,22 @@ namespace Unity.WebRTC
 
         public RTCRtpEncodingParameters[] Encodings => _encodings;
 
-
         readonly RTCRtpEncodingParameters[] _encodings;
         readonly string _transactionId;
 
         internal RTCRtpSendParameters(RTCRtpSendParametersInternal parameters)
         {
-            RTCRtpEncodingParametersInternal[] encodings = parameters.encodings.ToArray<RTCRtpEncodingParametersInternal>();
+            int length = parameters.encodingsLength;
+            RTCRtpEncodingParametersInternal[] encodings =
+                parameters.encodings.AsArray<RTCRtpEncodingParametersInternal>(length);
             _encodings = Array.ConvertAll(encodings, _ => new RTCRtpEncodingParameters(_));
             _transactionId = parameters.transactionId.AsAnsiStringWithFreeMem();
         }
 
         internal IntPtr CreatePtr()
         {
-            RTCRtpEncodingParametersInternal[] encodings = new RTCRtpEncodingParametersInternal[_encodings.Length];
+            RTCRtpEncodingParametersInternal[] encodings =
+                new RTCRtpEncodingParametersInternal[_encodings.Length];
             for(int i = 0; i < _encodings.Length; i++)
             {
                 _encodings[i].CopyInternal(ref encodings[i]);
