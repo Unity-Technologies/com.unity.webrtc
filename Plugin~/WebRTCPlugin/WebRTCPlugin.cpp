@@ -78,7 +78,7 @@ bool* ConvertArray(std::vector<bool> vec, size_t* length)
 
 char* ConvertString(const std::string str)
 {
-    size_t size = str.size();
+    const size_t size = str.size();
     char* ret = static_cast<char*>(CoTaskMemAlloc(size + sizeof(char)));
     str.copy(ret, size);
     ret[size] = '\0';
@@ -645,6 +645,72 @@ extern "C"
     UNITY_INTERFACE_EXPORT RtpSenderInterface* TransceiverGetSender(RtpTransceiverInterface* transceiver)
     {
         return transceiver->sender().get();
+    }
+
+    struct RTCRtpEncodingParameters
+    {
+        bool active;
+        bool hasValueMaxBitrate;
+        uint64_t maxBitrate;
+        bool hasValueMaxFramerate;
+        uint32_t maxFramerate;
+        bool hasValueScaleResolutionDownBy;
+        double scaleResolutionDownBy;
+        char* rid;
+    };
+
+    struct RTCRtpSendParameters
+    {
+        uint32_t encodingsLength;
+        RTCRtpEncodingParameters* encodings;
+        char* transactionId;
+    };
+
+    UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, RTCRtpSendParameters** parameters)
+    {
+        const RtpParameters src = sender->GetParameters();
+        RTCRtpSendParameters* dst = static_cast<RTCRtpSendParameters*>(CoTaskMemAlloc(sizeof(RTCRtpSendParameters)));
+        dst->encodingsLength = static_cast<uint32_t>(src.encodings.size());
+        dst->encodings = static_cast<RTCRtpEncodingParameters*>(CoTaskMemAlloc(sizeof(RTCRtpEncodingParameters) * src.encodings.size()));
+
+        for(int i = 0; i < src.encodings.size(); i++)
+        {
+            dst->encodings[i].active = src.encodings[i].active;
+            dst->encodings[i].hasValueMaxBitrate = src.encodings[i].max_bitrate_bps.has_value();
+            dst->encodings[i].maxBitrate = src.encodings[i].max_bitrate_bps.value_or(0);
+            dst->encodings[i].hasValueMaxFramerate = src.encodings[i].max_framerate.has_value();
+            dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value_or(0);
+            dst->encodings[i].hasValueScaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.has_value();
+            dst->encodings[i].scaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.value_or(0);
+            dst->encodings[i].rid = ConvertString(src.encodings[i].rid);
+        }
+        dst->transactionId = ConvertString(src.transaction_id);
+        *parameters = dst;
+    }
+
+    UNITY_INTERFACE_EXPORT RTCErrorType SenderSetParameters(RtpSenderInterface* sender, const RTCRtpSendParameters* src)
+    {
+        RtpParameters dst = sender->GetParameters();
+
+        for (int i = 0; i < dst.encodings.size(); i++)
+        {
+            dst.encodings[i].active = src->encodings[i].active;
+            if(src->encodings[i].hasValueMaxBitrate)
+                dst.encodings[i].max_bitrate_bps = static_cast<int>(src->encodings[i].maxBitrate);
+            if (src->encodings[i].hasValueMaxFramerate)
+                dst.encodings[i].max_framerate = static_cast<int>(src->encodings[i].maxFramerate);
+            if (src->encodings[i].hasValueScaleResolutionDownBy)
+                dst.encodings[i].scale_resolution_down_by = src->encodings[i].scaleResolutionDownBy;
+            if(src->encodings[i].rid != nullptr)
+                dst.encodings[i].rid = std::string(src->encodings[i].rid);
+        }
+        const ::webrtc::RTCError error = sender->SetParameters(dst);
+        return error.type();
+    }
+
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
+    {
+        return sender->track();
     }
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)

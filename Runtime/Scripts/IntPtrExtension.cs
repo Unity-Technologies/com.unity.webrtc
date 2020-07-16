@@ -69,12 +69,10 @@ namespace Unity.WebRTC
             return array;
         }
 
-        public static IntPtr[] AsIntPtrArray(this IntPtr ptr, int length)
+        public static string[] AsStringArray(this IntPtr ptr, int length)
         {
-            IntPtr[] array = new IntPtr[length];
-            Marshal.Copy(ptr, array, 0, length);
-            Marshal.FreeCoTaskMem(ptr);
-            return array;
+            IntPtr[] array = ptr.AsArray<IntPtr>(length);
+            return Array.ConvertAll(array, AsAnsiStringWithFreeMem);
         }
 
         public static T[] AsArray<T>(this IntPtr ptr, int length, bool freePtr = true)
@@ -135,21 +133,41 @@ namespace Unity.WebRTC
                 Marshal.Copy(ptr, _array, 0, length);
                 ret = _array as T[];
             }
+            else if (typeof(T) == typeof(string))
+            {
+                IntPtr[] array = ptr.AsArray<IntPtr>(length);
+                ret = Array.ConvertAll(array, AsAnsiStringWithFreeMem) as T[];
+            }
             else
             {
-                throw new ArgumentException();
+                ret = new T[length];
+                IntPtr iterator = ptr;
+                int size = Marshal.SizeOf(typeof(T));
+                for (int i = 0; i < ret.Length; i++)
+                {
+                    ret[i] = (T)Marshal.PtrToStructure(iterator, typeof(T));
+                    iterator = IntPtr.Add(iterator, size);
+                }
             }
-            if(freePtr)
+            if (freePtr)
             {
                 Marshal.FreeCoTaskMem(ptr);
             }
             return ret;
         }
 
-        public static string[] AsStringArray(this IntPtr ptr, int length)
+        public static IntPtr ToPtr<T>(T[] array)
         {
-            IntPtr[] array = ptr.AsIntPtrArray(length);
-            return Array.ConvertAll(array, AsAnsiStringWithFreeMem);
+            int size = Marshal.SizeOf(typeof(T));
+            int length = size * array.Length;
+            IntPtr ptr = Marshal.AllocCoTaskMem(length);
+            IntPtr iterator = ptr;
+            for (var i = 0; i < array.Length; i++)
+            {
+                Marshal.StructureToPtr(array[i], iterator, false);
+                iterator = IntPtr.Add(iterator, size);
+            }
+            return ptr;
         }
     }
 }

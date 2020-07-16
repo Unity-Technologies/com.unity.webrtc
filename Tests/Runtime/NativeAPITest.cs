@@ -153,12 +153,42 @@ namespace Unity.WebRTC.RuntimeTest
             var renderTexture = CreateRenderTexture(width, height);
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            var track2 = NativeMethods.SenderGetTrack(sender);
+            Assert.AreEqual(track, track2);
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
+        }
+
+        [Test]
+        public void SenderGetParameter()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var peer = NativeMethods.ContextCreatePeerConnection(context);
+            var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
+            Assert.IsNotEmpty(streamId);
+            const int width = 1280;
+            const int height = 720;
+            var renderTexture = CreateRenderTexture(width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
+            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+
+            NativeMethods.SenderGetParameters(sender, out var ptr);
+            var parameters = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
+            Marshal.FreeHGlobal(ptr);
+
+            Assert.AreNotEqual(IntPtr.Zero, parameters.encodings);
+            Assert.AreNotEqual(IntPtr.Zero, parameters.transactionId);
+
+            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeletePeerConnection(context, peer);
+            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
@@ -236,6 +266,32 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreNotEqual(callback, IntPtr.Zero);
             NativeMethods.ContextDestroy(0);
             NativeMethods.GetRenderEventFunc(IntPtr.Zero);
+        }
+
+        [Test]
+        public void RTCRtpSendParametersCreateAndDeletePtr()
+        {
+            RTCRtpSendParametersInternal parametersInternal = new RTCRtpSendParametersInternal();
+
+            int encodingsLength = 2;
+            RTCRtpEncodingParametersInternal[] encodings = new RTCRtpEncodingParametersInternal[encodingsLength];
+            for (int i = 0; i < encodingsLength; i++)
+            {
+                encodings[i].active = true;
+                encodings[i].hasValueMaxBitrate = true;
+                encodings[i].maxBitrate = 10000000;
+                encodings[i].hasValueMaxFramerate = true;
+                encodings[i].maxFramerate = 30;
+                encodings[i].hasValueScaleResolutionDownBy = true;
+                encodings[i].scaleResolutionDownBy = 1.0;
+                encodings[i].rid = Marshal.StringToCoTaskMemAnsi(string.Empty);
+            }
+            parametersInternal.transactionId = Marshal.StringToCoTaskMemAnsi(string.Empty);
+            parametersInternal.encodingsLength = encodingsLength;
+            parametersInternal.encodings = IntPtrExtension.ToPtr(encodings);
+            RTCRtpSendParameters parameter = new RTCRtpSendParameters(parametersInternal);
+            IntPtr ptr = parameter.CreatePtr();
+            RTCRtpSendParameters.DeletePtr(ptr);
         }
 
         /// <todo>
