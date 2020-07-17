@@ -30,7 +30,7 @@ namespace Unity.WebRTC.Editor
 
         private EditorCoroutine m_editorCoroutine;
 
-        private Dictionary<int, PeerConnectionRecord> m_peerConenctionDataStore =
+        private Dictionary<int, PeerConnectionRecord> m_peerConnenctionDataStore =
             new Dictionary<int, PeerConnectionRecord>();
 
         private void OnEnable()
@@ -38,7 +38,7 @@ namespace Unity.WebRTC.Editor
             var root = this.rootVisualElement;
             root.Add(new Button(() =>
             {
-                if (!m_peerConenctionDataStore.Any())
+                if (!m_peerConnenctionDataStore.Any())
                 {
                     return;
                 }
@@ -51,7 +51,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 var peerRecord = string.Join(",",
-                    m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
+                    m_peerConnenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
                 var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
                 File.WriteAllText(filePath, json);
 
@@ -64,7 +64,7 @@ namespace Unity.WebRTC.Editor
                 switch (change)
                 {
                     case PlayModeStateChange.EnteredPlayMode:
-                        m_peerConenctionDataStore.Clear();
+                        m_peerConnenctionDataStore.Clear();
                         m_editorCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(GetStatsPolling());
                         break;
                     case PlayModeStateChange.ExitingPlayMode:
@@ -99,12 +99,12 @@ namespace Unity.WebRTC.Editor
                             OnStats?.Invoke(peer, op.Value);
 
                             var peerId = peer.GetHashCode();
-                            if (!m_peerConenctionDataStore.ContainsKey(peerId))
+                            if (!m_peerConnenctionDataStore.ContainsKey(peerId))
                             {
-                                m_peerConenctionDataStore[peerId] = new PeerConnectionRecord(peer.GetConfiguration());
+                                m_peerConnenctionDataStore[peerId] = new PeerConnectionRecord(peer.GetConfiguration());
                             }
 
-                            m_peerConenctionDataStore[peerId].Update(op.Value);
+                            m_peerConnenctionDataStore[peerId].Update(op.Value);
                         }
                     }
                 }
@@ -146,8 +146,8 @@ namespace Unity.WebRTC.Editor
 
     public class PeerConnectionRecord
     {
-        private RTCConfiguration m_config;
-        private Dictionary<(RTCStatsType, string), StatsRecord> m_statsRecordMap;
+        private readonly RTCConfiguration m_config;
+        private readonly Dictionary<(RTCStatsType, string), StatsRecord> m_statsRecordMap;
 
         public PeerConnectionRecord(RTCConfiguration config)
         {
@@ -182,8 +182,8 @@ namespace Unity.WebRTC.Editor
     public class StatsRecord
     {
         private const int MAX_BUFFER_SIZE = 1000;
-        private Dictionary<string, List<(long timeStamp, object value)>> m_memberRecord;
-        private string m_id;
+        private readonly Dictionary<string, List<(long timeStamp, object value)>> m_memberRecord;
+        private readonly string m_id;
 
         public StatsRecord(string id)
         {

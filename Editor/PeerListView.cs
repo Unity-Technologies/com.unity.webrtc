@@ -8,7 +8,7 @@ namespace Unity.WebRTC.Editor
     {
         public event OnChangeSelectPeerHandler OnChangePeer;
 
-        private WebRTCInternals m_parent;
+        private readonly WebRTCInternals m_parent;
 
         public PeerListView(WebRTCInternals parent)
         {

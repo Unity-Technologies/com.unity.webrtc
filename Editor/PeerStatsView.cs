@@ -8,8 +8,8 @@ namespace Unity.WebRTC.Editor
 {
     public class PeerStatsView
     {
-        private WebRTCInternals m_parent;
-        private RTCPeerConnection m_peerConnection;
+        private readonly WebRTCInternals m_parent;
+        private readonly RTCPeerConnection m_peerConnection;
         private ICollection<(RTCStatsType, string)> m_lastUpdateKeys;
 
         public PeerStatsView(RTCPeerConnection peer, WebRTCInternals parent)
