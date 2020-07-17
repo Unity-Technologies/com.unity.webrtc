@@ -161,9 +161,17 @@ namespace Unity.WebRTC
             get { return NativeMethods.StatsGetId(self).AsAnsiStringWithFreeMem(); }
         }
 
+        /// <summary>
+        /// this timestamp is utc epoch time micro seconds.
+        /// </summary>
         public long Timestamp
         {
             get { return NativeMethods.StatsGetTimestamp(self); }
+        }
+
+        public DateTime UtcTimeStamp
+        {
+            get { return DateTimeOffset.FromUnixTimeMilliseconds(Timestamp / 1000).UtcDateTime; }
         }
 
         public IDictionary<string, object> Dict
@@ -242,7 +250,7 @@ namespace Unity.WebRTC
             uint length = 0;
             return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsStringArray((int)length);
         }
-        
+
         internal RTCStats(IntPtr ptr)
         {
             self = ptr;
@@ -419,7 +427,7 @@ namespace Unity.WebRTC
         public uint framesDropped { get { return GetUnsignedInt("framesDropped"); } }
         public uint framesCorrupted { get { return GetUnsignedInt("framesCorrupted"); } }
         public uint partialFramesLost { get { return GetUnsignedInt("partialFramesLost"); } }
-        public uint fullFramesLost { get { return GetUnsignedInt("decoderImplementation"); } }
+        public uint fullFramesLost { get { return GetUnsignedInt("fullFramesLost"); } }
         public double audioLevel { get { return GetDouble("audioLevel"); } }
         public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
         public double echoReturnLoss { get { return GetDouble("echoReturnLoss"); } }
@@ -644,7 +652,7 @@ namespace Unity.WebRTC
     public class RTCStatsReport
     {
         private IntPtr self;
-        private readonly Dictionary<RTCStatsType, RTCStats> m_dictStats;
+        private readonly Dictionary<(RTCStatsType, string), RTCStats> m_dictStats;
 
         internal RTCStatsReport(IntPtr ptr)
         {
@@ -656,15 +664,16 @@ namespace Unity.WebRTC
             IntPtr[] array = ptrStatsArray.AsArray<IntPtr>((int)length);
             byte[] types = ptrStatsTypeArray.AsArray<byte>((int)length);
 
-            m_dictStats = new Dictionary<RTCStatsType, RTCStats>();
+            m_dictStats = new Dictionary<(RTCStatsType, string), RTCStats>();
             for (int i = 0; i < length; i++)
             {
                 RTCStatsType type = (RTCStatsType)types[i];
-                m_dictStats[type] = StatsFactory.Create(type, array[i]);
+                RTCStats stats = StatsFactory.Create(type, array[i]);
+                m_dictStats[(type, stats.Id)] = stats;
             }
         }
 
-        public IDictionary<RTCStatsType, RTCStats> Stats
+        public IDictionary<(RTCStatsType, string), RTCStats> Stats
         {
             get { return m_dictStats; }
         }

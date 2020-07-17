@@ -185,7 +185,7 @@ public class StatsSample : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="pc"></param>
     /// <param name="streamEvent"></param>
@@ -316,9 +316,9 @@ public class StatsSample : MonoBehaviour
             if(dropdown.options.Count == 0)
             {
                 List<string> options = new List<string>();
-                foreach (var stat in op1.Value.Stats.Values)
+                foreach (var stat in op1.Value.Stats.Keys)
                 {
-                    options.Add(stat.Type.ToString());
+                    options.Add($"{stat.Item1}-{stat.Item2}");
                 }
                 dropdown.ClearOptions();
                 dropdown.AddOptions(options);
@@ -329,12 +329,13 @@ public class StatsSample : MonoBehaviour
                 currentValue = dropdown.value;
             }
 
-            var currentOption = dropdown.options[currentValue].text;
+            var currentOption = dropdown.options[currentValue].text.Split('-');
 
-            var type = (RTCStatsType)Enum.Parse(typeof(RTCStatsType), currentOption);
-            text.text = "Id:" + op1.Value.Stats[type].Id + "\n";
-            text.text += "Timestamp:" + op1.Value.Stats[type].Timestamp + "\n";
-            text.text += op1.Value.Stats[type].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
+            var type = (RTCStatsType)Enum.Parse(typeof(RTCStatsType), currentOption[0]);
+            var id = currentOption[1];
+            text.text = "Id:" + op1.Value.Stats[(type, id)].Id + "\n";
+            text.text += "Timestamp:" + op1.Value.Stats[(type, id)].Timestamp + "\n";
+            text.text += op1.Value.Stats[(type, id)].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
         }
     }
 
