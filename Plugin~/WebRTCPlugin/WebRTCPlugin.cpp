@@ -320,12 +320,12 @@ extern "C"
         obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSenderGetStats(PeerConnectionObject* obj, RtpSenderInterface* sender)
+    UNITY_INTERFACE_EXPORT void PeerConnectionSenderGetStats(PeerConnectionObject* obj, RtpSenderInterface* selector)
     {
-        obj->connection->GetStats(sender, PeerConnectionStatsCollectorCallback::Create(obj));
+        obj->connection->GetStats(selector, PeerConnectionStatsCollectorCallback::Create(obj));
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionReceiveretStats(PeerConnectionObject* obj, RtpReceiverInterface* receiver)
+    UNITY_INTERFACE_EXPORT void PeerConnectionReceiverGetStats(PeerConnectionObject* obj, RtpReceiverInterface* receiver)
     {
         obj->connection->GetStats(receiver, PeerConnectionStatsCollectorCallback::Create(obj));
     }
