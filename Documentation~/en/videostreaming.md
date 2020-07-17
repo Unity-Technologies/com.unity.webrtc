@@ -19,7 +19,7 @@ WebRTC.Initialize(EncoderType.Software);
 
 
 
-The major browsers that support WebRTC can use `H.264` and `VP8`, which means most browsers can recieve video streaming from Unity.
+The major browsers that support WebRTC can use `H.264` and `VP8`, which means most browsers can receive video streaming from Unity.
 
 ## <a id="videotrack"/> Video Track
 
@@ -69,7 +69,7 @@ foreach(var track in listTrack)
 }
 ```
 
-When using hardware encoding, the number of tracks that can be used simultaneously may be limited depending on the graphic device's limitations. Generally, on desktop GPUs, up to **two tracks** can be used simultaneously on an NVIDIA Geforce card (On server-grade GPUs this is typically 4). For details, see the [NVDIA Codec SDK documentation](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix).
+When using hardware encoding, the number of tracks that can be used simultaneously may be limited depending on the graphic device's limitations. Generally, on desktop GPUs, up to **two tracks** can be used simultaneously on an NVIDIA Geforce card (On server-grade GPUs this is typically 4). For details, see the [NVIDIA Codec SDK documentation](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix).
 
 
 See the section on **Streamless tracks** under [`PeerConnection.addTrack`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack) in the MDN documentation for information on simultaneously receiving multiple tracks in the browser. 
