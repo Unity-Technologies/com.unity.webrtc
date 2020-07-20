@@ -66,7 +66,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 var peerRecord = string.Join(",",
-                    m_peerConenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
+                    m_peerConnenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
                 var json =
                     $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
                 File.WriteAllText(filePath, json);
@@ -79,7 +79,7 @@ namespace Unity.WebRTC.Editor
 
             EditorApplication.update += () =>
             {
-                dumpButton.SetEnabled(m_peerConenctionDataStore.Any());
+                dumpButton.SetEnabled(m_peerConnenctionDataStore.Any());
             };
 
             EditorApplication.playModeStateChanged += change =>
@@ -104,7 +104,7 @@ namespace Unity.WebRTC.Editor
                 EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
             }
 
-            m_peerConenctionDataStore.Clear();
+            m_peerConnenctionDataStore.Clear();
         }
 
         IEnumerator GetStatsPolling()
