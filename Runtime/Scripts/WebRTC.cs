@@ -460,7 +460,7 @@ namespace Unity.WebRTC
             }
         }
 
-        public static IEnumerable<RTCPeerConnection> PeerList
+        public static IReadOnlyList<RTCPeerConnection> PeerList
         {
             get
             {
