@@ -97,7 +97,7 @@ localConnection.OnIceConnectionChange = state => {
 ### The Data Channel Connection
 
 When the ICE exchange is finished, `OnDataChannel` is called and a one-way peer Data Channel is created.
-Register the `OnMessage` callback and describe the procdure for when a message is received.
+Register the `OnMessage` callback and describe the procedure for when a message is received.
 
 ```CSharp
 RTCDataChannel receiveChannel;
