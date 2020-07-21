@@ -26,6 +26,7 @@ namespace Unity.WebRTC.Editor
         }
 
         private const int UpdateStatsInterval = 1;
+        private static readonly Color BackgroundColorInProSkin = new Color(45 / 255f, 45 / 255f, 45 / 255f);
 
         public event OnPeerListHandler OnPeerList;
         public event OnStatsReportHandler OnStats;
@@ -38,7 +39,7 @@ namespace Unity.WebRTC.Editor
         private void OnEnable()
         {
             var root = this.rootVisualElement;
-            root.style.backgroundColor = EditorGUIUtility.isProSkin ? new Color(45/255f,45/255f,45/255f) : Color.white;
+            root.style.backgroundColor = EditorGUIUtility.isProSkin ? BackgroundColorInProSkin : Color.white;
 
             var toolbar = new Toolbar {style = {alignItems = Align.FlexEnd}};
             root.Add(toolbar);

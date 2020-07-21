@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,6 +8,8 @@ namespace Unity.WebRTC.Editor
 
     public class PeerListView
     {
+        private static readonly Color ButtonBackground = new Color(70 / 255f, 70 / 255f, 70 / 255f);
+
         public event OnChangeSelectPeerHandler OnChangePeer;
 
         private WebRTCStats m_parent;
@@ -36,7 +38,7 @@ namespace Unity.WebRTC.Editor
 
                     if (EditorGUIUtility.isProSkin)
                     {
-                        button.style.backgroundColor = new Color(70 / 255f, 70 / 255f, 70 / 255f);
+                        button.style.backgroundColor = ButtonBackground;
                     }
 
                     container.Add(button);
