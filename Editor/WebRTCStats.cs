@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using UnityEditor.Experimental;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,16 +16,17 @@ namespace Unity.WebRTC.Editor
 
     public delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
 
-    public class WebRTCInternals : EditorWindow
+    public class WebRTCStats : EditorWindow
     {
-        [MenuItem("Window/Analysis/WebRTCInternals")]
-        public static void Show()
+        [MenuItem("Window/Analysis/WebRTC Stats")]
+        public static void Init()
         {
-            WebRTCInternals wnd = GetWindow<WebRTCInternals>();
-            wnd.titleContent = new GUIContent("WebRTCInternals");
+            WebRTCStats wnd = GetWindow<WebRTCStats>();
+            wnd.titleContent = new GUIContent("WebRTC Stats");
         }
 
         private const int UpdateStatsInterval = 1;
+        private static readonly Color BackgroundColorInProSkin = new Color(45 / 255f, 45 / 255f, 45 / 255f);
 
         public event OnPeerListHandler OnPeerList;
         public event OnStatsReportHandler OnStats;
@@ -36,7 +39,20 @@ namespace Unity.WebRTC.Editor
         private void OnEnable()
         {
             var root = this.rootVisualElement;
-            root.Add(new Button(() =>
+            root.style.backgroundColor = EditorGUIUtility.isProSkin ? BackgroundColorInProSkin : Color.white;
+
+            var toolbar = new Toolbar {style = {alignItems = Align.FlexEnd}};
+            root.Add(toolbar);
+
+            toolbar.Add(new ToolbarSpacer {flex = true});
+
+            var buttonContainer = new VisualElement
+            {
+                tooltip = "Save current webrtc stats information to a json file",
+            };
+            toolbar.Add(buttonContainer);
+
+            var dumpButton = new ToolbarButton(() =>
             {
                 if (!m_peerConnenctionDataStore.Any())
                 {
@@ -52,12 +68,20 @@ namespace Unity.WebRTC.Editor
 
                 var peerRecord = string.Join(",",
                     m_peerConnenctionDataStore.Select(record => $"\"{record.Key}\":{{{record.Value.ToJson()}}}"));
-                var json = $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
+                var json =
+                    $"{{\"getUserMedia\":[], \"PeerConnections\":{{{peerRecord}}}, \"UserAgent\":\"UnityEditor\"}}";
                 File.WriteAllText(filePath, json);
 
-            }) {text = "DumpExport"});
+            })
+            { text = "Save"};
+            buttonContainer.Add(dumpButton);
 
             root.Add(CreateStatsView());
+
+            EditorApplication.update += () =>
+            {
+                dumpButton.SetEnabled(m_peerConnenctionDataStore.Any());
+            };
 
             EditorApplication.playModeStateChanged += change =>
             {
@@ -76,7 +100,12 @@ namespace Unity.WebRTC.Editor
 
         private void OnDisable()
         {
-            EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+            if (m_editorCoroutine != null)
+            {
+                EditorCoroutineUtility.StopCoroutine(m_editorCoroutine);
+            }
+
+            m_peerConnenctionDataStore.Clear();
         }
 
         IEnumerator GetStatsPolling()
@@ -119,7 +148,7 @@ namespace Unity.WebRTC.Editor
 
             var sideView = new VisualElement
             {
-                style = {borderRightColor = new StyleColor(Color.gray), borderRightWidth = 1, width = 250,}
+                style = {borderRightColor = Color.gray, borderRightWidth = 1, width = 250,}
             };
             var mainView = new VisualElement {style = {flexGrow = 1}};
 
@@ -139,6 +168,8 @@ namespace Unity.WebRTC.Editor
                 var statsView = new PeerStatsView(newPeer, this);
                 mainView.Add(statsView.Create());
             };
+
+            mainView.Add(new Label("Statistics are displayed when in play mode"));
 
             return container;
         }

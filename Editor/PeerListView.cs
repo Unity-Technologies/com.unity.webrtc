@@ -1,4 +1,6 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
@@ -6,11 +8,13 @@ namespace Unity.WebRTC.Editor
 
     public class PeerListView
     {
+        private static readonly Color ButtonBackground = new Color(70 / 255f, 70 / 255f, 70 / 255f);
+
         public event OnChangeSelectPeerHandler OnChangePeer;
 
-        private readonly WebRTCInternals m_parent;
+        private WebRTCStats m_parent;
 
-        public PeerListView(WebRTCInternals parent)
+        public PeerListView(WebRTCStats parent)
         {
             m_parent = parent;
         }
@@ -30,7 +34,12 @@ namespace Unity.WebRTC.Editor
                     var button = new Button(() =>
                     {
                         OnChangePeer?.Invoke(peerConnection);
-                    }) {text = $"peer {peerConnection.GetHashCode()}"};
+                    }) {text = $"peer {peerConnection.GetHashCode()}",};
+
+                    if (EditorGUIUtility.isProSkin)
+                    {
+                        button.style.backgroundColor = ButtonBackground;
+                    }
 
                     container.Add(button);
                 }

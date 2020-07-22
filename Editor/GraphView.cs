@@ -14,6 +14,7 @@ namespace Unity.WebRTC.Editor
         private const float TimeStampLabelHeight = 20f;
         private const float LineWidth = 5f;
         private const uint GraphGridDivide = 5;
+        private static readonly string[] unitStr = {"", "k", "M", "G"};
 
         private List<KeyValuePair<DateTime, float>> data;
         private string label;
@@ -64,6 +65,10 @@ namespace Unity.WebRTC.Editor
 
             // grid
             Handles.color = new Color(1f, 1f, 1f, 0.5f);
+
+
+            var (unitCount, unitName) = DecideUnit(maxValue);
+
             for (uint i = 1; i < GraphGridDivide; ++i)
             {
                 float x = graphWidth / GraphGridDivide * i;
@@ -73,8 +78,10 @@ namespace Unity.WebRTC.Editor
                     new Vector2(area.x, area.y + y),
                     new Vector2(area.xMax, area.y + y));
 
-                Handles.Label(new Vector2(area.x, area.y + y), $"{maxValue / GraphGridDivide * (GraphGridDivide - i)}");
-                Handles.Label(new Vector2(area.x + x, area.yMax - TimeStampLabelHeight), data[dataPoint].Key.ToShortTimeString());
+                Handles.Label(new Vector2(area.x, area.y + y), $"{maxValue / GraphGridDivide / unitCount * (GraphGridDivide - i):0.00}{unitName}");
+                var guiSkin = GUI.skin.label;
+                guiSkin.fontSize = 10;
+                Handles.Label(new Vector2(area.x + x, area.yMax - TimeStampLabelHeight), data[dataPoint].Key.ToLocalTime().ToShortTimeString(), guiSkin);
             }
 
             // data
@@ -94,6 +101,27 @@ namespace Unity.WebRTC.Editor
             Handles.DrawAAPolyLine(LineWidth, points.ToArray());
 
             Handles.color = Color.white;
+        }
+
+        private static (int unitCount, string unitName) DecideUnit(float maxValue)
+        {
+            var unitCount = 1;
+            var unitIndex = 0;
+            var current = maxValue;
+
+            while (current >= 1000)
+            {
+                current /= 1000;
+                unitCount *= 1000;
+                unitIndex++;
+            }
+
+            if (unitIndex > unitStr.Length - 1)
+            {
+                unitIndex = unitStr.Length - 1;
+            }
+
+            return (unitCount, unitStr[unitIndex]);
         }
     }
 }
