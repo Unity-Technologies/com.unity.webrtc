@@ -52,8 +52,19 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
     const auto height = 256;
     const std::unique_ptr<ITexture2D> src(m_device->CreateDefaultTextureV(width, height));
     const std::unique_ptr<ITexture2D> dst(m_device->CreateDefaultTextureV(width, height));
-    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst.get(), src->GetEncodeTexturePtrV()));
-//    EXPECT_FALSE(m_device->CopyResourceFromNativeV(dst.get(), dst->GetNativeTexturePtrV()));
+    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
+}
+
+TEST_P(GraphicsDeviceTest, ConvertRGBToI420) {
+    const auto width = 256;
+    const auto height = 256;
+    const std::unique_ptr<ITexture2D> src(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr <ITexture2D> dst(m_device->CreateCPUReadTextureV(width, height));
+    EXPECT_TRUE(m_device->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
+    const auto frameBuffer = m_device->ConvertRGBToI420(dst.get());
+    EXPECT_NE(nullptr, frameBuffer);
+    EXPECT_EQ(width, frameBuffer->width());
+    EXPECT_EQ(height, frameBuffer->height());
 }
 #endif
 

@@ -13,7 +13,7 @@ namespace webrtc = ::webrtc;
 
 #define DefPtr(_a) _COM_SMARTPTR_TYPEDEF(_a, __uuidof(_a))
 DefPtr(ID3D12CommandAllocator);
-DefPtr(ID3D12GraphicsCommandList4);
+DefPtr(ID3D12GraphicsCommandList);
 
 inline std::string HrToString(HRESULT hr)
 {
@@ -74,7 +74,7 @@ private:
 
     //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
     ID3D12CommandAllocatorPtr m_commandAllocator;
-    ID3D12GraphicsCommandList4Ptr m_commandList;
+    ID3D12GraphicsCommandListPtr m_commandList;
 
     //Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
     ID3D12Fence* m_copyResourceFence;
