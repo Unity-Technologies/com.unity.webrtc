@@ -74,8 +74,6 @@ pack_{{ package.name }}:
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - unzip -qq -o macos_plugin*
-    - rm macos_plugin*
     - upm-ci package pack  
   artifacts:
     {{ package.name }}_package:  
