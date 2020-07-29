@@ -74,8 +74,6 @@ pack_{{ package.name }}:
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - unzip -qq -o macos_plugin*
-    - rm macos_plugin*
     - upm-ci package pack  
   artifacts:
     {{ package.name }}_package:  
@@ -133,7 +131,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - git clone git@github.cds.internal.unity3d.com:unity/utr.git
     - rm -Rf ./utr/.git
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install --user unity-downloader-cli --extra-index-url https://artifactory.eu-cph-1.unityops.net/api/pypi/common-python/simple'" 
+    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
     - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '/Users/bokken/Library/Python/3.7/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
@@ -157,6 +155,79 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 
+
+{% endif -%}
+{% endfor %}
+
+{% for platform in platforms %}
+{% if platform.name != "macos" -%}
+
+{% for editor in editors %}
+codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
+  name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+    - upm-ci package test -u {{ editor.version }} --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
+  artifacts:
+    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
+      paths:
+        - "upm-ci~/test-results/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+{% endfor %}
+
+{% else -%}
+
+{% for editor in editors %}
+codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
+  name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - |
+      cd ../
+      ls com.unity.webrtc/upm-ci~/packages/com.unity.webrtc-*.tgz | xargs tar xzvf
+      cp -rf package/ com.unity.webrtc
+      cd com.unity.webrtc
+    - brew install node
+    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+    - git clone git@github.cds.internal.unity3d.com:unity/utr.git
+    - rm -Rf ./utr/.git
+    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
+    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
+    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
+    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '/Users/bokken/Library/Python/3.7/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
+    - |
+      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --extra-editor-arg="-enablePackageManagerTraces" --enable-code-coverage --coverage-results-path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --coverage-options="generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"'
+      UTR_RESULT=$?
+      mkdir -p upm-ci~/test-results/
+      scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
+      exit $UTR_RESULT
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
+  artifacts:
+    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
+      paths:
+        - "upm-ci~/test-results/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+{% endfor %}
 
 {% endif -%}
 {% endfor %}
