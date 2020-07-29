@@ -13,6 +13,10 @@
 
 namespace {
 
+    // Minimum interval is 10k fps.
+    #define FPS_TO_INTERVAL(fps) \
+    (fps ? rtc::kNumNanosecsPerSec / fps : rtc::kNumNanosecsPerSec / 10000)
+
     const double kRoundingTruncation = 0.0005;
 
     // Default resolution. If no constraint is specified, this is the resolution we

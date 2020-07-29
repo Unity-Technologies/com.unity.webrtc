@@ -81,8 +81,7 @@ namespace webrtc
             m_setKeyFrame(m_encoderId);
         }
 
-        m_encodedImage.set_buffer(&frameDataBuffer[0], frameDataBuffer.capacity());
-        m_encodedImage.set_size(frameDataBuffer.size());
+        m_encodedImage.SetEncodedData(webrtc::EncodedImageBuffer::Create(&frameDataBuffer[0], frameDataBuffer.size()));
 
         m_fragHeader.VerifyAndAllocateFragmentationHeader(naluIndices.size());
         m_fragHeader.fragmentationVectorSize = static_cast<uint16_t>(naluIndices.size());
