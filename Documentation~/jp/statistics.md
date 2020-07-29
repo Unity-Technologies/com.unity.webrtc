@@ -1,11 +1,10 @@
 # 統計情報の取得
 
-PeerConnectionを介して送信されたオーディオ、ビデオまたはデータパケットは途中で失われる可能性があり、またネットワークによる遅延が発生したりします。
-そのためWebRTCを実装したアプリケーションでは、ネットワークとメディアパイプラインのパフォーマンスを監視することができるようになっています。
+PeerConnection を介して送信されたオーディオやビデオ、データパケットは、ネットワーク状況によっては途中で失われたり、遅延が生じる可能性があります。統計情報 API を利用することで、ネットワークとメディアパイプラインのパフォーマンスを監視し、問題の原因を特定する手がかりを得ることができます。
 
-## PeerConnectionごとの統計情報の取得
+## PeerConnection の統計情報の取得
 
-統計情報は、PeerConnectionごとに取得することができます。
+統計情報は、PeerConnection 毎に取得することができます。
 `RTCPeerConnection` の `GetStats` メソッドを呼び出してください。
 
 ```CSharp
@@ -15,13 +14,13 @@ yield return statsOperation;
 var statsReport = statisOperation.Value;
 ```
 
-`GetStats`メソッドを実行したタイミングでの、PeerConnectionで取得できる統計情報が取得することができます。
-取得した結果(`RTCStatsReport`)に含まれる統計情報は、対象のPeerConnectionでやり取りされているメディアまたはデータにより異なります。
-`RTCStatsReport.Stats` により、`RTCStatsType`と`Id` のペアをキーに`RTCStats`をバリューとしたディクショナリにアクセスできます。
+`GetStats` メソッドを呼び出した時点の統計情報を取得することができます。
+取得した結果に含まれる統計情報は `RTCStatsReport` に格納されます。統計情報の内容は、対象の PeerConnection でやり取りされているメディアまたはデータにより異なります。
+`RTCStatsReport.Stats` により、 `RTCStatsType` と `Id` のペアをキーに、 `RTCStats` を値とした辞書にアクセスできます。
 
 ## RTCStatsTypeとRTCStats
 
-取得できる統計情報の種類は`RTCStatsType`のEnumで定義されています。
+取得できる統計情報の種類は `RTCStatsType` で定義されています。
 
 ```CSharp
 public enum RTCStatsType
@@ -71,15 +70,8 @@ public enum RTCStatsType
 }
 ```
 
-各タイプごとに`RTCStats`を継承したクラスがあります。
-例えば、`RTCStatusType.Codec`の場合は、`RTCCodecStats` になります。
-
-この継承した各クラスは、タイプごとの保持している統計情報をメンバー変数として公開しています。
-タイプごとにどのような統計情報が取得できるかは、継承された各クラスを確認してください。
-
-使用する場合は、`RTCStatsReport.Stats` 経由で取得した `RTCStats` をタイプごとにアップキャストしてください。
-
-
+統計情報の種類毎に `RTCStats` を継承したクラスを定義しています。例えば `RTCStatusType.Codec` の場合は `RTCCodecStats` を定義しています。
+各クラスは、種類毎に保持している統計情報をメンバー変数として公開します。どのような統計情報が取得できるかについては、継承された各クラスを確認してください。メンバー変数にアクセス場合は、`RTCStatsReport.Stats` 経由で取得した `RTCStats` を種類毎にキャストします。
 
 ## 統計情報ツール
-Editor上であれば、現在の統計情報を表示するツールを用意しています。詳しくは、 [こちら](webrtcstats.md) をご覧ください
+エディタ上での動作確認のために、現在の統計情報を表示するツールを提供しています。詳しくは、 [こちら](webrtcstats.md) をご覧ください。
