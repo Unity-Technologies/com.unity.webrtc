@@ -2,7 +2,7 @@
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
-#include "NvVideoCapturer.h"
+#include "Codec/IEncoder.h"
 
 namespace unity
 {
@@ -12,6 +12,7 @@ namespace webrtc
     class Context;
     class IGraphicsDevice;
     class MediaStreamObserver;
+    class UnityVideoTrackSource;
     class SetSessionDescriptionObserver;
     class ContextManager
     {
@@ -55,7 +56,7 @@ namespace webrtc
 
 
         // MediaStreamTrack
-        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, void* frameBuffer);
+        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, void* frame);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label);
         void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
@@ -93,7 +94,7 @@ namespace webrtc
         rtc::scoped_refptr<webrtc::AudioTrackInterface> m_audioTrack;
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> m_mediaSteamTrackList;
         std::map<const PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
-        std::map<const webrtc::MediaStreamTrackInterface*, NvVideoCapturer*> m_mapVideoCapturer;
+        std::map<const webrtc::MediaStreamTrackInterface*, UnityVideoTrackSource*> m_mapVideoCapturer;
         std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> m_mapMediaStream;
         std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;

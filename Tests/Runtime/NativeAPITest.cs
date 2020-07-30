@@ -141,6 +141,19 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void AddAndRemoveVideoTrack()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            const int width = 1280;
+            const int height = 720;
+            var renderTexture = CreateRenderTexture(width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDestroy(0);
+            UnityEngine.Object.DestroyImmediate(renderTexture);
+        }
+
+        [Test]
         public void AddAndRemoveVideoTrackToPeerConnection()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);

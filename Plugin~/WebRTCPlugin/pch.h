@@ -16,6 +16,7 @@
 #include "api/video/video_frame.h"
 #include "api/video/video_frame_buffer.h"
 #include "api/video/i420_buffer.h"
+#include "api/video_track_source_proxy.h"
 
 #include "rtc_base/thread.h"
 #include "rtc_base/ref_counted_object.h"

@@ -164,7 +164,7 @@ IUnityInterface* CreateUnityInterface() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void GraphicsDeviceTestBase::SetUp()
+GraphicsDeviceTestBase::GraphicsDeviceTestBase()
 {
     std::tie(m_unityGfxRenderer, m_encoderType) = GetParam();
     const auto pGraphicsDevice = CreateDevice(m_unityGfxRenderer);
@@ -174,18 +174,21 @@ void GraphicsDeviceTestBase::SetUp()
     {
 #if defined(SUPPORT_D3D12)
         m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(pGraphicsDevice), pCommandQueue.Get());
-        ASSERT_TRUE(m_device->InitV());
+        m_device->InitV();
 #endif
     }
     else
     {
-        ASSERT_TRUE(GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, pGraphicsDevice, unityInterface));
+        GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, pGraphicsDevice, unityInterface);
         m_device = GraphicsDevice::GetInstance().GetDevice();
     }
 
-    ASSERT_NE(nullptr, m_device);
+    if (m_device == nullptr)
+        throw;
 }
-void GraphicsDeviceTestBase::TearDown()
+
+
+GraphicsDeviceTestBase::~GraphicsDeviceTestBase()
 {
     if (m_unityGfxRenderer == kUnityGfxRendererD3D12)
     {

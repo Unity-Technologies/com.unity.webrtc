@@ -1,5 +1,6 @@
 #pragma once
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 #include "../WebRTCPlugin/GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
@@ -11,11 +12,13 @@ using unity::webrtc::UnityEncoderType;
 using std::tuple;
 using testing::Values;
 
-class GraphicsDeviceTestBase : public testing::TestWithParam<tuple<UnityGfxRenderer, UnityEncoderType> > {
-
+class GraphicsDeviceTestBase
+    : public testing::TestWithParam<tuple<UnityGfxRenderer, UnityEncoderType> >
+{
+public:
+    GraphicsDeviceTestBase();
+    virtual ~GraphicsDeviceTestBase();
 protected:
-    void SetUp() override;
-    void TearDown() override;
     IGraphicsDevice* m_device;
     UnityEncoderType m_encoderType;
     UnityGfxRenderer m_unityGfxRenderer;
