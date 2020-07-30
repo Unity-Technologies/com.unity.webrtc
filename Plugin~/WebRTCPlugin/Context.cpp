@@ -4,11 +4,11 @@
 
 #include "Codec/NvCodec/NvEncoder.h"
 #include "DummyVideoEncoder.h"
-#include "VideoCaptureTrackSource.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
+#include "UnityVideoTrackSource.h"
 
 namespace unity
 {
@@ -202,7 +202,6 @@ namespace webrtc
         }
 
         m_mapVideoCapturer[track]->SetEncoder(encoder);
-        m_mapVideoCapturer[track]->StartEncoder();
 
         uint32_t id = GenerateUniqueId();
         encoder->SetEncoderId(id);
@@ -218,7 +217,10 @@ namespace webrtc
 
     bool Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
     {
-        return m_mapVideoCapturer[track]->EncodeVideoData();
+        if(m_mapVideoCapturer[track] == nullptr)
+            return false;
+        m_mapVideoCapturer[track]->OnFrameCaptured();
+        return true;
     }
 
     const VideoEncoderParameter* Context::GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track)
@@ -273,31 +275,27 @@ namespace webrtc
         stream->Release();
     }
 
-    MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
+    MediaStreamObserver* Context::GetObserver(
+        const webrtc::MediaStreamInterface* stream)
     {
         return m_mapMediaStreamObserver[stream].get();
     }
 
-    webrtc::VideoTrackInterface* Context::CreateVideoTrack(const std::string& label, void* frameBuffer)
+    webrtc::VideoTrackInterface* Context::CreateVideoTrack(
+        const std::string& label, void* frame)
     {
-        auto videoCapturer = std::make_unique<NvVideoCapturer>();
-        const std::unique_ptr<NvVideoCapturer>::pointer ptr = videoCapturer.get();
-        videoCapturer->SetFrameBuffer(frameBuffer);
+        rtc::scoped_refptr<UnityVideoTrackSource> src =
+            new rtc::RefCountedObject<UnityVideoTrackSource>(frame, false, nullptr);
 
-        const rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> source(
-            webrtc::VideoCapturerTrackSource::Create(m_workerThread.get(), std::move(videoCapturer), false));
-        webrtc::VideoTrackInterface* videoTrack =
-            m_peerConnectionFactory->CreateVideoTrack(label, source).release();
-        m_mapVideoCapturer[videoTrack] = ptr;
+        rtc::scoped_refptr<webrtc::VideoTrackInterface> videoTrack =
+            m_peerConnectionFactory->CreateVideoTrack(label, src).release();
+        m_mapVideoCapturer[videoTrack] = src.get();
         return videoTrack;
     }
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
-        if(m_mapVideoCapturer.count(track) > 0)
-        {
-            m_mapVideoCapturer[track]->Stop();
-        }
+        // todo:(kazuki)
     }
 
     webrtc::AudioTrackInterface* Context::CreateAudioTrack(const std::string& label)

@@ -145,6 +145,7 @@ elseif(APPLE)
       ${FRAMEWORK_LIBS}
       ${GTEST_MAIN_LIBRARIES}
       ${GTEST_LIBRARIES}
+      ${GMOCK_LIBRARIES}
   )
 
   target_include_directories(WebRTCPluginTest
@@ -170,6 +171,7 @@ elseif(UNIX)
       ${CMAKE_DL_LIBS}
       ${GTEST_MAIN_LIBRARIES}
       ${GTEST_LIBRARIES}
+      ${GMOCK_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT}
       ${Vulkan_LIBRARY}
       cuda

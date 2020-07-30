@@ -72,7 +72,7 @@ TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     const auto stream = context->CreateMediaStream("videostream");
     const auto track = context->CreateVideoTrack("video", tex.get());
-    const auto videoTrack = reinterpret_cast<webrtc::AudioTrackInterface*>(track);
+    const auto videoTrack = reinterpret_cast<webrtc::VideoTrackInterface*>(track);
     stream->AddTrack(videoTrack);
     stream->RemoveTrack(videoTrack);
     context->DeleteMediaStream(stream);

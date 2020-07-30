@@ -27,7 +27,7 @@ namespace webrtc
         virtual bool IsSupported() const = 0;
         virtual void SetIdrFrame() = 0;
         virtual uint64 GetCurrentFrameCount() const = 0;
-        sigslot::signal1<webrtc::VideoFrame&> CaptureFrame;
+        sigslot::signal1<const webrtc::VideoFrame&> CaptureFrame;
 
         // todo(kazuki): remove this virtual method after refactoring DummyVideoEncoder
         virtual void SetEncoderId(const uint32_t id) { m_encoderId = id;  }

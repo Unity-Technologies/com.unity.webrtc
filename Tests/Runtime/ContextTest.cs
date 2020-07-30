@@ -75,6 +75,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = context.CreateVideoTrack("video", rt.GetNativeTexturePtr());
             context.DeleteMediaStreamTrack(track);
             context.Dispose();
+            UnityEngine.Object.DestroyImmediate(rt);
         }
     }
 }
