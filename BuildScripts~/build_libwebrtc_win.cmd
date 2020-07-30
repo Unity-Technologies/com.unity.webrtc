@@ -5,13 +5,14 @@ git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools
 )
 
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=m79
+set WEBRTC_VERSION=4147
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set CPPFLAGS=/WX-
 set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2017
 set OUTPUT_DIR=out
 set ARTIFACTS_DIR=%cd%\artifacts
+set vs2017_install=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools
 
 cmd /k fetch.bat webrtc
 
@@ -26,7 +27,7 @@ REM add jsoncpp
 patch "src\BUILD.gn" < "BuildScripts~\add_jsoncpp.patch"
 
 REM install pywin32
-cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32
+cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32 --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
 
 cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 

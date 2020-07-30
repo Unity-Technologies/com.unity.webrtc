@@ -32,13 +32,7 @@ namespace webrtc
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetHardwareEncoderFormats() const
     {
-        const absl::optional<std::string> profileLevelId =
-            webrtc::H264::ProfileLevelIdToString(webrtc::H264::ProfileLevelId(webrtc::H264::kProfileConstrainedBaseline, webrtc::H264::kLevel5_1));
-        return { webrtc::SdpVideoFormat(
-            cricket::kH264CodecName,
-            { {cricket::kH264FmtpProfileLevelId, *profileLevelId},
-              {cricket::kH264FmtpLevelAsymmetryAllowed, "1"},
-              {cricket::kH264FmtpPacketizationMode, "1"} }) };
+        return { webrtc::CreateH264Format(webrtc::H264::kProfileConstrainedBaseline, webrtc::H264::kLevel5_1, "1") };
     }
 
 

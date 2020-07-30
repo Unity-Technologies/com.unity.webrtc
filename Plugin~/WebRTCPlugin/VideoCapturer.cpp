@@ -151,9 +151,7 @@ namespace cricket {
         apply_rotation_ = wants.rotation_applied;
 
         if (video_adapter()) {
-            video_adapter()->OnResolutionFramerateRequest(wants.target_pixel_count,
-                wants.max_pixel_count,
-                wants.max_framerate_fps);
+            video_adapter()->OnSinkWants(wants);
         }
     }
 
