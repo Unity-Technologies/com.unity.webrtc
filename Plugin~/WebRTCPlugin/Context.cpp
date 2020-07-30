@@ -4,14 +4,11 @@
 
 #include "Codec/NvCodec/NvEncoder.h"
 #include "DummyVideoEncoder.h"
-#include "VideoCaptureTrackSource.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
-#include "Codec/EncoderFactory.h"
-#include "GraphicsDevice/GraphicsDevice.h"
 
 namespace unity
 {
