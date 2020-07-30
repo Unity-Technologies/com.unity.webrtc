@@ -26,7 +26,7 @@ REM add jsoncpp
 patch "src\BUILD.gn" < "BuildScripts~\add_jsoncpp.patch"
 
 REM install pywin32
-cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32
+cmd /k %cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe -m pip install pywin32 --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
 
 cmd /k gn.bat gen %OUTPUT_DIR% --root="src" --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
