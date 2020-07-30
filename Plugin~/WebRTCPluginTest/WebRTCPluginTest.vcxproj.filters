@@ -79,6 +79,7 @@
     <ClCompile Include="..\WebRTCPlugin\MediaStreamObserver.cpp" />
     <ClCompile Include="..\WebRTCPlugin\SetSessionDescriptionObserver.cpp" />
     <ClCompile Include="..\WebRTCPlugin\UnityVideoEncoderFactory.cpp" />
+    <ClCompile Include="..\WebRTCPlugin\UnityVideoDecoderFactory.cpp" />
     <ClCompile Include="..\WebRTCPlugin\PeerConnectionStatsCollectorCallback.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +183,7 @@
     <ClInclude Include="..\WebRTCPlugin\MediaStreamObserver.h" />
     <ClInclude Include="..\WebRTCPlugin\SetSessionDescriptionObserver.h" />
     <ClInclude Include="..\WebRTCPlugin\UnityVideoEncoderFactory.h" />
+    <ClInclude Include="..\WebRTCPlugin\UnityVideoDecoderFactory.h" />
     <ClInclude Include="..\WebRTCPlugin\PeerConnectionStatsCollectorCallback.h" />
   </ItemGroup>
   <ItemGroup>

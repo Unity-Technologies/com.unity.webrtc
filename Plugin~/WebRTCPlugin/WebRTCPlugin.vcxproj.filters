@@ -73,6 +73,7 @@
     <ClCompile Include="SetSessionDescriptionObserver.cpp" />
     <ClCompile Include="UnityRenderEvent.cpp" />
     <ClCompile Include="UnityVideoEncoderFactory.cpp" />
+    <ClCompile Include="UnityVideoDecoderFactory.cpp" />
     <ClCompile Include="PeerConnectionStatsCollectorCallback.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +176,7 @@
     <ClInclude Include="SetSessionDescriptionObserver.h" />
     <ClInclude Include="NvVideoCapturer.h" />
     <ClInclude Include="UnityVideoEncoderFactory.h" />
+    <ClInclude Include="UnityVideoDecoderFactory.h" />
     <ClInclude Include="PeerConnectionStatsCollectorCallback.h" />
   </ItemGroup>
   <ItemGroup>
