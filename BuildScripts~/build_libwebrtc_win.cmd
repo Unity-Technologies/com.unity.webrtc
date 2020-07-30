@@ -12,6 +12,7 @@ set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2017
 set OUTPUT_DIR=out
 set ARTIFACTS_DIR=%cd%\artifacts
+set vs2017_install=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools
 
 cmd /k fetch.bat webrtc
 
