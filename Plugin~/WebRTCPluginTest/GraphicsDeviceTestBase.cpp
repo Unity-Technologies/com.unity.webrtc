@@ -36,7 +36,7 @@ Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11DeviceContext;
 
 Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter1;
 Microsoft::WRL::ComPtr<IDXGIFactory4> pFactory4;
-Microsoft::WRL::ComPtr<ID3D12Device> pD3D12Device;
+Microsoft::WRL::ComPtr<ID3D12Device5> pD3D12Device;
 Microsoft::WRL::ComPtr<ID3D12CommandQueue> pCommandQueue;
 
 const int kD3D12NodeMask = 0;
