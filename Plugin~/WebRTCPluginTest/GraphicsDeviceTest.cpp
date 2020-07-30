@@ -36,7 +36,7 @@ TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV) {
 
 //[Note-sin: 2019-12-19] Real Unity Interface is required for testing the following functions, and it is not 
 //possible to create a dummy Unity interface (with its command buffer) on Metal devices
-#if !defined(SUPPORT_METAL)
+#if !defined(SUPPORT_METAL) && !defined(SUPPORT_OPENGL_CORE)
 
 TEST_P(GraphicsDeviceTest, CopyResourceV) {
     const auto width = 256;

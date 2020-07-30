@@ -54,25 +54,19 @@ ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) 
 
 //---------------------------------------------------------------------------------------------------------------------
 bool OpenGLGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
-    auto nativeDest = reinterpret_cast<GLuint*>(dest->GetNativeTexturePtrV());
-    auto nativeSrc = reinterpret_cast<GLuint*>(src->GetNativeTexturePtrV());
     auto width = dest->GetWidth();
     auto height  = dest->GetHeight();
-
-    GLuint srcName = *nativeSrc;
-    GLuint dstName = *nativeDest;
+    GLuint dstName = reinterpret_cast<intptr_t>(dest->GetNativeTexturePtrV());
+    GLuint srcName = reinterpret_cast<intptr_t>(src->GetNativeTexturePtrV());
     return CopyResource(dstName, srcName, width, height);
-
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 bool OpenGLGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) {
-    auto nativeDest = reinterpret_cast<GLuint*>(dest->GetNativeTexturePtrV());
     auto width = dest->GetWidth();
     auto height  = dest->GetHeight();
-
-    GLuint srcName = (GLuint)(size_t)(nativeTexturePtr);
-    GLuint dstName = *nativeDest;
+    GLuint dstName = reinterpret_cast<intptr_t>(dest->GetNativeTexturePtrV());
+    GLuint srcName = reinterpret_cast<intptr_t>(nativeTexturePtr);
     return CopyResource(dstName, srcName, width, height);
 }
 
