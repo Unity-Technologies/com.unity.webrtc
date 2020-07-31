@@ -218,7 +218,7 @@ namespace webrtc
     bool Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
     {
         auto it = m_mapVideoCapturer.find(track);
-        if(it != m_mapVideoCapturer.end() && it->second == nullptr)
+        if(it != m_mapVideoCapturer.end() && it->second != nullptr)
         {
             it->second->OnFrameCaptured();
         }
