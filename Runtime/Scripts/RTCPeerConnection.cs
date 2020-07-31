@@ -487,13 +487,13 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr stats)
+        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr report)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnStatsDelivered(stats);
+                    connection.OnStatsDelivered(report);
                 }
             });
         }

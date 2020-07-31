@@ -217,9 +217,11 @@ namespace webrtc
 
     bool Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
     {
-        if(m_mapVideoCapturer[track] == nullptr)
-            return false;
-        m_mapVideoCapturer[track]->OnFrameCaptured();
+        auto it = m_mapVideoCapturer.find(track);
+        if(it != m_mapVideoCapturer.end() && it->second != nullptr)
+        {
+            it->second->OnFrameCaptured();
+        }
         return true;
     }
 
@@ -317,6 +319,18 @@ namespace webrtc
     {
         m_audioDevice->ProcessAudioData(data, size);
     }
+
+    void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
+    {
+        m_listStatsReport.push_back(report);
+    }
+
+    void Context::DeleteStatsReport(const webrtc::RTCStatsReport* report)
+    {
+        auto found = std::find_if(m_listStatsReport.begin(), m_listStatsReport.end(),
+             [report](rtc::scoped_refptr<const webrtc::RTCStatsReport> it){ return it.get() == report; });
+        m_listStatsReport.erase(found);
+	}
 
     DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)
     {

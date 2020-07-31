@@ -70,6 +70,10 @@ namespace webrtc
         SetSessionDescriptionObserver* GetObserver(webrtc::PeerConnectionInterface* connection);
         void DeletePeerConnection(PeerConnectionObject* obj) { m_mapClients.erase(obj); }
 
+        // StatsReport
+        void AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report);
+        void DeleteStatsReport(const webrtc::RTCStatsReport* report);
+    
         // DataChannel
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
         void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
@@ -93,6 +97,7 @@ namespace webrtc
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> m_audioTrack;
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> m_mediaSteamTrackList;
+        std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;
         std::map<const PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
         std::map<const webrtc::MediaStreamTrackInterface*, UnityVideoTrackSource*> m_mapVideoCapturer;
         std::map<const std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> m_mapMediaStream;

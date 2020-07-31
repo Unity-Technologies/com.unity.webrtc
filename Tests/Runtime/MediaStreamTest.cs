@@ -184,7 +184,6 @@ namespace Unity.WebRTC.RuntimeTest
         /// </todo>
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator PeerConnectionGetStats()
         {
             var camObj = new GameObject("Camera");
@@ -214,6 +213,52 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.NotNull(pair.Value);
                 }
             }
+
+            test.component.Dispose();
+            videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator SenderGetStats()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeersTest>();
+            test.component.SetStream(videoStream);
+            yield return test;
+            yield return new WaitForSeconds(0.1f);
+            var op = test.component.GetSenderStats(0);
+            yield return op;
+            Assert.True(op.IsDone);
+            Assert.IsNotEmpty(op.Value.Stats);
+
+            test.component.Dispose();
+            videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator ReceiverGetStats()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeersTest>();
+            test.component.SetStream(videoStream);
+            yield return test;
+            yield return new WaitForSeconds(0.1f);
+            var op = test.component.GetReceiverStats(0);
+            yield return op;
+            Assert.True(op.IsDone);
+            Assert.IsEmpty(op.Value.Stats);
 
             test.component.Dispose();
             videoStream.Dispose();
@@ -280,8 +325,6 @@ namespace Unity.WebRTC.RuntimeTest
         {
             private bool m_isFinished;
             private MediaStream m_stream;
-            List<RTCRtpSender> pc1Senders;
-            List<RTCRtpSender> pc2Senders;
             RTCPeerConnection peer1;
             RTCPeerConnection peer2;
             RTCDataChannel dataChannel;
@@ -301,9 +344,14 @@ namespace Unity.WebRTC.RuntimeTest
                 return peer1.GetStats();
             }
 
-            public RTCStatsReportAsyncOperation GetSenderStats()
+            public RTCStatsReportAsyncOperation GetSenderStats(int index)
             {
-                return pc1Senders.First().GetStats();
+                return GetPeer1Senders().ElementAt(index).GetStats();
+            }
+
+            public RTCStatsReportAsyncOperation GetReceiverStats(int index)
+            {
+                return GetPeer1Receivers().ElementAt(index).GetStats();
             }
 
             IEnumerator Start()
@@ -314,8 +362,6 @@ namespace Unity.WebRTC.RuntimeTest
                     new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
                 };
 
-                pc1Senders = new List<RTCRtpSender>();
-                pc2Senders = new List<RTCRtpSender>();
                 peer1 = new RTCPeerConnection(ref config);
                 peer2 = new RTCPeerConnection(ref config);
                 RTCDataChannelInit conf = new RTCDataChannelInit(true);
@@ -339,12 +385,12 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.NotNull(e.Track);
                     Assert.NotNull(e.Receiver);
                     Assert.NotNull(e.Transceiver);
-                    pc2Senders.Add(peer2.AddTrack(e.Track, m_stream));
+                    peer2.AddTrack(e.Track);
                 };
 
                 foreach (var track in m_stream.GetTracks())
                 {
-                    pc1Senders.Add(peer1.AddTrack(track, m_stream));
+                    peer1.AddTrack(track, m_stream);
                 }
 
                 RTCOfferOptions options1 = default;
@@ -382,7 +428,7 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return op8;
                 Assert.True(op8.IsCompleted);
 
-                var op9 = new WaitUntilWithTimeout(() => pc2Senders.Count > 0, 5000);
+                var op9 = new WaitUntilWithTimeout(() => GetPeer1Senders().Any(), 5000);
                 yield return op9;
                 Assert.True(op9.IsCompleted);
 
@@ -396,22 +442,17 @@ namespace Unity.WebRTC.RuntimeTest
 
             public IEnumerable<RTCRtpSender> GetPeer1Senders()
             {
-                return pc1Senders;
+                return peer1.GetSenders();
+            }
+
+            public IEnumerable<RTCRtpReceiver> GetPeer1Receivers()
+            {
+                return peer1.GetReceivers();
             }
 
             public void Dispose()
             {
-                foreach (var sender in pc1Senders)
-                {
-                    peer1.RemoveTrack(sender);
-                }
-
-                foreach (var sender in pc2Senders)
-                {
-                    peer2.RemoveTrack(sender);
-                }
                 dataChannel.Dispose();
-                pc1Senders.Clear();
                 peer1.Close();
                 peer2.Close();
             }

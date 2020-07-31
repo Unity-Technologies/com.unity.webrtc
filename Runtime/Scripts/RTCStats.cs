@@ -103,8 +103,6 @@ namespace Unity.WebRTC
         {
             StatsMemberType type = this.GetValueType();
 
-            // UnityEngine.Debug.LogFormat("{0} {1}", GetName(), type);
-
             uint length = 0;
             switch (type)
             {
@@ -123,19 +121,19 @@ namespace Unity.WebRTC
                 case StatsMemberType.String:
                     return NativeMethods.StatsMemberGetString(self).AsAnsiStringWithFreeMem();
                 case StatsMemberType.SequenceBool:
-                    return NativeMethods.StatsMemberGetBoolArray(self, ref length).AsBoolArray((int)length);
+                    return NativeMethods.StatsMemberGetBoolArray(self, ref length).AsArray<bool>((int)length);
                 case StatsMemberType.SequenceInt32:
-                    return NativeMethods.StatsMemberGetIntArray(self, ref length).AsIntArray((int)length);
+                    return NativeMethods.StatsMemberGetIntArray(self, ref length).AsArray<int>((int)length);
                 case StatsMemberType.SequenceUint32:
-                    return NativeMethods.StatsMemberGetUnsignedIntArray(self, ref length).AsUnsignedIntArray((int)length);
+                    return NativeMethods.StatsMemberGetUnsignedIntArray(self, ref length).AsArray<uint>((int)length);
                 case StatsMemberType.SequenceInt64:
-                    return NativeMethods.StatsMemberGetLongArray(self, ref length).AsLongArray((int)length);
+                    return NativeMethods.StatsMemberGetLongArray(self, ref length).AsArray<long>((int)length);
                 case StatsMemberType.SequenceUint64:
-                    return NativeMethods.StatsMemberGetUnsignedLongArray(self, ref length).AsUnsignedLongArray((int)length);
+                    return NativeMethods.StatsMemberGetUnsignedLongArray(self, ref length).AsArray<ulong>((int)length);
                 case StatsMemberType.SequenceDouble:
-                    return NativeMethods.StatsMemberGetDoubleArray(self, ref length).AsDoubleArray((int)length);
+                    return NativeMethods.StatsMemberGetDoubleArray(self, ref length).AsArray<double>((int)length);
                 case StatsMemberType.SequenceString:
-                    return NativeMethods.StatsMemberGetStringArray(self, ref length).AsStringArray((int)length);
+                    return NativeMethods.StatsMemberGetStringArray(self, ref length).AsArray<string>((int)length);
                 default:
                     throw new ArgumentException();
             }
@@ -217,38 +215,38 @@ namespace Unity.WebRTC
         internal bool[] GetBoolArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetBoolArray(m_members[key].self, ref length).AsBoolArray((int)length);
+            return NativeMethods.StatsMemberGetBoolArray(m_members[key].self, ref length).AsArray<bool>((int)length);
         }
         internal int[] GetIntArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetIntArray(m_members[key].self, ref length).AsIntArray((int)length);
+            return NativeMethods.StatsMemberGetIntArray(m_members[key].self, ref length).AsArray<int>((int)length);
         }
 
         internal uint[] GetUnsignedIntArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetUnsignedIntArray(m_members[key].self, ref length).AsUnsignedIntArray((int)length);
+            return NativeMethods.StatsMemberGetUnsignedIntArray(m_members[key].self, ref length).AsArray<uint>((int)length);
         }
         internal long[] GetLongArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetLongArray(m_members[key].self, ref length).AsLongArray((int)length);
+            return NativeMethods.StatsMemberGetLongArray(m_members[key].self, ref length).AsArray<long>((int)length);
         }
         internal ulong[] GetUnsignedLongArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetUnsignedLongArray(m_members[key].self, ref length).AsUnsignedLongArray((int)length);
+            return NativeMethods.StatsMemberGetUnsignedLongArray(m_members[key].self, ref length).AsArray<ulong>((int)length);
         }
         internal double[] GetDoubleArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetDoubleArray(m_members[key].self, ref length).AsDoubleArray((int)length);
+            return NativeMethods.StatsMemberGetDoubleArray(m_members[key].self, ref length).AsArray<double>((int)length);
         }
         internal string[] GetStringArray(string key)
         {
             uint length = 0;
-            return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsStringArray((int)length);
+            return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsArray<string>((int)length);
         }
 
         internal RTCStats(IntPtr ptr)
@@ -649,14 +647,18 @@ namespace Unity.WebRTC
         }
     }
 
-    public class RTCStatsReport
+    public class RTCStatsReport : IDisposable
     {
         private IntPtr self;
         private readonly Dictionary<(RTCStatsType, string), RTCStats> m_dictStats;
 
+        private bool disposed;
+
         internal RTCStatsReport(IntPtr ptr)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
+
             uint length = 0;
             IntPtr ptrStatsTypeArray = IntPtr.Zero;
             IntPtr ptrStatsArray = NativeMethods.StatsReportGetStatsList(self, ref length, ref ptrStatsTypeArray);
@@ -672,6 +674,31 @@ namespace Unity.WebRTC
                 m_dictStats[(type, stats.Id)] = stats;
             }
         }
+
+        ~RTCStatsReport()
+        {
+            this.Dispose();
+            WebRTC.Table.Remove(self);
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Context.DeleteStatsReport(self);
+                self = IntPtr.Zero;
+            }
+
+            this.disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        //internal
 
         public IDictionary<(RTCStatsType, string), RTCStats> Stats
         {
