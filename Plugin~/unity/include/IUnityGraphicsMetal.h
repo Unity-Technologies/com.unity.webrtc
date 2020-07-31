@@ -1,11 +1,17 @@
+// Unity Native Plugin API copyright © 2015 Unity Technologies ApS
+//
+// Licensed under the Unity Companion License for Unity - dependent projects--see[Unity Companion License](http://www.unity3d.com/legal/licenses/Unity_Companion_License).
+//
+// Unless expressly provided otherwise, the Software under this license is made available strictly on an “AS IS” BASIS WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.Please review the license for details on these and other terms and conditions.
+
 #pragma once
 #include "IUnityInterface.h"
 
 #ifndef __OBJC__
-#error metal plugin is objc code.
+    #error metal plugin is objc code.
 #endif
 #ifndef __clang__
-#error only clang compiler is supported.
+    #error only clang compiler is supported.
 #endif
 
 @class NSBundle;
@@ -15,10 +21,10 @@
 @protocol MTLTexture;
 @class MTLRenderPassDescriptor;
 
-// Should only be used on the rendering thread unless noted otherwise.
-UNITY_DECLARE_INTERFACE(IUnityGraphicsMetal)
+
+UNITY_DECLARE_INTERFACE(IUnityGraphicsMetalV1)
 {
-    NSBundle*               (UNITY_INTERFACE_API * MetalBundle)();
+    NSBundle* (UNITY_INTERFACE_API * MetalBundle)();
     id<MTLDevice>(UNITY_INTERFACE_API * MetalDevice)();
 
     id<MTLCommandBuffer>(UNITY_INTERFACE_API * CurrentCommandBuffer)();
@@ -40,6 +46,27 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsMetal)
     // NB: you pass here *native* RenderBuffer, acquired by calling (C#) RenderBuffer.GetNativeRenderBufferPtr
     // AAResolvedTextureFromRenderBuffer will return nil in case of non-AA RenderBuffer or if called for depth RenderBuffer
     // StencilTextureFromRenderBuffer will return nil in case of no-stencil RenderBuffer or if called for color RenderBuffer
+    id<MTLTexture>(UNITY_INTERFACE_API * TextureFromRenderBuffer)(UnityRenderBuffer buffer);
+    id<MTLTexture>(UNITY_INTERFACE_API * AAResolvedTextureFromRenderBuffer)(UnityRenderBuffer buffer);
+    id<MTLTexture>(UNITY_INTERFACE_API * StencilTextureFromRenderBuffer)(UnityRenderBuffer buffer);
+};
+UNITY_REGISTER_INTERFACE_GUID(0x29F8F3D03833465EULL, 0x92138551C15D823DULL, IUnityGraphicsMetalV1)
+
+
+// deprecated: please use versioned interface above
+
+UNITY_DECLARE_INTERFACE(IUnityGraphicsMetal)
+{
+    NSBundle* (UNITY_INTERFACE_API * MetalBundle)();
+    id<MTLDevice>(UNITY_INTERFACE_API * MetalDevice)();
+
+    id<MTLCommandBuffer>(UNITY_INTERFACE_API * CurrentCommandBuffer)();
+    id<MTLCommandEncoder>(UNITY_INTERFACE_API * CurrentCommandEncoder)();
+    void(UNITY_INTERFACE_API * EndCurrentCommandEncoder)();
+    MTLRenderPassDescriptor* (UNITY_INTERFACE_API * CurrentRenderPassDescriptor)();
+
+    UnityRenderBuffer(UNITY_INTERFACE_API * RenderBufferFromHandle)(void* bufferHandle);
+
     id<MTLTexture>(UNITY_INTERFACE_API * TextureFromRenderBuffer)(UnityRenderBuffer buffer);
     id<MTLTexture>(UNITY_INTERFACE_API * AAResolvedTextureFromRenderBuffer)(UnityRenderBuffer buffer);
     id<MTLTexture>(UNITY_INTERFACE_API * StencilTextureFromRenderBuffer)(UnityRenderBuffer buffer);
