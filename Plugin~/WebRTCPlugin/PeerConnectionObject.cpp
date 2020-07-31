@@ -243,6 +243,11 @@ namespace webrtc
         connection->AddIceCandidate(_candidate.get());
     }
 
+    void PeerConnectionObject::ReceiveStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
+    {
+        context.AddStatsReport(report);
+    }
+
     bool PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
     {
         if (sdp == nullptr)
@@ -258,11 +263,6 @@ namespace webrtc
         out.copy(desc.sdp, out.size());
         desc.sdp[out.size()] = '\0';
         return true;
-    }
-
-    void PeerConnectionObject::CollectStats()
-    {
-        connection->GetStats(m_statsCollectorCallback);
     }
 
 #pragma warning(push)

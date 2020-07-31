@@ -28,13 +28,13 @@ namespace webrtc
         void Close();
         void SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
         bool GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
-        void CollectStats();
         void SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer);
         webrtc::RTCErrorType SetConfiguration(const std::string& config);
         std::string GetConfiguration() const;
         void CreateOffer(const RTCOfferOptions& options);
         void CreateAnswer(const RTCAnswerOptions& options);
         void AddIceCandidate(const RTCIceCandidate& candidate);
+        void ReceiveStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report);
 
         void RegisterCallbackCreateSD(DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)
         {

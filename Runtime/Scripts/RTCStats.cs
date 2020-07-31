@@ -647,14 +647,18 @@ namespace Unity.WebRTC
         }
     }
 
-    public class RTCStatsReport
+    public class RTCStatsReport : IDisposable
     {
         private IntPtr self;
         private readonly Dictionary<(RTCStatsType, string), RTCStats> m_dictStats;
 
+        private bool disposed;
+
         internal RTCStatsReport(IntPtr ptr)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
+
             uint length = 0;
             IntPtr ptrStatsTypeArray = IntPtr.Zero;
             IntPtr ptrStatsArray = NativeMethods.StatsReportGetStatsList(self, ref length, ref ptrStatsTypeArray);
@@ -670,6 +674,31 @@ namespace Unity.WebRTC
                 m_dictStats[(type, stats.Id)] = stats;
             }
         }
+
+        ~RTCStatsReport()
+        {
+            this.Dispose();
+            WebRTC.Table.Remove(self);
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Context.DeleteStatsReport(self);
+                self = IntPtr.Zero;
+            }
+
+            this.disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        //internal
 
         public IDictionary<(RTCStatsType, string), RTCStats> Stats
         {

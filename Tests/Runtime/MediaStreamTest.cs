@@ -235,7 +235,7 @@ namespace Unity.WebRTC.RuntimeTest
             var op = test.component.GetSenderStats(0);
             yield return op;
             Assert.True(op.IsDone);
-            Assert.IsEmpty(op.Value.Stats);
+            Assert.IsNotEmpty(op.Value.Stats);
 
             test.component.Dispose();
             videoStream.Dispose();

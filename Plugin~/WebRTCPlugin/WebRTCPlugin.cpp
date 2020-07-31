@@ -358,21 +358,28 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetStatsList(const RTCStatsReport* report, size_t* length, byte** types)
     {
-        *length = report->size();
-        *types = static_cast<byte*>(CoTaskMemAlloc(sizeof(byte) * report->size()));
-        const auto buf = CoTaskMemAlloc(sizeof(RTCStats*) * report->size());
-        const auto ret = static_cast<const RTCStats**>(buf);
-        if(report->size() == 0)
+        const size_t size = report->size();
+        *length = size;
+        *types = static_cast<byte*>(CoTaskMemAlloc(sizeof(byte) * size));
+        void* buf = CoTaskMemAlloc(sizeof(RTCStats*) * size);
+        const RTCStats** ret = static_cast<const RTCStats**>(buf);
+        if(size == 0)
         {
             return ret;
         }
         int i = 0;
-        for (auto it = report->begin(); it != report->end(); ++it, i++)
+        for (const auto& stats : *report)
         {
-            ret[i] = &*it;
-            (*types)[i] = statsTypes.at(it->type());
+            ret[i] = &stats;
+            (*types)[i] = statsTypes.at(stats.type());
+            i++;
         }
         return ret;
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextDeleteStatsReport(Context* context, const RTCStatsReport* report)
+    {
+        context->DeleteStatsReport(report);
     }
 
     UNITY_INTERFACE_EXPORT const char* StatsGetJson(const RTCStats* stats)
@@ -486,11 +493,6 @@ extern "C"
     UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
     {
         obj->SetLocalDescription(*desc, context->GetObserver(obj->connection));
-    }
-
-    UNITY_INTERFACE_EXPORT void PeerConnectionCollectStats(PeerConnectionObject* obj)
-    {
-        obj->CollectStats();
     }
 
     UNITY_INTERFACE_EXPORT bool PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)

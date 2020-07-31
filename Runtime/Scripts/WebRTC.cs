@@ -555,6 +555,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
+        public static extern void ContextDeleteStatsReport(IntPtr context, IntPtr report);
+        [DllImport(WebRTC.Lib)]
         public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height);
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult GetInitializationResult(IntPtr context, IntPtr track);
