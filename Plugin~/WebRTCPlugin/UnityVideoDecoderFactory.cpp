@@ -5,7 +5,7 @@ namespace unity
 {
 namespace webrtc
 {
-    UnityVideoDecoderFactory::UnityVideoDecoderFactory(): internal_decoder_factory_(new webrtc::InternalDecoderFactory())
+    UnityVideoDecoderFactory::UnityVideoDecoderFactory() : internal_decoder_factory_(new webrtc::InternalDecoderFactory())
     {
     }
 

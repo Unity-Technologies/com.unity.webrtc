@@ -4,6 +4,10 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.5] - 2020-07-30
+
+- Fixed: Upgrade libwebrtc m84 to fix security issue (https://bugs.chromium.org/p/project-zero/issues/detail?id=2034)
+
 ## [2.0.4] - 2020-07-10
 
 - Fixed: Fix a crash bug when dispose a video track
