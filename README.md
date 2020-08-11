@@ -1,6 +1,6 @@
 # WebRTC for Unity
 
-<img src="https://img.shields.io/badge/unity-2019.3-green.svg?style=flat-square" alt="unity 2019.3">
+<img src="https://img.shields.io/badge/unity-2019.4-green.svg?style=flat-square" alt="unity 2019.4">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -29,10 +29,10 @@ This version of the package is compatible with the following versions of the Uni
 
 | Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
 | ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
-| Windows x64 | DirectX11    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
-| Windows x64 | DirectX12    |                                                                                                                          |                    | 
+| Windows x64 | DirectX11    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
+| Windows x64 | DirectX12    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
 | Windows x64 | OpenGL       |                                                                                                                          |                    |
-| Windows x64 | Vulkan       |                                                                                                                          |                    | 
+| Windows x64 | Vulkan       |                                                                                                                          |                    |
 | Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
 | Linux x64   | Vulkan       |                                                 	                                                                        |                    |
 | MacOS       | OpenGL       |                                                 	                                                                        |                    |
@@ -110,7 +110,9 @@ The package contains the following 3 samples.
 | `1.0`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
 | `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
 | `2.0`   | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
-| `2.1`   | [M83](https://groups.google.com/d/msg/discuss-webrtc/EieMDYtQ9sg/7po9fl8_AgAJ) | - Profiler tool <br>- Bitrate control                      |
+| `2.1`   | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0/m/A5X253_ZAQAJ) | - Profiler tool <br>- Bitrate control                             |
+| `2.2`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (V8, V9 only) <br>- Vulkan HW encoder support |
+| `2.3`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS suppport |
 
 ## Licenses
 
