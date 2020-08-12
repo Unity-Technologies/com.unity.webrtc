@@ -31,11 +31,10 @@ WebRTC for Unity は、 [WebRTC](https://webrtc.org) を Unity で利用可能�
 >
 > ``` sudo apt install -y libc++1 libc++abi1 ```
 
-
 ## インストール方法
-パッケージをインストールするためには、パッケージマネージャーから WebRTC for Unity を検索しインストールします。パッケージマネージャーの利用方法は[ドキュメント](https://docs.unity3d.com/Manual/upm-ui.html)を参照してください。
 
-![WebRTC Package Manager](../images/webrtc_package_manager.png)
+[パッケージのインストール](install.md) を参照してください。
+
 
 ## サンプル
 
