@@ -35,6 +35,8 @@ platforms:
         platform: playmode
       - backend: mono
         platform: standalone
+      - backend: il2cpp
+        platform: standalone
   - name: macos
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
