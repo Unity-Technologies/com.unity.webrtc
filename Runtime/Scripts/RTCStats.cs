@@ -293,13 +293,6 @@ namespace Unity.WebRTC
         }
     }
 
-    public class RTCInboundRtpStreamStats : RTCRTPStreamStats
-    {
-        internal RTCInboundRtpStreamStats(IntPtr ptr) : base(ptr)
-        {
-        }
-    }
-
     public class RTCCertificateStats : RTCStats
     {
         public string fingerprint { get { return GetString("fingerprint"); } }

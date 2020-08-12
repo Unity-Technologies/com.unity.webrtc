@@ -4,11 +4,224 @@ using NUnit.Framework;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 
 namespace Unity.WebRTC.RuntimeTest
 {
+    class Ignore
+    {
+        static public void Pass<T>(T val)
+        {
+        }
+    }
+
     class MediaStreamTest
     {
+        void StatsTest(RTCStats stats)
+        {
+            switch (stats.Type)
+            {
+                case RTCStatsType.CandidatePair:
+                    var iceCandidatePairStats = stats as RTCIceCandidatePairStats;
+                    Assert.NotNull(iceCandidatePairStats);
+                    Assert.IsNotEmpty(iceCandidatePairStats.transportId);
+                    Assert.IsNotEmpty(iceCandidatePairStats.localCandidateId);
+                    Assert.IsNotEmpty(iceCandidatePairStats.remoteCandidateId);
+                    Assert.IsNotEmpty(iceCandidatePairStats.state);
+                    Ignore.Pass(iceCandidatePairStats.nominated);
+                    Ignore.Pass(iceCandidatePairStats.writable);
+                    Ignore.Pass(iceCandidatePairStats.readable);
+                    Ignore.Pass(iceCandidatePairStats.bytesSent);
+                    Ignore.Pass(iceCandidatePairStats.bytesReceived);
+                    Ignore.Pass(iceCandidatePairStats.totalRoundTripTime);
+                    Ignore.Pass(iceCandidatePairStats.availableIncomingBitrate);
+                    Ignore.Pass(iceCandidatePairStats.availableOutgoingBitrate);
+                    Ignore.Pass(iceCandidatePairStats.consentRequestsReceived);
+                    Ignore.Pass(iceCandidatePairStats.consentRequestsSent);
+                    Ignore.Pass(iceCandidatePairStats.currentRoundTripTime);
+                    Ignore.Pass(iceCandidatePairStats.priority);
+                    Ignore.Pass(iceCandidatePairStats.requestsReceived);
+                    Ignore.Pass(iceCandidatePairStats.requestsSent);
+                    Ignore.Pass(iceCandidatePairStats.responsesReceived);
+                    Ignore.Pass(iceCandidatePairStats.responsesSent);
+                    Ignore.Pass(iceCandidatePairStats.retransmissionsReceived);
+                    Ignore.Pass(iceCandidatePairStats.retransmissionsSent);
+                    Ignore.Pass(iceCandidatePairStats.consentResponsesReceived);
+                    Ignore.Pass(iceCandidatePairStats.consentResponsesSent);
+                    break;
+                case RTCStatsType.DataChannel:
+                    var dataChannelStats = stats as RTCDataChannelStats;
+                    Assert.NotNull(dataChannelStats);
+                    Assert.IsNotEmpty(dataChannelStats.label);
+                    Assert.IsNotEmpty(dataChannelStats.state);
+                    Ignore.Pass(dataChannelStats.protocol);
+                    Ignore.Pass(dataChannelStats.messagesSent);
+                    Ignore.Pass(dataChannelStats.messagesReceived);
+                    Ignore.Pass(dataChannelStats.datachannelid);
+                    Ignore.Pass(dataChannelStats.bytesSent);
+                    Ignore.Pass(dataChannelStats.bytesReceived);
+                    break;
+                case RTCStatsType.LocalCandidate:
+                case RTCStatsType.RemoteCandidate:
+                    var candidateStats = stats as RTCIceCandidateStats;
+                    Assert.NotNull(candidateStats);
+                    Assert.IsNotEmpty(candidateStats.protocol);
+                    Assert.IsNotEmpty(candidateStats.candidateType);
+                    Assert.IsNotEmpty(candidateStats.ip);
+                    Assert.IsNotEmpty(candidateStats.transportId);
+                    Ignore.Pass(candidateStats.url);
+                    Ignore.Pass(candidateStats.relayProtocol);
+                    Ignore.Pass(candidateStats.networkType);
+                    Ignore.Pass(candidateStats.priority);
+                    Ignore.Pass(candidateStats.deleted);
+                    Ignore.Pass(candidateStats.isRemote);
+                    Ignore.Pass(candidateStats.port);
+                    break;
+                case RTCStatsType.Certificate:
+                    var certificateStats = stats as RTCCertificateStats;
+                    Assert.NotNull(certificateStats);
+                    Assert.IsNotEmpty(certificateStats.fingerprint);
+                    Assert.IsNotEmpty(certificateStats.fingerprintAlgorithm);
+                    Assert.IsNotEmpty(certificateStats.base64Certificate);
+                    Ignore.Pass(certificateStats.issuerCertificateId);
+                    break;
+                case RTCStatsType.Codec:
+                    var codecStats = stats as RTCCodecStats;
+                    Assert.NotNull(codecStats);
+                    Assert.IsNotEmpty(codecStats.mimeType);
+                    Ignore.Pass(codecStats.sdpFmtpLine);
+                    Ignore.Pass(codecStats.payloadType);
+                    Ignore.Pass(codecStats.clockRate);
+                    Ignore.Pass(codecStats.channels);
+                    break;
+                case RTCStatsType.RemoteInboundRtp:
+                case RTCStatsType.InboundRtp:
+                    var inboundRtpStreamStats = stats as RTCInboundRTPStreamStats;
+                    Assert.NotNull(inboundRtpStreamStats);
+                    Ignore.Pass(inboundRtpStreamStats.bytesReceived);
+                    Ignore.Pass(inboundRtpStreamStats.burstDiscardCount);
+                    Ignore.Pass(inboundRtpStreamStats.burstLossCount);
+                    Ignore.Pass(inboundRtpStreamStats.burstDiscardRate);
+                    Ignore.Pass(inboundRtpStreamStats.burstLossRate);
+                    Ignore.Pass(inboundRtpStreamStats.burstPacketsDiscarded);
+                    Ignore.Pass(inboundRtpStreamStats.burstPacketsLost);
+                    Ignore.Pass(inboundRtpStreamStats.contentType);
+                    Ignore.Pass(inboundRtpStreamStats.decoderImplementation);
+                    Ignore.Pass(inboundRtpStreamStats.framesDecoded);
+                    Ignore.Pass(inboundRtpStreamStats.gapDiscardRate);
+                    Ignore.Pass(inboundRtpStreamStats.gapLossRate);
+                    Ignore.Pass(inboundRtpStreamStats.contentType);
+                    Ignore.Pass(inboundRtpStreamStats.jitter);
+                    Ignore.Pass(inboundRtpStreamStats.headerBytesReceived);
+                    Ignore.Pass(inboundRtpStreamStats.packetsLost);
+                    Ignore.Pass(inboundRtpStreamStats.lastPacketReceivedTimestamp);
+                    Ignore.Pass(inboundRtpStreamStats.totalDecodeTime);
+                    Ignore.Pass(inboundRtpStreamStats.keyFramesDecoded);
+                    Ignore.Pass(inboundRtpStreamStats.packetsDiscarded);
+                    Ignore.Pass(inboundRtpStreamStats.packetsReceived);
+                    Ignore.Pass(inboundRtpStreamStats.packetsRepaired);
+                    break;
+                case RTCStatsType.Transport:
+                    var transportStats = stats as RTCTransportStats;
+                    Assert.NotNull(transportStats);
+                    Ignore.Pass(transportStats.bytesSent);
+                    Ignore.Pass(transportStats.bytesReceived);
+                    Ignore.Pass(transportStats.rtcpTransportStatsId);
+                    Ignore.Pass(transportStats.dtlsState);
+                    Ignore.Pass(transportStats.selectedCandidatePairId);
+                    Ignore.Pass(transportStats.localCertificateId);
+                    Ignore.Pass(transportStats.remoteCertificateId);
+                    Ignore.Pass(transportStats.selectedCandidatePairChanges);
+                    break;
+                case RTCStatsType.RemoteOutboundRtp:
+                case RTCStatsType.OutboundRtp:
+                    var outboundRtpStreamStats = stats as RTCOutboundRTPStreamStats;
+                    Assert.NotNull(outboundRtpStreamStats);
+                    Ignore.Pass(outboundRtpStreamStats.mediaSourceId);
+                    Ignore.Pass(outboundRtpStreamStats.packetsSent);
+                    Ignore.Pass(outboundRtpStreamStats.retransmittedPacketsSent);
+                    Ignore.Pass(outboundRtpStreamStats.bytesSent);
+                    Ignore.Pass(outboundRtpStreamStats.headerBytesSent);
+                    Ignore.Pass(outboundRtpStreamStats.retransmittedBytesSent);
+                    Ignore.Pass(outboundRtpStreamStats.targetBitrate);
+                    Ignore.Pass(outboundRtpStreamStats.framesEncoded);
+                    Ignore.Pass(outboundRtpStreamStats.keyFramesEncoded);
+                    Ignore.Pass(outboundRtpStreamStats.totalEncodeTime);
+                    Ignore.Pass(outboundRtpStreamStats.totalEncodedBytesTarget);
+                    Ignore.Pass(outboundRtpStreamStats.totalPacketSendDelay);
+                    Ignore.Pass(outboundRtpStreamStats.qualityLimitationReason);
+                    Ignore.Pass(outboundRtpStreamStats.qualityLimitationResolutionChanges);
+                    Ignore.Pass(outboundRtpStreamStats.contentType);
+                    Ignore.Pass(outboundRtpStreamStats.encoderImplementation);
+                    break;
+                case RTCStatsType.MediaSource:
+                    var mediaSourceStats = stats as RTCMediaSourceStats;
+                    Assert.NotNull(mediaSourceStats);
+                    Assert.IsNotEmpty(mediaSourceStats.trackIdentifier);
+                    Assert.IsNotEmpty(mediaSourceStats.kind);
+                    Ignore.Pass(mediaSourceStats.width);
+                    Ignore.Pass(mediaSourceStats.height);
+                    Ignore.Pass(mediaSourceStats.frames);
+                    Ignore.Pass(mediaSourceStats.framesPerSecond);
+
+                    break;
+                case RTCStatsType.Track:
+                    var mediaStreamTrackStats = stats as RTCMediaStreamTrackStats;
+                    Assert.NotNull(mediaStreamTrackStats);
+                    Ignore.Pass(mediaStreamTrackStats.trackIdentifier);
+                    Ignore.Pass(mediaStreamTrackStats.mediaSourceId);
+                    Ignore.Pass(mediaStreamTrackStats.remoteSource);
+                    Ignore.Pass(mediaStreamTrackStats.ended);
+                    Ignore.Pass(mediaStreamTrackStats.detached);
+                    Ignore.Pass(mediaStreamTrackStats.kind);
+                    Ignore.Pass(mediaStreamTrackStats.jitterBufferDelay);
+                    Ignore.Pass(mediaStreamTrackStats.jitterBufferEmittedCount);
+                    Ignore.Pass(mediaStreamTrackStats.frameWidth);
+                    Ignore.Pass(mediaStreamTrackStats.frameHeight);
+                    Ignore.Pass(mediaStreamTrackStats.framesPerSecond);
+                    Ignore.Pass(mediaStreamTrackStats.framesSent);
+                    Ignore.Pass(mediaStreamTrackStats.hugeFramesSent);
+                    Ignore.Pass(mediaStreamTrackStats.framesReceived);
+                    Ignore.Pass(mediaStreamTrackStats.framesDecoded);
+                    Ignore.Pass(mediaStreamTrackStats.framesDropped);
+                    Ignore.Pass(mediaStreamTrackStats.framesCorrupted);
+                    Ignore.Pass(mediaStreamTrackStats.partialFramesLost);
+                    Ignore.Pass(mediaStreamTrackStats.fullFramesLost);
+                    Ignore.Pass(mediaStreamTrackStats.audioLevel);
+                    Ignore.Pass(mediaStreamTrackStats.totalAudioEnergy);
+                    Ignore.Pass(mediaStreamTrackStats.echoReturnLoss);
+                    Ignore.Pass(mediaStreamTrackStats.echoReturnLossEnhancement);
+                    Ignore.Pass(mediaStreamTrackStats.totalSamplesReceived);
+                    Ignore.Pass(mediaStreamTrackStats.totalSamplesDuration);
+                    Ignore.Pass(mediaStreamTrackStats.concealedSamples);
+                    Ignore.Pass(mediaStreamTrackStats.silentConcealedSamples);
+                    Ignore.Pass(mediaStreamTrackStats.concealmentEvents);
+                    Ignore.Pass(mediaStreamTrackStats.insertedSamplesForDeceleration);
+                    Ignore.Pass(mediaStreamTrackStats.removedSamplesForAcceleration);
+                    Ignore.Pass(mediaStreamTrackStats.jitterBufferFlushes);
+                    Ignore.Pass(mediaStreamTrackStats.delayedPacketOutageSamples);
+                    Ignore.Pass(mediaStreamTrackStats.relativePacketArrivalDelay);
+                    Ignore.Pass(mediaStreamTrackStats.interruptionCount);
+                    Ignore.Pass(mediaStreamTrackStats.totalInterruptionDuration);
+                    Ignore.Pass(mediaStreamTrackStats.freezeCount);
+                    Ignore.Pass(mediaStreamTrackStats.pauseCount);
+                    Ignore.Pass(mediaStreamTrackStats.totalFreezesDuration);
+                    Ignore.Pass(mediaStreamTrackStats.totalPausesDuration);
+                    Ignore.Pass(mediaStreamTrackStats.totalFramesDuration);
+                    Ignore.Pass(mediaStreamTrackStats.sumOfSquaredFramesDuration);
+                    Assert.NotNull(mediaStreamTrackStats);
+                    break;
+                case RTCStatsType.Stream:
+                    var mediaStreamStats = stats as RTCMediaStreamStats;
+                    Assert.NotNull(mediaStreamStats);
+                    Ignore.Pass(mediaStreamStats.streamIdentifier);
+                    Ignore.Pass(mediaStreamStats.trackIds);
+                    break;
+            }
+        }
+
+
+
         [SetUp]
         public void SetUp()
         {
@@ -114,7 +327,6 @@ namespace Unity.WebRTC.RuntimeTest
         /// </todo>
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator CameraCaptureStream()
         {
             var camObj = new GameObject("Camera");
@@ -161,7 +373,6 @@ namespace Unity.WebRTC.RuntimeTest
         /// </todo>
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator CaptureStream()
         {
             var camObj = new GameObject("Camera");
@@ -173,7 +384,7 @@ namespace Unity.WebRTC.RuntimeTest
             test.component.SetStream(videoStream);
             yield return test;
             test.component.CoroutineWebRTCUpdate();
-            yield return 0;
+            yield return new WaitForSeconds(0.1f);
             test.component.Dispose();
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
@@ -194,6 +405,8 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(videoStream);
             yield return test;
+            test.component.CoroutineWebRTCUpdate();
+            yield return new WaitForSeconds(0.1f);
             var op = test.component.GetPeerStats();
             yield return op;
             Assert.True(op.IsDone);
@@ -212,6 +425,7 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.IsNotEmpty(pair.Key);
                     Assert.NotNull(pair.Value);
                 }
+                StatsTest(stats);
             }
 
             test.component.Dispose();
@@ -231,11 +445,26 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(videoStream);
             yield return test;
+            test.component.CoroutineWebRTCUpdate();
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetSenderStats(0);
             yield return op;
             Assert.True(op.IsDone);
             Assert.IsNotEmpty(op.Value.Stats);
+            Assert.Greater(op.Value.Stats.Count, 0);
+
+            foreach (RTCStats stats in op.Value.Stats.Values)
+            {
+                Assert.NotNull(stats);
+                Assert.Greater(stats.Timestamp, 0);
+                Assert.IsNotEmpty(stats.Id);
+                foreach (var pair in stats.Dict)
+                {
+                    Assert.IsNotEmpty(pair.Key);
+                    Assert.NotNull(pair.Value);
+                }
+                StatsTest(stats);
+            }
 
             test.component.Dispose();
             videoStream.Dispose();
@@ -254,12 +483,26 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeersTest>();
             test.component.SetStream(videoStream);
             yield return test;
+            test.component.CoroutineWebRTCUpdate();
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetReceiverStats(0);
             yield return op;
             Assert.True(op.IsDone);
-            Assert.IsEmpty(op.Value.Stats);
+            Assert.IsNotEmpty(op.Value.Stats);
+            Assert.Greater(op.Value.Stats.Count, 0);
 
+            foreach (RTCStats stats in op.Value.Stats.Values)
+            {
+                Assert.NotNull(stats);
+                Assert.Greater(stats.Timestamp, 0);
+                Assert.IsNotEmpty(stats.Id);
+                foreach (var pair in stats.Dict)
+                {
+                    Assert.IsNotEmpty(pair.Key);
+                    Assert.NotNull(pair.Value);
+                }
+                StatsTest(stats);
+            }
             test.component.Dispose();
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
@@ -270,7 +513,6 @@ namespace Unity.WebRTC.RuntimeTest
         /// </todo>
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator CaptureStreamTrack()
         {
             var camObj = new GameObject("Camera");
@@ -287,7 +529,6 @@ namespace Unity.WebRTC.RuntimeTest
         /// </todo>
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator SetParametersReturnNoError()
         {
             var camObj = new GameObject("Camera");
@@ -299,7 +540,7 @@ namespace Unity.WebRTC.RuntimeTest
             test.component.SetStream(videoStream);
             yield return test;
             test.component.CoroutineWebRTCUpdate();
-            yield return 0;
+            yield return new WaitForSeconds(0.1f);
 
             var senders = test.component.GetPeer1Senders();
             Assert.IsNotEmpty(senders);
@@ -447,7 +688,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             public IEnumerable<RTCRtpReceiver> GetPeer1Receivers()
             {
-                return peer1.GetReceivers();
+                return peer2.GetReceivers();
             }
 
             public void Dispose()
