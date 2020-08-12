@@ -10,7 +10,7 @@ WebRTC for Unity is a package that allows [WebRTC](https://webrtc.org) to be use
 
 This version of the package is compatible with the following versions of the Unity Editor:
 
-- **Unity 2019.3**
+- **Unity 2019.4**
 
 | Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
 | ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
