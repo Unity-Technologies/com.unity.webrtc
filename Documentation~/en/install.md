@@ -1,7 +1,7 @@
 # Install package
 
 > [!NOTE]
-> Unity 2020.1 and 2019.4 are difference how to install the WebRTC package so please attention the Unity version you are using and follow the instruction below.
+> In Unity 2020.1 and 2019.4, there are differences about how to install WebRTC package so please pay attention to the Unity version you are using and follow the instructions below.
 
 ## Case of Unity 2019.4
 
@@ -31,7 +31,7 @@
 
 4. Input the string below to the input field.
 
-```https://github.com/Unity-Technologies/com.unity.webrtc.git```
+```https://github.com/Unity-Technologies/com.unity.webrtc.git#2.1.0-preview```
 
 ![Input webrtc package git URL](../images/install_input_webrtc_git_url.png);
 
