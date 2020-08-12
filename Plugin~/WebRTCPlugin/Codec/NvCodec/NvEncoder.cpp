@@ -228,14 +228,21 @@ namespace webrtc
             std::memcpy(&nvEncReconfigureParams.reInitEncodeParams, &nvEncInitializeParams, sizeof(nvEncInitializeParams));
             nvEncReconfigureParams.version = NV_ENC_RECONFIGURE_PARAMS_VER;
             errorCode = pNvEncodeAPI->nvEncReconfigureEncoder(pEncoderInterface, &nvEncReconfigureParams);
-            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d", errorCode).c_str());
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d %d %d", errorCode, bitRate, m_frameRate).c_str());
         }
     }
     void NvEncoder::SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters)
     {
         const uint32_t bitrate = parameters.bitrate.get_sum_bps();
         m_bitrateAdjuster->SetTargetBitrateBps(bitrate);
-        m_frameRate = static_cast<uint32_t>(parameters.framerate_fps);
+
+        uint32_t framerate = static_cast<uint32_t>(parameters.framerate_fps);
+        if(framerate < 0 || framerate > 120)
+        {
+            LogPrint("SetRates() Invalid parameter framerate=%d", framerate);
+            return;
+        }
+        m_frameRate = framerate;
     }
 
     bool NvEncoder::CopyBuffer(void* frame)
