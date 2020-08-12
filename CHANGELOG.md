@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Added statistics window in Unity editor to allow checking the operation of WebRTC
 - Added `RTCPeerConnection.GetStats` API which collect statistics of WebRTC
-- Adjustment streaming video 
+- Added `RTCRtpSender.SetParameters` and `RTCRtpSender.GetParameters` to adjustment streaming video quality
 
 ## [2.0.5] - 2020-07-30
 
