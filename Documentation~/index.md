@@ -32,9 +32,8 @@ To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO 
 > ``` sudo apt install -y libc++1 libc++abi1 ```
 
 ## Installation
-To install the package, download WebRTC for Unity from the package manager. See the [documentation](https://docs.unity3d.com/Manual/upm-ui.html) for details on how to use the package manager. 
 
-![WebRTC Package Manager](images/webrtc_package_manager.png)
+Please see [Install package](en/install.md).
 
 ## Samples
 

@@ -17,30 +17,11 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Installation
 
-Please see [Install package](Documentation~/install.md).
+Please see [Install package](Documentation~/en/install.md).
 
 ## Requirements
 
-This version of the package is compatible with the following versions of the Unity Editor:
-
-- Unity 2019.3 and later
-
-| Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
-| ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
-| Windows x64 | DirectX11    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
-| Windows x64 | DirectX12    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
-| Windows x64 | OpenGL       |                                                                                                                          |                    |
-| Windows x64 | Vulkan       |                                                                                                                          |                    |
-| Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
-| Linux x64   | Vulkan       |                                                 	                                                                        |                    |
-| MacOS       | OpenGL       |                                                 	                                                                        |                    |
-| MacOS       | Metal        |                                                 	                                                                        | :white_check_mark: |
-
-On Linux, `libc++1` `libc++abi1` packages should be installed.
-
-```
-sudo apt install -y libc++1 libc++abi1
-```
+Please see [Requeirements](Documentation~/index.md#requirements).
 
 ### Limitations
 
