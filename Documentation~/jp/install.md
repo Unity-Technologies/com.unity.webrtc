@@ -31,7 +31,7 @@
 
 4. 入力ボックスに以下の文字列を追加します。
 
-```https://github.com/Unity-Technologies/com.unity.webrtc.git#release/2.0.5```
+```com.unity.webrtc@2.1.0-preview```
 
 ![Input webrtc package git URL](../images/install_input_webrtc_git_url.png);
 

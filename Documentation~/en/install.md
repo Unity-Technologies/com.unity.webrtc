@@ -31,7 +31,7 @@
 
 4. Input the string below to the input field.
 
-```https://github.com/Unity-Technologies/com.unity.webrtc.git#2.1.0-preview```
+```com.unity.webrtc@2.1.0-preview```
 
 ![Input webrtc package git URL](../images/install_input_webrtc_git_url.png);
 
