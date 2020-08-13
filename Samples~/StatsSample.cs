@@ -20,14 +20,14 @@ public class StatsSample : MonoBehaviour
     private RTCDataChannel dataChannel, remoteDataChannel;
     private Coroutine sdpCheck;
     private string msg;
-    private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
-    private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
-    private DelegateOnIceCandidate pc1OnIceCandidate;
-    private DelegateOnIceCandidate pc2OnIceCandidate;
-    private DelegateOnMessage onDataChannelMessage;
-    private DelegateOnOpen onDataChannelOpen;
-    private DelegateOnClose onDataChannelClose;
-    private DelegateOnDataChannel onDataChannel;
+    private DelegateOnIceConnectionChange pc1OnIceConnectionChange = null;
+    private DelegateOnIceConnectionChange pc2OnIceConnectionChange = null;
+    private DelegateOnIceCandidate pc1OnIceCandidate = null;
+    private DelegateOnIceCandidate pc2OnIceCandidate = null;
+    private DelegateOnMessage onDataChannelMessage = null;
+    private DelegateOnOpen onDataChannelOpen = null;
+    private DelegateOnClose onDataChannelClose = null;
+    private DelegateOnDataChannel onDataChannel = null;
     private int currentValue = -1;
 
     private RTCOfferOptions OfferOptions = new RTCOfferOptions
