@@ -1,6 +1,6 @@
 # WebRTC for Unity
 
-<img src="https://img.shields.io/badge/unity-2019.3-green.svg?style=flat-square" alt="unity 2019.3">
+<img src="https://img.shields.io/badge/unity-2019.4-green.svg?style=flat-square" alt="unity 2019.4">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -13,36 +13,15 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ### Guide
 
-- [Build plugin](Plugin~/README.md)
+- [Build native plugin](Plugin~/README.md)
 
 ## Installation
 
-To install the package, download WebRTC for Unity from the package manager. See the [documentation](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html) for details on how to use the package manager. 
-
-<img src="./Documentation~/images/webrtc_package_manager.png" width=600 align=center>
+Please see [Install package](Documentation~/en/install.md).
 
 ## Requirements
 
-This version of the package is compatible with the following versions of the Unity Editor:
-
-- Unity 2019.3 and later
-
-| Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
-| ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
-| Windows x64 | DirectX11    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
-| Windows x64 | DirectX12    |                                                                                                                          |                    | 
-| Windows x64 | OpenGL       |                                                                                                                          |                    |
-| Windows x64 | Vulkan       |                                                                                                                          |                    | 
-| Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
-| Linux x64   | Vulkan       |                                                 	                                                                        |                    |
-| MacOS       | OpenGL       |                                                 	                                                                        |                    |
-| MacOS       | Metal        |                                                 	                                                                        | :white_check_mark: |
-
-On Linux, `libc++1` `libc++abi1` packages should be installed.
-
-```
-sudo apt install -y libc++1 libc++abi1
-```
+Please see [Requeirements](Documentation~/index.md#requirements).
 
 ### Limitations
 
@@ -95,22 +74,25 @@ This package uses GPU hardware acceleration for video encoding, so it only runs 
 
 ### Samples
 
-The package contains the following 3 samples. 
+The package contains the following 4 samples. 
 
-| Scene          | Details                                                  |
-| -------------- | -------------------------------------------------------- |
-| PeerConnection | A scene for checking the process of connecting to a peer |
-| DataChannel    | A scene for sending and receiving text                   |
-| MediaStream    | A scene for sending and receiving video/audio            |
+| Scene          | Details                                                   |
+| -------------- | --------------------------------------------------------- |
+| PeerConnection | A scene for checking the process of connecting to a peer  |
+| DataChannel    | A scene for sending and receiving text                    |
+| MediaStream    | A scene for sending and receiving video/audio             |
+| Stats          | A scene for checking the operation of statistics features |
 
 ## Roadmap
 
-| Version | libwebrtc version                                                              | Focus                                                             |
-| ------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| `1.0`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                   |
-| `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux Support<br/> - Add software encoder  |
-| `2.0`   | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                      |
-| `2.1`   | [M83](https://groups.google.com/d/msg/discuss-webrtc/EieMDYtQ9sg/7po9fl8_AgAJ) | - Profiler tool <br>- Bitrate control                      |
+| Version | libwebrtc version                                                              | Focus                                                                      | When     | 
+| ------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | -------- |
+| `1.0`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release                                                            | Sep 2019 |    
+| `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux platform Support<br/> - Add software encoder  | Feb 2020 |
+| `2.0`   | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                               | Apr 2020 |
+| `2.1`   | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0/m/A5X253_ZAQAJ) | - Profiler tool <br>- Bitrate control                                      | Aug 2020 |
+| `2.2`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (V8, V9 only) <br>- Vulkan HW encoder support              | Oct 2020 |
+| `2.3`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS platform suppport                                                    | Dec 2020 |
 
 ## Licenses
 

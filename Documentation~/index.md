@@ -10,7 +10,7 @@ WebRTC for Unity is a package that allows [WebRTC](https://webrtc.org) to be use
 
 This version of the package is compatible with the following versions of the Unity Editor:
 
-- **Unity 2019.3**
+- **Unity 2019.4**
 
 | Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
 | ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
@@ -32,9 +32,8 @@ To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO 
 > ``` sudo apt install -y libc++1 libc++abi1 ```
 
 ## Installation
-To install the package, download WebRTC for Unity from the package manager. See the [documentation](https://docs.unity3d.com/Manual/upm-ui.html) for details on how to use the package manager. 
 
-![WebRTC Package Manager](images/webrtc_package_manager.png)
+Please see [Install package](en/install.md).
 
 ## Samples
 
