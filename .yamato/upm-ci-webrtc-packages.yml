@@ -1,10 +1,10 @@
 {% metadata_file .yamato/meta/environments.yml %}
 
 editors:
-  - version: 2019.3  
+  - version: 2019.4
 
 # Must be the same as the version of the sample project (WebRTC~)
-editor_mac_version: 2019.3
+editor_mac_version: 2019.4
 
 platforms:
   - name: win
