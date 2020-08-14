@@ -9,6 +9,7 @@ Plugin~/**
 .DS_Store
 .npmrc
 .npmignore
+.github
 .gitignore
 .editorconfig
 CONTRIBUTING.md

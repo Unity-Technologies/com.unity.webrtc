@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
 
@@ -12,11 +11,19 @@ namespace Unity.WebRTC
     public delegate void DelegateSetSessionDescSuccess();
     public delegate void DelegateSetSessionDescFailure(RTCError error);
 
+    /// <summary>
+    /// Represents a WebRTC connection between the local peer and remote peer.
+    /// </summary>
+    /// 
+    /// <remarks>
+    /// 
+    /// </remarks>
+    /// 
     public class RTCPeerConnection : IDisposable
     {
         internal IntPtr self;
 
-        public Action<IntPtr> OnStatsDelivered = null;
+        internal Action<IntPtr> OnStatsDelivered = null;
 
         private int m_id;
         private DelegateOnIceConnectionChange onIceConnectionChange;
@@ -24,11 +31,8 @@ namespace Unity.WebRTC
         private DelegateOnDataChannel onDataChannel;
         private DelegateOnTrack onTrack;
         private DelegateOnNegotiationNeeded onNegotiationNeeded;
-        private DelegateCreateSDSuccess onCreateSDSuccess;
-        private DelegateCreateSDFailure onCreateSDFailure;
         private DelegateSetSessionDescSuccess onSetSessionDescSuccess;
         private DelegateSetSessionDescFailure onSetSetSessionDescFailure;
-        private DelegateCollectStats m_onStatsDeliveredCallback;
 
         private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
         private RTCSessionDescriptionAsyncOperation m_opSetRemoteDesc;
@@ -41,6 +45,9 @@ namespace Unity.WebRTC
             WebRTC.Table.Remove(self);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             if (this.disposed)
@@ -59,6 +66,18 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// The readonly property of the <see cref="RTCPeerConnection"/> indicates
+        /// the current state of the peer connection by returning one of the
+        /// <see cref="RTCIceConnectionState"/> enum.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var peerConnection = new RTCPeerConnection(configuration);
+        /// var iceConnectionState = peerConnection.IceConnectionState;
+        /// </code>
+        /// </example>
+        /// <seealso cref="ConnectionState"/>
         public RTCIceConnectionState IceConnectionState
         {
             get
@@ -67,6 +86,18 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// The readonly property of the <see cref="RTCPeerConnection"/> indicates
+        /// the current state of the peer connection by returning one of the
+        /// <see cref="RTCPeerConnectionState"/> enum.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var peerConnection = new RTCPeerConnection(configuration);
+        /// var connectionState = peerConnection.ConnectionState;
+        /// </code>
+        /// </example>
+        /// <seealso cref="IceConnectionState"/>
         public RTCPeerConnectionState ConnectionState
         {
             get
@@ -75,6 +106,17 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// Returns array of objects each of which represents one RTP receiver.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var senders = peerConnection.GetReceivers();
+        /// </code>
+        /// </example>
+        /// <returns> Array of the senders </returns>
+        /// <seealso cref="GetSenders()"/>
+        /// <seealso cref="GetTransceivers()"/>
         public IEnumerable<RTCRtpReceiver> GetReceivers()
         {
             uint length = 0;
@@ -82,6 +124,17 @@ namespace Unity.WebRTC
             return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpReceiver(ptr, this));
         }
 
+        /// <summary>
+        /// Returns array of objects each of which represents one RTP sender.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var senders = peerConnection.GetSenders();
+        /// </code>
+        /// </example>
+        /// <returns> Array of the receivers </returns>
+        /// <seealso cref="GetReceivers()"/>
+        /// <seealso cref="GetTransceivers()"/>
         public IEnumerable<RTCRtpSender> GetSenders()
         {
             uint length = 0;
@@ -89,6 +142,17 @@ namespace Unity.WebRTC
             return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpSender(ptr, this));
         }
 
+        /// <summary>
+        /// Returns array of objects each of which represents one RTP transceiver.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var transceivers = peerConnection.GetTransceivers();
+        /// </code>
+        /// </example>
+        /// <returns> Array of the transceivers </returns>
+        /// <seealso cref="GetSenders()"/>
+        /// <seealso cref="GetReceivers()"/>
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
             uint length = 0;
@@ -96,75 +160,92 @@ namespace Unity.WebRTC
             return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpTransceiver(ptr, this));
         }
 
+        /// <summary>
+        /// This property is delegate to be called when the <see cref=IceConnectionState/> is changed.
+        /// </summary>
+        /// <returns> A delegate containing <see cref="IceConnectionState"/>. </returns>
+        /// <example>
+        /// <code>
+        /// peerConnection.OnIceConnectionChange = iceConnectionState =>
+        /// {
+        ///     ...
+        /// };
+        /// </code>
+        /// </example>
+        /// <seealso cref="IceConnectionState"/>
         public DelegateOnIceConnectionChange OnIceConnectionChange
         {
-            get => onIceConnectionChange;
+            private get => onIceConnectionChange;
             set
             {
                 onIceConnectionChange = value;
-                NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <seealso cref="RTCIceCandidate​"/>
         public DelegateOnIceCandidate OnIceCandidate
         {
-            get => onIceCandidate;
+            private get => onIceCandidate;
             set
             {
                 onIceCandidate = value;
-                NativeMethods.PeerConnectionRegisterOnIceCandidate(self, PCOnIceCandidate);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DelegateOnDataChannel OnDataChannel
         {
-            get => onDataChannel;
+            private get => onDataChannel;
             set
             {
                 onDataChannel = value;
-                NativeMethods.PeerConnectionRegisterOnDataChannel(self, PCOnDataChannel);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DelegateOnNegotiationNeeded OnNegotiationNeeded
         {
-            get => onNegotiationNeeded;
+            private get => onNegotiationNeeded;
             set
             {
                 onNegotiationNeeded = value;
-                NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DelegateOnTrack OnTrack
         {
-            get => onTrack;
+            private get => onTrack;
             set
             {
                 onTrack = value;
-                NativeMethods.PeerConnectionRegisterOnTrack(self, PCOnTrack);
             }
         }
 
         internal DelegateSetSessionDescSuccess OnSetSessionDescriptionSuccess
         {
-            get => onSetSessionDescSuccess;
+            private get => onSetSessionDescSuccess;
             set
             {
                 onSetSessionDescSuccess = value;
-                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(self,
-                    OnSetSessionDescSuccess);
             }
         }
 
         internal DelegateSetSessionDescFailure OnSetSessionDescriptionFailure
         {
-            get => onSetSetSessionDescFailure;
+            private get => onSetSetSessionDescFailure;
             set
             {
                 onSetSetSessionDescFailure = value;
-                WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(self,
-                    OnSetSessionDescFailure);
             }
         }
 
@@ -176,8 +257,8 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     var candidate =
-                        new RTCIceCandidate​ {candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex};
-                    connection.OnIceCandidate(candidate);
+                        new RTCIceCandidate​ { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
+                    connection.OnIceCandidate?.Invoke(candidate);
                 }
             });
         }
@@ -189,7 +270,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnIceConnectionChange(state);
+                    connection.OnIceConnectionChange?.Invoke(state);
                 }
             });
         }
@@ -201,7 +282,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnNegotiationNeeded();
+                    connection.OnNegotiationNeeded?.Invoke();
                 }
             });
         }
@@ -213,7 +294,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnDataChannel(new RTCDataChannel(ptrChannel, connection));
+                    connection.OnDataChannel?.Invoke(new RTCDataChannel(ptrChannel, connection));
                 }
             });
         }
@@ -225,22 +306,47 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnTrack(new RTCTrackEvent(transceiver, connection));
+                    connection.OnTrack?.Invoke(new RTCTrackEvent(transceiver, connection));
                 }
             });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <example>
+        /// <code>
+        /// var configuration = myPeerConnection.GetConfiguration();
+        /// if(configuration.urls.length == 0)
+        /// {
+        ///     configuration.urls = new[] {"stun:stun.l.google.com:19302"};
+        /// }
+        /// myPeerConnection.SetConfiguration(configuration);
+        /// </code>
+        /// </example>
         public RTCConfiguration GetConfiguration()
         {
             var str = NativeMethods.PeerConnectionGetConfiguration(self).AsAnsiStringWithFreeMem();
             return JsonUtility.FromJson<RTCConfiguration>(str);
         }
 
-        public RTCErrorType SetConfiguration(ref RTCConfiguration config)
+        /// <summary>
+        /// This lets you change the ICE servers used by the connection
+        /// and which transport policies to use.
+        /// </summary>
+        /// <param name="configuration">The changes are not additive; instead,
+        /// the new values completely replace the existing ones.</param>
+        /// <returns> Error </returns>
+        public RTCErrorType SetConfiguration(ref RTCConfiguration configuration)
         {
-            return NativeMethods.PeerConnectionSetConfiguration(self, JsonUtility.ToJson(config));
+            return NativeMethods.PeerConnectionSetConfiguration(self, JsonUtility.ToJson(configuration));
         }
 
+        /// <summary>
+        /// An RTCConfiguration dictionary providing options to configure the new connection.
+        /// </summary>
+        /// <seealso cref="RTCPeerConnection(ref RTCConfiguration)"/>
         public RTCPeerConnection()
         {
             self = WebRTC.Context.CreatePeerConnection();
@@ -253,9 +359,14 @@ namespace Unity.WebRTC
             InitCallback();
         }
 
-        public RTCPeerConnection(ref RTCConfiguration config)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <seealso cref="RTCPeerConnection()"/>
+        public RTCPeerConnection(ref RTCConfiguration configuration)
         {
-            string configStr = JsonUtility.ToJson(config);
+            string configStr = JsonUtility.ToJson(configuration);
             self = WebRTC.Context.CreatePeerConnection(configStr);
             if (self == IntPtr.Zero)
             {
@@ -268,13 +379,23 @@ namespace Unity.WebRTC
 
         void InitCallback()
         {
-            onCreateSDSuccess = OnSuccessCreateSessionDesc;
-            onCreateSDFailure = OnFailureCreateSessionDesc;
-            m_onStatsDeliveredCallback = OnStatsDeliveredCallback;
-            NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, onCreateSDSuccess, onCreateSDFailure);
-            NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, m_onStatsDeliveredCallback);
+            NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, OnSuccessCreateSessionDesc, OnFailureCreateSessionDesc);
+            NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, OnStatsDeliveredCallback);
+            NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
+            NativeMethods.PeerConnectionRegisterOnIceCandidate(self, PCOnIceCandidate);
+            NativeMethods.PeerConnectionRegisterOnDataChannel(self, PCOnDataChannel);
+            NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);
+            NativeMethods.PeerConnectionRegisterOnTrack(self, PCOnTrack);
+            WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(
+                self, OnSetSessionDescSuccess);
+            WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(
+                self, OnSetSessionDescFailure);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <seealso cref="Dispose"/>
         public void Close()
         {
             if (self != IntPtr.Zero)
@@ -283,9 +404,16 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="track"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        /// <seealso cref="RemoveTrack"/>
         public RTCRtpSender AddTrack(MediaStreamTrack track, MediaStream stream = null)
         {
-            if(track == null)
+            if (track == null)
             {
                 throw new ArgumentNullException("");
             }
@@ -294,21 +422,42 @@ namespace Unity.WebRTC
             return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(self, track.self, streamId), this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <seealso cref="AddTrack"/>
         public void RemoveTrack(RTCRtpSender sender)
         {
             NativeMethods.PeerConnectionRemoveTrack(self, sender.self);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track)
         {
             return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(self, track.self), this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="candidate"></param>
         public void AddIceCandidate(ref RTCIceCandidate​ candidate)
         {
             NativeMethods.PeerConnectionAddIceCandidate(self, ref candidate);
         }
 
+        /// <summary>
+        /// Create an SDP (Session Description Protocol) offer to start a new connection
+        /// to a remote peer.
+        /// </summary>
+        /// <param name="options"> A parameter to request for the offer. </param>
+        /// <returns></returns>
+        /// <seealso cref="CreateAnswer"/>
         public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferOptions options)
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
@@ -316,6 +465,12 @@ namespace Unity.WebRTC
             return m_opSessionDesc;
         }
 
+        /// <summary>
+        /// Create an SDP (Session Description Protocol) answer to start a new connection
+        /// to a remote peer.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCAnswerOptions options)
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
@@ -323,6 +478,13 @@ namespace Unity.WebRTC
             return m_opSessionDesc;
         }
 
+        /// <summary>
+        /// Creates a new data channel related the remote peer.
+        /// </summary>
+        /// <param name="label"> A string for the data channel.
+        /// This string may be checked by <see cref="RTCDataChannel.Label"/>. </param>
+        /// <param name="options"> A struct provides configuration options for the data channel. </param>
+        /// <returns> A new data channel. </returns>
         public RTCDataChannel CreateDataChannel(string label, ref RTCDataChannelInit options)
         {
             IntPtr ptr = WebRTC.Context.CreateDataChannel(self, label, ref options);
@@ -357,13 +519,44 @@ namespace Unity.WebRTC
             });
         }
 
-        public RTCSetSessionDescriptionAsyncOperation SetLocalDescription(ref RTCSessionDescription desc)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        /// <seealso cref="LocalDescription"/>
+        public RTCSetSessionDescriptionAsyncOperation SetLocalDescription(
+            ref RTCSessionDescription desc)
         {
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
             WebRTC.Context.PeerConnectionSetLocalDescription(self, ref desc);
             return op;
         }
 
+        /// <summary>
+        /// Returns an AsyncOperation which resolves with data providing statistics.
+        /// </summary>
+        /// <returns>
+        /// An AsyncOperation which resolves with an <see cref="RTCStatsReport"/>
+        /// object providing connection statistics.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// // Already instantiated peerConnection as RTCPeerConnection.
+        /// var operation = peerConnection.GetStats();
+        /// yield return operation;
+        /// 
+        /// if (!operation.IsError)
+        /// {
+        ///     var report = operation.Value;
+        ///     foreach (var stat in report.Stats.Values)
+        ///     {
+        ///         Debug.Log(stat.Type.ToString());
+        ///     }
+        /// }
+        /// </code>
+        /// </example>
+        /// <seealso cref="RTCStatsReport"/>
         public RTCStatsReportAsyncOperation GetStats()
         {
             return new RTCStatsReportAsyncOperation(this);
@@ -378,12 +571,15 @@ namespace Unity.WebRTC
             return new RTCStatsReportAsyncOperation(this, receiver);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSessionDescription LocalDescription
         {
             get
             {
                 RTCSessionDescription desc = default;
-                if(NativeMethods.PeerConnectionGetLocalDescription(self, ref desc))
+                if (NativeMethods.PeerConnectionGetLocalDescription(self, ref desc))
                 {
                     return desc;
                 }
@@ -391,12 +587,15 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSessionDescription RemoteDescription
         {
             get
             {
                 RTCSessionDescription desc = default;
-                if(NativeMethods.PeerConnectionGetRemoteDescription(self, ref desc))
+                if (NativeMethods.PeerConnectionGetRemoteDescription(self, ref desc))
                 {
                     return desc;
                 }
@@ -404,12 +603,15 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSessionDescription CurrentLocalDescription
         {
             get
             {
                 RTCSessionDescription desc = default;
-                if(NativeMethods.PeerConnectionGetCurrentLocalDescription(self, ref desc))
+                if (NativeMethods.PeerConnectionGetCurrentLocalDescription(self, ref desc))
                 {
                     return desc;
                 }
@@ -429,12 +631,16 @@ namespace Unity.WebRTC
                 throw new InvalidOperationException("CurrentRemoteDescription is not exist");
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSessionDescription PendingLocalDescription
         {
             get
             {
                 RTCSessionDescription desc = default;
-                if(NativeMethods.PeerConnectionGetPendingLocalDescription(self, ref desc))
+                if (NativeMethods.PeerConnectionGetPendingLocalDescription(self, ref desc))
                 {
                     return desc;
                 }
@@ -442,12 +648,15 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSessionDescription PendingRemoteDescription
         {
             get
             {
                 RTCSessionDescription desc = default;
-                if(NativeMethods.PeerConnectionGetPendingRemoteDescription(self, ref desc))
+                if (NativeMethods.PeerConnectionGetPendingRemoteDescription(self, ref desc))
                 {
                     return desc;
                 }
@@ -455,6 +664,11 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="desc"></param>
+        /// <returns></returns>
         public RTCSetSessionDescriptionAsyncOperation SetRemoteDescription(ref RTCSessionDescription desc)
         {
             var op = new RTCSetSessionDescriptionAsyncOperation(this);

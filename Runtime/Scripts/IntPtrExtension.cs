@@ -3,8 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
-
-    public static class IntPtrExtension
+    internal static class IntPtrExtension
     {
         public static string AsAnsiStringWithFreeMem(this IntPtr ptr)
         {
