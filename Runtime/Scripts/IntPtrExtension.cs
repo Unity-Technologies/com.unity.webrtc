@@ -110,12 +110,15 @@ namespace Unity.WebRTC
 
         public static IntPtr ToPtr(string[] array)
         {
+            int size = Marshal.SizeOf(typeof(IntPtr));
+            int length = size * array.Length;
+
             IntPtr[] ptrArray = new IntPtr[array.Length];
             for (var i = 0; i < array.Length; i++)
             {
                 ptrArray[i] = Marshal.StringToCoTaskMemAnsi(array[i]);
             }
-            IntPtr dst = Marshal.AllocCoTaskMem(array.Length);
+            IntPtr dst = Marshal.AllocCoTaskMem(length);
             Marshal.Copy(ptrArray, 0, dst, array.Length);
             return dst;
         }

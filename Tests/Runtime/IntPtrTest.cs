@@ -130,9 +130,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void AsArrayReturnsStringArray()
         {
             string[] source = { "red", "blue", "yellow" };
-            UnityEngine.Debug.Log("Hello");
             IntPtr ptr = IntPtrExtension.ToPtr(source);
-            UnityEngine.Debug.Log("Hello2");
             string[] dest = ptr.AsArray<string>(source.Length);
             Assert.IsNotEmpty(dest);
             CollectionAssert.AreEqual(source, dest);
