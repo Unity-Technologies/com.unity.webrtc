@@ -312,7 +312,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return test;
             test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
-            var op = test.component.GetPeerStats();
+            var op = test.component.GetPeerStats(0);
             yield return op;
             Assert.True(op.IsDone);
             Assert.IsNotEmpty(op.Value.Stats);
