@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"

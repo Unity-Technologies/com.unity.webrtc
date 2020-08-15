@@ -45,9 +45,9 @@ namespace webrtc
 
     bool ContextManager::Exists(Context *context)
     {
-        for(const auto& [key, value] : s_instance.m_contexts)
+        for(auto it = s_instance.m_contexts.begin(); it != s_instance.m_contexts.end(); ++it)
         {
-            if(value.get() == context)
+            if(it->second.get() == context)
                 return true;
         }
         return false;
