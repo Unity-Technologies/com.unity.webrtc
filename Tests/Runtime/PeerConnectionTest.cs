@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
@@ -251,7 +252,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator IceCandidate()
+        public IEnumerator IceConnectionStateChange()
         {
             RTCConfiguration config = default;
             config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
@@ -295,6 +296,46 @@ namespace Unity.WebRTC.RuntimeTest
             stream.Dispose();
             peer1.Close();
             peer2.Close();
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator GetStatsReturnsReport()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.SetStream(videoStream);
+            yield return test;
+            test.component.CoroutineUpdate();
+            yield return new WaitForSeconds(0.1f);
+            var op = test.component.GetPeerStats();
+            yield return op;
+            Assert.True(op.IsDone);
+            Assert.IsNotEmpty(op.Value.Stats);
+            Assert.IsNotEmpty(op.Value.Stats.Keys);
+            Assert.IsNotEmpty(op.Value.Stats.Values);
+            Assert.Greater(op.Value.Stats.Count, 0);
+
+            foreach (RTCStats stats in op.Value.Stats.Values)
+            {
+                Assert.NotNull(stats);
+                Assert.Greater(stats.Timestamp, 0);
+                Assert.IsNotEmpty(stats.Id);
+                foreach (var pair in stats.Dict)
+                {
+                    Assert.IsNotEmpty(pair.Key);
+                    Assert.NotNull(pair.Value);
+                }
+                StatsCheck.Test(stats);
+            }
+            op.Value.Dispose();
+            test.component.Dispose();
+            videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
         }
     }
 }
