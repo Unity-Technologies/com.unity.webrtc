@@ -82,9 +82,10 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (s_context == nullptr)
-    {
         return;
-    }
+    std::lock_guard<std::mutex> lock(s_context->mutex);
+    if(!ContextManager::GetInstance()->Exists(s_context))
+        return;
     const auto track = reinterpret_cast<::webrtc::MediaStreamTrackInterface*>(data);
     const auto event = static_cast<VideoStreamRenderEventID>(eventID);
 

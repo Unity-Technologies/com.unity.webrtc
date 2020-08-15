@@ -43,9 +43,21 @@ namespace webrtc
         curContext = context;
     }
 
+    bool ContextManager::Exists(Context *context)
+    {
+        for(const auto& [key, value] : s_instance.m_contexts)
+        {
+            if(value.get() == context)
+                return true;
+        }
+        return false;
+    }
+
     void ContextManager::DestroyContext(int uid)
     {
         auto it = s_instance.m_contexts.find(uid);
+        std::lock_guard<std::mutex> lock(it->second->mutex);
+
         if (it != s_instance.m_contexts.end()) {
             s_instance.m_contexts.erase(it);
             DebugLog("Unregistered context with ID %d", uid);
@@ -178,6 +190,7 @@ namespace webrtc
         m_peerConnectionFactory = nullptr;
         m_audioTrack = nullptr;
 
+        m_mapIdAndEncoder.clear();
         m_mediaSteamTrackList.clear();
         m_mapClients.clear();
         m_mapVideoCapturer.clear();
@@ -186,7 +199,6 @@ namespace webrtc
         m_mapSetSessionDescriptionObserver.clear();
         m_mapVideoEncoderParameter.clear();
         m_mapDataChannels.clear();
-        m_mapIdAndEncoder.clear();
 
         m_workerThread->Quit();
         m_workerThread.reset();
