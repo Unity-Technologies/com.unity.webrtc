@@ -337,7 +337,10 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new VideoStreamTrack("video", rt);
             Assert.NotNull(track);
 
-            // todo:: standalone on linux returns always NotInitialized.
+            // wait for the end of the initialization for encoder on the render thread.
+            yield return 0;
+
+            // todo:: returns always false.
             // Assert.True(track.IsInitialized);
 
             // Enabled property
@@ -347,9 +350,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             // ReadyState property
             Assert.AreEqual(track.ReadyState, TrackState.Live);
-            track.Dispose();
-            yield return new WaitForSeconds(0.1f);
 
+            track.Dispose();
             Object.DestroyImmediate(rt);
         }
 
@@ -365,7 +367,10 @@ namespace Unity.WebRTC.RuntimeTest
             rt.Create();
             var stream = new MediaStream();
             var track = new VideoStreamTrack("video", rt);
-            yield return new WaitForSeconds(0.1f);
+
+            // wait for the end of the initialization for encoder on the render thread.
+            yield return 0;
+
             Assert.AreEqual(TrackKind.Video, track.Kind);
             Assert.AreEqual(0, stream.GetVideoTracks().Count());
             Assert.True(stream.AddTrack(track));
