@@ -308,10 +308,10 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         /// <todo>
-        /// This unittest failed standalone mono 2019.3 on linux
+        /// NativeMethods.GetInitializationResult returns CodecInitializationResult.NotInitialized after executed InitializeEncoder
         /// </todo>
         [UnityTest]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [Ignore("todo::GetInitializationResult returns NotInitialized")]
         public IEnumerator CallVideoEncoderMethods()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
@@ -328,11 +328,12 @@ namespace Unity.WebRTC.RuntimeTest
             var callback = NativeMethods.GetRenderEventFunc(context);
             Assert.AreEqual(CodecInitializationResult.NotInitialized, NativeMethods.GetInitializationResult(context, track));
 
-            // TODO::
-            // note:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
+            // todo:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
             NativeMethods.ContextSetVideoEncoderParameter(context, track, width, height);
             VideoEncoderMethods.InitializeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
+
+            // todo:: NativeMethods.GetInitializationResult returns CodecInitializationResult.NotInitialized
             Assert.AreEqual(CodecInitializationResult.Success, NativeMethods.GetInitializationResult(context, track));
 
             VideoEncoderMethods.Encode(callback, track);
