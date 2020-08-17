@@ -312,9 +312,11 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// Returns an object which indicates the current configuration
+        /// of the <see cref="RTCPeerConnection"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns> An object describing the <see cref="RTCPeerConnection"/>'s
+        /// current configuration. </returns>
         /// <example>
         /// <code>
         /// var configuration = myPeerConnection.GetConfiguration();
@@ -325,26 +327,52 @@ namespace Unity.WebRTC
         /// myPeerConnection.SetConfiguration(configuration);
         /// </code>
         /// </example>
+        /// <seealso cref="SetConfiguration(ref RTCConfiguration)"/>
         public RTCConfiguration GetConfiguration()
         {
-            var str = NativeMethods.PeerConnectionGetConfiguration(self).AsAnsiStringWithFreeMem();
+            IntPtr ptr = NativeMethods.PeerConnectionGetConfiguration(self);
+            string str = ptr.AsAnsiStringWithFreeMem();
             return JsonUtility.FromJson<RTCConfiguration>(str);
         }
 
         /// <summary>
+        /// This method sets the current configuration of the <see cref="RTCPeerConnection"/>
         /// This lets you change the ICE servers used by the connection
         /// and which transport policies to use.
         /// </summary>
         /// <param name="configuration">The changes are not additive; instead,
         /// the new values completely replace the existing ones.</param>
-        /// <returns> Error </returns>
+        /// <returns> Error code. </returns>
+        /// <example>
+        /// <code>
+        /// var configuration = new RTCConfiguration
+        /// {
+        ///     iceServers = new[]
+        ///     {
+        ///         new RTCIceServer
+        ///         {
+        ///             urls = new[] {"stun:stun.l.google.com:19302"},
+        ///             username = "",
+        ///             credential = "",
+        ///             credentialType = RTCIceCredentialType.Password
+        ///         }
+        ///     }
+        /// };
+        /// var error = myPeerConnection.SetConfiguration(ref configuration);
+        /// if(error == RTCErrorType.None)
+        /// {
+        ///     ...
+        /// }
+        /// </code>
+        /// </example>
+        /// <seealso cref="GetConfiguration()"/>
         public RTCErrorType SetConfiguration(ref RTCConfiguration configuration)
         {
             return NativeMethods.PeerConnectionSetConfiguration(self, JsonUtility.ToJson(configuration));
         }
 
         /// <summary>
-        /// An RTCConfiguration dictionary providing options to configure the new connection.
+        /// This constructor creates an instance of peer connection with a default configuration.
         /// </summary>
         /// <seealso cref="RTCPeerConnection(ref RTCConfiguration)"/>
         public RTCPeerConnection()
@@ -360,7 +388,8 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// This constructor creates an instance of peer connection with a configuration provided by user.
+        /// An <seealso cref="RTCConfiguration "/> object providing options to configure the new connection.
         /// </summary>
         /// <param name="configuration"></param>
         /// <seealso cref="RTCPeerConnection()"/>
