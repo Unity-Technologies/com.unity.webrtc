@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
@@ -23,6 +24,7 @@ namespace webrtc
         Context* CreateContext(int uid, UnityEncoderType encoderType);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
+        bool Exists(Context* context);
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
     private:
@@ -87,6 +89,9 @@ namespace webrtc
         bool EncodeFrame(webrtc::MediaStreamTrackInterface* track);
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
         void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height);
+
+        // mutex;
+        std::mutex mutex;
 
     private:
         int m_uid;
