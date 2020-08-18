@@ -71,6 +71,7 @@ namespace webrtc
         Offer,
         PrAnswer,
         Answer,
+        Rollback
     };
 
     enum class SdpSemanticsType

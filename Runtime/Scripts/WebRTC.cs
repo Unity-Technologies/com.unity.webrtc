@@ -137,7 +137,8 @@ namespace Unity.WebRTC
     {
         Offer,
         Pranswer,
-        Answer
+        Answer,
+        Rollback
     }
 
     public enum RTCBundlePolicy
