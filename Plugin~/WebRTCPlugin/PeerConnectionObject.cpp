@@ -311,7 +311,28 @@ namespace webrtc
             return RTCPeerConnectionState::New;
         }
         throw std::invalid_argument("Unknown peer connection type");
-    } 
+    }
+
+    RTCSignalingState PeerConnectionObject::GetSignalingState()
+    {
+        auto state = connection->signaling_state();
+        switch (state)
+        {
+        case webrtc::PeerConnectionInterface::SignalingState::kStable:
+            return RTCSignalingState::Stable;
+        case webrtc::PeerConnectionInterface::SignalingState::kHaveLocalOffer:
+            return RTCSignalingState::HaveLocalOffer;
+        case webrtc::PeerConnectionInterface::SignalingState::kHaveRemoteOffer:
+            return RTCSignalingState::HaveRemoteOffer;
+        case webrtc::PeerConnectionInterface::SignalingState::kHaveLocalPrAnswer:
+            return RTCSignalingState::HaveLocalPranswer;
+        case webrtc::PeerConnectionInterface::SignalingState::kHaveRemotePrAnswer:
+            return RTCSignalingState::HaveRemotePranswer;
+        case webrtc::PeerConnectionInterface::SignalingState::kClosed:
+            return RTCSignalingState::Closed;
+        }
+        throw std::invalid_argument("Unknown signaling type");
+    }
 #pragma warning(pop)
     
 } // end namespace webrtc

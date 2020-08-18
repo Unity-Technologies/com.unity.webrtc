@@ -51,6 +51,7 @@ namespace webrtc
 
         RTCPeerConnectionState GetConnectionState();
         RTCIceConnectionState GetIceCandidateState();
+        RTCSignalingState GetSignalingState();
 
         //webrtc::CreateSessionDescriptionObserver
         // This callback transfers the ownership of the |desc|.

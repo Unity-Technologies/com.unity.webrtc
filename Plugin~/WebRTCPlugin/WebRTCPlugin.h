@@ -47,6 +47,16 @@ namespace webrtc
         Max
     };
 
+    enum class RTCSignalingState
+    {
+        Stable,
+        HaveLocalOffer,
+        HaveRemoteOffer,
+        HaveLocalPranswer,
+        HaveRemotePranswer,
+        Closed
+    };
+
     enum class RTCPeerConnectionEventType
     {
         ConnectionStateChange,
