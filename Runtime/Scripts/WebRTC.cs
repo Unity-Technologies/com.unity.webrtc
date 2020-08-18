@@ -269,7 +269,10 @@ namespace Unity.WebRTC
                 {
                     foreach(var track in VideoStreamTrack.tracks)
                     {
-                        track.Update();
+                        if (track.IsInitialized)
+                        {
+                            track.Update();
+                        }
                     }
                 }
             }

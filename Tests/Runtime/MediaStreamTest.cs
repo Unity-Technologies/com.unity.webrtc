@@ -327,7 +327,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStreamTrack")]
-        public IEnumerator MediaStreamTrackEnabled()
+        public IEnumerator VideoStreamTrackEnabled()
         {
             var width = 256;
             var height = 256;
@@ -358,7 +358,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStream")]
-        public IEnumerator MediaStreamAddTrack()
+        public IEnumerator VideoStreamAddTrack()
         {
             var width = 256;
             var height = 256;
@@ -383,6 +383,47 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
+
+        [Test]
+        [Category("MediaStream")]
+        [Ignore("TODO:: This test occurs crash already")]
+        public void VideoStreamTrackDisposeImmediately()
+        {
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack("video", rt);
+
+            track.Dispose();
+            Object.DestroyImmediate(rt);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        [Category("MediaStream")]
+        public IEnumerator VideoStreamTrackInstantiateMultiple()
+        {
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt1 = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt1.Create();
+            var track1 = new VideoStreamTrack("video1", rt1);
+
+            var rt2 = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt2.Create();
+            var track2 = new VideoStreamTrack("video2", rt2);
+
+            // wait for initialization encoder on render thread.
+            yield return new WaitForSeconds(0.1f);
+
+            track1.Dispose();
+            track2.Dispose();
+            Object.DestroyImmediate(rt1);
+            Object.DestroyImmediate(rt2);
+        }
 
         [Test]
         public void AddAndRemoveAudioStreamTrack()
