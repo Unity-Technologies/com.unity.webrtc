@@ -37,6 +37,7 @@ namespace webrtc
         webrtc::EncodedImage m_encodedImage;
         webrtc::RTPFragmentationHeader m_fragHeader;
         webrtc::H264BitstreamParser m_h264BitstreamParser;
+        const webrtc::VideoCodec* m_codec;
 
         // todo(kazuki): this member is for identify video encoder instance (IEncoder implemented).
         uint32_t m_encoderId = 0;

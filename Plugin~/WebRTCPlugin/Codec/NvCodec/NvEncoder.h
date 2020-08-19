@@ -2,6 +2,8 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <rtc_base/timestamp_aligner.h>
+
 #include "nvEncodeAPI.h"
 #include "Codec/IEncoder.h"
 
@@ -86,7 +88,10 @@ namespace webrtc
         bool isIdrFrame = false;
 
         uint32_t m_frameRate = 30;
+        uint32_t m_targetBitrate = 0;
+        webrtc::Clock* m_clock;
         std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
+        rtc::TimestampAligner timestamp_aligner_;
     };
     
 } // end namespace webrtc
