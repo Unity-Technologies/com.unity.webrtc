@@ -65,9 +65,6 @@ namespace webrtc
         m_encodedImage.SetTimestamp(frame.timestamp());
         m_encodedImage._encodedWidth = frame.video_frame_buffer()->width();
         m_encodedImage._encodedHeight = frame.video_frame_buffer()->height();
-//        m_encodedImage.set_size(0);
-//        m_encodedImage.ntp_time_ms_ = frame.ntp_time_ms();
-//        m_encodedImage.capture_time_ms_ = frame.render_time_ms();
         m_encodedImage.rotation_ = frame.rotation();
         m_encodedImage.content_type_ = webrtc::VideoContentType::UNSPECIFIED;
         m_encodedImage.timing_.flags = webrtc::VideoSendTiming::kInvalid;
