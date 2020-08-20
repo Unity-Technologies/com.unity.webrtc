@@ -32,8 +32,6 @@ namespace webrtc
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
         checkf(width > 0 && height > 0, "Invalid width or height!");
-
-        m_bitrateAdjuster = std::make_unique<webrtc::BitrateAdjuster>(0.5f, 0.95f);
     }
 
     void NvEncoder::InitV()
@@ -91,8 +89,10 @@ namespace webrtc
         std::memcpy(&nvEncConfig, &presetConfig.presetCfg, sizeof(NV_ENC_CONFIG));
         nvEncConfig.profileGUID = NV_ENC_H264_PROFILE_BASELINE_GUID;
         nvEncConfig.gopLength = nvEncInitializeParams.frameRateNum;
-//        nvEncConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ;
-        nvEncConfig.rcParams.averageBitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        nvEncConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ;
+        nvEncConfig.rcParams.averageBitRate = (static_cast<unsigned int>(5.0f *
+            nvEncInitializeParams.encodeWidth *
+            nvEncInitializeParams.encodeHeight) / (1280 * 720)) * 100000;
         nvEncConfig.encodeCodecConfig.h264Config.idrPeriod = nvEncConfig.gopLength;
 
         nvEncConfig.encodeCodecConfig.h264Config.sliceMode = 0;
@@ -217,7 +217,7 @@ namespace webrtc
     void NvEncoder::UpdateSettings()
     {
         bool settingChanged = false;
-        m_targetBitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+//        m_targetBitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
         if (nvEncConfig.rcParams.averageBitRate != m_targetBitrate)
         {
             nvEncConfig.rcParams.averageBitRate = m_targetBitrate;
@@ -255,66 +255,11 @@ namespace webrtc
         return static_cast<uint32_t>(((1.0 - factor) * low) + (factor * high) + 0.5);
     }
 
-    void NvEncoder::SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters)
+    void NvEncoder::SetRates(uint32_t bitRate, int64_t frameRate)
     {
-        if (parameters.framerate_fps < 1.0)
-        {
-            RTC_LOG(LS_WARNING) << "Invalid frame rate: " << parameters.framerate_fps;
-            return;
-        }
-
-        if (parameters.bitrate.get_sum_bps() == 0)
-        {
-            return;
-        }
-
-        uint32_t bitrate2 = 0;
-        if(parameters.bitrate.HasBitrate(0, 0))
-        {
-            bitrate2 = parameters.bitrate.GetBitrate(0, 0);
-        }
-
-        m_bitrateAdjuster->SetTargetBitrateBps(
-            parameters.bitrate.get_sum_bps());
-
-        double bandwidth_headroom_factor =
-            parameters.bandwidth_allocation.bps<double>() /
-            parameters.bitrate.get_sum_bps();
-
-//        Interpolate(min_bitrate, max_bitrate, bandwidth_headroom_factor);
-
-//        const uint32_t bitrate = parameters.bitrate.get_sum_bps();
-//        m_bitrateAdjuster->SetTargetBitrateBps(bitrate);
-//        m_targetBitrate = parameters.bitrate.get_sum_bps();
-        RTC_LOG(LS_INFO) << parameters.bitrate.get_sum_bps() << " " << parameters.bandwidth_allocation.bps() << " " << bandwidth_headroom_factor;
-
-        //m_targetBitrate = static_cast<uint32_t>(parameters.bandwidth_allocation.bps<double>() + 0.5);
-        //m_targetBitrate = parameters.bitrate.get_sum_bps();
-        // m_targetBitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
-
-        std::ostringstream stringStream;
-        stringStream << parameters.bitrate.get_sum_bps()
-            << " "
-            << parameters.bandwidth_allocation.bps()
-            << " "
-            << bandwidth_headroom_factor
-            << " "
-            << m_targetBitrate
-            << " "
-            << bitrate2
-            << "\n";
-        std::string str = stringStream.str();
-        ::OutputDebugStringA(str.c_str());
-
-        uint32_t framerate = static_cast<uint32_t>(parameters.framerate_fps + 0.5);
-        if(framerate < 0 || framerate > 120)
-        {
-            RTC_LOG(LS_WARNING) << "SetRates() Invalid parameter framerate=" << framerate;
-            return;
-        }
+        m_frameRate = frameRate;
+        m_targetBitrate = bitRate;
         isIdrFrame = true;
-
-        m_frameRate = framerate;
     }
 
     bool NvEncoder::CopyBuffer(void* frame)
@@ -355,15 +300,14 @@ namespace webrtc
 #pragma region start encoding
         if (isIdrFrame)
         {
-            picParams.encodePicFlags |= NV_ENC_PIC_FLAG_FORCEIDR;
+            picParams.encodePicFlags = NV_ENC_PIC_FLAG_FORCEIDR | NV_ENC_PIC_FLAG_FORCEINTRA;
+            isIdrFrame = false;
         }
-        isIdrFrame = false;
         errorCode = pNvEncodeAPI->nvEncEncodePicture(pEncoderInterface, &picParams);
         checkf(NV_RESULT(errorCode), StringFormat("Failed to encode frame, error is %d", errorCode).c_str());
 #pragma endregion
         ProcessEncodedFrame(frame);
         frameCount++;
-        //m_bitrateAdjuster->Update(frame.encodedFrame.size());
         return true;
     }
 
@@ -409,10 +353,14 @@ namespace webrtc
 //            .set_timestamp_us(now_us);
             .set_ntp_time_ms(rtc::TimeMillis());
 
-        //std::ostringstream stringStream;
-        //stringStream << translated_camera_time_us << "\n";
-        //std::string str = stringStream.str();
-        //::OutputDebugStringA(str.c_str());
+        std::ostringstream stringStream;
+        stringStream
+        << "framerate:" << m_frameRate << " "
+        << "bitrate:" << m_targetBitrate
+        << "\n";
+        std::string str = stringStream.str();
+        ::OutputDebugStringA(str.c_str());
+
         CaptureFrame(builder.build());
     }
 

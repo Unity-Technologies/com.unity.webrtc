@@ -7,6 +7,9 @@ namespace webrtc
 {
 
     DummyVideoEncoder::DummyVideoEncoder(IVideoEncoderObserver* observer)
+        : m_encode_fps(1000, 1000)
+        , m_clock(webrtc::Clock::GetRealTimeClock())
+        , m_bitrateAdjuster(std::make_unique<webrtc::BitrateAdjuster>(0.5f, 0.95f))
     {
         this->m_setKeyFrame.connect(observer, &IVideoEncoderObserver::SetKeyFrame);
         this->m_setRates.connect(observer, &IVideoEncoderObserver::SetRates);
@@ -89,20 +92,13 @@ namespace webrtc
             }
         }
 
-        std::ostringstream stringStream;
-        stringStream << "frameTypes"
-        << (int)(*frameTypes)[0]
-        << "\n";
-        std::string str = stringStream.str();
-        ::OutputDebugStringA(str.c_str());
-
-
         if (m_encodedImage._frameType != webrtc::VideoFrameType::kVideoFrameKey && frameTypes && (*frameTypes)[0] == webrtc::VideoFrameType::kVideoFrameKey)
         {
             m_setKeyFrame(m_encoderId);
         }
 
         m_encodedImage.SetEncodedData(webrtc::EncodedImageBuffer::Create(&frameDataBuffer[0], frameDataBuffer.size()));
+        m_encodedImage.set_size(frameDataBuffer.size());
 
         m_fragHeader.VerifyAndAllocateFragmentationHeader(naluIndices.size());
         m_fragHeader.fragmentationVectorSize = static_cast<uint16_t>(naluIndices.size());
@@ -128,12 +124,46 @@ namespace webrtc
             LogPrint("Encode callback failed %d", result.error);
             return WEBRTC_VIDEO_CODEC_ERROR;
         }
+
+        int64_t now_ms = m_clock->TimeInMilliseconds();
+        m_encode_fps.Update(1, now_ms);
+
+        m_bitrateAdjuster->Update(frameDataBuffer.size());
+
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
     void DummyVideoEncoder::SetRates(const RateControlParameters& parameters)
     {
-        m_setRates(m_encoderId, parameters);
+
+        //
+        // "parameters.framerate_fps" which the parameter of the argument of
+        // "SetRates" method, in many cases this parameter is higher than
+        // the frequency of the encoding.
+        // Need to determine the right framerate to set to the hardware encoder,
+        // so collect timestamp of encoding and get stats.
+        // 
+        int64_t now_ms = m_clock->TimeInMilliseconds();
+        absl::optional<int64_t> encodeFrameRate = m_encode_fps.Rate(now_ms);
+        int64_t frameRate = encodeFrameRate.value_or(30);
+
+        //
+        // The bitrate adjuster is using for avoiding overshoot the bitrate.
+        // But, when a frame rate is low, estimation of bitrate may be low
+        // so it can not recover video quality.
+        // If it determine the low frame rate (defined as 15fps),
+        // use original bps to avoid bitrate undershoot.
+        // 
+        m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
+        uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        const uint32_t kLowFrameRate = 15;
+        if (frameRate < kLowFrameRate)
+        {
+            bitRate = parameters.bitrate.get_sum_bps();
+        }
+
+
+        m_setRates(m_encoderId, bitRate, frameRate);
     }
 
 } // end namespace webrtc

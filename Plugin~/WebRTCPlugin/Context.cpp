@@ -257,11 +257,11 @@ namespace webrtc
         }
     }
 
-    void Context::SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters)
+    void Context::SetRates(uint32_t id, uint32_t bitRate, int64_t frameRate)
     {
         if(m_mapIdAndEncoder.count(id))
         {
-            m_mapIdAndEncoder[id]->SetRates(parameters);
+            m_mapIdAndEncoder[id]->SetRates(bitRate, frameRate);
         }
     }
 
