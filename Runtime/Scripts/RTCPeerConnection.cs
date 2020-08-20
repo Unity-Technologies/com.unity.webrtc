@@ -117,7 +117,7 @@ namespace Unity.WebRTC
         /// var signalingState = peerConnection.SignalingState;
         /// </code>
         /// </example>
-        /// <seealso cref="SignalingState"/>
+        /// <seealso cref="ConnectionState"/>
         public RTCSignalingState SignalingState
         {
             get
