@@ -99,6 +99,16 @@ namespace Unity.WebRTC
         Max
     }
 
+    public enum RTCSignalingState
+    {
+        Stable,
+        HaveLocalOffer,
+        HaveRemoteOffer,
+        HaveLocalPranswer,
+        HaveRemotePranswer,
+        Closed
+    }
+
     public enum RTCErrorType
     {
         None,
@@ -568,6 +578,8 @@ namespace Unity.WebRTC
         public static extern IntPtr PeerConnectionGetTransceivers(IntPtr ptr, ref uint length);
         [DllImport(WebRTC.Lib)]
         public static extern RTCIceConnectionState PeerConnectionIceConditionState(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern RTCSignalingState PeerConnectionSignalingState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnDataChannel(IntPtr ptr, DelegateNativeOnDataChannel callback);
         [DllImport(WebRTC.Lib)]

@@ -107,6 +107,26 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
+        /// The readonly property of the <see cref="RTCPeerConnection"/> indicates
+        /// the current state of the peer connection by returning one of the
+        /// <see cref="RTCSignalingState"/> enum.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var peerConnection = new RTCPeerConnection(configuration);
+        /// var signalingState = peerConnection.SignalingState;
+        /// </code>
+        /// </example>
+        /// <seealso cref="SignalingState"/>
+        public RTCSignalingState SignalingState
+        {
+            get
+            {
+                return NativeMethods.PeerConnectionSignalingState(self);
+            }
+        }
+
+        /// <summary>
         /// Returns array of objects each of which represents one RTP receiver.
         /// </summary>
         /// <example>
