@@ -217,7 +217,6 @@ namespace webrtc
     void NvEncoder::UpdateSettings()
     {
         bool settingChanged = false;
-//        m_targetBitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
         if (nvEncConfig.rcParams.averageBitRate != m_targetBitrate)
         {
             nvEncConfig.rcParams.averageBitRate = m_targetBitrate;
@@ -349,17 +348,7 @@ namespace webrtc
             .set_video_frame_buffer(buffer)
             .set_timestamp_us(translated_camera_time_us)
             .set_timestamp_rtp(0)
-//            .set_timestamp_us(timestamp_us);
-//            .set_timestamp_us(now_us);
             .set_ntp_time_ms(rtc::TimeMillis());
-
-        std::ostringstream stringStream;
-        stringStream
-        << "framerate:" << m_frameRate << " "
-        << "bitrate:" << m_targetBitrate
-        << "\n";
-        std::string str = stringStream.str();
-        ::OutputDebugStringA(str.c_str());
 
         CaptureFrame(builder.build());
     }
