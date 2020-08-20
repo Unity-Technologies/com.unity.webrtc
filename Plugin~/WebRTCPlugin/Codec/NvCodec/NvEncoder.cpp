@@ -241,18 +241,6 @@ namespace webrtc
     constexpr double kLowRateFactor = 1.0;
     constexpr double kHighRateFactor = 2.0;
 
-    uint32_t Interpolate(uint32_t low,
-        uint32_t high,
-        double bandwidth_headroom_factor) {
-
-        RTC_DCHECK_GE(bandwidth_headroom_factor, kLowRateFactor);
-        RTC_DCHECK_LE(bandwidth_headroom_factor, kHighRateFactor);
-
-        // |factor| is between 0.0 and 1.0.
-        const double factor = bandwidth_headroom_factor - kLowRateFactor;
-
-        return static_cast<uint32_t>(((1.0 - factor) * low) + (factor * high) + 0.5);
-    }
 
     void NvEncoder::SetRates(uint32_t bitRate, int64_t frameRate)
     {
