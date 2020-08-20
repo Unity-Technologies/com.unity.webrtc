@@ -36,13 +36,6 @@ namespace webrtc
         }
         m_codec = codec_settings;
 
-        std::ostringstream stringStream;
-        stringStream << "maxBitrate="
-            << codec_settings->maxBitrate
-            << "\n";
-        std::string str = stringStream.str();
-        ::OutputDebugStringA(str.c_str());
-
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
