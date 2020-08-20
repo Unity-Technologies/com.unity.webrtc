@@ -40,40 +40,9 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        [Category("MediaStreamTrack")]
-        public IEnumerator VideoStreamTrackEnabled()
-        {
-            var width = 256;
-            var height = 256;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var rt = new RenderTexture(width, height, 0, format);
-            rt.Create();
-            var track = new VideoStreamTrack("video", rt);
-            Assert.NotNull(track);
-
-            // wait for the end of the initialization for encoder on the render thread.
-            yield return 0;
-
-            // todo:: returns always false.
-            // Assert.True(track.IsInitialized);
-
-            // Enabled property
-            Assert.True(track.Enabled);
-            track.Enabled = false;
-            Assert.False(track.Enabled);
-
-            // ReadyState property
-            Assert.AreEqual(track.ReadyState, TrackState.Live);
-
-            track.Dispose();
-            yield return 0;
-            Object.DestroyImmediate(rt);
-        }
-
-        [UnityTest]
-        [Timeout(5000)]
         [Category("MediaStream")]
-        public IEnumerator VideoStreamAddTrack()
+        [Ignore("TODO::Crash on windows standalone")]
+        public IEnumerator VideoStreamAddTrackAndRemoveTrack()
         {
             var width = 256;
             var height = 256;
@@ -94,51 +63,11 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.True(stream.RemoveTrack(track));
             Assert.AreEqual(0, stream.GetVideoTracks().Count());
             track.Dispose();
+            // wait for disposing video track.
             yield return 0;
+
             stream.Dispose();
             Object.DestroyImmediate(rt);
-        }
-
-
-        [Test]
-        [Category("MediaStream")]
-        [Ignore("TODO:: This test occurs crash already")]
-        public void VideoStreamTrackDisposeImmediately()
-        {
-            var width = 256;
-            var height = 256;
-            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
-            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
-            rt.Create();
-            var track = new VideoStreamTrack("video", rt);
-
-            track.Dispose();
-            Object.DestroyImmediate(rt);
-        }
-
-        [UnityTest]
-        [Timeout(5000)]
-        [Category("MediaStream")]
-        public IEnumerator VideoStreamTrackInstantiateMultiple()
-        {
-            var width = 256;
-            var height = 256;
-            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
-            var rt1 = new UnityEngine.RenderTexture(width, height, 0, format);
-            rt1.Create();
-            var track1 = new VideoStreamTrack("video1", rt1);
-
-            var rt2 = new UnityEngine.RenderTexture(width, height, 0, format);
-            rt2.Create();
-            var track2 = new VideoStreamTrack("video2", rt2);
-
-            // wait for initialization encoder on render thread.
-            yield return new WaitForSeconds(0.1f);
-
-            track1.Dispose();
-            track2.Dispose();
-            Object.DestroyImmediate(rt1);
-            Object.DestroyImmediate(rt2);
         }
 
         [Test]
@@ -172,8 +101,10 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 track.Dispose();
             }
-            videoStream.Dispose();
+            // wait for disposing video track.
             yield return 0;
+
+            videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
 
@@ -230,8 +161,10 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 track.Dispose();
             }
-            videoStream.Dispose();
+            // wait for disposing video track.
             yield return 0;
+
+            videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
 
@@ -274,6 +207,9 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 track.Dispose();
             }
+            // wait for disposing video track.
+            yield return 0;
+
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
@@ -315,20 +251,10 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 track.Dispose();
             }
-            videoStream.Dispose();
-            Object.DestroyImmediate(camObj);
-        }
-
-        [UnityTest]
-        [Timeout(5000)]
-        public IEnumerator CaptureStreamTrack()
-        {
-            var camObj = new GameObject("Camera");
-            var cam = camObj.AddComponent<Camera>();
-            var track = cam.CaptureStreamTrack(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
-            track.Dispose();
+            // wait for disposing video track.
             yield return 0;
+
+            videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
 
@@ -367,6 +293,9 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 track.Dispose();
             }
+            // wait for disposing video track.
+            yield return 0;
+
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
@@ -415,6 +344,9 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
 
             test.component.Dispose();
+            // wait for disposing video track.
+            yield return 0;
+
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
