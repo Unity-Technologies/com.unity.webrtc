@@ -66,6 +66,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(track.ReadyState, TrackState.Live);
 
             track.Dispose();
+            yield return 0;
             Object.DestroyImmediate(rt);
         }
 
@@ -93,6 +94,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.True(stream.RemoveTrack(track));
             Assert.AreEqual(0, stream.GetVideoTracks().Count());
             track.Dispose();
+            yield return 0;
             stream.Dispose();
             Object.DestroyImmediate(rt);
         }
@@ -171,6 +173,7 @@ namespace Unity.WebRTC.RuntimeTest
                 track.Dispose();
             }
             videoStream.Dispose();
+            yield return 0;
             Object.DestroyImmediate(camObj);
         }
 
@@ -228,6 +231,7 @@ namespace Unity.WebRTC.RuntimeTest
                 track.Dispose();
             }
             videoStream.Dispose();
+            yield return 0;
             Object.DestroyImmediate(camObj);
         }
 
@@ -324,6 +328,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = cam.CaptureStreamTrack(1280, 720, 1000000);
             yield return new WaitForSeconds(0.1f);
             track.Dispose();
+            yield return 0;
             Object.DestroyImmediate(camObj);
         }
 
