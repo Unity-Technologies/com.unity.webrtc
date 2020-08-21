@@ -92,7 +92,7 @@ namespace webrtc
         nvEncConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ;
         nvEncConfig.rcParams.averageBitRate = (static_cast<unsigned int>(5.0f *
             nvEncInitializeParams.encodeWidth *
-            nvEncInitializeParams.encodeHeight) / (1280 * 720)) * 100000;
+            nvEncInitializeParams.encodeHeight) / (m_width * m_height)) * 100000;
         nvEncConfig.encodeCodecConfig.h264Config.idrPeriod = nvEncConfig.gopLength;
 
         nvEncConfig.encodeCodecConfig.h264Config.sliceMode = 0;
