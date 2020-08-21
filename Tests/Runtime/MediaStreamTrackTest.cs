@@ -57,9 +57,10 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
+        // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
-        [Ignore("TODO::Test execution timed out on linux standalone")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator CaptureStreamTrack()
         {
             var camObj = new GameObject("Camera");
