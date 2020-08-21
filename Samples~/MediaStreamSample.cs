@@ -37,7 +37,7 @@ public class MediaStreamSample : MonoBehaviour
     {
         iceRestart = false,
         offerToReceiveAudio = true,
-        offerToReceiveVideo = false
+        offerToReceiveVideo = true
     };
 
     private RTCAnswerOptions _answerOptions = new RTCAnswerOptions

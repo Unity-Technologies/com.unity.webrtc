@@ -605,6 +605,11 @@ extern "C"
         return obj->GetIceCandidateState();
     }
 
+    UNITY_INTERFACE_EXPORT RTCSignalingState PeerConnectionSignalingState(PeerConnectionObject* obj)
+    {
+        return obj->GetSignalingState();
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnDataChannel(PeerConnectionObject* obj, DelegateOnDataChannel callback)
     {
         obj->RegisterOnDataChannel(callback);
