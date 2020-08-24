@@ -12,8 +12,8 @@ namespace webrtc
     public:
         VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
         ~VTEncoderMetal();
-        void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override;
-        void UpdateSettings() override;
+        void SetRates(uint32_t bitRate, int64_t frameRate) override {};
+        void UpdateSettings() override {};
         bool CopyBuffer(void* frame) override;
         bool EncodeFrame() override;
         bool IsSupported() const override;

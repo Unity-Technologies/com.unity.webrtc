@@ -12,7 +12,7 @@ namespace webrtc
     {
     public:
         virtual void SetKeyFrame(uint32_t id) = 0;
-        virtual void SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters) = 0;
+        virtual void SetRates(uint32_t id, uint32_t bitRate, int64_t frameRate) = 0;
     };
 
     class DummyVideoEncoder : public webrtc::VideoEncoder
@@ -37,13 +37,18 @@ namespace webrtc
         webrtc::EncodedImage m_encodedImage;
         webrtc::RTPFragmentationHeader m_fragHeader;
         webrtc::H264BitstreamParser m_h264BitstreamParser;
+        const webrtc::VideoCodec* m_codec;
+
+        webrtc::RateStatistics m_encode_fps;
+        webrtc::Clock* m_clock;
+        std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
 
         // todo(kazuki): this member is for identify video encoder instance (IEncoder implemented).
         uint32_t m_encoderId = 0;
 
         // todo(kazuki): remove these signals when moving hardware encoder instance to this class
         sigslot::signal1<uint32_t> m_setKeyFrame;
-        sigslot::signal2<uint32_t, const RateControlParameters&> m_setRates;
+        sigslot::signal3<uint32_t, uint32_t, int64_t> m_setRates;
     };
 
     // todo::(kazuki)

@@ -201,12 +201,7 @@ namespace webrtc
             NSLog(@"VTCompressionSessionCompleteFrames failed %d", status);
         }
     }
-    void VTEncoderMetal::SetRate(uint32_t rate)
-    {
-    }
-    void VTEncoderMetal::UpdateSettings()
-    {
-    }
+
     bool VTEncoderMetal::CopyBuffer(void* frame)
     {
         const int curFrameNum = GetCurrentFrameCount() % bufferedFrameNum;

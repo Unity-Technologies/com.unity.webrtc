@@ -117,7 +117,7 @@ namespace webrtc
         // todo(kazuki): remove these callback methods by moving hardware encoder instance to DummyVideoEncoder.
         //               attention point is multi-threaded opengl implementation with nvcodec.
         void SetKeyFrame(uint32_t id) override;
-        void SetRates(uint32_t id, const webrtc::VideoEncoder::RateControlParameters& parameters) override;
+        void SetRates(uint32_t id, uint32_t bitRate, int64_t frameRate) override;
 
         // todo(kazuki): static variable to set id each encoder.
         static uint32_t s_encoderId;

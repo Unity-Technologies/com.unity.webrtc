@@ -22,12 +22,16 @@ namespace webrtc
         const NV_ENC_INPUT_RESOURCE_TYPE inputType,
         const NV_ENC_BUFFER_FORMAT bufferFormat,
         const int width, const int height, IGraphicsDevice* device)
-    : m_width(width), m_height(height), m_device(device), m_deviceType(type), m_inputType(inputType), m_bufferFormat(bufferFormat)
+    : m_width(width)
+    , m_height(height)
+    , m_device(device)
+    , m_deviceType(type)
+    , m_inputType(inputType)
+    , m_bufferFormat(bufferFormat)
+    , m_clock(webrtc::Clock::GetRealTimeClock())
     {
         LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
         checkf(width > 0 && height > 0, "Invalid width or height!");
-
-        m_bitrateAdjuster = std::make_unique<webrtc::BitrateAdjuster>(0.5f, 0.95f);
     }
 
     void NvEncoder::InitV()
@@ -85,7 +89,10 @@ namespace webrtc
         std::memcpy(&nvEncConfig, &presetConfig.presetCfg, sizeof(NV_ENC_CONFIG));
         nvEncConfig.profileGUID = NV_ENC_H264_PROFILE_BASELINE_GUID;
         nvEncConfig.gopLength = nvEncInitializeParams.frameRateNum;
-        nvEncConfig.rcParams.averageBitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        nvEncConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ;
+        nvEncConfig.rcParams.averageBitRate = (static_cast<unsigned int>(5.0f *
+            nvEncInitializeParams.encodeWidth *
+            nvEncInitializeParams.encodeHeight) / (m_width * m_height)) * 100000;
         nvEncConfig.encodeCodecConfig.h264Config.idrPeriod = nvEncConfig.gopLength;
 
         nvEncConfig.encodeCodecConfig.h264Config.sliceMode = 0;
@@ -210,10 +217,9 @@ namespace webrtc
     void NvEncoder::UpdateSettings()
     {
         bool settingChanged = false;
-        const uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
-        if (nvEncConfig.rcParams.averageBitRate != bitRate)
+        if (nvEncConfig.rcParams.averageBitRate != m_targetBitrate)
         {
-            nvEncConfig.rcParams.averageBitRate = bitRate;
+            nvEncConfig.rcParams.averageBitRate = m_targetBitrate;
             settingChanged = true;
         }
         if (nvEncInitializeParams.frameRateNum != m_frameRate)
@@ -228,21 +234,19 @@ namespace webrtc
             std::memcpy(&nvEncReconfigureParams.reInitEncodeParams, &nvEncInitializeParams, sizeof(nvEncInitializeParams));
             nvEncReconfigureParams.version = NV_ENC_RECONFIGURE_PARAMS_VER;
             errorCode = pNvEncodeAPI->nvEncReconfigureEncoder(pEncoderInterface, &nvEncReconfigureParams);
-            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d %d %d", errorCode, bitRate, m_frameRate).c_str());
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d %d %d", errorCode, m_targetBitrate, m_frameRate).c_str());
         }
     }
-    void NvEncoder::SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters)
-    {
-        const uint32_t bitrate = parameters.bitrate.get_sum_bps();
-        m_bitrateAdjuster->SetTargetBitrateBps(bitrate);
 
-        uint32_t framerate = static_cast<uint32_t>(parameters.framerate_fps);
-        if(framerate < 0 || framerate > 120)
-        {
-            LogPrint("SetRates() Invalid parameter framerate=%d", framerate);
-            return;
-        }
-        m_frameRate = framerate;
+    constexpr double kLowRateFactor = 1.0;
+    constexpr double kHighRateFactor = 2.0;
+
+
+    void NvEncoder::SetRates(uint32_t bitRate, int64_t frameRate)
+    {
+        m_frameRate = frameRate;
+        m_targetBitrate = bitRate;
+        isIdrFrame = true;
     }
 
     bool NvEncoder::CopyBuffer(void* frame)
@@ -283,15 +287,14 @@ namespace webrtc
 #pragma region start encoding
         if (isIdrFrame)
         {
-            picParams.encodePicFlags |= NV_ENC_PIC_FLAG_FORCEIDR;
+            picParams.encodePicFlags = NV_ENC_PIC_FLAG_FORCEIDR | NV_ENC_PIC_FLAG_FORCEINTRA;
+            isIdrFrame = false;
         }
-        isIdrFrame = false;
         errorCode = pNvEncodeAPI->nvEncEncodePicture(pEncoderInterface, &picParams);
         checkf(NV_RESULT(errorCode), StringFormat("Failed to encode frame, error is %d", errorCode).c_str());
 #pragma endregion
         ProcessEncodedFrame(frame);
         frameCount++;
-        m_bitrateAdjuster->Update(frame.encodedFrame.size());
         return true;
     }
 
@@ -321,10 +324,21 @@ namespace webrtc
         frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
         rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(m_width, m_height, frame.encodedFrame, m_encoderId);
-        int64 timestamp = rtc::TimeMillis();
-        webrtc::VideoFrame videoFrame{buffer, webrtc::VideoRotation::kVideoRotation_0, timestamp};
-        videoFrame.set_ntp_time_ms(timestamp);
-        CaptureFrame(videoFrame);
+
+        const int64_t timestamp_us = m_clock->TimeInMicroseconds();
+        const int64_t now_us = rtc::TimeMicros();
+        const int64_t translated_camera_time_us =
+            timestamp_aligner_.TranslateTimestamp(timestamp_us,
+                now_us);
+
+        webrtc::VideoFrame::Builder builder =
+            webrtc::VideoFrame::Builder()
+            .set_video_frame_buffer(buffer)
+            .set_timestamp_us(translated_camera_time_us)
+            .set_timestamp_rtp(0)
+            .set_ntp_time_ms(rtc::TimeMillis());
+
+        CaptureFrame(builder.build());
     }
 
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE inputType, void *buffer)

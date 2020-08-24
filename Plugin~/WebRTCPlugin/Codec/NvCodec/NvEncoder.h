@@ -2,6 +2,8 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <rtc_base/timestamp_aligner.h>
+
 #include "nvEncodeAPI.h"
 #include "Codec/IEncoder.h"
 
@@ -47,7 +49,7 @@ namespace webrtc
         static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
 
         void InitV() override;
-        void SetRates(const webrtc::VideoEncoder::RateControlParameters& parameters) override;
+        void SetRates(uint32_t bitRate, int64_t frameRate) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
         bool EncodeFrame() override;
@@ -85,8 +87,11 @@ namespace webrtc
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;
 
+        webrtc::Clock* m_clock;
+
         uint32_t m_frameRate = 30;
-        std::unique_ptr<webrtc::BitrateAdjuster> m_bitrateAdjuster;
+        uint32_t m_targetBitrate = 0;
+        rtc::TimestampAligner timestamp_aligner_;
     };
     
 } // end namespace webrtc
