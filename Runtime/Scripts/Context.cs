@@ -57,11 +57,6 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        public CodecInitializationResult GetCodecInitializationResult()
-        {
-            return NativeMethods.ContextGetCodecInitializationResult(self);
-        }
-
         public EncoderType GetEncoderType()
         {
             return NativeMethods.ContextGetEncoderType(self);

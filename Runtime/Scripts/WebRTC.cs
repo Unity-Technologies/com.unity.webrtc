@@ -401,19 +401,6 @@ namespace Unity.WebRTC
             }
         }
 
-        public static CodecInitializationResult CodecInitializationResult
-        {
-            get
-            {
-                if (s_context.IsNull)
-                {
-                    return CodecInitializationResult.NotInitialized;
-                }
-                var result = Context.GetCodecInitializationResult();
-                return result;
-            }
-        }
-
         public static IReadOnlyList<RTCPeerConnection> PeerList
         {
             get
@@ -475,8 +462,6 @@ namespace Unity.WebRTC
 
     internal static class NativeMethods
     {
-        [DllImport(WebRTC.Lib)]
-        public static extern CodecInitializationResult ContextGetCodecInitializationResult(IntPtr context);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetHardwareEncoderSupport();
