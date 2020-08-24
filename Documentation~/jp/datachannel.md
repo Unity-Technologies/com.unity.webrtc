@@ -1,9 +1,5 @@
 # データチャネル
 
-- [データチャネルの作成](#creating-datachannel)
-- [メッセージの送信](#send-message)
-- [メッセージの受信](#recv-message)
-
 データチャネル（`DataChannel`）は、文字列やバイナリをピア間で送受信するための機能です。WebSocket と同等の機能を持ちつつ、プロトコルに UDP を利用しているためハイパフォーマンスであるという特徴があります。
 
 ## <a id="videotrack"/> データチャネルの作成

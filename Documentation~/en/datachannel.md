@@ -1,9 +1,5 @@
 # Data Channel
 
-- [Creating Data Channel](#creating-datachannel)
-- [Send Message](#send-message)
-- [Receive Message](#recv-message)
-
 The `DataChannel` feature passes text strings and binary between peers. It has the same features as WebSocket and uses UDP protocol, giving it several high performance characteristics. 
 
 ## <a id="videotrack"/> Creating Data Channel

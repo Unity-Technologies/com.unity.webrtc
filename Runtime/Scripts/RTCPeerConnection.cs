@@ -181,7 +181,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// This property is delegate to be called when the <see cref=IceConnectionState/> is changed.
+        /// This property is delegate to be called when the <see cref ="IceConnectionState"/> is changed.
         /// </summary>
         /// <returns> A delegate containing <see cref="IceConnectionState"/>. </returns>
         /// <example>
