@@ -72,7 +72,7 @@ namespace Unity.WebRTC
             }
             else if (typeof(T) == typeof(bool))
             {
-                byte[] _array = new byte[length];
+                int[] _array = new int[length];
                 Marshal.Copy(ptr, _array, 0, length);
                 ret = Array.ConvertAll(_array, Convert.ToBoolean) as T[];
             }
@@ -108,8 +108,24 @@ namespace Unity.WebRTC
             return ret;
         }
 
+        public static IntPtr ToPtr(string[] array)
+        {
+            int size = Marshal.SizeOf(typeof(IntPtr));
+            int length = size * array.Length;
+
+            IntPtr[] ptrArray = new IntPtr[array.Length];
+            for (var i = 0; i < array.Length; i++)
+            {
+                ptrArray[i] = Marshal.StringToCoTaskMemAnsi(array[i]);
+            }
+            IntPtr dst = Marshal.AllocCoTaskMem(length);
+            Marshal.Copy(ptrArray, 0, dst, array.Length);
+            return dst;
+        }
+
         public static IntPtr ToPtr<T>(T[] array)
         {
+            
             int size = Marshal.SizeOf(typeof(T));
             int length = size * array.Length;
             IntPtr ptr = Marshal.AllocCoTaskMem(length);
