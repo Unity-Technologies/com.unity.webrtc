@@ -8,8 +8,8 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Documentation
 
-- [English](https://docs.unity3d.com/Packages/com.unity.webrtc@1.1/manual/index.html)
-- [Japanese](https://docs.unity3d.com/Packages/com.unity.webrtc@1.1/manual/jp/index.html)
+- [English](https://docs.unity3d.com/Packages/com.unity.webrtc@2.1/manual/index.html)
+- [Japanese](https://docs.unity3d.com/Packages/com.unity.webrtc@2.1/manual/jp/index.html)
 
 ### Guide
 
@@ -91,7 +91,7 @@ The package contains the following 4 samples.
 | `1.1`   | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux platform Support<br/> - Add software encoder  | Feb 2020 |
 | `2.0`   | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support                               | Apr 2020 |
 | `2.1`   | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0/m/A5X253_ZAQAJ) | - Profiler tool <br>- Bitrate control                                      | Aug 2020 |
-| `2.2`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (V8, V9 only) <br>- Vulkan HW encoder support              | Oct 2020 |
+| `2.2`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (VP8, VP9 only) <br>- Vulkan HW encoder support              | Oct 2020 |
 | `2.3`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS platform suppport                                                    | Dec 2020 |
 
 ## Licenses

@@ -20,7 +20,6 @@ This version of the package is compatible with the following versions of the Uni
 | Windows x64 | Vulkan       |                                                                                                                          |                    | 
 | Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
 | Linux x64   | Vulkan       |                                                 	                                                                        |                    |
-| MacOS       | OpenGL       |                                                 	                                                                        |                    |
 | MacOS       | Metal        |                                                 	                                                                        | :white_check_mark: |
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
@@ -44,6 +43,8 @@ The package contains the following 3 samples.
 | PeerConnection | A scene for checking the process of connecting to a peer |
 | DataChannel    | A scene for sending and receiving text                   |
 | MediaStream    | A scene for sending and receiving video/audio            |
+| Stats          | A scene for checking the process of getting stats        |
+
 
 To get these samples, Push the `Import into Project` button on Package Manager.
 

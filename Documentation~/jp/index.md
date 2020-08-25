@@ -21,7 +21,6 @@ WebRTC for Unity は、 [WebRTC](https://webrtc.org) を Unity で利用可能�
 | Windows x64 | Vulkan       |                                                                                                                             |                    | 
 | Linux x64   | OpenGL       | :white_check_mark: (NVIDIA の[グラフィックスカード](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)が必要) |                    |
 | Linux x64   | Vulkan       |                                                                                                                             |                    |
-| MacOS       | OpenGL       |                                                                                                                             |                    |
 | MacOS       | Metal        |                                                                                                                             | :white_check_mark: |
 
 対応している NVIDIA のグラフィックスカードについては、[NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder) のページをご覧ください。
@@ -40,11 +39,13 @@ WebRTC for Unity は、 [WebRTC](https://webrtc.org) を Unity で利用可能�
 
 パッケージでは以下のサンプルを用意しています。
 
-| シーン名        | 説明                                  |
+| シーン名        | 説明                                 |
 | -------------- | ------------------------------------ |
-| PeerConnection | ピアを接続する手続きを確認するシーン      |
-| DataChannel    | テキスト送受信を確認するシーン           |
-| MediaStream    | ビデオ/音声送信を確認するシーン          |
+| PeerConnection | ピアを接続する手続きを確認するシーン    |
+| DataChannel    | テキスト送受信を確認するシーン          |
+| MediaStream    | ビデオ/音声送信を確認するシーン         |
+| Stats          | 統計情報を確認するシーン               |
+
 
 サンプルを入手するには、 Package Manager の `Import into Project` ボタンを押してください。
 

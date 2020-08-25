@@ -2,10 +2,6 @@ using UnityEngine;
 
 namespace Unity.WebRTC
 {
-
-    /// <inheritdoc />
-    /// <summary>
-    /// </summary>
     public class AsyncOperationBase : CustomYieldInstruction
     {
         public RTCError Error { get; internal set; }
