@@ -407,7 +407,7 @@ namespace Unity.WebRTC
         /// This property will be removed next major version up.
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        [Obsolete]
+        [Obsolete("Use 'VideoStreamTrack.IsInitialized' instead.", true)]
         public static CodecInitializationResult CodecInitializationResult
         {
             get
