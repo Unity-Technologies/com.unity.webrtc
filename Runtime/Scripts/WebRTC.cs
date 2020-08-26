@@ -148,6 +148,14 @@ namespace Unity.WebRTC
         BundlePolicyMaxCompat
     }
 
+    public enum RTCDataChannelState
+    {
+        Connecting,
+        Open,
+        Closing,
+        Closed
+    }
+
     public struct RTCSessionDescription
     {
         public RTCSdpType type;
@@ -609,6 +617,8 @@ namespace Unity.WebRTC
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DataChannelGetLabel(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern RTCDataChannelState DataChannelGetReadyState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelSend(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string msg);
         [DllImport(WebRTC.Lib)]
