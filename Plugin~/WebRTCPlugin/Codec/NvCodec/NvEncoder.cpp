@@ -224,7 +224,10 @@ namespace webrtc
         }
         if (nvEncInitializeParams.frameRateNum != m_frameRate)
         {
-            nvEncInitializeParams.frameRateNum = m_frameRate;
+            // nvcodec do not allow a framerate over 240
+            const uint32_t kMaxFramerate = 240;
+            uint32_t targetFramerate = std::min(m_frameRate, kMaxFramerate);
+            nvEncInitializeParams.frameRateNum = targetFramerate;
             settingChanged = true;
         }
 
@@ -234,7 +237,8 @@ namespace webrtc
             std::memcpy(&nvEncReconfigureParams.reInitEncodeParams, &nvEncInitializeParams, sizeof(nvEncInitializeParams));
             nvEncReconfigureParams.version = NV_ENC_RECONFIGURE_PARAMS_VER;
             errorCode = pNvEncodeAPI->nvEncReconfigureEncoder(pEncoderInterface, &nvEncReconfigureParams);
-            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d %d %d", errorCode, m_targetBitrate, m_frameRate).c_str());
+            checkf(NV_RESULT(errorCode), StringFormat("Failed to reconfigure encoder setting %d %d %d",
+                errorCode, nvEncInitializeParams.frameRateNum, nvEncConfig.rcParams.averageBitRate).c_str());
         }
     }
 

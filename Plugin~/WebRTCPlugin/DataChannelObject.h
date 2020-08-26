@@ -35,6 +35,12 @@ namespace webrtc
         {
             dataChannel->Send(webrtc::DataBuffer(std::string(data)));
         }
+
+        webrtc::DataChannelInterface::DataState GetReadyState() const
+        {
+            return dataChannel->state();
+        }
+
         void Send(const byte* data, int len)
         {
             rtc::CopyOnWriteBuffer buf(data, len);

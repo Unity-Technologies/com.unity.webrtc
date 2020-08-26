@@ -49,7 +49,21 @@ namespace Unity.WebRTC
         {
             get => NativeMethods.DataChannelGetID(self);
         }
+
         public string Label { get; private set; }
+
+        /// <summary>
+        /// The property returns an enum of the <c>RTCDataChannelState</c> which shows 
+        /// the state of the channel.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Send(string)"/> method must be called when the state is <b>Open</b>.
+        /// </remarks>
+        /// <seealso cref="RTCDataChannelState"/>
+        public RTCDataChannelState ReadyState
+        {
+            get => NativeMethods.DataChannelGetReadyState(self);
+        }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
         static void DataChannelNativeOnMessage(IntPtr ptr, byte[] msg, int len)
@@ -120,13 +134,39 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// The method Sends data across the data channel to the remote peer.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>
+        /// <param name="msg"></param>
+        /// <seealso cref="ReadyState"/>
         public void Send(string msg)
         {
+            if (ReadyState != RTCDataChannelState.Open)
+            {
+                throw new InvalidOperationException("DataChannel is not open");
+            }
             NativeMethods.DataChannelSend(self, msg);
         }
 
+        /// <summary>
+        /// The method Sends data across the data channel to the remote peer.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>
+        /// <param name="msg"></param>
+        /// <seealso cref="ReadyState"/>
         public void Send(byte[] msg)
         {
+            if (ReadyState != RTCDataChannelState.Open)
+            {
+                throw new InvalidOperationException("DataChannel is not open");
+            }
             NativeMethods.DataChannelSendBinary(self, msg, msg.Length);
         }
 

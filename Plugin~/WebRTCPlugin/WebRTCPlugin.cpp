@@ -730,6 +730,12 @@ extern "C"
         return ConvertString(dataChannelObj->GetLabel());
     }
 
+    UNITY_INTERFACE_EXPORT DataChannelInterface::DataState DataChannelGetReadyState(
+        DataChannelObject* dataChannelObj)
+    {
+        return dataChannelObj->GetReadyState();
+    }
+
     UNITY_INTERFACE_EXPORT void DataChannelSend(DataChannelObject* dataChannelObj, const char* msg)
     {
         dataChannelObj->Send(msg);

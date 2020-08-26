@@ -20,6 +20,12 @@ namespace Unity.WebRTC.RuntimeTest
             m_stream = stream;
         }
 
+        public RTCDataChannel AddDataChannel(int indexPeer)
+        {
+            var option = new RTCDataChannelInit(true);
+            return peers[indexPeer].CreateDataChannel("test1", ref option);
+        }
+
         public RTCStatsReportAsyncOperation GetPeerStats(int indexPeer)
         {
             return peers[indexPeer].GetStats();
@@ -84,9 +90,12 @@ namespace Unity.WebRTC.RuntimeTest
                 peers[1].AddTrack(e.Track);
             };
 
-            foreach (var track in m_stream.GetTracks())
+            if (m_stream != null)
             {
-                peers[0].AddTrack(track, m_stream);
+                foreach (var track in m_stream.GetTracks())
+                {
+                    peers[0].AddTrack(track, m_stream);
+                }
             }
 
             RTCOfferOptions options1 = default;
@@ -124,9 +133,12 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op8;
             Assert.True(op8.IsCompleted);
 
-            var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any(), 5000);
-            yield return op9;
-            Assert.True(op9.IsCompleted);
+            if (m_stream != null)
+            {
+                var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any(), 5000);
+                yield return op9;
+                Assert.True(op9.IsCompleted);
+            }
 
             IsTestFinished = true;
         }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
@@ -47,6 +48,26 @@ namespace Unity.WebRTC.RuntimeTest
             RTCDataChannelInit option1 = default;
             Assert.Throws<System.ArgumentException>(() => peer.CreateDataChannel("test1", ref option1));
             peer.Close();
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator SendMessageThrowExceptionAfterCloseDataChannel()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            yield return test;
+            RTCDataChannel channel = test.component.AddDataChannel(0);
+            byte[] message1 = { 1, 2, 3 };
+            string message2 = "123";
+
+            Assert.DoesNotThrow(() => channel.Send(message1));
+            Assert.DoesNotThrow(() => channel.Send(message2));
+            channel.Close();
+            Assert.Throws<InvalidOperationException>(() => channel.Send(message1));
+            Assert.Throws<InvalidOperationException>(() => channel.Send(message2));
+
+            test.component.Dispose();
+            yield return 0;
         }
 
         [UnityTest]
