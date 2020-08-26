@@ -73,3 +73,38 @@ When using hardware encoding, the number of tracks that can be used simultaneous
 
 
 See the section on **Streamless tracks** under [`PeerConnection.addTrack`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack) in the MDN documentation for information on simultaneously receiving multiple tracks in the browser. 
+
+### Bitrate control
+
+To control the bitrate of video streaming, use `SetParameter` method of `RTCRtpSender` instance. The instance of `RTCRtpSender` is obtained from `RTCPeerConnection`.
+
+```CSharp
+var senders = peerConnection.GetSenders();
+```
+
+Or, obtained from `AddTrack` method as its return value.
+
+```CSharp
+var sender = peerConnection.AddTrack(track);
+```
+
+After obtained the instance of `RTCRtpSender`, To get the settings about the sending stream, call the `GetParameter` method is able. And call the `SetParameter` method with customized settings. as a result, the settings are reflected.
+
+```CSharp
+var parameters = sender.GetParameters();
+foreach (var encoding in parameters.Encodings)
+{
+    encoding.maxBitrate = bitrate;
+}
+sender.SetParameters(parameters);
+```
+
+> [!NOTE]
+> Currently not supported `maxFramerate` in values of the settings.
+> Also, `scaleResolutionDownBy` parameter only works on software encoder.
+>
+
+It is possible to check the current bitrate on browsers. If using Google Chrome, shows statistics of WebRTC by accessing the URL `chrome://webrtc-internals`. Check the graph showing the received bytes per unit time in the category `RTCInboundRTPVideoStream` of statistics.
+
+![Chrome WebRTC Stats](../images/chrome-webrtc-stats.png)
+

@@ -5,34 +5,36 @@
 
 ## Unity 2019.4 の場合
 
-1. メニューバーから `Window/Package Manager` を選択します。
+メニューバーから `Window/Package Manager` を選択します。
 
 ![Install Package Manager from menu bar](../images/install_select_packman_menu_unity2019.png)
 
-2. Package Manager ウィンドウに移動し、`Advanced` ボタンをクリックして、`Show preview packages` を有効にします。
+Package Manager ウィンドウに移動し、`Advanced` ボタンをクリックして、`Show preview packages` を有効にします。
 
 ![Select show preview packages on advanced options](../images/install_select_show_preview_packages.png)
 
-3. Package Manager ウィンドウ上部にある検索ボックスに `webrtc` と入力します。
+Package Manager ウィンドウ上部にある検索ボックスに `webrtc` と入力します。
 
 ![Search webrtc package](../images/install_search_webrtc_package.png)
 
-4. 画面右下の `Install` ボタンを押すと、インストールが開始されます。
+画面右下の `Install` ボタンを押すと、インストールが開始されます。
 
 ## Unity 2020.1 の場合
 
-1. メニューバーから `Window/Package Manager` を選択します。
+メニューバーから `Window/Package Manager` を選択します。
 
 ![Install Package Manager from menu bar](../images/install_select_packman_menu_unity2020.png)
 
-2. Package Manager ウィンドウに移動して、左上の `+` ボタンを押し、`Add package from git URL...` を選択します。
+Package Manager ウィンドウに移動して、左上の `+` ボタンを押し、`Add package from git URL...` を選択します。
 
 ![Select add package from git url](../images/install_select_add_package_from_git_url.png)
 
-4. 入力ボックスに以下の文字列を追加します。
+入力ボックスに以下の文字列を追加します。
 
-```com.unity.webrtc@2.1.0-preview```
+```
+com.unity.webrtc@2.1.0-preview
+```
 
 ![Input webrtc package git URL](../images/install_input_webrtc_git_url.png);
 
-5. `Add` ボタンを押すと、インストールが開始されます。
+`Add` ボタンを押すと、インストールが開始されます。
