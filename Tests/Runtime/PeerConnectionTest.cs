@@ -333,7 +333,15 @@ namespace Unity.WebRTC.RuntimeTest
                 StatsCheck.Test(stats);
             }
             op.Value.Dispose();
+
             test.component.Dispose();
+            foreach (var track in videoStream.GetTracks())
+            {
+                track.Dispose();
+            }
+            // wait for disposing video track.
+            yield return 0;
+
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
