@@ -15,7 +15,7 @@ namespace Unity.WebRTC
         Hardware = 1
     }
 
-    public struct RTCIceCandidate​
+    public struct RTCIceCandidate
     {
         [MarshalAs(UnmanagedType.LPStr)]
         public string candidate;
@@ -576,7 +576,7 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, ref RTCIceCandidate​ candidate);
+        public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, ref RTCIceCandidate candidate);
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
