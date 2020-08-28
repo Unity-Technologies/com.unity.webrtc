@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
-    public delegate void DelegateOnIceCandidate(RTCIceCandidate​ candidate);
+    public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
     public delegate void DelegateOnNegotiationNeeded();
     public delegate void DelegateOnTrack(RTCTrackEvent e);
@@ -14,11 +14,11 @@ namespace Unity.WebRTC
     /// <summary>
     /// Represents a WebRTC connection between the local peer and remote peer.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
-    /// 
+    ///
     /// </remarks>
-    /// 
+    ///
     public class RTCPeerConnection : IDisposable
     {
         internal IntPtr self;
@@ -46,7 +46,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void Dispose()
         {
@@ -203,7 +203,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <seealso cref="RTCIceCandidate​"/>
         public DelegateOnIceCandidate OnIceCandidate
@@ -216,7 +216,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public DelegateOnDataChannel OnDataChannel
         {
@@ -228,7 +228,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public DelegateOnNegotiationNeeded OnNegotiationNeeded
         {
@@ -240,7 +240,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public DelegateOnTrack OnTrack
         {
@@ -277,7 +277,7 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     var candidate =
-                        new RTCIceCandidate​ { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
+                        new RTCIceCandidate { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
                     connection.OnIceCandidate?.Invoke(candidate);
                 }
             });
@@ -442,7 +442,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <seealso cref="Dispose"/>
         public void Close()
@@ -454,7 +454,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="track"></param>
         /// <param name="stream"></param>
@@ -472,7 +472,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <seealso cref="AddTrack"/>
@@ -482,7 +482,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>
@@ -492,10 +492,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="candidate"></param>
-        public void AddIceCandidate(ref RTCIceCandidate​ candidate)
+        public void AddIceCandidate(ref RTCIceCandidate candidate)
         {
             NativeMethods.PeerConnectionAddIceCandidate(self, ref candidate);
         }
@@ -569,7 +569,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="desc"></param>
         /// <returns></returns>
@@ -594,7 +594,7 @@ namespace Unity.WebRTC
         /// // Already instantiated peerConnection as RTCPeerConnection.
         /// var operation = peerConnection.GetStats();
         /// yield return operation;
-        /// 
+        ///
         /// if (!operation.IsError)
         /// {
         ///     var report = operation.Value;
@@ -621,7 +621,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCSessionDescription LocalDescription
         {
@@ -637,7 +637,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCSessionDescription RemoteDescription
         {
@@ -653,7 +653,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCSessionDescription CurrentLocalDescription
         {
@@ -682,7 +682,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCSessionDescription PendingLocalDescription
         {
@@ -698,7 +698,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCSessionDescription PendingRemoteDescription
         {
@@ -714,7 +714,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="desc"></param>
         /// <returns></returns>
