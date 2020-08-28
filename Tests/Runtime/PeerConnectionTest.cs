@@ -27,7 +27,8 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            WebRTC.Initialize();
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
         }
 
         [TearDown]
@@ -333,7 +334,15 @@ namespace Unity.WebRTC.RuntimeTest
                 StatsCheck.Test(stats);
             }
             op.Value.Dispose();
+
             test.component.Dispose();
+            foreach (var track in videoStream.GetTracks())
+            {
+                track.Dispose();
+            }
+            // wait for disposing video track.
+            yield return 0;
+
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
         }
