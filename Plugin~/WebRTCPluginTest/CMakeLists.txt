@@ -88,9 +88,8 @@ include(GoogleTest)
 
 if(MSVC)
   # Use precompiled header
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT /Zi")
+  set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
 
   target_compile_definitions(WebRTCPluginTest
       PRIVATE
@@ -99,7 +98,7 @@ if(MSVC)
   )
   target_link_libraries(WebRTCPluginTest
       PRIVATE
-      ${WEBRTC_LIBRARIES}
+      ${WEBRTC_LIBRARY}
       ${Vulkan_LIBRARY}
       ${CUDA_CUDA_LIBRARY}
       ${GTEST_MAIN_LIBRARIES}
@@ -140,7 +139,7 @@ elseif(APPLE)
   )
   target_link_libraries(WebRTCPluginTest
     PRIVATE
-      ${WEBRTC_LIBRARIES}
+      ${WEBRTC_LIBRARY}
       ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
       ${GTEST_MAIN_LIBRARIES}
@@ -165,7 +164,7 @@ elseif(UNIX)
 
   target_link_libraries(WebRTCPluginTest
     PRIVATE
-      ${WEBRTC_LIBRARIES}
+      ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
       ${GLUT_LIBRARY}
       ${CMAKE_DL_LIBS}

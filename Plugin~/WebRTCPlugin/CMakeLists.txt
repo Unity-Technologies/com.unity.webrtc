@@ -88,10 +88,10 @@ endif()
 
 if(MSVC)
   # Use precompiled header
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT /Zi")
-  set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
+  set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
+  set(PROJECT_BINARY_DIR 
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
   target_compile_definitions(webrtc
     PRIVATE
@@ -100,7 +100,7 @@ if(MSVC)
   )
   target_link_libraries(webrtc
     PRIVATE
-      ${WEBRTC_LIBRARIES}
+      ${WEBRTC_LIBRARY}
       ${Vulkan_LIBRARY}
       ${CUDA_CUDA_LIBRARY}
       d3d11
@@ -152,7 +152,7 @@ elseif(APPLE)
   )
   target_link_libraries(webrtc
     PRIVATE
-      ${WEBRTC_LIBRARIES}
+      ${WEBRTC_LIBRARY}
       ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
   )
@@ -175,7 +175,7 @@ elseif(UNIX)
   )
   target_link_libraries(webrtc
     PRIVATE
-      ${WEBRTC_LIBRARIES}
+      ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
       ${Vulkan_LIBRARY}
       cuda
