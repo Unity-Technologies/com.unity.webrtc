@@ -5,7 +5,6 @@ project(webrtc-test)
 # Common source files
 file(GLOB sources
   ../../.editorconfig
-  ../libcxx/debug.cpp
   *.cpp
   *.h
   ../WebRTCPlugin/*.h
@@ -41,6 +40,7 @@ if(MSVC)
   list (APPEND sources ${append_source})
 elseif(APPLE)
   file(GLOB append_source
+    ../libcxx/debug.cpp
     ../WebRTCPlugin/GraphicsDevice/Metal/*.h
     ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
     ../WebRTCPlugin/Codec/SoftwareCodec/*.h

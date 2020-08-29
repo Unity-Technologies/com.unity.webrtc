@@ -45,7 +45,11 @@ ninja -C "$OUTPUT_DIR" webrtc
 # cppy static library for debug
 cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/libwebrtcd.a"
 
-python ./src/tools_webrtc/libs/generate_licenses.py \
+# fix error when generate license
+patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
+  "$(pwd)/patches/generate_licenses.patch"
+
+python "./src/tools_webrtc/libs/generate_licenses.py" \
   --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src

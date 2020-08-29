@@ -5,7 +5,6 @@ project(webrtc-plugin)
 # Common source files
 file(GLOB sources
   ../../.editorconfig
-  ../libcxx/debug.cpp
   *.cpp
   *.h
   GraphicsDevice/*.h
@@ -38,6 +37,7 @@ if(MSVC)
   list (APPEND sources ${append_source})
 elseif(APPLE)
   file(GLOB append_source
+    ../libcxx/debug.cpp
     GraphicsDevice/Metal/*.h
     GraphicsDevice/Metal/*.mm
     Codec/SoftwareCodec/*.h
