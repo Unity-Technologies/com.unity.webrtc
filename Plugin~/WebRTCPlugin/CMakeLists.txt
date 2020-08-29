@@ -5,6 +5,7 @@ project(webrtc-plugin)
 # Common source files
 file(GLOB sources
   ../../.editorconfig
+  ../libcxx/debug.cpp
   *.cpp
   *.h
   GraphicsDevice/*.h
