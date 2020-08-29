@@ -6,7 +6,7 @@ then
 fi
 
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=4147
+export WEBRTC_VERSION=4183
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 
