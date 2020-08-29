@@ -27,7 +27,7 @@ if not exist src (
 call gclient.bat sync -f
 
 rem add jsoncpp
-patch -N "src\BUILD.gn" < "%COMMAND_DIR%\add_jsoncpp.patch"
+patch -N "src\BUILD.gn" < "%COMMAND_DIR%\patch\add_jsoncpp.patch"
 
 rem install pywin32
 call "%cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe" ^
@@ -37,14 +37,12 @@ rem generate ninja
 call gn.bat gen %OUTPUT_DIR% --root="src" ^
   --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
-rem update LIB_TO_LICENSES_DICT in generate_licenses.py
-powershell -File "%COMMAND_DIR%\ReplaceText.ps1" ^
-  "src\tools_webrtc\libs\generate_licenses.py" ^
-  "'ow2_asm': []," ^
-  "'ow2_asm': [], 'winsdk_samples': [], 'googletest': ['third_party/googletest/src/LICENSE'], 'nasm': ['third_party/nasm/LICENSE'], "
-
 rem build
 ninja.exe -C %OUTPUT_DIR%
+
+rem fix error when generate license
+patch -N "src/tools_webrtc/libs/generate_licenses.py" < ^
+  "%COMMAND_DIR%\patch\generate_license.patch"
 
 rem generate license
 call python.bat .\src\tools_webrtc\libs\generate_licenses.py ^
