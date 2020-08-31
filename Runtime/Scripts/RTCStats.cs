@@ -577,7 +577,7 @@ namespace Unity.WebRTC
     {
         public string label { get { return GetString("label"); } }
         public string protocol { get { return GetString("protocol"); } }
-        public int datachannelid { get { return GetInt("datachannelid"); } }
+        public int dataChannelIdentifier { get { return GetInt("dataChannelIdentifier"); } }
         public string state { get { return GetString("state"); } }
         public uint messagesSent { get { return GetUnsignedInt("messagesSent"); } }
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
