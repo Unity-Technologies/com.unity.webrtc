@@ -5,7 +5,7 @@ then
   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 fi
 
-export COMMAND_DIR="$(pwd)"
+export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
 export WEBRTC_VERSION=4183
 export OUTPUT_DIR="$(pwd)/out"
