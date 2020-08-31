@@ -5,6 +5,7 @@ then
   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 fi
 
+export COMMAND_DIR="$(pwd)"
 export PATH="$(pwd)/depot_tools:$PATH"
 export WEBRTC_VERSION=4183
 export OUTPUT_DIR="$(pwd)/out"
@@ -21,7 +22,7 @@ then
 fi
 
 # add jsoncpp
-patch -N "src/BUILD.gn" < "$(pwd)/patches/add_jsoncpp.patch"
+patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
@@ -47,7 +48,7 @@ cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/libwebrtcd.a"
 
 # fix error when generate license
 patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
-  "$(pwd)/patches/generate_licenses.patch"
+  "$COMMAND_DIR/patches/generate_licenses.patch"
 
 python "./src/tools_webrtc/libs/generate_licenses.py" \
   --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
