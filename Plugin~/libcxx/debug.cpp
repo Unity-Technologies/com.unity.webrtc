@@ -6,6 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#ifdef _LIBCPP_DEBUG
+
 #include "__config"
 #include "__debug"
 #include "functional"
@@ -576,3 +578,5 @@ __c_node::__remove(__i_node* p)
 }
 
 _LIBCPP_END_NAMESPACE_STD
+
+#endif // _LIBCPP_DEBUG
