@@ -6,17 +6,25 @@ project(webrtc)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -D_DEBUG")
 
+if(MSVC)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /Zi -D_ITERATOR_DEBUG_LEVEL=0")
+else()
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_LIBCPP_DEBUG=1")
+endif()
+
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH 
+  "${CMAKE_SOURCE_DIR}/cmake"
+)
+
 find_package(WebRTC REQUIRED)
-if(MSVC)
-  find_package(CUDA REQUIRED)
-  find_package(Vulkan REQUIRED)
-elseif(APPLE)
+
+if(APPLE)
   find_package(Framework REQUIRED)
-elseif(UNIX)
+else()
   find_package(CUDA REQUIRED)
   find_package(Vulkan REQUIRED)
 endif()

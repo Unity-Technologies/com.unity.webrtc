@@ -1,0 +1,10 @@
+--- ./src/tools_webrtc/libs/generate_licenses.py	2020-08-08 11:02:57.064616700 +0900
++++ ./src/tools_webrtc/libs/generate_licenses.py.edited	2020-08-29 10:58:18.826417100 +0900
+@@ -70,6 +70,7 @@ LIB_TO_LICENSES_DICT = {
+     'g722': ['modules/third_party/g722/LICENSE'],
+     'ooura': ['common_audio/third_party/ooura/LICENSE'],
+     'spl_sqrt_floor': ['common_audio/third_party/spl_sqrt_floor/LICENSE'],
++    'catapult': ['third_party/catapult/LICENSE'],
+ 
+     # TODO(bugs.webrtc.org/1110): Remove this hack. This is not a lib.
+     # For some reason it is listed as so in _GetThirdPartyLibraries.
