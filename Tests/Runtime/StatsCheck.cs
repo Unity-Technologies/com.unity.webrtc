@@ -58,7 +58,7 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(dataChannelStats.protocol);
                     Ignore.Pass(dataChannelStats.messagesSent);
                     Ignore.Pass(dataChannelStats.messagesReceived);
-                    Ignore.Pass(dataChannelStats.datachannelid);
+                    Ignore.Pass(dataChannelStats.dataChannelIdentifier);
                     Ignore.Pass(dataChannelStats.bytesSent);
                     Ignore.Pass(dataChannelStats.bytesReceived);
                     break;

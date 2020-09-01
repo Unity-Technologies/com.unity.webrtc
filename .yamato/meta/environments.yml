@@ -2,4 +2,4 @@ upm:
   registry_url: https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
   package_version: stable
 webrtc_version:
-  name: M84
+  name: M85
