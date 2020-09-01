@@ -482,7 +482,7 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(dataChannelStats.Timestamp)}: {dataChannelStats.Timestamp}"));
                 container.Add(new Label($"{nameof(dataChannelStats.label)}: {dataChannelStats.label}"));
                 container.Add(new Label($"{nameof(dataChannelStats.protocol)}: {dataChannelStats.protocol}"));
-                container.Add(new Label($"{nameof(dataChannelStats.datachannelid)}: {dataChannelStats.datachannelid}"));
+                container.Add(new Label($"{nameof(dataChannelStats.dataChannelIdentifier)}: {dataChannelStats.dataChannelIdentifier}"));
                 container.Add(new Label($"{nameof(dataChannelStats.state)}: {dataChannelStats.state}"));
                 container.Add(new Label($"{nameof(dataChannelStats.messagesSent)}: {dataChannelStats.messagesSent}"));
                 container.Add(new Label($"{nameof(dataChannelStats.bytesSent)}: {dataChannelStats.bytesSent}"));
