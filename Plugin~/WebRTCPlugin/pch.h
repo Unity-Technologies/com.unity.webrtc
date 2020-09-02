@@ -15,6 +15,7 @@
 #include "api/video_codecs/sdp_video_format.h"
 #include "api/video/video_frame.h"
 #include "api/video/video_frame_buffer.h"
+#include "api/video/video_sink_interface.h"
 #include "api/video/i420_buffer.h"
 #include "api/video_track_source_proxy.h"
 

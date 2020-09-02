@@ -218,6 +218,21 @@ extern "C"
         track->set_enabled(enabled);
     }
 
+    UNITY_INTERFACE_EXPORT UnityVideoRenderer* CreateVideoRenderer(Context* context)
+    {
+        return context->CreateVideoRenderer();
+    }
+
+    UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, rtc::VideoSinkInterface<VideoFrame>* sink)
+    {
+        track->AddOrUpdateSink(sink, rtc::VideoSinkWants());
+    }
+
+    UNITY_INTERFACE_EXPORT void VideoTrackRemoveSink(VideoTrackInterface* track, rtc::VideoSinkInterface<VideoFrame>* sink)
+    {
+        track->RemoveSink(sink);
+    }
+
     UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func)
     {
         delegateDebugLog = func;

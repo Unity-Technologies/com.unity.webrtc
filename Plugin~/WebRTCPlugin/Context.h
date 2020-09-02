@@ -3,6 +3,7 @@
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
+#include "UnityVideoRenderer.h"
 #include "Codec/IEncoder.h"
 
 using namespace ::webrtc;
@@ -83,7 +84,9 @@ namespace webrtc
         void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
         void DeleteDataChannel(DataChannelObject* obj);
 
-        
+        // Renderer
+        UnityVideoRenderer* CreateVideoRenderer();
+
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
         bool FinalizeEncoder(IEncoder* encoder);
