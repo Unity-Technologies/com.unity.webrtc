@@ -664,6 +664,12 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamTrackSetEnabled(IntPtr track, [MarshalAs(UnmanagedType.U1)] bool enabled);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr CreateVideoRenderer(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoStreamTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoStreamTrackRemoveSink(IntPtr track, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
         public static extern void SetCurrentContext(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetRenderEventFunc(IntPtr context);

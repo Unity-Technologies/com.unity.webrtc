@@ -151,6 +151,11 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteMediaStreamTrack(self, track);
         }
 
+        public IntPtr CreateVideoRenderer()
+        {
+            return NativeMethods.CreateVideoRenderer(self);
+        }
+
         public void DeleteStatsReport(IntPtr report)
         {
             NativeMethods.ContextDeleteStatsReport(self, report);
