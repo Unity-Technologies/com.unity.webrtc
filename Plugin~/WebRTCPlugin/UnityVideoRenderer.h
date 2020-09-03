@@ -12,7 +12,7 @@ namespace webrtc {
     public:
       UnityVideoRenderer();
       ~UnityVideoRenderer();
-      void OnFrame(const webrtc::VideoFrame &frame);
+      void OnFrame(const webrtc::VideoFrame &frame) override;
 
     private:
       void *frame_;

@@ -20,11 +20,6 @@ namespace webrtc
             formats.push_back(format);
         }
 
-        for (const webrtc::SdpVideoFormat& format : internal_decoder_factory_->GetSupportedFormats())
-        {
-            formats.push_back(format);
-        }
-
         return formats;
     }
 
@@ -40,7 +35,7 @@ namespace webrtc
             return webrtc::VP9Decoder::Create();
         }
 
-        return internal_decoder_factory_->CreateVideoDecoder(format);;
+        return nullptr;
     }
 
 }  // namespace webrtc
