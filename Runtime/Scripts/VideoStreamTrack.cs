@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Unity.WebRTC
@@ -45,11 +48,21 @@ namespace Unity.WebRTC
             }
         }
 
-        public void SetReceivedTexture(Texture tex)
+        public void InitializeReceiver()
         {
             //ToDo: on update write sink butter to tex
             m_sink = new UnityVideoSink(WebRTC.Context.CreateVideoRenderer());
             NativeMethods.VideoTrackAddOrUpdateSink(self, m_sink.self);
+        }
+
+        public Texture2D UpdateReceiveTexture()
+        {
+            if (self == IntPtr.Zero || m_sink.self == IntPtr.Zero)
+            {
+                throw new Exception("already receiver is disposed");
+            }
+
+            return m_sink?.UpdateTexture();
         }
 
         internal void Update()
@@ -189,10 +202,12 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         private bool disposed;
+        private Texture2D m_videoBuffer;
 
         public UnityVideoSink(IntPtr ptr)
         {
             self = ptr;
+            m_videoBuffer = Texture2D.blackTexture;
         }
 
         ~UnityVideoSink()
@@ -216,9 +231,48 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        public IntPtr GetImageBuffer()
+        public Texture2D UpdateTexture()
         {
-            return IntPtr.Zero; // ToDO: Implement
+            NativeMethods.GetVideoRendererImageData(self, out var data);
+
+            if (data.RawData == IntPtr.Zero)
+            {
+                return m_videoBuffer;
+            }
+
+            Debug.Log($"imagedata, prt:{data.RawData}, height:{data.Height}, width:{data.Width}");
+            if (data.Height != m_videoBuffer.height || data.Width != m_videoBuffer.width)
+            {
+                m_videoBuffer.Resize(data.Width, data.Height);
+            }
+
+            data.CopyBufferToTexture(m_videoBuffer);
+            return m_videoBuffer;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 8)]
+    internal struct ImageData
+    {
+        public IntPtr RawData;
+        [MarshalAs(UnmanagedType.I4)] public readonly int Width;
+        [MarshalAs(UnmanagedType.I4)] public readonly int Height;
+    }
+
+    internal static class ImageDataExtensions
+    {
+        public static void CopyBufferToTexture(this ImageData imageData, Texture2D tex)
+        {
+            int length = imageData.Width * imageData.Height * 4;
+            unsafe
+        {
+                void* src = imageData.RawData.ToPointer();
+                NativeArray<float> rawTextureData = tex.GetRawTextureData<float>();
+                void* dest = rawTextureData.GetUnsafePtr();
+                Buffer.MemoryCopy(src, dest, length, length);
+            }
+
+            tex.Apply();
         }
     }
 }

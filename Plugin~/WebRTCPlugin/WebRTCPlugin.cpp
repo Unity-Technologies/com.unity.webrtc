@@ -220,6 +220,11 @@ extern "C"
         return context->CreateVideoRenderer();
     }
 
+    UNITY_INTERFACE_EXPORT void GetVideoRendererImageData(UnityVideoRenderer* sink, UnityVideoRenderer::ImageData* imageData)
+    {
+        *imageData = *sink->GetFrameBuffer();
+    }
+
     UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, UnityVideoRenderer* sink)
     {
         track->AddOrUpdateSink(sink, rtc::VideoSinkWants());

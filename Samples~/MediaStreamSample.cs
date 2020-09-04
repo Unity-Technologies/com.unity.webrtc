@@ -13,10 +13,10 @@ public class MediaStreamSample : MonoBehaviour
     [SerializeField] private Button callButton;
     [SerializeField] private Button addTracksButton;
     [SerializeField] private Button removeTracksButton;
-    [SerializeField] private Button dumpReceiveStreamTrackButton;
     [SerializeField] private Camera cam;
     [SerializeField] private InputField infoText;
     [SerializeField] private RawImage RtImage;
+    [SerializeField] private RawImage ReceiveImage;
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
@@ -54,7 +54,6 @@ public class MediaStreamSample : MonoBehaviour
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
         receiveStream = new MediaStream();
-        dumpReceiveStreamTrackButton.onClick.AddListener(GetReceiveStreamTrack);
     }
 
     private void OnDestroy()
@@ -86,9 +85,8 @@ public class MediaStreamSample : MonoBehaviour
             if (e.Track.Kind == TrackKind.Video)
             {
                 var videoTrack = (VideoStreamTrack)e.Track;
-                var rt = new RenderTexture(1280, 720, 0, RenderTextureFormat.ARGB32);
-                rt.Create();
-                videoTrack.SetReceivedTexture(rt);
+                videoTrack.InitializeReceiver();
+                StartCoroutine(UpdateReceive(videoTrack));
             }
         };
         infoText.text = !WebRTC.SupportHardwareEncoder ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
@@ -96,15 +94,14 @@ public class MediaStreamSample : MonoBehaviour
         receiveStream.OnAddTrack = pc2OnAddTrack;
     }
 
-    void GetReceiveStreamTrack()
+
+    private IEnumerator UpdateReceive(VideoStreamTrack track)
     {
-        var builder = new StringBuilder();
-        builder.AppendLine("on receiveStream Track");
-        foreach (var track in receiveStream.GetTracks())
+        while (true)
         {
-            builder.AppendLine($"{track.Id}");
+            yield return new WaitForEndOfFrame();
+            ReceiveImage.texture = track.UpdateReceiveTexture();
         }
-        Debug.LogWarning(builder.ToString());
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()

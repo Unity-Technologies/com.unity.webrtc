@@ -666,6 +666,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateVideoRenderer(IntPtr context);
         [DllImport(WebRTC.Lib)]
+        public static extern void GetVideoRendererImageData(IntPtr sink, out ImageData tResult);
+
+        [DllImport(WebRTC.Lib)]
         public static extern void VideoTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]
         public static extern void VideoTrackRemoveSink(IntPtr track, IntPtr sink);
