@@ -235,12 +235,11 @@ namespace Unity.WebRTC
         {
             NativeMethods.GetVideoRendererImageData(self, out var data);
 
-            if (data.RawData == IntPtr.Zero)
+            if (data.RawData == IntPtr.Zero || data.Height <= 0 || data.Width <= 0)
             {
                 return m_videoBuffer;
             }
 
-            Debug.Log($"imagedata, prt:{data.RawData}, height:{data.Height}, width:{data.Width}");
             if (data.Height != m_videoBuffer.height || data.Width != m_videoBuffer.width)
             {
                 m_videoBuffer.Resize(data.Width, data.Height);
@@ -265,7 +264,7 @@ namespace Unity.WebRTC
         {
             int length = imageData.Width * imageData.Height * 4;
             unsafe
-        {
+            {
                 void* src = imageData.RawData.ToPointer();
                 NativeArray<float> rawTextureData = tex.GetRawTextureData<float>();
                 void* dest = rawTextureData.GetUnsafePtr();

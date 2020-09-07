@@ -2,6 +2,7 @@
 #include <mutex>
 #include "api/video/video_frame.h"
 #include "api/video/video_sink_interface.h"
+#include "third_party/libyuv/include/libyuv.h"
 
 namespace unity {
 namespace webrtc {
@@ -26,6 +27,7 @@ namespace webrtc {
 
     private:
       ImageData m_imageData;
+      rtc::scoped_refptr<webrtc::VideoFrameBuffer> m_frameBuffer;
     };
 
 } // end namespace webrtc
