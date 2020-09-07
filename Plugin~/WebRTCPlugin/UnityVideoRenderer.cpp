@@ -14,9 +14,6 @@ UnityVideoRenderer::~UnityVideoRenderer() = default;
 
 void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame &frame)
 {
-    //ToDo Implement
-    DebugLog("Invoked OnFrame on UnityVideoRenderer");
-
     rtc::scoped_refptr<webrtc::VideoFrameBuffer> frame_buffer = frame.video_frame_buffer();
 
     if (frame_buffer->type() == webrtc::VideoFrameBuffer::Type::kNative)
@@ -30,19 +27,20 @@ void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame &frame)
 
 UnityVideoRenderer::ImageData* UnityVideoRenderer::GetFrameBuffer()
 {
-    DebugLog("Get frame buffer on UnityCideoRenderer");
-
     std::lock_guard<std::mutex> guard(m_mutex);
 
-    if (m_imageData.RawData != nullptr)
+    if (m_frameBuffer == nullptr)
     {
-        delete[] m_imageData.RawData;
+        DebugLog("FrameBuffer is not received yet");
+        return &m_imageData;
     }
-    
 
-    m_imageData.Height = m_frameBuffer->height();
-    m_imageData.Width = m_frameBuffer->width();
-    m_imageData.RawData = new uint8_t[webrtc::CalcBufferSize(webrtc::VideoType::kABGR, m_imageData.Width, m_imageData.Height)];
+    if (m_imageData.Height != m_frameBuffer->height() || m_imageData.Width != m_frameBuffer->width())
+    {
+        m_imageData.Height = m_frameBuffer->height();
+        m_imageData.Width = m_frameBuffer->width();
+        m_imageData.RawData = new uint8_t[m_frameBuffer->height() * m_frameBuffer->width() * 4];
+    }
 
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(*m_frameBuffer);
 
