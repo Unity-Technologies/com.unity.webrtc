@@ -10,6 +10,7 @@ namespace webrtc
     {
     public:
         NvEncoderCuda(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
+        void InitV() override;
         virtual ~NvEncoderCuda() = default;
     protected:
         virtual void* AllocateInputResourceV(ITexture2D* tex) override;

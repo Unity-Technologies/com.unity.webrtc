@@ -8,6 +8,11 @@
 #include "Context.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 
+#if defined(SUPPORT_VULKAN)
+#include <IUnityGraphicsVulkan.h>
+#include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
+#endif
+
 enum class VideoStreamRenderEventID
 {
     Initialize = 0,
@@ -23,7 +28,6 @@ namespace webrtc
     IUnityGraphics* s_Graphics = nullptr;
     IUnityProfiler* s_UnityProfiler = nullptr;
     Context* s_context = nullptr;
-    IGraphicsDevice* s_device;
     std::map<const ::webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
@@ -52,6 +56,21 @@ namespace webrtc
         // DebugLog("Unknown texture format:%d", type);
         return webrtc::VideoType::kUnknown;
     }
+
+    IGraphicsDevice* GetGraphicsDevice()
+    {
+        if (!GraphicsDevice::GetInstance().IsInitialized())
+        {
+            GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
+        }
+        return GraphicsDevice::GetInstance().GetDevice();
+    }
+
+    UnityGfxRenderer GetGraphicsRenderer()
+    {
+        return s_Graphics->GetRenderer();
+    }
+
 } // end namespace webrtc
 } // end namespace unity
 
@@ -64,10 +83,17 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     case kUnityGfxDeviceEventInitialize:
     {
         s_mapEncoder.clear();
+
+        IGraphicsDevice* device = GetGraphicsDevice();
+        if (device != nullptr)
+            device->InitV();
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
+        IGraphicsDevice* device = GetGraphicsDevice();
+        if (device != nullptr)
+            device->ShutdownV();
         //UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
         s_mapEncoder.clear();
@@ -89,6 +115,14 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
     s_UnityInterfaces = unityInterfaces;
     s_Graphics = unityInterfaces->Get<IUnityGraphics>();
     s_Graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
+
+#if defined(SUPPORT_VULKAN)
+    IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
+    if(vulkan != nullptr)
+    {
+        vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+    }
+#endif
 
     s_UnityProfiler = unityInterfaces->Get<IUnityProfiler>();
     if (s_UnityProfiler != nullptr)
@@ -129,15 +163,11 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     {
         case VideoStreamRenderEventID::Initialize:
         {
-            if (!GraphicsDevice::GetInstance().IsInitialized())
-            {
-                GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
-            }
-            s_device = GraphicsDevice::GetInstance().GetDevice();
+            IGraphicsDevice* device = GetGraphicsDevice();
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
             s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
-                param->width, param->height, s_device, encoderType);
+                param->width, param->height, device, encoderType);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
                 // DebugLog("Encoder initialization faild.");

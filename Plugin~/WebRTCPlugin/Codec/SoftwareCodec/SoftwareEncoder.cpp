@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "SoftwareEncoder.h"
-#include "Context.h"
-#include <cstring>
 #include "GraphicsDevice/IGraphicsDevice.h"
 
-#if _WIN32
+#if defined(_WIN32)
 #else
 #include <dlfcn.h>
 #endif
@@ -14,9 +12,9 @@ namespace unity
 namespace webrtc
 {
 
-    SoftwareEncoder::SoftwareEncoder(int _width, int _height, IGraphicsDevice* device) : m_width(_width), m_height(_height), m_device(device)
+    SoftwareEncoder::SoftwareEncoder(int width, int height, IGraphicsDevice* device)
+    : m_width(width), m_height(height), m_device(device)
     {
-
     }
 
     void SoftwareEncoder::InitV()

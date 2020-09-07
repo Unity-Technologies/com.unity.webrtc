@@ -234,12 +234,7 @@ namespace webrtc
             return false;
         if (encoder->GetCodecInitializationResult() != CodecInitializationResult::Success)
             return false;
-
         source->SetEncoder(encoder);
-
-        uint32_t id = GenerateUniqueId();
-        encoder->SetEncoderId(id);
-        m_mapIdAndEncoder[id] = encoder;
         return true;
     }
 
@@ -252,8 +247,9 @@ namespace webrtc
     bool Context::EncodeFrame(MediaStreamTrackInterface* track)
     {
         UnityVideoTrackSource* source = GetVideoSource(track);
-        if(source != nullptr)
-            source->OnFrameCaptured();
+        if (source != nullptr)
+            return false;
+        source->OnFrameCaptured();
         return true;
     }
 

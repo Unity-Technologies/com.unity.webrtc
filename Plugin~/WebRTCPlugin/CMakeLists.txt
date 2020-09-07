@@ -53,6 +53,8 @@ elseif(UNIX)
     GraphicsDevice/Vulkan/*.cpp
     GraphicsDevice/Vulkan/Cuda/*.h
     GraphicsDevice/Vulkan/Cuda/*.cpp
+    Codec/SoftwareCodec/*.h
+    Codec/SoftwareCodec/*.cpp
     Codec/NvCodec/NvEncoder.cpp
     Codec/NvCodec/NvEncoder.h
     Codec/NvCodec/NvEncoderGL.cpp

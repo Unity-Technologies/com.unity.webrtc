@@ -62,6 +62,8 @@ elseif(UNIX)
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
     ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
     ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
+    ../WebRTCPlugin/Codec/SoftwareCodec/*.h
+    ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
     ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
     ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
     ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp

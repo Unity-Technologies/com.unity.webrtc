@@ -19,7 +19,7 @@ publish_com.unity.webrtc_github_release:
     image: package-ci/win10:stable
     flavor: b1.large
   commands:
-    - npm install github-release-cli -g
+    - npm install github-release-cli@1.3.1 -g
     - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "%GIT_TAG%" -n "%GIT_TAG%" "upm-ci~/packages/com.unity.webrtc-%GIT_TAG%.tgz"
   triggers:
     tags:
@@ -35,7 +35,7 @@ publish_libwebrtc_github_release:
     image: package-ci/win10:stable
     flavor: b1.large
   commands:
-    - npm install github-release-cli -g
+    - npm install github-release-cli@1.3.1 -g
     {% for platform in platforms %}
     - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/{{ platform.artifact_filename }}"
     {% endfor %}

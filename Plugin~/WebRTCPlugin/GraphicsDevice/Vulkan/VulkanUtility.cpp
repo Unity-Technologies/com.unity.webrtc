@@ -19,7 +19,8 @@ namespace webrtc
 {
 
 //
-bool VulkanUtility::FindMemoryTypeInto(const VkPhysicalDevice physicalDevice, uint32_t typeFilter,
+bool VulkanUtility::FindMemoryTypeInto(
+    const VkPhysicalDevice physicalDevice, uint32_t typeFilter,
         VkMemoryPropertyFlags properties, uint32_t* memoryTypeIndex)
 {
     VkPhysicalDeviceMemoryProperties memProperties;
@@ -27,7 +28,8 @@ bool VulkanUtility::FindMemoryTypeInto(const VkPhysicalDevice physicalDevice, ui
 
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
         //properties define special features of the memory, like being able to map so we can write to it from the CPU. 
-        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+        if ((typeFilter & (1 << i)) &&
+            (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
             *memoryTypeIndex = i;
             return true;
         }
@@ -47,7 +49,6 @@ VkDeviceSize VulkanUtility::CreateImage(const VkPhysicalDevice physicalDevice, c
     const VkFormat format,
     VkImage* image, VkDeviceMemory* imageMemory, bool exportHandle) 
 {
-
     VkImageCreateInfo imageInfo = {};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -74,7 +75,8 @@ VkDeviceSize VulkanUtility::CreateImage(const VkPhysicalDevice physicalDevice, c
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     if (!VulkanUtility::FindMemoryTypeInto(
-        physicalDevice, memRequirements.memoryTypeBits, properties, &allocInfo.memoryTypeIndex)
+        physicalDevice, memRequirements.memoryTypeBits,
+        properties, &allocInfo.memoryTypeIndex)
        )
     {
         return 0;
@@ -94,6 +96,84 @@ VkDeviceSize VulkanUtility::CreateImage(const VkPhysicalDevice physicalDevice, c
     VULKAN_CHECK_FAILVALUE(vkBindImageMemory(device, *image, *imageMemory, 0), 0);
 
     return memRequirements.size;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+VkResult VulkanUtility::CreateImage(
+    const VkPhysicalDevice physicalDevice, const VkDevice device,
+    const VkAllocationCallbacks* allocator,
+    const uint32_t width, const uint32_t height,
+    const VkImageTiling tiling, const VkImageUsageFlags usage, const VkMemoryPropertyFlags properties,
+    const VkFormat format,
+    UnityVulkanImage* unityVulkanImage, bool exportHandle)
+{
+    VkImageCreateInfo imageInfo = {};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = static_cast<uint32_t>(width);
+    imageInfo.extent.height = static_cast<uint32_t>(height);
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = format;
+    imageInfo.tiling = tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.flags = 0; // Optional
+    VkResult result = vkCreateImage(device, &imageInfo, allocator, &unityVulkanImage->image);
+    if(result != VK_SUCCESS) {
+        return result;
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(device, unityVulkanImage->image, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    bool success = VulkanUtility::FindMemoryTypeInto(
+        physicalDevice, memRequirements.memoryTypeBits,
+        properties, &allocInfo.memoryTypeIndex);
+    RTC_CHECK(success);
+
+    VkExportMemoryAllocateInfoKHR exportInfo = {};
+    if (exportHandle) {
+        exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
+        exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR;
+        allocInfo.pNext = &exportInfo;
+    }
+
+    result = vkAllocateMemory(
+        device, &allocInfo, allocator, &unityVulkanImage->memory.memory);
+    if(result != VK_SUCCESS) {
+        return result;
+    }
+
+    const VkDeviceSize memoryOffset = 0;
+    result = vkBindImageMemory(
+        device, unityVulkanImage->image,
+        unityVulkanImage->memory.memory, memoryOffset);
+    if (result != VK_SUCCESS) {
+        return result;
+    }
+
+    unityVulkanImage->memory.offset = memoryOffset;
+    unityVulkanImage->memory.size = memRequirements.size;
+    unityVulkanImage->memory.flags = properties;
+    unityVulkanImage->memory.memoryTypeIndex = allocInfo.memoryTypeIndex;
+    unityVulkanImage->layout = imageInfo.initialLayout;
+    unityVulkanImage->usage = imageInfo.usage;
+    unityVulkanImage->format = imageInfo.format;
+    unityVulkanImage->extent = imageInfo.extent;
+    unityVulkanImage->tiling = imageInfo.tiling;
+    unityVulkanImage->type = imageInfo.imageType;
+    unityVulkanImage->samples = imageInfo.samples;
+    unityVulkanImage->layers = imageInfo.arrayLayers;
+    unityVulkanImage->mipCount = imageInfo.mipLevels;
+
+    return VK_SUCCESS;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -240,10 +320,11 @@ VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, 
 
 //---------------------------------------------------------------------------------------------------------------------
 
-VkResult VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
-                                          const VkImage image, const VkFormat format, 
-                                          const VkImageLayout oldLayout, const VkPipelineStageFlags oldStage,
-                                          const VkImageLayout newLayout, const VkPipelineStageFlags newStage) 
+VkResult VulkanUtility::DoImageLayoutTransition(
+    const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, 
+    const VkImage image, const VkFormat format, 
+    const VkImageLayout oldLayout, const VkPipelineStageFlags oldStage,
+    const VkImageLayout newLayout, const VkPipelineStageFlags newStage) 
 { 
     VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
     VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer));
@@ -361,9 +442,10 @@ VkResult VulkanUtility::DoImageLayoutTransition(const VkDevice device, const VkC
 
 //---------------------------------------------------------------------------------------------------------------------
 
-VkResult VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
-               const VkImage srcImage, const VkImage dstImage,
-               const uint32_t width, const uint32_t height) 
+VkResult VulkanUtility::CopyImage(
+    const VkDevice device, const VkCommandPool commandPool, const VkQueue queue,
+    const VkImage srcImage, const VkImage dstImage,
+    const uint32_t width, const uint32_t height) 
 {
     VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
     VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer));
@@ -375,9 +457,10 @@ VkResult VulkanUtility::CopyImage(const VkDevice device, const VkCommandPool com
 	copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
 	copyRegion.dstOffset = { 0, 0, 0 };
 	copyRegion.extent = { width, height, 1 };
-	vkCmdCopyImage(commandBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-
+	vkCmdCopyImage(commandBuffer,
+        srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1, &copyRegion);
 
     return EndAndSubmitOneTimeCommandBuffer(device,commandPool,queue,commandBuffer);
 }

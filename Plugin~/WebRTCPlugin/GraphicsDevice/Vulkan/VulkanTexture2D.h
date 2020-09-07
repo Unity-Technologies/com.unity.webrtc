@@ -15,8 +15,9 @@ public:
     VulkanTexture2D(const uint32_t w, const uint32_t h);
     virtual ~VulkanTexture2D();
 
-    bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device); 
-    void Shutdown(); 
+    bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device);
+    bool InitCpuRead(const VkPhysicalDevice physicalDevice, const VkDevice device);
+    void Shutdown();
 
     inline virtual void* GetNativeTexturePtrV() override;
     inline virtual const void* GetNativeTexturePtrV() const override;
@@ -37,14 +38,16 @@ private:
     CudaImage           m_cudaImage;
     VkFormat            m_textureFormat;
 
+    UnityVulkanImage    m_unityVulkanImage;
+
     const VkAllocationCallbacks* m_allocator = nullptr;
 
 };
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* VulkanTexture2D::GetNativeTexturePtrV() { return  m_textureImage; }
-const void* VulkanTexture2D::GetNativeTexturePtrV() const { return m_textureImage; };
+void* VulkanTexture2D::GetNativeTexturePtrV() { return  &m_unityVulkanImage; }
+const void* VulkanTexture2D::GetNativeTexturePtrV() const { return &m_unityVulkanImage; };
 void* VulkanTexture2D::GetEncodeTexturePtrV() { return m_cudaImage.GetArray(); }
 const void* VulkanTexture2D::GetEncodeTexturePtrV() const { return m_cudaImage.GetArray(); }
 
