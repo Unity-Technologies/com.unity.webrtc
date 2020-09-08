@@ -74,22 +74,11 @@ public class VideoReceiveSample : MonoBehaviour
             if (e.Track.Kind == TrackKind.Video)
             {
                 var videoTrack = (VideoStreamTrack)e.Track;
-                videoTrack.InitializeReceiver();
-                StartCoroutine(UpdateReceive(videoTrack));
+                ReceiveImage.texture = videoTrack.InitializeReceiver();
             }
         };
 
         receiveStream.OnAddTrack = pc2OnAddTrack;
-    }
-
-
-    private IEnumerator UpdateReceive(VideoStreamTrack track)
-    {
-        while (true)
-        {
-            yield return new WaitForEndOfFrame();
-            ReceiveImage.texture = track.UpdateReceiveTexture();
-        }
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()

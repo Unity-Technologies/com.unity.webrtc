@@ -4,10 +4,9 @@
 namespace unity {
 namespace webrtc {
 
-UnityVideoRenderer::UnityVideoRenderer()
+UnityVideoRenderer::UnityVideoRenderer(uint32_t id) : m_id(id)
 {
-    //Do nothing
-    DebugLog("Create UnityVideoRenderer");
+    DebugLog("Create UnityVideoRenderer Id:%d", id);
 }
 
 UnityVideoRenderer::~UnityVideoRenderer() = default;
@@ -21,11 +20,27 @@ void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame &frame)
         frame_buffer = frame_buffer->ToI420();
     }
 
-    std::lock_guard<std::mutex> guard(m_mutex);
-    m_frameBuffer = frame_buffer;
+    SetFrameBuffer(frame_buffer);
 }
 
-UnityVideoRenderer::ImageData* UnityVideoRenderer::GetFrameBuffer()
+uint32_t UnityVideoRenderer::GetId()
+{
+    return m_id;
+}
+
+rtc::scoped_refptr<webrtc::VideoFrameBuffer> UnityVideoRenderer::GetFrameBuffer()
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    return m_frameBuffer;
+}
+
+void UnityVideoRenderer::SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    m_frameBuffer = buffer;
+}
+
+UnityVideoRenderer::ImageData* UnityVideoRenderer::GetImageData()
 {
     std::lock_guard<std::mutex> guard(m_mutex);
 

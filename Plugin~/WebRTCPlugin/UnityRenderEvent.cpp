@@ -2,6 +2,7 @@
 
 #include <IUnityGraphics.h>
 #include <IUnityProfiler.h>
+#include <IUnityRenderingExtensions.h>
 
 #include "Codec/EncoderFactory.h"
 #include "Context.h"
@@ -27,6 +28,23 @@ namespace webrtc
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     bool s_IsDevelopmentBuild = false;
+
+    static webrtc::VideoType ConvertTextureFormat(UnityRenderingExtTextureFormat type)
+    {
+        switch (type)
+        {
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SNorm:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UInt:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SInt:
+            return webrtc::VideoType::kBGRA;
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
+            return webrtc::VideoType::kARGB;
+        }
+        throw std::invalid_argument("not support texture format");
+    }
 } // end namespace webrtc
 } // end namespace unity
 
@@ -149,4 +167,59 @@ extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 {
     s_context = context;
     return OnRenderEvent;
+}
+
+static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
+{
+    auto event = static_cast<UnityRenderingExtEventType>(eventID);
+
+    if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
+    {
+        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
+        
+        auto renderer = s_context->GetVideoRenderer(params->userData);
+        if (renderer == nullptr)
+        {
+            DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
+            return;
+        }
+
+        auto frame = renderer->GetFrameBuffer();
+        if(frame == nullptr)
+        {
+            DebugLog("VideoFrame is not received yet, rendererId:%d", params->userData);
+            return;
+        }
+
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(params->width, params->height);
+        i420_buffer->ScaleFrom(*frame->ToI420());
+        delete[] renderer->tempBuffer;
+        renderer->tempBuffer = new uint8_t[params->width * params->height * 4];
+
+        libyuv::ConvertFromI420(
+            i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),
+            i420_buffer->StrideU(), i420_buffer->DataV(), i420_buffer->StrideV(),
+            renderer->tempBuffer, 0, params->width, params->height,
+            ConvertVideoType(ConvertTextureFormat(params->format)));
+        params->texData = renderer->tempBuffer;
+    }
+    else if (event == kUnityRenderingExtEventUpdateTextureEndV2)
+    {
+        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
+        auto renderer = s_context->GetVideoRenderer(params->userData);
+        if (renderer == nullptr)
+        {
+            DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
+            return;
+        }
+
+        delete[] renderer->tempBuffer;
+        renderer->tempBuffer = nullptr;
+    }
+}
+
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetUpdateTextureFunc(Context* context)
+{
+    s_context = context;
+    return TextureUpdateCallback;
 }

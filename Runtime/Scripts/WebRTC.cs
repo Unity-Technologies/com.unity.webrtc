@@ -291,6 +291,10 @@ namespace Unity.WebRTC
                         {
                             track.Update();
                         }
+                        else if (track.IsDecoderInitialized)
+                        {
+                            track.UpdateReceiveTexture();
+                        }
                     }
                 }
             }
@@ -666,9 +670,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateVideoRenderer(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern void DeleteVideoRenderer(IntPtr context, IntPtr sink);
+        public static extern uint GetVideoRendererId(IntPtr sink);
         [DllImport(WebRTC.Lib)]
-        public static extern void GetVideoRendererImageData(IntPtr sink, out ImageData tResult);
+        public static extern void DeleteVideoRenderer(IntPtr context, IntPtr sink);
         [DllImport(WebRTC.Lib)]
         public static extern void VideoTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]
@@ -677,6 +681,8 @@ namespace Unity.WebRTC
         public static extern void SetCurrentContext(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
         [DllImport(WebRTC.Lib)]
@@ -755,6 +761,18 @@ namespace Unity.WebRTC
         public static void FinalizeEncoder(IntPtr callback, IntPtr track)
         {
             _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Finalize, track);
+            Graphics.ExecuteCommandBuffer(_command);
+            _command.Clear();
+        }
+    }
+
+    internal static class VideoDecoderMethods
+    {
+        static UnityEngine.Rendering.CommandBuffer _command = new UnityEngine.Rendering.CommandBuffer();
+
+        public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
+        {
+            _command.IssuePluginCustomTextureUpdateV2(callback, texture, rendererId);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }

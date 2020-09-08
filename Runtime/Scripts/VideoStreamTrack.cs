@@ -12,9 +12,9 @@ namespace Unity.WebRTC
     {
         internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
 
-        readonly bool m_needFlip = false;
-        readonly UnityEngine.Texture m_sourceTexture;
-        readonly UnityEngine.RenderTexture m_destTexture;
+        bool m_needFlip = false;
+        UnityEngine.Texture m_sourceTexture;
+        UnityEngine.RenderTexture m_destTexture;
 
         UnityVideoSink m_sink;
 
@@ -48,21 +48,40 @@ namespace Unity.WebRTC
             }
         }
 
-        public void InitializeReceiver()
+        public bool IsDecoderInitialized
         {
-            //ToDo: on update write sink butter to tex
-            m_sink = new UnityVideoSink(WebRTC.Context.CreateVideoRenderer());
-            NativeMethods.VideoTrackAddOrUpdateSink(self, m_sink.self);
+            get
+            {
+                return m_sink != null && m_sink.self != IntPtr.Zero;
+            }
         }
 
-        public Texture2D UpdateReceiveTexture()
+        public RenderTexture InitializeReceiver()
         {
-            if (self == IntPtr.Zero || m_sink.self == IntPtr.Zero)
+            m_needFlip = true;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            m_sourceTexture = CreateRenderTexture(1280, 720, format);
+            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
+
+            m_sink = new UnityVideoSink(WebRTC.Context.CreateVideoRenderer());
+            NativeMethods.VideoTrackAddOrUpdateSink(self, m_sink.self);
+
+            return m_destTexture;
+        }
+
+        internal void UpdateReceiveTexture()
+        {
+            // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
+            // note: streamed video is flipped vertical if no action was taken:
+            //  - duplicate RenderTexture from its source texture
+            //  - call Graphics.Blit command with flip material every frame
+            //  - it might be better to implement this if possible
+            if (m_needFlip)
             {
-                throw new Exception("already receiver is disposed");
+                UnityEngine.Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
             }
 
-            return m_sink?.UpdateTexture();
+            WebRTC.Context.UpdateRendererTexture(m_sink.rendererId, m_sourceTexture);
         }
 
         internal void Update()
@@ -201,13 +220,12 @@ namespace Unity.WebRTC
     public class UnityVideoSink : IDisposable
     {
         internal IntPtr self;
+        internal uint rendererId => NativeMethods.GetVideoRendererId(self);
         private bool disposed;
-        private Texture2D m_videoBuffer;
 
         public UnityVideoSink(IntPtr ptr)
         {
             self = ptr;
-            m_videoBuffer = Texture2D.blackTexture;
         }
 
         ~UnityVideoSink()
@@ -230,49 +248,6 @@ namespace Unity.WebRTC
 
             this.disposed = true;
             GC.SuppressFinalize(this);
-        }
-
-        public Texture2D UpdateTexture()
-        {
-            NativeMethods.GetVideoRendererImageData(self, out var data);
-
-            if (data.RawData == IntPtr.Zero || data.Height <= 0 || data.Width <= 0)
-            {
-                return m_videoBuffer;
-            }
-
-            if (data.Height != m_videoBuffer.height || data.Width != m_videoBuffer.width)
-            {
-                m_videoBuffer.Resize(data.Width, data.Height);
-            }
-
-            data.CopyBufferToTexture(m_videoBuffer);
-            return m_videoBuffer;
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 8)]
-    internal struct ImageData
-    {
-        public IntPtr RawData;
-        [MarshalAs(UnmanagedType.I4)] public readonly int Width;
-        [MarshalAs(UnmanagedType.I4)] public readonly int Height;
-    }
-
-    internal static class ImageDataExtensions
-    {
-        public static void CopyBufferToTexture(this ImageData imageData, Texture2D tex)
-        {
-            int length = imageData.Width * imageData.Height * 4;
-            unsafe
-            {
-                void* src = imageData.RawData.ToPointer();
-                NativeArray<float> rawTextureData = tex.GetRawTextureData<float>();
-                void* dest = rawTextureData.GetUnsafePtr();
-                Buffer.MemoryCopy(src, dest, length, length);
-            }
-
-            tex.Apply();
         }
     }
 }

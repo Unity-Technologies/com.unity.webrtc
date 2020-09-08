@@ -220,6 +220,11 @@ extern "C"
         return context->CreateVideoRenderer();
     }
 
+    UNITY_INTERFACE_EXPORT uint32_t GetVideoRendererId(UnityVideoRenderer* sink)
+    {
+        return sink->GetId();
+    }
+
     UNITY_INTERFACE_EXPORT void DeleteVideoRenderer(Context* context, UnityVideoRenderer* sink)
     {
         context->DeleteVideoRenderer(sink);
@@ -227,7 +232,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void GetVideoRendererImageData(UnityVideoRenderer* sink, UnityVideoRenderer::ImageData* imageData)
     {
-        *imageData = *sink->GetFrameBuffer();
+        *imageData = *sink->GetImageData();
     }
 
     UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, UnityVideoRenderer* sink)

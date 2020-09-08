@@ -11,6 +11,7 @@ namespace Unity.WebRTC
         private int id;
         private bool disposed;
         private IntPtr renderFunction;
+        private IntPtr textureUpdateFunction;
 
         public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware)
         {
@@ -131,6 +132,11 @@ namespace Unity.WebRTC
             return NativeMethods.GetRenderEventFunc(self);
         }
 
+        public IntPtr GetUpdateTextureFunc()
+        {
+            return NativeMethods.GetUpdateTextureFunc(self);
+        }
+
         public IntPtr CreateAudioTrack(string label)
         {
             return NativeMethods.ContextCreateAudioTrack(self, label);
@@ -192,6 +198,12 @@ namespace Unity.WebRTC
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
             VideoEncoderMethods.Encode(renderFunction, track);
+        }
+
+        internal void UpdateRendererTexture(uint rendererId, UnityEngine.Texture texture)
+        {
+            textureUpdateFunction = textureUpdateFunction == IntPtr.Zero ? GetUpdateTextureFunc() : textureUpdateFunction;
+            VideoDecoderMethods.UpdateRendererTexture(textureUpdateFunction, texture, rendererId);
         }
     }
 }

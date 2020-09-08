@@ -501,7 +501,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.30411178, g: 0.43165317, b: 0.6320754, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -747,7 +747,6 @@ MonoBehaviour:
   addTracksButton: {fileID: 2092880142}
   removeTracksButton: {fileID: 510738292}
   cam: {fileID: 934963288}
-  infoText: {fileID: 0}
   RtImage: {fileID: 1839397354}
   ReceiveImage: {fileID: 2123783124}
 --- !u!1 &1068560632

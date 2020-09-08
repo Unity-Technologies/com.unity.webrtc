@@ -426,17 +426,25 @@ namespace webrtc
         return m_mapSetSessionDescriptionObserver[connection];
     }
 
+    uint32_t Context::s_rendererId = 0;
+    uint32_t Context::GenerateRendererId() { return s_rendererId++; }
+
     UnityVideoRenderer* Context::CreateVideoRenderer()
     {
-        auto renderer = std::make_unique<UnityVideoRenderer>();
-        UnityVideoRenderer* ptr = renderer.get();
-        m_mapVideoRenderer[ptr] = std::move(renderer);
-        return ptr;
+        auto rendererId = GenerateRendererId();
+        auto renderer = std::make_unique<UnityVideoRenderer>(rendererId);
+        m_mapVideoRenderer[rendererId] = std::move(renderer);
+        return m_mapVideoRenderer[rendererId].get();
+    }
+
+    UnityVideoRenderer* Context::GetVideoRenderer(uint32_t id)
+    {
+        return m_mapVideoRenderer[id].get();
     }
 
     void Context::DeleteVideoRenderer(UnityVideoRenderer* renderer)
     {
-        m_mapVideoRenderer.erase(renderer);
+        m_mapVideoRenderer.erase(renderer->GetId());
         renderer = nullptr;
     }
 
