@@ -230,11 +230,6 @@ extern "C"
         context->DeleteVideoRenderer(sink);
     }
 
-    UNITY_INTERFACE_EXPORT void GetVideoRendererImageData(UnityVideoRenderer* sink, UnityVideoRenderer::ImageData* imageData)
-    {
-        *imageData = *sink->GetImageData();
-    }
-
     UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, UnityVideoRenderer* sink)
     {
         track->AddOrUpdateSink(sink, rtc::VideoSinkWants());
