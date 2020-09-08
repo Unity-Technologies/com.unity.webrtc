@@ -16,12 +16,11 @@ public class MediaStreamSample : MonoBehaviour
     [SerializeField] private Camera cam;
     [SerializeField] private InputField infoText;
     [SerializeField] private RawImage RtImage;
-    [SerializeField] private RawImage ReceiveImage;
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders, pc2Senders;
-    private MediaStream audioStream, videoStream, receiveStream;
+    private MediaStream audioStream, videoStream;
     private RTCDataChannel remoteDataChannel;
     private Coroutine sdpCheck;
     private string msg;
@@ -31,7 +30,6 @@ public class MediaStreamSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private DelegateOnAddTrack pc2OnAddTrack;
     private StringBuilder trackInfos;
     private bool videoUpdateStarted;
 
@@ -49,11 +47,10 @@ public class MediaStreamSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize();
         callButton.onClick.AddListener(Call);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
-        receiveStream = new MediaStream();
     }
 
     private void OnDestroy()
@@ -73,35 +70,9 @@ public class MediaStreamSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
-        pc2Ontrack = e =>
-        {
-            Debug.LogWarning($"call pc2 ontrack {e.Track.Id}");
-            OnTrack(_pc2, e);
-        };
+        pc2Ontrack = e => { OnTrack(_pc2, e); };
         pc1OnNegotiationNeeded = () => { StartCoroutine(Pc1OnNegotiationNeeded()); };
-        pc2OnAddTrack = e =>
-        {
-            Debug.LogWarning($"invoke onaddtrack on {e.Track.Id}");
-            if (e.Track.Kind == TrackKind.Video)
-            {
-                var videoTrack = (VideoStreamTrack)e.Track;
-                videoTrack.InitializeReceiver();
-                StartCoroutine(UpdateReceive(videoTrack));
-            }
-        };
         infoText.text = !WebRTC.SupportHardwareEncoder ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
-
-        receiveStream.OnAddTrack = pc2OnAddTrack;
-    }
-
-
-    private IEnumerator UpdateReceive(VideoStreamTrack track)
-    {
-        while (true)
-        {
-            yield return new WaitForEndOfFrame();
-            ReceiveImage.texture = track.UpdateReceiveTexture();
-        }
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
@@ -224,7 +195,7 @@ public class MediaStreamSample : MonoBehaviour
 
     }
 
-    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
+    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");
@@ -232,9 +203,7 @@ public class MediaStreamSample : MonoBehaviour
 
     private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
     {
-//        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
-        receiveStream.AddTrack(e.Track);
-//        pc2Senders.Add(pc.AddTrack(e.Track, receiveStream));
+        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
         trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
         trackInfos.Append($"Track kind: {e.Track.Kind}\r\n");
         trackInfos.Append($"Track id: {e.Track.Id}\r\n");
