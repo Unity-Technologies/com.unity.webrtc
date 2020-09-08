@@ -3,10 +3,15 @@
 set(WEBRTC_DIR "${CMAKE_SOURCE_DIR}/webrtc")
 
 set(WEBRTC_INCLUDE_DIR
-    ${WEBRTC_DIR}/include
-    ${WEBRTC_DIR}/include/third_party/abseil-cpp
-    ${WEBRTC_DIR}/include/third_party/jsoncpp/source/include
-    ${WEBRTC_DIR}/include/third_party/jsoncpp/generated
+  ${WEBRTC_DIR}/include
+  ${WEBRTC_DIR}/include/third_party/abseil-cpp
+  ${WEBRTC_DIR}/include/third_party/jsoncpp/source/include
+  ${WEBRTC_DIR}/include/third_party/jsoncpp/generated
+)
+
+set(WEBRTC_OBJC_INCLUDE_DIR
+  ${WEBRTC_DIR}/include/sdk/objc
+  ${WEBRTC_DIR}/include/sdk/objc/base
 )
 
 set(WEBRTC_LIBRARY_DIR
