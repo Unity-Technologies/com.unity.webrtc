@@ -1,0 +1,19 @@
+--- src/sdk/BUILD.gn	2020-08-31 17:02:50.000000000 +0900
++++ src/sdk/BUILD.gn.edited	2020-08-31 17:15:53.000000000 +0900
+@@ -24,6 +24,16 @@ group("sdk") {
+     if (is_ios) {
+       public_deps += [ ":framework_objc" ]
+     }
++    if(is_mac) {
++      public_deps += [ 
++        ":base_objc",
++        ":default_codec_factory_objc",
++        ":native_api",
++        ":native_video",
++        ":videocodec_objc",
++        ":videotoolbox_objc"
++      ]
++    }
+   }
+ }
+ 

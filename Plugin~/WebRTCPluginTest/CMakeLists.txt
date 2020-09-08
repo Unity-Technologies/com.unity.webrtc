@@ -41,6 +41,7 @@ if(MSVC)
 elseif(APPLE)
   file(GLOB append_source
     ../libcxx/debug.cpp
+    ../WebRTCPlugin/*.mm
     ../WebRTCPlugin/GraphicsDevice/Metal/*.h
     ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
     ../WebRTCPlugin/Codec/SoftwareCodec/*.h
@@ -132,6 +133,11 @@ if(MSVC)
 elseif(APPLE)
   set(CMAKE_C_FLAGS "-x objective-c")
   set(CMAKE_CXX_FLAGS "-x objective-c++")
+  
+  set_target_properties( WebRTCPluginTest 
+    PROPERTIES LINK_FLAGS 
+      "-ObjC"
+  )  
 
   target_compile_definitions(WebRTCPluginTest
     PRIVATE
@@ -151,6 +157,7 @@ elseif(APPLE)
   target_include_directories(WebRTCPluginTest
     PRIVATE
       ..
+      ${WEBRTC_OBJC_INCLUDE_DIR}
   )
 elseif(UNIX)
   find_package(OpenGL REQUIRED)

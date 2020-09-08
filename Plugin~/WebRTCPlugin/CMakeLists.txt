@@ -38,12 +38,11 @@ if(MSVC)
 elseif(APPLE)
   file(GLOB append_source
     ../libcxx/debug.cpp
+    *.mm
     GraphicsDevice/Metal/*.h
     GraphicsDevice/Metal/*.mm
     Codec/SoftwareCodec/*.h
     Codec/SoftwareCodec/*.cpp
-    #Codec/VideoToolbox/VTEncoderMetal.mm
-    #Codec/VideoToolbox/VTEncoderMetal.h
   )
   list (APPEND sources ${append_source})
 elseif(UNIX)
@@ -165,7 +164,15 @@ elseif(APPLE)
     PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE 
       ${PROJECT_BINARY_DIR}
   )
+  target_include_directories(webrtc
+    PRIVATE
+      ${WEBRTC_OBJC_INCLUDE_DIR}
+  )
 
+  set_target_properties( webrtc 
+    PROPERTIES LINK_FLAGS 
+      "-ObjC"
+  )  
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 
