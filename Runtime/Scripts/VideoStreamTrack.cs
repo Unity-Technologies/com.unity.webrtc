@@ -224,6 +224,7 @@ namespace Unity.WebRTC
 
             if (self != IntPtr.Zero)
             {
+                WebRTC.Context.DeleteVideoRenderer(self);
                 self = IntPtr.Zero;
             }
 

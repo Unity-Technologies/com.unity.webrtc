@@ -156,6 +156,11 @@ namespace Unity.WebRTC
             return NativeMethods.CreateVideoRenderer(self);
         }
 
+        public void DeleteVideoRenderer(IntPtr sink)
+        {
+            NativeMethods.DeleteVideoRenderer(self, sink);
+        }
+
         public void DeleteStatsReport(IntPtr report)
         {
             NativeMethods.ContextDeleteStatsReport(self, report);

@@ -220,6 +220,11 @@ extern "C"
         return context->CreateVideoRenderer();
     }
 
+    UNITY_INTERFACE_EXPORT void DeleteVideoRenderer(Context* context, UnityVideoRenderer* sink)
+    {
+        context->DeleteVideoRenderer(sink);
+    }
+
     UNITY_INTERFACE_EXPORT void GetVideoRendererImageData(UnityVideoRenderer* sink, UnityVideoRenderer::ImageData* imageData)
     {
         *imageData = *sink->GetFrameBuffer();

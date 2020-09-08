@@ -434,5 +434,11 @@ namespace webrtc
         return ptr;
     }
 
+    void Context::DeleteVideoRenderer(UnityVideoRenderer* renderer)
+    {
+        m_mapVideoRenderer.erase(renderer);
+        renderer = nullptr;
+    }
+
 } // end namespace webrtc
 } // end namespace unity
