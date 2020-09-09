@@ -22,6 +22,13 @@ choco install -y wget
 wget https://vulkan.lunarg.com/sdk/download/1.1.121.2/windows/VulkanSDK-1.1.121.2-Installer.exe -O C:/Windows/Temp/VulkanSDK.exe
 C:/Windows/Temp/VulkanSDK.exe /S
 
+# Install CMake 3.18.0
+choco install cmake -y --version 3.18.0
+
+# Setting up environment variables
+setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
+setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
+
 #install googletest
 cd %SOLUTION_DIR%
 git clone https://github.com/google/googletest.git
@@ -36,13 +43,6 @@ xcopy /e googlemock\include\gmock include\gmock
 mkdir lib
 xcopy /e build64\googlemock\Release lib
 xcopy /e build64\googlemock\gtest\Release lib
-
-# Install CMake 3.18.0
-choco install cmake -y --version 3.18.0
-
-# Setting up environment variables
-setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
-setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
 ```
 
 ### How to install dependencies (Ubuntu18.04)
@@ -56,17 +56,6 @@ sudo apt-get install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 l
 # Install libc++, libc++abi googletest clang glut
 sudo apt update
 sudo apt install -y 6googletest clang freeglut3-dev
-
-# Install googletest
-cd /usr/src/googletest
-sudo cmake -Dcxx_no_rtti=ON \
-           -DCMAKE_C_COMPILER="clang" \
-           -DCMAKE_CXX_COMPILER="clang++" \
-           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-           CMakeLists.txt
-sudo make
-sudo cp googlemock/*.a "/usr/lib"
-sudo cp googlemock/gtest/*.a "/usr/lib"
 
 # Install CUDA SDK
 sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
@@ -82,6 +71,17 @@ wget https://github.com/Kitware/CMake/releases/download/v3.18.0/cmake-3.18.0.tar
 tar xvf cmake-3.18.0.tar.gz
 cd cmake-3.18.0
 ./bootstrap && make && sudo make install
+
+# Install googletest
+cd /usr/src/googletest
+sudo cmake -Dcxx_no_rtti=ON \
+           -DCMAKE_C_COMPILER="clang" \
+           -DCMAKE_CXX_COMPILER="clang++" \
+           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+           CMakeLists.txt
+sudo make
+sudo cp googlemock/*.a "/usr/lib"
+sudo cp googlemock/gtest/*.a "/usr/lib"
 ```
 
 ### How to install dependencies (MacOS)
