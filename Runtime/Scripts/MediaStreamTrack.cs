@@ -67,11 +67,13 @@ namespace Unity.WebRTC
             {
                 return;
             }
+
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 self = IntPtr.Zero;
             }
+
             this.disposed = true;
             GC.SuppressFinalize(this);
         }
@@ -81,6 +83,16 @@ namespace Unity.WebRTC
         {
             WebRTC.Context.StopMediaStreamTrack(self);
         }
+
+        internal static MediaStreamTrack Create(IntPtr ptr)
+        {
+            if (NativeMethods.MediaStreamTrackGetKind(ptr) == TrackKind.Video)
+            {
+                return new VideoStreamTrack(ptr);
+            }
+
+            return new AudioStreamTrack(ptr);
+        }
     }
 
     public enum TrackKind
@@ -88,6 +100,7 @@ namespace Unity.WebRTC
         Audio,
         Video
     }
+
     public enum TrackState
     {
         Live,
@@ -111,15 +124,7 @@ namespace Unity.WebRTC
         internal RTCTrackEvent(IntPtr ptrTransceiver, RTCPeerConnection peer)
         {
             IntPtr ptrTrack = NativeMethods.TransceiverGetTrack(ptrTransceiver);
-            Track = WebRTC.FindOrCreate(ptrTrack, ptr =>
-            {
-                if (NativeMethods.MediaStreamTrackGetKind(ptr) == TrackKind.Video)
-                {
-                    return (MediaStreamTrack) new VideoStreamTrack(ptr);
-                }
-
-                return (MediaStreamTrack) new AudioStreamTrack(ptr);
-            });
+            Track = WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
             Transceiver = new RTCRtpTransceiver(ptrTransceiver, peer);
         }
     }
@@ -130,16 +135,7 @@ namespace Unity.WebRTC
 
         internal MediaStreamTrackEvent(IntPtr ptrTrack)
         {
-            Track = WebRTC.FindOrCreate(ptrTrack, ptr =>
-            {
-                if (NativeMethods.MediaStreamTrackGetKind(ptr) == TrackKind.Video)
-                {
-                    return (MediaStreamTrack) new VideoStreamTrack(ptr);
-                }
-
-                return (MediaStreamTrack) new AudioStreamTrack(ptr);
-            });
+            Track = WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
         }
     }
 }
-
