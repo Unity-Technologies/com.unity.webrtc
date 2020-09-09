@@ -7,6 +7,7 @@ set(WEBRTC_INCLUDE_DIR
   ${WEBRTC_DIR}/include/third_party/abseil-cpp
   ${WEBRTC_DIR}/include/third_party/jsoncpp/source/include
   ${WEBRTC_DIR}/include/third_party/jsoncpp/generated
+  ${WEBRTC_DIR}/include/third_party/libyuv/include
 )
 
 set(WEBRTC_OBJC_INCLUDE_DIR
