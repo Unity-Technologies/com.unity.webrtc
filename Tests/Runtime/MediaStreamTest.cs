@@ -11,8 +11,11 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            // ToDo: @kannan
+            // Since Unity VideoDecoder on the receiver side does not support H264 codec, the test is performed by SoftwareEncode/Decode only.
+            // var value = NativeMethods.GetHardwareEncoderSupport();
+            // WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            WebRTC.Initialize(EncoderType.Software);
         }
 
         [TearDown]
@@ -301,7 +304,7 @@ namespace Unity.WebRTC.RuntimeTest
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })] 
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator OnAddTrackDelegatesWithEvent()
         {
             var camObj = new GameObject("Camera");

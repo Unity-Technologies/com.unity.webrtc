@@ -47,7 +47,7 @@ public class MediaStreamSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize();
+        WebRTC.Initialize(EncoderType.Software);
         callButton.onClick.AddListener(Call);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
@@ -195,7 +195,7 @@ public class MediaStreamSample : MonoBehaviour
 
     }
 
-    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
+    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");

@@ -11,8 +11,11 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            // ToDo: @kannan
+            // Since Unity VideoDecoder on the receiver side does not support H264 codec, the test is performed by SoftwareEncode/Decode only.
+            // var value = NativeMethods.GetHardwareEncoderSupport();
+            // WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            WebRTC.Initialize(EncoderType.Software);
         }
 
         [TearDown]
