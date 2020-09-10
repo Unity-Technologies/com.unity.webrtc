@@ -109,14 +109,82 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
             Assert.False(op2.IsError);
 
-            desc.sdp = desc.sdp
+            desc.sdp = ReplaceOfferSdpForHardwareEncodeTest(desc.sdp);
+
+            var op3 = peers[1].SetRemoteDescription(ref desc);
+            yield return op3;
+            Assert.False(op3.IsError);
+            var op4 = peers[1].CreateAnswer(ref options2);
+            yield return op4;
+            Assert.False(op4.IsError);
+            desc = op4.Desc;
+            var op5 = peers[1].SetLocalDescription(ref desc);
+            yield return op5;
+            Assert.False(op5.IsError);
+
+            desc.sdp = ReplaceAnswerSdpForHardwareEncodeTest(desc.sdp);
+
+            var op6 = peers[0].SetRemoteDescription(ref desc);
+            yield return op6;
+            Assert.False(op6.IsError);
+
+            var op7 = new WaitUntilWithTimeout(() =>
+                peers[0].IceConnectionState == RTCIceConnectionState.Connected ||
+                peers[0].IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op7;
+            Assert.True(op7.IsCompleted);
+
+            var op8 = new WaitUntilWithTimeout(() =>
+                peers[1].IceConnectionState == RTCIceConnectionState.Connected ||
+                peers[1].IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op8;
+            Assert.True(op8.IsCompleted);
+
+            if (m_stream != null)
+            {
+                var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any(), 5000);
+                yield return op9;
+                Assert.True(op9.IsCompleted);
+            }
+
+            IsTestFinished = true;
+        }
+
+        private static string ReplaceAnswerSdpForHardwareEncodeTest(string originalSdp)
+        {
+            if (WebRTC.GetEncoderType() == EncoderType.Software)
+            {
+                return originalSdp;
+            }
+
+            return originalSdp
+                .Replace("m=video 9 UDP/TLS/RTP/SAVPF 96 98 100 104 105 106",
+                    "m=video 9 UDP/TLS/RTP/SAVPF 96 98 100 102 104 105 106")
+                .Replace("a=rtpmap:104 red/90000", @"a=rtpmap:102 H264/90000
+a=rtcp-fb:102 goog-remb
+a=rtcp-fb:102 transport-cc
+a=rtcp-fb:102 ccm fir
+a=rtcp-fb:102 nack
+a=rtcp-fb:102 nack pli
+a=fmtp:102 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e033
+a=rtpmap:104 red/90000");
+        }
+
+        private static string ReplaceOfferSdpForHardwareEncodeTest(string originalSdp)
+        {
+            if (WebRTC.GetEncoderType() == EncoderType.Software)
+            {
+                return originalSdp;
+            }
+
+            var result = originalSdp
                 .Replace("m=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100",
                     "m=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100 101 102 103 104 105 106");
 
-            var matchedObject = Regex.Match(desc.sdp, @"(a=rtpmap:96.*)a=ssrc-group", RegexOptions.Singleline);
+            var matchedObject = Regex.Match(originalSdp, @"(a=rtpmap:96.*)a=ssrc-group", RegexOptions.Singleline);
             if (!string.IsNullOrEmpty(matchedObject.Value))
             {
-                desc.sdp = desc.sdp.Replace(matchedObject.Value, @"a=rtpmap:96 VP8/90000
+                result = result.Replace(matchedObject.Value, @"a=rtpmap:96 VP8/90000
 a=rtcp-fb:96 goog-remb
 a=rtcp-fb:96 transport-cc
 a=rtcp-fb:96 ccm fir
@@ -158,53 +226,7 @@ a=rtpmap:106 ulpfec/90000
 a=ssrc-group");
             }
 
-            var op3 = peers[1].SetRemoteDescription(ref desc);
-            yield return op3;
-            Assert.False(op3.IsError);
-            var op4 = peers[1].CreateAnswer(ref options2);
-            yield return op4;
-            Assert.False(op4.IsError);
-            desc = op4.Desc;
-            var op5 = peers[1].SetLocalDescription(ref desc);
-            yield return op5;
-            Assert.False(op5.IsError);
-
-            desc.sdp = desc.sdp
-                .Replace("m=video 9 UDP/TLS/RTP/SAVPF 96 98 100 104 105 106",
-                    "m=video 9 UDP/TLS/RTP/SAVPF 96 98 100 102 104 105 106")
-                .Replace("a=rtpmap:104 red/90000", @"a=rtpmap:102 H264/90000
-a=rtcp-fb:102 goog-remb
-a=rtcp-fb:102 transport-cc
-a=rtcp-fb:102 ccm fir
-a=rtcp-fb:102 nack
-a=rtcp-fb:102 nack pli
-a=fmtp:102 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e033
-a=rtpmap:104 red/90000");
-
-            var op6 = peers[0].SetRemoteDescription(ref desc);
-            yield return op6;
-            Assert.False(op6.IsError);
-
-            var op7 = new WaitUntilWithTimeout(() =>
-                peers[0].IceConnectionState == RTCIceConnectionState.Connected ||
-                peers[0].IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op7;
-            Assert.True(op7.IsCompleted);
-
-            var op8 = new WaitUntilWithTimeout(() =>
-                peers[1].IceConnectionState == RTCIceConnectionState.Connected ||
-                peers[1].IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op8;
-            Assert.True(op8.IsCompleted);
-
-            if (m_stream != null)
-            {
-                var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any(), 5000);
-                yield return op9;
-                Assert.True(op9.IsCompleted);
-            }
-
-            IsTestFinished = true;
+            return result;
         }
 
         public void Dispose()
