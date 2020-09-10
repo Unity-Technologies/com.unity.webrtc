@@ -130,8 +130,6 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    {
-
     void DummyVideoEncoder::SetRates(const RateControlParameters& parameters)
     {
         int64_t frameRate = parameters.framerate_fps;
