@@ -13,7 +13,7 @@ export ARTIFACTS_DIR="$(pwd)/artifacts"
 
 if [ ! -e "$(pwd)/src" ]
 then
-  fetch webrtc
+  fetch --nohooks webrtc_ios
   cd src
   git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
@@ -26,25 +26,32 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-# generate ninja files for release
-gn gen "$OUTPUT_DIR" --root="src" \
-  --args="is_debug=false target_os=\"mac\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false"
+# add jsoncpp
+patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
-# build static library for release
-ninja -C "$OUTPUT_DIR" webrtc
+mkdir -p "$ARTIFACTS_DIR/lib"
 
-# cppy static library for release
-cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/libwebrtc.a"
+for target_cpu in "arm64" "x64"
+do
+  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+  for is_debug in "true" "false"
+  do
+    # generate ninja files
+    gn gen "$OUTPUT_DIR" --root="src" \
+      --args="is_debug=${is_debug} target_os=\"ios\" target_cpu=${target_cpu}"
 
-# generate ninja files for debug
-gn gen "$OUTPUT_DIR" --root="src" \
-  --args="is_debug=true target_os=\"mac\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false"
+    # build static library
+    ninja -C "$OUTPUT_DIR" webrtc
 
-# build static library for debug
-ninja -C "$OUTPUT_DIR" webrtc
+    filename="libwebrtc.a"
+    if [ $is_debug = "true" ]; then
+      filename="libwebrtcd.a"
+    fi
 
-# cppy static library for debug
-cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/libwebrtcd.a"
+    # cppy static library
+    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
+  done
+done
 
 # fix error when generate license
 patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
@@ -60,4 +67,4 @@ cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
 # create zip
 cd "$ARTIFACTS_DIR"
-zip -r webrtc-mac.zip lib include LICENSE.md
+zip -r webrtc-ios.zip lib include LICENSE.md
