@@ -33,7 +33,7 @@ do
   do
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} target_os=\"android\" target_cpu=${target_cpu}"
+      --args="is_debug=${is_debug} target_os=\"android\" target_cpu=\"${target_cpu}\""
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
