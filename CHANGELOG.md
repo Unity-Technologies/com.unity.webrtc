@@ -8,11 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Erase documentation in Japanese to move to a translation system
+- Erase Japanese documentation due to migrating to internal translation system.
 
 ### Fixed
 
-- Fixed an issue which `RTCRtpSender.SetParameters` API don't work well
+- Fixed an issue where the `RTCRtpSender.SetParameters` API did not work properly
 - Removed ZWSP(zero-width-space) in C# code
 
 ## [2.1.0] - 2020-08-24
