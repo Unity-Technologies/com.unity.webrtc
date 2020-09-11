@@ -4,6 +4,17 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2020-09-11
+
+### Changed
+
+- Erase Japanese documentation due to migrating to internal translation system.
+
+### Fixed
+
+- Fixed an issue where the `RTCRtpSender.SetParameters` API did not work properly
+- Removed ZWSP(zero-width-space) in C# code
+
 ## [2.1.0] - 2020-08-24
 
 ### Added
@@ -11,6 +22,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added statistics window in Unity editor to allow checking the operation of WebRTC
 - Added `RTCPeerConnection.GetStats` API which collect statistics of WebRTC
 - Added `RTCRtpSender.SetParameters` and `RTCRtpSender.GetParameters` to adjustment streaming video quality
+- Added `RTCDataChannel.ReadyState` which shows the state of the channel
+
+### Fixed
+
+- Fixed a issue which video stream remains with bad quality after a short network degradation
 
 ## [2.0.5] - 2020-07-30
 
