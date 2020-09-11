@@ -38,10 +38,10 @@ namespace webrtc
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SNorm:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UInt:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SInt:
-            return webrtc::VideoType::kBGRA;
+            return webrtc::VideoType::kARGB;
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
-            return webrtc::VideoType::kARGB;
+            return webrtc::VideoType::kABGR;
         }
         throw std::invalid_argument("not support texture format");
     }
