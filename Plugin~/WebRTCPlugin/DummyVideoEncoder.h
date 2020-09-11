@@ -37,7 +37,7 @@ namespace webrtc
         webrtc::EncodedImage m_encodedImage;
         webrtc::RTPFragmentationHeader m_fragHeader;
         webrtc::H264BitstreamParser m_h264BitstreamParser;
-        const webrtc::VideoCodec* m_codec;
+        webrtc::VideoCodec m_codec;
 
         webrtc::RateStatistics m_encode_fps;
         webrtc::Clock* m_clock;

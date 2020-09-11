@@ -90,7 +90,8 @@ namespace webrtc
         nvEncConfig.profileGUID = NV_ENC_H264_PROFILE_BASELINE_GUID;
         nvEncConfig.gopLength = nvEncInitializeParams.frameRateNum;
         nvEncConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ;
-        nvEncConfig.rcParams.averageBitRate = (static_cast<unsigned int>(5.0f *
+        nvEncConfig.rcParams.averageBitRate =
+            (static_cast<unsigned int>(5.0f *
             nvEncInitializeParams.encodeWidth *
             nvEncInitializeParams.encodeHeight) / (m_width * m_height)) * 100000;
         nvEncConfig.encodeCodecConfig.h264Config.idrPeriod = nvEncConfig.gopLength;
@@ -107,7 +108,7 @@ namespace webrtc
         capsParam.capsToQuery = NV_ENC_CAPS_ASYNC_ENCODE_SUPPORT;
         int32 asyncMode = 0;
         errorCode = pNvEncodeAPI->nvEncGetEncodeCaps(pEncoderInterface, nvEncInitializeParams.encodeGUID, &capsParam, &asyncMode);
-        checkf(NV_RESULT(errorCode), StringFormat("Failded to get NVEncoder capability params %d", errorCode).c_str());
+        checkf(NV_RESULT(errorCode), StringFormat("Failed to get NVEncoder capability params %d", errorCode).c_str());
         nvEncInitializeParams.enableEncodeAsync = 0;
 #pragma endregion
 #pragma region initialize hardware encoder session
@@ -115,11 +116,10 @@ namespace webrtc
         result = NV_RESULT(errorCode);
         checkf(result, StringFormat("Failed to initialize NVEncoder %d", errorCode).c_str());
 #pragma endregion
-
         InitEncoderResources();
         m_isNvEncoderSupported = true;
-
     }
+
     NvEncoder::~NvEncoder()
     {
         ReleaseEncoderResources();
@@ -205,7 +205,7 @@ namespace webrtc
     {
         if (s_hModule)
         {
-#if _WIN32
+#if defined(_WIN32)
             FreeLibrary((HMODULE)s_hModule);
 #else
             dlclose(s_hModule);
@@ -242,10 +242,6 @@ namespace webrtc
         }
     }
 
-    constexpr double kLowRateFactor = 1.0;
-    constexpr double kHighRateFactor = 2.0;
-
-
     void NvEncoder::SetRates(uint32_t bitRate, int64_t frameRate)
     {
         m_frameRate = frameRate;
@@ -269,14 +265,6 @@ namespace webrtc
         UpdateSettings();
         uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;
         Frame& frame = bufferedFrames[bufferIndexToWrite];
-#pragma region set frame params
-        //no free buffer, skip this frame
-        if (frame.isEncoding)
-        {
-            return false;
-        }
-        frame.isEncoding = true;
-#pragma endregion
 #pragma region configure per-frame encode parameters
         NV_ENC_PIC_PARAMS picParams = { 0 };
         picParams.version = NV_ENC_PIC_PARAMS_VER;
@@ -305,12 +293,6 @@ namespace webrtc
     //get encoded frame
     void NvEncoder::ProcessEncodedFrame(Frame& frame)
     {
-        //The frame hasn't been encoded, something wrong
-        if (!frame.isEncoding)
-        {
-            return;
-        }
-        frame.isEncoding = false;
 #pragma region retrieve encoded frame from output buffer
         NV_ENC_LOCK_BITSTREAM lockBitStream = { 0 };
         lockBitStream.version = NV_ENC_LOCK_BITSTREAM_VER;
@@ -325,14 +307,15 @@ namespace webrtc
         }
         errorCode = pNvEncodeAPI->nvEncUnlockBitstream(pEncoderInterface, frame.outputFrame);
         checkf(NV_RESULT(errorCode), StringFormat("Failed to unlock bit stream, error is %d", errorCode).c_str());
-        frame.isIdrFrame = lockBitStream.pictureType == NV_ENC_PIC_TYPE_IDR;
 #pragma endregion
-        rtc::scoped_refptr<FrameBuffer> buffer = new rtc::RefCountedObject<FrameBuffer>(m_width, m_height, frame.encodedFrame, m_encoderId);
-
+        const rtc::scoped_refptr<FrameBuffer> buffer =
+            new rtc::RefCountedObject<FrameBuffer>(
+                m_width, m_height, frame.encodedFrame, m_encoderId);
         const int64_t timestamp_us = m_clock->TimeInMicroseconds();
         const int64_t now_us = rtc::TimeMicros();
         const int64_t translated_camera_time_us =
-            timestamp_aligner_.TranslateTimestamp(timestamp_us,
+            timestamp_aligner_.TranslateTimestamp(
+                timestamp_us,
                 now_us);
 
         webrtc::VideoFrame::Builder builder =

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DummyVideoEncoder.h"
+#include "modules/video_coding/utility/simulcast_rate_allocator.h"
 
 namespace unity
 {
@@ -34,7 +35,13 @@ namespace webrtc
         {
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
-        m_codec = codec_settings;
+
+        m_codec = *codec_settings;
+        webrtc::SimulcastRateAllocator init_allocator(m_codec);
+        webrtc::VideoBitrateAllocation allocation =
+            init_allocator.Allocate(webrtc::VideoBitrateAllocationParameters(
+                webrtc::DataRate::KilobitsPerSec(m_codec.startBitrate), m_codec.maxFramerate));
+        SetRates(RateControlParameters(allocation, m_codec.maxFramerate));
 
         return WEBRTC_VIDEO_CODEC_OK;
     }
@@ -125,33 +132,10 @@ namespace webrtc
 
     void DummyVideoEncoder::SetRates(const RateControlParameters& parameters)
     {
+        int64_t frameRate = parameters.framerate_fps;
 
-        //
-        // "parameters.framerate_fps" which the parameter of the argument of
-        // "SetRates" method, in many cases this parameter is higher than
-        // the frequency of the encoding.
-        // Need to determine the right framerate to set to the hardware encoder,
-        // so collect timestamp of encoding and get stats.
-        // 
-        int64_t now_ms = m_clock->TimeInMilliseconds();
-        absl::optional<int64_t> encodeFrameRate = m_encode_fps.Rate(now_ms);
-        int64_t frameRate = encodeFrameRate.value_or(30);
-
-        //
-        // The bitrate adjuster is using for avoiding overshoot the bitrate.
-        // But, when a frame rate is low, estimation of bitrate may be low
-        // so it can not recover video quality.
-        // If it determine the low frame rate (defined as 15fps),
-        // use original bps to avoid bitrate undershoot.
-        // 
         m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
         uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
-        const uint32_t kLowFrameRate = 15;
-        if (frameRate < kLowFrameRate)
-        {
-            bitRate = parameters.bitrate.get_sum_bps();
-        }
-
 
         m_setRates(m_encoderId, bitRate, frameRate);
     }

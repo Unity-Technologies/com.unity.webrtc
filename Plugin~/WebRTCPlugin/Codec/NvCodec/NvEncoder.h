@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <thread>
-#include <atomic>
 #include <rtc_base/timestamp_aligner.h>
 
 #include "nvEncodeAPI.h"
@@ -30,8 +29,6 @@ namespace webrtc
             InputFrame inputFrame = {nullptr, nullptr, NV_ENC_BUFFER_FORMAT_UNDEFINED };
             OutputFrame outputFrame = nullptr;
             std::vector<uint8> encodedFrame = {};
-            bool isIdrFrame = false;
-            std::atomic<bool> isEncoding = { false };
         };
     public:
         NvEncoder(
