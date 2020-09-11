@@ -18,6 +18,7 @@ find_package(Threads REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH 
   "${CMAKE_SOURCE_DIR}/cmake"
+  "${CMAKE_SOURCE_DIR}/NvCodec"
 )
 
 find_package(WebRTC REQUIRED)
@@ -27,7 +28,9 @@ if(APPLE)
 else()
   find_package(CUDA REQUIRED)
   find_package(Vulkan REQUIRED)
+  add_subdirectory(NvCodec)
 endif()
+
 include(AddPlugin)
 
 enable_testing()
