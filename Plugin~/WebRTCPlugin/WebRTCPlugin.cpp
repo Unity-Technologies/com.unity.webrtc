@@ -316,6 +316,16 @@ extern "C"
         return obj->connection->AddTransceiver(track, *init).value().get();
     }
 
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithType(PeerConnectionObject* obj, cricket::MediaType type)
+    {
+        return obj->connection->AddTransceiver(type).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(PeerConnectionObject* obj, cricket::MediaType type, RtpTransceiverInit* init)
+    {
+        return obj->connection->AddTransceiver(type, *init).value().get();
+    }
+
     UNITY_INTERFACE_EXPORT void PeerConnectionRemoveTrack(PeerConnectionObject* obj, RtpSenderInterface* sender)
     {
         obj->connection->RemoveTrack(sender);

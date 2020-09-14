@@ -168,7 +168,7 @@ namespace webrtc
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
         //Always use SoftwareEncoder on Mac for now.
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = webrtc::CreateBuiltinVideoDecoderFactory();
+        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
 #else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
