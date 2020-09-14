@@ -30,6 +30,7 @@ public class MediaStreamSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
+    private DelegateOnNegotiationNeeded pc2OnNegotiationNeeded;
     private StringBuilder trackInfos;
     private bool videoUpdateStarted;
 
@@ -71,7 +72,8 @@ public class MediaStreamSample : MonoBehaviour
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e => { OnTrack(_pc2, e); };
-        pc1OnNegotiationNeeded = () => { StartCoroutine(Pc1OnNegotiationNeeded()); };
+        pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
+        pc2OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc2)); };
         infoText.text = !WebRTC.SupportHardwareEncoder ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
     }
 
@@ -118,15 +120,15 @@ public class MediaStreamSample : MonoBehaviour
                 throw new ArgumentOutOfRangeException(nameof(state), state, null);
         }
     }
-    IEnumerator Pc1OnNegotiationNeeded()
+    IEnumerator PcOnNegotiationNeeded(RTCPeerConnection pc)
     {
-        Debug.Log("pc1 createOffer start");
-        var op = _pc1.CreateOffer(ref _offerOptions);
+        Debug.Log($"{GetName(pc)} createOffer start");
+        var op = pc.CreateOffer(ref _offerOptions);
         yield return op;
 
         if (!op.IsError)
         {
-            yield return StartCoroutine(OnCreateOfferSuccess(op.Desc));
+            yield return StartCoroutine(OnCreateOfferSuccess(pc, op.Desc));
         }
         else
         {
@@ -185,6 +187,7 @@ public class MediaStreamSample : MonoBehaviour
         Debug.Log("Created remote peer connection object pc2");
         _pc2.OnIceCandidate = pc2OnIceCandidate;
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
+        _pc2.OnNegotiationNeeded = pc2OnNegotiationNeeded;
         _pc2.OnTrack = pc2Ontrack;
 
         RTCDataChannelInit conf = new RTCDataChannelInit(true);
@@ -192,7 +195,6 @@ public class MediaStreamSample : MonoBehaviour
         audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720, 1000000);
         RtImage.texture = cam.targetTexture;
-
     }
 
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
@@ -220,16 +222,16 @@ public class MediaStreamSample : MonoBehaviour
         return (pc == _pc1) ? _pc2 : _pc1;
     }
 
-    private IEnumerator OnCreateOfferSuccess(RTCSessionDescription desc)
+    private IEnumerator OnCreateOfferSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
     {
-        Debug.Log($"Offer from pc1\n{desc.sdp}");
-        Debug.Log("pc1 setLocalDescription start");
-        var op = _pc1.SetLocalDescription(ref desc);
+        Debug.Log($"Offer from {GetName(pc)}\n{desc.sdp}");
+        Debug.Log($"{GetName(pc)} setLocalDescription start");
+        var op = pc.SetLocalDescription(ref desc);
         yield return op;
 
         if (!op.IsError)
         {
-            OnSetLocalSuccess(_pc1);
+            OnSetLocalSuccess(pc);
         }
         else
         {
@@ -237,28 +239,29 @@ public class MediaStreamSample : MonoBehaviour
             OnSetSessionDescriptionError(ref error);
         }
 
-        Debug.Log("pc2 setRemoteDescription start");
-        var op2 = _pc2.SetRemoteDescription(ref desc);
+        var otherPc = GetOtherPc(pc);
+        Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
+        var op2 = otherPc.SetRemoteDescription(ref desc);
         yield return op2;
         if (!op2.IsError)
         {
-            OnSetRemoteSuccess(_pc2);
+            OnSetRemoteSuccess(otherPc);
         }
         else
         {
             var error = op2.Error;
             OnSetSessionDescriptionError(ref error);
         }
-        Debug.Log("pc2 createAnswer start");
+        Debug.Log($"{GetName(otherPc)} createAnswer start");
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
 
-        var op3 = _pc2.CreateAnswer(ref _answerOptions);
+        var op3 = otherPc.CreateAnswer(ref _answerOptions);
         yield return op3;
         if (!op3.IsError)
         {
-            yield return OnCreateAnswerSuccess(op3.Desc);
+            yield return OnCreateAnswerSuccess(otherPc, op3.Desc);
         }
         else
         {
@@ -286,16 +289,16 @@ public class MediaStreamSample : MonoBehaviour
         Debug.Log($"{GetName(pc)} SetRemoteDescription complete");
     }
 
-    IEnumerator OnCreateAnswerSuccess(RTCSessionDescription desc)
+    IEnumerator OnCreateAnswerSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
     {
-        Debug.Log($"Answer from pc2:\n{desc.sdp}");
-        Debug.Log("pc2 setLocalDescription start");
-        var op = _pc2.SetLocalDescription(ref desc);
+        Debug.Log($"Answer from {GetName(pc)}:\n{desc.sdp}");
+        Debug.Log($"{GetName(pc)} setLocalDescription start");
+        var op = pc.SetLocalDescription(ref desc);
         yield return op;
 
         if (!op.IsError)
         {
-            OnSetLocalSuccess(_pc2);
+            OnSetLocalSuccess(pc);
         }
         else
         {
@@ -303,13 +306,14 @@ public class MediaStreamSample : MonoBehaviour
             OnSetSessionDescriptionError(ref error);
         }
 
-        Debug.Log("pc1 setRemoteDescription start");
+        var otherPc = GetOtherPc(pc);
+        Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
 
-        var op2 = _pc1.SetRemoteDescription(ref desc);
+        var op2 = otherPc.SetRemoteDescription(ref desc);
         yield return op2;
         if (!op2.IsError)
         {
-            OnSetRemoteSuccess(_pc1);
+            OnSetRemoteSuccess(otherPc);
         }
         else
         {
