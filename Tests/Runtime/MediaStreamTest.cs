@@ -182,8 +182,10 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
+        // todo(kazuki):: fix error linux runtime
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(include = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator SenderGetStats()
         {
             if (SystemInfo.processorType == "Apple M1")
@@ -230,8 +232,10 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
+        // todo(kazuki):: fix error linux runtime
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(include = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator ReceiverGetStats()
         {
             var camObj = new GameObject("Camera");

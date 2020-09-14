@@ -8,8 +8,6 @@ target_sources(WebRTCLib
     DataChannelObject.h
     DummyAudioDevice.cpp
     DummyAudioDevice.h
-    DummyVideoEncoder.cpp
-    DummyVideoEncoder.h
     AudioTrackSinkAdapter.h
     AudioTrackSinkAdapter.cpp
     Logger.cpp
@@ -46,8 +44,15 @@ target_sources(WebRTCLib
     WebRTCPlugin.h
     UnityLogStream.h
     UnityLogStream.cpp
+    VideoFrame.cpp
+    VideoFrame.h
+    VideoFrameUtil.cpp
+    VideoFrameUtil.h
+    GpuMemoryBuffer.cpp
+    GpuMemoryBuffer.h
+    GpuMemoryBufferPool.cpp
+    GpuMemoryBufferPool.h
 )
-
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Visual Studio Generator has not been supported supression warnings of external headers yet.

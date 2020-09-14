@@ -9,8 +9,10 @@ namespace unity
 namespace webrtc
 {
 
-    MetalGraphicsDevice::MetalGraphicsDevice(id<MTLDevice>  device, IUnityGraphicsMetal* unityGraphicsMetal)
-        : m_device(device)
+    MetalGraphicsDevice::MetalGraphicsDevice(
+        id<MTLDevice>  device, IUnityGraphicsMetal* unityGraphicsMetal, UnityGfxRenderer renderer)
+        : IGraphicsDevice(renderer)
+        , m_device(device)
         , m_unityGraphicsMetal(unityGraphicsMetal)
     {
     }

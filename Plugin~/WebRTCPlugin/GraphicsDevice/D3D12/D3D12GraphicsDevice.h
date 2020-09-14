@@ -40,10 +40,11 @@ inline void ThrowIfFailed(HRESULT hr)
     }
 }
 
-class D3D12GraphicsDevice : public IGraphicsDevice{
+class D3D12GraphicsDevice : public IGraphicsDevice
+{
 public:
-    explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface );
-    explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue);
+    explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer);
+    explicit D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer);
     virtual ~D3D12GraphicsDevice();
     virtual bool InitV() override;
     virtual void ShutdownV() override;
@@ -57,10 +58,12 @@ public:
     virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
-    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    bool IsCudaSupport() override { return m_isCudaSupport; }
+    CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
 
+private:
     D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
     void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
     void Barrier(ID3D12Resource* res,
@@ -85,6 +88,9 @@ private:
     ID3D12Fence* m_copyResourceFence;
 	HANDLE m_copyResourceEventHandle;
     uint64_t m_copyResourceFenceValue = 1;
+
+    CUcontext m_context;
+    CUdevice m_device;
 };
 
 //---------------------------------------------------------------------------------------------------------------------

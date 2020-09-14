@@ -440,7 +440,7 @@ namespace webrtc
         {
 #if defined(SUPPORT_D3D12)
             device =
-                new D3D12GraphicsDevice(static_cast<ID3D12Device*>(nativeGfxDevice_), pCommandQueue.Get());
+                new D3D12GraphicsDevice(static_cast<ID3D12Device*>(nativeGfxDevice_), pCommandQueue.Get(), renderer);
 #endif
         }
         else

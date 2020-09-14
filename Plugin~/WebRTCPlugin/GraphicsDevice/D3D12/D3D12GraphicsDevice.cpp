@@ -1,9 +1,16 @@
 #include "pch.h"
 #include "D3D12GraphicsDevice.h"
+#include <cuda.h>
+#include <cudaD3D11.h>
+#include <wrl/client.h>
+
 #include "D3D12Texture2D.h"
 #include "D3D12Constants.h" //DEFAULT_HEAP_PROPS
-
+#include "NvCodecUtils.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/D3D11/D3D11Texture2D.h"
+
+using namespace Microsoft::WRL;
 
 namespace unity
 {
@@ -12,8 +19,10 @@ namespace webrtc
 
 //---------------------------------------------------------------------------------------------------------------------
 
-D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
-    : m_d3d12Device(nativeDevice)
+D3D12GraphicsDevice::D3D12GraphicsDevice(
+    ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer)
+    : IGraphicsDevice(renderer)
+    , m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
     , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
     , m_copyResourceFence(nullptr)
@@ -21,15 +30,16 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraph
 {
 }
 //---------------------------------------------------------------------------------------------------------------------
-D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue)
-    : m_d3d12Device(nativeDevice)
+D3D12GraphicsDevice::D3D12GraphicsDevice(
+    ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer)
+    : IGraphicsDevice(renderer)
+    , m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
     , m_d3d12CommandQueue(commandQueue)
     , m_copyResourceFence(nullptr)
     , m_copyResourceEventHandle(nullptr)
 {
 }
-
 
 //---------------------------------------------------------------------------------------------------------------------
 D3D12GraphicsDevice::~D3D12GraphicsDevice()
@@ -174,15 +184,21 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
     const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
     ID3D12Resource* nativeTex = nullptr;
-    ThrowIfFailed(m_d3d12Device->CreateCommittedResource(&D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
+    ThrowIfFailed(m_d3d12Device->CreateCommittedResource(
+        &D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
         nullptr, IID_PPV_ARGS(&nativeTex)));
 
+    if (nativeTex == nullptr)
+        return nullptr;
+
     ID3D11Texture2D* sharedTex = nullptr;
-    HANDLE handle = nullptr;   
-    ThrowIfFailed(m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
+    HANDLE handle = nullptr;
+    ThrowIfFailed(m_d3d12Device->CreateSharedHandle(
+        nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
 
     //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
-    ThrowIfFailed(m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex)));
+    ThrowIfFailed(m_d3d11Device->OpenSharedResource1(
+        handle, IID_PPV_ARGS(&sharedTex)));
 
     return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
 }
@@ -214,7 +230,8 @@ void D3D12GraphicsDevice::Barrier(ID3D12Resource* res,
 
 //----------------------------------------------------------------------------------------------------------------------
 
-ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(
+    uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
     const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device);
     if (FAILED(hr)){
@@ -226,9 +243,11 @@ ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, U
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
+    ITexture2D* baseTex)
 {
-    D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
+    D3D12Texture2D* tex =
+        reinterpret_cast<D3D12Texture2D*>(baseTex);
     assert(nullptr != tex);
     if (nullptr == tex)
         return nullptr;
@@ -240,22 +259,23 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
 
     const uint32_t width = tex->GetWidth();
     const uint32_t height = tex->GetHeight();
-    const D3D12ResourceFootprint* resFP = tex->GetNativeTextureFootprint();
+    const D3D12ResourceFootprint* footprint = tex->GetNativeTextureFootprint();
+    const uint32_t rowSize = static_cast<uint32_t>(footprint->RowSize);
 
     //Map to read from CPU
     uint8* data{};
     const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
     assert(hr == S_OK);
-    if (hr!=S_OK) {
+    if (hr != S_OK) {
         return nullptr;
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-        width, height, static_cast<uint32_t>(resFP->RowSize), static_cast<uint8_t*>(data)
-    );
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
+        GraphicsUtility::ConvertRGBToI420Buffer(
+            width, height, rowSize, static_cast<uint8_t*>(data));
 
     D3D12_RANGE emptyRange{ 0, 0 };
-    readbackResource->Unmap(0,&emptyRange);
+    readbackResource->Unmap(0, &emptyRange);
 
     return i420_buffer; 
 }

@@ -15,11 +15,17 @@ namespace webrtc
 
         MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex);
         virtual ~MetalTexture2D();
+        
+        std::unique_ptr<GpuMemoryBufferHandle> Map() override
+        {
+            // todo(kazuki):: not supported
+            throw;
+        }
 
-        inline virtual void* GetNativeTexturePtrV();
-        inline virtual const void* GetNativeTexturePtrV() const;
-        inline virtual void* GetEncodeTexturePtrV();
-        inline virtual const void* GetEncodeTexturePtrV() const;
+        inline void* GetNativeTexturePtrV() override;
+        inline const void* GetNativeTexturePtrV() const override;
+        inline void* GetEncodeTexturePtrV() override;
+        inline const void* GetEncodeTexturePtrV() const override;
 
     };
 

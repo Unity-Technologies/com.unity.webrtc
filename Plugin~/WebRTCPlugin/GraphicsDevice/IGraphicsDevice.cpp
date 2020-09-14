@@ -6,7 +6,8 @@ namespace unity
 namespace webrtc
 {
 
-IGraphicsDevice::IGraphicsDevice() {
+IGraphicsDevice::IGraphicsDevice(UnityGfxRenderer renderer) : m_gfxRenderer(renderer)
+{
 }
 
 //---------------------------------------------------------------------------------------------------------------------

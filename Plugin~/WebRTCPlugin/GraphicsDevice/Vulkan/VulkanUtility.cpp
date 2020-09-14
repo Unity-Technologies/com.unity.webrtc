@@ -300,8 +300,9 @@ VkResult VulkanUtility::BeginOneTimeCommandBufferInto(const VkDevice device, con
 //---------------------------------------------------------------------------------------------------------------------
 
 //Uses vkQueueWaitIdle to synchronize
-VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
-                                                  const VkQueue queue, VkCommandBuffer commandBuffer)
+VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(
+    const VkDevice device, const VkCommandPool commandPool, 
+    const VkQueue queue, VkCommandBuffer commandBuffer)
 {
     vkEndCommandBuffer(commandBuffer);
 

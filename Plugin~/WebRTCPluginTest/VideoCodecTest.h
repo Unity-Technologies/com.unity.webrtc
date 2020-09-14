@@ -1,0 +1,114 @@
+#pragma once
+
+#include "api/test/frame_generator_interface.h"
+#include "api/video_codecs/h264_profile_level_id.h"
+#include "api/video_codecs/video_codec.h"
+#include "api/video_codecs/video_decoder.h"
+#include "api/video_codecs/video_encoder.h"
+#include "media/base/codec.h"
+#include "rtc_base/checks.h"
+#include "gtest/gtest.h"
+
+namespace unity
+{
+namespace webrtc
+{
+    using namespace ::webrtc;
+    using namespace ::webrtc::test;
+
+// todo(kazuki):: move another header for CUDA platform
+    constexpr int kNumCores = 1;
+    constexpr size_t kMaxPayloadSize = 1440;
+    const H264ProfileLevelId kProfileLevelId(H264Profile::kProfileBaseline, H264Level::kLevel3_1);
+    VideoEncoder::Capabilities kCapabilities();
+    std::string kProfileLevelIdString();
+    VideoEncoder::Settings kSettings();
+
+    constexpr void SetDefaultSettings(VideoCodec* codec_settings)
+    {
+        codec_settings->codecType = kVideoCodecH264;
+        codec_settings->maxFramerate = 60;
+        codec_settings->width = 1280;
+        codec_settings->height = 720;
+        // If frame dropping is false, we get a warning that bitrate can't
+        // be controlled for RC_QUALITY_MODE; RC_BITRATE_MODE and RC_TIMESTAMP_MODE
+        codec_settings->H264()->frameDroppingOn = true;
+        codec_settings->startBitrate = 2000;
+        codec_settings->maxBitrate = 4000;
+    }
+
+    class VideoCodecTest : public testing::TestWithParam<UnityGfxRenderer>
+    {
+    public:
+        VideoCodecTest()
+            : encodedImageCallback_(this)
+            , decodedImageCallback_(this)
+        {
+        }
+        virtual ~VideoCodecTest() override { }
+
+        virtual std::unique_ptr<VideoEncoder> CreateEncoder() = 0;
+        virtual std::unique_ptr<VideoDecoder> CreateDecoder() = 0;
+        virtual std::unique_ptr<FrameGeneratorInterface> CreateFrameGenerator(
+            int width,
+            int height,
+            absl::optional<FrameGeneratorInterface::OutputType> type,
+            absl::optional<int> num_squares) = 0;
+        void SetUp() override;
+
+        VideoFrame NextInputFrame();
+
+        // Helper method for waiting a single encoded frame.
+        bool WaitForEncodedFrame(EncodedImage* frame, CodecSpecificInfo* codec_specific_info);
+        bool WaitForEncodedFrames(std::vector<EncodedImage>* frames, std::vector<CodecSpecificInfo>* codec_specific_info);
+
+    protected:
+        class FakeEncodedImageCallback : public EncodedImageCallback
+        {
+        public:
+            explicit FakeEncodedImageCallback(VideoCodecTest* test)
+                : _test(test)
+            {
+            }
+            Result OnEncodedImage(const EncodedImage& frame, const CodecSpecificInfo* codec_specific_info) override;
+
+        private:
+            VideoCodecTest* _test;
+        };
+        class FakeDecodedImageCallback : public DecodedImageCallback
+        {
+        public:
+            explicit FakeDecodedImageCallback(VideoCodecTest* test)
+                : _test(test)
+            {
+            }
+            int32_t Decoded(VideoFrame& decodedImage) override
+            {
+                RTC_CHECK_NOTREACHED();
+                return -1;
+            }
+            void
+            Decoded(VideoFrame& frame, absl::optional<int32_t> decode_time_ms, absl::optional<uint8_t> qp) override;
+
+        private:
+            VideoCodecTest* _test;
+        };
+
+        VideoCodec codecSettings_;
+        std::unique_ptr<VideoEncoder> encoder_;
+        std::unique_ptr<VideoDecoder> decoder_;
+        std::unique_ptr<test::FrameGeneratorInterface> inputFrameGenerator_;
+
+    private:
+        rtc::Event encodedFrameEvent_;
+        rtc::Event decodedFrameEvent_;
+        Mutex encodedFrameSection_;
+        Mutex decodedFrameSection_;
+        std::vector<EncodedImage> encodedFrames_;
+        absl::optional<VideoFrame> decodedFrame_;
+        std::vector<CodecSpecificInfo> codecSpecificInfos_;
+        FakeEncodedImageCallback encodedImageCallback_;
+        FakeDecodedImageCallback decodedImageCallback_;
+    };
+}
+}

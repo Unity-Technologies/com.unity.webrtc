@@ -43,6 +43,7 @@ void VulkanTexture2D::Shutdown()
 //---------------------------------------------------------------------------------------------------------------------
 
 bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device) {
+    m_physicalDevice = physicalDevice;
     m_device = device;
 
     const bool EXPORT_HANDLE = true;
@@ -63,11 +64,7 @@ bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice
     m_textureImageMemory = m_unityVulkanImage.memory.memory;
     m_textureImageMemorySize = m_unityVulkanImage.memory.size;
 
-#if CUDA_PLATFORM
-    return (CUDA_SUCCESS == m_cudaImage.Init(m_device, this));
-#else
     return true;
-#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -93,6 +90,18 @@ bool VulkanTexture2D::InitCpuRead(const VkPhysicalDevice physicalDevice, const V
     m_textureImageMemorySize = m_unityVulkanImage.memory.size;
     return true;
 }
+    std::unique_ptr<GpuMemoryBufferHandle> VulkanTexture2D::Map()
+    {
+#if CUDA_PLATFORM
+        if(CUDA_SUCCESS != m_cudaImage.Init(m_device, this))
+            throw;
 
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        handle->array = m_cudaImage.GetArray();
+        return handle;
+#else
+        RTC_CHECK_NOTREACHED();
+#endif
+    }
 } // end namespace webrtc
 } // end namespace unity

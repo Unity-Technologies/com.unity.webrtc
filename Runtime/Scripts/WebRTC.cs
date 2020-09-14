@@ -392,7 +392,7 @@ namespace Unity.WebRTC
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
-            s_context = Context.Create(encoderType:type, forTest:forTest);
+            s_context = Context.Create(encoderType:type);
             NativeMethods.SetCurrentContext(s_context.self);
 
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
@@ -471,9 +471,11 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         public static EncoderType GetEncoderType()
         {
-            return s_context.GetEncoderType();
+            // todo(kazuki): remove this APi
+            return EncoderType.Hardware;
         }
 
         /// <summary>
@@ -834,7 +836,7 @@ namespace Unity.WebRTC
         public static extern void RegisterDebugLog(DelegateDebugLog func, [MarshalAs(UnmanagedType.U1)] bool enableNativeLog,
             NativeLoggingSeverity nativeLoggingSeverity);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreate(int uid, EncoderType encoderType, [MarshalAs(UnmanagedType.U1)] bool forTest);
+        public static extern IntPtr ContextCreate(int uid);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDestroy(int uid);
         [DllImport(WebRTC.Lib)]
@@ -866,13 +868,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteStatsReport(IntPtr context, IntPtr report);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height, GraphicsFormat format, IntPtr texturePtr);
-        [DllImport(WebRTC.Lib)]
         public static extern void ContextAddRefPtr(IntPtr context, IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteRefPtr(IntPtr context, IntPtr ptr);
-        [DllImport(WebRTC.Lib)]
-        public static extern CodecInitializationResult GetInitializationResult(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -1058,8 +1056,6 @@ namespace Unity.WebRTC
         public static extern void AudioTrackSinkProcessAudio(
             IntPtr sink, float[] data, int length, int channels, int sampleRate);
         [DllImport(WebRTC.Lib)]
-        public static extern EncoderType ContextGetEncoderType(IntPtr context);
-        [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MediaStreamAddTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
@@ -1161,30 +1157,15 @@ namespace Unity.WebRTC
 
     internal static class VideoEncoderMethods
     {
-        static UnityEngine.Rendering.CommandBuffer _command = new UnityEngine.Rendering.CommandBuffer();
+        static CommandBuffer _command = new CommandBuffer();
         enum VideoStreamRenderEventId
         {
-            Initialize = 0,
             Encode = 1,
-            Finalize = 2,
         }
 
-        public static void InitializeEncoder(IntPtr callback, IntPtr track)
+        public static void Encode(IntPtr callback, IntPtr data)
         {
-            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Initialize, track);
-            Graphics.ExecuteCommandBuffer(_command);
-            _command.Clear();
-        }
-
-        public static void Encode(IntPtr callback, IntPtr track)
-        {
-            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Encode, track);
-            Graphics.ExecuteCommandBuffer(_command);
-            _command.Clear();
-        }
-        public static void FinalizeEncoder(IntPtr callback, IntPtr track)
-        {
-            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Finalize, track);
+            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Encode, data);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }

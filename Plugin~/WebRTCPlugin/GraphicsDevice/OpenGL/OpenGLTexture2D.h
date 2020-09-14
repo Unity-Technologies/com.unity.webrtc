@@ -3,6 +3,11 @@
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
 
+#if CUDA_PLATFORM
+#include "GraphicsDevice/Cuda/CudaContext.h"
+#endif
+
+
 namespace unity
 {
 namespace webrtc
@@ -13,10 +18,16 @@ public:
     OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex);
     virtual ~OpenGLTexture2D();
 
-    inline virtual void* GetNativeTexturePtrV();
-    inline virtual const void* GetNativeTexturePtrV() const;
-    inline virtual void* GetEncodeTexturePtrV();
-    inline virtual const void* GetEncodeTexturePtrV() const;
+    inline void* GetNativeTexturePtrV() override;
+    inline const void* GetNativeTexturePtrV() const override;
+    inline void* GetEncodeTexturePtrV() override;
+    inline const void* GetEncodeTexturePtrV() const override;
+
+    std::unique_ptr<GpuMemoryBufferHandle> Map() override
+    {
+        // todo(kazuki):: not supported yet.
+        throw;
+    }
 
     void CreatePBO();
     size_t GetBufferSize() const { return m_width * m_height * 4; }

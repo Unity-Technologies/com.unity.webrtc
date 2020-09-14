@@ -13,7 +13,7 @@ namespace webrtc
 
     GraphicsDeviceTestBase::GraphicsDeviceTestBase()
     {
-        std::tie(m_unityGfxRenderer, m_encoderType, m_textureFormat) = GetParam();
+        std::tie(m_unityGfxRenderer, m_textureFormat) = GetParam();
         container_ = std::make_unique<GraphicsDeviceContainer>(m_unityGfxRenderer);
     }
 

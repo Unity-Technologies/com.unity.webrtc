@@ -14,7 +14,9 @@ namespace webrtc
 GLuint fbo[2];
 #endif
 
-OpenGLGraphicsDevice::OpenGLGraphicsDevice()
+OpenGLGraphicsDevice::OpenGLGraphicsDevice(
+    UnityGfxRenderer renderer)
+    : IGraphicsDevice(renderer)
 {
 }
 

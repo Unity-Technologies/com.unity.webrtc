@@ -12,6 +12,7 @@ class ICudaDevice
 public:
     virtual bool IsCudaSupport() = 0;
     virtual CUcontext GetCUcontext() = 0;
+    virtual NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() = 0;
 };
 } // namespace webrtc
 } // namespace unity

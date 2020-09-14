@@ -6,9 +6,11 @@
 
 #include "Context.h"
 #include "ScopedProfiler.h"
-#include "Codec/EncoderFactory.h"
+#include "UnityVideoTrackSource.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "VideoFrame.h"
+#include "GpuMemoryBufferPool.h"
 
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
@@ -21,6 +23,9 @@ enum class VideoStreamRenderEventID
     Finalize = 2
 };
 
+using namespace unity::webrtc;
+using namespace ::webrtc;
+
 namespace unity
 {
 namespace webrtc
@@ -28,13 +33,13 @@ namespace webrtc
     IUnityInterfaces* s_UnityInterfaces = nullptr;
     IUnityGraphics* s_Graphics = nullptr;
     Context* s_context = nullptr;
-    std::map<const MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
     std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     std::unique_ptr <Clock> s_clock;
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     std::unique_ptr<IGraphicsDevice> s_gfxDevice;
+    std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
 
     IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
     {
@@ -117,7 +122,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         /// First time, s_UnityInterfaces return UnityGfxRenderer as kUnityGfxRendererNull.
         /// The actual value of UnityGfxRenderer is returned on second time.
 
-        s_mapEncoder.clear();
         s_mapVideoRenderer.clear();
 
         UnityGfxRenderer renderer =
@@ -144,11 +148,11 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             s_gfxDevice->InitV();
         }
+        s_bufferPool = std::make_unique<GpuMemoryBufferPool>(s_gfxDevice.get());
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
-        s_mapEncoder.clear();
         s_mapVideoRenderer.clear();
 
         if (s_gfxDevice != nullptr)
@@ -250,6 +254,17 @@ void PluginUnload()
     s_clock.reset();
 }
 
+// Data format used by the managed code.
+// CommandBuffer.IssuePluginEventAndData method pass data packed by this format. 
+struct EncodeData
+{
+    void* texture;
+    UnityVideoTrackSource* source;
+    int width;
+    int height;
+    UnityRenderingExtTextureFormat format;
+};
+
 // Notice: When DebugLog is used in a method called from RenderingThread, 
 // it hangs when attempting to leave PlayMode and re-enter PlayMode.
 // So, we comment out `DebugLog`.
@@ -264,52 +279,36 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     if(!lock.owns_lock())
         return;
 
-    MediaStreamTrackInterface* track =
-        static_cast<MediaStreamTrackInterface*>(data);
+    EncodeData* encodeData =
+        static_cast<EncodeData*>(data);
+
+    RTC_DCHECK_GT(encodeData->width, 0);
+    RTC_DCHECK_GT(encodeData->height, 0);
+
     const VideoStreamRenderEventID event =
         static_cast<VideoStreamRenderEventID>(eventID);
 
-    if (!s_context->ExistsRefPtr(track))
-    {
-        RTC_LOG(LS_INFO) << "OnRenderEvent:: track is not found";
-        return;
-    }
 
     switch(event)
     {
-        case VideoStreamRenderEventID::Initialize:
-        {
-            const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
-            const UnityEncoderType encoderType = s_context->GetEncoderType();
-            UnityVideoTrackSource* source = s_context->GetVideoSource(track);
-            UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
-            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
-                param->textureHandle, s_gfxDevice.get(), gfxRenderer);
-            source->Init(ptr);
-            s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
-                param->width, param->height, s_gfxDevice.get(), encoderType, param->textureFormat);
-            if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
-            {
-                // DebugLog("Encoder initialization failed.");
-            }
-            return;
-        }
         case VideoStreamRenderEventID::Encode:
         {
-            UnityVideoTrackSource* source = s_context->GetVideoSource(track);
+            UnityVideoTrackSource* source = encodeData->source;
             if (source == nullptr)
                 return;
-            int64_t timestamp_us = s_clock->TimeInMicroseconds();
+            Timestamp timestamp = s_clock->CurrentTime();
+            IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
+            UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
+            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
+                encodeData->texture, device, gfxRenderer);
+            Size size(encodeData->width, encodeData->height);
             {
                 ScopedProfiler profiler(*s_MarkerEncode);
-                source->OnFrameCaptured(timestamp_us);
+
+                auto frame =
+                    s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp.us());
+                source->OnFrameCaptured(std::move(frame));
             }
-            return;
-        }
-        case VideoStreamRenderEventID::Finalize:
-        {
-            s_context->FinalizeEncoder(s_mapEncoder[track].get());
-            s_mapEncoder.erase(track);
             return;
         }
         default: {
@@ -342,10 +341,7 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 
         auto renderer = s_context->GetVideoRenderer(params->userData);
         if (renderer == nullptr)
-        {
-            // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
             return;
-        }
         s_mapVideoRenderer[params->userData] = renderer;
         {
             ScopedProfiler profiler(*s_MarkerDecode);

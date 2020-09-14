@@ -11,9 +11,9 @@ namespace webrtc
 {
 
 VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
-    const VkPhysicalDevice physicalDevice,
-    const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex)
-    : m_unityVulkan(unityVulkan)
+    const VkPhysicalDevice physicalDevice, const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex, UnityGfxRenderer renderer)
+        : IGraphicsDevice(renderer)
+    , m_unityVulkan(unityVulkan)
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
@@ -64,7 +64,8 @@ std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr)
 }
 
 //Returns null if failed
-ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(
+    const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
 
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->Init(m_physicalDevice, m_device)) {
@@ -88,7 +89,8 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(
+    uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device)) {
         delete (vulkanTexture);
@@ -147,6 +149,20 @@ bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     );
 
     return true;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+NativeTexPtr VulkanGraphicsDevice::ConvertNativeFromUnityPtr(void* tex)
+{
+    std::unique_ptr<UnityVulkanImage> unityVulkanImage = std::make_unique<UnityVulkanImage>();
+    VkImageSubresource subResource{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
+    if (!m_unityVulkan->AccessTexture(tex, &subResource, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_READ_BIT, kUnityVulkanResourceAccess_PipelineBarrier,
+        unityVulkanImage.get()))
+    {
+        return nullptr;
+    }
+    return unityVulkanImage.release();
 }
 
 //---------------------------------------------------------------------------------------------------------------------

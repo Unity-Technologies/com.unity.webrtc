@@ -36,6 +36,5 @@ private:
     CUcontext m_context;
 };
 
-
 } // end namespace webrtc
 } // end namespace unity

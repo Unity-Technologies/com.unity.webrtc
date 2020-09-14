@@ -1,5 +1,11 @@
 #pragma once
 
+#if CUDA_PLATFORM
+#include <cuda.h>
+#endif
+
+#include "GpuMemoryBuffer.h"
+
 namespace unity
 {
 namespace webrtc
@@ -15,10 +21,19 @@ public:
 
     virtual ~ITexture2D() = 0;
 
+    /// <summary>
+    /// Get the pointer taken from Unity
+    /// </summary>
     virtual void* GetNativeTexturePtrV() = 0;
+    /// <summary>
+    /// Get the pointer taken from Unity
+    /// </summary>
     virtual const void* GetNativeTexturePtrV() const = 0;
+
     virtual void* GetEncodeTexturePtrV() = 0;
     virtual const void* GetEncodeTexturePtrV() const = 0;
+
+    virtual std::unique_ptr<GpuMemoryBufferHandle> Map() = 0;
 
     uint32_t GetWidth() const { return m_width; };
     uint32_t GetHeight()  const { return m_height; };

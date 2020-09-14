@@ -9,9 +9,10 @@ namespace unity
 namespace webrtc
 {
 
-class D3D11GraphicsDevice : public IGraphicsDevice{
+class D3D11GraphicsDevice : public IGraphicsDevice
+{
 public:
-    D3D11GraphicsDevice(ID3D11Device* nativeDevice);
+    D3D11GraphicsDevice(ID3D11Device* nativeDevice, UnityGfxRenderer renderer);
     virtual ~D3D11GraphicsDevice();
     virtual bool InitV() override;
     virtual void ShutdownV() override;
@@ -21,13 +22,14 @@ public:
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
+
     virtual rtc::scoped_refptr < ::webrtc::I420Buffer > ConvertRGBToI420(ITexture2D* tex) override;
 
-    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    bool IsCudaSupport() override { return m_isCudaSupport; }
+    CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
     ID3D11Device* m_d3d11Device;
-    ID3D11DeviceContext* m_d3d11Context;
 
     bool m_isCudaSupport;
     CudaContext m_cudaContext;

@@ -32,6 +32,7 @@ public:
     inline ID3D12Resource* GetReadbackResource() const;
     inline const D3D12ResourceFootprint* GetNativeTextureFootprint() const;
 
+    std::unique_ptr<GpuMemoryBufferHandle> Map() override;
 private:
     ID3D12Resource* m_nativeTexture;
     HANDLE m_sharedHandle;

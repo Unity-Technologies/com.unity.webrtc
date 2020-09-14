@@ -3,7 +3,7 @@
 #include "WebRTCConstants.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #endif
 
@@ -14,9 +14,10 @@ namespace webrtc
 
 namespace webrtc = ::webrtc;
 
-class OpenGLGraphicsDevice : public IGraphicsDevice{
+class OpenGLGraphicsDevice : public IGraphicsDevice
+{
 public:
-    OpenGLGraphicsDevice();
+    OpenGLGraphicsDevice(UnityGfxRenderer renderer);
     virtual ~OpenGLGraphicsDevice();
 
     virtual bool InitV() override;
@@ -30,14 +31,16 @@ public:
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
 
-#if defined(CUDA_PLATFORM)
-    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+#if CUDA_PLATFORM
+    bool IsCudaSupport() override { return m_isCudaSupport; }
+    CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 #endif
+
 private:
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
 #endif

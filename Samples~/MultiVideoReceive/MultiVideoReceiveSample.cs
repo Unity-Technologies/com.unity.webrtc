@@ -39,8 +39,8 @@ class MultiVideoReceiveSample : MonoBehaviour
     private bool videoUpdateStarted;
     private int objectIndex = 0;
     private int videoIndex = 0;
-    private const int DefaultWidth = 128;
-    private const int DefaultHeight = 128;
+    private const int DefaultWidth = 256;
+    private const int DefaultHeight = 256;
     private int width = DefaultWidth;
     private int height = DefaultHeight;
 

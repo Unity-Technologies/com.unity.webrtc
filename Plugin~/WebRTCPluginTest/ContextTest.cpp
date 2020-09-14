@@ -3,8 +3,6 @@
 #include "GraphicsDeviceTestBase.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
-#include "Codec/EncoderFactory.h"
-#include "Codec/IEncoder.h"
 #include "Context.h"
 
 #include "rtc_base/ref_counted_object.h"
@@ -22,16 +20,13 @@ protected:
     const int width = 256;
     const int height = 256;
     std::unique_ptr<Context> context;
-    std::unique_ptr<IEncoder> encoder_;
     DelegateVideoFrameResize callback_videoframeresize;
 
     void SetUp() override {
         GraphicsDeviceTestBase::SetUp();
-        encoder_ = EncoderFactory::GetInstance().Init(width, height, device(), m_encoderType, m_textureFormat);
-        EXPECT_NE(nullptr, encoder_);
         EXPECT_NE(nullptr, device());
 
-        context = std::make_unique<Context>();
+        context = std::make_unique<Context>(device());
         callback_videoframeresize = &OnFrameSizeChange;
     }
 
@@ -48,7 +43,6 @@ TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     EXPECT_NE(nullptr, tex);
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
-    EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
 
     context->RemoveRefPtr(track);
     context->RemoveRefPtr(source);
@@ -66,7 +60,6 @@ TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
     EXPECT_NE(nullptr, track);
-    EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
 
     context->RemoveRefPtr(track);
     context->RemoveRefPtr(source);

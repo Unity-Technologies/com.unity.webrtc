@@ -83,23 +83,25 @@ IGraphicsDevice* GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 //---------------------------------------------------------------------------------------------------------------------
 
 IGraphicsDevice* GraphicsDevice::Init(
-    const UnityGfxRenderer rendererType, void* device, IUnityInterface* unityInterface)
+    const UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface)
 {
     IGraphicsDevice* pDevice = nullptr;
-    switch (rendererType) {
+    switch (renderer) {
 #if SUPPORT_D3D11
     case kUnityGfxRendererD3D11: {
         RTC_DCHECK(device);
-        pDevice = new D3D11GraphicsDevice(static_cast<ID3D11Device*>(device));
+        pDevice = new D3D11GraphicsDevice(
+            static_cast<ID3D11Device*>(device), renderer);
         break;
     }
 #endif
 #if SUPPORT_D3D12
     case kUnityGfxRendererD3D12: {
         RTC_DCHECK(device);
-        pDevice = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device),
-            reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface)
-        );
+        pDevice = new D3D12GraphicsDevice(
+            static_cast<ID3D12Device*>(device),
+            reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface),
+            renderer);
         break;
     }
 #endif
@@ -107,7 +109,7 @@ IGraphicsDevice* GraphicsDevice::Init(
     case kUnityGfxRendererOpenGLES20:
     case kUnityGfxRendererOpenGLES30:
     case kUnityGfxRendererOpenGLCore: {
-        pDevice = new OpenGLGraphicsDevice();
+        pDevice = new OpenGLGraphicsDevice(renderer);
         break;
     }
 #endif
@@ -122,7 +124,8 @@ IGraphicsDevice* GraphicsDevice::Init(
             vulkan->physicalDevice,
             vulkan->device,
             vulkan->graphicsQueue,
-            vulkan->queueFamilyIndex
+            vulkan->queueFamilyIndex,
+            renderer
         );
         break;
     }
@@ -133,12 +136,12 @@ IGraphicsDevice* GraphicsDevice::Init(
         id<MTLDevice> metalDevice = reinterpret_cast<id<MTLDevice>>(device);
         IUnityGraphicsMetal* metalUnityInterface =
             reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
-        pDevice = new MetalGraphicsDevice(metalDevice, metalUnityInterface);
+        pDevice = new MetalGraphicsDevice(metalDevice, metalUnityInterface, renderer);
         break;
     }
 #endif
     default: {
-        DebugError("Unsupported Unity Renderer: %d", rendererType);
+        DebugError("Unsupported Unity Renderer: %d", renderer);
         return nullptr;
     }
     }
