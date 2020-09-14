@@ -2,7 +2,10 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
+#if !defined(UNITY_OSX)
 #include "Codec/NvCodec/NvEncoder.h"
+#endif
+
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
