@@ -49,7 +49,3 @@ The package contains the following 3 samples.
 To get these samples, Push the `Import into Project` button on Package Manager.
 
 ![Download package sample](images/download_package_sample.png)
-
-## Other Languages
-
-- [Japanese](jp/index.md)
