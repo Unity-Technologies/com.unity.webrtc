@@ -106,6 +106,7 @@ if(MSVC)
       ${GTEST_MAIN_LIBRARIES}
       ${GTEST_LIBRARIES}
       ${GMOCK_LIBRARIES}
+      ${NVCODEC_LIBRARIES}
       d3d11
       d3d12
       dxgi
@@ -119,10 +120,7 @@ if(MSVC)
     PRIVATE
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
-  )    
-  set_target_properties( WebRTCPluginTest 
-    PROPERTIES LINK_FLAGS 
-      "/DEBUG"
+      ${NVCODEC_INCLUDE_DIR}
   )
 
   # Creare precompiled header
@@ -181,12 +179,14 @@ elseif(UNIX)
       ${GMOCK_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT}
       ${Vulkan_LIBRARY}
+      ${NVCODEC_LIBRARIES}      
       cuda
   )
   target_include_directories(WebRTCPluginTest
     PRIVATE
       ..
       ${CUDA_INCLUDE_DIRS}
+      ${NVCODEC_INCLUDE_DIR}
   )
 endif()
 
