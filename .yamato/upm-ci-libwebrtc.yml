@@ -16,6 +16,16 @@ platforms:
     image: cds-ops/ubuntu-18.04-base:stable
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_linux.sh
+  - name: android
+    type: Unity::VM
+    image: cds-ops/ubuntu-18.04-base:stable
+    flavor: b1.xlarge
+    build_command: BuildScripts~/build_libwebrtc_android.sh
+  - name: ios
+    type: Unity::VM::osx
+    image: slough-ops/macos-10.14-xcode:stable
+    flavor: m1.mac  
+    build_command: BuildScripts~/build_libwebrtc_ios.sh
 projects:
   - name: libwebrtc
 ---
