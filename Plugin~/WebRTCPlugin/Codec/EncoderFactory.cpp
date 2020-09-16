@@ -17,8 +17,9 @@
 
 #include "SoftwareCodec/SoftwareEncoder.h"
 
+#if !defined(UNITY_OSX)
 #include "NvCodec/NvEncoderCuda.h"
-
+#endif
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #if defined(SUPPORT_METAL)

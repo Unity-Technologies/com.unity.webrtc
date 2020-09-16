@@ -103,6 +103,7 @@ if(MSVC)
       ${WEBRTC_LIBRARY}
       ${Vulkan_LIBRARY}
       ${CUDA_CUDA_LIBRARY}
+      ${NVCODEC_LIBRARIES}
       d3d11
       winmm
       Secur32
@@ -114,12 +115,13 @@ if(MSVC)
     PRIVATE
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
+      ${NVCODEC_INCLUDE_DIR}
   )
 
   # Set linker option
   set_target_properties( webrtc 
     PROPERTIES LINK_FLAGS 
-      "/DEBUG /SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+      "/SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
   )
 
   # Change output directory for shared library
@@ -186,12 +188,14 @@ elseif(UNIX)
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
       ${Vulkan_LIBRARY}
+      ${NVCODEC_LIBRARIES}
       cuda
   )
   target_include_directories(webrtc
     PRIVATE
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
+      ${NVCODEC_INCLUDE_DIR}
   )
 endif()
 
