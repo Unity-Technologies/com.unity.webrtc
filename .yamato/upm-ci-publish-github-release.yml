@@ -7,6 +7,10 @@ platforms:
     artifact_filename: webrtc-linux.zip
   - name: macos 
     artifact_filename: webrtc-mac.zip
+  - name: ios
+    artifact_filename: webrtc-ios.zip
+  - name: android
+    artifact_filename: webrtc-android.zip
 ---
 publish_com.unity.webrtc_github_release:
   name: Publish com.unity.webrtc to Github Release

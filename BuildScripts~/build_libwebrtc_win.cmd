@@ -17,7 +17,7 @@ set PYPI_URL=https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/si
 set vs2017_install=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools
 
 if not exist src (
-  call fetch.bat webrtc
+  call fetch.bat --nohooks webrtc
   cd src
   call git.bat config --system core.longpaths true
   call git.bat checkout  refs/remotes/branch-heads/%WEBRTC_VERSION%
@@ -32,27 +32,34 @@ rem install pywin32
 call "%cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe" ^
   -m pip install pywin32 --index-url "%PYPI_URL%" --upgrade
 
-rem generate ninja for release
-call gn.bat gen %OUTPUT_DIR% --root="src" ^
-  --args="is_debug=false is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
-
-rem build
-ninja.exe -C %OUTPUT_DIR%
-
 mkdir "%ARTIFACTS_DIR%\lib"
 
-rem copy static library for release build
-copy "%OUTPUT_DIR%\obj\webrtc.lib" "%ARTIFACTS_DIR%\lib\webrtc.lib"
+setlocal enabledelayedexpansion
 
-rem generate ninja for debug build
-call gn.bat gen %OUTPUT_DIR% --root="src" ^
-  --args="is_debug=true is_clang=false target_cpu=\"x64\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
+for %%i in (x64) do (
+  mkdir "%ARTIFACTS_DIR%/lib/%%i"
+  for %%j in (true false) do (
 
-rem build
-ninja.exe -C %OUTPUT_DIR%
+    rem generate ninja for release
+    call gn.bat gen %OUTPUT_DIR% --root="src" ^
+      --args="is_debug=%%j is_clang=false target_cpu=\"%%i\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
-rem copy static library for debug build
-copy "%OUTPUT_DIR%\obj\webrtc.lib" "%ARTIFACTS_DIR%\lib\webrtcd.lib"
+    rem build
+    ninja.exe -C %OUTPUT_DIR%
+
+    set filename=
+    if true==%%j (
+      set filename=webrtcd.lib
+    ) else (
+      set filename=webrtc.lib
+    )
+
+    rem copy static library for release build
+    copy "%OUTPUT_DIR%\obj\webrtc.lib" "%ARTIFACTS_DIR%\lib\%%i\!filename!"
+  )
+)
+
+endlocal
 
 rem fix error when generate license
 patch -N "%cd%\src\tools_webrtc\libs\generate_licenses.py" < ^
