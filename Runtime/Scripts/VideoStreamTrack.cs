@@ -16,7 +16,7 @@ namespace Unity.WebRTC
         UnityEngine.Texture m_sourceTexture;
         UnityEngine.RenderTexture m_destTexture;
 
-        UnityVideoSink m_sink;
+        UnityVideoRenderer m_renderer;
 
         private static UnityEngine.RenderTexture CreateRenderTexture(int width, int height,
             UnityEngine.RenderTextureFormat format)
@@ -52,7 +52,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                return m_sink != null && m_sink.self != IntPtr.Zero;
+                return m_renderer != null && m_renderer.self != IntPtr.Zero;
             }
         }
 
@@ -63,8 +63,8 @@ namespace Unity.WebRTC
             m_sourceTexture = CreateRenderTexture(1280, 720, format);
             m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
 
-            m_sink = new UnityVideoSink(WebRTC.Context.CreateVideoRenderer());
-            NativeMethods.VideoTrackAddOrUpdateSink(self, m_sink.self);
+            m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer());
+            NativeMethods.VideoTrackAddOrUpdateSink(self, m_renderer.self);
 
             return m_destTexture;
         }
@@ -81,7 +81,7 @@ namespace Unity.WebRTC
                 UnityEngine.Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
             }
 
-            WebRTC.Context.UpdateRendererTexture(m_sink.rendererId, m_sourceTexture);
+            WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_sourceTexture);
         }
 
         internal void Update()
@@ -167,10 +167,10 @@ namespace Unity.WebRTC
                     UnityEngine.Object.DestroyImmediate(m_destTexture);
                 }
 
-                if (m_sink != null)
+                if (m_renderer != null)
                 {
-                    NativeMethods.VideoTrackRemoveSink(self, m_sink.self);
-                    m_sink.Dispose();
+                    NativeMethods.VideoTrackRemoveSink(self, m_renderer.self);
+                    m_renderer.Dispose();
                 }
 
                 tracks.Remove(this);
@@ -217,18 +217,18 @@ namespace Unity.WebRTC
         }
     }
 
-    public class UnityVideoSink : IDisposable
+    internal class UnityVideoRenderer : IDisposable
     {
         internal IntPtr self;
-        internal uint rendererId => NativeMethods.GetVideoRendererId(self);
+        internal uint id => NativeMethods.GetVideoRendererId(self);
         private bool disposed;
 
-        public UnityVideoSink(IntPtr ptr)
+        public UnityVideoRenderer(IntPtr ptr)
         {
             self = ptr;
         }
 
-        ~UnityVideoSink()
+        ~UnityVideoRenderer()
         {
             this.Dispose();
         }

@@ -48,7 +48,7 @@ public class MediaStreamSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize();
         callButton.onClick.AddListener(Call);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
