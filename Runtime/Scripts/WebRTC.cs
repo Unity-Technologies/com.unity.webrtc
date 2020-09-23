@@ -688,6 +688,9 @@ namespace Unity.WebRTC
         public static extern StatsMemberType StatsMemberGetType(IntPtr member);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool StatsMemberIsDefined(IntPtr member);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool StatsMemberGetBool(IntPtr member);
         [DllImport(WebRTC.Lib)]
         public static extern int StatsMemberGetInt(IntPtr member);
