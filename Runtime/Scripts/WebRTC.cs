@@ -72,9 +72,10 @@ namespace Unity.WebRTC
     public struct RTCError
     {
         public int errorType;
-        public string message;
-        public long errorDetailType;
-        public long sctpCauseCode;
+        public IntPtr messagePtr;
+        public int errorDetailType;
+        public ushort sctpCauseCode;
+        public string message => messagePtr.AsAnsiStringWithFreeMem();
     }
 
     public enum RTCPeerConnectionState
