@@ -270,6 +270,31 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        [Test]
+        public void CreateAndDeleteVideoRenderer()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var renderer = NativeMethods.CreateVideoRenderer(context);
+            NativeMethods.DeleteVideoRenderer(context, renderer);
+            NativeMethods.ContextDestroy(0);
+        }
+
+        [Test]
+        public void AddAndRemoveVideoRendererToVideoTrack()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            const int width = 1280;
+            const int height = 720;
+            var renderTexture = CreateRenderTexture(width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
+            var renderer = NativeMethods.CreateVideoRenderer(context);
+            NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
+            NativeMethods.VideoTrackRemoveSink(track, renderer);
+            NativeMethods.DeleteVideoRenderer(context, renderer);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDestroy(0);
+            UnityEngine.Object.DestroyImmediate(renderTexture);
+        }
 
         [Test]
         public void CallGetRenderEventFunc()
@@ -349,6 +374,54 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
+        }
+
+        [Test]
+        public void CallGetUpdateTextureFunc()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var callback = NativeMethods.GetUpdateTextureFunc(context);
+            Assert.AreNotEqual(callback, IntPtr.Zero);
+            NativeMethods.ContextDestroy(0);
+            NativeMethods.GetUpdateTextureFunc(IntPtr.Zero);
+        }
+
+        [UnityTest]
+        [Ignore("todo::Need encoderType is Software")]
+        public IEnumerator CallVideoDecoderMethods()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            const int width = 1280;
+            const int height = 720;
+            var renderTexture = CreateRenderTexture(width, height);
+            var receiveTexture = CreateRenderTexture(width, height);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
+            var renderer = NativeMethods.CreateVideoRenderer(context);
+            var rendererId = NativeMethods.GetVideoRendererId(renderer);
+            NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
+
+            var renderEvent = NativeMethods.GetRenderEventFunc(context);
+            var updateTextureEvent = NativeMethods.GetUpdateTextureFunc(context);
+
+            NativeMethods.ContextSetVideoEncoderParameter(context, track, width, height);
+            VideoEncoderMethods.InitializeEncoder(renderEvent, track);
+            yield return new WaitForSeconds(1.0f);
+
+            VideoEncoderMethods.Encode(renderEvent, track);
+            yield return new WaitForSeconds(1.0f);
+
+            VideoDecoderMethods.UpdateRendererTexture(updateTextureEvent, receiveTexture, rendererId);
+            yield return new WaitForSeconds(1.0f);
+
+            VideoEncoderMethods.FinalizeEncoder(renderEvent, track);
+            yield return new WaitForSeconds(1.0f);
+
+            NativeMethods.VideoTrackRemoveSink(track, renderer);
+            NativeMethods.DeleteVideoRenderer(context, renderer);
+            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDestroy(0);
+            UnityEngine.Object.DestroyImmediate(renderTexture);
+            UnityEngine.Object.DestroyImmediate(receiveTexture);
         }
     }
 
