@@ -455,7 +455,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateGetStats(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDFailure(IntPtr ptr);
+    internal delegate void DelegateCreateSDFailure(IntPtr ptr, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativePeerConnectionSetSessionDescSuccess(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
