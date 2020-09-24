@@ -8,6 +8,7 @@ namespace Unity.WebRTC
     {
         public bool active;
         public ulong? maxBitrate;
+        public ulong? minBitrate;
         public uint? maxFramerate;
         public double? scaleResolutionDownBy;
         public string rid;
@@ -17,6 +18,8 @@ namespace Unity.WebRTC
             active = parameter.active;
             if (parameter.hasValueMaxBitrate)
                 maxBitrate = parameter.maxBitrate;
+            if (parameter.hasValueMinBitrate)
+                minBitrate = parameter.minBitrate;
             if (parameter.hasValueMaxFramerate)
                 maxFramerate = parameter.maxFramerate;
             if (parameter.hasValueScaleResolutionDownBy)
@@ -31,6 +34,9 @@ namespace Unity.WebRTC
             instance.hasValueMaxBitrate = maxBitrate.HasValue;
             if(maxBitrate.HasValue)
                 instance.maxBitrate = maxBitrate.Value;
+            instance.hasValueMinBitrate = minBitrate.HasValue;
+            if (minBitrate.HasValue)
+                instance.minBitrate = minBitrate.Value;
             instance.hasValueMaxFramerate = maxFramerate.HasValue;
             if (maxFramerate.HasValue)
                 instance.maxFramerate = maxFramerate.Value;
@@ -100,6 +106,9 @@ namespace Unity.WebRTC
         [MarshalAs(UnmanagedType.U1)]
         public bool hasValueMaxBitrate;
         public ulong maxBitrate;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool hasValueMinBitrate;
+        public ulong minBitrate;
         [MarshalAs(UnmanagedType.U1)]
         public bool hasValueMaxFramerate;
         public uint maxFramerate;

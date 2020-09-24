@@ -659,6 +659,8 @@ extern "C"
         bool active;
         bool hasValueMaxBitrate;
         uint64_t maxBitrate;
+        bool hasValueMinBitrate;
+        uint64_t minBitrate;
         bool hasValueMaxFramerate;
         uint32_t maxFramerate;
         bool hasValueScaleResolutionDownBy;
@@ -685,6 +687,8 @@ extern "C"
             dst->encodings[i].active = src.encodings[i].active;
             dst->encodings[i].hasValueMaxBitrate = src.encodings[i].max_bitrate_bps.has_value();
             dst->encodings[i].maxBitrate = src.encodings[i].max_bitrate_bps.value_or(0);
+            dst->encodings[i].hasValueMinBitrate = src.encodings[i].min_bitrate_bps.has_value();
+            dst->encodings[i].minBitrate = src.encodings[i].min_bitrate_bps.value_or(0);
             dst->encodings[i].hasValueMaxFramerate = src.encodings[i].max_framerate.has_value();
             dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value_or(0);
             dst->encodings[i].hasValueScaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.has_value();
@@ -704,6 +708,8 @@ extern "C"
             dst.encodings[i].active = src->encodings[i].active;
             if(src->encodings[i].hasValueMaxBitrate)
                 dst.encodings[i].max_bitrate_bps = static_cast<int>(src->encodings[i].maxBitrate);
+            if (src->encodings[i].hasValueMinBitrate)
+                dst.encodings[i].min_bitrate_bps = static_cast<int>(src->encodings[i].minBitrate);
             if (src->encodings[i].hasValueMaxFramerate)
                 dst.encodings[i].max_framerate = static_cast<int>(src->encodings[i].maxFramerate);
             if (src->encodings[i].hasValueScaleResolutionDownBy)
