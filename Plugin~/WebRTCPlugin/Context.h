@@ -114,7 +114,8 @@ namespace webrtc
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
-
+        std::map<const UnityVideoRenderer*, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
+ 
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
 
