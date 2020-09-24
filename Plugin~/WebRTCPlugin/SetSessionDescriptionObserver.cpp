@@ -39,7 +39,7 @@ namespace webrtc
     {
         for (auto delegate : m_vectorDelegateSetSDFailure)
         {
-            delegate(m_connection, error);
+            delegate(m_connection, error.type(), error.message());
         }
     }
     

@@ -11,7 +11,6 @@ namespace webrtc
     class PeerConnectionObject;
     enum class RTCSdpType;
     enum class RTCPeerConnectionEventType;
-    struct RTCError;
     struct MediaStreamEvent;
 
     using DelegateDebugLog = void(*)(const char*);
@@ -19,7 +18,7 @@ namespace webrtc
     using DelegateMediaStreamOnAddTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
     using DelegateMediaStreamOnRemoveTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
     using DelegateSetSessionDescSuccess = void(*)(PeerConnectionObject*);
-    using DelegateSetSessionDescFailure = void(*)(PeerConnectionObject*, webrtc::RTCError);
+    using DelegateSetSessionDescFailure = void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
 
     void debugLog(const char* buf);
     void SetResolution(int32* width, int32* length);
@@ -110,15 +109,6 @@ namespace webrtc
         Video
     };
 
-    struct RTCError
-    {
-        RTCErrorDetailType errorDetail;
-        long sdpLineNumber;
-        long httpRequestStatusCode;
-        long sctpCauseCode;
-        unsigned long receivedAlert;
-        unsigned long sentAlert;
-    };
 
     struct RTCSessionDescription
     {

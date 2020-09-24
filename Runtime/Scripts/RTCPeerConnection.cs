@@ -738,12 +738,13 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
-        static void OnSetSessionDescFailure(IntPtr ptr, RTCError error)
+        static void OnSetSessionDescFailure(IntPtr ptr, RTCErrorType type, string message)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
+                    RTCError error = new RTCError { errorType = type, message = message };
                     connection.OnSetSessionDescriptionFailure(error);
                 }
             });
