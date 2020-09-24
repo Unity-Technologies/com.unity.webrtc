@@ -114,7 +114,6 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
-
         public IEnumerator CreateOffer()
         {
             var config = GetConfiguration();
@@ -133,7 +132,6 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
-
         public IEnumerator CreateAnswerFailed()
         {
             var config = GetConfiguration();
@@ -144,8 +142,9 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op;
             Assert.True(op.IsDone);
 
-            // This is failed 
+            // This is failed
             Assert.True(op.IsError);
+            Assert.IsNotEmpty(op.Error.message);
 
             peer.Close();
             peer.Dispose();
@@ -187,7 +186,6 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
-
         public IEnumerator SetLocalDescription()
         {
             var peer = new RTCPeerConnection();
@@ -245,6 +243,73 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(desc.type, desc2.type);
 
             channel1.Dispose();
+            peer1.Close();
+            peer2.Close();
+            peer1.Dispose();
+            peer2.Dispose();
+        }
+
+        [UnityTest]
+        [Timeout(1000)]
+        [Category("PeerConnection")]
+        public IEnumerator SetLocalDescriptionFailed()
+        {
+            var peer = new RTCPeerConnection();
+            var stream = new MediaStream();
+            var track = new AudioStreamTrack("audio");
+            var sender = peer.AddTrack(track, stream);
+
+            RTCOfferOptions options = default;
+            var op = peer.CreateOffer(ref options);
+            yield return op;
+            Assert.True(op.IsDone);
+            Assert.False(op.IsError);
+            var desc = op.Desc;
+            // change sdp to cannot parse
+            desc.sdp = desc.sdp.Replace("m=audio", "m=audiable");
+            var op2 = peer.SetLocalDescription(ref desc);
+            yield return op2;
+            Assert.True(op2.IsDone);
+            Assert.True(op2.IsError);
+            Assert.IsNotEmpty(op2.Error.message);
+
+            peer.RemoveTrack(sender);
+            track.Dispose();
+            stream.Dispose();
+            peer.Close();
+            peer.Dispose();
+        }
+
+        [UnityTest]
+        [Timeout(1000)]
+        [Category("PeerConnection")]
+        public IEnumerator SetRemoteDescriptionFailed()
+        {
+            var config = GetConfiguration();
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+
+            var stream = new MediaStream();
+            var track = new AudioStreamTrack("audio");
+            var sender = peer1.AddTrack(track, stream);
+
+            RTCOfferOptions options1 = default;
+            var op1 = peer1.CreateOffer(ref options1);
+            yield return op1;
+            var desc = op1.Desc;
+            var op2 = peer1.SetLocalDescription(ref desc);
+            yield return op2;
+            // change sdp to cannot parse
+            desc.sdp = desc.sdp.Replace("m=audio", "m=audiable");
+            var op3 = peer2.SetRemoteDescription(ref desc);
+            yield return op3;
+            Assert.True(op3.IsDone);
+            Assert.True(op3.IsError);
+            Assert.IsNotEmpty(op3.Error.message);
+
+            peer1.RemoveTrack(sender);
+            track.Dispose();
+            stream.Dispose();
             peer1.Close();
             peer2.Close();
             peer1.Dispose();
