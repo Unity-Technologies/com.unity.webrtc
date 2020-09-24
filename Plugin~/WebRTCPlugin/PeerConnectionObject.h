@@ -9,7 +9,7 @@ namespace webrtc
 {
 
     using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
-    using DelegateCreateSDFailure = void(*)(PeerConnectionObject*);
+    using DelegateCreateSDFailure = void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
     using DelegateLocalSdpReady = void(*)(PeerConnectionObject*, const char*, const char*);
     using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
     using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);

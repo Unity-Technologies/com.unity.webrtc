@@ -85,7 +85,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
-        static void PeerConnectionSetSessionDescFailure(IntPtr connection, RTCError error)
+        static void PeerConnectionSetSessionDescFailure(IntPtr connection, RTCErrorType type, string message)
         {
         }
 

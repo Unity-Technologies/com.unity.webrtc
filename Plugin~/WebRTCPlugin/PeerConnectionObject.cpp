@@ -62,7 +62,7 @@ namespace webrtc
         //RTCError _error = { RTCErrorDetailType::IdpTimeout };
         if (onCreateSDFailure != nullptr)
         {
-            onCreateSDFailure(this);
+            onCreateSDFailure(this, error.type(), error.message());
         }
     }
 

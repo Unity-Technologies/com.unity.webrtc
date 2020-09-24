@@ -71,10 +71,8 @@ namespace Unity.WebRTC
 
     public struct RTCError
     {
-        public int errorType;
+        public RTCErrorType errorType;
         public string message;
-        public long errorDetailType;
-        public long sctpCauseCode;
     }
 
     public enum RTCPeerConnectionState
@@ -121,7 +119,8 @@ namespace Unity.WebRTC
         InvalidModification,
         NetworkError,
         ResourceExhausted,
-        InternalError
+        InternalError,
+        OperationErrorWithData
     }
 
     public enum RTCPeerConnectionEventType
@@ -456,11 +455,11 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateGetStats(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDFailure(IntPtr ptr);
+    internal delegate void DelegateCreateSDFailure(IntPtr ptr, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativePeerConnectionSetSessionDescSuccess(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativePeerConnectionSetSessionDescFailure(IntPtr ptr, RTCError error);
+    internal delegate void DelegateNativePeerConnectionSetSessionDescFailure(IntPtr ptr, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

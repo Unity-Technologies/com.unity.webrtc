@@ -205,7 +205,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        /// <seealso cref="RTCIceCandidate​"/>
+        /// <seealso cref="RTCIceCandidate"/>
         public DelegateOnIceCandidate OnIceCandidate
         {
             private get => onIceCandidate;
@@ -556,13 +556,14 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDFailure))]
-        static void OnFailureCreateSessionDesc(IntPtr ptr)
+        static void OnFailureCreateSessionDesc(IntPtr ptr, RTCErrorType type, string message)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     connection.m_opSessionDesc.IsError = true;
+                    connection.m_opSessionDesc.Error = new RTCError{errorType = type, message = message};
                     connection.m_opSessionDesc.Done();
                 }
             });
@@ -738,12 +739,13 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
-        static void OnSetSessionDescFailure(IntPtr ptr, RTCError error)
+        static void OnSetSessionDescFailure(IntPtr ptr, RTCErrorType type, string message)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
+                    RTCError error = new RTCError { errorType = type, message = message };
                     connection.OnSetSessionDescriptionFailure(error);
                 }
             });
