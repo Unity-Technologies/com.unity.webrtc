@@ -59,9 +59,8 @@ namespace webrtc
     void ContextManager::DestroyContext(int uid)
     {
         auto it = s_instance.m_contexts.find(uid);
-        std::lock_guard<std::mutex> lock(it->second->mutex);
-
-        if (it != s_instance.m_contexts.end()) {
+        if (it != s_instance.m_contexts.end())
+        {
             s_instance.m_contexts.erase(it);
             DebugLog("Unregistered context with ID %d", uid);
         }
@@ -192,23 +191,27 @@ namespace webrtc
 
     Context::~Context()
     {
-        m_peerConnectionFactory = nullptr;
-        m_audioTrack = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
 
-        m_mapIdAndEncoder.clear();
-        m_mediaSteamTrackList.clear();
-        m_mapClients.clear();
-        m_mapVideoCapturer.clear();
-        m_mapMediaStream.clear();
-        m_mapMediaStreamObserver.clear();
-        m_mapSetSessionDescriptionObserver.clear();
-        m_mapVideoEncoderParameter.clear();
-        m_mapDataChannels.clear();
+            m_peerConnectionFactory = nullptr;
+            m_audioTrack = nullptr;
 
-        m_workerThread->Quit();
-        m_workerThread.reset();
-        m_signalingThread->Quit();
-        m_signalingThread.reset();
+            m_mapIdAndEncoder.clear();
+            m_mediaSteamTrackList.clear();
+            m_mapClients.clear();
+            m_mapVideoCapturer.clear();
+            m_mapMediaStream.clear();
+            m_mapMediaStreamObserver.clear();
+            m_mapSetSessionDescriptionObserver.clear();
+            m_mapVideoEncoderParameter.clear();
+            m_mapDataChannels.clear();
+
+            m_workerThread->Quit();
+            m_workerThread.reset();
+            m_signalingThread->Quit();
+            m_signalingThread.reset();
+        }
     }
 
     bool Context::InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track)

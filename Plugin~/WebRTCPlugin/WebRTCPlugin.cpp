@@ -407,6 +407,11 @@ extern "C"
         return ConvertArray(stats->Members(), length);
     }
 
+    UNITY_INTERFACE_EXPORT bool StatsMemberIsDefined(const RTCStatsMemberInterface* member)
+    {
+        return member->is_defined();
+    }
+
     UNITY_INTERFACE_EXPORT const char* StatsMemberGetName(const RTCStatsMemberInterface* member)
     {
         return ConvertString(std::string(member->name()));
