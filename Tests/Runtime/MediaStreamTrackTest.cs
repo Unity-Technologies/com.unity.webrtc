@@ -109,6 +109,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStream")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator VideoStreamTrackInstantiateMultiple()
         {
             var width = 256;
