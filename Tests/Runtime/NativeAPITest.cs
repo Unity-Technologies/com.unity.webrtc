@@ -293,6 +293,8 @@ namespace Unity.WebRTC.RuntimeTest
                 encodings[i].active = true;
                 encodings[i].hasValueMaxBitrate = true;
                 encodings[i].maxBitrate = 10000000;
+                encodings[i].hasValueMinBitrate = true;
+                encodings[i].minBitrate = 10000000;
                 encodings[i].hasValueMaxFramerate = true;
                 encodings[i].maxFramerate = 30;
                 encodings[i].hasValueScaleResolutionDownBy = true;

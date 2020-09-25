@@ -134,8 +134,7 @@ namespace webrtc
     {
         int64_t frameRate = parameters.framerate_fps;
 
-        m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
-        uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        uint32_t bitRate = parameters.bitrate.get_sum_bps();
 
         m_setRates(m_encoderId, bitRate, frameRate);
     }
