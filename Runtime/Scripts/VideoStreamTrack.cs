@@ -171,6 +171,7 @@ namespace Unity.WebRTC
                 {
                     NativeMethods.VideoTrackRemoveSink(self, m_renderer.self);
                     m_renderer.Dispose();
+                    UnityEngine.Object.DestroyImmediate(m_sourceTexture);
                 }
 
                 tracks.Remove(this);

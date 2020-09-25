@@ -21,9 +21,6 @@ public class VideoReceiveSample : MonoBehaviour
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
     private MediaStream audioStream, videoStream, receiveStream;
-    private RTCDataChannel remoteDataChannel;
-    private Coroutine sdpCheck;
-    private string msg;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
