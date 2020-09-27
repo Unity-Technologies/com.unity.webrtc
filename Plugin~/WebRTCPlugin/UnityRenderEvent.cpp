@@ -83,9 +83,12 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (s_context == nullptr)
         return;
-    std::lock_guard<std::mutex> lock(s_context->mutex);
-    if(!ContextManager::GetInstance()->Exists(s_context))
+    if (!ContextManager::GetInstance()->Exists(s_context))
         return;
+    std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
+    if(!lock.owns_lock()) {
+        return;
+    }
     const auto track = reinterpret_cast<::webrtc::MediaStreamTrackInterface*>(data);
     const auto event = static_cast<VideoStreamRenderEventID>(eventID);
 

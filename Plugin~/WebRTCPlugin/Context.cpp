@@ -13,6 +13,8 @@
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
 
+using namespace ::webrtc;
+
 namespace unity
 {
 namespace webrtc
@@ -200,7 +202,6 @@ namespace webrtc
             m_mapIdAndEncoder.clear();
             m_mediaSteamTrackList.clear();
             m_mapClients.clear();
-            m_mapVideoCapturer.clear();
             m_mapMediaStream.clear();
             m_mapMediaStreamObserver.clear();
             m_mapSetSessionDescriptionObserver.clear();
@@ -214,14 +215,28 @@ namespace webrtc
         }
     }
 
-    bool Context::InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track)
+    UnityVideoTrackSource* Context::GetVideoSource(const MediaStreamTrackInterface* track)
     {
-        if (encoder->GetCodecInitializationResult() != CodecInitializationResult::Success)
-        {
-            return false;
-        }
+        const auto result = std::find_if(
+            m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
+            [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
+        if (result == m_mediaSteamTrackList.end())
+            return nullptr;
 
-        m_mapVideoCapturer[track]->SetEncoder(encoder);
+        const VideoTrackInterface* videoTrack = static_cast<const VideoTrackInterface*>(track);
+        UnityVideoTrackSource* source = static_cast<UnityVideoTrackSource*>(videoTrack->GetSource());
+        return source;
+    }
+
+    bool Context::InitializeEncoder(IEncoder* encoder, MediaStreamTrackInterface* track)
+    {
+        UnityVideoTrackSource* source = GetVideoSource(track);
+        if (source == nullptr)
+            return false;
+        if (encoder->GetCodecInitializationResult() != CodecInitializationResult::Success)
+            return false;
+
+        source->SetEncoder(encoder);
 
         uint32_t id = GenerateUniqueId();
         encoder->SetEncoderId(id);
@@ -235,17 +250,15 @@ namespace webrtc
         return true;
     }
 
-    bool Context::EncodeFrame(webrtc::MediaStreamTrackInterface* track)
+    bool Context::EncodeFrame(MediaStreamTrackInterface* track)
     {
-        auto it = m_mapVideoCapturer.find(track);
-        if(it != m_mapVideoCapturer.end() && it->second != nullptr)
-        {
-            it->second->OnFrameCaptured();
-        }
+        UnityVideoTrackSource* source = GetVideoSource(track);
+        if(source != nullptr)
+            source->OnFrameCaptured();
         return true;
     }
 
-    const VideoEncoderParameter* Context::GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track)
+    const VideoEncoderParameter* Context::GetEncoderParameter(const MediaStreamTrackInterface* track)
     {
         return m_mapVideoEncoderParameter[track].get();
     }
@@ -276,9 +289,12 @@ namespace webrtc
         return m_encoderType;
     }
 
-    CodecInitializationResult Context::GetInitializationResult(webrtc::MediaStreamTrackInterface* track)
+    CodecInitializationResult Context::GetInitializationResult(MediaStreamTrackInterface* track)
     {
-        return m_mapVideoCapturer[track]->GetCodecInitializationResult();
+        UnityVideoTrackSource* source = GetVideoSource(track);
+        if (source != nullptr)
+            return source->GetCodecInitializationResult();
+        return CodecInitializationResult::NotInitialized;
     }
 
     webrtc::MediaStreamInterface* Context::CreateMediaStream(const std::string& streamId)
@@ -306,13 +322,13 @@ namespace webrtc
     webrtc::VideoTrackInterface* Context::CreateVideoTrack(
         const std::string& label, void* frame)
     {
-        rtc::scoped_refptr<UnityVideoTrackSource> src =
+        const rtc::scoped_refptr<UnityVideoTrackSource> source =
             new rtc::RefCountedObject<UnityVideoTrackSource>(frame, false, nullptr);
 
-        rtc::scoped_refptr<webrtc::VideoTrackInterface> videoTrack =
-            m_peerConnectionFactory->CreateVideoTrack(label, src).release();
-        m_mapVideoCapturer[videoTrack] = src.get();
-        return videoTrack;
+        const rtc::scoped_refptr<VideoTrackInterface> track =
+            m_peerConnectionFactory->CreateVideoTrack(label, source);
+        m_mediaSteamTrackList.push_back(track);
+        return track;
     }
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
@@ -320,19 +336,31 @@ namespace webrtc
         // todo:(kazuki)
     }
 
-    webrtc::AudioTrackInterface* Context::CreateAudioTrack(const std::string& label)
+    AudioTrackInterface* Context::CreateAudioTrack(const std::string& label)
     {
         //avoid optimization specially for voice
         cricket::AudioOptions audioOptions;
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
-        return m_peerConnectionFactory->CreateAudioTrack(label, m_peerConnectionFactory->CreateAudioSource(audioOptions)).release();
+        const rtc::scoped_refptr<AudioSourceInterface> source =
+            m_peerConnectionFactory->CreateAudioSource(audioOptions);
+        const rtc::scoped_refptr<AudioTrackInterface> track =
+            m_peerConnectionFactory->CreateAudioTrack(label, source);
+        m_mediaSteamTrackList.push_back(track);
+
+        return track;
     }
 
-    void Context::DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
+    void Context::DeleteMediaStreamTrack(MediaStreamTrackInterface* track)
     {
-        track->Release();
+        const auto result = std::find_if(
+            m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
+            [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
+        if(result != m_mediaSteamTrackList.end())
+        {
+            m_mediaSteamTrackList.erase(result);
+        }
     }
 
     void Context::ProcessAudioData(const float* data, int32 size)
