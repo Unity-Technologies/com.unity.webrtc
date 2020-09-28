@@ -147,7 +147,7 @@ namespace Unity.WebRTC
         /// Creates from MediaStreamTrack object
         /// </summary>
         /// <param name="sourceTrack"></param>
-        public VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
+        internal VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
             tracks.Add(this);
         }

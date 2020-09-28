@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "UnityVideoDecoderFactory.h"
+#include "absl/strings/match.h"
 
 namespace unity
 {

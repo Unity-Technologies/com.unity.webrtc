@@ -65,7 +65,15 @@ protected:
     }
 };
 
-// todo::(kazuki) fix MetalGraphicsDevice.mm
+TEST_P(VideoRendererTest, SetAndGetFrameBuffer)
+{
+    int width = 256;
+    int height = 256;
+    auto builder = CreateBlackFrameBuilder(width, height);
+    m_renderer->OnFrame(builder.build());
+    EXPECT_NE(nullptr, m_renderer->GetFrameBuffer());
+}
+
 #if !defined(SUPPORT_METAL)
 TEST_P(VideoRendererTest, SendTestFrame)
 {
