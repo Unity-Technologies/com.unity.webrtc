@@ -83,10 +83,10 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized);
 
             sendVideoTrack.Update();
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.1f);
 
             receiveVideoTrack.UpdateReceiveTexture();
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.1f);
 
             receiveVideoTrack.Dispose();
             receiveStream.Dispose();
