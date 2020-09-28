@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -129,6 +130,26 @@ namespace Unity.WebRTC.RuntimeTest
             var pc1SetRemoteDescription = offerPc.SetRemoteDescription(ref answerDesc);
             yield return pc1SetRemoteDescription;
             Assert.False(pc1SetRemoteDescription.IsError);
+
+            var waitConnectOfferPc = new WaitUntilWithTimeout(() =>
+                offerPc.IceConnectionState == RTCIceConnectionState.Connected ||
+                offerPc.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return waitConnectOfferPc;
+            Assert.True(waitConnectOfferPc.IsCompleted);
+
+            var waitConnectAnswerPc = new WaitUntilWithTimeout(() =>
+                answerPc.IceConnectionState == RTCIceConnectionState.Connected ||
+                answerPc.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return waitConnectAnswerPc;
+            Assert.True(waitConnectAnswerPc.IsCompleted);
+
+            var checkSenders = new WaitUntilWithTimeout(() => offerPc.GetSenders().Any(), 5000);
+            yield return checkSenders;
+            Assert.True(checkSenders.IsCompleted);
+
+            var checkReceivers = new WaitUntilWithTimeout(() => answerPc.GetReceivers().Any(), 5000);
+            yield return checkReceivers;
+            Assert.True(checkReceivers.IsCompleted);
         }
     }
 }
