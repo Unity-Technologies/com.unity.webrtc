@@ -387,9 +387,15 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
-        [Ignore("todo::Need encoderType is Software")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer })]
         public IEnumerator CallVideoDecoderMethods()
         {
+            if (encoderType == EncoderType.Hardware)
+            {
+                //Todo: If Support Codec VP8/VP9 on HardwareEncoder or Support Codec H264 on Decoder, it can test on hardware encoder.
+                yield break;
+            }
+
             var context = NativeMethods.ContextCreate(0, encoderType);
             const int width = 1280;
             const int height = 720;
