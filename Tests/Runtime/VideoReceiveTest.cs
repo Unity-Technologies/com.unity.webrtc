@@ -35,8 +35,10 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt1);
         }
 
+        // todo::Software encoder does not support yet on linux
         [UnityTest]
-        [Timeout(10000)]
+        [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer })]
         public IEnumerator VideoReceive()
         {
             var config = new RTCConfiguration
@@ -55,7 +57,6 @@ namespace Unity.WebRTC.RuntimeTest
                 {
                     receiveVideoTrack = (VideoStreamTrack)e.Track;
                     receiveImage = receiveVideoTrack.InitializeReceiver();
-                    RenderTexture.active = receiveImage;
                 }
             };
             pc2.OnTrack = e => receiveStream.AddTrack(e.Track);
