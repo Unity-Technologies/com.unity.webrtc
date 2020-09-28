@@ -18,6 +18,8 @@ file(GLOB sources
 # Apple/Unix specific source files
 if(MSVC)
   file(GLOB append_source
+    NvCodec/*.h
+    NvCodec/*.cpp
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
     ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h

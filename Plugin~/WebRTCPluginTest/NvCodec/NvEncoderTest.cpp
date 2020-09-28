@@ -1,8 +1,9 @@
 #include "pch.h"
-#include "../GraphicsDeviceTestBase.h"
-#include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
-#include "../WebRTCPlugin/Codec/EncoderFactory.h"
-#include "../WebRTCPlugin/Codec/IEncoder.h"
+#include "GraphicsDeviceTestBase.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
+#include "Codec/EncoderFactory.h"
+#include "Codec/IEncoder.h"
 
 namespace unity
 {
@@ -35,7 +36,7 @@ TEST_P(NvEncoderTest, CopyBuffer) {
     const auto width = 256;
     const auto height = 256;
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
-    const auto result = encoder_->CopyBuffer(tex->GetEncodeTexturePtrV());
+    const auto result = encoder_->CopyBuffer(tex->GetNativeTexturePtrV());
     EXPECT_TRUE(result);
 }
 
