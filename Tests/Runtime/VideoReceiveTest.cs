@@ -59,12 +59,14 @@ namespace Unity.WebRTC.RuntimeTest
             var receiveStream = new MediaStream();
             VideoStreamTrack receiveVideoTrack = null;
             RenderTexture receiveImage = null;
+            bool initializeDecoder = false;
             receiveStream.OnAddTrack = e =>
             {
-                if (e.Track.Kind == TrackKind.Video)
+                if (e.Track.Kind == TrackKind.Video && e.Track is VideoStreamTrack track)
                 {
-                    receiveVideoTrack = (VideoStreamTrack)e.Track;
+                    receiveVideoTrack = track;
                     receiveImage = receiveVideoTrack.InitializeReceiver();
+                    initializeDecoder = receiveVideoTrack.IsDecoderInitialized;
                 }
             };
             pc2.OnTrack = e => receiveStream.AddTrack(e.Track);
@@ -80,7 +82,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             yield return SignalingPeers(pc1, pc2);
 
-            yield return new WaitUntil(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized);
+            yield return new WaitUntil(() => initializeDecoder);
 
             sendVideoTrack.Update();
             yield return new WaitForSeconds(0.1f);
