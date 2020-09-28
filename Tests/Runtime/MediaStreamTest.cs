@@ -344,11 +344,13 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
 
             test.component.Dispose();
+            track2.Dispose();
             // wait for disposing video track.
             yield return 0;
 
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(rt);
         }
     }
 }

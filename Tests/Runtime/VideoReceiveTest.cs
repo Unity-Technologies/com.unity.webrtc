@@ -19,8 +19,9 @@ namespace Unity.WebRTC.RuntimeTest
             WebRTC.Dispose();
         }
 
-        [Test]
-        public void InitializeReceiver()
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator InitializeReceiver()
         {
             var width = 256;
             var height = 256;
@@ -28,9 +29,15 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
             var videoTrack = new VideoStreamTrack("video", rt);
+            // wait for initialization encoder on render thread.
+            yield return new WaitForSeconds(0.1f);
+
             var rt1 = videoTrack.InitializeReceiver();
             Assert.True(videoTrack.IsDecoderInitialized);
             videoTrack.Dispose();
+            // wait for disposing video track.
+            yield return 0;
+
             Object.DestroyImmediate(rt);
             Object.DestroyImmediate(rt1);
         }
