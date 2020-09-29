@@ -22,9 +22,6 @@
 #endif
 
 #include "GraphicsDevice/IGraphicsDevice.h"
-#if defined(SUPPORT_METAL)
-#include "VideoToolbox/VTEncoderMetal.h"
-#endif
 
 namespace unity
 {
