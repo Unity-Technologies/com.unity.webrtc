@@ -23,7 +23,12 @@ UnityVideoTrackSource::UnityVideoTrackSource(
 //  DETACH_FROM_THREAD(thread_checker_);
 }
 
-UnityVideoTrackSource::~UnityVideoTrackSource() = default;
+UnityVideoTrackSource::~UnityVideoTrackSource()
+{
+    {
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
+    }
+};
 
 UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
 {
