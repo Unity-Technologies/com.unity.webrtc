@@ -26,7 +26,7 @@ UnityVideoTrackSource::UnityVideoTrackSource(
 UnityVideoTrackSource::~UnityVideoTrackSource()
 {
     {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
     }
 };
 
@@ -62,7 +62,7 @@ void UnityVideoTrackSource::OnFrameCaptured()
 {
     // todo::(kazuki)
     // OnFrame(frame);
-    std::unique_lock<std::shared_mutex> lock(m_mutex, std::try_to_lock);
+    std::unique_lock<std::mutex> lock(m_mutex, std::try_to_lock);
     if (!lock.owns_lock()) {
         return;
     }
