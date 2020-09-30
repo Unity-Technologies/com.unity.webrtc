@@ -167,7 +167,7 @@ namespace Unity.WebRTC
                     UnityEngine.Object.DestroyImmediate(m_destTexture);
                 }
 
-                if (m_renderer != null)
+                if (IsDecoderInitialized)
                 {
                     NativeMethods.VideoTrackRemoveSink(self, m_renderer.self);
                     m_renderer.Dispose();

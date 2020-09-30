@@ -4,30 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.WebRTC;
 using UnityEngine.UI;
-using System.Text;
 
-[RequireComponent(typeof(AudioListener))]
 public class VideoReceiveSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Button callButton;
+    [SerializeField] private Button hangUpButton;
     [SerializeField] private Button addTracksButton;
     [SerializeField] private Button removeTracksButton;
     [SerializeField] private Camera cam;
-    [SerializeField] private RawImage RtImage;
-    [SerializeField] private RawImage ReceiveImage;
+    [SerializeField] private RawImage sourceImage;
+    [SerializeField] private RawImage receiveImage;
+    [SerializeField] private Transform rotateObject;
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
-    private MediaStream audioStream, videoStream, receiveStream;
+    private MediaStream videoStream, receiveStream;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private DelegateOnAddTrack pc2OnAddTrack;
     private bool videoUpdateStarted;
 
     private RTCOfferOptions _offerOptions = new RTCOfferOptions
@@ -41,6 +40,7 @@ public class VideoReceiveSample : MonoBehaviour
     {
         WebRTC.Initialize(EncoderType.Software);
         callButton.onClick.AddListener(Call);
+        hangUpButton.onClick.AddListener(HangUp);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
         receiveStream = new MediaStream();
@@ -48,7 +48,6 @@ public class VideoReceiveSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        Audio.Stop();
         WebRTC.Dispose();
     }
 
@@ -56,6 +55,7 @@ public class VideoReceiveSample : MonoBehaviour
     {
         pc1Senders = new List<RTCRtpSender>();
         callButton.interactable = true;
+        hangUpButton.interactable = false;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -66,16 +66,23 @@ public class VideoReceiveSample : MonoBehaviour
             receiveStream.AddTrack(e.Track);
         };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
-        pc2OnAddTrack = e =>
+
+        receiveStream.OnAddTrack = e =>
         {
             if (e.Track.Kind == TrackKind.Video)
             {
-                var videoTrack = (VideoStreamTrack)e.Track;
-                ReceiveImage.texture = videoTrack.InitializeReceiver();
+                var videoStreamTrack = (VideoStreamTrack)e.Track;
+                receiveImage.texture = videoStreamTrack.InitializeReceiver();
             }
         };
+    }
 
-        receiveStream.OnAddTrack = pc2OnAddTrack;
+    private void Update()
+    {
+        if (rotateObject != null)
+        {
+            rotateObject.Rotate(1, 2, 3);
+        }
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
@@ -127,6 +134,12 @@ public class VideoReceiveSample : MonoBehaviour
 
         if (!op.IsError)
         {
+            if (pc.SignalingState != RTCSignalingState.Stable)
+            {
+                Debug.LogError($"{GetName(pc)} signaling state is not stable.");
+                yield break;
+            }
+
             yield return StartCoroutine(OnCreateOfferSuccess(pc, op.Desc));
         }
         else
@@ -137,11 +150,6 @@ public class VideoReceiveSample : MonoBehaviour
 
     private void AddTracks()
     {
-        foreach (var track in audioStream.GetTracks())
-        {
-            pc1Senders.Add(_pc1.AddTrack(track, audioStream));
-        }
-
         foreach (var track in videoStream.GetTracks())
         {
             pc1Senders.Add(_pc1.AddTrack(track, videoStream));
@@ -172,6 +180,10 @@ public class VideoReceiveSample : MonoBehaviour
     private void Call()
     {
         callButton.interactable = false;
+        hangUpButton.interactable = true;
+        addTracksButton.interactable = true;
+        removeTracksButton.interactable = false;
+
         Debug.Log("GetSelectedSdpSemantics");
         var configuration = GetSelectedSdpSemantics();
         _pc1 = new RTCPeerConnection(ref configuration);
@@ -185,11 +197,23 @@ public class VideoReceiveSample : MonoBehaviour
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;
 
-        RTCDataChannelInit conf = new RTCDataChannelInit(true);
-        _pc1.CreateDataChannel("data", ref conf);
-        audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720, 1000000);
-        RtImage.texture = cam.targetTexture;
+        sourceImage.texture = cam.targetTexture;
+    }
+
+    private void HangUp()
+    {
+        _pc1.Close();
+        _pc2.Close();
+        Debug.Log("Close local/remote peer connection");
+        _pc1.Dispose();
+        _pc2.Dispose();
+        _pc1 = null;
+        _pc2 = null;
+        callButton.interactable = true;
+        hangUpButton.interactable = false;
+        addTracksButton.interactable = false;
+        removeTracksButton.interactable = false;
     }
 
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
@@ -253,11 +277,6 @@ public class VideoReceiveSample : MonoBehaviour
         {
             OnCreateSessionDescriptionError(op3.Error);
         }
-    }
-
-    private void OnAudioFilterRead(float[] data, int channels)
-    {
-        Audio.Update(data, data.Length);
     }
 
     private void OnSetLocalSuccess(RTCPeerConnection pc)
