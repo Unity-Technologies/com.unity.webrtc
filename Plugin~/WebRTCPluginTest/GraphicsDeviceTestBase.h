@@ -24,18 +24,26 @@ protected:
 };
 
 static tuple<UnityGfxRenderer, UnityEncoderType> VALUES_TEST_ENV[] = {
-#if defined(UNITY_WIN)
+#if defined(SUPPORT_D3D11)
     { kUnityGfxRendererD3D11, UnityEncoderType::UnityEncoderHardware },
     { kUnityGfxRendererD3D11, UnityEncoderType::UnityEncoderSoftware },
+#endif // defined(SUPPORT_D3D11)
+#if defined(SUPPORT_D3D12)
     { kUnityGfxRendererD3D12, UnityEncoderType::UnityEncoderHardware },
     { kUnityGfxRendererD3D12, UnityEncoderType::UnityEncoderSoftware },
+#endif // defined(SUPPORT_D3D12)
+#if defined(SUPPORT_METAL)
+    { kUnityGfxRendererMetal, UnityEncoderType::UnityEncoderSoftware }
+#endif // defined(SUPPORT_METAL)
+// todo::(kazuki) windows support
+// todo::(kazuki) software encoder support
+#if defined(SUPPORT_OPENGL_UNIFIED) & defined(UNITY_LINUX)
+    { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderHardware },
+#endif // defined(SUPPORT_OPENGL_UNIFIED)
+#if defined(SUPPORT_VULKAN)
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderHardware },
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderSoftware }
-#elif defined(UNITY_OSX)
-    { kUnityGfxRendererMetal, UnityEncoderType::UnityEncoderSoftware }
-#elif defined(UNITY_LINUX)
-    { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderHardware }
-#endif
+#endif // defined(SUPPORT_VULKAN)
 };
 
 } // end namespace webrtc
