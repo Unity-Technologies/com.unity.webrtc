@@ -29,7 +29,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCRtpTransceiverDirection CurrentDirection
         {
@@ -45,7 +45,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCRtpReceiver Receiver
         {
@@ -53,7 +53,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCRtpSender Sender
         {
@@ -61,7 +61,19 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public MediaStreamTrack Track
+        {
+            get
+            {
+                IntPtr ptrTrack = NativeMethods.TransceiverGetTrack(self);
+                return WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
+            }
+        }
+
+        /// <summary>
+        ///
         /// </summary>
         /// <param name="direction"></param>
         public void SetDirection(RTCRtpTransceiverDirection direction)
