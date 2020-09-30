@@ -58,6 +58,9 @@ namespace Unity.WebRTC
 
         public RenderTexture InitializeReceiver()
         {
+            if (IsDecoderInitialized)
+                throw new InvalidOperationException("Already initialized receiver");
+
             m_needFlip = true;
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             m_sourceTexture = CreateRenderTexture(1280, 720, format);
