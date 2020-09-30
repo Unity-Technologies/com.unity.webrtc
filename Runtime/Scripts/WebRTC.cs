@@ -287,7 +287,7 @@ namespace Unity.WebRTC
                 {
                     foreach(var track in VideoStreamTrack.tracks)
                     {
-                        if (track.IsInitialized)
+                        if (track.IsEncoderInitialized)
                         {
                             track.Update();
                         }
@@ -666,9 +666,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateVideoRenderer(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern void VideoStreamTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
+        public static extern void VideoTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]
-        public static extern void VideoStreamTrackRemoveSink(IntPtr track, IntPtr sink);
+        public static extern void VideoTrackRemoveSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]
         public static extern void SetCurrentContext(IntPtr context);
         [DllImport(WebRTC.Lib)]

@@ -13,6 +13,7 @@ public class MediaStreamSample : MonoBehaviour
     [SerializeField] private Button callButton;
     [SerializeField] private Button addTracksButton;
     [SerializeField] private Button removeTracksButton;
+    [SerializeField] private Button dumpReceiveStreamTrackButton;
     [SerializeField] private Camera cam;
     [SerializeField] private InputField infoText;
     [SerializeField] private RawImage RtImage;
@@ -20,7 +21,7 @@ public class MediaStreamSample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders, pc2Senders;
-    private MediaStream audioStream, videoStream;
+    private MediaStream audioStream, videoStream, receiveStream;
     private RTCDataChannel remoteDataChannel;
     private Coroutine sdpCheck;
     private string msg;
@@ -30,6 +31,7 @@ public class MediaStreamSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
+    private DelegateOnAddTrack pc2OnAddTrack;
     private StringBuilder trackInfos;
     private bool videoUpdateStarted;
 
@@ -47,10 +49,12 @@ public class MediaStreamSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize();
+        WebRTC.Initialize(EncoderType.Software);
         callButton.onClick.AddListener(Call);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
+        receiveStream = new MediaStream();
+        dumpReceiveStreamTrackButton.onClick.AddListener(GetReceiveStreamTrack);
     }
 
     private void OnDestroy()
@@ -70,9 +74,37 @@ public class MediaStreamSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
-        pc2Ontrack = e => { OnTrack(_pc2, e); };
+        pc2Ontrack = e =>
+        {
+            Debug.LogWarning($"call pc2 ontrack {e.Track.Id}");
+            OnTrack(_pc2, e);
+        };
         pc1OnNegotiationNeeded = () => { StartCoroutine(Pc1OnNegotiationNeeded()); };
+        pc2OnAddTrack = e =>
+        {
+            Debug.LogWarning($"invoke onaddtrack on {e.Track.Id}");
+            if (e.Track.Kind == TrackKind.Video)
+            {
+                var videoTrack = (VideoStreamTrack)e.Track;
+                var rt = new RenderTexture(1280, 720, 0, RenderTextureFormat.ARGB32);
+                rt.Create();
+                videoTrack.SetReceivedTexture(rt);
+            }
+        };
         infoText.text = !WebRTC.SupportHardwareEncoder ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
+
+        receiveStream.OnAddTrack = pc2OnAddTrack;
+    }
+
+    void GetReceiveStreamTrack()
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine("on receiveStream Track");
+        foreach (var track in receiveStream.GetTracks())
+        {
+            builder.AppendLine($"{track.Id}");
+        }
+        Debug.LogWarning(builder.ToString());
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
@@ -195,7 +227,7 @@ public class MediaStreamSample : MonoBehaviour
 
     }
 
-    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
+    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");
@@ -203,7 +235,9 @@ public class MediaStreamSample : MonoBehaviour
 
     private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
     {
-        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
+//        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
+        receiveStream.AddTrack(e.Track);
+//        pc2Senders.Add(pc.AddTrack(e.Track, receiveStream));
         trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
         trackInfos.Append($"Track kind: {e.Track.Kind}\r\n");
         trackInfos.Append($"Track id: {e.Track.Id}\r\n");

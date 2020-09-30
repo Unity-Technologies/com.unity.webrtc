@@ -1,8 +1,14 @@
-﻿namespace Unity.WebRTC
+﻿using System;
+
+namespace Unity.WebRTC
 {
     public class AudioStreamTrack : MediaStreamTrack
     {
         public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(label))
+        {
+        }
+
+        public AudioStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
         }
     }

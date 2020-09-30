@@ -223,7 +223,7 @@ extern "C"
         return context->CreateVideoRenderer();
     }
 
-    UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, rtc::VideoSinkInterface<VideoFrame>* sink)
+    UNITY_INTERFACE_EXPORT void VideoStreamTrackAddOrUpdateSink(VideoTrackInterface* track, rtc::VideoSinkInterface<VideoFrame>* sink)
     {
         track->AddOrUpdateSink(sink, rtc::VideoSinkWants());
     }

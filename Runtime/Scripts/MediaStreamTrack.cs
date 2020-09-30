@@ -111,7 +111,15 @@ namespace Unity.WebRTC
         internal RTCTrackEvent(IntPtr ptrTransceiver, RTCPeerConnection peer)
         {
             IntPtr ptrTrack = NativeMethods.TransceiverGetTrack(ptrTransceiver);
-            Track = WebRTC.FindOrCreate(ptrTrack, ptr => new MediaStreamTrack(ptr));
+            Track = WebRTC.FindOrCreate(ptrTrack, ptr =>
+            {
+                if (NativeMethods.MediaStreamTrackGetKind(ptr) == TrackKind.Video)
+                {
+                    return (MediaStreamTrack) new VideoStreamTrack(ptr);
+                }
+
+                return (MediaStreamTrack) new AudioStreamTrack(ptr);
+            });
             Transceiver = new RTCRtpTransceiver(ptrTransceiver, peer);
         }
     }
@@ -122,7 +130,15 @@ namespace Unity.WebRTC
 
         internal MediaStreamTrackEvent(IntPtr ptrTrack)
         {
-            Track = WebRTC.FindOrCreate(ptrTrack, ptr => new MediaStreamTrack(ptr));
+            Track = WebRTC.FindOrCreate(ptrTrack, ptr =>
+            {
+                if (NativeMethods.MediaStreamTrackGetKind(ptr) == TrackKind.Video)
+                {
+                    return (MediaStreamTrack) new VideoStreamTrack(ptr);
+                }
+
+                return (MediaStreamTrack) new AudioStreamTrack(ptr);
+            });
         }
     }
 }

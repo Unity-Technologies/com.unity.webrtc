@@ -13,6 +13,8 @@ namespace Unity.WebRTC
         readonly UnityEngine.Texture m_sourceTexture;
         readonly UnityEngine.RenderTexture m_destTexture;
 
+        UnityVideoSink m_sink;
+
         private static UnityEngine.RenderTexture CreateRenderTexture(int width, int height,
             UnityEngine.RenderTextureFormat format)
         {
@@ -35,7 +37,7 @@ namespace Unity.WebRTC
         /// The videotrack cannot be used if the encoder has not been initialized.
         /// Do not use it until the initialization is complete.
         /// </summary>
-        public bool IsInitialized
+        public bool IsEncoderInitialized
         {
             get
             {
@@ -46,22 +48,13 @@ namespace Unity.WebRTC
         public void SetReceivedTexture(Texture tex)
         {
             //ToDo: on update write sink butter to tex
-            var sink = new UnityVideoSink(WebRTC.Context.CreateVideoRenderer());
-            AddOrUpdateSink(sink);
-        }
-
-        internal void AddOrUpdateSink(UnityVideoSink sink)
-        {
-            NativeMethods.VideoStreamTrackAddOrUpdateSink(self, sink.self);
-        }
-
-        internal void RemoveSink(UnityVideoSink sink)
-        {
-            NativeMethods.VideoStreamTrackRemoveSink(self, sink.self);
+            m_sink = new UnityVideoSink(WebRTC.Context.CreateVideoRenderer());
+            NativeMethods.VideoTrackAddOrUpdateSink(self, m_sink.self);
         }
 
         internal void Update()
         {
+            return;
             // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
             // note: streamed video is flipped vertical if no action was taken:
             //  - duplicate RenderTexture from its source texture
@@ -119,6 +112,15 @@ namespace Unity.WebRTC
             tracks.Add(this);
         }
 
+        /// <summary>
+        /// Creates from MediaStreamTrack object
+        /// </summary>
+        /// <param name="sourceTrack"></param>
+        public VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
+        {
+            tracks.Add(this);
+        }
+
         public override void Dispose()
         {
             if (this.disposed)
@@ -128,10 +130,20 @@ namespace Unity.WebRTC
 
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                WebRTC.Context.FinalizeEncoder(self);
+                if (IsEncoderInitialized)
+                {
+                    WebRTC.Context.FinalizeEncoder(self);
+                    UnityEngine.Object.DestroyImmediate(m_destTexture);
+                }
+
+                if (m_sink != null)
+                {
+                    NativeMethods.VideoTrackRemoveSink(self, m_sink.self);
+                    m_sink.Dispose();
+                }
+
                 tracks.Remove(this);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
-                UnityEngine.Object.DestroyImmediate(m_destTexture);
                 self = IntPtr.Zero;
             }
 
