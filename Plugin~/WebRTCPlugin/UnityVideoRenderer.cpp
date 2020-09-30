@@ -65,8 +65,18 @@ void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, i
         return;
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
-    i420_buffer->ScaleFrom(*frame->ToI420());
+    rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer;
+    if (width == frame->width() && height == frame->height())
+    {
+        i420_buffer = frame->ToI420();
+    }
+    else
+    {
+        auto temp = webrtc::I420Buffer::Create(width, height);
+        temp->ScaleFrom(*frame->ToI420());
+        i420_buffer = temp;
+    }
+
     size_t size = width * height * 4;
     if (tempBuffer.size() != size)
         tempBuffer.resize(size);
