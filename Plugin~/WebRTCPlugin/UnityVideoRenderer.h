@@ -19,7 +19,7 @@ namespace webrtc {
       uint32_t GetId();
       rtc::scoped_refptr<webrtc::VideoFrameBuffer> GetFrameBuffer();
       void SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer);
-      uint8_t* tempBuffer = nullptr;
+      std::vector<uint8_t> tempBuffer;
 
     private:
       uint32_t m_id;

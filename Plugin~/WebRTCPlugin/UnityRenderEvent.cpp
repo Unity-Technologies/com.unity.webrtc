@@ -208,28 +208,16 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 
         rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(params->width, params->height);
         i420_buffer->ScaleFrom(*frame->ToI420());
-        delete[] renderer->tempBuffer;
-        renderer->tempBuffer = new uint8_t[params->width * params->height * 4];
+        size_t size = params->width * params->height * 4;
+        if(renderer->tempBuffer.size() != size)
+            renderer->tempBuffer.resize(size);
 
         libyuv::ConvertFromI420(
             i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),
             i420_buffer->StrideU(), i420_buffer->DataV(), i420_buffer->StrideV(),
-            renderer->tempBuffer, 0, params->width, params->height,
+            renderer->tempBuffer.data(), 0, params->width, params->height,
             ConvertVideoType(ConvertTextureFormat(params->format)));
-        params->texData = renderer->tempBuffer;
-    }
-    else if (event == kUnityRenderingExtEventUpdateTextureEndV2)
-    {
-        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
-        auto renderer = s_context->GetVideoRenderer(params->userData);
-        if (renderer == nullptr)
-        {
-            DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
-            return;
-        }
-
-        delete[] renderer->tempBuffer;
-        renderer->tempBuffer = nullptr;
+        params->texData = renderer->tempBuffer.data();
     }
 }
 
