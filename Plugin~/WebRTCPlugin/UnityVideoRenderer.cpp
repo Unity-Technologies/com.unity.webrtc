@@ -9,7 +9,13 @@ UnityVideoRenderer::UnityVideoRenderer(uint32_t id) : m_id(id)
     DebugLog("Create UnityVideoRenderer Id:%d", id);
 }
 
-UnityVideoRenderer::~UnityVideoRenderer() = default;
+UnityVideoRenderer::~UnityVideoRenderer()
+{
+    DebugLog("Destory UnityVideoRenderer Id:%d", m_id);
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+    }
+}
 
 void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame &frame)
 {
@@ -30,13 +36,23 @@ uint32_t UnityVideoRenderer::GetId()
 
 rtc::scoped_refptr<webrtc::VideoFrameBuffer> UnityVideoRenderer::GetFrameBuffer()
 {
-    std::lock_guard<std::mutex> guard(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (!lock.owns_lock())
+    {
+        return nullptr;
+    }
+
     return m_frameBuffer;
 }
 
 void UnityVideoRenderer::SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer)
 {
-    std::lock_guard<std::mutex> guard(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (!lock.owns_lock())
+    {
+        return;
+    }
+
     m_frameBuffer = buffer;
 }
 

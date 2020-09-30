@@ -178,6 +178,14 @@ extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {
+    if (s_context == nullptr)
+        return;
+    if (!ContextManager::GetInstance()->Exists(s_context))
+        return;
+    std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
+    if (!lock.owns_lock())
+        return;
+
     auto event = static_cast<UnityRenderingExtEventType>(eventID);
 
     if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
