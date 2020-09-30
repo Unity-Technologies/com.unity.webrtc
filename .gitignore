@@ -381,6 +381,7 @@ Runtime/Plugins/x86_64/*.exp
 Runtime/Plugins/x86_64/*.exp.meta
 Runtime/Plugins/x86_64/*.lib
 Runtime/Plugins/x86_64/*.lib.meta
+Runtime/Plugins/x86_64/*.ilk.meta
 Runtime/Plugins/x86_64/*.pdb.meta
 
 
