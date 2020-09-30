@@ -199,24 +199,7 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
             return;
         }
 
-        auto frame = renderer->GetFrameBuffer();
-        if(frame == nullptr)
-        {
-            DebugLog("VideoFrame is not received yet, rendererId:%d", params->userData);
-            return;
-        }
-
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(params->width, params->height);
-        i420_buffer->ScaleFrom(*frame->ToI420());
-        size_t size = params->width * params->height * 4;
-        if(renderer->tempBuffer.size() != size)
-            renderer->tempBuffer.resize(size);
-
-        libyuv::ConvertFromI420(
-            i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),
-            i420_buffer->StrideU(), i420_buffer->DataV(), i420_buffer->StrideV(),
-            renderer->tempBuffer.data(), 0, params->width, params->height,
-            ConvertVideoType(ConvertTextureFormat(params->format)));
+        renderer->ConvertVideoFrameToTextureAndWriteToBuffer(params->width, params->height, ConvertTextureFormat(params->format));
         params->texData = renderer->tempBuffer.data();
     }
 }

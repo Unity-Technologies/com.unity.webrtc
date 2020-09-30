@@ -21,6 +21,8 @@ namespace webrtc {
       void SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer);
       std::vector<uint8_t> tempBuffer;
 
+      void ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, webrtc::VideoType format);
+
     private:
       uint32_t m_id;
       std::mutex m_mutex;
