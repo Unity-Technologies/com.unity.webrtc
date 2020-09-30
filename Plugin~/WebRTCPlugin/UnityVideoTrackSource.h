@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include "Codec/IEncoder.h"
 #include "rtc_base/timestamp_aligner.h"
 
@@ -83,6 +84,8 @@ class UnityVideoTrackSource :
 
   const bool is_screencast_;
   const absl::optional<bool> needs_denoising_;
+
+  std::mutex m_mutex;
   IEncoder* encoder_;
   void* frame_;
 };

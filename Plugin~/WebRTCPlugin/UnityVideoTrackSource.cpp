@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "UnityVideoTrackSource.h"
+
+#include <mutex>
+
 #include "Codec/IEncoder.h"
 
 namespace unity
@@ -20,7 +23,12 @@ UnityVideoTrackSource::UnityVideoTrackSource(
 //  DETACH_FROM_THREAD(thread_checker_);
 }
 
-UnityVideoTrackSource::~UnityVideoTrackSource() = default;
+UnityVideoTrackSource::~UnityVideoTrackSource()
+{
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+    }
+};
 
 UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
 {
@@ -54,7 +62,10 @@ void UnityVideoTrackSource::OnFrameCaptured()
 {
     // todo::(kazuki)
     // OnFrame(frame);
-
+    std::unique_lock<std::mutex> lock(m_mutex, std::try_to_lock);
+    if (!lock.owns_lock()) {
+        return;
+    }
     if (encoder_ == nullptr)
     {
         LogPrint("encoder is null");

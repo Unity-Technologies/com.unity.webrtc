@@ -69,7 +69,9 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
     if (s_UnityProfiler != nullptr)
     {
         s_IsDevelopmentBuild = s_UnityProfiler->IsAvailable() != 0;
-        s_UnityProfiler->CreateMarker(&s_MarkerEncode, "Encode", kUnityProfilerCategoryRender, kUnityProfilerMarkerFlagDefault, 0);
+        s_UnityProfiler->CreateMarker(
+            &s_MarkerEncode, "Encode", kUnityProfilerCategoryRender,
+            kUnityProfilerMarkerFlagDefault, 0);
     }
 
     OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
@@ -83,11 +85,16 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (s_context == nullptr)
         return;
-    std::lock_guard<std::mutex> lock(s_context->mutex);
-    if(!ContextManager::GetInstance()->Exists(s_context))
+    if (!ContextManager::GetInstance()->Exists(s_context))
         return;
-    const auto track = reinterpret_cast<::webrtc::MediaStreamTrackInterface*>(data);
-    const auto event = static_cast<VideoStreamRenderEventID>(eventID);
+    std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
+    if(!lock.owns_lock())
+        return;
+
+    MediaStreamTrackInterface* track =
+        static_cast<MediaStreamTrackInterface*>(data);
+    const VideoStreamRenderEventID event =
+        static_cast<VideoStreamRenderEventID>(eventID);
 
     switch(event)
     {
@@ -100,7 +107,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             s_device = GraphicsDevice::GetInstance().GetDevice();
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
-            s_mapEncoder[track] = EncoderFactory::GetInstance().Init(param->width, param->height, s_device, encoderType);
+            s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
+                param->width, param->height, s_device, encoderType);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
                 LogPrint("Encoder initialization faild.");
