@@ -252,7 +252,7 @@ namespace webrtc
     bool Context::EncodeFrame(MediaStreamTrackInterface* track)
     {
         UnityVideoTrackSource* source = GetVideoSource(track);
-        if (source != nullptr)
+        if (source == nullptr)
             return false;
         source->OnFrameCaptured();
         return true;
