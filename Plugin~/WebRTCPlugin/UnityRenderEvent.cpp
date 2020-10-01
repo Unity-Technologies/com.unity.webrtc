@@ -49,7 +49,7 @@ namespace webrtc
             return webrtc::VideoType::kABGR;
         }
 
-        DebugLog("Unknown texture format:%d", type);
+        // DebugLog("Unknown texture format:%d", type);
         return webrtc::VideoType::kUnknown;
     }
 } // end namespace webrtc
@@ -106,6 +106,10 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
+// Notice: When DebugLog is used in a method called from RenderingThread, 
+// it hangs when attempting to leave PlayMode and re-enter PlayMode.
+// So, we comment out `DebugLog`.
+
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (s_context == nullptr)
@@ -136,7 +140,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                 param->width, param->height, s_device, encoderType);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
-                LogPrint("Encoder initialization faild.");
+                // DebugLog("Encoder initialization faild.");
             }
             return;
         }
@@ -146,7 +150,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                 s_UnityProfiler->BeginSample(s_MarkerEncode);
             if(!s_context->EncodeFrame(track))
             {
-                LogPrint("Encode frame failed");
+                // DebugLog("Encode frame failed");
             }
             if (s_IsDevelopmentBuild)
                 s_UnityProfiler->EndSample(s_MarkerEncode);
@@ -164,7 +168,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             return;
         }
         default: {
-            LogPrint("Unknown event id %d", eventID);
+            // DebugLog("Unknown VideoStreamRenderEventID:%d", eventID);
             return;
         }
     }
@@ -195,7 +199,7 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
         auto renderer = s_context->GetVideoRenderer(params->userData);
         if (renderer == nullptr)
         {
-            DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
+            // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
             return;
         }
 

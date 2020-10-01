@@ -61,7 +61,6 @@ void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, i
     auto frame = GetFrameBuffer();
     if (frame == nullptr)
     {
-        DebugLog("VideoFrame is not received yet, rendererId:%d", GetId());
         return;
     }
 
