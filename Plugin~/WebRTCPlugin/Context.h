@@ -3,6 +3,7 @@
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
+#include "UnityVideoRenderer.h"
 #include "Codec/IEncoder.h"
 
 using namespace ::webrtc;
@@ -83,7 +84,11 @@ namespace webrtc
         void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
         void DeleteDataChannel(DataChannelObject* obj);
 
-        
+        // Renderer
+        UnityVideoRenderer* CreateVideoRenderer();
+        UnityVideoRenderer* GetVideoRenderer(uint32_t id);
+        void DeleteVideoRenderer(UnityVideoRenderer* renderer);
+
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
         bool FinalizeEncoder(IEncoder* encoder);
@@ -111,7 +116,8 @@ namespace webrtc
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
-
+        std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
+ 
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
 
@@ -123,6 +129,9 @@ namespace webrtc
         // todo(kazuki): static variable to set id each encoder.
         static uint32_t s_encoderId;
         static uint32_t GenerateUniqueId();
+
+        static uint32_t s_rendererId;
+        static uint32_t GenerateRendererId();
     };
 
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);

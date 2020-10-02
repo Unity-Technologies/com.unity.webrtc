@@ -94,6 +94,32 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     context->DeleteDataChannel(channel);
     context->DeletePeerConnection(connection);
 }
+
+TEST_P(ContextTest, CreateAndDeleteVideoRenderer) {
+    const auto renderer = context->CreateVideoRenderer();
+    EXPECT_NE(nullptr, renderer);
+    context->DeleteVideoRenderer(renderer);
+}
+
+TEST_P(ContextTest, EqualRendererGetById) {
+    const auto renderer = context->CreateVideoRenderer();
+    EXPECT_NE(nullptr, renderer);
+    const auto rendererId = renderer->GetId();
+    const auto rendererGetById = context->GetVideoRenderer(rendererId);
+    EXPECT_NE(nullptr, rendererGetById);
+    EXPECT_EQ(renderer, rendererGetById);
+    context->DeleteVideoRenderer(renderer);
+}
+
+TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
+    const auto track = context->CreateVideoTrack("video", tex.get());
+    const auto renderer = context->CreateVideoRenderer();
+    track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
+    track->RemoveSink(renderer);
+    context->DeleteVideoRenderer(renderer);
+}
+
 INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc

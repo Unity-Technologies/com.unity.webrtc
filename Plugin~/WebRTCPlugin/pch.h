@@ -15,6 +15,7 @@
 #include "api/video_codecs/sdp_video_format.h"
 #include "api/video/video_frame.h"
 #include "api/video/video_frame_buffer.h"
+#include "api/video/video_sink_interface.h"
 #include "api/video/i420_buffer.h"
 #include "api/video_track_source_proxy.h"
 
@@ -55,6 +56,8 @@
 #include "modules/audio_device/audio_device_generic.h"
 #include "modules/audio_processing/include/audio_processing.h"
 #include "modules/video_coding/codecs/h264/include/h264.h"
+#include "modules/video_coding/codecs/vp8/include/vp8.h"
+#include "modules/video_coding/codecs/vp9/include/vp9.h"
 
 #include "common_video/h264/h264_bitstream_parser.h"
 #include "common_video/h264/h264_common.h"

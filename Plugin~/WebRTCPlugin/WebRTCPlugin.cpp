@@ -18,10 +18,7 @@ namespace webrtc
     {
         if (delegateDebugLog != nullptr)
         {
-            if(rtc::ThreadManager::Instance()->IsMainThread())
-            {
-                delegateDebugLog(buf);
-            }
+            delegateDebugLog(buf);
         }
     }
 
@@ -218,6 +215,31 @@ extern "C"
         track->set_enabled(enabled);
     }
 
+    UNITY_INTERFACE_EXPORT UnityVideoRenderer* CreateVideoRenderer(Context* context)
+    {
+        return context->CreateVideoRenderer();
+    }
+
+    UNITY_INTERFACE_EXPORT uint32_t GetVideoRendererId(UnityVideoRenderer* sink)
+    {
+        return sink->GetId();
+    }
+
+    UNITY_INTERFACE_EXPORT void DeleteVideoRenderer(Context* context, UnityVideoRenderer* sink)
+    {
+        context->DeleteVideoRenderer(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, UnityVideoRenderer* sink)
+    {
+        track->AddOrUpdateSink(sink, rtc::VideoSinkWants());
+    }
+
+    UNITY_INTERFACE_EXPORT void VideoTrackRemoveSink(VideoTrackInterface* track, UnityVideoRenderer* sink)
+    {
+        track->RemoveSink(sink);
+    }
+
     UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func)
     {
         delegateDebugLog = func;
@@ -292,6 +314,16 @@ extern "C"
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(PeerConnectionObject* obj, MediaStreamTrackInterface* track, RtpTransceiverInit* init)
     {
         return obj->connection->AddTransceiver(track, *init).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithType(PeerConnectionObject* obj, cricket::MediaType type)
+    {
+        return obj->connection->AddTransceiver(type).value().get();
+    }
+
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(PeerConnectionObject* obj, cricket::MediaType type, RtpTransceiverInit* init)
+    {
+        return obj->connection->AddTransceiver(type, *init).value().get();
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRemoveTrack(PeerConnectionObject* obj, RtpSenderInterface* sender)

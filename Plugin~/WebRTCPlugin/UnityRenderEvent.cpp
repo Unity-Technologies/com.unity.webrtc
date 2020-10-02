@@ -2,6 +2,7 @@
 
 #include <IUnityGraphics.h>
 #include <IUnityProfiler.h>
+#include <IUnityRenderingExtensions.h>
 
 #include "Codec/EncoderFactory.h"
 #include "Context.h"
@@ -27,6 +28,30 @@ namespace webrtc
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     bool s_IsDevelopmentBuild = false;
+
+    static webrtc::VideoType ConvertTextureFormat(UnityRenderingExtTextureFormat type)
+    {
+        switch (type)
+        {
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SNorm:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UInt:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SInt:
+            return webrtc::VideoType::kARGB;
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SRGB:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_UNorm:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SNorm:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_UInt:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SInt:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
+        case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
+            return webrtc::VideoType::kABGR;
+        }
+
+        // DebugLog("Unknown texture format:%d", type);
+        return webrtc::VideoType::kUnknown;
+    }
 } // end namespace webrtc
 } // end namespace unity
 
@@ -81,6 +106,10 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }
 
+// Notice: When DebugLog is used in a method called from RenderingThread, 
+// it hangs when attempting to leave PlayMode and re-enter PlayMode.
+// So, we comment out `DebugLog`.
+
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (s_context == nullptr)
@@ -111,7 +140,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                 param->width, param->height, s_device, encoderType);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
-                LogPrint("Encoder initialization faild.");
+                // DebugLog("Encoder initialization faild.");
             }
             return;
         }
@@ -121,7 +150,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                 s_UnityProfiler->BeginSample(s_MarkerEncode);
             if(!s_context->EncodeFrame(track))
             {
-                LogPrint("Encode frame failed");
+                // DebugLog("Encode frame failed");
             }
             if (s_IsDevelopmentBuild)
                 s_UnityProfiler->EndSample(s_MarkerEncode);
@@ -139,7 +168,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             return;
         }
         default: {
-            LogPrint("Unknown event id %d", eventID);
+            // DebugLog("Unknown VideoStreamRenderEventID:%d", eventID);
             return;
         }
     }
@@ -149,4 +178,38 @@ extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 {
     s_context = context;
     return OnRenderEvent;
+}
+
+static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
+{
+    if (s_context == nullptr)
+        return;
+    if (!ContextManager::GetInstance()->Exists(s_context))
+        return;
+    std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
+    if (!lock.owns_lock())
+        return;
+
+    auto event = static_cast<UnityRenderingExtEventType>(eventID);
+
+    if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
+    {
+        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
+        
+        auto renderer = s_context->GetVideoRenderer(params->userData);
+        if (renderer == nullptr)
+        {
+            // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
+            return;
+        }
+
+        renderer->ConvertVideoFrameToTextureAndWriteToBuffer(params->width, params->height, ConvertTextureFormat(params->format));
+        params->texData = renderer->tempBuffer.data();
+    }
+}
+
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetUpdateTextureFunc(Context* context)
+{
+    s_context = context;
+    return TextureUpdateCallback;
 }

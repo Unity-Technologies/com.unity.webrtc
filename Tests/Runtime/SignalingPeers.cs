@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -107,6 +108,9 @@ namespace Unity.WebRTC.RuntimeTest
             var op2 = peers[0].SetLocalDescription(ref desc);
             yield return op2;
             Assert.False(op2.IsError);
+
+            desc.sdp = ReplaceOfferSdpForHardwareEncodeTest(desc.sdp);
+
             var op3 = peers[1].SetRemoteDescription(ref desc);
             yield return op3;
             Assert.False(op3.IsError);
@@ -117,6 +121,9 @@ namespace Unity.WebRTC.RuntimeTest
             var op5 = peers[1].SetLocalDescription(ref desc);
             yield return op5;
             Assert.False(op5.IsError);
+
+            desc.sdp = ReplaceAnswerSdpForHardwareEncodeTest(desc.sdp);
+
             var op6 = peers[0].SetRemoteDescription(ref desc);
             yield return op6;
             Assert.False(op6.IsError);
@@ -141,6 +148,85 @@ namespace Unity.WebRTC.RuntimeTest
             }
 
             IsTestFinished = true;
+        }
+
+        private static string ReplaceAnswerSdpForHardwareEncodeTest(string originalSdp)
+        {
+            if (WebRTC.GetEncoderType() == EncoderType.Software)
+            {
+                return originalSdp;
+            }
+
+            return originalSdp
+                .Replace("m=video 9 UDP/TLS/RTP/SAVPF 96 98 100 104 105 106",
+                    "m=video 9 UDP/TLS/RTP/SAVPF 96 98 100 102 104 105 106")
+                .Replace("a=rtpmap:104 red/90000", @"a=rtpmap:102 H264/90000
+a=rtcp-fb:102 goog-remb
+a=rtcp-fb:102 transport-cc
+a=rtcp-fb:102 ccm fir
+a=rtcp-fb:102 nack
+a=rtcp-fb:102 nack pli
+a=fmtp:102 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e033
+a=rtpmap:104 red/90000");
+        }
+
+        private static string ReplaceOfferSdpForHardwareEncodeTest(string originalSdp)
+        {
+            if (WebRTC.GetEncoderType() == EncoderType.Software)
+            {
+                return originalSdp;
+            }
+
+            var result = originalSdp
+                .Replace("m=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100",
+                    "m=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100 101 102 103 104 105 106");
+
+            var matchedObject = Regex.Match(originalSdp, @"(a=rtpmap:96.*)a=ssrc-group", RegexOptions.Singleline);
+            if (!string.IsNullOrEmpty(matchedObject.Value))
+            {
+                result = result.Replace(matchedObject.Value, @"a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 goog-remb
+a=rtcp-fb:96 transport-cc
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack
+a=rtcp-fb:96 nack pli
+a=rtpmap:97 rtx/90000
+a=fmtp:97 apt=96
+a=rtpmap:98 VP9/90000
+a=rtcp-fb:98 goog-remb
+a=rtcp-fb:98 transport-cc
+a=rtcp-fb:98 ccm fir
+a=rtcp-fb:98 nack
+a=rtcp-fb:98 nack pli
+a=fmtp:98 profile-id=0
+a=rtpmap:99 rtx/90000
+a=fmtp:99 apt=98
+a=rtpmap:100 VP9/90000
+a=rtcp-fb:100 goog-remb
+a=rtcp-fb:100 transport-cc
+a=rtcp-fb:100 ccm fir
+a=rtcp-fb:100 nack
+a=rtcp-fb:100 nack pli
+a=fmtp:100 profile-id=2
+a=rtpmap:101 rtx/90000
+a=fmtp:101 apt=100
+a=rtpmap:102 H264/90000
+a=rtcp-fb:102 goog-remb
+a=rtcp-fb:102 transport-cc
+a=rtcp-fb:102 ccm fir
+a=rtcp-fb:102 nack
+a=rtcp-fb:102 nack pli
+a=fmtp:102 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e033
+a=rtpmap:103 rtx/90000
+a=fmtp:103 apt=102
+a=rtpmap:104 red/90000
+a=rtpmap:105 rtx/90000
+a=fmtp:105 apt=104
+a=rtpmap:106 ulpfec/90000
+a=ssrc-group");
+            }
+
+            return result;
         }
 
         public void Dispose()

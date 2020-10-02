@@ -168,14 +168,12 @@ namespace webrtc
 #if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
         //Always use SoftwareEncoder on Mac for now.
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = webrtc::CreateBuiltinVideoDecoderFactory();
+        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
 #else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
             std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this)) : webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
-            m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<UnityVideoDecoderFactory>() : webrtc::CreateBuiltinVideoDecoderFactory();
+        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
 #endif
 
         m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
@@ -207,6 +205,7 @@ namespace webrtc
             m_mapSetSessionDescriptionObserver.clear();
             m_mapVideoEncoderParameter.clear();
             m_mapDataChannels.clear();
+            m_mapVideoRenderer.clear();
 
             m_workerThread->Quit();
             m_workerThread.reset();
@@ -426,5 +425,28 @@ namespace webrtc
     {
         return m_mapSetSessionDescriptionObserver[connection];
     }
+
+    uint32_t Context::s_rendererId = 0;
+    uint32_t Context::GenerateRendererId() { return s_rendererId++; }
+
+    UnityVideoRenderer* Context::CreateVideoRenderer()
+    {
+        auto rendererId = GenerateRendererId();
+        auto renderer = std::make_unique<UnityVideoRenderer>(rendererId);
+        m_mapVideoRenderer[rendererId] = std::move(renderer);
+        return m_mapVideoRenderer[rendererId].get();
+    }
+
+    UnityVideoRenderer* Context::GetVideoRenderer(uint32_t id)
+    {
+        return m_mapVideoRenderer[id].get();
+    }
+
+    void Context::DeleteVideoRenderer(UnityVideoRenderer* renderer)
+    {
+        m_mapVideoRenderer.erase(renderer->GetId());
+        renderer = nullptr;
+    }
+
 } // end namespace webrtc
 } // end namespace unity

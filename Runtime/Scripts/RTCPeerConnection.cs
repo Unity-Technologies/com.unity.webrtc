@@ -491,6 +491,11 @@ namespace Unity.WebRTC
             return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(self, track.self), this);
         }
 
+        public RTCRtpTransceiver AddTransceiver(TrackKind kind)
+        {
+            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiverWithType(self, kind), this);
+        }
+
         /// <summary>
         ///
         /// </summary>

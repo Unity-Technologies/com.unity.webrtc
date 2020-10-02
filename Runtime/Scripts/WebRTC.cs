@@ -287,9 +287,13 @@ namespace Unity.WebRTC
                 {
                     foreach(var track in VideoStreamTrack.tracks)
                     {
-                        if (track.IsInitialized)
+                        if (track.IsEncoderInitialized)
                         {
                             track.Update();
+                        }
+                        else if (track.IsDecoderInitialized)
+                        {
+                            track.UpdateReceiveTexture();
                         }
                     }
                 }
@@ -572,6 +576,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind);
+        [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -664,9 +670,21 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamTrackSetEnabled(IntPtr track, [MarshalAs(UnmanagedType.U1)] bool enabled);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr CreateVideoRenderer(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern uint GetVideoRendererId(IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void DeleteVideoRenderer(IntPtr context, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoTrackRemoveSink(IntPtr track, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
         public static extern void SetCurrentContext(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
         [DllImport(WebRTC.Lib)]
@@ -745,6 +763,18 @@ namespace Unity.WebRTC
         public static void FinalizeEncoder(IntPtr callback, IntPtr track)
         {
             _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Finalize, track);
+            Graphics.ExecuteCommandBuffer(_command);
+            _command.Clear();
+        }
+    }
+
+    internal static class VideoDecoderMethods
+    {
+        static UnityEngine.Rendering.CommandBuffer _command = new UnityEngine.Rendering.CommandBuffer();
+
+        public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
+        {
+            _command.IssuePluginCustomTextureUpdateV2(callback, texture, rendererId);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }

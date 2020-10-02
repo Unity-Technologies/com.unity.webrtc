@@ -301,7 +301,7 @@ namespace Unity.WebRTC.RuntimeTest
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })] 
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator OnAddTrackDelegatesWithEvent()
         {
             var camObj = new GameObject("Camera");
@@ -344,11 +344,13 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
 
             test.component.Dispose();
+            track2.Dispose();
             // wait for disposing video track.
             yield return 0;
 
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(rt);
         }
     }
 }
