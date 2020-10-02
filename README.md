@@ -17,7 +17,7 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Installation
 
-Please see [Install package](Documentation~/en/install.md).
+Please see [Install package](Documentation~/install.md).
 
 ## Requirements
 

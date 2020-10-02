@@ -32,7 +32,7 @@ To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO 
 
 ## Installation
 
-Please see [Install package](en/install.md).
+Please see [Install package](install.md).
 
 ## Samples
 
