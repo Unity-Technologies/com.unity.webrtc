@@ -35,7 +35,7 @@ protected:
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     EXPECT_NE(nullptr, tex);
-    const auto track = context->CreateVideoTrack("video", tex.get());
+    const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
 }
 
@@ -48,7 +48,7 @@ TEST_P(ContextTest, CreateAndDeleteMediaStream) {
 TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     EXPECT_NE(nullptr, tex.get());
-    const auto track = context->CreateVideoTrack("video", tex.get());
+    const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     EXPECT_NE(nullptr, track);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
     context->DeleteMediaStreamTrack(track);
@@ -72,7 +72,7 @@ TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
 TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
     const auto stream = context->CreateMediaStream("videostream");
-    const auto track = context->CreateVideoTrack("video", tex.get());
+    const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     const auto videoTrack = reinterpret_cast<webrtc::VideoTrackInterface*>(track);
     stream->AddTrack(videoTrack);
     stream->RemoveTrack(videoTrack);
@@ -114,7 +114,7 @@ TEST_P(ContextTest, EqualRendererGetById) {
 
 TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
-    const auto track = context->CreateVideoTrack("video", tex.get());
+    const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     const auto renderer = context->CreateVideoRenderer();
     track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
     track->RemoveSink(renderer);

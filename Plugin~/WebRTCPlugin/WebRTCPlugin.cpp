@@ -121,8 +121,8 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt)
     {
-#if defined(SUPPORT_VULKAN)
         UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
+#if defined(SUPPORT_VULKAN)
         if(gfxRenderer == kUnityGfxRendererVulkan)
         {
             void* frame = nullptr;
@@ -130,10 +130,10 @@ extern "C"
                 static_cast<VulkanGraphicsDevice*>(GraphicsUtility::GetGraphicsDevice());
             const std::unique_ptr<UnityVulkanImage> unityVulkanImage =
                 device->AccessTexture(rt);
-            return context->CreateVideoTrack(label, unityVulkanImage.get());
+            return context->CreateVideoTrack(label, unityVulkanImage.get(), gfxRenderer);
         }
 #endif
-        return context->CreateVideoTrack(label, rt);
+        return context->CreateVideoTrack(label, rt, gfxRenderer);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)

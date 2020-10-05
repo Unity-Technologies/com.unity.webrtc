@@ -28,6 +28,7 @@ public:
     {
         m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
             m_texture->GetNativeTexturePtrV(),
+            m_unityGfxRenderer,
             /*is_screencast=*/ false,
             /*needs_denoising=*/ absl::nullopt);
         m_renderer = std::make_unique<UnityVideoRenderer>(1);

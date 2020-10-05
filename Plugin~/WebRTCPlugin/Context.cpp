@@ -321,9 +321,8 @@ namespace webrtc
     }
 
     webrtc::VideoTrackInterface* Context::CreateVideoTrack(
-        const std::string& label, void* frame)
+        const std::string& label, void* frame, UnityGfxRenderer gfxRenderer)
     {
-        UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
         const rtc::scoped_refptr<UnityVideoTrackSource> source =
             new rtc::RefCountedObject<UnityVideoTrackSource>(frame, gfxRenderer, false, nullptr);
 
