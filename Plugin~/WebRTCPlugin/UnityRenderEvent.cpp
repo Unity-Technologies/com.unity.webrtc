@@ -32,6 +32,7 @@ namespace webrtc
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     bool s_IsDevelopmentBuild = false;
+    IGraphicsDevice* s_gfxDevice = nullptr;
 
     static webrtc::VideoType ConvertTextureFormat(UnityRenderingExtTextureFormat type)
     {
@@ -56,21 +57,6 @@ namespace webrtc
         // DebugLog("Unknown texture format:%d", type);
         return webrtc::VideoType::kUnknown;
     }
-
-    IGraphicsDevice* GetGraphicsDevice()
-    {
-        if (!GraphicsDevice::GetInstance().IsInitialized())
-        {
-            GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
-        }
-        return GraphicsDevice::GetInstance().GetDevice();
-    }
-
-    UnityGfxRenderer GetGraphicsRenderer()
-    {
-        return s_Graphics->GetRenderer();
-    }
-
 } // end namespace webrtc
 } // end namespace unity
 
@@ -82,18 +68,32 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
     case kUnityGfxDeviceEventInitialize:
     {
+        /// note::
+        /// kUnityGfxDeviceEventInitialize event is occurred twice on Unity Editor.
+        /// First time, s_UnityInterfaces return UnityGfxRenderer as kUnityGfxRendererNull.
+        /// The actual value of UnityGfxRenderer is returned on second time.
+
         s_mapEncoder.clear();
 
-        IGraphicsDevice* device = GetGraphicsDevice();
-        if (device != nullptr)
-            device->InitV();
+        UnityGfxRenderer renderer = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
+        if (renderer == kUnityGfxRendererNull)
+            break;
+
+        s_gfxDevice = GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
+        if(s_gfxDevice != nullptr)
+        {
+            s_gfxDevice->InitV();
+        }
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
-        IGraphicsDevice* device = GetGraphicsDevice();
-        if (device != nullptr)
-            device->ShutdownV();
+        if (s_gfxDevice != nullptr)
+        {
+            s_gfxDevice->ShutdownV();
+            s_gfxDevice = nullptr;
+        }
+
         //UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
         s_mapEncoder.clear();
@@ -163,11 +163,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     {
         case VideoStreamRenderEventID::Initialize:
         {
-            IGraphicsDevice* device = GetGraphicsDevice();
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
             s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
-                param->width, param->height, device, encoderType);
+                param->width, param->height, s_gfxDevice, encoderType);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
                 // DebugLog("Encoder initialization faild.");
@@ -191,15 +190,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         {
             s_context->FinalizeEncoder(s_mapEncoder[track].get());
             s_mapEncoder.erase(track);
-            if(s_mapEncoder.empty())
-            {
-                GraphicsDevice::GetInstance().Shutdown();
-            }
             return;
         }
         default: {
-            // DebugLog("Unknown VideoStreamRenderEventID:%d", eventID);
-            return;
+            RTC_DCHECK(0);
         }
     }
 }

@@ -31,18 +31,21 @@ GraphicsDevice& GraphicsDevice::GetInstance() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
-    const UnityGfxRenderer rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
+IGraphicsDevice* GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
+    const UnityGfxRenderer rendererType =
+        unityInterface->Get<IUnityGraphics>()->GetRenderer();
     switch (rendererType) {
 #if defined(SUPPORT_D3D11)
         case kUnityGfxRendererD3D11: {
-            IUnityGraphicsD3D11* deviceInterface = unityInterface->Get<IUnityGraphicsD3D11>();
+            IUnityGraphicsD3D11* deviceInterface =
+                unityInterface->Get<IUnityGraphicsD3D11>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
 #endif
 #if defined(SUPPORT_D3D12)
         case kUnityGfxRendererD3D12: {
-            IUnityGraphicsD3D12v5* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12v5>();
+            IUnityGraphicsD3D12v5* deviceInterface =
+                unityInterface->Get<IUnityGraphicsD3D12v5>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface);
         }
 #endif
@@ -51,41 +54,44 @@ bool GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         }
 #if defined(SUPPORT_VULKAN)
         case kUnityGfxRendererVulkan : {
-            IUnityGraphicsVulkan* deviceInterface = unityInterface->Get<IUnityGraphicsVulkan>();
+            IUnityGraphicsVulkan* deviceInterface =
+                unityInterface->Get<IUnityGraphicsVulkan>();
             UnityVulkanInstance vulkan = deviceInterface->Instance();
             return Init(rendererType, reinterpret_cast<void*>(&vulkan), deviceInterface);
         }
 #endif
         case kUnityGfxRendererMetal: {
 #if defined(SUPPORT_METAL)
-            IUnityGraphicsMetal* deviceInterface = unityInterface->Get<IUnityGraphicsMetal>();
+            IUnityGraphicsMetal* deviceInterface =
+                unityInterface->Get<IUnityGraphicsMetal>();
             return Init(rendererType, deviceInterface->MetalDevice(), deviceInterface);
 #endif
             break;
         }
         default: {
-            DebugError("Unsupported Unity Renderer: %d", m_rendererType);
-            return false;
+            DebugError("Unsupported Unity Renderer: %d", rendererType);
+            return nullptr;
         }
     }
-    return false;
+    return nullptr;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUnityInterface* unityInterface)
+IGraphicsDevice* GraphicsDevice::Init(
+    const UnityGfxRenderer rendererType, void* device, IUnityInterface* unityInterface)
 {
-    m_rendererType = rendererType;
+    IGraphicsDevice* pDevice = nullptr;
     switch (rendererType) {
     case kUnityGfxRendererD3D11: {
 #if defined(SUPPORT_D3D11)
-        m_device = new D3D11GraphicsDevice(static_cast<ID3D11Device*>(device));
+        pDevice = new D3D11GraphicsDevice(static_cast<ID3D11Device*>(device));
 #endif
         break;
     }
     case kUnityGfxRendererD3D12: {
 #if defined(SUPPORT_D3D12)
-        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device),
+        pDevice = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device),
             reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface)
         );
 #endif
@@ -93,14 +99,15 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
     }
     case kUnityGfxRendererOpenGLCore: {
 #if defined(SUPPORT_OPENGL_CORE)
-        m_device = new OpenGLGraphicsDevice();
+        pDevice = new OpenGLGraphicsDevice();
 #endif
         break;
     }
 #if defined(SUPPORT_VULKAN)
     case kUnityGfxRendererVulkan: {
-        const UnityVulkanInstance* vulkan = reinterpret_cast<const UnityVulkanInstance*>(device);
-        m_device = new VulkanGraphicsDevice(
+        const UnityVulkanInstance* vulkan =
+            static_cast<const UnityVulkanInstance*>(device);
+        pDevice = new VulkanGraphicsDevice(
             reinterpret_cast<IUnityGraphicsVulkan*>(unityInterface),
             vulkan->instance,
             vulkan->physicalDevice,
@@ -114,36 +121,24 @@ bool GraphicsDevice::Init(const UnityGfxRenderer rendererType, void* device, IUn
 #if defined(SUPPORT_METAL)
     case kUnityGfxRendererMetal: {
         id<MTLDevice> metalDevice = reinterpret_cast<id<MTLDevice>>(device);
-        IUnityGraphicsMetal* metalUnityInterface = reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
-        m_device = new MetalGraphicsDevice(metalDevice, metalUnityInterface);
+        IUnityGraphicsMetal* metalUnityInterface =
+            reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
+        pDevice = new MetalGraphicsDevice(metalDevice, metalUnityInterface);
         break;
     }
 #endif
     default: {
         DebugError("Unsupported Unity Renderer: %d", rendererType);
-        return false;
+        return nullptr;
     }
     }
-    if(m_device == nullptr) {
-        return false;
-    }
-    return m_device->InitV();
+    return pDevice;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void GraphicsDevice::Shutdown() {
-    if (nullptr != m_device) {
-        m_device->ShutdownV();
-        delete m_device;
-        m_device = nullptr;
-    }
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-
-GraphicsDevice::GraphicsDevice() : m_rendererType(static_cast<UnityGfxRenderer>(0)) {
-
+GraphicsDevice::GraphicsDevice()
+{
 }
 
 } // end namespace webrtc

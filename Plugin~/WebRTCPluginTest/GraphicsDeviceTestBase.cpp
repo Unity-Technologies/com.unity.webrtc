@@ -372,8 +372,8 @@ GraphicsDeviceTestBase::GraphicsDeviceTestBase()
     }
     else
     {
-        GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, pGraphicsDevice, unityInterface);
-        m_device = GraphicsDevice::GetInstance().GetDevice();
+        m_device = GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, pGraphicsDevice, unityInterface);
+        m_device->InitV();
     }
 
     if (m_device == nullptr)
@@ -392,7 +392,7 @@ GraphicsDeviceTestBase::~GraphicsDeviceTestBase()
     }
     else
     {
-        GraphicsDevice::GetInstance().Shutdown();
+        m_device->ShutdownV();
     }
 }
 
