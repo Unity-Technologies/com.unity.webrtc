@@ -5,6 +5,11 @@
 #include "SetSessionDescriptionObserver.h"
 #include "Context.h"
 #include "Codec/EncoderFactory.h"
+#include "GraphicsDevice/GraphicsUtility.h"
+
+#if defined(SUPPORT_VULKAN)
+#include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
+#endif
 
 namespace unity
 {
@@ -114,8 +119,20 @@ extern "C"
         context->DeleteMediaStream(stream);
     }
 
-    UNITY_INTERFACE_EXPORT::webrtc::MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt, int32 width, int32 height)
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt)
     {
+#if defined(SUPPORT_VULKAN)
+        UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
+        if(gfxRenderer == kUnityGfxRendererVulkan)
+        {
+            void* frame = nullptr;
+            VulkanGraphicsDevice* device =
+                static_cast<VulkanGraphicsDevice*>(GraphicsUtility::GetGraphicsDevice());
+            const std::unique_ptr<UnityVulkanImage> unityVulkanImage =
+                device->AccessTexture(rt);
+            return context->CreateVideoTrack(label, unityVulkanImage.get());
+        }
+#endif
         return context->CreateVideoTrack(label, rt);
     }
 

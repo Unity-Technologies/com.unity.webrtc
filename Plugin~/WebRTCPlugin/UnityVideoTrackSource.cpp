@@ -12,6 +12,7 @@ namespace webrtc
 
 UnityVideoTrackSource::UnityVideoTrackSource(
     void* frame,
+    UnityGfxRenderer gfxRenderer,
     bool is_screencast,
     absl::optional<bool> needs_denoising) :
     AdaptedVideoTrackSource(/*required_alignment=*/1),
@@ -21,6 +22,14 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     needs_denoising_(needs_denoising)
 {
 //  DETACH_FROM_THREAD(thread_checker_);
+
+#if defined(SUPPORT_VULKAN)
+    if(gfxRenderer == kUnityGfxRendererVulkan)
+    {
+        unityVulkanImage_ = *static_cast<UnityVulkanImage*>(frame_);
+        frame_ = &unityVulkanImage_;
+    }
+#endif
 }
 
 UnityVideoTrackSource::~UnityVideoTrackSource()

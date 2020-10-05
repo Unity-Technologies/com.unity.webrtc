@@ -70,6 +70,23 @@ void VulkanGraphicsDevice::ShutdownV() {
 
 //---------------------------------------------------------------------------------------------------------------------
 
+std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr) const
+{
+    std::unique_ptr<UnityVulkanImage> unityVulkanImage =
+        std::make_unique<UnityVulkanImage>();
+
+    VkImageSubresource subResource{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
+    if (!m_unityVulkan->AccessTexture(
+        ptr, &subResource, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_READ_BIT,
+        kUnityVulkanResourceAccess_PipelineBarrier,
+        unityVulkanImage.get()))
+    {
+        return nullptr;
+    }
+    return std::move(unityVulkanImage);
+}
+
 //Returns null if failed
 ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const uint32_t h) {
 
@@ -166,41 +183,20 @@ bool VulkanGraphicsDevice::CopyResourceFromNativeV(
         return false;
 
     VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
-    VkImageSubresource subResource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
-    VkImage image;
+    UnityVulkanImage* unityVulkanImage = static_cast<UnityVulkanImage*>(nativeTexturePtr);
 
-    // The nativeTexturePtr is texture pointer provided by Unity.
-    // When running native test, this pointer as UnityVulkanImage pointer.
-    if (m_unityVulkan != nullptr)
+    //Transition the src texture layout. 
+    VkResult result = VulkanUtility::DoImageLayoutTransition(
+        m_device, m_commandPool, m_graphicsQueue,
+        unityVulkanImage->image, unityVulkanImage->format,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT
+    );
+    if(result != VK_SUCCESS)
     {
-        UnityVulkanImage unityVulkanImage;
-        if (!m_unityVulkan->AccessTexture(
-            nativeTexturePtr, &subResource, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_READ_BIT,
-            kUnityVulkanResourceAccess_PipelineBarrier,
-            &unityVulkanImage))
-        {
-            return false;
-        }
-        image = unityVulkanImage.image;
+        return false;
     }
-    else
-    {
-        UnityVulkanImage* unityVulkanImage = static_cast<UnityVulkanImage*>(nativeTexturePtr);
-
-        //Transition the src texture layout. 
-        VkResult result = VulkanUtility::DoImageLayoutTransition(
-            m_device, m_commandPool, m_graphicsQueue,
-            unityVulkanImage->image, unityVulkanImage->format,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT
-        );
-        if(result != VK_SUCCESS)
-        {
-            return false;
-        }
-        image = unityVulkanImage->image;
-    }
+    VkImage image = unityVulkanImage->image;
 
     if (destTexture->GetImage() == image)
         return false;

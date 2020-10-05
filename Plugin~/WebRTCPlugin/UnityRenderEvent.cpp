@@ -7,6 +7,7 @@
 #include "Codec/EncoderFactory.h"
 #include "Context.h"
 #include "GraphicsDevice/GraphicsDevice.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 
 #if defined(SUPPORT_VULKAN)
 #include <IUnityGraphicsVulkan.h>
@@ -28,11 +29,23 @@ namespace webrtc
     IUnityGraphics* s_Graphics = nullptr;
     IUnityProfiler* s_UnityProfiler = nullptr;
     Context* s_context = nullptr;
-    std::map<const ::webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
+    std::map<const MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     bool s_IsDevelopmentBuild = false;
     IGraphicsDevice* s_gfxDevice = nullptr;
+
+    IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
+    {
+        RTC_DCHECK(s_gfxDevice);
+        return s_gfxDevice;
+    }
+
+    UnityGfxRenderer GraphicsUtility::GetGfxRenderer()
+    {
+        RTC_DCHECK(s_Graphics);
+        return s_Graphics->GetRenderer();
+    }
 
     static webrtc::VideoType ConvertTextureFormat(UnityRenderingExtTextureFormat type)
     {
