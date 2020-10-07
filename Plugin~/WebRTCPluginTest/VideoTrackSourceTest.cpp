@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "GraphicsDeviceTestBase.h"
-#include "../WebRTCPlugin/Codec/EncoderFactory.h"
-#include "../WebRTCPlugin/Codec/IEncoder.h"
-#include "../WebRTCPlugin/Context.h"
-#include "../WebRTCPlugin/GraphicsDevice/ITexture2D.h"
+#include "Codec/EncoderFactory.h"
+#include "Codec/IEncoder.h"
+#include "Context.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
 #include "UnityVideoTrackSource.h"
 
 using testing::_;
@@ -32,6 +33,7 @@ public:
     {
         m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
             m_texture->GetNativeTexturePtrV(),
+            m_unityGfxRenderer,
             /*is_screencast=*/ false,
             /*needs_denoising=*/ absl::nullopt);
         m_trackSource->AddOrUpdateSink(&mock_sink_, rtc::VideoSinkWants());

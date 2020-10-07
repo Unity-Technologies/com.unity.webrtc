@@ -78,7 +78,13 @@ namespace webrtc
 #endif
 #if defined(SUPPORT_VULKAN)
             case GRAPHICS_DEVICE_VULKAN: {
-                encoder = std::make_unique<NvEncoderCuda>(width, height, device);
+                if (encoderType == UnityEncoderType::UnityEncoderHardware)
+                {
+                    encoder = std::make_unique<NvEncoderCuda>(width, height, device);
+                }
+                else {
+                    encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                }
                 break;
             }
 #endif            

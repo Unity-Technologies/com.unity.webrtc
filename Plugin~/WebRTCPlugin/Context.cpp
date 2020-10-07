@@ -12,6 +12,7 @@
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 
 using namespace ::webrtc;
 
@@ -252,8 +253,9 @@ namespace webrtc
     bool Context::EncodeFrame(MediaStreamTrackInterface* track)
     {
         UnityVideoTrackSource* source = GetVideoSource(track);
-        if(source != nullptr)
-            source->OnFrameCaptured();
+        if (source == nullptr)
+            return false;
+        source->OnFrameCaptured();
         return true;
     }
 
@@ -319,10 +321,10 @@ namespace webrtc
     }
 
     webrtc::VideoTrackInterface* Context::CreateVideoTrack(
-        const std::string& label, void* frame)
+        const std::string& label, void* frame, UnityGfxRenderer gfxRenderer)
     {
         const rtc::scoped_refptr<UnityVideoTrackSource> source =
-            new rtc::RefCountedObject<UnityVideoTrackSource>(frame, false, nullptr);
+            new rtc::RefCountedObject<UnityVideoTrackSource>(frame, gfxRenderer, false, nullptr);
 
         const rtc::scoped_refptr<VideoTrackInterface> track =
             m_peerConnectionFactory->CreateVideoTrack(label, source);

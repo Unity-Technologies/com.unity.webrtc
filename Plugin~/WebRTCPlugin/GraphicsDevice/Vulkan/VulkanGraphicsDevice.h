@@ -24,6 +24,8 @@ public:
     virtual ITexture2D* CreateDefaultTextureV(const uint32_t w, const uint32_t h) override;
     virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height) override;
 
+    std::unique_ptr<UnityVulkanImage> AccessTexture(void* ptr) const;
+
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;

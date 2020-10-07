@@ -31,6 +31,7 @@ class UnityVideoTrackSource :
 
     UnityVideoTrackSource(
         void* frame,
+        UnityGfxRenderer gfxRenderer,
         bool is_screencast,
         absl::optional<bool> needs_denoising);
     ~UnityVideoTrackSource() override;
@@ -64,30 +65,33 @@ class UnityVideoTrackSource :
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
 
  private:
-  FrameAdaptationParams ComputeAdaptationParams(int width,
-                                                int height,
-                                                int64_t time_us);
+    FrameAdaptationParams ComputeAdaptationParams(
+        int width, int height, int64_t time_us);
 
-  // Delivers |frame| to base class method
-  // rtc::AdaptedVideoTrackSource::OnFrame(). If the cropping (given via
-  // |frame->visible_rect()|) has changed since the last delivered frame, the
-  // whole frame is marked as updated.
-  // void DeliverFrame(rtc::scoped_refptr<::webrtc::VideoFrame> frame,
-  //                  gfx::Rect* update_rect,
-  //                  int64_t timestamp_us);
+    // Delivers |frame| to base class method
+    // rtc::AdaptedVideoTrackSource::OnFrame(). If the cropping (given via
+    // |frame->visible_rect()|) has changed since the last delivered frame, the
+    // whole frame is marked as updated.
+    // void DeliverFrame(rtc::scoped_refptr<::webrtc::VideoFrame> frame,
+    //                  gfx::Rect* update_rect,
+    //                  int64_t timestamp_us);
 
-  // |thread_checker_| is bound to the libjingle worker thread.
-  // THREAD_CHECKER(thread_checker_);
-  // media::VideoFramePool scaled_frame_pool_;
-  // State for the timestamp translation.
-  rtc::TimestampAligner timestamp_aligner_;
+    // |thread_checker_| is bound to the libjingle worker thread.
+    // THREAD_CHECKER(thread_checker_);
+    // media::VideoFramePool scaled_frame_pool_;
+    // State for the timestamp translation.
+    rtc::TimestampAligner timestamp_aligner_;
 
-  const bool is_screencast_;
-  const absl::optional<bool> needs_denoising_;
+    const bool is_screencast_;
+    const absl::optional<bool> needs_denoising_;
 
-  std::mutex m_mutex;
-  IEncoder* encoder_;
-  void* frame_;
+    std::mutex m_mutex;
+    IEncoder* encoder_;
+    void* frame_;
+
+#if defined(SUPPORT_VULKAN)
+    UnityVulkanImage unityVulkanImage_;
+#endif
 };
 
 } // end namespace webrtc

@@ -20,6 +20,13 @@ public:
         const VkFormat format,
         VkImage* image, VkDeviceMemory* imageMemory, bool exportHandle);
 
+    static VkResult CreateImage(const VkPhysicalDevice physicalDevice, const VkDevice device,
+        const VkAllocationCallbacks* allocator,
+        const uint32_t width, const uint32_t height,
+        const VkImageTiling tiling, const VkImageUsageFlags usage, const VkMemoryPropertyFlags properties,
+        const VkFormat format,
+        UnityVulkanImage* image, bool exportHandle);
+
     static VkImageView  CreateImageView(const VkDevice device, const VkAllocationCallbacks* allocator, 
                                         const VkImage image, const VkFormat format);
 

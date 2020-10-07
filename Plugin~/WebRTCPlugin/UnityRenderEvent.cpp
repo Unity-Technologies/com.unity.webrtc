@@ -7,6 +7,12 @@
 #include "Codec/EncoderFactory.h"
 #include "Context.h"
 #include "GraphicsDevice/GraphicsDevice.h"
+#include "GraphicsDevice/GraphicsUtility.h"
+
+#if defined(SUPPORT_VULKAN)
+#include <IUnityGraphicsVulkan.h>
+#include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
+#endif
 
 enum class VideoStreamRenderEventID
 {
@@ -23,11 +29,23 @@ namespace webrtc
     IUnityGraphics* s_Graphics = nullptr;
     IUnityProfiler* s_UnityProfiler = nullptr;
     Context* s_context = nullptr;
-    IGraphicsDevice* s_device;
-    std::map<const ::webrtc::MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
+    std::map<const MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     bool s_IsDevelopmentBuild = false;
+    IGraphicsDevice* s_gfxDevice = nullptr;
+
+    IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
+    {
+        RTC_DCHECK(s_gfxDevice);
+        return s_gfxDevice;
+    }
+
+    UnityGfxRenderer GraphicsUtility::GetGfxRenderer()
+    {
+        RTC_DCHECK(s_Graphics);
+        return s_Graphics->GetRenderer();
+    }
 
     static webrtc::VideoType ConvertTextureFormat(UnityRenderingExtTextureFormat type)
     {
@@ -63,11 +81,32 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
     case kUnityGfxDeviceEventInitialize:
     {
+        /// note::
+        /// kUnityGfxDeviceEventInitialize event is occurred twice on Unity Editor.
+        /// First time, s_UnityInterfaces return UnityGfxRenderer as kUnityGfxRendererNull.
+        /// The actual value of UnityGfxRenderer is returned on second time.
+
         s_mapEncoder.clear();
+
+        UnityGfxRenderer renderer = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
+        if (renderer == kUnityGfxRendererNull)
+            break;
+
+        s_gfxDevice = GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
+        if(s_gfxDevice != nullptr)
+        {
+            s_gfxDevice->InitV();
+        }
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
+        if (s_gfxDevice != nullptr)
+        {
+            s_gfxDevice->ShutdownV();
+            s_gfxDevice = nullptr;
+        }
+
         //UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
         s_mapEncoder.clear();
@@ -89,6 +128,14 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
     s_UnityInterfaces = unityInterfaces;
     s_Graphics = unityInterfaces->Get<IUnityGraphics>();
     s_Graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
+
+#if defined(SUPPORT_VULKAN)
+    IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
+    if(vulkan != nullptr)
+    {
+        vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+    }
+#endif
 
     s_UnityProfiler = unityInterfaces->Get<IUnityProfiler>();
     if (s_UnityProfiler != nullptr)
@@ -129,15 +176,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     {
         case VideoStreamRenderEventID::Initialize:
         {
-            if (!GraphicsDevice::GetInstance().IsInitialized())
-            {
-                GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
-            }
-            s_device = GraphicsDevice::GetInstance().GetDevice();
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
             s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
-                param->width, param->height, s_device, encoderType);
+                param->width, param->height, s_gfxDevice, encoderType);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
                 // DebugLog("Encoder initialization faild.");
@@ -161,15 +203,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         {
             s_context->FinalizeEncoder(s_mapEncoder[track].get());
             s_mapEncoder.erase(track);
-            if(s_mapEncoder.empty())
-            {
-                GraphicsDevice::GetInstance().Shutdown();
-            }
             return;
         }
         default: {
-            // DebugLog("Unknown VideoStreamRenderEventID:%d", eventID);
-            return;
+            RTC_DCHECK(0);
         }
     }
 }
