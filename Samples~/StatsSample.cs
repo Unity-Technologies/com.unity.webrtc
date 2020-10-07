@@ -135,11 +135,11 @@ public class StatsSample : MonoBehaviour
         OnIceConnectionChange(pc2, state);
     }
 
-    void Pc1OnIceCandidate(RTCIceCandidate​ candidate)
+    void Pc1OnIceCandidate(RTCIceCandidate candidate)
     {
         OnIceCandidate(pc1, candidate);
     }
-    void Pc2OnIceCandidate(RTCIceCandidate​ candidate)
+    void Pc2OnIceCandidate(RTCIceCandidate candidate)
     {
         OnIceCandidate(pc2, candidate);
     }
@@ -189,7 +189,7 @@ public class StatsSample : MonoBehaviour
     /// </summary>
     /// <param name="pc"></param>
     /// <param name="streamEvent"></param>
-    void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
+    void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");

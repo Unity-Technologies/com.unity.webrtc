@@ -142,7 +142,7 @@ public class PeerConnectionSample : MonoBehaviour
                 break;
         }
     }
-    void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate​ candidate)
+    void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
         GetOtherPc(pc).AddIceCandidate(ref candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.candidate}");
