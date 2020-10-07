@@ -1,3 +1,13 @@
+/// This implementation works when enabled a debug mode of Libc++.
+/// Please see the link below to get more detail.
+/// https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html
+/// We can use the implementation from llvm depending on the developing environment.
+/// https://github.com/llvm/llvm-project/blob/master/libcxx/src/debug.cpp
+///
+/// In this project, the debug mode is enabled if the project would be built as a debug.
+/// But currently, it not used because the debug mode behaves unintendedly.
+/// You can check the behaviour if you just add a definition "USE_DEBUG_MODE" to a build option.
+
 //===-------------------------- debug.cpp ---------------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -6,7 +16,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifdef _LIBCPP_DEBUG
 
 #include "__config"
 #include "__debug"
@@ -44,6 +53,8 @@ bool __libcpp_set_debug_function(__libcpp_debug_function_type __func) {
   __libcpp_debug_function = __func;
   return true;
 }
+
+#if defined(USE_DEBUG_MODE)
 
 _LIBCPP_FUNC_VIS
 __libcpp_db*
@@ -576,7 +587,6 @@ __c_node::__remove(__i_node* p)
     if (--end_ != r)
         memmove(r, r+1, static_cast<size_t>(end_ - r)*sizeof(__i_node*));
 }
+#endif // defined(USE_DEBUG_MODE)
 
 _LIBCPP_END_NAMESPACE_STD
-
-#endif // _LIBCPP_DEBUG
