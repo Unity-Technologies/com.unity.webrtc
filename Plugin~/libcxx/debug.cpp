@@ -33,6 +33,7 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#if __clang_major__ >= 12
 std::string __libcpp_debug_info::what() const {
   string msg = __file_;
   msg += ":" + to_string(__line_) + ": _LIBCPP_ASSERT '";
@@ -41,8 +42,12 @@ std::string __libcpp_debug_info::what() const {
   msg += __msg_;
   return msg;
 }
+#endif
+
 _LIBCPP_NORETURN void __libcpp_abort_debug_function(__libcpp_debug_info const& info) {
+#if __clang_major__ >= 12
     std::fprintf(stderr, "%s\n", info.what().c_str());
+#endif
     std::abort();
 }
 
