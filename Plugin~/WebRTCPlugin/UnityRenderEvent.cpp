@@ -188,13 +188,13 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         }
         case VideoStreamRenderEventID::Encode:
         {
-            if (s_IsDevelopmentBuild)
+            if (s_IsDevelopmentBuild && s_UnityProfiler != nullptr)
                 s_UnityProfiler->BeginSample(s_MarkerEncode);
             if(!s_context->EncodeFrame(track))
             {
                 // DebugLog("Encode frame failed");
             }
-            if (s_IsDevelopmentBuild)
+            if (s_IsDevelopmentBuild && s_UnityProfiler != nullptr)
                 s_UnityProfiler->EndSample(s_MarkerEncode);
 
             return;
