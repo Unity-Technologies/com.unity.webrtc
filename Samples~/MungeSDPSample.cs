@@ -126,6 +126,7 @@ public class MungeSDPSample : MonoBehaviour
         if (op.IsError)
         {
             OnCreateSessionDescriptionError(op.Error);
+            yield break;
         }
 
         offerSdpInput.text = op.Desc.sdp;
@@ -143,6 +144,7 @@ public class MungeSDPSample : MonoBehaviour
         if (opLocal.IsError)
         {
             OnSetSessionDescriptionError(opLocal.Error);
+            yield break;
         }
 
         Debug.Log("Set Local session description success on LocalPeerConnection");
@@ -153,6 +155,7 @@ public class MungeSDPSample : MonoBehaviour
         if (opRemote.IsError)
         {
             OnSetSessionDescriptionError(opRemote.Error);
+            yield break;
         }
 
         Debug.Log("Set Remote session description success on RemotePeerConnection");
@@ -166,6 +169,7 @@ public class MungeSDPSample : MonoBehaviour
         if (op.IsError)
         {
             OnCreateSessionDescriptionError(op.Error);
+            yield break;
         }
 
         answerSdpInput.text = op.Desc.sdp;
@@ -183,6 +187,7 @@ public class MungeSDPSample : MonoBehaviour
         if (opLocal.IsError)
         {
             OnSetSessionDescriptionError(opLocal.Error);
+            yield break;
         }
 
         Debug.Log("Set Local session description success on RemotePeerConnection");
@@ -193,6 +198,7 @@ public class MungeSDPSample : MonoBehaviour
         if (opRemote.IsError)
         {
             OnSetSessionDescriptionError(opRemote.Error);
+            yield break;
         }
 
         Debug.Log("Set Remote session description success on LocalPeerConnection");
