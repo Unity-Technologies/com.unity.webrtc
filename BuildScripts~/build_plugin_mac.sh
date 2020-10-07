@@ -14,7 +14,9 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 git clone https://github.com/google/googletest.git
 cd googletest
 git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
-cmake .
+mkdir release
+cd release
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 sudo make install
 
