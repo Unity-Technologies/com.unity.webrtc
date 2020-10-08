@@ -120,6 +120,39 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.NotNull(peer.GetTransceivers().First());
         }
 
+        [Test]
+        [Category("PeerConnection")]
+        public void AddTransceiverTrackKindAudio()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Audio);
+            Assert.NotNull(transceiver);
+            Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
+            MediaStreamTrack track = transceiver.Track;
+            Assert.NotNull(track);
+            Assert.AreEqual(TrackKind.Audio, track.Kind);
+            Assert.True(track is AudioStreamTrack);
+
+            Assert.AreEqual(1, peer.GetTransceivers().Count());
+            Assert.NotNull(peer.GetTransceivers().First());
+        }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void AddTransceiverTrackKindVideo()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.NotNull(transceiver);
+            Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
+            MediaStreamTrack track = transceiver.Track;
+            Assert.NotNull(track);
+            Assert.AreEqual(TrackKind.Video, track.Kind);
+            Assert.True(track is VideoStreamTrack);
+
+            Assert.AreEqual(1, peer.GetTransceivers().Count());
+            Assert.NotNull(peer.GetTransceivers().First());
+        }
 
         [UnityTest]
         [Timeout(1000)]
