@@ -359,11 +359,6 @@ extern "C"
         return ConvertString(str);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
-    {
-        obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection));
-    }
-
     UNITY_INTERFACE_EXPORT void PeerConnectionGetStats(PeerConnectionObject* obj)
     {
         obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
@@ -544,9 +539,16 @@ extern "C"
         return member->type();
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetLocalDescription(
+        Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
     {
-        obj->SetLocalDescription(*desc, context->GetObserver(obj->connection));
+        return obj->SetLocalDescription(*desc, context->GetObserver(obj->connection), error);
+    }
+    
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetRemoteDescription(
+        Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
+    {
+        return obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection), error);
     }
 
     UNITY_INTERFACE_EXPORT bool PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)

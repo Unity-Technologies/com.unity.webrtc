@@ -151,30 +151,38 @@ namespace webrtc
         }
     }
 
-    void PeerConnectionObject::SetLocalDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer)
+    RTCErrorType PeerConnectionObject::SetLocalDescription(
+        const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, char* error[])
     {
-        webrtc::SdpParseError error;
-        auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error);
+        webrtc::SdpParseError error_;
+        auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
         if (!_desc.get())
         {
             DebugLog("Can't parse received session description message.");
-            DebugLog("SdpParseError:\n%s", error.description.c_str());
-            return;
+            DebugLog("SdpParseError:\n%s", error_.description.c_str());
+            *error = new char[error_.description.size()];
+            error_.description.copy(*error, error_.description.size());
+            return RTCErrorType::SYNTAX_ERROR;
         }
         connection->SetLocalDescription(observer, _desc.release());
+        return RTCErrorType::NONE;
     }
 
-    void PeerConnectionObject::SetRemoteDescription(const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer)
+    RTCErrorType PeerConnectionObject::SetRemoteDescription(
+        const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, char* error[])
     {
-        webrtc::SdpParseError error;
-        auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error);
+        webrtc::SdpParseError error_;
+        auto _desc = ::webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
         if (!_desc.get())
         {
             DebugLog("Can't parse received session description message.");
-            DebugLog("SdpParseError:\n%s", error.description.c_str());
-            return;
+            DebugLog("SdpParseError:\n%s", error_.description.c_str());
+            *error = new char[error_.description.size()];
+            error_.description.copy(*error, error_.description.size());
+            return RTCErrorType::SYNTAX_ERROR;
         }
         connection->SetRemoteDescription(observer, _desc.release());
+        return RTCErrorType::NONE;
     }
 
     webrtc::RTCErrorType PeerConnectionObject::SetConfiguration(const std::string& config)

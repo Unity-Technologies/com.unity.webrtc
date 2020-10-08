@@ -78,13 +78,24 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
-        public void PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        public RTCError PeerConnectionSetLocalDescription(
+            IntPtr ptr, ref RTCSessionDescription desc)
         {
-            NativeMethods.PeerConnectionSetLocalDescription(self, ptr, ref desc);
+            IntPtr ptrError = IntPtr.Zero;
+            RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
+                self, ptr, ref desc, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            return new RTCError { errorType =  errorType, message = message};
         }
-        public void PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc)
+
+        public RTCError PeerConnectionSetRemoteDescription(
+            IntPtr ptr, ref RTCSessionDescription desc)
         {
-            NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, ref desc);
+            IntPtr ptrError = IntPtr.Zero;
+            RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
+                self, ptr, ref desc, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            return new RTCError { errorType =  errorType, message = message};
         }
 
         public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
