@@ -27,7 +27,9 @@ namespace Unity.WebRTC.RuntimeTest
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Video);
             Assert.NotNull(transceiver);
-            MediaStreamTrack track = transceiver.Track;
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.NotNull(receiver);
+            MediaStreamTrack track = receiver.Track;
             Assert.NotNull(track);
             Assert.AreEqual(TrackKind.Video, track.Kind);
             var videoTrack = track as VideoStreamTrack;

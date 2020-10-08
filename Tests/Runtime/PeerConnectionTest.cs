@@ -128,7 +128,9 @@ namespace Unity.WebRTC.RuntimeTest
             var transceiver = peer.AddTransceiver(TrackKind.Audio);
             Assert.NotNull(transceiver);
             Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
-            MediaStreamTrack track = transceiver.Track;
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.NotNull(receiver);
+            MediaStreamTrack track = receiver.Track;
             Assert.NotNull(track);
             Assert.AreEqual(TrackKind.Audio, track.Kind);
             Assert.True(track is AudioStreamTrack);
@@ -145,7 +147,9 @@ namespace Unity.WebRTC.RuntimeTest
             var transceiver = peer.AddTransceiver(TrackKind.Video);
             Assert.NotNull(transceiver);
             Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
-            MediaStreamTrack track = transceiver.Track;
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.NotNull(receiver);
+            MediaStreamTrack track = receiver.Track;
             Assert.NotNull(track);
             Assert.AreEqual(TrackKind.Video, track.Kind);
             Assert.True(track is VideoStreamTrack);
