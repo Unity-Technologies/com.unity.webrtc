@@ -187,7 +187,7 @@ namespace Unity.WebRTC
 
     public static class CameraExtension
     {
-        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height, int bitrate,
+        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             switch (depth)
@@ -209,11 +209,11 @@ namespace Unity.WebRTC
         }
 
 
-        public static MediaStream CaptureStream(this Camera cam, int width, int height, int bitrate,
+        public static MediaStream CaptureStream(this Camera cam, int width, int height,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
-            var track = cam.CaptureStreamTrack(width, height, bitrate, depth);
+            var track = cam.CaptureStreamTrack(width, height, depth);
             stream.AddTrack(track);
             return stream;
         }
