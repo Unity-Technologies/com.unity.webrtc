@@ -583,6 +583,10 @@ namespace Unity.WebRTC
         /// An AsyncOperation which resolves with an <see cref="RTCSessionDescription"/>
         /// object providing a description of the session.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an argument has an invalid value.
+        /// For example, when passed the sdp which is null or empty.
+        /// </exception>
         /// <exception cref="RTCErrorException">
         /// Thrown when an argument has an invalid value.
         /// For example, when passed the sdp which is not be able to parse.
@@ -591,6 +595,9 @@ namespace Unity.WebRTC
         public RTCSetSessionDescriptionAsyncOperation SetLocalDescription(
             ref RTCSessionDescription desc)
         {
+            if(string.IsNullOrEmpty(desc.sdp))
+                throw new ArgumentException("sdp is null or empty");
+
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
             RTCError error = WebRTC.Context.PeerConnectionSetLocalDescription(
                 self, ref desc);
@@ -611,6 +618,10 @@ namespace Unity.WebRTC
         /// An AsyncOperation which resolves with an <see cref="RTCSessionDescription"/>
         /// object providing a description of the session.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an argument has an invalid value.
+        /// For example, when passed the sdp which is null or empty.
+        /// </exception>
         /// <exception cref="RTCErrorException">
         /// Thrown when an argument has an invalid value.
         /// For example, when passed the sdp which is not be able to parse.
@@ -619,6 +630,9 @@ namespace Unity.WebRTC
         public RTCSetSessionDescriptionAsyncOperation SetRemoteDescription(
             ref RTCSessionDescription desc)
         {
+            if (string.IsNullOrEmpty(desc.sdp))
+                throw new ArgumentException("sdp is null or empty");
+
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
             RTCError error = WebRTC.Context.PeerConnectionSetRemoteDescription(
                 self, ref desc);

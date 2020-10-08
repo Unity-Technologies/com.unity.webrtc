@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using System.Linq;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -219,6 +221,18 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
         }
 
+        [Test]
+        [Category("PeerConnection")]
+        public void SetLocalDescriptionThrowException()
+        {
+            var peer = new RTCPeerConnection();
+            RTCSessionDescription empty = new RTCSessionDescription();
+            Assert.Throws<ArgumentException>(() => peer.SetLocalDescription(ref empty));
+
+            RTCSessionDescription invalid = new RTCSessionDescription { sdp = "this is invalid parameter" };
+            Assert.Throws<RTCErrorException>(() => peer.SetLocalDescription(ref invalid));
+        }
+
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
@@ -258,6 +272,19 @@ namespace Unity.WebRTC.RuntimeTest
             peer1.Dispose();
             peer2.Dispose();
         }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void SetRemoteDescriptionThrowException()
+        {
+            var peer = new RTCPeerConnection();
+            RTCSessionDescription empty = new RTCSessionDescription();
+            Assert.Throws<ArgumentException>(() => peer.SetRemoteDescription(ref empty));
+
+            RTCSessionDescription invalid = new RTCSessionDescription { sdp = "this is invalid parameter" };
+            Assert.Throws<RTCErrorException>(() => peer.SetRemoteDescription(ref invalid));
+        }
+
 
         [UnityTest]
         [Timeout(1000)]

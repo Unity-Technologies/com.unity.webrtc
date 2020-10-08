@@ -154,14 +154,15 @@ namespace webrtc
     RTCErrorType PeerConnectionObject::SetLocalDescription(
         const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, char* error[])
     {
-        webrtc::SdpParseError error_;
-        auto _desc = webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
+        SdpParseError error_;
+        std::unique_ptr<SessionDescriptionInterface> _desc =
+            CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
         if (!_desc.get())
         {
             DebugLog("Can't parse received session description message.");
             DebugLog("SdpParseError:\n%s", error_.description.c_str());
-            *error = new char[error_.description.size()];
-            error_.description.copy(*error, error_.description.size());
+
+            *error = ConvertString(error_.description);
             return RTCErrorType::SYNTAX_ERROR;
         }
         connection->SetLocalDescription(observer, _desc.release());
@@ -171,14 +172,15 @@ namespace webrtc
     RTCErrorType PeerConnectionObject::SetRemoteDescription(
         const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, char* error[])
     {
-        webrtc::SdpParseError error_;
-        auto _desc = ::webrtc::CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
+        SdpParseError error_;
+        std::unique_ptr<SessionDescriptionInterface> _desc =
+            CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
         if (!_desc.get())
         {
             DebugLog("Can't parse received session description message.");
             DebugLog("SdpParseError:\n%s", error_.description.c_str());
-            *error = new char[error_.description.size()];
-            error_.description.copy(*error, error_.description.size());
+
+            *error = ConvertString(error_.description);
             return RTCErrorType::SYNTAX_ERROR;
         }
         connection->SetRemoteDescription(observer, _desc.release());
