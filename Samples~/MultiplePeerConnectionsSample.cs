@@ -16,14 +16,14 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
     [SerializeField] private Transform rotateObject;
 #pragma warning restore 0649
 
-    private RTCOfferOptions offerOptions = new RTCOfferOptions
+    private static RTCOfferOptions offerOptions = new RTCOfferOptions
     {
         iceRestart = false, offerToReceiveAudio = true, offerToReceiveVideo = true
     };
 
-    private RTCAnswerOptions answerOptions = new RTCAnswerOptions {iceRestart = false,};
+    private static RTCAnswerOptions answerOptions = new RTCAnswerOptions {iceRestart = false,};
 
-    private RTCConfiguration configuration = new RTCConfiguration
+    private static RTCConfiguration configuration = new RTCConfiguration
     {
         iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}}
     };
@@ -118,8 +118,8 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
 
         Debug.Log("Adding local stream to pc1Local/pc2Local");
 
-        StartCoroutine(NegotiationPeer1());
-        StartCoroutine(NegotiationPeer2());
+        StartCoroutine(NegotiationPeer(pc1Local, pc1Remote));
+        StartCoroutine(NegotiationPeer(pc2Local, pc2Remote));
 
         callButton.interactable = false;
         hangUpButton.interactable = true;
@@ -162,9 +162,9 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
         Debug.LogError($"Failed to create session description: {error.message}");
     }
 
-    private IEnumerator NegotiationPeer1()
+    private static IEnumerator NegotiationPeer(RTCPeerConnection localPeer, RTCPeerConnection remotePeer)
     {
-        var opCreateOffer = pc1Local.CreateOffer(ref offerOptions);
+        var opCreateOffer = localPeer.CreateOffer(ref offerOptions);
         yield return opCreateOffer;
 
         if (opCreateOffer.IsError)
@@ -174,11 +174,11 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
         }
 
         var offerDesc = opCreateOffer.Desc;
-        yield return pc1Local.SetLocalDescription(ref offerDesc);
-        Debug.Log($"Offer from pc1Local\n {offerDesc.sdp}");
-        yield return pc1Remote.SetRemoteDescription(ref offerDesc);
+        yield return localPeer.SetLocalDescription(ref offerDesc);
+        Debug.Log($"Offer from LocalPeer \n {offerDesc.sdp}");
+        yield return remotePeer.SetRemoteDescription(ref offerDesc);
 
-        var opCreateAnswer = pc1Remote.CreateAnswer(ref answerOptions);
+        var opCreateAnswer = remotePeer.CreateAnswer(ref answerOptions);
         yield return opCreateAnswer;
 
         if (opCreateAnswer.IsError)
@@ -188,39 +188,8 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
         }
 
         var answerDesc = opCreateAnswer.Desc;
-        yield return pc1Remote.SetLocalDescription(ref answerDesc);
-        Debug.Log($"Answer from pc1Remote\n {answerDesc.sdp}");
-        yield return pc1Local.SetRemoteDescription(ref answerDesc);
-    }
-
-    private IEnumerator NegotiationPeer2()
-    {
-        var opCreateOffer = pc2Local.CreateOffer(ref offerOptions);
-        yield return opCreateOffer;
-
-        if (opCreateOffer.IsError)
-        {
-            OnCreateSessionDescriptionError(opCreateOffer.Error);
-            yield break;
-        }
-
-        var offerDesc = opCreateOffer.Desc;
-        yield return pc2Local.SetLocalDescription(ref offerDesc);
-        Debug.Log($"Offer from pc1Local\n {offerDesc.sdp}");
-        yield return pc2Remote.SetRemoteDescription(ref offerDesc);
-
-        var opCreateAnswer = pc2Remote.CreateAnswer(ref answerOptions);
-        yield return opCreateAnswer;
-
-        if (opCreateAnswer.IsError)
-        {
-            OnCreateSessionDescriptionError(opCreateAnswer.Error);
-            yield break;
-        }
-
-        var answerDesc = opCreateAnswer.Desc;
-        yield return pc2Remote.SetLocalDescription(ref answerDesc);
-        Debug.Log($"Answer from pc1Remote\n {answerDesc.sdp}");
-        yield return pc2Local.SetRemoteDescription(ref answerDesc);
+        yield return remotePeer.SetLocalDescription(ref answerDesc);
+        Debug.Log($"Answer from RemotePeer \n {answerDesc.sdp}");
+        yield return localPeer.SetRemoteDescription(ref answerDesc);
     }
 }
