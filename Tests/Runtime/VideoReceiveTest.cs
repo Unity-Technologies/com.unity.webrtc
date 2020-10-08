@@ -24,23 +24,22 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         public IEnumerator InitializeReceiver()
         {
-            var width = 256;
-            var height = 256;
-            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
-            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
-            rt.Create();
-            var videoTrack = new VideoStreamTrack("video", rt);
-            // wait for initialization encoder on render thread.
-            yield return new WaitForSeconds(0.1f);
-
-            var rt1 = videoTrack.InitializeReceiver();
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.NotNull(transceiver);
+            MediaStreamTrack track = transceiver.Track;
+            Assert.NotNull(track);
+            Assert.AreEqual(TrackKind.Video, track.Kind);
+            var videoTrack = track as VideoStreamTrack;
+            Assert.NotNull(videoTrack);
+            var rt = videoTrack.InitializeReceiver();
             Assert.True(videoTrack.IsDecoderInitialized);
             videoTrack.Dispose();
             // wait for disposing video track.
             yield return 0;
 
+            peer.Dispose();
             Object.DestroyImmediate(rt);
-            Object.DestroyImmediate(rt1);
         }
 
         // todo::Software encoder does not support yet on linux
@@ -61,7 +60,7 @@ namespace Unity.WebRTC.RuntimeTest
             RenderTexture receiveImage = null;
             receiveStream.OnAddTrack = e =>
             {
-                if (e.Track.Kind == TrackKind.Video && e.Track is VideoStreamTrack track)
+                if (e.Track is VideoStreamTrack track)
                 {
                     receiveVideoTrack = track;
                     receiveImage = receiveVideoTrack.InitializeReceiver();

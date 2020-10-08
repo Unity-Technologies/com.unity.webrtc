@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -56,13 +52,13 @@ namespace Unity.WebRTC
             }
         }
 
-        public RenderTexture InitializeReceiver()
+        public UnityEngine.RenderTexture InitializeReceiver()
         {
             if (IsDecoderInitialized)
                 throw new InvalidOperationException("Already initialized receiver");
 
             m_needFlip = true;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             m_sourceTexture = CreateRenderTexture(1280, 720, format);
             m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
 
@@ -119,7 +115,7 @@ namespace Unity.WebRTC
             : this(label,
                 source,
                 CreateRenderTexture(source.width, source.height,
-                    WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType)),
+                    WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
                 source.width,
                 source.height)
         {
@@ -187,7 +183,7 @@ namespace Unity.WebRTC
 
     public static class CameraExtension
     {
-        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height, int bitrate,
+        public static VideoStreamTrack CaptureStreamTrack(this UnityEngine.Camera cam, int width, int height, int bitrate,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             switch (depth)
@@ -201,15 +197,15 @@ namespace Unity.WebRTC
             }
 
             int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var rt = new RenderTexture(width, height, depthValue, format);
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
             return new VideoStreamTrack(cam.name, rt);
         }
 
 
-        public static MediaStream CaptureStream(this Camera cam, int width, int height, int bitrate,
+        public static MediaStream CaptureStream(this UnityEngine.Camera cam, int width, int height, int bitrate,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
