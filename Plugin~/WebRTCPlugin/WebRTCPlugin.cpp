@@ -34,58 +34,59 @@ namespace webrtc
             delegateSetResolution(width, length);
         }
     }
-    
+
+    template<class T>
+    T** ConvertPtrArrayFromRefPtrArray(
+        std::vector<rtc::scoped_refptr<T>> vec, size_t* length)
+    {
+        *length = vec.size();
+        const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
+        const auto ret = static_cast<T**>(buf);
+        std::copy(vec.begin(), vec.end(), ret);
+        return ret;
+    }
+
+    template<typename T>
+    T* ConvertArray(std::vector<T> vec, size_t* length)
+    {
+        *length = vec.size();
+        size_t size = sizeof(T*) * vec.size();
+        auto dst = CoTaskMemAlloc(size);
+        auto src = vec.data();
+        std::memcpy(dst, src, size);
+        return static_cast<T*>(dst);
+    }
+
+    ///
+    /// avoid compile erorr for vector<bool>
+    /// https://en.cppreference.com/w/cpp/container/vector_bool
+    bool* ConvertArray(std::vector<bool> vec, size_t* length)
+    {
+        *length = vec.size();
+        size_t size = sizeof(bool*) * vec.size();
+        auto dst = CoTaskMemAlloc(size);
+        bool* ret = static_cast<bool*>(dst);
+        for (size_t i = 0; i < vec.size(); i++)
+        {
+            ret[i] = vec[i];
+        }
+        return ret;
+    }
+
+    char* ConvertString(const std::string str)
+    {
+        const size_t size = str.size();
+        char* ret = static_cast<char*>(CoTaskMemAlloc(size + sizeof(char)));
+        str.copy(ret, size);
+        ret[size] = '\0';
+        return ret;
+    }
+
 } // end namespace webrtc
 } // end namespace unity
 
 using namespace unity::webrtc;
 using namespace ::webrtc;
-
-template<class T>
-T** ConvertPtrArrayFromRefPtrArray(std::vector<rtc::scoped_refptr<T>> vec, size_t* length)
-{
-    *length = vec.size();
-    const auto buf = CoTaskMemAlloc(sizeof(T*) * vec.size());
-    const auto ret = static_cast<T**>(buf);
-    std::copy(vec.begin(), vec.end(), ret);
-    return ret;
-}
-
-template<typename T>
-T* ConvertArray(std::vector<T> vec, size_t* length)
-{
-    *length = vec.size();
-    size_t size = sizeof(T*) * vec.size();
-    auto dst = CoTaskMemAlloc(size);
-    auto src = vec.data();
-    std::memcpy(dst, src, size);
-    return static_cast<T*>(dst);
-}
-
-///
-/// avoid compile erorr for vector<bool>
-/// https://en.cppreference.com/w/cpp/container/vector_bool
-bool* ConvertArray(std::vector<bool> vec, size_t* length)
-{
-    *length = vec.size();
-    size_t size = sizeof(bool*) * vec.size();
-    auto dst = CoTaskMemAlloc(size);
-    bool* ret = static_cast<bool*>(dst);
-    for (size_t i = 0; i < vec.size(); i++)
-    {
-        ret[i] = vec[i];
-    }
-    return ret;
-}
-
-char* ConvertString(const std::string str)
-{
-    const size_t size = str.size();
-    char* ret = static_cast<char*>(CoTaskMemAlloc(size + sizeof(char)));
-    str.copy(ret, size);
-    ret[size] = '\0';
-    return ret;
-}
 
 extern "C"
 {
@@ -359,11 +360,6 @@ extern "C"
         return ConvertString(str);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetRemoteDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
-    {
-        obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection));
-    }
-
     UNITY_INTERFACE_EXPORT void PeerConnectionGetStats(PeerConnectionObject* obj)
     {
         obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
@@ -544,9 +540,16 @@ extern "C"
         return member->type();
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSetLocalDescription(Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc)
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetLocalDescription(
+        Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
     {
-        obj->SetLocalDescription(*desc, context->GetObserver(obj->connection));
+        return obj->SetLocalDescription(*desc, context->GetObserver(obj->connection), error);
+    }
+    
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetRemoteDescription(
+        Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
+    {
+        return obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection), error);
     }
 
     UNITY_INTERFACE_EXPORT bool PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)

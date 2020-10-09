@@ -575,17 +575,72 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// This method changes the session description
+        /// of the local connection to negotiate with other connections.
         /// </summary>
         /// <param name="desc"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// An AsyncOperation which resolves with an <see cref="RTCSessionDescription"/>
+        /// object providing a description of the session.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an argument has an invalid value.
+        /// For example, when passed the sdp which is null or empty.
+        /// </exception>
+        /// <exception cref="RTCErrorException">
+        /// Thrown when an argument has an invalid value.
+        /// For example, when passed the sdp which is not be able to parse.
+        /// </exception>
         /// <seealso cref="LocalDescription"/>
         public RTCSetSessionDescriptionAsyncOperation SetLocalDescription(
             ref RTCSessionDescription desc)
         {
+            if(string.IsNullOrEmpty(desc.sdp))
+                throw new ArgumentException("sdp is null or empty");
+
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            WebRTC.Context.PeerConnectionSetLocalDescription(self, ref desc);
-            return op;
+            RTCError error = WebRTC.Context.PeerConnectionSetLocalDescription(
+                self, ref desc);
+            if (error.errorType == RTCErrorType.None)
+            {
+                return op;
+            }
+            throw new RTCErrorException(ref error);
+        }
+
+
+        /// <summary>
+        /// This method changes the session description
+        /// of the remote connection to negotiate with local connections.
+        /// </summary>
+        /// <param name="desc"></param>
+        /// <returns>
+        /// An AsyncOperation which resolves with an <see cref="RTCSessionDescription"/>
+        /// object providing a description of the session.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an argument has an invalid value.
+        /// For example, when passed the sdp which is null or empty.
+        /// </exception>
+        /// <exception cref="RTCErrorException">
+        /// Thrown when an argument has an invalid value.
+        /// For example, when passed the sdp which is not be able to parse.
+        /// </exception>
+        /// <seealso cref="RemoteDescription"/>
+        public RTCSetSessionDescriptionAsyncOperation SetRemoteDescription(
+            ref RTCSessionDescription desc)
+        {
+            if (string.IsNullOrEmpty(desc.sdp))
+                throw new ArgumentException("sdp is null or empty");
+
+            var op = new RTCSetSessionDescriptionAsyncOperation(this);
+            RTCError error = WebRTC.Context.PeerConnectionSetRemoteDescription(
+                self, ref desc);
+            if (error.errorType == RTCErrorType.None)
+            {
+                return op;
+            }
+            throw new RTCErrorException(ref error);
         }
 
         /// <summary>
@@ -717,18 +772,6 @@ namespace Unity.WebRTC
                 }
                 throw new InvalidOperationException("PendingRemoteDescription is not exist");
             }
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="desc"></param>
-        /// <returns></returns>
-        public RTCSetSessionDescriptionAsyncOperation SetRemoteDescription(ref RTCSessionDescription desc)
-        {
-            var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            WebRTC.Context.PeerConnectionSetRemoteDescription(self, ref desc);
-            return op;
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
