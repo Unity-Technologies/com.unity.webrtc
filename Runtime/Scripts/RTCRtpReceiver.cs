@@ -18,5 +18,14 @@ namespace Unity.WebRTC
         {
             return peer.GetStats(this);
         }
+
+        public MediaStreamTrack Track
+        {
+            get
+            {
+                IntPtr ptrTrack = NativeMethods.ReceiverGetTrack(self);
+                return WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
+            }
+        }
     }
 }

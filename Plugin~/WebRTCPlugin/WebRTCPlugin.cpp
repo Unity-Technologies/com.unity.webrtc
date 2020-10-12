@@ -681,10 +681,6 @@ extern "C"
     {
         obj->RegisterOnTrack(callback);
     }
-    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* TransceiverGetTrack(RtpTransceiverInterface* transceiver)
-    {
-        return transceiver->receiver()->track().get();
-    }
 
     UNITY_INTERFACE_EXPORT bool TransceiverGetCurrentDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection* direction)
     {
@@ -780,7 +776,12 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
     {
-        return sender->track();
+        return sender->track().get();
+    }
+
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ReceiverGetTrack(RtpReceiverInterface* receiver)
+    {
+        return receiver->track().get();
     }
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)

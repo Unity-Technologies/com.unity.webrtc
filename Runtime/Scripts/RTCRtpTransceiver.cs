@@ -63,18 +63,6 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public MediaStreamTrack Track
-        {
-            get
-            {
-                IntPtr ptrTrack = NativeMethods.TransceiverGetTrack(self);
-                return WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
-            }
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="direction"></param>
         public void SetDirection(RTCRtpTransceiverDirection direction)
         {

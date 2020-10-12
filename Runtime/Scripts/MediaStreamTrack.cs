@@ -109,8 +109,6 @@ namespace Unity.WebRTC
 
     public class RTCTrackEvent
     {
-        public MediaStreamTrack Track { get; }
-
         public RTCRtpTransceiver Transceiver { get; }
 
         public RTCRtpReceiver Receiver
@@ -121,10 +119,16 @@ namespace Unity.WebRTC
             }
         }
 
+        public MediaStreamTrack Track
+        {
+            get
+            {
+                return Receiver.Track;
+            }
+        }
+
         internal RTCTrackEvent(IntPtr ptrTransceiver, RTCPeerConnection peer)
         {
-            IntPtr ptrTrack = NativeMethods.TransceiverGetTrack(ptrTransceiver);
-            Track = WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
             Transceiver = new RTCRtpTransceiver(ptrTransceiver, peer);
         }
     }

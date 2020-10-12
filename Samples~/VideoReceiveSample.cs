@@ -69,10 +69,9 @@ public class VideoReceiveSample : MonoBehaviour
 
         receiveStream.OnAddTrack = e =>
         {
-            if (e.Track.Kind == TrackKind.Video)
+            if (e.Track is VideoStreamTrack track)
             {
-                var videoStreamTrack = (VideoStreamTrack)e.Track;
-                receiveImage.texture = videoStreamTrack.InitializeReceiver();
+                receiveImage.texture = track.InitializeReceiver();
             }
         };
     }
