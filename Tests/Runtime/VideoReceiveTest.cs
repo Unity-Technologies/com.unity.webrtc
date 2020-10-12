@@ -34,7 +34,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(TrackKind.Video, track.Kind);
             var videoTrack = track as VideoStreamTrack;
             Assert.NotNull(videoTrack);
-            var rt = videoTrack.InitializeReceiver();
+            var rt = videoTrack.InitializeReceiver(640, 320);
             Assert.True(videoTrack.IsDecoderInitialized);
             videoTrack.Dispose();
             // wait for disposing video track.
@@ -65,7 +65,7 @@ namespace Unity.WebRTC.RuntimeTest
                 if (e.Track is VideoStreamTrack track)
                 {
                     receiveVideoTrack = track;
-                    receiveImage = receiveVideoTrack.InitializeReceiver();
+                    receiveImage = receiveVideoTrack.InitializeReceiver(640, 320);
                 }
             };
             pc2.OnTrack = e => receiveStream.AddTrack(e.Track);
