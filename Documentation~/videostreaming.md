@@ -4,6 +4,8 @@ WebRTC enables streaming video between peers. It can stream video rendered by Un
 
 ## Codec
 
+### Encode
+
 There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding different kinds of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`.
 
 We can select the type of encoder by specifying the EncoderType in WebRTC.Initialize's method argument.
@@ -17,9 +19,16 @@ WebRTC.Initialize(EncoderType.Software);
 > This option selects whether or not to use hardware for encoding.
 > Currently, there is no way to explicitly designate a codec. 
 
-
-
 The major browsers that support WebRTC can use `H.264` and `VP8`, which means most browsers can receive video streaming from Unity.
+
+### Decode
+
+Currently, only SoftwareDecoder can be used, in which case VP8/VP9 can be used as a codec.
+In this case, `VP8` or `VP9` can be used as a codec.
+
+> [!NOTE]
+> Currently, HardwareDecoder is not supported.
+> We plan about HardwareDecoder support in 2.x release.
 
 ## <a id="videotrack"/> Video Track
 
@@ -107,4 +116,48 @@ sender.SetParameters(parameters);
 It is possible to check the current bitrate on browsers. If using Google Chrome, shows statistics of WebRTC by accessing the URL `chrome://webrtc-internals`. Check the graph showing the received bytes per unit time in the category `RTCInboundRTPVideoStream` of statistics.
 
 ![Chrome WebRTC Stats](images/chrome-webrtc-stats.png)
+
+
+## Receiving Video
+
+You can use VideoTrack to receive the video.
+`VideoTrack` for receiving video is got on `OnTrack` event of the `PeerConnection` instance.
+If the type of `MediaStreamTrack` argument of the event is Video, it casts to the `VideoStreamTrack` class.
+And call `InitializeReceiver` method, you can get `RenderTexture` that is rendering received video.
+You can specify the resolution of the `RenderTexture` on `InitializeReceiver` method.
+The received video will be scaled up or down to the resolution of this `RenderTexture`.
+
+```CSharp
+var peerConnection = new RTCPeerConnection();
+peerConnection.OnTrack = (RTCTrackEvent e) => {
+    if (e.Track.Kind == TrackKind.Video)
+    {
+        var videoTrack = (VideoStreamTrack) e.Track;
+        var receiveRender = videoTrack.InitializeReceiver(1280, 720);
+    }
+    // or
+    if (e.Track is VideoStreamTrack videoTrack)
+    {
+        var videoTrack = (VideoStreamTrack) e.Track;
+        var receiveRender = videoTrack.InitializeReceiver(1280, 720);
+    }
+    // Set RenderTexture to some Image class
+};
+```
+
+### Receiving multi video
+
+Multiple VideoTracks can be received in a single `PeerConnection`.
+It is a good idea to call the `AddTransciver` method on the `PeerConnection` instance as needed track count, and then do signaling.
+
+```CSharp
+// call AddTransceiver as needed track count
+peerConnection.AddTransceiver(TrackKind.Video);
+// Do process signaling
+```
+
+### Notes.
+
+- It is not possible to send and receive video in a single `VideoStreamTrack` instance.
+- The `VideoStreamTrack` used to receive the video should be the track received in the event of the `PeerConnection.OnTrack`.
 
