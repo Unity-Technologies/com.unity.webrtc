@@ -12,6 +12,7 @@ namespace webrtc
     enum class RTCSdpType;
     enum class RTCPeerConnectionEventType;
     struct MediaStreamEvent;
+    class UnityVideoTrackSource;
 
     using DelegateDebugLog = void(*)(const char*);
     using DelegateSetResolution = void(*)(int32*, int32*);
@@ -19,6 +20,7 @@ namespace webrtc
     using DelegateMediaStreamOnRemoveTrack = void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
     using DelegateSetSessionDescSuccess = void(*)(PeerConnectionObject*);
     using DelegateSetSessionDescFailure = void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
+    using DelegateOnVideoFrameEncode = void(*)(::webrtc::MediaStreamTrackInterface*, int encoderTypeID, int width, int height, const uint8_t* buffer, int bufferSize);
 
     void debugLog(const char* buf);
     void SetResolution(int32* width, int32* length);

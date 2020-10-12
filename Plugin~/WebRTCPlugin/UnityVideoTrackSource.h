@@ -3,6 +3,8 @@
 #include <mutex>
 #include "Codec/IEncoder.h"
 #include "rtc_base/timestamp_aligner.h"
+#include "WebRTCPlugin.h"
+#include "api/media_stream_interface.h"
 
 namespace unity {
 namespace webrtc {
@@ -46,7 +48,8 @@ class UnityVideoTrackSource :
     void OnFrameCaptured();
 
     // todo(kazuki)::
-    void DelegateOnFrame(const ::webrtc::VideoFrame& frame) { OnFrame(frame); }
+    //void DelegateOnFrame(const ::webrtc::VideoFrame& frame) { OnFrame(frame); }
+    void DelegateOnFrame(const ::webrtc::VideoFrame& frame);
 
     // todo(kazuki)::
     void SetEncoder(IEncoder* encoder);
@@ -60,6 +63,8 @@ class UnityVideoTrackSource :
         }
         return encoder_->GetCodecInitializationResult();
     }
+
+    void SetVideoFrameOnEncodeCallback(::webrtc::MediaStreamTrackInterface* track, DelegateOnVideoFrameEncode callback);
 
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
@@ -88,6 +93,9 @@ class UnityVideoTrackSource :
     std::mutex m_mutex;
     IEncoder* encoder_;
     void* frame_;
+    ::webrtc::MediaStreamTrackInterface* track_;
+    DelegateOnVideoFrameEncode on_encode_;
+    std::mutex m_onEncodeMutex;
 
 #if defined(SUPPORT_VULKAN)
     UnityVulkanImage unityVulkanImage_;

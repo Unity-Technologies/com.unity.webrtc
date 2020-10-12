@@ -3,7 +3,9 @@
 
 #include <mutex>
 
-#include "Codec/IEncoder.h"
+#include "DummyVideoEncoder.h"
+#include "WebRTCPlugin.h"
+#include "common_video/libyuv/include/webrtc_libyuv.h"
 
 namespace unity
 {
@@ -19,7 +21,8 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     frame_(frame),
     encoder_(nullptr),
     is_screencast_(is_screencast),
-    needs_denoising_(needs_denoising)
+    needs_denoising_(needs_denoising),
+    on_encode_(nullptr)
 {
 //  DETACH_FROM_THREAD(thread_checker_);
 
@@ -36,6 +39,7 @@ UnityVideoTrackSource::~UnityVideoTrackSource()
 {
     {
         std::unique_lock<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> onencode_lock(m_onEncodeMutex);
     }
 };
 
@@ -89,6 +93,56 @@ void UnityVideoTrackSource::OnFrameCaptured()
     {
         LogPrint("Encode frame is failed");
         return;
+    }
+}
+
+void UnityVideoTrackSource::DelegateOnFrame(const ::webrtc::VideoFrame& frame) {
+    if (on_encode_ != nullptr) {
+        std::unique_lock<std::mutex> lock(m_onEncodeMutex, std::try_to_lock);
+        if (lock.owns_lock()) {
+
+            int width = frame.width();
+            int height = frame.height();
+
+            auto i420Buffer = frame.video_frame_buffer()->ToI420();
+            if (i420Buffer != nullptr) {
+                auto bufferSz = ::webrtc::CalcBufferSize(::webrtc::VideoType::kI420, width, height);
+                static std::vector<uint8_t> buffer(bufferSz);
+                int extractSz = ::webrtc::ExtractBuffer(i420Buffer, bufferSz, buffer.data());
+
+                if (extractSz != bufferSz) {
+                    LogPrint("OnEncodeFrame i420 buffer extract size did not match expected size.");
+                }
+                else if (on_encode_ != nullptr) {
+                    on_encode_(track_, encoder_->Id(), width, height, buffer.data(), bufferSz);
+                }
+            }
+            else {
+                // Hardware encoder is in use. Encoding has been done.
+                auto encodedFrameBuffer = static_cast<unity::webrtc::FrameBuffer*>(frame.video_frame_buffer().get());
+                if (encodedFrameBuffer != nullptr && encodedFrameBuffer->buffer().size() > 0) {
+                    int bufferSz = encodedFrameBuffer->buffer().size();
+                    //char msgbuf[100];
+                    //sprintf(msgbuf, "Encoded buffer size is %d\n", encodedFrameBuffer->buffer().size());
+                    //OutputDebugString(msgbuf);
+                    //_onEncodedFrame(frame.width(), frame.height(), encodedFrameBuffer->buffer().data(), encodedFrameBuffer->buffer().size());
+                    //OutputDebugString("OnEncodedFrame complete.\n");
+                    if (on_encode_ != nullptr) {
+                        on_encode_(track_, encoder_->Id(), width, height, nullptr, bufferSz);
+                    }
+                }
+            }
+        }
+    }
+    OnFrame(frame);
+}
+
+void UnityVideoTrackSource::SetVideoFrameOnEncodeCallback(::webrtc::MediaStreamTrackInterface* track, DelegateOnVideoFrameEncode callback)
+{
+    track_ = track;
+    on_encode_ = callback;
+    if (on_encode_ != nullptr) {
+        on_encode_(track, 0, 640, 480, nullptr, -1);
     }
 }
 

@@ -6,6 +6,7 @@
 #include "Context.h"
 #include "Codec/EncoderFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "UnityVideoTrackSource.h"
 
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
@@ -840,6 +841,12 @@ extern "C"
         {
             ContextManager::GetInstance()->curContext->ProcessAudioData(data, size);
         }
+    }
+
+    UNITY_INTERFACE_EXPORT void SetOnVideoFrameEncodedCallback(Context* context, MediaStreamTrackInterface* track, DelegateOnVideoFrameEncode callback)
+    {
+        auto videoSource = context->GetVideoSource(track);
+        videoSource->SetVideoFrameOnEncodeCallback(track, callback);
     }
 }
 
