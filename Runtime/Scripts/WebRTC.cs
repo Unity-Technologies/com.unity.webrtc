@@ -485,6 +485,8 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeMediaStreamOnAddTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void DelegateNativeOnVideoFrameEncoded(IntPtr videoStreamTrack, int encoderID, int width, int height, IntPtr buffer, int bufferSize);
 
     internal static class NativeMethods
     {
@@ -735,6 +737,8 @@ namespace Unity.WebRTC
         public static extern IntPtr StatsMemberGetDoubleArray(IntPtr member, ref uint length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetStringArray(IntPtr member, ref uint length);
+        [DllImport(WebRTC.Lib)]
+        public static extern void SetOnVideoFrameEncodedCallback(IntPtr context, IntPtr videoStreamTrack, DelegateNativeOnVideoFrameEncoded callback);
     }
 
     internal static class VideoEncoderMethods

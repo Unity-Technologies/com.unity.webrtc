@@ -193,6 +193,20 @@ namespace Unity.WebRTC
             return NativeMethods.GetInitializationResult(self, track);
         }
 
+        /// <summary>
+        /// Sets a callback method for on encoded frame events on a native video source instance. The
+        /// callback gets fired after the post-capture operations have been performed. For software encoding
+        /// the callback will receive an I420 buffer. For hardware encoding it will receive an encoded sample.
+        /// </summary>
+        /// <param name="track">A pointer to the video stream track that was returned when the video
+        /// track was created.</param>
+        /// <param name="callback">The function pointer that will be set on the native video source for on frame
+        /// encoded events.</param>
+        public void SetOnVideoFrameEncodedCallback(IntPtr track, DelegateNativeOnVideoFrameEncoded callback)
+        {
+            NativeMethods.SetOnVideoFrameEncodedCallback(self, track, callback);
+        }
+
         internal void InitializeEncoder(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -8,6 +8,8 @@ using UnityEngine;
 
 namespace Unity.WebRTC
 {
+    public delegate void DelegateOnVideoFrameEncoded(int encoderID, int width, int height, IntPtr buffer, int bufferSize);
+
     public class VideoStreamTrack : MediaStreamTrack
     {
         internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
@@ -15,8 +17,10 @@ namespace Unity.WebRTC
         bool m_needFlip = false;
         UnityEngine.Texture m_sourceTexture;
         UnityEngine.RenderTexture m_destTexture;
+        bool m_isInitialised = false;
 
         UnityVideoRenderer m_renderer;
+        private DelegateOnVideoFrameEncoded onFrameEncoded;
 
         private static UnityEngine.RenderTexture CreateRenderTexture(int width, int height,
             UnityEngine.RenderTextureFormat format)
@@ -152,6 +156,50 @@ namespace Unity.WebRTC
         internal VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
             tracks.Add(this);
+        }
+
+        /// <summary>
+        /// This property sets a callback on the underlying native video source. It will be
+        /// called for each source video frame after the post-capture operations have been applied.
+        /// Set to null to cancel the subscription.
+        /// </summary>
+        public DelegateOnVideoFrameEncoded OnFrameEncoded
+        {
+            private get => onFrameEncoded;
+            set
+            {
+                if (!m_isInitialised)
+                {
+                    WebRTC.Context.SetOnVideoFrameEncodedCallback(self, OnVideoFrameEncoded);
+                    m_isInitialised = true;
+                }
+
+                onFrameEncoded = value;
+            }
+        }
+
+        /// <summary>
+        /// This method only gets called if the application wishes to receive callbacks for the on encoded event
+        /// of native video sources. The method will only be called once per managed video track. It is responsible for
+        /// matching native callbacks to the managed video track.
+        /// </summary>
+        /// <param name="ptr">The pointer to the native media stream track that matches this managed instance.</param>
+        /// <param name="encoderID">The ID of the native encoder that was used to process the video frame.</param>
+        /// <param name="width">The width of the frame.</param>
+        /// <param name="height">The height of the frame.</param>
+        /// <param name="buffer">The video frame data. Will be either an I420 buffer or an encoded video sample depending on
+        /// whether the WebRTC context is using hardware or software encoding.</param>
+        /// <param name="bufferSize">The size of the video frame data.</param>
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnVideoFrameEncoded))]
+        static void OnVideoFrameEncoded(IntPtr ptr, int encoderID, int width, int height, IntPtr buffer, int bufferSize)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is VideoStreamTrack videoStreamTrack)
+                {
+                    videoStreamTrack.OnFrameEncoded?.Invoke(encoderID, width, height, buffer, bufferSize);
+                }
+            });
         }
 
         public override void Dispose()
