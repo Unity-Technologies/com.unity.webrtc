@@ -131,6 +131,8 @@ namespace webrtc
             return webrtc::SdpType::kPrAnswer;
         case RTCSdpType::Answer:
             return webrtc::SdpType::kAnswer;
+        case RTCSdpType::Rollback:
+            return webrtc::SdpType::kRollback;
         }
         throw std::invalid_argument("Unknown RTCSdpType");
     }

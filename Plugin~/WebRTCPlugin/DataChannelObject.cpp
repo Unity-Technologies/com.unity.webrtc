@@ -6,7 +6,9 @@ namespace unity
 namespace webrtc
 {
 
-    DataChannelObject::DataChannelObject(rtc::scoped_refptr<webrtc::DataChannelInterface> channel, PeerConnectionObject& pc) : dataChannel(channel), peerConnectionObj(pc)
+    DataChannelObject::DataChannelObject(
+        rtc::scoped_refptr<webrtc::DataChannelInterface> channel, PeerConnectionObject& pc)
+        : dataChannel(channel)
     {
         dataChannel->RegisterObserver(this);
     }

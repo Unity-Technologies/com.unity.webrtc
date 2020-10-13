@@ -735,7 +735,7 @@ extern "C"
         dst->encodingsLength = static_cast<uint32_t>(src.encodings.size());
         dst->encodings = static_cast<RTCRtpEncodingParameters*>(CoTaskMemAlloc(sizeof(RTCRtpEncodingParameters) * src.encodings.size()));
 
-        for(int i = 0; i < src.encodings.size(); i++)
+        for(size_t i = 0; i < src.encodings.size(); i++)
         {
             dst->encodings[i].active = src.encodings[i].active;
             dst->encodings[i].hasValueMaxBitrate = src.encodings[i].max_bitrate_bps.has_value();
@@ -756,7 +756,7 @@ extern "C"
     {
         RtpParameters dst = sender->GetParameters();
 
-        for (int i = 0; i < dst.encodings.size(); i++)
+        for (size_t i = 0; i < dst.encodings.size(); i++)
         {
             dst.encodings[i].active = src->encodings[i].active;
             if(src->encodings[i].hasValueMaxBitrate)
