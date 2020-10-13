@@ -198,6 +198,17 @@ public class MultiVideoReceiveSample : MonoBehaviour
                 receiveImage2.texture = track.InitializeReceiver();
             }
         };
+
+        foreach (var track in videoStreamTrackList)
+        {
+            _pc1.AddTrack(track);
+        }
+
+        if (!videoUpdateStarted)
+        {
+            StartCoroutine(WebRTC.Update());
+            videoUpdateStarted = true;
+        }
     }
 
     private void HangUp()
@@ -281,21 +292,6 @@ public class MultiVideoReceiveSample : MonoBehaviour
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
-
-        if (otherPc == _pc1)
-        {
-            foreach (var track in videoStreamTrackList)
-            {
-                _pc1.AddTrack(track);
-            }
-
-            if (!videoUpdateStarted)
-            {
-                StartCoroutine(WebRTC.Update());
-                videoUpdateStarted = true;
-            }
-        }
-
         var op3 = otherPc.CreateAnswer(ref _answerOptions);
         yield return op3;
         if (!op3.IsError)
