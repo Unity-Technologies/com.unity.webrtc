@@ -23,7 +23,7 @@ namespace webrtc
         virtual void SetRates(uint32_t bitRate, int64_t frameRate) = 0;
         virtual void UpdateSettings() = 0;
         virtual bool CopyBuffer(void* frame) = 0;
-        virtual bool EncodeFrame() = 0;
+        virtual bool EncodeFrame(int64_t timestamp_us) = 0;
         virtual bool IsSupported() const = 0;
         virtual void SetIdrFrame() = 0;
         virtual uint64 GetCurrentFrameCount() const = 0;

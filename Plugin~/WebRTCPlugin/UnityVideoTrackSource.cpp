@@ -16,10 +16,11 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     bool is_screencast,
     absl::optional<bool> needs_denoising) :
     AdaptedVideoTrackSource(/*required_alignment=*/1),
-    frame_(frame),
-    encoder_(nullptr),
     is_screencast_(is_screencast),
-    needs_denoising_(needs_denoising)
+    needs_denoising_(needs_denoising),
+    encoder_(nullptr),
+    frame_(frame),
+    clock_(webrtc::Clock::GetRealTimeClock())
 {
 //  DETACH_FROM_THREAD(thread_checker_);
 
@@ -85,7 +86,8 @@ void UnityVideoTrackSource::OnFrameCaptured()
         LogPrint("Copy texture buffer is failed");
         return;
     }
-    if (!encoder_->EncodeFrame())
+    int64_t timestamp_us = clock_->TimeInMicroseconds();
+    if (!encoder_->EncodeFrame(timestamp_us))
     {
         LogPrint("Encode frame is failed");
         return;

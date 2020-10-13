@@ -3,6 +3,13 @@
 
 #include "DummyVideoEncoder.h"
 
+#if defined(__APPLE__)
+#import "sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h"
+#import "sdk/objc/native/api/video_encoder_factory.h"
+#endif
+
+using namespace ::webrtc::H264;
+
 namespace unity
 {    
 namespace webrtc
@@ -24,31 +31,58 @@ namespace webrtc
         return false;
     }
 
+    webrtc::VideoEncoderFactory* CreateEncoderFactory()
+    {
+#if defined(__APPLE__)
+        return webrtc::ObjCToNativeVideoEncoderFactory(
+            [[RTCDefaultVideoEncoderFactory alloc] init]).release();
+#endif
+        return new webrtc::InternalEncoderFactory();
+    }
+
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IVideoEncoderObserver* observer)
-    : internal_encoder_factory_(new webrtc::InternalEncoderFactory())
+    : internal_encoder_factory_(CreateEncoderFactory())
+
     {
         m_observer = observer;
     }
+    
+    UnityVideoEncoderFactory::~UnityVideoEncoderFactory() = default;
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetHardwareEncoderFormats() const
     {
-        return { webrtc::CreateH264Format(webrtc::H264::kProfileConstrainedBaseline, webrtc::H264::kLevel5_1, "1") };
+#if defined(__APPLE__)
+        auto formats = internal_encoder_factory_->GetSupportedFormats();
+        std::vector<webrtc::SdpVideoFormat> filtered;
+        std::copy_if(formats.begin(), formats.end(), std::back_inserter(filtered),
+            [](webrtc::SdpVideoFormat format) {
+                if(format.parameters.count("profile-level-id") == 0)
+                    return false;
+                std::string id = format.parameters.at("profile-level-id");
+                if(format.name.find("H264") == std::string::npos)
+                    return false;
+                return true;
+            });
+        return filtered;
+#else
+        return { webrtc::CreateH264Format(
+            webrtc::H264::kProfileConstrainedHigh,
+            webrtc::H264::kLevel5_1, "1") };
+#endif
     }
 
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetSupportedFormats() const
     {
-        std::vector <webrtc::SdpVideoFormat> formats = GetHardwareEncoderFormats();
-
         // todo(kazuki): should support codec other than h264 like vp8, vp9 and av1.
-        // 
+        //
         // std::vector <webrtc::SdpVideoFormat> formats2 = internal_encoder_factory_->GetSupportedFormats();
         // formats.insert(formats.end(), formats2.begin(), formats2.end());
-        
-        return formats;
+        return GetHardwareEncoderFormats();
     }
 
-    webrtc::VideoEncoderFactory::CodecInfo UnityVideoEncoderFactory::QueryVideoEncoder(const webrtc::SdpVideoFormat& format) const
+    webrtc::VideoEncoderFactory::CodecInfo UnityVideoEncoderFactory::QueryVideoEncoder(
+        const webrtc::SdpVideoFormat& format) const
     {
         if (IsFormatSupported(GetHardwareEncoderFormats(), format))
         {
@@ -60,19 +94,13 @@ namespace webrtc
 
     std::unique_ptr<webrtc::VideoEncoder> UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
+#if !defined(__APPLE__)
         if (IsFormatSupported(GetHardwareEncoderFormats(), format))
         {
             return std::make_unique<DummyVideoEncoder>(m_observer);
         }
-
-        std::unique_ptr<webrtc::VideoEncoder> internalEncoder;
-        // Try creating internal encoder.
-        if (IsFormatSupported(GetSupportedFormats(), format))
-        {
-            internalEncoder = internal_encoder_factory_->CreateVideoEncoder(format);
-        }
-        return internalEncoder;
+#endif
+        return internal_encoder_factory_->CreateVideoEncoder(format);
     }
-
 }
 }

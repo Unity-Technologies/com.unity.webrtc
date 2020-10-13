@@ -166,16 +166,12 @@ namespace webrtc
 
         m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
 
-#if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
-        //Always use SoftwareEncoder on Mac for now.
-        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
-#else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this)) : webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
-#endif
+            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this))
+            : webrtc::CreateBuiltinVideoEncoderFactory();
+        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
+            std::make_unique<UnityVideoDecoderFactory>();
 
         m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
                                 m_workerThread.get(),

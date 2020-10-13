@@ -92,6 +92,7 @@ class UnityVideoTrackSource :
 #if defined(SUPPORT_VULKAN)
     UnityVulkanImage unityVulkanImage_;
 #endif
+  webrtc::Clock* clock_;
 };
 
 } // end namespace webrtc

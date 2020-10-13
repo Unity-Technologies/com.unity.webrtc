@@ -19,7 +19,7 @@ namespace webrtc
         void SetRates(uint32_t bitRate, int64_t frameRate) override {}
         void UpdateSettings() override {}
         bool CopyBuffer(void* frame) override;
-        bool EncodeFrame() override;
+        bool EncodeFrame(int64_t timestamp_us) override;
         bool IsSupported() const override { return true; }
         void SetIdrFrame() override {}
         uint64 GetCurrentFrameCount() const override { return m_frameCount; }
