@@ -121,7 +121,7 @@ namespace webrtc
  
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
-        std::unique_ptr<Clock> m_clock;
+        Clock* m_clock;
 
         // todo(kazuki): remove these callback methods by moving hardware encoder instance to DummyVideoEncoder.
         //               attention point is multi-threaded opengl implementation with nvcodec.
