@@ -56,9 +56,6 @@ namespace webrtc
         std::vector<webrtc::SdpVideoFormat> filtered;
         std::copy_if(formats.begin(), formats.end(), std::back_inserter(filtered),
             [](webrtc::SdpVideoFormat format) {
-                if(format.parameters.count("profile-level-id") == 0)
-                    return false;
-                std::string id = format.parameters.at("profile-level-id");
                 if(format.name.find("H264") == std::string::npos)
                     return false;
                 return true;
