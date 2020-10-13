@@ -106,6 +106,8 @@ void UnityVideoTrackSource::DelegateOnFrame(const ::webrtc::VideoFrame& frame) {
 
             auto i420Buffer = frame.video_frame_buffer()->ToI420();
             if (i420Buffer != nullptr) {
+                // If the WebRTC context was initialised with software encoding then the post frame capture
+                // will result in I420 buffer samples.
                 auto bufferSz = ::webrtc::CalcBufferSize(::webrtc::VideoType::kI420, width, height);
                 static std::vector<uint8_t> buffer(bufferSz);
                 int extractSz = ::webrtc::ExtractBuffer(i420Buffer, bufferSz, buffer.data());
@@ -118,17 +120,13 @@ void UnityVideoTrackSource::DelegateOnFrame(const ::webrtc::VideoFrame& frame) {
                 }
             }
             else {
-                // Hardware encoder is in use. Encoding has been done.
+                // If the WebRTC context was initialised with hardware encoding then the post frame capture
+                // will result in encoded buffer samples.
                 auto encodedFrameBuffer = static_cast<unity::webrtc::FrameBuffer*>(frame.video_frame_buffer().get());
                 if (encodedFrameBuffer != nullptr && encodedFrameBuffer->buffer().size() > 0) {
                     int bufferSz = encodedFrameBuffer->buffer().size();
-                    //char msgbuf[100];
-                    //sprintf(msgbuf, "Encoded buffer size is %d\n", encodedFrameBuffer->buffer().size());
-                    //OutputDebugString(msgbuf);
-                    //_onEncodedFrame(frame.width(), frame.height(), encodedFrameBuffer->buffer().data(), encodedFrameBuffer->buffer().size());
-                    //OutputDebugString("OnEncodedFrame complete.\n");
                     if (on_encode_ != nullptr) {
-                        on_encode_(track_, encoder_->Id(), width, height, nullptr, bufferSz);
+                        on_encode_(track_, encoder_->Id(), width, height, encodedFrameBuffer->buffer().data(), bufferSz);
                     }
                 }
             }
@@ -141,9 +139,6 @@ void UnityVideoTrackSource::SetVideoFrameOnEncodeCallback(::webrtc::MediaStreamT
 {
     track_ = track;
     on_encode_ = callback;
-    if (on_encode_ != nullptr) {
-        on_encode_(track, 0, 640, 480, nullptr, -1);
-    }
 }
 
 } // end namespace webrtc

@@ -843,6 +843,15 @@ extern "C"
         }
     }
 
+    /*
+    * This function sets a frame encoded callback on a video source. The purpose of the
+    * callback is to supply video frames from the end of the post-capture processing
+    * stage to managed scripts.
+    * @param[in] context: the singleton WebRTC context.
+    * @param[in] track: the base media stream track for the video source. It's used to match
+    *  the native track with the managed track.
+    * @param[in] callback: the on frame encoded callback function to set on the video source.
+    */
     UNITY_INTERFACE_EXPORT void SetOnVideoFrameEncodedCallback(Context* context, MediaStreamTrackInterface* track, DelegateOnVideoFrameEncode callback)
     {
         auto videoSource = context->GetVideoSource(track);

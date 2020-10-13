@@ -47,8 +47,11 @@ class UnityVideoTrackSource :
     // todo(kazuki)::
     void OnFrameCaptured();
 
-    // todo(kazuki)::
-    //void DelegateOnFrame(const ::webrtc::VideoFrame& frame) { OnFrame(frame); }
+    /*
+    * Gets called after for every frame capture immediately prior to handing
+    * the frame over to the WebRTC pipeline.
+    * @param[in] frame: the frame after post-capture processing.
+    */
     void DelegateOnFrame(const ::webrtc::VideoFrame& frame);
 
     // todo(kazuki)::
@@ -64,6 +67,12 @@ class UnityVideoTrackSource :
         return encoder_->GetCodecInitializationResult();
     }
 
+    /*
+    * Sets the post capture callback for this video source.
+    * @param[in] track: the base track for this video source. It's required to match
+    *  the managed and native tracks.
+    * @param[in] callback: the callback to invoke after the post frame capture processing.
+    */
     void SetVideoFrameOnEncodeCallback(::webrtc::MediaStreamTrackInterface* track, DelegateOnVideoFrameEncode callback);
 
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
