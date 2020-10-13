@@ -19,8 +19,7 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     is_screencast_(is_screencast),
     needs_denoising_(needs_denoising),
     encoder_(nullptr),
-    frame_(frame),
-    clock_(webrtc::Clock::GetRealTimeClock())
+    frame_(frame)
 {
 //  DETACH_FROM_THREAD(thread_checker_);
 
@@ -68,7 +67,7 @@ void UnityVideoTrackSource::SetEncoder(IEncoder* encoder)
 }
 
 
-void UnityVideoTrackSource::OnFrameCaptured()
+void UnityVideoTrackSource::OnFrameCaptured(int64_t timestamp_us)
 {
     // todo::(kazuki)
     // OnFrame(frame);
@@ -86,7 +85,6 @@ void UnityVideoTrackSource::OnFrameCaptured()
         LogPrint("Copy texture buffer is failed");
         return;
     }
-    int64_t timestamp_us = clock_->TimeInMicroseconds();
     if (!encoder_->EncodeFrame(timestamp_us))
     {
         LogPrint("Encode frame is failed");

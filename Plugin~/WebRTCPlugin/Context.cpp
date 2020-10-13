@@ -12,7 +12,6 @@
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 
 using namespace ::webrtc;
 
@@ -156,6 +155,7 @@ namespace webrtc
     Context::Context(int uid, UnityEncoderType encoderType)
         : m_uid(uid)
         , m_encoderType(encoderType)
+        , m_clock(Clock::GetRealTimeClock())
     {
         m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_workerThread->Start();
@@ -251,7 +251,8 @@ namespace webrtc
         UnityVideoTrackSource* source = GetVideoSource(track);
         if (source == nullptr)
             return false;
-        source->OnFrameCaptured();
+        int64_t timestamp_us = m_clock->TimeInMicroseconds();
+        source->OnFrameCaptured(timestamp_us);
         return true;
     }
 

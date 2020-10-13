@@ -43,7 +43,7 @@ class UnityVideoTrackSource :
     absl::optional<bool> needs_denoising() const override;
 
     // todo(kazuki)::
-    void OnFrameCaptured();
+    void OnFrameCaptured(int64_t timestampe_us);
 
     // todo(kazuki)::
     void DelegateOnFrame(const ::webrtc::VideoFrame& frame) { OnFrame(frame); }

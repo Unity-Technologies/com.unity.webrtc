@@ -5,6 +5,8 @@
 #include "Codec/EncoderFactory.h"
 #include "Codec/IEncoder.h"
 
+using namespace ::webrtc;
+
 namespace unity
 {
 namespace webrtc
@@ -42,7 +44,7 @@ TEST_P(NvEncoderTest, CopyBuffer) {
 
 TEST_P(NvEncoderTest, EncodeFrame) {
     auto before = encoder_->GetCurrentFrameCount();
-    EXPECT_TRUE(encoder_->EncodeFrame());
+    EXPECT_TRUE(encoder_->EncodeFrame(0));
     const auto after = encoder_->GetCurrentFrameCount();
     EXPECT_EQ(before + 1, after);
 }
