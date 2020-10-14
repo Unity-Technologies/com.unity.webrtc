@@ -77,14 +77,14 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
         {
             if (e.Track is VideoStreamTrack track)
             {
-                receiveImage1.texture = track.InitializeReceiver();
+                receiveImage1.texture = track.InitializeReceiver(1280, 720);
             }
         };
         receiveVideoStream2.OnAddTrack = e =>
         {
             if (e.Track is VideoStreamTrack track)
             {
-                receiveImage2.texture = track.InitializeReceiver();
+                receiveImage2.texture = track.InitializeReceiver(1280, 720);
             }
         };
 
