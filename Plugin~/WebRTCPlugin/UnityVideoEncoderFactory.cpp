@@ -63,7 +63,7 @@ namespace webrtc
         return filtered;
 #else
         return { webrtc::CreateH264Format(
-            webrtc::H264::kProfileConstrainedHigh,
+            webrtc::H264::kProfileConstrainedBaseline,
             webrtc::H264::kLevel5_1, "1") };
 #endif
     }
