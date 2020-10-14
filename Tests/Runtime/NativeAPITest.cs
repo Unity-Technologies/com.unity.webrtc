@@ -220,9 +220,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
-            IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
-            Marshal.FreeCoTaskMem(trackNativePtr);
+            //IntPtr[] tracksPtr = new IntPtr[trackSize];
+            //Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
+            //Marshal.FreeCoTaskMem(trackNativePtr);
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -243,9 +243,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
-            IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
-            Marshal.FreeCoTaskMem(trackNativePtr);
+            //IntPtr[] tracksPtr = new IntPtr[trackSize];
+            //Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
+            //Marshal.FreeCoTaskMem(trackNativePtr);
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
