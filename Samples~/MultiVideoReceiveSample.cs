@@ -32,6 +32,8 @@ public class MultiVideoReceiveSample : MonoBehaviour
     private bool videoUpdateStarted;
     private int videoIndex = 0;
     private const int MaxVideoIndexLength = 2;
+    private const int width = 1280;
+    private const int height = 720;
 
     private RTCOfferOptions _offerOptions = new RTCOfferOptions
     {
@@ -176,9 +178,9 @@ public class MultiVideoReceiveSample : MonoBehaviour
         _pc2.OnTrack = pc2Ontrack;
         _pc2.OnNegotiationNeeded = pc2OnNegotiationNeeded;
 
-        videoStreamTrackList.Add(cam1.CaptureStreamTrack(1280, 720, 1000000));
+        videoStreamTrackList.Add(cam1.CaptureStreamTrack(width, height, 1000000));
         sourceImage1.texture = cam1.targetTexture;
-        videoStreamTrackList.Add(cam2.CaptureStreamTrack(1280, 720, 1000000));
+        videoStreamTrackList.Add(cam2.CaptureStreamTrack(width, height, 1000000));
         sourceImage2.texture = cam2.targetTexture;
 
         receiveStreamList.Add(new MediaStream());
@@ -188,14 +190,14 @@ public class MultiVideoReceiveSample : MonoBehaviour
         {
             if (e.Track is VideoStreamTrack track)
             {
-                receiveImage1.texture = track.InitializeReceiver();
+                receiveImage1.texture = track.InitializeReceiver(width, height);
             }
         };
         receiveStreamList[1].OnAddTrack = e =>
         {
             if (e.Track is VideoStreamTrack track)
             {
-                receiveImage2.texture = track.InitializeReceiver();
+                receiveImage2.texture = track.InitializeReceiver(width, height);
             }
         };
 
