@@ -260,7 +260,7 @@ namespace webrtc
     }
 
     //entry for encoding a frame
-    bool NvEncoder::EncodeFrame()
+    bool NvEncoder::EncodeFrame(int64_t timestamp_us)
     {
         UpdateSettings();
         uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;
@@ -285,13 +285,13 @@ namespace webrtc
         errorCode = pNvEncodeAPI->nvEncEncodePicture(pEncoderInterface, &picParams);
         checkf(NV_RESULT(errorCode), StringFormat("Failed to encode frame, error is %d", errorCode).c_str());
 #pragma endregion
-        ProcessEncodedFrame(frame);
+        ProcessEncodedFrame(frame, timestamp_us);
         frameCount++;
         return true;
     }
 
     //get encoded frame
-    void NvEncoder::ProcessEncodedFrame(Frame& frame)
+    void NvEncoder::ProcessEncodedFrame(Frame& frame, int64_t timestamp_us)
     {
 #pragma region retrieve encoded frame from output buffer
         NV_ENC_LOCK_BITSTREAM lockBitStream = { 0 };
@@ -311,7 +311,6 @@ namespace webrtc
         const rtc::scoped_refptr<FrameBuffer> buffer =
             new rtc::RefCountedObject<FrameBuffer>(
                 m_width, m_height, frame.encodedFrame, m_encoderId);
-        const int64_t timestamp_us = m_clock->TimeInMicroseconds();
         const int64_t now_us = rtc::TimeMicros();
         const int64_t translated_camera_time_us =
             timestamp_aligner_.TranslateTimestamp(

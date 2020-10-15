@@ -31,13 +31,19 @@ namespace webrtc
         return true;
     }
 
-    bool SoftwareEncoder::EncodeFrame()
+    bool SoftwareEncoder::EncodeFrame(int64_t timestamp_us)
     {
         const rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer = m_device->ConvertRGBToI420(m_encodeTex);
         if (nullptr == i420Buffer)
             return false;
 
-        webrtc::VideoFrame frame = webrtc::VideoFrame::Builder().set_video_frame_buffer(i420Buffer).set_rotation(webrtc::kVideoRotation_0).set_timestamp_us(0).build();
+        webrtc::VideoFrame frame =
+            webrtc::VideoFrame::Builder()
+            .set_video_frame_buffer(i420Buffer)
+            .set_rotation(webrtc::kVideoRotation_0)
+            .set_timestamp_us(timestamp_us)
+            .build();
+            
         CaptureFrame(frame);
         m_frameCount++;
         return true;

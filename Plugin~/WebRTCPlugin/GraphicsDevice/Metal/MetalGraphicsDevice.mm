@@ -124,20 +124,22 @@ namespace webrtc
 //---------------------------------------------------------------------------------------------------------------------
     rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex){
         id<MTLTexture> nativeTex = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
-        const uint32_t BYTES_PER_PIXEL = 4;
-        
+        if (nil == nativeTex)
+            return nullptr;
+
+        const uint32_t BYTES_PER_PIXEL = 4;        
         const uint32_t width  = tex->GetWidth();
         const uint32_t height = tex->GetHeight();
         const uint32_t bytesPerRow = width * BYTES_PER_PIXEL;
         const uint32_t bufferSize = bytesPerRow * height;
-        
 
         std::vector<uint8_t> buffer;
         buffer.resize(bufferSize);
-        if (nil == nativeTex)
-            return nullptr;
         
-        [nativeTex getBytes:buffer.data() bytesPerRow:bytesPerRow fromRegion:MTLRegionMake2D(0,0,width,height) mipmapLevel:0];
+        [nativeTex getBytes:buffer.data()
+            bytesPerRow:bytesPerRow
+            fromRegion:MTLRegionMake2D(0,0,width,height)
+            mipmapLevel:0];
 
         rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
             width, height,

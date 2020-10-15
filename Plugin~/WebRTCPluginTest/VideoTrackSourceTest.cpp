@@ -67,7 +67,7 @@ protected:
 
     void SendTestFrame(int width, int height)
     {
-        m_trackSource->OnFrameCaptured();
+        m_trackSource->OnFrameCaptured(0);
     }
 };
 

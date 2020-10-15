@@ -8,14 +8,14 @@ namespace webrtc
 
 //---------------------------------------------------------------------------------------------------------------------
 
-    MetalTexture2D::MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex) : ITexture2D(w,h)
-            , m_texture(tex)
+    MetalTexture2D::MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex)
+    : ITexture2D(w,h) , m_texture(tex)
     {
     }
 
     MetalTexture2D::~MetalTexture2D()
     {
-        [m_texture release];
+        m_texture = nullptr;
     }
     
 } // end namespace webrtc

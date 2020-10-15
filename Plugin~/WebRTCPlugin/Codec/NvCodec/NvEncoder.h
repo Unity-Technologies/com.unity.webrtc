@@ -49,7 +49,7 @@ namespace webrtc
         void SetRates(uint32_t bitRate, int64_t frameRate) override;
         void UpdateSettings() override;
         bool CopyBuffer(void* frame) override;
-        bool EncodeFrame() override;
+        bool EncodeFrame(int64_t timestamp_us) override;
         bool IsSupported() const override { return m_isNvEncoderSupported; }
         void SetIdrFrame()  override { isIdrFrame = true; }
         uint64 GetCurrentFrameCount() const override { return frameCount; }
@@ -71,7 +71,7 @@ namespace webrtc
         void ReleaseEncoderResources();
 
         void ReleaseFrameInputBuffer(Frame& frame);
-        void ProcessEncodedFrame(Frame& frame);
+        void ProcessEncodedFrame(Frame& frame, int64_t timestamp_us);
         NV_ENC_REGISTERED_PTR RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE type, void *pBuffer);
         void MapResources(InputFrame& inputFrame);
         NV_ENC_OUTPUT_PTR InitializeBitstreamBuffer();

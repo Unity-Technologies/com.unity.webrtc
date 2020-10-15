@@ -12,7 +12,6 @@
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 
 using namespace ::webrtc;
 
@@ -158,6 +157,7 @@ namespace webrtc
     Context::Context(int uid, UnityEncoderType encoderType)
         : m_uid(uid)
         , m_encoderType(encoderType)
+        , m_clock(Clock::GetRealTimeClock())
     {
         m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_workerThread->Start();
@@ -168,16 +168,12 @@ namespace webrtc
 
         m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
 
-#if defined(SUPPORT_METAL) && defined(SUPPORT_SOFTWARE_ENCODER)
-        //Always use SoftwareEncoder on Mac for now.
-        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory = webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
-#else
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this)) : webrtc::CreateBuiltinVideoEncoderFactory();
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory = std::make_unique<UnityVideoDecoderFactory>();
-#endif
+            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this))
+            : webrtc::CreateBuiltinVideoEncoderFactory();
+        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
+            std::make_unique<UnityVideoDecoderFactory>();
 
         m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
                                 m_workerThread.get(),
@@ -257,7 +253,8 @@ namespace webrtc
         UnityVideoTrackSource* source = GetVideoSource(track);
         if (source == nullptr)
             return false;
-        source->OnFrameCaptured();
+        int64_t timestamp_us = m_clock->TimeInMicroseconds();
+        source->OnFrameCaptured(timestamp_us);
         return true;
     }
 
