@@ -427,18 +427,18 @@ namespace Unity.WebRTC
             }
         }
 
-        public static IReadOnlyList<RTCPeerConnection> PeerList
+        public static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
         {
             get
             {
-                var list = new List<RTCPeerConnection>();
+                var list = new List<WeakReference<RTCPeerConnection>>();
                 if (Table?.Values != null)
                 {
                     foreach (var value in Table?.Values)
                     {
                         if (value is RTCPeerConnection peer)
                         {
-                            list.Add(peer);
+                            list.Add(new WeakReference<RTCPeerConnection>(peer));
                         }
                     }
 

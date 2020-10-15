@@ -29,8 +29,13 @@ namespace Unity.WebRTC.Editor
             m_parent.OnPeerList += peerList =>
             {
                 container.Clear();
-                foreach (var peerConnection in peerList)
+                foreach (var weakReference in peerList)
                 {
+                    if (!weakReference.TryGetTarget(out var peerConnection))
+                    {
+                        continue;
+                    }
+
                     var button = new Button(() =>
                     {
                         OnChangePeer?.Invoke(peerConnection);
