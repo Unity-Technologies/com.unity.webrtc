@@ -156,7 +156,7 @@ peerConnection.AddTransceiver(TrackKind.Video);
 // Do process signaling
 ```
 
-### Notes.
+### Notes
 
 - It is not possible to send and receive video in a single `VideoStreamTrack` instance.
 - The `VideoStreamTrack` used to receive the video should be the track received in the event of the `PeerConnection.OnTrack`.
