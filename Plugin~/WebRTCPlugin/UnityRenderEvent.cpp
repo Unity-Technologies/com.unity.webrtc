@@ -65,6 +65,8 @@ namespace webrtc
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
             return webrtc::VideoType::kABGR;
+        default:
+            return webrtc::VideoType::kUnknown;
         }
 
         // DebugLog("Unknown texture format:%d", type);

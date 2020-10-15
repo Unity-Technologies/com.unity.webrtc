@@ -16,7 +16,7 @@ namespace webrtc
                 convertedAudioData.push_back(data[i] >= 0 ? data[i] * SHRT_MAX : data[i] * -SHRT_MIN);
             }
             //opus supports up to 48khz sample rate, enforce 48khz here for quality
-            int chunkSize = 48000 * 2 / 100;
+            size_t chunkSize = 48000 * 2 / 100;
             while (convertedAudioData.size() > chunkSize)
             {
                 deviceBuffer->SetRecordedBuffer(convertedAudioData.data(), chunkSize / 2);

@@ -69,7 +69,6 @@ namespace webrtc
         DelegateOnClose onClose = nullptr;
     private:
         rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
-        PeerConnectionObject& peerConnectionObj;
     };
 
 } // end namespace webrtc
