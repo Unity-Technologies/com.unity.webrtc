@@ -8,6 +8,7 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
+	[Ignore("")]
     [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
     class NativeAPITestWithHardwareEncoder : NativeAPITestWithSoftwareEncoder
     {
@@ -220,14 +221,13 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreNotEqual(buf, IntPtr.Zero);
             Assert.Greater(length, 0);
 
-            IntPtr[] array = new IntPtr[length];
-
 			// todo(kazuki):: Copying native buffer to managed array occurs crash
 			// on linux with il2cpp
 			#if !(UNITY_STANDALONE_LINUX && ENABLE_IL2CPP)
+            IntPtr[] array = new IntPtr[length];
             Marshal.Copy(buf, array, 0, (int)length);
-			#endif
             Marshal.FreeCoTaskMem(buf);
+			#endif
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -254,14 +254,13 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreNotEqual(buf, IntPtr.Zero);
             Assert.Greater(length, 0);
 
-            IntPtr[] array = new IntPtr[length];
-
 			// todo(kazuki):: Copying native buffer to managed array occurs crash
 			// on linux with il2cpp
 			#if !(UNITY_STANDALONE_LINUX && ENABLE_IL2CPP)
+            IntPtr[] array = new IntPtr[length];
             Marshal.Copy(buf, array, 0, (int)length);
-			#endif
             Marshal.FreeCoTaskMem(buf);
+			#endif
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -447,6 +446,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 
+	[Ignore("")]
     [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
     class NativeAPITestWithHardwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithHardwareEncoder, IPrebuildSetup
@@ -461,6 +461,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 
+	[Ignore("")]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
     class NativeAPITestWithSoftwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithSoftwareEncoder, IPrebuildSetup
     {
