@@ -157,7 +157,6 @@ namespace webrtc
     Context::Context(int uid, UnityEncoderType encoderType)
         : m_uid(uid)
         , m_encoderType(encoderType)
-        , m_clock(Clock::GetRealTimeClock())
     {
         m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_workerThread->Start();
@@ -245,16 +244,6 @@ namespace webrtc
     bool Context::FinalizeEncoder(IEncoder* encoder)
     {
         m_mapIdAndEncoder.erase(encoder->Id());
-        return true;
-    }
-
-    bool Context::EncodeFrame(MediaStreamTrackInterface* track)
-    {
-        UnityVideoTrackSource* source = GetVideoSource(track);
-        if (source == nullptr)
-            return false;
-        int64_t timestamp_us = m_clock->TimeInMicroseconds();
-        source->OnFrameCaptured(timestamp_us);
         return true;
     }
 

@@ -4,6 +4,7 @@
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "UnityVideoRenderer.h"
+#include "UnityVideoTrackSource.h"
 #include "Codec/IEncoder.h"
 
 using namespace ::webrtc;
@@ -16,7 +17,6 @@ namespace webrtc
     class Context;
     class IGraphicsDevice;
     class MediaStreamObserver;
-    class UnityVideoTrackSource;
     class SetSessionDescriptionObserver;
     class ContextManager
     {
@@ -94,7 +94,6 @@ namespace webrtc
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
         bool FinalizeEncoder(IEncoder* encoder);
         // You must call these methods on Rendering thread.
-        bool EncodeFrame(webrtc::MediaStreamTrackInterface* track);
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
         void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height);
 
@@ -121,7 +120,6 @@ namespace webrtc
  
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
-        Clock* m_clock;
 
         // todo(kazuki): remove these callback methods by moving hardware encoder instance to DummyVideoEncoder.
         //               attention point is multi-threaded opengl implementation with nvcodec.
