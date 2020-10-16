@@ -22,6 +22,7 @@ namespace Unity.WebRTC.RuntimeTest
     class NativeAPITestWithSoftwareEncoder
     {
         protected EncoderType encoderType;
+        private ColorSpace colorSpace;
 
         private static RenderTexture CreateRenderTexture(int width, int height)
         {
@@ -41,6 +42,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void Init()
         {
             NativeMethods.RegisterDebugLog(DebugLog);
+            colorSpace = QualitySettings.activeColorSpace;
         }
 
         [TearDown]
@@ -58,14 +60,14 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateAndDestroyContext()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             NativeMethods.ContextDestroy(0);
         }
 
         [Test]
         public void GetEncoderType()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             Assert.AreEqual(encoderType, NativeMethods.ContextGetEncoderType(context));
             NativeMethods.ContextDestroy(0);
         }
@@ -73,7 +75,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateAndDeletePeerConnection()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
@@ -92,7 +94,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void RegisterDelegateToPeerConnection()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var connection = NativeMethods.ContextCreatePeerConnection(context);
 
             NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(context, connection, PeerConnectionSetSessionDescSuccess);
@@ -104,7 +106,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateAndDeleteDataChannel()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var init = new RTCDataChannelInit(true);
             var channel = NativeMethods.ContextCreateDataChannel(context, peer, "test", ref init);
@@ -116,7 +118,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateAndDeleteMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDestroy(0);
@@ -131,7 +133,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void RegisterDelegateToMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
 
             NativeMethods.MediaStreamRegisterOnAddTrack(context, stream, MediaStreamOnAddTrack);
@@ -143,7 +145,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AddAndRemoveVideoTrack()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
@@ -156,7 +158,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AddAndRemoveVideoTrackToPeerConnection()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -179,7 +181,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void SenderGetParameter()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -207,7 +209,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AddAndRemoveVideoTrackToMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             const int width = 1280;
             const int height = 720;
@@ -238,7 +240,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AddAndRemoveAudioTrackToMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             NativeMethods.MediaStreamAddTrack(stream, track);
@@ -270,7 +272,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AddAndRemoveAudioTrack()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -287,7 +289,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateAndDeleteVideoRenderer()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var renderer = NativeMethods.CreateVideoRenderer(context);
             NativeMethods.DeleteVideoRenderer(context, renderer);
             NativeMethods.ContextDestroy(0);
@@ -296,7 +298,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AddAndRemoveVideoRendererToVideoTrack()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
@@ -313,7 +315,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CallGetRenderEventFunc()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var callback = NativeMethods.GetRenderEventFunc(context);
             Assert.AreNotEqual(callback, IntPtr.Zero);
             NativeMethods.ContextDestroy(0);
@@ -355,7 +357,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Ignore("todo::GetInitializationResult returns NotInitialized")]
         public IEnumerator CallVideoEncoderMethods()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -393,7 +395,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CallGetUpdateTextureFunc()
         {
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             var callback = NativeMethods.GetUpdateTextureFunc(context);
             Assert.AreNotEqual(callback, IntPtr.Zero);
             NativeMethods.ContextDestroy(0);
@@ -410,7 +412,7 @@ namespace Unity.WebRTC.RuntimeTest
                 yield break;
             }
 
-            var context = NativeMethods.ContextCreate(0, encoderType);
+            var context = NativeMethods.ContextCreate(0, encoderType, colorSpace);
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
