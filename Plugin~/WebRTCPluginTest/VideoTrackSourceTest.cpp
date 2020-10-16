@@ -28,8 +28,8 @@ class VideoTrackSourceTest : public GraphicsDeviceTestBase
 {
 public:
     VideoTrackSourceTest() :
-        encoder_(EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType)),
-        m_texture(m_device->CreateDefaultTextureV(width, height))
+        encoder_(EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType, m_colorSpace)),
+        m_texture(m_device->CreateDefaultTextureV(width, height, m_colorSpace))
     {
         m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
             m_texture->GetNativeTexturePtrV(),
