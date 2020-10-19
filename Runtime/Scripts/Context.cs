@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 
 namespace Unity.WebRTC
 {
     internal class Context : IDisposable
     {
         internal IntPtr self;
-        internal Hashtable table;
+        internal WeakReferenceTable table;
 
         private int id;
         private bool disposed;
@@ -28,7 +27,7 @@ namespace Unity.WebRTC
         {
             self = ptr;
             this.id = id;
-            this.table = new Hashtable();
+            this.table = new WeakReferenceTable();
         }
 
         ~Context()
@@ -44,8 +43,10 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero)
             {
-                foreach(var value in table.Values)
+                foreach (var value in table.CopiedValues)
                 {
+                    if (value == null)
+                        continue;
                     var disposable = value as IDisposable;
                     disposable.Dispose();
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -173,6 +173,7 @@ namespace Unity.WebRTC
 
                 tracks.Remove(this);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
+                WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
 
@@ -233,7 +234,6 @@ namespace Unity.WebRTC
         ~UnityVideoRenderer()
         {
             this.Dispose();
-            WebRTC.Table.Remove(self);
         }
 
         public void Dispose()
@@ -251,6 +251,7 @@ namespace Unity.WebRTC
                 }
 
                 WebRTC.Context.DeleteVideoRenderer(self);
+                WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
 

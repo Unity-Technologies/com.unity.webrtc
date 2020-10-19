@@ -58,7 +58,6 @@ namespace Unity.WebRTC
         ~MediaStreamTrack()
         {
             this.Dispose();
-            WebRTC.Table.Remove(self);
         }
 
         public virtual void Dispose()
@@ -71,6 +70,7 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Context.DeleteMediaStreamTrack(self);
+                WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
 

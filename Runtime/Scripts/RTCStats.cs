@@ -759,7 +759,6 @@ namespace Unity.WebRTC
         ~RTCStatsReport()
         {
             this.Dispose();
-            WebRTC.Table.Remove(self);
         }
 
         public void Dispose()
@@ -772,6 +771,7 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Context.DeleteStatsReport(self);
+                WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
 

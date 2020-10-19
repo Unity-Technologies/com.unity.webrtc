@@ -42,7 +42,6 @@ namespace Unity.WebRTC
         ~RTCPeerConnection()
         {
             this.Dispose();
-            WebRTC.Table.Remove(self);
         }
 
         /// <summary>
@@ -59,6 +58,7 @@ namespace Unity.WebRTC
             {
                 Close();
                 WebRTC.Context.DeletePeerConnection(self);
+                WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
 
