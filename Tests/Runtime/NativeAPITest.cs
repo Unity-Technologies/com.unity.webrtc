@@ -215,14 +215,18 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", renderTexture.GetNativeTexturePtr());
             NativeMethods.MediaStreamAddTrack(stream, track);
 
-            uint trackSize = 0;
-            var trackNativePtr = NativeMethods.MediaStreamGetVideoTracks(stream, ref trackSize);
-            Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
-            Assert.Greater(trackSize, 0);
+            uint length = 0;
+            IntPtr buf = NativeMethods.MediaStreamGetVideoTracks(stream, ref length);
+            Assert.AreNotEqual(buf, IntPtr.Zero);
+            Assert.Greater(length, 0);
 
-            IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
-            Marshal.FreeCoTaskMem(trackNativePtr);
+            // todo(kazuki):: Copying native buffer to managed array occurs crash
+            // on linux with il2cpp
+            #if !(UNITY_STANDALONE_LINUX && ENABLE_IL2CPP)
+            IntPtr[] array = new IntPtr[length];
+            Marshal.Copy(buf, array, 0, (int)length);
+            Marshal.FreeCoTaskMem(buf);
+            #endif
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
@@ -238,14 +242,24 @@ namespace Unity.WebRTC.RuntimeTest
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             NativeMethods.MediaStreamAddTrack(stream, track);
+
             uint trackSize = 0;
             var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, ref trackSize);
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
-            IntPtr[] tracksPtr = new IntPtr[trackSize];
-            Marshal.Copy(trackNativePtr, tracksPtr, 0, (int)trackSize);
-            Marshal.FreeCoTaskMem(trackNativePtr);
+            uint length = 0;
+            IntPtr buf = NativeMethods.MediaStreamGetAudioTracks(stream, ref length);
+            Assert.AreNotEqual(buf, IntPtr.Zero);
+            Assert.Greater(length, 0);
+
+            // todo(kazuki):: Copying native buffer to managed array occurs crash
+            // on linux with il2cpp
+            #if !(UNITY_STANDALONE_LINUX && ENABLE_IL2CPP)
+            IntPtr[] array = new IntPtr[length];
+            Marshal.Copy(buf, array, 0, (int)length);
+            Marshal.FreeCoTaskMem(buf);
+            #endif
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
