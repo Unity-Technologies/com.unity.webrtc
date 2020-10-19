@@ -35,7 +35,7 @@ void OpenGLGraphicsDevice::ShutdownV() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
+ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -46,7 +46,7 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
     assert(false && "CreateCPUReadTextureV need to implement on OpenGL");
     return nullptr;
 }

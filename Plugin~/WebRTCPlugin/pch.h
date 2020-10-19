@@ -156,6 +156,13 @@ namespace webrtc
         UnityEncoderSoftware = 0,
         UnityEncoderHardware = 1,
     };
-    
+
+    enum UnityColorSpace
+    {
+        Uninitialized = -1,
+        Gamma = 0,
+        Linear = 1,
+    };
+
 } // end namespace webrtc
 } // end namespace unity

@@ -31,14 +31,14 @@ namespace webrtc
         return nullptr;
     }
 
-    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
+    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace)
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
-        auto ctx = new Context(uid, encoderType);
+        auto ctx = new Context(uid, encoderType, colorSpace);
         s_instance.m_contexts[uid].reset(ctx);
         return ctx;
     }
@@ -154,9 +154,10 @@ namespace webrtc
     }
 #pragma warning(pop)
 
-    Context::Context(int uid, UnityEncoderType encoderType)
+    Context::Context(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace)
         : m_uid(uid)
         , m_encoderType(encoderType)
+        , m_colorSpace(colorSpace)
     {
         m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_workerThread->Start();
@@ -276,6 +277,11 @@ namespace webrtc
     UnityEncoderType Context::GetEncoderType() const
     {
         return m_encoderType;
+    }
+
+    UnityColorSpace Context::GetColorSpace() const
+    {
+        return m_colorSpace;
     }
 
     CodecInitializationResult Context::GetInitializationResult(MediaStreamTrackInterface* track)

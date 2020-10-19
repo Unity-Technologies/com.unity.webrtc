@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -13,9 +14,9 @@ namespace Unity.WebRTC
         private IntPtr renderFunction;
         private IntPtr textureUpdateFunction;
 
-        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware)
+        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware, ColorSpace colorSpace = ColorSpace.Linear)
         {
-            var ptr = NativeMethods.ContextCreate(id, encoderType);
+            var ptr = NativeMethods.ContextCreate(id, encoderType, colorSpace);
             return new Context(ptr, id);
         }
 

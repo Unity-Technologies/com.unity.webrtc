@@ -31,9 +31,9 @@ namespace webrtc
     }
 
 //---------------------------------------------------------------------------------------------------------------------
-    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
+    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+        textureDescriptor.pixelFormat = colorSpace == Linear ? MTLPixelFormatBGRA8Unorm_sRGB : MTLPixelFormatBGRA8Unorm;
         textureDescriptor.width = w;
         textureDescriptor.height = h;
         id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
@@ -107,10 +107,10 @@ namespace webrtc
     }
 
 //---------------------------------------------------------------------------------------------------------------------
-    ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height)
+    ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityColorSpace colorSpace)
     {
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+        textureDescriptor.pixelFormat = colorSpace == Linear ? MTLPixelFormatBGRA8Unorm_sRGB : MTLPixelFormatBGRA8Unorm;
         textureDescriptor.width = width;
         textureDescriptor.height = height;
         textureDescriptor.allowGPUOptimizedContents = false;

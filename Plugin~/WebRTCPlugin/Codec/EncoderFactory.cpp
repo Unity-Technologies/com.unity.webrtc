@@ -44,7 +44,7 @@ namespace webrtc
     }
 
     //Can throw exception. The caller is expected to catch it.
-    std::unique_ptr<IEncoder> EncoderFactory::Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType)
+    std::unique_ptr<IEncoder> EncoderFactory::Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType, UnityColorSpace colorSpace)
     {
         std::unique_ptr<IEncoder> encoder;
         const GraphicsDeviceType deviceType = device->GetDeviceType();
@@ -53,9 +53,9 @@ namespace webrtc
             case GRAPHICS_DEVICE_D3D11: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
-                    encoder = std::make_unique<NvEncoderD3D11>(width, height, device);
+                    encoder = std::make_unique<NvEncoderD3D11>(width, height, device, colorSpace);
                 } else {
-                    encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                    encoder = std::make_unique<SoftwareEncoder>(width, height, device, colorSpace);
                 }
                 break;
             }
@@ -64,16 +64,16 @@ namespace webrtc
             case GRAPHICS_DEVICE_D3D12: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
-                    encoder = std::make_unique<NvEncoderD3D12>(width, height, device);
+                    encoder = std::make_unique<NvEncoderD3D12>(width, height, device, colorSpace);
                 } else {
-                    encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                    encoder = std::make_unique<SoftwareEncoder>(width, height, device, colorSpace);
                 }
                 break;
             }
 #endif
 #if defined(SUPPORT_OPENGL_CORE)
             case GRAPHICS_DEVICE_OPENGL: {
-                encoder = std::make_unique<NvEncoderGL>(width, height, device);
+                encoder = std::make_unique<NvEncoderGL>(width, height, device, colorSpace);
                 break;
             }
 #endif
@@ -81,17 +81,17 @@ namespace webrtc
             case GRAPHICS_DEVICE_VULKAN: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
-                    encoder = std::make_unique<NvEncoderCuda>(width, height, device);
+                    encoder = std::make_unique<NvEncoderCuda>(width, height, device, colorSpace);
                 }
                 else {
-                    encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                    encoder = std::make_unique<SoftwareEncoder>(width, height, device, colorSpace);
                 }
                 break;
             }
 #endif            
 #if defined(SUPPORT_METAL)
             case GRAPHICS_DEVICE_METAL: {
-                encoder = std::make_unique<SoftwareEncoder>(width, height, device);
+                encoder = std::make_unique<SoftwareEncoder>(width, height, device, colorSpace);
                 break;
             }
 #endif            

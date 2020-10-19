@@ -87,7 +87,7 @@ void D3D12GraphicsDevice::ShutdownV() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
+ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
 
     return CreateSharedD3D12Texture(w,h);
 }
@@ -214,7 +214,7 @@ void D3D12GraphicsDevice::Barrier(ID3D12Resource* res,
 
 //----------------------------------------------------------------------------------------------------------------------
 
-ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
     D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
     const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device);
     if (FAILED(hr)){
