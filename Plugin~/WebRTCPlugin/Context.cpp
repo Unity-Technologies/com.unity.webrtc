@@ -31,14 +31,14 @@ namespace webrtc
         return nullptr;
     }
 
-    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace)
+    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
-        auto ctx = new Context(uid, encoderType, colorSpace);
+        auto ctx = new Context(uid, encoderType);
         s_instance.m_contexts[uid].reset(ctx);
         return ctx;
     }
@@ -154,10 +154,9 @@ namespace webrtc
     }
 #pragma warning(pop)
 
-    Context::Context(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace)
+    Context::Context(int uid, UnityEncoderType encoderType)
         : m_uid(uid)
         , m_encoderType(encoderType)
-        , m_colorSpace(colorSpace)
     {
         m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_workerThread->Start();
@@ -253,9 +252,9 @@ namespace webrtc
         return m_mapVideoEncoderParameter[track].get();
     }
 
-    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height)
+    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityColorSpace colorSpace)
     {
-        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height);
+        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height, colorSpace);
     }
 
     void Context::SetKeyFrame(uint32_t id)
@@ -277,11 +276,6 @@ namespace webrtc
     UnityEncoderType Context::GetEncoderType() const
     {
         return m_encoderType;
-    }
-
-    UnityColorSpace Context::GetColorSpace() const
-    {
-        return m_colorSpace;
     }
 
     CodecInitializationResult Context::GetInitializationResult(MediaStreamTrackInterface* track)

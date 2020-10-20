@@ -105,9 +105,9 @@ extern "C"
         return context->GetInitializationResult(track);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, MediaStreamTrackInterface* track, int width, int height, UnityEncoderType type)
+    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, MediaStreamTrackInterface* track, int width, int height, UnityColorSpace colorSpace)
     {
-        context->SetEncoderParameter(track, width, height);
+        context->SetEncoderParameter(track, width, height, colorSpace);
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
@@ -268,7 +268,7 @@ extern "C"
         delegateSetResolution = func;
     }
 
-    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace)
+    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType)
     {
         auto ctx = ContextManager::GetInstance()->GetContext(uid);
         if (ctx != nullptr)
@@ -276,7 +276,7 @@ extern "C"
             DebugLog("Already created context with ID %d", uid);
             return ctx;
         }
-        ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType, colorSpace);
+        ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType);
         return ctx;
     }
 

@@ -14,9 +14,9 @@ namespace Unity.WebRTC
         private IntPtr renderFunction;
         private IntPtr textureUpdateFunction;
 
-        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware, ColorSpace colorSpace = ColorSpace.Linear)
+        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware)
         {
-            var ptr = NativeMethods.ContextCreate(id, encoderType, colorSpace);
+            var ptr = NativeMethods.ContextCreate(id, encoderType);
             return new Context(ptr, id);
         }
 
@@ -186,9 +186,9 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteStatsReport(self, report);
         }
 
-        public void SetVideoEncoderParameter(IntPtr track, int width, int height)
+        public void SetVideoEncoderParameter(IntPtr track, int width, int height, ColorSpace colorSpace)
         {
-            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height);
+            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, colorSpace);
         }
 
         public CodecInitializationResult GetInitializationResult(IntPtr track)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -136,7 +137,8 @@ namespace Unity.WebRTC
         public VideoStreamTrack(string label, IntPtr ptr, int width, int height)
             : base(WebRTC.Context.CreateVideoTrack(label, ptr))
         {
-            WebRTC.Context.SetVideoEncoderParameter(self, width, height);
+            ColorSpace colorSpace = QualitySettings.activeColorSpace;
+            WebRTC.Context.SetVideoEncoderParameter(self, width, height, colorSpace);
             WebRTC.Context.InitializeEncoder(self);
             tracks.Add(this);
         }

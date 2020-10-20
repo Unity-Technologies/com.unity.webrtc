@@ -24,7 +24,7 @@ namespace webrtc
         static ContextManager* GetInstance() { return &s_instance; }
      
         Context* GetContext(int uid) const;
-        Context* CreateContext(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace);
+        Context* CreateContext(int uid, UnityEncoderType encoderType);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
         bool Exists(Context* context);
@@ -40,19 +40,22 @@ namespace webrtc
     {
         int width;
         int height;
-        VideoEncoderParameter(int width, int height) :width(width), height(height) { }
+        UnityColorSpace colorSpace;
+        VideoEncoderParameter(int width, int height, UnityColorSpace colorSpace)
+            : width(width), height(height), colorSpace(colorSpace)
+        {
+        }
     };
 
     class Context : public IVideoEncoderObserver
     {
     public:
         
-        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware, UnityColorSpace colorSpace = Linear);
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
         ~Context();
 
         // Utility
         UnityEncoderType GetEncoderType() const;
-        UnityColorSpace GetColorSpace() const;
         CodecInitializationResult GetInitializationResult(webrtc::MediaStreamTrackInterface* track);
 
         // MediaStream
@@ -96,7 +99,7 @@ namespace webrtc
         bool FinalizeEncoder(IEncoder* encoder);
         // You must call these methods on Rendering thread.
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
-        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height);
+        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityColorSpace colorSpace);
 
         // mutex;
         std::mutex mutex;
@@ -104,7 +107,6 @@ namespace webrtc
     private:
         int m_uid;
         UnityEncoderType m_encoderType;
-        UnityColorSpace m_colorSpace;
         std::unique_ptr<rtc::Thread> m_workerThread;
         std::unique_ptr<rtc::Thread> m_signalingThread;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
