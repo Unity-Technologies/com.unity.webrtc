@@ -24,7 +24,7 @@ namespace webrtc
         static ContextManager* GetInstance() { return &s_instance; }
      
         Context* GetContext(int uid) const;
-        Context* CreateContext(int uid, UnityEncoderType encoderType);
+        Context* CreateContext(int uid, UnityEncoderType encoderType, UnityColorSpace colorSpace);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
         bool Exists(Context* context);
@@ -47,11 +47,12 @@ namespace webrtc
     {
     public:
         
-        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware, UnityColorSpace colorSpace = Linear);
         ~Context();
 
         // Utility
         UnityEncoderType GetEncoderType() const;
+        UnityColorSpace GetColorSpace() const;
         CodecInitializationResult GetInitializationResult(webrtc::MediaStreamTrackInterface* track);
 
         // MediaStream
@@ -103,6 +104,7 @@ namespace webrtc
     private:
         int m_uid;
         UnityEncoderType m_encoderType;
+        UnityColorSpace m_colorSpace;
         std::unique_ptr<rtc::Thread> m_workerThread;
         std::unique_ptr<rtc::Thread> m_signalingThread;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;

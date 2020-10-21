@@ -269,7 +269,8 @@ namespace Unity.WebRTC
             }
 
             NativeMethods.RegisterDebugLog(DebugLog);
-            s_context = Context.Create(encoderType:type);
+            var colorSpace = QualitySettings.activeColorSpace;
+            s_context = Context.Create(encoderType:type, colorSpace:colorSpace);
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
             var flipShader = Resources.Load<Shader>("Flip");
@@ -495,7 +496,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
+        public static extern IntPtr ContextCreate(int uid, EncoderType encoderType, ColorSpace colorSpace);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDestroy(int uid);
         [DllImport(WebRTC.Lib)]

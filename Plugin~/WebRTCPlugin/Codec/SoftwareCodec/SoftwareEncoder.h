@@ -14,7 +14,7 @@ namespace webrtc
     class SoftwareEncoder : public IEncoder
     {
     public:
-        SoftwareEncoder(int _width, int _height, IGraphicsDevice* device);
+        SoftwareEncoder(int _width, int _height, IGraphicsDevice* device, UnityColorSpace colorSpace);
         void InitV() override;
         void SetRates(uint32_t bitRate, int64_t frameRate) override {}
         void UpdateSettings() override {}
@@ -29,6 +29,7 @@ namespace webrtc
         ITexture2D* m_encodeTex;
         int m_width = 1920;
         int m_height = 1080;
+        UnityColorSpace m_colorSpace;
         uint64 m_frameCount = 0;
     };
 //---------------------------------------------------------------------------------------------------------------------

@@ -35,7 +35,10 @@ namespace webrtc
             NV_ENC_DEVICE_TYPE type,
             NV_ENC_INPUT_RESOURCE_TYPE inputType,
             NV_ENC_BUFFER_FORMAT bufferFormat,
-            int width, int height, IGraphicsDevice* device);
+            int width,
+            int height,
+            IGraphicsDevice* device,
+            UnityColorSpace colorSpace);
         virtual ~NvEncoder();
 
         static CodecInitializationResult LoadCodec();
@@ -57,6 +60,7 @@ namespace webrtc
         int m_width;
         int m_height;
         IGraphicsDevice* m_device;
+        UnityColorSpace m_colorSpace;
 
         NV_ENC_DEVICE_TYPE m_deviceType;
         NV_ENC_INPUT_RESOURCE_TYPE m_inputType;

@@ -32,7 +32,7 @@ void D3D11GraphicsDevice::ShutdownV() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
+ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
 
     ID3D11Texture2D* texture = nullptr;
     D3D11_TEXTURE2D_DESC desc = { 0 };
@@ -50,7 +50,7 @@ ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+ITexture2D* D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
 
     ID3D11Texture2D* texture = nullptr;
     D3D11_TEXTURE2D_DESC desc = { 0 };
