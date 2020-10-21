@@ -4,11 +4,27 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2020-10-26
+
+### Added
+
+- Software decoder support
+- Hardware encoder (VideoToolbox) support on macOS
+- Vulkan API support on Linux and Windows
+- Linux IL2CPP support
+- Add WebRTC samples (`MultiplePeerConnections`, `MultiVideoReceive`, `MungeSDP`, `VideoReceive`)
+
+### Changed
+
+- Upgrade libwebrtc m85
+- Upgrade NVIDIA Codec SDK 9.1
+- Changed `RTCPeerConnection` behaviour to throw exceptions when pass invalid arguments to `SetLocalDescription`, `SetRemoteDescription` 
+
 ## [2.1.3] - 2020-09-28
 
 ### Changed
 
-- Add "minBitrate" parameter to RTCRtpEncodingParameters class.
+- Add "minBitrate" parameter to `RTCRtpEncodingParameters` class.
 
 ## [2.1.2] - 2020-09-14
 
