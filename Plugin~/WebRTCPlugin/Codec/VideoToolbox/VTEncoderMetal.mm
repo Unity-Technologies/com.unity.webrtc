@@ -139,8 +139,8 @@ namespace webrtc
         encoder->CaptureFrame(*encodedFrame);
     }
 
-    VTEncoderMetal::VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device)
-        : m_device(device), m_width(nWidth), m_height(nHeight)
+    VTEncoderMetal::VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat)
+        : m_device(device), m_width(nWidth), m_height(nHeight), m_textureFormat(textureFormat)
     {
         OSStatus status = VTCompressionSessionCreate(NULL, nWidth, nHeight,
                                                      kCMVideoCodecType_H264,

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace Unity.WebRTC
 {
@@ -24,7 +26,7 @@ namespace Unity.WebRTC
 
         internal VideoStreamTrack(string label, UnityEngine.Texture source, UnityEngine.RenderTexture dest, int width,
             int height)
-            : this(label, dest.GetNativeTexturePtr(), width, height)
+            : this(label, dest.GetNativeTexturePtr(), width, height, source.graphicsFormat)
         {
             m_needFlip = true;
             m_sourceTexture = source;
@@ -133,10 +135,11 @@ namespace Unity.WebRTC
         /// <param name="ptr"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public VideoStreamTrack(string label, IntPtr ptr, int width, int height)
+        /// <param name="format"></param>
+        public VideoStreamTrack(string label, IntPtr ptr, int width, int height, GraphicsFormat format)
             : base(WebRTC.Context.CreateVideoTrack(label, ptr))
         {
-            WebRTC.Context.SetVideoEncoderParameter(self, width, height);
+            WebRTC.Context.SetVideoEncoderParameter(self, width, height, format);
             WebRTC.Context.InitializeEncoder(self);
             tracks.Add(this);
         }

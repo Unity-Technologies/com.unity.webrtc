@@ -23,7 +23,7 @@ protected:
         GraphicsDeviceTestBase::SetUp();
         EXPECT_NE(nullptr, m_device);
 
-        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType);
+        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType, m_textureFormat);
         EXPECT_NE(nullptr, encoder_);
 
         context = std::make_unique<Context>();
@@ -33,7 +33,7 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
     EXPECT_NE(nullptr, tex);
     const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
@@ -46,7 +46,7 @@ TEST_P(ContextTest, CreateAndDeleteMediaStream) {
 
 
 TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
     EXPECT_NE(nullptr, tex.get());
     const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     EXPECT_NE(nullptr, track);
@@ -70,7 +70,7 @@ TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto stream = context->CreateMediaStream("videostream");
     const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     const auto videoTrack = reinterpret_cast<webrtc::VideoTrackInterface*>(track);
@@ -113,7 +113,7 @@ TEST_P(ContextTest, EqualRendererGetById) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height));
+    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto track = context->CreateVideoTrack("video", tex.get(), m_unityGfxRenderer);
     const auto renderer = context->CreateVideoRenderer();
     track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());

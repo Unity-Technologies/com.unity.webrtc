@@ -56,6 +56,7 @@ bool VulkanGraphicsDevice::InitV() {
 
 void VulkanGraphicsDevice::ShutdownV() {
     VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
+    vkDestroyDevice(m_device, NULL);
     m_cudaContext.Shutdown();
 
     if (s_hModule)
@@ -88,7 +89,7 @@ std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr)
 }
 
 //Returns null if failed
-ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const uint32_t h) {
+ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
 
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->Init(m_physicalDevice, m_device)) {
@@ -112,7 +113,7 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h) {
+ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device)) {
         vulkanTexture->Shutdown();

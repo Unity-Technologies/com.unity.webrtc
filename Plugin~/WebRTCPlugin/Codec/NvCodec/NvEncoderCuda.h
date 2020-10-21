@@ -9,7 +9,7 @@ namespace webrtc
     class NvEncoderCuda : public NvEncoder
     {
     public:
-        NvEncoderCuda(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
+        NvEncoderCuda(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat);
         void InitV() override;
         virtual ~NvEncoderCuda() = default;
     protected:

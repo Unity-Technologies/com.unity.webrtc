@@ -68,6 +68,7 @@
 #pragma endregion
 
 #include "PlatformBase.h"
+#include "IUnityRenderingExtensions.h"
 
 #if defined(SUPPORT_D3D11)
 #include <comdef.h>
@@ -156,6 +157,6 @@ namespace webrtc
         UnityEncoderSoftware = 0,
         UnityEncoderHardware = 1,
     };
-    
+
 } // end namespace webrtc
 } // end namespace unity

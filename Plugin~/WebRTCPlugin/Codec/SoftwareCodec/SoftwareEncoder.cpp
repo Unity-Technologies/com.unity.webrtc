@@ -12,16 +12,17 @@ namespace unity
 namespace webrtc
 {
 
-    SoftwareEncoder::SoftwareEncoder(int width, int height, IGraphicsDevice* device) :
+    SoftwareEncoder::SoftwareEncoder(int width, int height, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat) :
     m_device(device),
     m_width(width),
-    m_height(height)
+    m_height(height),
+    m_textureFormat(textureFormat)
     {
     }
 
     void SoftwareEncoder::InitV()
     {
-        m_encodeTex = m_device->CreateCPUReadTextureV(m_width, m_height);
+        m_encodeTex = m_device->CreateCPUReadTextureV(m_width, m_height, m_textureFormat);
         m_initializationResult = CodecInitializationResult::Success;
     }
 

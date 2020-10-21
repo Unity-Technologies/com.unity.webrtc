@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace Unity.WebRTC
 {
@@ -184,9 +187,9 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteStatsReport(self, report);
         }
 
-        public void SetVideoEncoderParameter(IntPtr track, int width, int height)
+        public void SetVideoEncoderParameter(IntPtr track, int width, int height, GraphicsFormat format)
         {
-            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height);
+            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, format);
         }
 
         public CodecInitializationResult GetInitializationResult(IntPtr track)

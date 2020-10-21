@@ -40,7 +40,11 @@ namespace webrtc
     {
         int width;
         int height;
-        VideoEncoderParameter(int width, int height) :width(width), height(height) { }
+        UnityRenderingExtTextureFormat textureFormat;
+        VideoEncoderParameter(int width, int height, UnityRenderingExtTextureFormat textureFormat)
+            : width(width), height(height), textureFormat(textureFormat)
+        {
+        }
     };
 
     class Context : public IVideoEncoderObserver
@@ -95,7 +99,7 @@ namespace webrtc
         bool FinalizeEncoder(IEncoder* encoder);
         // You must call these methods on Rendering thread.
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
-        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height);
+        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat format);
 
         // mutex;
         std::mutex mutex;

@@ -10,7 +10,7 @@ namespace webrtc
 
     class VTEncoderMetal : public IEncoder{
     public:
-        VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device);
+        VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat);
         ~VTEncoderMetal();
         void SetRates(uint32_t bitRate, int64_t frameRate) override {};
         void UpdateSettings() override {};
@@ -25,6 +25,7 @@ namespace webrtc
         uint64 m_width = 0;
         uint64 m_height = 0;
         IGraphicsDevice* m_device;
+        UnityRenderingExtTextureFormat m_textureFormat;
         ITexture2D* renderTextures[bufferedFrameNum];
         CVPixelBufferRef pixelBuffers[bufferedFrameNum];
         std::vector<uint8> encodedBuffers[bufferedFrameNum];

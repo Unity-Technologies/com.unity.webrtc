@@ -48,12 +48,12 @@ public:
     virtual void ShutdownV() override;
     inline virtual void* GetEncodeDevicePtrV() override;
 
-    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h) override;
+    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
 
-    virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h) override;
+    virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
 private:
