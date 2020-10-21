@@ -30,8 +30,6 @@ namespace webrtc
     , m_bufferFormat(bufferFormat)
     , m_clock(webrtc::Clock::GetRealTimeClock())
     {
-        LogPrint(StringFormat("width is %d, height is %d", width, height).c_str());
-        checkf(width > 0 && height > 0, "Invalid width or height!");
     }
 
     void NvEncoder::InitV()
@@ -122,6 +120,8 @@ namespace webrtc
 
     NvEncoder::~NvEncoder()
     {
+        RTC_LOG(LS_INFO) << "NvEncoder destructor";
+
         ReleaseEncoderResources();
         if (pEncoderInterface)
         {
@@ -152,7 +152,7 @@ namespace webrtc
         NvEncodeAPIGetMaxSupportedVersion(&version);
         if (currentVersion > version)
         {
-            LogPrint("Current Driver Version does not support this NvEncodeAPI version, please upgrade driver");
+            RTC_LOG(LS_INFO) << "Current Driver Version does not support this NvEncodeAPI version, please upgrade driver";
             return CodecInitializationResult::DriverVersionDoesNotSupportAPI;
         }
 
@@ -165,7 +165,7 @@ namespace webrtc
 
         if (!NvEncodeAPICreateInstance)
         {
-            LogPrint("Cannot find NvEncodeAPICreateInstance() entry in NVENC library");
+            RTC_LOG(LS_INFO) << "Cannot find NvEncodeAPICreateInstance() entry in NVENC library";
             return CodecInitializationResult::APINotFound;
         }
         bool result = (NvEncodeAPICreateInstance(pNvEncodeAPI.get()) == NV_ENC_SUCCESS);
@@ -194,7 +194,7 @@ namespace webrtc
 
         if (module == nullptr)
         {
-            LogPrint("NVENC library file is not found. Please ensure NV driver is installed");
+            RTC_LOG(LS_INFO) << "NVENC library file is not found. Please ensure NV driver is installed";
             return false;
         }
         s_hModule = module;
@@ -334,7 +334,7 @@ namespace webrtc
         registerResource.resourceToRegister = buffer;
 
         if (!registerResource.resourceToRegister)
-            LogPrint("resource is not initialized");
+            RTC_LOG(LS_INFO) << "resource is not initialized";
         registerResource.width = m_width;
         registerResource.height = m_height;
         if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY)

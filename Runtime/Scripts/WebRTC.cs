@@ -402,7 +402,7 @@ namespace Unity.WebRTC
         }
 
         internal static Context Context { get { return s_context; } }
-        internal static Hashtable Table { get { return s_context?.table; } }
+        internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
         public static bool SupportHardwareEncoder
         {
@@ -427,18 +427,19 @@ namespace Unity.WebRTC
             }
         }
 
-        public static IReadOnlyList<RTCPeerConnection> PeerList
+        public static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
         {
             get
             {
-                var list = new List<RTCPeerConnection>();
-                if (Table?.Values != null)
+                var list = new List<WeakReference<RTCPeerConnection>>();
+                var values = Table?.CopiedValues;
+                if (values != null)
                 {
-                    foreach (var value in Table?.Values)
+                    foreach (var value in values)
                     {
                         if (value is RTCPeerConnection peer)
                         {
-                            list.Add(peer);
+                            list.Add(new WeakReference<RTCPeerConnection>(peer));
                         }
                     }
 

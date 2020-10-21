@@ -115,7 +115,6 @@ namespace Unity.WebRTC
         ~RTCDataChannel()
         {
             this.Dispose();
-            WebRTC.Table.Remove(self);
         }
 
         public void Dispose()
@@ -128,6 +127,7 @@ namespace Unity.WebRTC
             {
                 Close();
                 WebRTC.Context.DeleteDataChannel(self);
+                WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
             this.disposed = true;

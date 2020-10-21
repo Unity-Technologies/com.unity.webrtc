@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public delegate void OnPeerListHandler(IEnumerable<RTCPeerConnection> peerList);
+    public delegate void OnPeerListHandler(IEnumerable<WeakReference<RTCPeerConnection>> peerList);
 
     public delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
 
@@ -118,8 +118,13 @@ namespace Unity.WebRTC.Editor
                 {
                     OnPeerList?.Invoke(peerList);
 
-                    foreach (var peer in peerList)
+                    foreach (var weakReference in peerList)
                     {
+                        if (!weakReference.TryGetTarget(out var peer))
+                        {
+                            continue;
+                        }
+
                         var op = peer.GetStats();
                         yield return op;
 

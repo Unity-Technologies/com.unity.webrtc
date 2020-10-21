@@ -120,6 +120,10 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.IsNotEmpty(parameters.TransactionId);
             Assert.AreEqual(1, peer.GetTransceivers().Count());
             Assert.NotNull(peer.GetTransceivers().First());
+
+            track.Dispose();
+            stream.Dispose();
+            peer.Dispose();
         }
 
         [Test]
@@ -268,6 +272,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             RTCSessionDescription invalid = new RTCSessionDescription { sdp = "this is invalid parameter" };
             Assert.Throws<RTCErrorException>(() => peer.SetLocalDescription(ref invalid));
+
+            peer.Dispose();
         }
 
         [UnityTest]
@@ -320,6 +326,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             RTCSessionDescription invalid = new RTCSessionDescription { sdp = "this is invalid parameter" };
             Assert.Throws<RTCErrorException>(() => peer.SetRemoteDescription(ref invalid));
+
+            peer.Dispose();
         }
 
 
