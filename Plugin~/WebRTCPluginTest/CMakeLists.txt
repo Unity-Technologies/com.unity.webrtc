@@ -48,8 +48,6 @@ elseif(APPLE)
     ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
     ../WebRTCPlugin/Codec/SoftwareCodec/*.h
     ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
-    #Codec/VideoToolbox/VTEncoderMetal.mm
-    #Codec/VideoToolbox/VTEncoderMetal.h
   )
   list (APPEND sources ${append_source})
 elseif(UNIX)
