@@ -21,8 +21,8 @@ public:
     virtual bool InitV() override;
     virtual void ShutdownV() override;
     inline virtual void* GetEncodeDevicePtrV() override;
-    virtual ITexture2D* CreateDefaultTextureV(const uint32_t w, const uint32_t h, UnityColorSpace colorSpace) override;
-    virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityColorSpace colorSpace) override;
+    virtual ITexture2D* CreateDefaultTextureV(const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
+    virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
 
     std::unique_ptr<UnityVulkanImage> AccessTexture(void* ptr) const;
 

@@ -359,7 +359,7 @@ void* CreateDevice(UnityGfxRenderer renderer)
 
 GraphicsDeviceTestBase::GraphicsDeviceTestBase()
 {
-    std::tie(m_unityGfxRenderer, m_encoderType, m_colorSpace) = GetParam();
+    std::tie(m_unityGfxRenderer, m_encoderType, m_textureFormat) = GetParam();
     const auto pGraphicsDevice = CreateDevice(m_unityGfxRenderer);
     const auto unityInterface = CreateUnityInterface(m_unityGfxRenderer);
 

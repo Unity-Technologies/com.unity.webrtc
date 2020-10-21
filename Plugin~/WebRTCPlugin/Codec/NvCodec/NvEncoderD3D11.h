@@ -9,7 +9,7 @@ namespace webrtc
     class NvEncoderD3D11 : public NvEncoder
     {
     public:
-        NvEncoderD3D11(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityColorSpace colorSpace);
+        NvEncoderD3D11(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFromat);
         virtual ~NvEncoderD3D11();
     protected:
 

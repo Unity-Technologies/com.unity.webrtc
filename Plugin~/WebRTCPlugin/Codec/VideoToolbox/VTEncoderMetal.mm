@@ -139,8 +139,8 @@ namespace webrtc
         encoder->CaptureFrame(*encodedFrame);
     }
 
-    VTEncoderMetal::VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityColorSpace colorSpace)
-        : m_device(device), m_width(nWidth), m_height(nHeight), m_colorSpace(colorSpace)
+    VTEncoderMetal::VTEncoderMetal(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat)
+        : m_device(device), m_width(nWidth), m_height(nHeight), m_textureFormat(textureFormat)
     {
         OSStatus status = VTCompressionSessionCreate(NULL, nWidth, nHeight,
                                                      kCMVideoCodecType_H264,
@@ -176,12 +176,11 @@ namespace webrtc
             }
 
             CVMetalTextureRef imageTexture;
-            MTLPixelFormat pixelFormat = m_colorSpace == Linear ? MTLPixelFormatBGRA8Unorm_sRGB : MTLPixelFormatBGRA8Unorm;
             result = CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                                textureCache,
                                                                pixelBuffers[i],
                                                                nil,
-                                                               pixelFormat,
+                                                               MTLPixelFormatBGRA8Unorm_sRGB,
                                                                m_width, m_height, 0,
                                                                &imageTexture);
             if(result != kCVReturnSuccess)

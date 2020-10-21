@@ -31,9 +31,9 @@ namespace webrtc
     }
 
 //---------------------------------------------------------------------------------------------------------------------
-    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
+    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = colorSpace == Linear ? MTLPixelFormatBGRA8Unorm_sRGB : MTLPixelFormatBGRA8Unorm;
+        textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
         textureDescriptor.width = w;
         textureDescriptor.height = h;
         id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
@@ -107,10 +107,10 @@ namespace webrtc
     }
 
 //---------------------------------------------------------------------------------------------------------------------
-    ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityColorSpace colorSpace)
+    ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = colorSpace == Linear ? MTLPixelFormatBGRA8Unorm_sRGB : MTLPixelFormatBGRA8Unorm;
+        textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
         textureDescriptor.width = width;
         textureDescriptor.height = height;
         textureDescriptor.allowGPUOptimizedContents = false;
@@ -146,6 +146,19 @@ namespace webrtc
             bytesPerRow, buffer.data()
         );
         return i420_buffer;
+    }
+
+//---------------------------------------------------------------------------------------------------------------------
+    MTLPixelFormat MetalGraphicsDevice::ConvertFormat(UnityRenderingExtTextureFormat format)
+    {
+        switch(format) {
+            case kUnityRenderingExtFormatB8G8R8A8_SRGB:
+                return MTLPixelFormatBGRA8Unorm_sRGB;
+            case kUnityRenderingExtFormatB8G8R8A8_UNorm:
+                return MTLPixelFormatBGRA8Unorm;
+            default:
+                return MTLPixelFormatInvalid;
+        }
     }
 
 } // end namespace webrtc
