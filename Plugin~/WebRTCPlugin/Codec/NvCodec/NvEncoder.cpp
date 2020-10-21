@@ -24,11 +24,11 @@ namespace webrtc
         const int width,
         const int height,
         IGraphicsDevice* device,
-        UnityColorSpace colorSpace)
+        UnityRenderingExtTextureFormat textureFormat)
     : m_width(width)
     , m_height(height)
     , m_device(device)
-    , m_colorSpace(colorSpace)
+    , m_textureFormat(textureFormat)
     , m_deviceType(type)
     , m_inputType(inputType)
     , m_bufferFormat(bufferFormat)
@@ -374,7 +374,7 @@ namespace webrtc
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            renderTextures[i] = m_device->CreateDefaultTextureV(m_width, m_height, m_colorSpace);
+            renderTextures[i] = m_device->CreateDefaultTextureV(m_width, m_height, m_textureFormat);
             void* buffer = AllocateInputResourceV(renderTextures[i]);
 
             Frame& frame = bufferedFrames[i];

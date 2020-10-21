@@ -5,6 +5,7 @@ using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
 namespace Unity.WebRTC
@@ -522,7 +523,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteStatsReport(IntPtr context, IntPtr report);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height, ColorSpace colorSpace);
+        public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height, GraphicsFormat format);
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult GetInitializationResult(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]

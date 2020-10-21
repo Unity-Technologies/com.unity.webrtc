@@ -252,9 +252,9 @@ namespace webrtc
         return m_mapVideoEncoderParameter[track].get();
     }
 
-    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityColorSpace colorSpace)
+    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat textureFormat)
     {
-        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height, colorSpace);
+        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height, textureFormat);
     }
 
     void Context::SetKeyFrame(uint32_t id)

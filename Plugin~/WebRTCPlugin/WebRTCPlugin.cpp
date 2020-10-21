@@ -105,9 +105,9 @@ extern "C"
         return context->GetInitializationResult(track);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, MediaStreamTrackInterface* track, int width, int height, UnityColorSpace colorSpace)
+    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat textureFormat)
     {
-        context->SetEncoderParameter(track, width, height, colorSpace);
+        context->SetEncoderParameter(track, width, height, textureFormat);
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
