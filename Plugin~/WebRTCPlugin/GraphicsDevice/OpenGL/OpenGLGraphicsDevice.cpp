@@ -35,7 +35,7 @@ void OpenGLGraphicsDevice::ShutdownV() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
+ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -46,7 +46,7 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityColorSpace colorSpace) {
+ITexture2D* OpenGLGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     assert(false && "CreateCPUReadTextureV need to implement on OpenGL");
     return nullptr;
 }
@@ -73,17 +73,17 @@ bool OpenGLGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativ
 bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height) {
     if(srcName == dstName)
     {
-        LogPrint("Same texture");
+//        LogPrint("Same texture");
         return false;
     }
     if(glIsTexture(srcName) == GL_FALSE)
     {
-        LogPrint("srcName is not texture");
+//        LogPrint("srcName is not texture");
         return false;
     }
     if(glIsTexture(dstName) == GL_FALSE)
     {
-        LogPrint("dstName is not texture");
+//        LogPrint("dstName is not texture");
         return false;
     }
     glCopyImageSubData(
