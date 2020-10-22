@@ -13,6 +13,24 @@ platforms:
     flavor: b1.large
     prepack_command: BuildScripts~/build_plugin.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
+  - name: linux
+    type: Unity::VM::GPU
+    image: renderstreaming/ubuntu-18.04:latest
+    flavor: b1.large
+    prepack_command: BuildScripts~/build_plugin.sh
+    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
+  - name: macos
+    type: Unity::metal::macmini
+    image: slough-ops/macos-10.14-xcode
+    flavor: m1.mac
+    prepack_command: BuildScripts~/build_plugin_mac.sh
+    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
+
+test_targets:
+  - name: win
+    type: Unity::VM
+    image: renderstreaming/win10:latest
+    flavor: b1.large
     test_params:
       - backend: mono
         platform: editmode
@@ -23,11 +41,9 @@ platforms:
       - backend: il2cpp
         platform: standalone
   - name: linux
-    type: Unity::VM::GPU
+    type: Unity::VM
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
-    prepack_command: BuildScripts~/build_plugin.sh
-    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
     test_params:
       - backend: mono
         platform: editmode
@@ -37,6 +53,32 @@ platforms:
         platform: standalone
       - backend: il2cpp
         platform: standalone
+  - name: win-gpu
+    type: Unity::VM::GPU
+    image: renderstreaming/win10:latest
+    flavor: b1.large
+    test_params:
+      - backend: mono
+        platform: editmode
+      - backend: mono
+        platform: playmode
+      - backend: mono
+        platform: standalone
+      - backend: il2cpp
+        platform: standalone
+  - name: linux-gpu
+    type: Unity::VM::GPU
+    image: renderstreaming/ubuntu-18.04:latest
+    flavor: b1.large
+    test_params:
+      - backend: mono
+        platform: editmode
+      - backend: mono
+        platform: playmode
+      - backend: mono
+        platform: standalone
+      - backend: il2cpp
+        platform: standalone        
   - name: macos
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
@@ -86,17 +128,17 @@ pack_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
     {% endfor %}
 
-{% for platform in platforms %}
-{% if platform.name != "macos" -%}
+{% for target in test_targets %}
+{% if target.name != "macos" -%}
 
 {% for editor in editors %}
-{% for param in platform.test_params %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ platform.name }}
+{% for param in target.test_params %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }}
   agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
@@ -107,7 +149,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
       except:
       - "master"
   artifacts:
-    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ platform.name }}_test_results: 
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
@@ -116,13 +158,13 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
 {% endfor %}
 {% else -%}
 
-{% for param in platform.test_params %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor_mac_version }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor_mac_version }} on {{ platform.name }}
+{% for param in target.test_params %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor_mac_version }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor_mac_version }} on {{ target.name }}
   agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
   commands:
     - |
       cd ../
@@ -150,14 +192,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.nam
       except:
       - "master"
   artifacts:
-    {{ package.name }}_il2cpp_{{ editor.version }}_{{ platform.name }}_test_results: 
+    {{ package.name }}_il2cpp_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
-
-
 {% endif -%}
 {% endfor %}
 
@@ -251,9 +291,11 @@ push_plugin:
   dependencies:
     {% for platform in platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#prepack_{{ package.name }}_{{ platform.name }}
+    {% endfor %}
+    {% for target in test_targets %}
     {% for editor in editors %}
-    {% for param in platform.test_params %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
+    {% for param in target.test_params %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
     {% endfor %}
@@ -273,10 +315,10 @@ publish_{{ package.name }}:
         - "upm-ci~/packages/*.tgz"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+    {% for target in test_targets %}
     {% for editor in editors %}
-    {% for platform in platforms %}
-    {% for param in platform.test_params %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ platform.name }}_{{ editor.version }}
+    {% for param in target.test_params %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
     {% endfor %}
