@@ -30,6 +30,3 @@ cmake -DCMAKE_C_COMPILER="clang" \
       -DCMAKE_BUILD_TYPE="Release" \
       .
 make
-
-# Run UnitTest
-"$SOLUTION_DIR/WebRTCPluginTest/WebRTCPluginTest"
