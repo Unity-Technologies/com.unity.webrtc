@@ -43,6 +43,7 @@ namespace webrtc
 
         static CodecInitializationResult LoadCodec();
         static bool LoadModule();
+        static bool CheckDriverVersion();
         static void UnloadModule();
         static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
         static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
