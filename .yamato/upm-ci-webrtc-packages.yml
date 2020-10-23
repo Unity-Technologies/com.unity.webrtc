@@ -215,7 +215,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endif -%}
 {% endfor %}
 
-test_{{ package.name }}:
+test_{{ package.name }}_nogpu:
   name : Test {{ package.packagename }} all platforms witout GPU
   triggers:
     branches:
@@ -228,6 +228,19 @@ test_{{ package.name }}:
     {% for editor in editors %}
     {% for param in target.test_params %}
     {% if target.is_gpu == "false" -%}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
+    {% endif -%}
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
+
+test_{{ package.name }}_gpu:
+  name : Test {{ package.packagename }} all platforms with GPU
+  dependencies:
+    {% for target in test_targets %}
+    {% for editor in editors %}
+    {% for param in target.test_params %}
+    {% if target.is_gpu == "true" -%}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
     {% endif -%}
     {% endfor %}
@@ -311,15 +324,10 @@ push_plugin:
   dependencies:
     {% for platform in platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endfor %}
-    {% for target in test_targets %}
-    {% for editor in editors %}
-    {% for param in target.test_params %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
+    - .yamato/upm-ci-{{ package.name }}-packages.test_webrtc_plugin_all_platform
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_nogpu
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
