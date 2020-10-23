@@ -325,7 +325,7 @@ push_plugin:
     {% for platform in platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
-    - .yamato/upm-ci-{{ package.name }}-packages.test_webrtc_plugin_all_platform
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_gpu
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_nogpu
 
