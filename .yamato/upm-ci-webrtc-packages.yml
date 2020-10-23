@@ -37,6 +37,7 @@ test_targets:
     type: Unity::VM
     image: renderstreaming/win10:latest
     flavor: b1.large
+    is_gpu: false
     test_params:
       - backend: mono
         platform: editmode
@@ -50,6 +51,7 @@ test_targets:
     type: Unity::VM
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
+    is_gpu: false
     test_params:
       - backend: mono
         platform: editmode
@@ -63,6 +65,7 @@ test_targets:
     type: Unity::VM::GPU
     image: renderstreaming/win10:latest
     flavor: b1.large
+    is_gpu: true
     test_params:
       - backend: mono
         platform: editmode
@@ -76,6 +79,7 @@ test_targets:
     type: Unity::VM::GPU
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
+    is_gpu: true
     test_params:
       - backend: mono
         platform: editmode
@@ -89,6 +93,7 @@ test_targets:
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
+    is_gpu: false
     test_params:
       - backend: mono
       - backend: il2cpp
@@ -163,12 +168,6 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
@@ -206,12 +205,6 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       mkdir -p upm-ci~/test-results/
       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
       exit $UTR_RESULT
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
   artifacts:
     {{ package.name }}_il2cpp_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
@@ -222,9 +215,27 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endif -%}
 {% endfor %}
 
+test_{{ package.name }}:
+  name : Test {{ package.packagename }} all platforms witout GPU
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
+  dependencies:
+    {% for target in test_targets %}
+    {% for editor in editors %}
+    {% for param in target.test_params %}
+    {% if target.is_gpu == "false" -%}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
+    {% endif -%}
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
+
 {% for platform in platforms %}
 {% if platform.name != "macos" -%}
-
 {% for editor in editors %}
 codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
@@ -235,12 +246,6 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package test -u {{ editor.version }} --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
   artifacts:
     {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
       paths:
@@ -278,12 +283,6 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
       mkdir -p upm-ci~/test-results/
       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
       exit $UTR_RESULT
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
   artifacts:
     {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
       paths:
@@ -312,6 +311,7 @@ push_plugin:
   dependencies:
     {% for platform in platforms %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endfor %}
     {% for target in test_targets %}
     {% for editor in editors %}
