@@ -93,12 +93,11 @@ test_targets:
       - backend: mono
       - backend: il2cpp
 
-packages:
-  - name: webrtc
-    packagename: com.unity.webrtc
+package:
+  name: webrtc
+  packagename: com.unity.webrtc
     
 ---
-{% for package in packages %}
 {% for platform in platforms %}
 build_webrtc_plugin_{{ platform.name }}:
   name: Build webrtc plugin {{ platform.name }}
@@ -124,6 +123,13 @@ test_webrtc_plugin_{{ platform.name }}:
   commands:
     - {{ platform.build_command }}
 {% endfor %}
+
+test_webrtc_plugin_all_platform:
+  name: Test webrtc plugin for all platforms
+  dependencies:
+    {% for platform in platforms %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
+    {% endfor %}
 
 pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
@@ -361,4 +367,3 @@ publish_dry_run_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}
     {% endfor %}
-{% endfor %}
