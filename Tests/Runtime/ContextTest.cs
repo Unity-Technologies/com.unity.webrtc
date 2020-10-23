@@ -26,7 +26,9 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDelete()
         {
-            var context = Context.Create();
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var context = Context.Create(
+                encoderType:value ? EncoderType.Hardware : EncoderType.Software);
             context.Dispose();
         }
 
@@ -34,8 +36,11 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void GetSetEncoderType()
         {
-            var context = Context.Create();
-            Assert.AreEqual(EncoderType.Hardware, context.GetEncoderType());
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var encoderType = value? EncoderType.Hardware: EncoderType.Software;
+            var context = Context.Create(
+                encoderType: encoderType);
+            Assert.AreEqual(encoderType, context.GetEncoderType());
             context.Dispose();
         }
 
@@ -43,7 +48,9 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeletePeerConnection()
         {
-            var context = Context.Create();
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var context = Context.Create(
+                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
             var peerPtr = context.CreatePeerConnection();
             context.DeletePeerConnection(peerPtr);
             context.Dispose();
@@ -53,7 +60,9 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeleteDataChannel()
         {
-            var context = Context.Create();
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var context = Context.Create(
+                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
             var peerPtr = context.CreatePeerConnection();
             var init = new RTCDataChannelInit(true);
             var channelPtr = context.CreateDataChannel(peerPtr, "test", ref init);
@@ -66,7 +75,9 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeleteVideoTrack()
         {
-            var context = Context.Create();
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var context = Context.Create(
+                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
             var width = 256;
             var height = 256;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
