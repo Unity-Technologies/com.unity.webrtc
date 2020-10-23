@@ -233,7 +233,7 @@ namespace Unity.WebRTC
 #elif UNITY_STANDALONE
         internal const string Lib = "webrtc";
 #endif
-        private static Context s_context;
+        private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
         internal static Material flipMat;
 

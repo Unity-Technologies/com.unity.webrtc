@@ -144,19 +144,9 @@ namespace webrtc
         {
             return CodecInitializationResult::DriverNotInstalled;
         }
-        using NvEncodeAPIGetMaxSupportedVersion_Type = NVENCSTATUS(NVENCAPI *)(uint32_t*);
-#if defined(_WIN32)
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress((HMODULE)s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
-#else
-        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion = (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
-#endif
 
-        uint32_t version = 0;
-        uint32_t currentVersion = (NVENCAPI_MAJOR_VERSION << 4) | NVENCAPI_MINOR_VERSION;
-        NvEncodeAPIGetMaxSupportedVersion(&version);
-        if (currentVersion > version)
+        if(!CheckDriverVersion())
         {
-            RTC_LOG(LS_INFO) << "Current Driver Version does not support this NvEncodeAPI version, please upgrade driver";
             return CodecInitializationResult::DriverVersionDoesNotSupportAPI;
         }
 
@@ -179,6 +169,28 @@ namespace webrtc
             return CodecInitializationResult::APINotFound;
         }
         return CodecInitializationResult::Success;
+    }
+
+    bool NvEncoder::CheckDriverVersion()
+    {
+        using NvEncodeAPIGetMaxSupportedVersion_Type = NVENCSTATUS(NVENCAPI*)(uint32_t*);
+#if defined(_WIN32)
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion =
+            (NvEncodeAPIGetMaxSupportedVersion_Type)GetProcAddress((HMODULE)s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
+#else
+        NvEncodeAPIGetMaxSupportedVersion_Type NvEncodeAPIGetMaxSupportedVersion =
+            (NvEncodeAPIGetMaxSupportedVersion_Type)dlsym(s_hModule, "NvEncodeAPIGetMaxSupportedVersion");
+#endif
+
+        uint32_t version = 0;
+        uint32_t currentVersion = (NVENCAPI_MAJOR_VERSION << 4) | NVENCAPI_MINOR_VERSION;
+        NvEncodeAPIGetMaxSupportedVersion(&version);
+        if (currentVersion > version)
+        {
+            RTC_LOG(LS_INFO) << "Current Driver Version does not support this NvEncodeAPI version, please upgrade driver";
+            return false;
+        }
+        return true;
     }
 
     bool NvEncoder::LoadModule()

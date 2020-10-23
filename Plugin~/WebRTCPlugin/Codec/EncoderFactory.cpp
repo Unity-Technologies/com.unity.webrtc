@@ -39,7 +39,11 @@ namespace webrtc
         // todo(kazuki): check VideoToolbox compatibility
         return true;
 #else
-        return NvEncoder::LoadModule();
+        if(!NvEncoder::LoadModule())
+        {
+            return false;
+        }
+        return NvEncoder::CheckDriverVersion();
 #endif
     }
 
