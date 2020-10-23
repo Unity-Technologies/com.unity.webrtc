@@ -43,6 +43,10 @@ This version of the package is compatible with the following versions of the Uni
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
 
+This package depends on **NVIDIA Video Codec SDK 9.1**. Please check the graphics driver version.
+- Windows: Driver version `436.15` or higher
+- Linux:   Driver version `435.21` or higher
+
 > [!NOTE]
 > On Linux, `libc++1` `libc++abi1` packages should be installed.
 > Please install like command below 
