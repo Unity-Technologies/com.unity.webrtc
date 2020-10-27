@@ -326,7 +326,6 @@ public class BandwidthSample : MonoBehaviour
     private RTCStatsReport lastResult = null;
     private void UpdateStatsPacketSize(RTCStatsReport res)
     {
-        Debug.Log("UpdateStatsPacketSize");
         foreach (RTCStats stats in res.Stats.Values)
         {
             if (!(stats is RTCOutboundRTPStreamStats report))
@@ -337,11 +336,8 @@ public class BandwidthSample : MonoBehaviour
             if (report.isRemote)
                 return;
 
-            Debug.Log("UpdateStatsPacketSize 1");
             long now = report.Timestamp;
             ulong bytes = report.bytesSent;
-            // ulong headerBytes = report.headerBytesSent;
-            // uint packets = report.packetsSent;
 
             if (lastResult != null)
             {
