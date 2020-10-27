@@ -43,7 +43,6 @@ public class VideoReceiveSample : MonoBehaviour
         hangUpButton.onClick.AddListener(HangUp);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
-        receiveStream = new MediaStream();
     }
 
     private void OnDestroy()
@@ -61,19 +60,8 @@ public class VideoReceiveSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
-        pc2Ontrack = e =>
-        {
-            receiveStream.AddTrack(e.Track);
-        };
+        pc2Ontrack = e => { receiveStream.AddTrack(e.Track); };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
-
-        receiveStream.OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
-            {
-                receiveImage.texture = track.InitializeReceiver(1280, 720);
-            }
-        };
     }
 
     private void Update()
@@ -198,10 +186,24 @@ public class VideoReceiveSample : MonoBehaviour
 
         videoStream = cam.CaptureStream(1280, 720, 1000000);
         sourceImage.texture = cam.targetTexture;
+
+        receiveStream = new MediaStream();
+        receiveStream.OnAddTrack = e =>
+        {
+            if (e.Track is VideoStreamTrack track)
+            {
+                receiveImage.texture = track.InitializeReceiver(1280, 720);
+            }
+        };
     }
 
     private void HangUp()
     {
+        videoStream.Dispose();
+        receiveStream.Dispose();
+        videoStream = null;
+        receiveStream = null;
+
         _pc1.Close();
         _pc2.Close();
         Debug.Log("Close local/remote peer connection");
@@ -209,6 +211,7 @@ public class VideoReceiveSample : MonoBehaviour
         _pc2.Dispose();
         _pc1 = null;
         _pc2 = null;
+        receiveImage.texture = null;
         callButton.interactable = true;
         hangUpButton.interactable = false;
         addTracksButton.interactable = false;
