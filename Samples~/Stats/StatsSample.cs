@@ -333,7 +333,12 @@ public class StatsSample : MonoBehaviour
 
             text.text = "Id:" + op1.Value.Stats[id].Id + "\n";
             text.text += "Timestamp:" + op1.Value.Stats[id].Timestamp + "\n";
-            text.text += op1.Value.Stats[id].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
+
+            if (!op1.Value.TryGetValue(id, out RTCStats stats))
+                continue;
+
+            text.text += stats.Dict.Aggregate(string.Empty,(str, next) =>
+                str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
         }
     }
 
