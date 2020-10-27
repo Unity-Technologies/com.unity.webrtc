@@ -318,7 +318,7 @@ public class StatsSample : MonoBehaviour
                 List<string> options = new List<string>();
                 foreach (var stat in op1.Value.Stats.Keys)
                 {
-                    options.Add($"{stat.Item1}-{stat.Item2}");
+                    options.Add($"{stat}");
                 }
                 dropdown.ClearOptions();
                 dropdown.AddOptions(options);
@@ -329,13 +329,11 @@ public class StatsSample : MonoBehaviour
                 currentValue = dropdown.value;
             }
 
-            var currentOption = dropdown.options[currentValue].text.Split('-');
+            var id = dropdown.options[currentValue].text;
 
-            var type = (RTCStatsType)Enum.Parse(typeof(RTCStatsType), currentOption[0]);
-            var id = currentOption[1];
-            text.text = "Id:" + op1.Value.Stats[(type, id)].Id + "\n";
-            text.text += "Timestamp:" + op1.Value.Stats[(type, id)].Timestamp + "\n";
-            text.text += op1.Value.Stats[(type, id)].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
+            text.text = "Id:" + op1.Value.Stats[id].Id + "\n";
+            text.text += "Timestamp:" + op1.Value.Stats[id].Timestamp + "\n";
+            text.text += op1.Value.Stats[id].Dict.Aggregate(string.Empty, (str, next) => str + next.Key + ":" + next.Value.ToString() + "\n");
         }
     }
 

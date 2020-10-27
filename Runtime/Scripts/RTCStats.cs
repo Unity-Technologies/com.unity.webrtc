@@ -731,7 +731,7 @@ namespace Unity.WebRTC
     public class RTCStatsReport : IDisposable
     {
         private IntPtr self;
-        private readonly Dictionary<(RTCStatsType, string), RTCStats> m_dictStats;
+        private readonly Dictionary<string, RTCStats> m_dictStats;
 
         private bool disposed;
 
@@ -747,12 +747,12 @@ namespace Unity.WebRTC
             IntPtr[] array = ptrStatsArray.AsArray<IntPtr>((int)length);
             byte[] types = ptrStatsTypeArray.AsArray<byte>((int)length);
 
-            m_dictStats = new Dictionary<(RTCStatsType, string), RTCStats>();
+            m_dictStats = new Dictionary<string, RTCStats>();
             for (int i = 0; i < length; i++)
             {
                 RTCStatsType type = (RTCStatsType)types[i];
                 RTCStats stats = StatsFactory.Create(type, array[i]);
-                m_dictStats[(type, stats.Id)] = stats;
+                m_dictStats[stats.Id] = stats;
             }
         }
 
@@ -779,9 +779,17 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        //internal
+        public RTCStats Get(string id)
+        {
+            return m_dictStats[id];
+        }
 
-        public IDictionary<(RTCStatsType, string), RTCStats> Stats
+        public bool TryGetValue(string id, out RTCStats stats)
+        {
+            return m_dictStats.TryGetValue(id, out stats);
+        }
+
+        public IDictionary<string, RTCStats> Stats
         {
             get { return m_dictStats; }
         }

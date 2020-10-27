@@ -10,7 +10,7 @@ namespace Unity.WebRTC.Editor
     {
         private readonly WebRTCStats m_parent;
         private readonly RTCPeerConnection m_peerConnection;
-        private ICollection<(RTCStatsType, string)> m_lastUpdateKeys;
+        private ICollection<string> m_lastUpdateKeys;
 
         public PeerStatsView(RTCPeerConnection peer, WebRTCStats parent)
         {
@@ -35,7 +35,7 @@ namespace Unity.WebRTC.Editor
 
                 var container = new VisualElement();
 
-                var popup = new PopupField<(RTCStatsType type, string id)>(m_lastUpdateKeys.ToList(), 0, tuple => $"{tuple.type}_{tuple.id}", tuple => $"{tuple.type}_{tuple.id}");
+                var popup = new PopupField<string>(m_lastUpdateKeys.ToList(), 0, id => $"{id}", id => $"{id}");
 
                 root.Add(popup);
                 root.Add(container);
@@ -43,8 +43,9 @@ namespace Unity.WebRTC.Editor
                 popup.RegisterValueChangedCallback(e =>
                 {
                     container.Clear();
-                    var id = e.newValue.id;
-                    switch (e.newValue.type)
+                    var id = e.newValue;
+                    var type = report.Get(id).Type;
+                    switch (type)
                     {
                         case RTCStatsType.Codec:
                             container.Add(CreateCodecView(id));
@@ -110,7 +111,7 @@ namespace Unity.WebRTC.Editor
                             container.Add(CreateIceServerView(id));
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException($"this type is not supported : {e.newValue.type}");
+                            throw new ArgumentOutOfRangeException($"this type is not supported : {type}");
                     }
                 });
             };
@@ -132,7 +133,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Codec, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCCodecStats codecStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Codec}"));
@@ -166,7 +167,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.InboundRtp, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCInboundRTPStreamStats inboundStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.InboundRtp}"));
@@ -239,7 +240,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.OutboundRtp, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCOutboundRTPStreamStats outboundStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.OutboundRtp}"));
@@ -307,7 +308,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.RemoteInboundRtp, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCRemoteInboundRtpStreamStats remoteInboundStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.RemoteInboundRtp}"));
@@ -334,7 +335,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.RemoteOutboundRtp, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCRemoteOutboundRtpStreamStats remoteOutboundStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.RemoteOutboundRtp}"));
@@ -364,7 +365,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.MediaSource, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCMediaSourceStats mediaSourceStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.MediaSource}"));
@@ -413,7 +414,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Csrc, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCCodecStats csrcStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Csrc}"));
@@ -440,7 +441,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.PeerConnection, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCPeerConnectionStats peerStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Codec}"));
@@ -471,7 +472,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.DataChannel, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCDataChannelStats dataChannelStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.DataChannel}"));
@@ -512,7 +513,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Stream, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCMediaStreamStats streamStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Stream}"));
@@ -544,7 +545,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Track, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCMediaStreamTrackStats trackStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Track}"));
@@ -629,7 +630,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Transceiver, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCTransceiverStats transceiverStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Transceiver}"));
@@ -656,7 +657,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Sender, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCSenderStats senderStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Sender}"));
@@ -683,7 +684,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Receiver, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCReceiverStats receiverStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Receiver}"));
@@ -712,7 +713,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Transport, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCTransportStats transportStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Transport}"));
@@ -759,7 +760,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.SctpTransport, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCTransportStats transportStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Codec}"));
@@ -806,7 +807,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.CandidatePair, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCIceCandidatePairStats candidatePairStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.CandidatePair}"));
@@ -879,7 +880,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.LocalCandidate, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCIceCandidateStats candidateStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.LocalCandidate}"));
@@ -917,7 +918,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.RemoteCandidate, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCIceCandidateStats candidateStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.RemoteCandidate}"));
@@ -955,7 +956,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.Certificate, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCCertificateStats certificateStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Certificate}"));
@@ -989,7 +990,7 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
-                if (!report.Stats.TryGetValue((RTCStatsType.IceServer, id), out var stats) ||
+                if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCCertificateStats outboundStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.IceServer}"));

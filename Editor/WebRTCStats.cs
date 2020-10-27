@@ -183,12 +183,12 @@ namespace Unity.WebRTC.Editor
     public class PeerConnectionRecord
     {
         private readonly RTCConfiguration m_config;
-        private readonly Dictionary<(RTCStatsType, string), StatsRecord> m_statsRecordMap;
+        private readonly Dictionary<string, StatsRecord> m_statsRecordMap;
 
         public PeerConnectionRecord(RTCConfiguration config)
         {
             m_config = config;
-            m_statsRecordMap = new Dictionary<(RTCStatsType, string), StatsRecord>();
+            m_statsRecordMap = new Dictionary<string, StatsRecord>();
         }
 
         public void Update(RTCStatsReport report)
