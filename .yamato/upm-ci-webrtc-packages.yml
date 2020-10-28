@@ -216,13 +216,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 
 test_{{ package.name }}_nogpu:
-  name : Test {{ package.packagename }} all platforms witout GPU
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
+  name : Test {{ package.packagename }} all platforms without GPU
   dependencies:
     {% for target in test_targets %}
     {% for editor in editors %}
@@ -236,6 +230,12 @@ test_{{ package.name }}_nogpu:
 
 test_{{ package.name }}_gpu:
   name : Test {{ package.packagename }} all platforms with GPU
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
   dependencies:
     {% for target in test_targets %}
     {% for editor in editors %}
@@ -327,7 +327,7 @@ push_plugin:
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_nogpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_nogpu
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
@@ -344,13 +344,9 @@ publish_{{ package.name }}:
         - "upm-ci~/packages/*.tgz"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-    {% for target in test_targets %}
-    {% for editor in editors %}
-    {% for param in target.test_params %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_nogpu
 
 publish_dry_run_{{ package.name }}:
   name: Publish Dry Run {{ package.packagename }}
