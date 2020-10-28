@@ -93,7 +93,7 @@ test_targets:
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
-    is_gpu: false
+    is_gpu: true
     test_params:
       - backend: mono
       - backend: il2cpp
