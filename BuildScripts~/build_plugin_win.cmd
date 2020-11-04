@@ -35,10 +35,3 @@ echo Build com.unity.webrtc Plugin
 cd %SOLUTION_DIR%
 cmake . -G "Visual Studio 15 2017" -A x64 -B "build64"
 cmake --build build64 --config Release
-
-echo -------------------
-echo Test com.unity.webrtc Plugin 
-
-%SOLUTION_DIR%\build64\WebRTCPluginTest\Release\WebRTCPluginTest.exe
-if not %errorlevel% == 0 exit 1
-echo -------------------
