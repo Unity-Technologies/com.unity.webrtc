@@ -17,7 +17,7 @@ namespace Unity.WebRTC
         UnityVideoRenderer m_renderer;
 
         private static RenderTexture CreateRenderTexture(int width, int height,
-            RenderTextureFormat format)
+            GraphicsFormat format)
         {
             var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
@@ -54,21 +54,6 @@ namespace Unity.WebRTC
             }
         }
 
-        //public UnityEngine.RenderTexture InitializeReceiver(int width, int height)
-        //{
-        //    if (IsDecoderInitialized)
-        //        throw new InvalidOperationException("Already initialized receiver");
-
-        //    m_needFlip = true;
-        //    var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
-        //    m_sourceTexture = CreateRenderTexture(width, height, format);
-        //    m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
-
-        //    m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
-
-        //    return m_destTexture;
-        //}
-
         public UnityEngine.Texture InitializeReceiver(int width, int height)
         {
             if (IsDecoderInitialized)
@@ -76,9 +61,8 @@ namespace Unity.WebRTC
 
             m_needFlip = true;
             var format = WebRTC.GetSupportedTextureFormat(SystemInfo.graphicsDeviceType);
-            m_sourceTexture = new Texture2D(width, height, format, false);
-            var format2 = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format2);
+            m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
 
             m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
 
@@ -124,7 +108,7 @@ namespace Unity.WebRTC
         /// <param name="width"></param>
         /// <param name="height"></param>
         public VideoStreamTrack(string label, UnityEngine.RenderTexture source)
-            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width,
+            : this(label, source, CreateRenderTexture(source.width, source.height, source.graphicsFormat), source.width,
                 source.height)
         {
         }
@@ -133,7 +117,7 @@ namespace Unity.WebRTC
             : this(label,
                 source,
                 CreateRenderTexture(source.width, source.height,
-                    WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
+                    WebRTC.GetSupportedTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
                 source.width,
                 source.height)
         {

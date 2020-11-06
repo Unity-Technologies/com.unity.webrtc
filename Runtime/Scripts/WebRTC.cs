@@ -369,21 +369,21 @@ namespace Unity.WebRTC
             return RenderTextureFormat.Default;
         }
 
-        public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
+        public static GraphicsFormat GetSupportedTextureFormat(GraphicsDeviceType type)
         {
             switch (type)
             {
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
-                    return TextureFormat.BGRA32;
+                    return GraphicsFormat.B8G8R8A8_SRGB;
                 case UnityEngine.Rendering.GraphicsDeviceType.Vulkan:
-                    return TextureFormat.RGBA32;
+                    return GraphicsFormat.R8G8B8A8_SRGB;
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore:
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
                 case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
-                    return TextureFormat.ARGB32;
+                    return GraphicsFormat.R8G8B8A8_SRGB;
                 case UnityEngine.Rendering.GraphicsDeviceType.Metal:
-                    return TextureFormat.BGRA32;
+                    return GraphicsFormat.B8G8R8A8_SRGB;
             }
             throw new ArgumentException("Graphics device type not supported");
         }
