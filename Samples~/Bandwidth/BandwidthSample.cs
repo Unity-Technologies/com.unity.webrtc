@@ -45,6 +45,9 @@ public class BandwidthSample : MonoBehaviour
         { "125",  125 },
     };
 
+    private const int width = 1280;
+    private const int height = 720;
+
     private RTCOfferOptions _offerOptions = new RTCOfferOptions
     {
         iceRestart = false, offerToReceiveAudio = true, offerToReceiveVideo = true
@@ -94,7 +97,7 @@ public class BandwidthSample : MonoBehaviour
 
             if (e.Track is VideoStreamTrack track)
             {
-                receiveImage.texture = track.InitializeReceiver(1280, 720);
+                receiveImage.texture = track.InitializeReceiver(width, height);
                 receiveImage.color = Color.white;
             }
         };
@@ -227,7 +230,7 @@ public class BandwidthSample : MonoBehaviour
 
         if (videoStream == null)
         {
-            videoStream = cam.CaptureStream(1280, 720, 1000000);
+            videoStream = cam.CaptureStream(width, height, 1000000);
         }
         sourceImage.texture = cam.targetTexture;
         sourceImage.color = Color.white;

@@ -4,7 +4,6 @@ using UnityEngine;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
@@ -368,6 +367,25 @@ namespace Unity.WebRTC
                     return RenderTextureFormat.BGRA32;
             }
             return RenderTextureFormat.Default;
+        }
+
+        public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
+        {
+            switch (type)
+            {
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
+                    return TextureFormat.BGRA32;
+                case UnityEngine.Rendering.GraphicsDeviceType.Vulkan:
+                    return TextureFormat.RGBA32;
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
+                    return TextureFormat.ARGB32;
+                case UnityEngine.Rendering.GraphicsDeviceType.Metal:
+                    return TextureFormat.BGRA32;
+            }
+            throw new ArgumentException("Graphics device type not supported");
         }
 
         internal static IEnumerable<T> Deserialize<T>(IntPtr buf, int length, Func<IntPtr, T> constructor) where T : class

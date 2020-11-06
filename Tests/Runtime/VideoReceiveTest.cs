@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -59,7 +59,7 @@ namespace Unity.WebRTC.RuntimeTest
             var sendStream = new MediaStream();
             var receiveStream = new MediaStream();
             VideoStreamTrack receiveVideoTrack = null;
-            RenderTexture receiveImage = null;
+            Texture receiveImage = null;
             receiveStream.OnAddTrack = e =>
             {
                 if (e.Track is VideoStreamTrack track)
