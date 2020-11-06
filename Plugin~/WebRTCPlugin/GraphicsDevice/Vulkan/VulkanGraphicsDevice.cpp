@@ -231,17 +231,29 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
     const uint32_t width = tex->GetWidth();
     const uint32_t height = tex->GetHeight();
     const VkDeviceMemory dstImageMemory = vulkanTexture->GetTextureImageMemory();
+    VkImageSubresource subresource{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
+    VkSubresourceLayout subresourceLayout;
+    vkGetImageSubresourceLayout(m_device, vulkanTexture->GetImage(), &subresource,
+        &subresourceLayout);
+    size_t rowPitch = subresourceLayout.rowPitch;
 
     void* data;
-    VkResult result = vkMapMemory(m_device, dstImageMemory, 0, VK_WHOLE_SIZE, 0, &data);
+    std::vector<uint8_t> dst;
+    dst.resize(vulkanTexture->GetTextureImageMemorySize());
+    const VkResult result = vkMapMemory(
+        m_device, dstImageMemory, 0, VK_WHOLE_SIZE, 0, &data);
     if(result != VK_SUCCESS) {
         return nullptr;
     }
+    std::memcpy(static_cast<void*>(dst.data()), data, dst.size());
+
+    vkUnmapMemory(m_device, dstImageMemory);
+
     // convert format to i420
     rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-        width, height, width * 4, static_cast<uint8_t*>(data)
+        width, height, rowPitch, dst.data()
     );
-    vkUnmapMemory(m_device, dstImageMemory);
+
     return i420Buffer;
 }
 

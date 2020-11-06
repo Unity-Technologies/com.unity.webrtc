@@ -16,10 +16,10 @@ namespace Unity.WebRTC
 
         UnityVideoRenderer m_renderer;
 
-        private static UnityEngine.RenderTexture CreateRenderTexture(int width, int height,
-            UnityEngine.RenderTextureFormat format)
+        private static RenderTexture CreateRenderTexture(int width, int height,
+            GraphicsFormat format)
         {
-            var tex = new UnityEngine.RenderTexture(width, height, 0, format);
+            var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
             return tex;
         }
@@ -54,14 +54,14 @@ namespace Unity.WebRTC
             }
         }
 
-        public UnityEngine.RenderTexture InitializeReceiver(int width, int height)
+        public UnityEngine.Texture InitializeReceiver(int width, int height)
         {
             if (IsDecoderInitialized)
                 throw new InvalidOperationException("Already initialized receiver");
 
             m_needFlip = true;
-            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
-            m_sourceTexture = CreateRenderTexture(width, height, format);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
             m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
 
             m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
@@ -108,7 +108,7 @@ namespace Unity.WebRTC
         /// <param name="width"></param>
         /// <param name="height"></param>
         public VideoStreamTrack(string label, UnityEngine.RenderTexture source)
-            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width,
+            : this(label, source, CreateRenderTexture(source.width, source.height, source.graphicsFormat), source.width,
                 source.height)
         {
         }
@@ -117,7 +117,7 @@ namespace Unity.WebRTC
             : this(label,
                 source,
                 CreateRenderTexture(source.width, source.height,
-                    WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
+                    WebRTC.GetSupportedGraphicsFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
                 source.width,
                 source.height)
         {
