@@ -60,7 +60,7 @@ namespace Unity.WebRTC
                 throw new InvalidOperationException("Already initialized receiver");
 
             m_needFlip = true;
-            var format = WebRTC.GetSupportedTextureFormat(SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
             m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
 
@@ -117,7 +117,7 @@ namespace Unity.WebRTC
             : this(label,
                 source,
                 CreateRenderTexture(source.width, source.height,
-                    WebRTC.GetSupportedTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
+                    WebRTC.GetSupportedGraphicsFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
                 source.width,
                 source.height)
         {

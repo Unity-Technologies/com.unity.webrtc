@@ -369,7 +369,7 @@ namespace Unity.WebRTC
             return RenderTextureFormat.Default;
         }
 
-        public static GraphicsFormat GetSupportedTextureFormat(GraphicsDeviceType type)
+        public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
         {
             switch (type)
             {
