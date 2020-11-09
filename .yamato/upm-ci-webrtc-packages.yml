@@ -38,6 +38,13 @@ test_targets:
     image: renderstreaming/win10:latest
     flavor: b1.large
     is_gpu: false
+    gfx_types:
+      - name: d3d11
+        extra-editor-arg: force-d3d11
+      - name: d3d12
+        extra-editor-arg: force-d3d12
+      - name: vulkan
+        extra-editor-arg: force-vulkan
     test_params:
       - backend: mono
         platform: editmode
@@ -52,6 +59,11 @@ test_targets:
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     is_gpu: false
+    gfx_types:
+      - name: glcore
+        extra-editor-arg: force-glcore
+      - name: vulkan
+        extra-editor-arg: force-vulkan
     test_params:
       - backend: mono
         platform: editmode
@@ -66,6 +78,13 @@ test_targets:
     image: renderstreaming/win10:latest
     flavor: b1.large
     is_gpu: true
+    gfx_types:
+      - name: d3d11
+        extra-editor-arg: force-d3d11
+      - name: d3d12
+        extra-editor-arg: force-d3d12
+      - name: vulkan
+        extra-editor-arg: force-vulkan
     test_params:
       - backend: mono
         platform: editmode
@@ -80,6 +99,11 @@ test_targets:
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     is_gpu: true
+    gfx_types:
+      - name: glcore
+        extra-editor-arg: force-glcore
+      - name: vulkan
+        extra-editor-arg: force-vulkan    
     test_params:
       - backend: mono
         platform: editmode
@@ -94,6 +118,9 @@ test_targets:
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     is_gpu: true
+    gfx_types:
+      - name: metal
+        extra-editor-arg: force-metal    
     test_params:
       - backend: mono
       - backend: il2cpp
@@ -159,28 +186,31 @@ pack_{{ package.name }}:
 
 {% for editor in editors %}
 {% for param in target.test_params %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }}
+{% for gfx_type in target.gfx_types %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }}
+    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }} --extra-editor-arg {{ gfx_type.extra-editor-arg }}
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}    
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+{% endfor %}
 {% endfor %}
 {% endfor %}
 {% else -%}
 
 {% for param in target.test_params %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor_mac_version }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor_mac_version }} on {{ target.name }}
+{% for gfx_type in target.gfx_types %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor_mac_version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor_mac_version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
     type: {{ target.type }}
     image: {{ target.image }}
@@ -200,7 +230,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
     - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
     - |
-      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --scripting-backend={{ param.backend }} --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results' 
+      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --scripting-backend={{ param.backend }} --extra-editor-arg="-{{ gfx_type.extra-editor-arg }}" --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results' 
       UTR_RESULT=$?
       mkdir -p upm-ci~/test-results/
       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
@@ -212,6 +242,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
+{% endfor %}
 {% endif -%}
 {% endfor %}
 
@@ -221,9 +252,11 @@ test_{{ package.name }}_nogpu:
     {% for target in test_targets %}
     {% for editor in editors %}
     {% for param in target.test_params %}
+    {% for gfx_type in target.gfx_types %}
     {% if target.is_gpu == "false" -%}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
     {% endif -%}
+    {% endfor %}
     {% endfor %}
     {% endfor %}
     {% endfor %}
@@ -240,9 +273,11 @@ test_{{ package.name }}_gpu:
     {% for target in test_targets %}
     {% for editor in editors %}
     {% for param in target.test_params %}
+    {% for gfx_type in target.gfx_types %}
     {% if target.is_gpu == "true" -%}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
     {% endif -%}
+    {% endfor %}
     {% endfor %}
     {% endfor %}
     {% endfor %}
@@ -368,6 +403,6 @@ publish_dry_run_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_vulkan
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
