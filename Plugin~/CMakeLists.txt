@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 enable_language(CXX)
 
-project(webrtc)
+project(webrtc
+  LANGUAGES C CXX ASM)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -D_DEBUG")

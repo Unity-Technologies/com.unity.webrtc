@@ -52,6 +52,7 @@ elseif(APPLE)
   list (APPEND sources ${append_source})
 elseif(UNIX)
   file(GLOB append_source
+    ../dynlink/*
     NvCodec/*.h
     NvCodec/*.cpp
     ../WebRTCPlugin/GraphicsDevice/OpenGL/*.h
@@ -181,8 +182,6 @@ elseif(UNIX)
       ${GMOCK_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT}
       ${Vulkan_LIBRARY}
-      ${NVCODEC_LIBRARIES}      
-      cuda
   )
   target_include_directories(WebRTCPluginTest
     PRIVATE
