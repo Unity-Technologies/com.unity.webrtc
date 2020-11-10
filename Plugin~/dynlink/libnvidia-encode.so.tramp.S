@@ -9,21 +9,21 @@
 
   .data
 
-  .globl _libnvidia_encode_so_1_tramp_table
-  .hidden _libnvidia_encode_so_1_tramp_table
+  .globl _libnvidia_encode_so_tramp_table
+  .hidden _libnvidia_encode_so_tramp_table
   .align 8
-_libnvidia_encode_so_1_tramp_table:
+_libnvidia_encode_so_tramp_table:
   .zero 24
 
   .text
 
-  .globl _libnvidia_encode_so_1_tramp_resolve
-  .hidden _libnvidia_encode_so_1_tramp_resolve
+  .globl _libnvidia_encode_so_tramp_resolve
+  .hidden _libnvidia_encode_so_tramp_resolve
 
-  .globl _libnvidia_encode_so_1_save_regs_and_resolve
-  .hidden _libnvidia_encode_so_1_save_regs_and_resolve
-  .type _libnvidia_encode_so_1_save_regs_and_resolve, %function
-_libnvidia_encode_so_1_save_regs_and_resolve:
+  .globl _libnvidia_encode_so_save_regs_and_resolve
+  .hidden _libnvidia_encode_so_save_regs_and_resolve
+  .type _libnvidia_encode_so_save_regs_and_resolve, %function
+_libnvidia_encode_so_save_regs_and_resolve:
   .cfi_startproc
 
 #define PUSH_REG(reg) pushq %reg ; .cfi_adjust_cfa_offset 8; .cfi_rel_offset reg, 0
@@ -68,7 +68,7 @@ _libnvidia_encode_so_1_save_regs_and_resolve:
   PUSH_XMM_REG(xmm7)
 
   // Stack is just 8-byte aligned but callee will re-align to 16
-  call _libnvidia_encode_so_1_tramp_resolve
+  call _libnvidia_encode_so_tramp_resolve
 
   POP_XMM_REG(xmm7)
   POP_XMM_REG(xmm6)
@@ -115,14 +115,14 @@ NvEncodeAPICreateInstance:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvidia_encode_so_1_tramp_table+0(%rip)
+  cmpq $0, _libnvidia_encode_so_tramp_table+0(%rip)
   je 2f
 1:
-  jmp *_libnvidia_encode_so_1_tramp_table+0(%rip)
+  jmp *_libnvidia_encode_so_tramp_table+0(%rip)
 2:
   pushq $0
   .cfi_adjust_cfa_offset 8
-  call _libnvidia_encode_so_1_save_regs_and_resolve
+  call _libnvidia_encode_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -145,14 +145,14 @@ NvEncodeAPIGetMaxSupportedVersion:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvidia_encode_so_1_tramp_table+8(%rip)
+  cmpq $0, _libnvidia_encode_so_tramp_table+8(%rip)
   je 2f
 1:
-  jmp *_libnvidia_encode_so_1_tramp_table+8(%rip)
+  jmp *_libnvidia_encode_so_tramp_table+8(%rip)
 2:
   pushq $1
   .cfi_adjust_cfa_offset 8
-  call _libnvidia_encode_so_1_save_regs_and_resolve
+  call _libnvidia_encode_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b

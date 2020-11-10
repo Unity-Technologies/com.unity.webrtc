@@ -25,7 +25,7 @@ extern "C" {
 
 #define CHECK(cond, fmt, ...) do { \
     if(!(cond)) { \
-      fprintf(stderr, "implib-gen: libcuda.so.1: " fmt "\n", ##__VA_ARGS__); \
+      fprintf(stderr, "implib-gen: libcuda.so: " fmt "\n", ##__VA_ARGS__); \
       assert(0 && "Assertion in generated code"); \
       exit(1); \
     } \
@@ -49,10 +49,10 @@ static void *load_library() {
   CHECK(0, "internal error"); // We shouldn't get here
 #elif CALL_USER_CALLBACK
   extern void *(const char *lib_name);
-  lib_handle = ("libcuda.so.1");
+  lib_handle = ("libcuda.so");
   CHECK(lib_handle, "callback '' failed to load library");
 #else
-  lib_handle = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
+  lib_handle = dlopen("libcuda.so", RTLD_LAZY | RTLD_GLOBAL);
   CHECK(lib_handle, "failed to load library: %s", dlerror());
 #endif
 
@@ -83,6 +83,7 @@ static const char *const sym_names[] = {
   "cuArrayDestroy",
   "cuArrayGetDescriptor",
   "cuArrayGetDescriptor_v2",
+  "cuArrayGetSparseProperties",
   "cuCtxAttach",
   "cuCtxCreate",
   "cuCtxCreate_v2",
@@ -117,11 +118,13 @@ static const char *const sym_names[] = {
   "cuDeviceGetAttribute",
   "cuDeviceGetByPCIBusId",
   "cuDeviceGetCount",
+  "cuDeviceGetLuid",
   "cuDeviceGetName",
   "cuDeviceGetNvSciSyncAttributes",
   "cuDeviceGetP2PAttribute",
   "cuDeviceGetPCIBusId",
   "cuDeviceGetProperties",
+  "cuDeviceGetTexture1DLinearMaxWidth",
   "cuDeviceGetUuid",
   "cuDevicePrimaryCtxGetState",
   "cuDevicePrimaryCtxRelease",
@@ -150,6 +153,8 @@ static const char *const sym_names[] = {
   "cuEventElapsedTime",
   "cuEventQuery",
   "cuEventRecord",
+  "cuEventRecordWithFlags",
+  "cuEventRecordWithFlags_ptsz",
   "cuEventRecord_ptsz",
   "cuEventSynchronize",
   "cuExternalMemoryGetMappedBuffer",
@@ -183,6 +188,8 @@ static const char *const sym_names[] = {
   "cuGraphAddChildGraphNode",
   "cuGraphAddDependencies",
   "cuGraphAddEmptyNode",
+  "cuGraphAddEventRecordNode",
+  "cuGraphAddEventWaitNode",
   "cuGraphAddHostNode",
   "cuGraphAddKernelNode",
   "cuGraphAddMemcpyNode",
@@ -192,7 +199,14 @@ static const char *const sym_names[] = {
   "cuGraphCreate",
   "cuGraphDestroy",
   "cuGraphDestroyNode",
+  "cuGraphEventRecordNodeGetEvent",
+  "cuGraphEventRecordNodeSetEvent",
+  "cuGraphEventWaitNodeGetEvent",
+  "cuGraphEventWaitNodeSetEvent",
+  "cuGraphExecChildGraphNodeSetParams",
   "cuGraphExecDestroy",
+  "cuGraphExecEventRecordNodeSetEvent",
+  "cuGraphExecEventWaitNodeSetEvent",
   "cuGraphExecHostNodeSetParams",
   "cuGraphExecKernelNodeSetParams",
   "cuGraphExecMemcpyNodeSetParams",
@@ -221,6 +235,8 @@ static const char *const sym_names[] = {
   "cuGraphNodeGetDependentNodes",
   "cuGraphNodeGetType",
   "cuGraphRemoveDependencies",
+  "cuGraphUpload",
+  "cuGraphUpload_ptsz",
   "cuGraphicsEGLRegisterImage",
   "cuGraphicsGLRegisterBuffer",
   "cuGraphicsGLRegisterImage",
@@ -298,6 +314,8 @@ static const char *const sym_names[] = {
   "cuMemHostUnregister",
   "cuMemImportFromShareableHandle",
   "cuMemMap",
+  "cuMemMapArrayAsync",
+  "cuMemMapArrayAsync_ptsz",
   "cuMemPrefetchAsync",
   "cuMemPrefetchAsync_ptsz",
   "cuMemRangeGetAttribute",
@@ -405,6 +423,7 @@ static const char *const sym_names[] = {
   "cuMipmappedArrayCreate",
   "cuMipmappedArrayDestroy",
   "cuMipmappedArrayGetLevel",
+  "cuMipmappedArrayGetSparseProperties",
   "cuModuleGetFunction",
   "cuModuleGetGlobal",
   "cuModuleGetGlobal_v2",
@@ -537,10 +556,10 @@ static const char *const sym_names[] = {
   0
 };
 
-extern void *_libcuda_so_1_tramp_table[];
+extern void *_libcuda_so_tramp_table[];
 
 // Can be sped up by manually parsing library symtab...
-void _libcuda_so_1_tramp_resolve(int i) {
+void _libcuda_so_tramp_resolve(int i) {
   assert((unsigned)i + 1 < sizeof(sym_names) / sizeof(sym_names[0]));
 
   CHECK(!is_lib_loading, "library function '%s' called during library load", sym_names[i]);
@@ -558,15 +577,15 @@ void _libcuda_so_1_tramp_resolve(int i) {
 #endif
 
   // Dlsym is thread-safe so don't need to protect it.
-  _libcuda_so_1_tramp_table[i] = dlsym(h, sym_names[i]);
-  CHECK(_libcuda_so_1_tramp_table[i], "failed to resolve symbol '%s'", sym_names[i]);
+  _libcuda_so_tramp_table[i] = dlsym(h, sym_names[i]);
+  CHECK(_libcuda_so_tramp_table[i], "failed to resolve symbol '%s'", sym_names[i]);
 }
 
 // Helper for user to resolve all symbols
-void _libcuda_so_1_tramp_resolve_all(void) {
+void _libcuda_so_tramp_resolve_all(void) {
   size_t i;
   for(i = 0; i + 1 < sizeof(sym_names) / sizeof(sym_names[0]); ++i)
-    _libcuda_so_1_tramp_resolve(i);
+    _libcuda_so_tramp_resolve(i);
 }
 
 #ifdef __cplusplus

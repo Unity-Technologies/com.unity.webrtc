@@ -9,21 +9,21 @@
 
   .data
 
-  .globl _libnvcuvid_so_1_tramp_table
-  .hidden _libnvcuvid_so_1_tramp_table
+  .globl _libnvcuvid_so_tramp_table
+  .hidden _libnvcuvid_so_tramp_table
   .align 8
-_libnvcuvid_so_1_tramp_table:
-  .zero 232
+_libnvcuvid_so_tramp_table:
+  .zero 248
 
   .text
 
-  .globl _libnvcuvid_so_1_tramp_resolve
-  .hidden _libnvcuvid_so_1_tramp_resolve
+  .globl _libnvcuvid_so_tramp_resolve
+  .hidden _libnvcuvid_so_tramp_resolve
 
-  .globl _libnvcuvid_so_1_save_regs_and_resolve
-  .hidden _libnvcuvid_so_1_save_regs_and_resolve
-  .type _libnvcuvid_so_1_save_regs_and_resolve, %function
-_libnvcuvid_so_1_save_regs_and_resolve:
+  .globl _libnvcuvid_so_save_regs_and_resolve
+  .hidden _libnvcuvid_so_save_regs_and_resolve
+  .type _libnvcuvid_so_save_regs_and_resolve, %function
+_libnvcuvid_so_save_regs_and_resolve:
   .cfi_startproc
 
 #define PUSH_REG(reg) pushq %reg ; .cfi_adjust_cfa_offset 8; .cfi_rel_offset reg, 0
@@ -68,7 +68,7 @@ _libnvcuvid_so_1_save_regs_and_resolve:
   PUSH_XMM_REG(xmm7)
 
   // Stack is just 8-byte aligned but callee will re-align to 16
-  call _libnvcuvid_so_1_tramp_resolve
+  call _libnvcuvid_so_tramp_resolve
 
   POP_XMM_REG(xmm7)
   POP_XMM_REG(xmm6)
@@ -115,14 +115,14 @@ __std_1U4S4U_X02:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+0(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+0(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+0(%rip)
+  jmp *_libnvcuvid_so_tramp_table+0(%rip)
 2:
   pushq $0
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -145,14 +145,14 @@ __std_2U4S4U_X08:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+8(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+8(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+8(%rip)
+  jmp *_libnvcuvid_so_tramp_table+8(%rip)
 2:
   pushq $1
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -175,14 +175,74 @@ __std_4U4S4U_X04:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+16(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+16(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+16(%rip)
+  jmp *_libnvcuvid_so_tramp_table+16(%rip)
 2:
   pushq $2
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuvidConvertYUVToRGB
+  .p2align 4
+  .type cuvidConvertYUVToRGB, %function
+cuvidConvertYUVToRGB:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libnvcuvid_so_tramp_table+24(%rip)
+  je 2f
+1:
+  jmp *_libnvcuvid_so_tramp_table+24(%rip)
+2:
+  pushq $3
+  .cfi_adjust_cfa_offset 8
+  call _libnvcuvid_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuvidConvertYUVToRGBArray
+  .p2align 4
+  .type cuvidConvertYUVToRGBArray, %function
+cuvidConvertYUVToRGBArray:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libnvcuvid_so_tramp_table+32(%rip)
+  je 2f
+1:
+  jmp *_libnvcuvid_so_tramp_table+32(%rip)
+2:
+  pushq $4
+  .cfi_adjust_cfa_offset 8
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -205,14 +265,14 @@ cuvidCreateDecoder:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+24(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+40(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+24(%rip)
+  jmp *_libnvcuvid_so_tramp_table+40(%rip)
 2:
-  pushq $3
+  pushq $5
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -235,14 +295,14 @@ cuvidCreateVideoParser:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+32(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+48(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+32(%rip)
+  jmp *_libnvcuvid_so_tramp_table+48(%rip)
 2:
-  pushq $4
+  pushq $6
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -265,14 +325,14 @@ cuvidCreateVideoSource:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+40(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+56(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+40(%rip)
+  jmp *_libnvcuvid_so_tramp_table+56(%rip)
 2:
-  pushq $5
+  pushq $7
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -295,14 +355,14 @@ cuvidCreateVideoSourceW:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+48(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+64(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+48(%rip)
+  jmp *_libnvcuvid_so_tramp_table+64(%rip)
 2:
-  pushq $6
+  pushq $8
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -325,14 +385,14 @@ cuvidCtxLock:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+56(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+72(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+56(%rip)
+  jmp *_libnvcuvid_so_tramp_table+72(%rip)
 2:
-  pushq $7
+  pushq $9
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -355,14 +415,14 @@ cuvidCtxLockCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+64(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+80(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+64(%rip)
+  jmp *_libnvcuvid_so_tramp_table+80(%rip)
 2:
-  pushq $8
+  pushq $10
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -385,14 +445,14 @@ cuvidCtxLockDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+72(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+88(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+72(%rip)
+  jmp *_libnvcuvid_so_tramp_table+88(%rip)
 2:
-  pushq $9
+  pushq $11
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -415,14 +475,14 @@ cuvidCtxUnlock:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+80(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+96(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+80(%rip)
+  jmp *_libnvcuvid_so_tramp_table+96(%rip)
 2:
-  pushq $10
+  pushq $12
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -445,14 +505,14 @@ cuvidDecodePicture:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+88(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+104(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+88(%rip)
+  jmp *_libnvcuvid_so_tramp_table+104(%rip)
 2:
-  pushq $11
+  pushq $13
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -475,14 +535,14 @@ cuvidDestroyDecoder:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+96(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+112(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+96(%rip)
+  jmp *_libnvcuvid_so_tramp_table+112(%rip)
 2:
-  pushq $12
+  pushq $14
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -505,14 +565,14 @@ cuvidDestroyVideoParser:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+104(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+120(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+104(%rip)
+  jmp *_libnvcuvid_so_tramp_table+120(%rip)
 2:
-  pushq $13
+  pushq $15
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -535,14 +595,14 @@ cuvidDestroyVideoSource:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+112(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+128(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+112(%rip)
+  jmp *_libnvcuvid_so_tramp_table+128(%rip)
 2:
-  pushq $14
+  pushq $16
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -565,14 +625,14 @@ cuvidGetDecodeStatus:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+120(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+136(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+120(%rip)
+  jmp *_libnvcuvid_so_tramp_table+136(%rip)
 2:
-  pushq $15
+  pushq $17
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -595,14 +655,14 @@ cuvidGetDecoderCaps:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+128(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+144(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+128(%rip)
+  jmp *_libnvcuvid_so_tramp_table+144(%rip)
 2:
-  pushq $16
+  pushq $18
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -625,14 +685,14 @@ cuvidGetSourceAudioFormat:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+136(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+152(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+136(%rip)
+  jmp *_libnvcuvid_so_tramp_table+152(%rip)
 2:
-  pushq $17
+  pushq $19
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -655,14 +715,14 @@ cuvidGetSourceVideoFormat:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+144(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+160(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+144(%rip)
+  jmp *_libnvcuvid_so_tramp_table+160(%rip)
 2:
-  pushq $18
+  pushq $20
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -685,14 +745,14 @@ cuvidGetVideoSourceState:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+152(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+168(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+152(%rip)
+  jmp *_libnvcuvid_so_tramp_table+168(%rip)
 2:
-  pushq $19
+  pushq $21
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -715,14 +775,14 @@ cuvidMapVideoFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+160(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+176(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+160(%rip)
+  jmp *_libnvcuvid_so_tramp_table+176(%rip)
 2:
-  pushq $20
+  pushq $22
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -745,14 +805,14 @@ cuvidMapVideoFrame64:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+168(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+184(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+168(%rip)
+  jmp *_libnvcuvid_so_tramp_table+184(%rip)
 2:
-  pushq $21
+  pushq $23
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -775,14 +835,14 @@ cuvidParseVideoData:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+176(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+192(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+176(%rip)
+  jmp *_libnvcuvid_so_tramp_table+192(%rip)
 2:
-  pushq $22
+  pushq $24
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -805,14 +865,14 @@ cuvidPrivateOp:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+184(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+200(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+184(%rip)
+  jmp *_libnvcuvid_so_tramp_table+200(%rip)
 2:
-  pushq $23
+  pushq $25
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -835,14 +895,14 @@ cuvidReconfigureDecoder:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+192(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+208(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+192(%rip)
+  jmp *_libnvcuvid_so_tramp_table+208(%rip)
 2:
-  pushq $24
+  pushq $26
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -865,14 +925,14 @@ cuvidSetVideoSourceState:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+200(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+216(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+200(%rip)
+  jmp *_libnvcuvid_so_tramp_table+216(%rip)
 2:
-  pushq $25
+  pushq $27
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -895,14 +955,14 @@ cuvidUnmapVideoFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+208(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+224(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+208(%rip)
+  jmp *_libnvcuvid_so_tramp_table+224(%rip)
 2:
-  pushq $26
+  pushq $28
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -925,14 +985,14 @@ cuvidUnmapVideoFrame64:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libnvcuvid_so_1_tramp_table+216(%rip)
+  cmpq $0, _libnvcuvid_so_tramp_table+232(%rip)
   je 2f
 1:
-  jmp *_libnvcuvid_so_1_tramp_table+216(%rip)
+  jmp *_libnvcuvid_so_tramp_table+232(%rip)
 2:
-  pushq $27
+  pushq $29
   .cfi_adjust_cfa_offset 8
-  call _libnvcuvid_so_1_save_regs_and_resolve
+  call _libnvcuvid_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b

@@ -25,7 +25,7 @@ extern "C" {
 
 #define CHECK(cond, fmt, ...) do { \
     if(!(cond)) { \
-      fprintf(stderr, "implib-gen: libnvidia-encode.so.1: " fmt "\n", ##__VA_ARGS__); \
+      fprintf(stderr, "implib-gen: libnvcuvid.so: " fmt "\n", ##__VA_ARGS__); \
       assert(0 && "Assertion in generated code"); \
       exit(1); \
     } \
@@ -49,10 +49,10 @@ static void *load_library() {
   CHECK(0, "internal error"); // We shouldn't get here
 #elif CALL_USER_CALLBACK
   extern void *(const char *lib_name);
-  lib_handle = ("libnvidia-encode.so.1");
+  lib_handle = ("libnvcuvid.so");
   CHECK(lib_handle, "callback '' failed to load library");
 #else
-  lib_handle = dlopen("libnvidia-encode.so.1", RTLD_LAZY | RTLD_GLOBAL);
+  lib_handle = dlopen("libnvcuvid.so", RTLD_LAZY | RTLD_GLOBAL);
   CHECK(lib_handle, "failed to load library: %s", dlerror());
 #endif
 
@@ -74,15 +74,43 @@ static void __attribute__((destructor)) unload_lib() {
 
 // TODO: convert to single 0-separated string
 static const char *const sym_names[] = {
-  "NvEncodeAPICreateInstance",
-  "NvEncodeAPIGetMaxSupportedVersion",
+  "__std_1U4S4U_X02",
+  "__std_2U4S4U_X08",
+  "__std_4U4S4U_X04",
+  "cuvidConvertYUVToRGB",
+  "cuvidConvertYUVToRGBArray",
+  "cuvidCreateDecoder",
+  "cuvidCreateVideoParser",
+  "cuvidCreateVideoSource",
+  "cuvidCreateVideoSourceW",
+  "cuvidCtxLock",
+  "cuvidCtxLockCreate",
+  "cuvidCtxLockDestroy",
+  "cuvidCtxUnlock",
+  "cuvidDecodePicture",
+  "cuvidDestroyDecoder",
+  "cuvidDestroyVideoParser",
+  "cuvidDestroyVideoSource",
+  "cuvidGetDecodeStatus",
+  "cuvidGetDecoderCaps",
+  "cuvidGetSourceAudioFormat",
+  "cuvidGetSourceVideoFormat",
+  "cuvidGetVideoSourceState",
+  "cuvidMapVideoFrame",
+  "cuvidMapVideoFrame64",
+  "cuvidParseVideoData",
+  "cuvidPrivateOp",
+  "cuvidReconfigureDecoder",
+  "cuvidSetVideoSourceState",
+  "cuvidUnmapVideoFrame",
+  "cuvidUnmapVideoFrame64",
   0
 };
 
-extern void *_libnvidia_encode_so_1_tramp_table[];
+extern void *_libnvcuvid_so_tramp_table[];
 
 // Can be sped up by manually parsing library symtab...
-void _libnvidia_encode_so_1_tramp_resolve(int i) {
+void _libnvcuvid_so_tramp_resolve(int i) {
   assert((unsigned)i + 1 < sizeof(sym_names) / sizeof(sym_names[0]));
 
   CHECK(!is_lib_loading, "library function '%s' called during library load", sym_names[i]);
@@ -100,15 +128,15 @@ void _libnvidia_encode_so_1_tramp_resolve(int i) {
 #endif
 
   // Dlsym is thread-safe so don't need to protect it.
-  _libnvidia_encode_so_1_tramp_table[i] = dlsym(h, sym_names[i]);
-  CHECK(_libnvidia_encode_so_1_tramp_table[i], "failed to resolve symbol '%s'", sym_names[i]);
+  _libnvcuvid_so_tramp_table[i] = dlsym(h, sym_names[i]);
+  CHECK(_libnvcuvid_so_tramp_table[i], "failed to resolve symbol '%s'", sym_names[i]);
 }
 
 // Helper for user to resolve all symbols
-void _libnvidia_encode_so_1_tramp_resolve_all(void) {
+void _libnvcuvid_so_tramp_resolve_all(void) {
   size_t i;
   for(i = 0; i + 1 < sizeof(sym_names) / sizeof(sym_names[0]); ++i)
-    _libnvidia_encode_so_1_tramp_resolve(i);
+    _libnvcuvid_so_tramp_resolve(i);
 }
 
 #ifdef __cplusplus

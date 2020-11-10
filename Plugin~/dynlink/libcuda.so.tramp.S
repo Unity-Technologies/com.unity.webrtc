@@ -9,21 +9,21 @@
 
   .data
 
-  .globl _libcuda_so_1_tramp_table
-  .hidden _libcuda_so_1_tramp_table
+  .globl _libcuda_so_tramp_table
+  .hidden _libcuda_so_tramp_table
   .align 8
-_libcuda_so_1_tramp_table:
-  .zero 3688
+_libcuda_so_tramp_table:
+  .zero 3840
 
   .text
 
-  .globl _libcuda_so_1_tramp_resolve
-  .hidden _libcuda_so_1_tramp_resolve
+  .globl _libcuda_so_tramp_resolve
+  .hidden _libcuda_so_tramp_resolve
 
-  .globl _libcuda_so_1_save_regs_and_resolve
-  .hidden _libcuda_so_1_save_regs_and_resolve
-  .type _libcuda_so_1_save_regs_and_resolve, %function
-_libcuda_so_1_save_regs_and_resolve:
+  .globl _libcuda_so_save_regs_and_resolve
+  .hidden _libcuda_so_save_regs_and_resolve
+  .type _libcuda_so_save_regs_and_resolve, %function
+_libcuda_so_save_regs_and_resolve:
   .cfi_startproc
 
 #define PUSH_REG(reg) pushq %reg ; .cfi_adjust_cfa_offset 8; .cfi_rel_offset reg, 0
@@ -68,7 +68,7 @@ _libcuda_so_1_save_regs_and_resolve:
   PUSH_XMM_REG(xmm7)
 
   // Stack is just 8-byte aligned but callee will re-align to 16
-  call _libcuda_so_1_tramp_resolve
+  call _libcuda_so_tramp_resolve
 
   POP_XMM_REG(xmm7)
   POP_XMM_REG(xmm6)
@@ -115,14 +115,14 @@ cuArray3DCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+0(%rip)
+  cmpq $0, _libcuda_so_tramp_table+0(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+0(%rip)
+  jmp *_libcuda_so_tramp_table+0(%rip)
 2:
   pushq $0
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -145,14 +145,14 @@ cuArray3DCreate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+8(%rip)
+  cmpq $0, _libcuda_so_tramp_table+8(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+8(%rip)
+  jmp *_libcuda_so_tramp_table+8(%rip)
 2:
   pushq $1
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -175,14 +175,14 @@ cuArray3DGetDescriptor:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+16(%rip)
+  cmpq $0, _libcuda_so_tramp_table+16(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+16(%rip)
+  jmp *_libcuda_so_tramp_table+16(%rip)
 2:
   pushq $2
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -205,14 +205,14 @@ cuArray3DGetDescriptor_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+24(%rip)
+  cmpq $0, _libcuda_so_tramp_table+24(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+24(%rip)
+  jmp *_libcuda_so_tramp_table+24(%rip)
 2:
   pushq $3
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -235,14 +235,14 @@ cuArrayCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+32(%rip)
+  cmpq $0, _libcuda_so_tramp_table+32(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+32(%rip)
+  jmp *_libcuda_so_tramp_table+32(%rip)
 2:
   pushq $4
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -265,14 +265,14 @@ cuArrayCreate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+40(%rip)
+  cmpq $0, _libcuda_so_tramp_table+40(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+40(%rip)
+  jmp *_libcuda_so_tramp_table+40(%rip)
 2:
   pushq $5
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -295,14 +295,14 @@ cuArrayDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+48(%rip)
+  cmpq $0, _libcuda_so_tramp_table+48(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+48(%rip)
+  jmp *_libcuda_so_tramp_table+48(%rip)
 2:
   pushq $6
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -325,14 +325,14 @@ cuArrayGetDescriptor:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+56(%rip)
+  cmpq $0, _libcuda_so_tramp_table+56(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+56(%rip)
+  jmp *_libcuda_so_tramp_table+56(%rip)
 2:
   pushq $7
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -355,14 +355,44 @@ cuArrayGetDescriptor_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+64(%rip)
+  cmpq $0, _libcuda_so_tramp_table+64(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+64(%rip)
+  jmp *_libcuda_so_tramp_table+64(%rip)
 2:
   pushq $8
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuArrayGetSparseProperties
+  .p2align 4
+  .type cuArrayGetSparseProperties, %function
+cuArrayGetSparseProperties:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+72(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+72(%rip)
+2:
+  pushq $9
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -385,14 +415,14 @@ cuCtxAttach:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+72(%rip)
+  cmpq $0, _libcuda_so_tramp_table+80(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+72(%rip)
+  jmp *_libcuda_so_tramp_table+80(%rip)
 2:
-  pushq $9
+  pushq $10
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -415,14 +445,14 @@ cuCtxCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+80(%rip)
+  cmpq $0, _libcuda_so_tramp_table+88(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+80(%rip)
+  jmp *_libcuda_so_tramp_table+88(%rip)
 2:
-  pushq $10
+  pushq $11
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -445,14 +475,14 @@ cuCtxCreate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+88(%rip)
+  cmpq $0, _libcuda_so_tramp_table+96(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+88(%rip)
+  jmp *_libcuda_so_tramp_table+96(%rip)
 2:
-  pushq $11
+  pushq $12
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -475,14 +505,14 @@ cuCtxDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+96(%rip)
+  cmpq $0, _libcuda_so_tramp_table+104(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+96(%rip)
+  jmp *_libcuda_so_tramp_table+104(%rip)
 2:
-  pushq $12
+  pushq $13
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -505,14 +535,14 @@ cuCtxDestroy_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+104(%rip)
+  cmpq $0, _libcuda_so_tramp_table+112(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+104(%rip)
+  jmp *_libcuda_so_tramp_table+112(%rip)
 2:
-  pushq $13
+  pushq $14
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -535,14 +565,14 @@ cuCtxDetach:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+112(%rip)
+  cmpq $0, _libcuda_so_tramp_table+120(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+112(%rip)
+  jmp *_libcuda_so_tramp_table+120(%rip)
 2:
-  pushq $14
+  pushq $15
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -565,14 +595,14 @@ cuCtxDisablePeerAccess:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+120(%rip)
+  cmpq $0, _libcuda_so_tramp_table+128(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+120(%rip)
+  jmp *_libcuda_so_tramp_table+128(%rip)
 2:
-  pushq $15
+  pushq $16
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -595,14 +625,14 @@ cuCtxEnablePeerAccess:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+128(%rip)
+  cmpq $0, _libcuda_so_tramp_table+136(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+128(%rip)
+  jmp *_libcuda_so_tramp_table+136(%rip)
 2:
-  pushq $16
+  pushq $17
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -625,14 +655,14 @@ cuCtxGetApiVersion:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+136(%rip)
+  cmpq $0, _libcuda_so_tramp_table+144(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+136(%rip)
+  jmp *_libcuda_so_tramp_table+144(%rip)
 2:
-  pushq $17
+  pushq $18
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -655,14 +685,14 @@ cuCtxGetCacheConfig:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+144(%rip)
+  cmpq $0, _libcuda_so_tramp_table+152(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+144(%rip)
+  jmp *_libcuda_so_tramp_table+152(%rip)
 2:
-  pushq $18
+  pushq $19
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -685,14 +715,14 @@ cuCtxGetCurrent:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+152(%rip)
+  cmpq $0, _libcuda_so_tramp_table+160(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+152(%rip)
+  jmp *_libcuda_so_tramp_table+160(%rip)
 2:
-  pushq $19
+  pushq $20
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -715,14 +745,14 @@ cuCtxGetDevice:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+160(%rip)
+  cmpq $0, _libcuda_so_tramp_table+168(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+160(%rip)
+  jmp *_libcuda_so_tramp_table+168(%rip)
 2:
-  pushq $20
+  pushq $21
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -745,14 +775,14 @@ cuCtxGetFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+168(%rip)
+  cmpq $0, _libcuda_so_tramp_table+176(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+168(%rip)
+  jmp *_libcuda_so_tramp_table+176(%rip)
 2:
-  pushq $21
+  pushq $22
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -775,14 +805,14 @@ cuCtxGetLimit:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+176(%rip)
+  cmpq $0, _libcuda_so_tramp_table+184(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+176(%rip)
+  jmp *_libcuda_so_tramp_table+184(%rip)
 2:
-  pushq $22
+  pushq $23
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -805,14 +835,14 @@ cuCtxGetSharedMemConfig:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+184(%rip)
+  cmpq $0, _libcuda_so_tramp_table+192(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+184(%rip)
+  jmp *_libcuda_so_tramp_table+192(%rip)
 2:
-  pushq $23
+  pushq $24
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -835,14 +865,14 @@ cuCtxGetStreamPriorityRange:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+192(%rip)
+  cmpq $0, _libcuda_so_tramp_table+200(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+192(%rip)
+  jmp *_libcuda_so_tramp_table+200(%rip)
 2:
-  pushq $24
+  pushq $25
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -865,14 +895,14 @@ cuCtxPopCurrent:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+200(%rip)
+  cmpq $0, _libcuda_so_tramp_table+208(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+200(%rip)
+  jmp *_libcuda_so_tramp_table+208(%rip)
 2:
-  pushq $25
+  pushq $26
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -895,14 +925,14 @@ cuCtxPopCurrent_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+208(%rip)
+  cmpq $0, _libcuda_so_tramp_table+216(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+208(%rip)
+  jmp *_libcuda_so_tramp_table+216(%rip)
 2:
-  pushq $26
+  pushq $27
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -925,14 +955,14 @@ cuCtxPushCurrent:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+216(%rip)
+  cmpq $0, _libcuda_so_tramp_table+224(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+216(%rip)
+  jmp *_libcuda_so_tramp_table+224(%rip)
 2:
-  pushq $27
+  pushq $28
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -955,14 +985,14 @@ cuCtxPushCurrent_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+224(%rip)
+  cmpq $0, _libcuda_so_tramp_table+232(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+224(%rip)
+  jmp *_libcuda_so_tramp_table+232(%rip)
 2:
-  pushq $28
+  pushq $29
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -985,14 +1015,14 @@ cuCtxResetPersistingL2Cache:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+232(%rip)
+  cmpq $0, _libcuda_so_tramp_table+240(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+232(%rip)
+  jmp *_libcuda_so_tramp_table+240(%rip)
 2:
-  pushq $29
+  pushq $30
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1015,14 +1045,14 @@ cuCtxSetCacheConfig:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+240(%rip)
+  cmpq $0, _libcuda_so_tramp_table+248(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+240(%rip)
+  jmp *_libcuda_so_tramp_table+248(%rip)
 2:
-  pushq $30
+  pushq $31
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1045,14 +1075,14 @@ cuCtxSetCurrent:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+248(%rip)
+  cmpq $0, _libcuda_so_tramp_table+256(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+248(%rip)
+  jmp *_libcuda_so_tramp_table+256(%rip)
 2:
-  pushq $31
+  pushq $32
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1075,14 +1105,14 @@ cuCtxSetLimit:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+256(%rip)
+  cmpq $0, _libcuda_so_tramp_table+264(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+256(%rip)
+  jmp *_libcuda_so_tramp_table+264(%rip)
 2:
-  pushq $32
+  pushq $33
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1105,14 +1135,14 @@ cuCtxSetSharedMemConfig:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+264(%rip)
+  cmpq $0, _libcuda_so_tramp_table+272(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+264(%rip)
+  jmp *_libcuda_so_tramp_table+272(%rip)
 2:
-  pushq $33
+  pushq $34
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1135,14 +1165,14 @@ cuCtxSynchronize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+272(%rip)
+  cmpq $0, _libcuda_so_tramp_table+280(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+272(%rip)
+  jmp *_libcuda_so_tramp_table+280(%rip)
 2:
-  pushq $34
+  pushq $35
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1165,14 +1195,14 @@ cuDestroyExternalMemory:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+280(%rip)
+  cmpq $0, _libcuda_so_tramp_table+288(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+280(%rip)
+  jmp *_libcuda_so_tramp_table+288(%rip)
 2:
-  pushq $35
+  pushq $36
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1195,14 +1225,14 @@ cuDestroyExternalSemaphore:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+288(%rip)
+  cmpq $0, _libcuda_so_tramp_table+296(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+288(%rip)
+  jmp *_libcuda_so_tramp_table+296(%rip)
 2:
-  pushq $36
+  pushq $37
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1225,14 +1255,14 @@ cuDeviceCanAccessPeer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+296(%rip)
+  cmpq $0, _libcuda_so_tramp_table+304(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+296(%rip)
+  jmp *_libcuda_so_tramp_table+304(%rip)
 2:
-  pushq $37
+  pushq $38
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1255,14 +1285,14 @@ cuDeviceComputeCapability:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+304(%rip)
+  cmpq $0, _libcuda_so_tramp_table+312(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+304(%rip)
+  jmp *_libcuda_so_tramp_table+312(%rip)
 2:
-  pushq $38
+  pushq $39
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1285,14 +1315,14 @@ cuDeviceGet:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+312(%rip)
+  cmpq $0, _libcuda_so_tramp_table+320(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+312(%rip)
+  jmp *_libcuda_so_tramp_table+320(%rip)
 2:
-  pushq $39
+  pushq $40
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1315,14 +1345,14 @@ cuDeviceGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+320(%rip)
+  cmpq $0, _libcuda_so_tramp_table+328(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+320(%rip)
+  jmp *_libcuda_so_tramp_table+328(%rip)
 2:
-  pushq $40
+  pushq $41
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1345,14 +1375,14 @@ cuDeviceGetByPCIBusId:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+328(%rip)
+  cmpq $0, _libcuda_so_tramp_table+336(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+328(%rip)
+  jmp *_libcuda_so_tramp_table+336(%rip)
 2:
-  pushq $41
+  pushq $42
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1375,14 +1405,44 @@ cuDeviceGetCount:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+336(%rip)
+  cmpq $0, _libcuda_so_tramp_table+344(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+336(%rip)
+  jmp *_libcuda_so_tramp_table+344(%rip)
 2:
-  pushq $42
+  pushq $43
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuDeviceGetLuid
+  .p2align 4
+  .type cuDeviceGetLuid, %function
+cuDeviceGetLuid:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+352(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+352(%rip)
+2:
+  pushq $44
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1405,14 +1465,14 @@ cuDeviceGetName:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+344(%rip)
+  cmpq $0, _libcuda_so_tramp_table+360(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+344(%rip)
+  jmp *_libcuda_so_tramp_table+360(%rip)
 2:
-  pushq $43
+  pushq $45
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1435,14 +1495,14 @@ cuDeviceGetNvSciSyncAttributes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+352(%rip)
+  cmpq $0, _libcuda_so_tramp_table+368(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+352(%rip)
+  jmp *_libcuda_so_tramp_table+368(%rip)
 2:
-  pushq $44
+  pushq $46
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1465,14 +1525,14 @@ cuDeviceGetP2PAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+360(%rip)
+  cmpq $0, _libcuda_so_tramp_table+376(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+360(%rip)
+  jmp *_libcuda_so_tramp_table+376(%rip)
 2:
-  pushq $45
+  pushq $47
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1495,14 +1555,14 @@ cuDeviceGetPCIBusId:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+368(%rip)
+  cmpq $0, _libcuda_so_tramp_table+384(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+368(%rip)
+  jmp *_libcuda_so_tramp_table+384(%rip)
 2:
-  pushq $46
+  pushq $48
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1525,14 +1585,44 @@ cuDeviceGetProperties:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+376(%rip)
+  cmpq $0, _libcuda_so_tramp_table+392(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+376(%rip)
+  jmp *_libcuda_so_tramp_table+392(%rip)
 2:
-  pushq $47
+  pushq $49
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuDeviceGetTexture1DLinearMaxWidth
+  .p2align 4
+  .type cuDeviceGetTexture1DLinearMaxWidth, %function
+cuDeviceGetTexture1DLinearMaxWidth:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+400(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+400(%rip)
+2:
+  pushq $50
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1555,14 +1645,14 @@ cuDeviceGetUuid:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+384(%rip)
+  cmpq $0, _libcuda_so_tramp_table+408(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+384(%rip)
+  jmp *_libcuda_so_tramp_table+408(%rip)
 2:
-  pushq $48
+  pushq $51
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1585,14 +1675,14 @@ cuDevicePrimaryCtxGetState:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+392(%rip)
+  cmpq $0, _libcuda_so_tramp_table+416(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+392(%rip)
+  jmp *_libcuda_so_tramp_table+416(%rip)
 2:
-  pushq $49
+  pushq $52
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1615,14 +1705,14 @@ cuDevicePrimaryCtxRelease:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+400(%rip)
+  cmpq $0, _libcuda_so_tramp_table+424(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+400(%rip)
+  jmp *_libcuda_so_tramp_table+424(%rip)
 2:
-  pushq $50
+  pushq $53
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1645,14 +1735,14 @@ cuDevicePrimaryCtxRelease_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+408(%rip)
+  cmpq $0, _libcuda_so_tramp_table+432(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+408(%rip)
+  jmp *_libcuda_so_tramp_table+432(%rip)
 2:
-  pushq $51
+  pushq $54
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1675,14 +1765,14 @@ cuDevicePrimaryCtxReset:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+416(%rip)
+  cmpq $0, _libcuda_so_tramp_table+440(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+416(%rip)
+  jmp *_libcuda_so_tramp_table+440(%rip)
 2:
-  pushq $52
+  pushq $55
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1705,14 +1795,14 @@ cuDevicePrimaryCtxReset_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+424(%rip)
+  cmpq $0, _libcuda_so_tramp_table+448(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+424(%rip)
+  jmp *_libcuda_so_tramp_table+448(%rip)
 2:
-  pushq $53
+  pushq $56
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1735,14 +1825,14 @@ cuDevicePrimaryCtxRetain:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+432(%rip)
+  cmpq $0, _libcuda_so_tramp_table+456(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+432(%rip)
+  jmp *_libcuda_so_tramp_table+456(%rip)
 2:
-  pushq $54
+  pushq $57
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1765,14 +1855,14 @@ cuDevicePrimaryCtxSetFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+440(%rip)
+  cmpq $0, _libcuda_so_tramp_table+464(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+440(%rip)
+  jmp *_libcuda_so_tramp_table+464(%rip)
 2:
-  pushq $55
+  pushq $58
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1795,14 +1885,14 @@ cuDevicePrimaryCtxSetFlags_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+448(%rip)
+  cmpq $0, _libcuda_so_tramp_table+472(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+448(%rip)
+  jmp *_libcuda_so_tramp_table+472(%rip)
 2:
-  pushq $56
+  pushq $59
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1825,14 +1915,14 @@ cuDeviceTotalMem:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+456(%rip)
+  cmpq $0, _libcuda_so_tramp_table+480(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+456(%rip)
+  jmp *_libcuda_so_tramp_table+480(%rip)
 2:
-  pushq $57
+  pushq $60
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1855,14 +1945,14 @@ cuDeviceTotalMem_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+464(%rip)
+  cmpq $0, _libcuda_so_tramp_table+488(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+464(%rip)
+  jmp *_libcuda_so_tramp_table+488(%rip)
 2:
-  pushq $58
+  pushq $61
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1885,14 +1975,14 @@ cuDriverGetVersion:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+472(%rip)
+  cmpq $0, _libcuda_so_tramp_table+496(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+472(%rip)
+  jmp *_libcuda_so_tramp_table+496(%rip)
 2:
-  pushq $59
+  pushq $62
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1915,14 +2005,14 @@ cuEGLApiInit:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+480(%rip)
+  cmpq $0, _libcuda_so_tramp_table+504(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+480(%rip)
+  jmp *_libcuda_so_tramp_table+504(%rip)
 2:
-  pushq $60
+  pushq $63
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1945,14 +2035,14 @@ cuEGLStreamConsumerAcquireFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+488(%rip)
+  cmpq $0, _libcuda_so_tramp_table+512(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+488(%rip)
+  jmp *_libcuda_so_tramp_table+512(%rip)
 2:
-  pushq $61
+  pushq $64
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -1975,14 +2065,14 @@ cuEGLStreamConsumerConnect:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+496(%rip)
+  cmpq $0, _libcuda_so_tramp_table+520(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+496(%rip)
+  jmp *_libcuda_so_tramp_table+520(%rip)
 2:
-  pushq $62
+  pushq $65
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2005,14 +2095,14 @@ cuEGLStreamConsumerConnectWithFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+504(%rip)
+  cmpq $0, _libcuda_so_tramp_table+528(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+504(%rip)
+  jmp *_libcuda_so_tramp_table+528(%rip)
 2:
-  pushq $63
+  pushq $66
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2035,14 +2125,14 @@ cuEGLStreamConsumerDisconnect:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+512(%rip)
+  cmpq $0, _libcuda_so_tramp_table+536(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+512(%rip)
+  jmp *_libcuda_so_tramp_table+536(%rip)
 2:
-  pushq $64
+  pushq $67
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2065,14 +2155,14 @@ cuEGLStreamConsumerReleaseFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+520(%rip)
+  cmpq $0, _libcuda_so_tramp_table+544(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+520(%rip)
+  jmp *_libcuda_so_tramp_table+544(%rip)
 2:
-  pushq $65
+  pushq $68
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2095,14 +2185,14 @@ cuEGLStreamProducerConnect:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+528(%rip)
+  cmpq $0, _libcuda_so_tramp_table+552(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+528(%rip)
+  jmp *_libcuda_so_tramp_table+552(%rip)
 2:
-  pushq $66
+  pushq $69
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2125,14 +2215,14 @@ cuEGLStreamProducerDisconnect:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+536(%rip)
+  cmpq $0, _libcuda_so_tramp_table+560(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+536(%rip)
+  jmp *_libcuda_so_tramp_table+560(%rip)
 2:
-  pushq $67
+  pushq $70
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2155,14 +2245,14 @@ cuEGLStreamProducerPresentFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+544(%rip)
+  cmpq $0, _libcuda_so_tramp_table+568(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+544(%rip)
+  jmp *_libcuda_so_tramp_table+568(%rip)
 2:
-  pushq $68
+  pushq $71
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2185,14 +2275,14 @@ cuEGLStreamProducerReturnFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+552(%rip)
+  cmpq $0, _libcuda_so_tramp_table+576(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+552(%rip)
+  jmp *_libcuda_so_tramp_table+576(%rip)
 2:
-  pushq $69
+  pushq $72
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2215,14 +2305,14 @@ cuEventCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+560(%rip)
+  cmpq $0, _libcuda_so_tramp_table+584(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+560(%rip)
+  jmp *_libcuda_so_tramp_table+584(%rip)
 2:
-  pushq $70
+  pushq $73
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2245,14 +2335,14 @@ cuEventDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+568(%rip)
+  cmpq $0, _libcuda_so_tramp_table+592(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+568(%rip)
+  jmp *_libcuda_so_tramp_table+592(%rip)
 2:
-  pushq $71
+  pushq $74
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2275,14 +2365,14 @@ cuEventDestroy_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+576(%rip)
+  cmpq $0, _libcuda_so_tramp_table+600(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+576(%rip)
+  jmp *_libcuda_so_tramp_table+600(%rip)
 2:
-  pushq $72
+  pushq $75
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2305,14 +2395,14 @@ cuEventElapsedTime:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+584(%rip)
+  cmpq $0, _libcuda_so_tramp_table+608(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+584(%rip)
+  jmp *_libcuda_so_tramp_table+608(%rip)
 2:
-  pushq $73
+  pushq $76
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2335,14 +2425,14 @@ cuEventQuery:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+592(%rip)
+  cmpq $0, _libcuda_so_tramp_table+616(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+592(%rip)
+  jmp *_libcuda_so_tramp_table+616(%rip)
 2:
-  pushq $74
+  pushq $77
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2365,14 +2455,74 @@ cuEventRecord:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+600(%rip)
+  cmpq $0, _libcuda_so_tramp_table+624(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+600(%rip)
+  jmp *_libcuda_so_tramp_table+624(%rip)
 2:
-  pushq $75
+  pushq $78
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuEventRecordWithFlags
+  .p2align 4
+  .type cuEventRecordWithFlags, %function
+cuEventRecordWithFlags:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+632(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+632(%rip)
+2:
+  pushq $79
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuEventRecordWithFlags_ptsz
+  .p2align 4
+  .type cuEventRecordWithFlags_ptsz, %function
+cuEventRecordWithFlags_ptsz:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+640(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+640(%rip)
+2:
+  pushq $80
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2395,14 +2545,14 @@ cuEventRecord_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+608(%rip)
+  cmpq $0, _libcuda_so_tramp_table+648(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+608(%rip)
+  jmp *_libcuda_so_tramp_table+648(%rip)
 2:
-  pushq $76
+  pushq $81
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2425,14 +2575,14 @@ cuEventSynchronize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+616(%rip)
+  cmpq $0, _libcuda_so_tramp_table+656(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+616(%rip)
+  jmp *_libcuda_so_tramp_table+656(%rip)
 2:
-  pushq $77
+  pushq $82
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2455,14 +2605,14 @@ cuExternalMemoryGetMappedBuffer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+624(%rip)
+  cmpq $0, _libcuda_so_tramp_table+664(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+624(%rip)
+  jmp *_libcuda_so_tramp_table+664(%rip)
 2:
-  pushq $78
+  pushq $83
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2485,14 +2635,14 @@ cuExternalMemoryGetMappedMipmappedArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+632(%rip)
+  cmpq $0, _libcuda_so_tramp_table+672(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+632(%rip)
+  jmp *_libcuda_so_tramp_table+672(%rip)
 2:
-  pushq $79
+  pushq $84
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2515,14 +2665,14 @@ cuFuncGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+640(%rip)
+  cmpq $0, _libcuda_so_tramp_table+680(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+640(%rip)
+  jmp *_libcuda_so_tramp_table+680(%rip)
 2:
-  pushq $80
+  pushq $85
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2545,14 +2695,14 @@ cuFuncGetModule:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+648(%rip)
+  cmpq $0, _libcuda_so_tramp_table+688(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+648(%rip)
+  jmp *_libcuda_so_tramp_table+688(%rip)
 2:
-  pushq $81
+  pushq $86
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2575,14 +2725,14 @@ cuFuncSetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+656(%rip)
+  cmpq $0, _libcuda_so_tramp_table+696(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+656(%rip)
+  jmp *_libcuda_so_tramp_table+696(%rip)
 2:
-  pushq $82
+  pushq $87
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2605,14 +2755,14 @@ cuFuncSetBlockShape:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+664(%rip)
+  cmpq $0, _libcuda_so_tramp_table+704(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+664(%rip)
+  jmp *_libcuda_so_tramp_table+704(%rip)
 2:
-  pushq $83
+  pushq $88
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2635,14 +2785,14 @@ cuFuncSetCacheConfig:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+672(%rip)
+  cmpq $0, _libcuda_so_tramp_table+712(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+672(%rip)
+  jmp *_libcuda_so_tramp_table+712(%rip)
 2:
-  pushq $84
+  pushq $89
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2665,14 +2815,14 @@ cuFuncSetSharedMemConfig:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+680(%rip)
+  cmpq $0, _libcuda_so_tramp_table+720(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+680(%rip)
+  jmp *_libcuda_so_tramp_table+720(%rip)
 2:
-  pushq $85
+  pushq $90
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2695,14 +2845,14 @@ cuFuncSetSharedSize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+688(%rip)
+  cmpq $0, _libcuda_so_tramp_table+728(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+688(%rip)
+  jmp *_libcuda_so_tramp_table+728(%rip)
 2:
-  pushq $86
+  pushq $91
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2725,14 +2875,14 @@ cuGLCtxCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+696(%rip)
+  cmpq $0, _libcuda_so_tramp_table+736(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+696(%rip)
+  jmp *_libcuda_so_tramp_table+736(%rip)
 2:
-  pushq $87
+  pushq $92
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2755,14 +2905,14 @@ cuGLCtxCreate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+704(%rip)
+  cmpq $0, _libcuda_so_tramp_table+744(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+704(%rip)
+  jmp *_libcuda_so_tramp_table+744(%rip)
 2:
-  pushq $88
+  pushq $93
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2785,14 +2935,14 @@ cuGLGetDevices:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+712(%rip)
+  cmpq $0, _libcuda_so_tramp_table+752(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+712(%rip)
+  jmp *_libcuda_so_tramp_table+752(%rip)
 2:
-  pushq $89
+  pushq $94
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2815,14 +2965,14 @@ cuGLGetDevices_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+720(%rip)
+  cmpq $0, _libcuda_so_tramp_table+760(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+720(%rip)
+  jmp *_libcuda_so_tramp_table+760(%rip)
 2:
-  pushq $90
+  pushq $95
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2845,14 +2995,14 @@ cuGLInit:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+728(%rip)
+  cmpq $0, _libcuda_so_tramp_table+768(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+728(%rip)
+  jmp *_libcuda_so_tramp_table+768(%rip)
 2:
-  pushq $91
+  pushq $96
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2875,14 +3025,14 @@ cuGLMapBufferObject:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+736(%rip)
+  cmpq $0, _libcuda_so_tramp_table+776(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+736(%rip)
+  jmp *_libcuda_so_tramp_table+776(%rip)
 2:
-  pushq $92
+  pushq $97
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2905,14 +3055,14 @@ cuGLMapBufferObjectAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+744(%rip)
+  cmpq $0, _libcuda_so_tramp_table+784(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+744(%rip)
+  jmp *_libcuda_so_tramp_table+784(%rip)
 2:
-  pushq $93
+  pushq $98
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2935,14 +3085,14 @@ cuGLMapBufferObjectAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+752(%rip)
+  cmpq $0, _libcuda_so_tramp_table+792(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+752(%rip)
+  jmp *_libcuda_so_tramp_table+792(%rip)
 2:
-  pushq $94
+  pushq $99
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2965,14 +3115,14 @@ cuGLMapBufferObjectAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+760(%rip)
+  cmpq $0, _libcuda_so_tramp_table+800(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+760(%rip)
+  jmp *_libcuda_so_tramp_table+800(%rip)
 2:
-  pushq $95
+  pushq $100
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -2995,14 +3145,14 @@ cuGLMapBufferObject_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+768(%rip)
+  cmpq $0, _libcuda_so_tramp_table+808(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+768(%rip)
+  jmp *_libcuda_so_tramp_table+808(%rip)
 2:
-  pushq $96
+  pushq $101
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3025,14 +3175,14 @@ cuGLMapBufferObject_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+776(%rip)
+  cmpq $0, _libcuda_so_tramp_table+816(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+776(%rip)
+  jmp *_libcuda_so_tramp_table+816(%rip)
 2:
-  pushq $97
+  pushq $102
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3055,14 +3205,14 @@ cuGLRegisterBufferObject:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+784(%rip)
+  cmpq $0, _libcuda_so_tramp_table+824(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+784(%rip)
+  jmp *_libcuda_so_tramp_table+824(%rip)
 2:
-  pushq $98
+  pushq $103
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3085,14 +3235,14 @@ cuGLSetBufferObjectMapFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+792(%rip)
+  cmpq $0, _libcuda_so_tramp_table+832(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+792(%rip)
+  jmp *_libcuda_so_tramp_table+832(%rip)
 2:
-  pushq $99
+  pushq $104
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3115,14 +3265,14 @@ cuGLUnmapBufferObject:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+800(%rip)
+  cmpq $0, _libcuda_so_tramp_table+840(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+800(%rip)
+  jmp *_libcuda_so_tramp_table+840(%rip)
 2:
-  pushq $100
+  pushq $105
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3145,14 +3295,14 @@ cuGLUnmapBufferObjectAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+808(%rip)
+  cmpq $0, _libcuda_so_tramp_table+848(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+808(%rip)
+  jmp *_libcuda_so_tramp_table+848(%rip)
 2:
-  pushq $101
+  pushq $106
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3175,14 +3325,14 @@ cuGLUnregisterBufferObject:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+816(%rip)
+  cmpq $0, _libcuda_so_tramp_table+856(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+816(%rip)
+  jmp *_libcuda_so_tramp_table+856(%rip)
 2:
-  pushq $102
+  pushq $107
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3205,14 +3355,14 @@ cuGetErrorName:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+824(%rip)
+  cmpq $0, _libcuda_so_tramp_table+864(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+824(%rip)
+  jmp *_libcuda_so_tramp_table+864(%rip)
 2:
-  pushq $103
+  pushq $108
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3235,14 +3385,14 @@ cuGetErrorString:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+832(%rip)
+  cmpq $0, _libcuda_so_tramp_table+872(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+832(%rip)
+  jmp *_libcuda_so_tramp_table+872(%rip)
 2:
-  pushq $104
+  pushq $109
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3265,14 +3415,14 @@ cuGetExportTable:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+840(%rip)
+  cmpq $0, _libcuda_so_tramp_table+880(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+840(%rip)
+  jmp *_libcuda_so_tramp_table+880(%rip)
 2:
-  pushq $105
+  pushq $110
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3295,14 +3445,14 @@ cuGraphAddChildGraphNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+848(%rip)
+  cmpq $0, _libcuda_so_tramp_table+888(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+848(%rip)
+  jmp *_libcuda_so_tramp_table+888(%rip)
 2:
-  pushq $106
+  pushq $111
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3325,14 +3475,14 @@ cuGraphAddDependencies:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+856(%rip)
+  cmpq $0, _libcuda_so_tramp_table+896(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+856(%rip)
+  jmp *_libcuda_so_tramp_table+896(%rip)
 2:
-  pushq $107
+  pushq $112
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3355,14 +3505,74 @@ cuGraphAddEmptyNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+864(%rip)
+  cmpq $0, _libcuda_so_tramp_table+904(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+864(%rip)
+  jmp *_libcuda_so_tramp_table+904(%rip)
 2:
-  pushq $108
+  pushq $113
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphAddEventRecordNode
+  .p2align 4
+  .type cuGraphAddEventRecordNode, %function
+cuGraphAddEventRecordNode:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+912(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+912(%rip)
+2:
+  pushq $114
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphAddEventWaitNode
+  .p2align 4
+  .type cuGraphAddEventWaitNode, %function
+cuGraphAddEventWaitNode:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+920(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+920(%rip)
+2:
+  pushq $115
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3385,14 +3595,14 @@ cuGraphAddHostNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+872(%rip)
+  cmpq $0, _libcuda_so_tramp_table+928(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+872(%rip)
+  jmp *_libcuda_so_tramp_table+928(%rip)
 2:
-  pushq $109
+  pushq $116
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3415,14 +3625,14 @@ cuGraphAddKernelNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+880(%rip)
+  cmpq $0, _libcuda_so_tramp_table+936(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+880(%rip)
+  jmp *_libcuda_so_tramp_table+936(%rip)
 2:
-  pushq $110
+  pushq $117
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3445,14 +3655,14 @@ cuGraphAddMemcpyNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+888(%rip)
+  cmpq $0, _libcuda_so_tramp_table+944(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+888(%rip)
+  jmp *_libcuda_so_tramp_table+944(%rip)
 2:
-  pushq $111
+  pushq $118
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3475,14 +3685,14 @@ cuGraphAddMemsetNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+896(%rip)
+  cmpq $0, _libcuda_so_tramp_table+952(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+896(%rip)
+  jmp *_libcuda_so_tramp_table+952(%rip)
 2:
-  pushq $112
+  pushq $119
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3505,14 +3715,14 @@ cuGraphChildGraphNodeGetGraph:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+904(%rip)
+  cmpq $0, _libcuda_so_tramp_table+960(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+904(%rip)
+  jmp *_libcuda_so_tramp_table+960(%rip)
 2:
-  pushq $113
+  pushq $120
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3535,14 +3745,14 @@ cuGraphClone:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+912(%rip)
+  cmpq $0, _libcuda_so_tramp_table+968(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+912(%rip)
+  jmp *_libcuda_so_tramp_table+968(%rip)
 2:
-  pushq $114
+  pushq $121
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3565,14 +3775,14 @@ cuGraphCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+920(%rip)
+  cmpq $0, _libcuda_so_tramp_table+976(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+920(%rip)
+  jmp *_libcuda_so_tramp_table+976(%rip)
 2:
-  pushq $115
+  pushq $122
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3595,14 +3805,14 @@ cuGraphDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+928(%rip)
+  cmpq $0, _libcuda_so_tramp_table+984(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+928(%rip)
+  jmp *_libcuda_so_tramp_table+984(%rip)
 2:
-  pushq $116
+  pushq $123
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3625,14 +3835,164 @@ cuGraphDestroyNode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+936(%rip)
+  cmpq $0, _libcuda_so_tramp_table+992(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+936(%rip)
+  jmp *_libcuda_so_tramp_table+992(%rip)
 2:
-  pushq $117
+  pushq $124
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphEventRecordNodeGetEvent
+  .p2align 4
+  .type cuGraphEventRecordNodeGetEvent, %function
+cuGraphEventRecordNodeGetEvent:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1000(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1000(%rip)
+2:
+  pushq $125
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphEventRecordNodeSetEvent
+  .p2align 4
+  .type cuGraphEventRecordNodeSetEvent, %function
+cuGraphEventRecordNodeSetEvent:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1008(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1008(%rip)
+2:
+  pushq $126
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphEventWaitNodeGetEvent
+  .p2align 4
+  .type cuGraphEventWaitNodeGetEvent, %function
+cuGraphEventWaitNodeGetEvent:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1016(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1016(%rip)
+2:
+  pushq $127
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphEventWaitNodeSetEvent
+  .p2align 4
+  .type cuGraphEventWaitNodeSetEvent, %function
+cuGraphEventWaitNodeSetEvent:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1024(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1024(%rip)
+2:
+  pushq $128
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphExecChildGraphNodeSetParams
+  .p2align 4
+  .type cuGraphExecChildGraphNodeSetParams, %function
+cuGraphExecChildGraphNodeSetParams:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1032(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1032(%rip)
+2:
+  pushq $129
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3655,14 +4015,74 @@ cuGraphExecDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+944(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1040(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+944(%rip)
+  jmp *_libcuda_so_tramp_table+1040(%rip)
 2:
-  pushq $118
+  pushq $130
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphExecEventRecordNodeSetEvent
+  .p2align 4
+  .type cuGraphExecEventRecordNodeSetEvent, %function
+cuGraphExecEventRecordNodeSetEvent:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1048(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1048(%rip)
+2:
+  pushq $131
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphExecEventWaitNodeSetEvent
+  .p2align 4
+  .type cuGraphExecEventWaitNodeSetEvent, %function
+cuGraphExecEventWaitNodeSetEvent:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1056(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1056(%rip)
+2:
+  pushq $132
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3685,14 +4105,14 @@ cuGraphExecHostNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+952(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1064(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+952(%rip)
+  jmp *_libcuda_so_tramp_table+1064(%rip)
 2:
-  pushq $119
+  pushq $133
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3715,14 +4135,14 @@ cuGraphExecKernelNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+960(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1072(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+960(%rip)
+  jmp *_libcuda_so_tramp_table+1072(%rip)
 2:
-  pushq $120
+  pushq $134
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3745,14 +4165,14 @@ cuGraphExecMemcpyNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+968(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1080(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+968(%rip)
+  jmp *_libcuda_so_tramp_table+1080(%rip)
 2:
-  pushq $121
+  pushq $135
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3775,14 +4195,14 @@ cuGraphExecMemsetNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+976(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1088(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+976(%rip)
+  jmp *_libcuda_so_tramp_table+1088(%rip)
 2:
-  pushq $122
+  pushq $136
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3805,14 +4225,14 @@ cuGraphExecUpdate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+984(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1096(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+984(%rip)
+  jmp *_libcuda_so_tramp_table+1096(%rip)
 2:
-  pushq $123
+  pushq $137
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3835,14 +4255,14 @@ cuGraphGetEdges:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+992(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1104(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+992(%rip)
+  jmp *_libcuda_so_tramp_table+1104(%rip)
 2:
-  pushq $124
+  pushq $138
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3865,14 +4285,14 @@ cuGraphGetNodes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1000(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1112(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1000(%rip)
+  jmp *_libcuda_so_tramp_table+1112(%rip)
 2:
-  pushq $125
+  pushq $139
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3895,14 +4315,14 @@ cuGraphGetRootNodes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1008(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1120(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1008(%rip)
+  jmp *_libcuda_so_tramp_table+1120(%rip)
 2:
-  pushq $126
+  pushq $140
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3925,14 +4345,14 @@ cuGraphHostNodeGetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1016(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1128(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1016(%rip)
+  jmp *_libcuda_so_tramp_table+1128(%rip)
 2:
-  pushq $127
+  pushq $141
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3955,14 +4375,14 @@ cuGraphHostNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1024(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1136(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1024(%rip)
+  jmp *_libcuda_so_tramp_table+1136(%rip)
 2:
-  pushq $128
+  pushq $142
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -3985,14 +4405,14 @@ cuGraphInstantiate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1032(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1144(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1032(%rip)
+  jmp *_libcuda_so_tramp_table+1144(%rip)
 2:
-  pushq $129
+  pushq $143
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4015,14 +4435,14 @@ cuGraphInstantiate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1040(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1152(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1040(%rip)
+  jmp *_libcuda_so_tramp_table+1152(%rip)
 2:
-  pushq $130
+  pushq $144
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4045,14 +4465,14 @@ cuGraphKernelNodeCopyAttributes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1048(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1160(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1048(%rip)
+  jmp *_libcuda_so_tramp_table+1160(%rip)
 2:
-  pushq $131
+  pushq $145
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4075,14 +4495,14 @@ cuGraphKernelNodeGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1056(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1168(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1056(%rip)
+  jmp *_libcuda_so_tramp_table+1168(%rip)
 2:
-  pushq $132
+  pushq $146
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4105,14 +4525,14 @@ cuGraphKernelNodeGetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1064(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1176(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1064(%rip)
+  jmp *_libcuda_so_tramp_table+1176(%rip)
 2:
-  pushq $133
+  pushq $147
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4135,14 +4555,14 @@ cuGraphKernelNodeSetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1072(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1184(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1072(%rip)
+  jmp *_libcuda_so_tramp_table+1184(%rip)
 2:
-  pushq $134
+  pushq $148
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4165,14 +4585,14 @@ cuGraphKernelNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1080(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1192(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1080(%rip)
+  jmp *_libcuda_so_tramp_table+1192(%rip)
 2:
-  pushq $135
+  pushq $149
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4195,14 +4615,14 @@ cuGraphLaunch:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1088(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1200(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1088(%rip)
+  jmp *_libcuda_so_tramp_table+1200(%rip)
 2:
-  pushq $136
+  pushq $150
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4225,14 +4645,14 @@ cuGraphLaunch_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1096(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1208(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1096(%rip)
+  jmp *_libcuda_so_tramp_table+1208(%rip)
 2:
-  pushq $137
+  pushq $151
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4255,14 +4675,14 @@ cuGraphMemcpyNodeGetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1104(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1216(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1104(%rip)
+  jmp *_libcuda_so_tramp_table+1216(%rip)
 2:
-  pushq $138
+  pushq $152
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4285,14 +4705,14 @@ cuGraphMemcpyNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1112(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1224(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1112(%rip)
+  jmp *_libcuda_so_tramp_table+1224(%rip)
 2:
-  pushq $139
+  pushq $153
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4315,14 +4735,14 @@ cuGraphMemsetNodeGetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1120(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1232(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1120(%rip)
+  jmp *_libcuda_so_tramp_table+1232(%rip)
 2:
-  pushq $140
+  pushq $154
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4345,14 +4765,14 @@ cuGraphMemsetNodeSetParams:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1128(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1240(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1128(%rip)
+  jmp *_libcuda_so_tramp_table+1240(%rip)
 2:
-  pushq $141
+  pushq $155
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4375,14 +4795,14 @@ cuGraphNodeFindInClone:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1136(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1248(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1136(%rip)
+  jmp *_libcuda_so_tramp_table+1248(%rip)
 2:
-  pushq $142
+  pushq $156
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4405,14 +4825,14 @@ cuGraphNodeGetDependencies:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1144(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1256(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1144(%rip)
+  jmp *_libcuda_so_tramp_table+1256(%rip)
 2:
-  pushq $143
+  pushq $157
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4435,14 +4855,14 @@ cuGraphNodeGetDependentNodes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1152(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1264(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1152(%rip)
+  jmp *_libcuda_so_tramp_table+1264(%rip)
 2:
-  pushq $144
+  pushq $158
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4465,14 +4885,14 @@ cuGraphNodeGetType:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1160(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1272(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1160(%rip)
+  jmp *_libcuda_so_tramp_table+1272(%rip)
 2:
-  pushq $145
+  pushq $159
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4495,14 +4915,74 @@ cuGraphRemoveDependencies:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1168(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1280(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1168(%rip)
+  jmp *_libcuda_so_tramp_table+1280(%rip)
 2:
-  pushq $146
+  pushq $160
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphUpload
+  .p2align 4
+  .type cuGraphUpload, %function
+cuGraphUpload:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1288(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1288(%rip)
+2:
+  pushq $161
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuGraphUpload_ptsz
+  .p2align 4
+  .type cuGraphUpload_ptsz, %function
+cuGraphUpload_ptsz:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1296(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1296(%rip)
+2:
+  pushq $162
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4525,14 +5005,14 @@ cuGraphicsEGLRegisterImage:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1176(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1304(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1176(%rip)
+  jmp *_libcuda_so_tramp_table+1304(%rip)
 2:
-  pushq $147
+  pushq $163
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4555,14 +5035,14 @@ cuGraphicsGLRegisterBuffer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1184(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1312(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1184(%rip)
+  jmp *_libcuda_so_tramp_table+1312(%rip)
 2:
-  pushq $148
+  pushq $164
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4585,14 +5065,14 @@ cuGraphicsGLRegisterImage:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1192(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1320(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1192(%rip)
+  jmp *_libcuda_so_tramp_table+1320(%rip)
 2:
-  pushq $149
+  pushq $165
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4615,14 +5095,14 @@ cuGraphicsMapResources:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1200(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1328(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1200(%rip)
+  jmp *_libcuda_so_tramp_table+1328(%rip)
 2:
-  pushq $150
+  pushq $166
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4645,14 +5125,14 @@ cuGraphicsMapResources_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1208(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1336(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1208(%rip)
+  jmp *_libcuda_so_tramp_table+1336(%rip)
 2:
-  pushq $151
+  pushq $167
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4675,14 +5155,14 @@ cuGraphicsResourceGetMappedEglFrame:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1216(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1344(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1216(%rip)
+  jmp *_libcuda_so_tramp_table+1344(%rip)
 2:
-  pushq $152
+  pushq $168
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4705,14 +5185,14 @@ cuGraphicsResourceGetMappedMipmappedArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1224(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1352(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1224(%rip)
+  jmp *_libcuda_so_tramp_table+1352(%rip)
 2:
-  pushq $153
+  pushq $169
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4735,14 +5215,14 @@ cuGraphicsResourceGetMappedPointer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1232(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1360(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1232(%rip)
+  jmp *_libcuda_so_tramp_table+1360(%rip)
 2:
-  pushq $154
+  pushq $170
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4765,14 +5245,14 @@ cuGraphicsResourceGetMappedPointer_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1240(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1368(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1240(%rip)
+  jmp *_libcuda_so_tramp_table+1368(%rip)
 2:
-  pushq $155
+  pushq $171
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4795,14 +5275,14 @@ cuGraphicsResourceSetMapFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1248(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1376(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1248(%rip)
+  jmp *_libcuda_so_tramp_table+1376(%rip)
 2:
-  pushq $156
+  pushq $172
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4825,14 +5305,14 @@ cuGraphicsResourceSetMapFlags_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1256(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1384(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1256(%rip)
+  jmp *_libcuda_so_tramp_table+1384(%rip)
 2:
-  pushq $157
+  pushq $173
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4855,14 +5335,14 @@ cuGraphicsSubResourceGetMappedArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1264(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1392(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1264(%rip)
+  jmp *_libcuda_so_tramp_table+1392(%rip)
 2:
-  pushq $158
+  pushq $174
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4885,14 +5365,14 @@ cuGraphicsUnmapResources:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1272(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1400(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1272(%rip)
+  jmp *_libcuda_so_tramp_table+1400(%rip)
 2:
-  pushq $159
+  pushq $175
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4915,14 +5395,14 @@ cuGraphicsUnmapResources_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1280(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1408(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1280(%rip)
+  jmp *_libcuda_so_tramp_table+1408(%rip)
 2:
-  pushq $160
+  pushq $176
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4945,14 +5425,14 @@ cuGraphicsUnregisterResource:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1288(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1416(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1288(%rip)
+  jmp *_libcuda_so_tramp_table+1416(%rip)
 2:
-  pushq $161
+  pushq $177
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -4975,14 +5455,14 @@ cuGraphicsVDPAURegisterOutputSurface:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1296(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1424(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1296(%rip)
+  jmp *_libcuda_so_tramp_table+1424(%rip)
 2:
-  pushq $162
+  pushq $178
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5005,14 +5485,14 @@ cuGraphicsVDPAURegisterVideoSurface:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1304(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1432(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1304(%rip)
+  jmp *_libcuda_so_tramp_table+1432(%rip)
 2:
-  pushq $163
+  pushq $179
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5035,14 +5515,14 @@ cuImportExternalMemory:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1312(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1440(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1312(%rip)
+  jmp *_libcuda_so_tramp_table+1440(%rip)
 2:
-  pushq $164
+  pushq $180
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5065,14 +5545,14 @@ cuImportExternalSemaphore:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1320(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1448(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1320(%rip)
+  jmp *_libcuda_so_tramp_table+1448(%rip)
 2:
-  pushq $165
+  pushq $181
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5095,14 +5575,14 @@ cuInit:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1328(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1456(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1328(%rip)
+  jmp *_libcuda_so_tramp_table+1456(%rip)
 2:
-  pushq $166
+  pushq $182
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5125,14 +5605,14 @@ cuIpcCloseMemHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1336(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1464(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1336(%rip)
+  jmp *_libcuda_so_tramp_table+1464(%rip)
 2:
-  pushq $167
+  pushq $183
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5155,14 +5635,14 @@ cuIpcGetEventHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1344(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1472(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1344(%rip)
+  jmp *_libcuda_so_tramp_table+1472(%rip)
 2:
-  pushq $168
+  pushq $184
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5185,14 +5665,14 @@ cuIpcGetMemHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1352(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1480(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1352(%rip)
+  jmp *_libcuda_so_tramp_table+1480(%rip)
 2:
-  pushq $169
+  pushq $185
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5215,14 +5695,14 @@ cuIpcOpenEventHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1360(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1488(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1360(%rip)
+  jmp *_libcuda_so_tramp_table+1488(%rip)
 2:
-  pushq $170
+  pushq $186
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5245,14 +5725,14 @@ cuIpcOpenMemHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1368(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1496(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1368(%rip)
+  jmp *_libcuda_so_tramp_table+1496(%rip)
 2:
-  pushq $171
+  pushq $187
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5275,14 +5755,14 @@ cuIpcOpenMemHandle_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1376(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1504(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1376(%rip)
+  jmp *_libcuda_so_tramp_table+1504(%rip)
 2:
-  pushq $172
+  pushq $188
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5305,14 +5785,14 @@ cuLaunch:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1384(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1512(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1384(%rip)
+  jmp *_libcuda_so_tramp_table+1512(%rip)
 2:
-  pushq $173
+  pushq $189
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5335,14 +5815,14 @@ cuLaunchCooperativeKernel:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1392(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1520(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1392(%rip)
+  jmp *_libcuda_so_tramp_table+1520(%rip)
 2:
-  pushq $174
+  pushq $190
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5365,14 +5845,14 @@ cuLaunchCooperativeKernelMultiDevice:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1400(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1528(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1400(%rip)
+  jmp *_libcuda_so_tramp_table+1528(%rip)
 2:
-  pushq $175
+  pushq $191
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5395,14 +5875,14 @@ cuLaunchCooperativeKernel_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1408(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1536(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1408(%rip)
+  jmp *_libcuda_so_tramp_table+1536(%rip)
 2:
-  pushq $176
+  pushq $192
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5425,14 +5905,14 @@ cuLaunchGrid:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1416(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1544(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1416(%rip)
+  jmp *_libcuda_so_tramp_table+1544(%rip)
 2:
-  pushq $177
+  pushq $193
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5455,14 +5935,14 @@ cuLaunchGridAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1424(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1552(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1424(%rip)
+  jmp *_libcuda_so_tramp_table+1552(%rip)
 2:
-  pushq $178
+  pushq $194
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5485,14 +5965,14 @@ cuLaunchHostFunc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1432(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1560(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1432(%rip)
+  jmp *_libcuda_so_tramp_table+1560(%rip)
 2:
-  pushq $179
+  pushq $195
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5515,14 +5995,14 @@ cuLaunchHostFunc_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1440(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1568(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1440(%rip)
+  jmp *_libcuda_so_tramp_table+1568(%rip)
 2:
-  pushq $180
+  pushq $196
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5545,14 +6025,14 @@ cuLaunchKernel:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1448(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1576(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1448(%rip)
+  jmp *_libcuda_so_tramp_table+1576(%rip)
 2:
-  pushq $181
+  pushq $197
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5575,14 +6055,14 @@ cuLaunchKernel_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1456(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1584(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1456(%rip)
+  jmp *_libcuda_so_tramp_table+1584(%rip)
 2:
-  pushq $182
+  pushq $198
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5605,14 +6085,14 @@ cuLinkAddData:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1464(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1592(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1464(%rip)
+  jmp *_libcuda_so_tramp_table+1592(%rip)
 2:
-  pushq $183
+  pushq $199
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5635,14 +6115,14 @@ cuLinkAddData_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1472(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1600(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1472(%rip)
+  jmp *_libcuda_so_tramp_table+1600(%rip)
 2:
-  pushq $184
+  pushq $200
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5665,14 +6145,14 @@ cuLinkAddFile:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1480(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1608(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1480(%rip)
+  jmp *_libcuda_so_tramp_table+1608(%rip)
 2:
-  pushq $185
+  pushq $201
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5695,14 +6175,14 @@ cuLinkAddFile_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1488(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1616(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1488(%rip)
+  jmp *_libcuda_so_tramp_table+1616(%rip)
 2:
-  pushq $186
+  pushq $202
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5725,14 +6205,14 @@ cuLinkComplete:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1496(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1624(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1496(%rip)
+  jmp *_libcuda_so_tramp_table+1624(%rip)
 2:
-  pushq $187
+  pushq $203
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5755,14 +6235,14 @@ cuLinkCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1504(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1632(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1504(%rip)
+  jmp *_libcuda_so_tramp_table+1632(%rip)
 2:
-  pushq $188
+  pushq $204
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5785,14 +6265,14 @@ cuLinkCreate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1512(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1640(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1512(%rip)
+  jmp *_libcuda_so_tramp_table+1640(%rip)
 2:
-  pushq $189
+  pushq $205
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5815,14 +6295,14 @@ cuLinkDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1520(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1648(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1520(%rip)
+  jmp *_libcuda_so_tramp_table+1648(%rip)
 2:
-  pushq $190
+  pushq $206
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5845,14 +6325,14 @@ cuMemAddressFree:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1528(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1656(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1528(%rip)
+  jmp *_libcuda_so_tramp_table+1656(%rip)
 2:
-  pushq $191
+  pushq $207
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5875,14 +6355,14 @@ cuMemAddressReserve:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1536(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1664(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1536(%rip)
+  jmp *_libcuda_so_tramp_table+1664(%rip)
 2:
-  pushq $192
+  pushq $208
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5905,14 +6385,14 @@ cuMemAdvise:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1544(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1672(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1544(%rip)
+  jmp *_libcuda_so_tramp_table+1672(%rip)
 2:
-  pushq $193
+  pushq $209
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5935,14 +6415,14 @@ cuMemAlloc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1552(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1680(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1552(%rip)
+  jmp *_libcuda_so_tramp_table+1680(%rip)
 2:
-  pushq $194
+  pushq $210
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5965,14 +6445,14 @@ cuMemAllocHost:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1560(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1688(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1560(%rip)
+  jmp *_libcuda_so_tramp_table+1688(%rip)
 2:
-  pushq $195
+  pushq $211
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -5995,14 +6475,14 @@ cuMemAllocHost_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1568(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1696(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1568(%rip)
+  jmp *_libcuda_so_tramp_table+1696(%rip)
 2:
-  pushq $196
+  pushq $212
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6025,14 +6505,14 @@ cuMemAllocManaged:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1576(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1704(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1576(%rip)
+  jmp *_libcuda_so_tramp_table+1704(%rip)
 2:
-  pushq $197
+  pushq $213
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6055,14 +6535,14 @@ cuMemAllocPitch:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1584(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1712(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1584(%rip)
+  jmp *_libcuda_so_tramp_table+1712(%rip)
 2:
-  pushq $198
+  pushq $214
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6085,14 +6565,14 @@ cuMemAllocPitch_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1592(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1720(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1592(%rip)
+  jmp *_libcuda_so_tramp_table+1720(%rip)
 2:
-  pushq $199
+  pushq $215
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6115,14 +6595,14 @@ cuMemAlloc_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1600(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1728(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1600(%rip)
+  jmp *_libcuda_so_tramp_table+1728(%rip)
 2:
-  pushq $200
+  pushq $216
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6145,14 +6625,14 @@ cuMemCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1608(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1736(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1608(%rip)
+  jmp *_libcuda_so_tramp_table+1736(%rip)
 2:
-  pushq $201
+  pushq $217
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6175,14 +6655,14 @@ cuMemExportToShareableHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1616(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1744(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1616(%rip)
+  jmp *_libcuda_so_tramp_table+1744(%rip)
 2:
-  pushq $202
+  pushq $218
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6205,14 +6685,14 @@ cuMemFree:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1624(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1752(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1624(%rip)
+  jmp *_libcuda_so_tramp_table+1752(%rip)
 2:
-  pushq $203
+  pushq $219
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6235,14 +6715,14 @@ cuMemFreeHost:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1632(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1760(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1632(%rip)
+  jmp *_libcuda_so_tramp_table+1760(%rip)
 2:
-  pushq $204
+  pushq $220
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6265,14 +6745,14 @@ cuMemFree_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1640(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1768(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1640(%rip)
+  jmp *_libcuda_so_tramp_table+1768(%rip)
 2:
-  pushq $205
+  pushq $221
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6295,14 +6775,14 @@ cuMemGetAccess:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1648(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1776(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1648(%rip)
+  jmp *_libcuda_so_tramp_table+1776(%rip)
 2:
-  pushq $206
+  pushq $222
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6325,14 +6805,14 @@ cuMemGetAddressRange:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1656(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1784(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1656(%rip)
+  jmp *_libcuda_so_tramp_table+1784(%rip)
 2:
-  pushq $207
+  pushq $223
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6355,14 +6835,14 @@ cuMemGetAddressRange_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1664(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1792(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1664(%rip)
+  jmp *_libcuda_so_tramp_table+1792(%rip)
 2:
-  pushq $208
+  pushq $224
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6385,14 +6865,14 @@ cuMemGetAllocationGranularity:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1672(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1800(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1672(%rip)
+  jmp *_libcuda_so_tramp_table+1800(%rip)
 2:
-  pushq $209
+  pushq $225
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6415,14 +6895,14 @@ cuMemGetAllocationPropertiesFromHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1680(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1808(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1680(%rip)
+  jmp *_libcuda_so_tramp_table+1808(%rip)
 2:
-  pushq $210
+  pushq $226
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6445,14 +6925,14 @@ cuMemGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1688(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1816(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1688(%rip)
+  jmp *_libcuda_so_tramp_table+1816(%rip)
 2:
-  pushq $211
+  pushq $227
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6475,14 +6955,14 @@ cuMemGetAttribute_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1696(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1824(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1696(%rip)
+  jmp *_libcuda_so_tramp_table+1824(%rip)
 2:
-  pushq $212
+  pushq $228
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6505,14 +6985,14 @@ cuMemGetInfo:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1704(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1832(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1704(%rip)
+  jmp *_libcuda_so_tramp_table+1832(%rip)
 2:
-  pushq $213
+  pushq $229
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6535,14 +7015,14 @@ cuMemGetInfo_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1712(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1840(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1712(%rip)
+  jmp *_libcuda_so_tramp_table+1840(%rip)
 2:
-  pushq $214
+  pushq $230
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6565,14 +7045,14 @@ cuMemHostAlloc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1720(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1848(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1720(%rip)
+  jmp *_libcuda_so_tramp_table+1848(%rip)
 2:
-  pushq $215
+  pushq $231
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6595,14 +7075,14 @@ cuMemHostGetDevicePointer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1728(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1856(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1728(%rip)
+  jmp *_libcuda_so_tramp_table+1856(%rip)
 2:
-  pushq $216
+  pushq $232
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6625,14 +7105,14 @@ cuMemHostGetDevicePointer_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1736(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1864(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1736(%rip)
+  jmp *_libcuda_so_tramp_table+1864(%rip)
 2:
-  pushq $217
+  pushq $233
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6655,14 +7135,14 @@ cuMemHostGetFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1744(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1872(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1744(%rip)
+  jmp *_libcuda_so_tramp_table+1872(%rip)
 2:
-  pushq $218
+  pushq $234
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6685,14 +7165,14 @@ cuMemHostRegister:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1752(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1880(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1752(%rip)
+  jmp *_libcuda_so_tramp_table+1880(%rip)
 2:
-  pushq $219
+  pushq $235
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6715,14 +7195,14 @@ cuMemHostRegister_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1760(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1888(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1760(%rip)
+  jmp *_libcuda_so_tramp_table+1888(%rip)
 2:
-  pushq $220
+  pushq $236
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6745,14 +7225,14 @@ cuMemHostUnregister:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1768(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1896(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1768(%rip)
+  jmp *_libcuda_so_tramp_table+1896(%rip)
 2:
-  pushq $221
+  pushq $237
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6775,14 +7255,14 @@ cuMemImportFromShareableHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1776(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1904(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1776(%rip)
+  jmp *_libcuda_so_tramp_table+1904(%rip)
 2:
-  pushq $222
+  pushq $238
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6805,14 +7285,74 @@ cuMemMap:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1784(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1912(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1784(%rip)
+  jmp *_libcuda_so_tramp_table+1912(%rip)
 2:
-  pushq $223
+  pushq $239
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuMemMapArrayAsync
+  .p2align 4
+  .type cuMemMapArrayAsync, %function
+cuMemMapArrayAsync:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1920(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1920(%rip)
+2:
+  pushq $240
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuMemMapArrayAsync_ptsz
+  .p2align 4
+  .type cuMemMapArrayAsync_ptsz, %function
+cuMemMapArrayAsync_ptsz:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+1928(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+1928(%rip)
+2:
+  pushq $241
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6835,14 +7375,14 @@ cuMemPrefetchAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1792(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1936(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1792(%rip)
+  jmp *_libcuda_so_tramp_table+1936(%rip)
 2:
-  pushq $224
+  pushq $242
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6865,14 +7405,14 @@ cuMemPrefetchAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1800(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1944(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1800(%rip)
+  jmp *_libcuda_so_tramp_table+1944(%rip)
 2:
-  pushq $225
+  pushq $243
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6895,14 +7435,14 @@ cuMemRangeGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1808(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1952(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1808(%rip)
+  jmp *_libcuda_so_tramp_table+1952(%rip)
 2:
-  pushq $226
+  pushq $244
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6925,14 +7465,14 @@ cuMemRangeGetAttributes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1816(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1960(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1816(%rip)
+  jmp *_libcuda_so_tramp_table+1960(%rip)
 2:
-  pushq $227
+  pushq $245
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6955,14 +7495,14 @@ cuMemRelease:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1824(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1968(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1824(%rip)
+  jmp *_libcuda_so_tramp_table+1968(%rip)
 2:
-  pushq $228
+  pushq $246
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -6985,14 +7525,14 @@ cuMemRetainAllocationHandle:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1832(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1976(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1832(%rip)
+  jmp *_libcuda_so_tramp_table+1976(%rip)
 2:
-  pushq $229
+  pushq $247
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7015,14 +7555,14 @@ cuMemSetAccess:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1840(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1984(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1840(%rip)
+  jmp *_libcuda_so_tramp_table+1984(%rip)
 2:
-  pushq $230
+  pushq $248
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7045,14 +7585,14 @@ cuMemUnmap:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1848(%rip)
+  cmpq $0, _libcuda_so_tramp_table+1992(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1848(%rip)
+  jmp *_libcuda_so_tramp_table+1992(%rip)
 2:
-  pushq $231
+  pushq $249
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7075,14 +7615,14 @@ cuMemcpy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1856(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2000(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1856(%rip)
+  jmp *_libcuda_so_tramp_table+2000(%rip)
 2:
-  pushq $232
+  pushq $250
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7105,14 +7645,14 @@ cuMemcpy2D:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1864(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2008(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1864(%rip)
+  jmp *_libcuda_so_tramp_table+2008(%rip)
 2:
-  pushq $233
+  pushq $251
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7135,14 +7675,14 @@ cuMemcpy2DAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1872(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2016(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1872(%rip)
+  jmp *_libcuda_so_tramp_table+2016(%rip)
 2:
-  pushq $234
+  pushq $252
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7165,14 +7705,14 @@ cuMemcpy2DAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1880(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2024(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1880(%rip)
+  jmp *_libcuda_so_tramp_table+2024(%rip)
 2:
-  pushq $235
+  pushq $253
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7195,14 +7735,14 @@ cuMemcpy2DAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1888(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2032(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1888(%rip)
+  jmp *_libcuda_so_tramp_table+2032(%rip)
 2:
-  pushq $236
+  pushq $254
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7225,14 +7765,14 @@ cuMemcpy2DUnaligned:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1896(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2040(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1896(%rip)
+  jmp *_libcuda_so_tramp_table+2040(%rip)
 2:
-  pushq $237
+  pushq $255
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7255,14 +7795,14 @@ cuMemcpy2DUnaligned_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1904(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2048(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1904(%rip)
+  jmp *_libcuda_so_tramp_table+2048(%rip)
 2:
-  pushq $238
+  pushq $256
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7285,14 +7825,14 @@ cuMemcpy2DUnaligned_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1912(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2056(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1912(%rip)
+  jmp *_libcuda_so_tramp_table+2056(%rip)
 2:
-  pushq $239
+  pushq $257
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7315,14 +7855,14 @@ cuMemcpy2D_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1920(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2064(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1920(%rip)
+  jmp *_libcuda_so_tramp_table+2064(%rip)
 2:
-  pushq $240
+  pushq $258
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7345,14 +7885,14 @@ cuMemcpy2D_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1928(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2072(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1928(%rip)
+  jmp *_libcuda_so_tramp_table+2072(%rip)
 2:
-  pushq $241
+  pushq $259
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7375,14 +7915,14 @@ cuMemcpy3D:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1936(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2080(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1936(%rip)
+  jmp *_libcuda_so_tramp_table+2080(%rip)
 2:
-  pushq $242
+  pushq $260
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7405,14 +7945,14 @@ cuMemcpy3DAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1944(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2088(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1944(%rip)
+  jmp *_libcuda_so_tramp_table+2088(%rip)
 2:
-  pushq $243
+  pushq $261
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7435,14 +7975,14 @@ cuMemcpy3DAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1952(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2096(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1952(%rip)
+  jmp *_libcuda_so_tramp_table+2096(%rip)
 2:
-  pushq $244
+  pushq $262
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7465,14 +8005,14 @@ cuMemcpy3DAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1960(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2104(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1960(%rip)
+  jmp *_libcuda_so_tramp_table+2104(%rip)
 2:
-  pushq $245
+  pushq $263
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7495,14 +8035,14 @@ cuMemcpy3DPeer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1968(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2112(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1968(%rip)
+  jmp *_libcuda_so_tramp_table+2112(%rip)
 2:
-  pushq $246
+  pushq $264
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7525,14 +8065,14 @@ cuMemcpy3DPeerAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1976(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2120(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1976(%rip)
+  jmp *_libcuda_so_tramp_table+2120(%rip)
 2:
-  pushq $247
+  pushq $265
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7555,14 +8095,14 @@ cuMemcpy3DPeerAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1984(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2128(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1984(%rip)
+  jmp *_libcuda_so_tramp_table+2128(%rip)
 2:
-  pushq $248
+  pushq $266
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7585,14 +8125,14 @@ cuMemcpy3DPeer_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+1992(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2136(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+1992(%rip)
+  jmp *_libcuda_so_tramp_table+2136(%rip)
 2:
-  pushq $249
+  pushq $267
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7615,14 +8155,14 @@ cuMemcpy3D_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2000(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2144(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2000(%rip)
+  jmp *_libcuda_so_tramp_table+2144(%rip)
 2:
-  pushq $250
+  pushq $268
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7645,14 +8185,14 @@ cuMemcpy3D_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2008(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2152(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2008(%rip)
+  jmp *_libcuda_so_tramp_table+2152(%rip)
 2:
-  pushq $251
+  pushq $269
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7675,14 +8215,14 @@ cuMemcpyAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2016(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2160(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2016(%rip)
+  jmp *_libcuda_so_tramp_table+2160(%rip)
 2:
-  pushq $252
+  pushq $270
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7705,14 +8245,14 @@ cuMemcpyAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2024(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2168(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2024(%rip)
+  jmp *_libcuda_so_tramp_table+2168(%rip)
 2:
-  pushq $253
+  pushq $271
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7735,14 +8275,14 @@ cuMemcpyAtoA:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2032(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2176(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2032(%rip)
+  jmp *_libcuda_so_tramp_table+2176(%rip)
 2:
-  pushq $254
+  pushq $272
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7765,14 +8305,14 @@ cuMemcpyAtoA_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2040(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2184(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2040(%rip)
+  jmp *_libcuda_so_tramp_table+2184(%rip)
 2:
-  pushq $255
+  pushq $273
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7795,14 +8335,14 @@ cuMemcpyAtoA_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2048(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2192(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2048(%rip)
+  jmp *_libcuda_so_tramp_table+2192(%rip)
 2:
-  pushq $256
+  pushq $274
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7825,14 +8365,14 @@ cuMemcpyAtoD:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2056(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2200(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2056(%rip)
+  jmp *_libcuda_so_tramp_table+2200(%rip)
 2:
-  pushq $257
+  pushq $275
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7855,14 +8395,14 @@ cuMemcpyAtoD_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2064(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2208(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2064(%rip)
+  jmp *_libcuda_so_tramp_table+2208(%rip)
 2:
-  pushq $258
+  pushq $276
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7885,14 +8425,14 @@ cuMemcpyAtoD_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2072(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2216(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2072(%rip)
+  jmp *_libcuda_so_tramp_table+2216(%rip)
 2:
-  pushq $259
+  pushq $277
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7915,14 +8455,14 @@ cuMemcpyAtoH:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2080(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2224(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2080(%rip)
+  jmp *_libcuda_so_tramp_table+2224(%rip)
 2:
-  pushq $260
+  pushq $278
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7945,14 +8485,14 @@ cuMemcpyAtoHAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2088(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2232(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2088(%rip)
+  jmp *_libcuda_so_tramp_table+2232(%rip)
 2:
-  pushq $261
+  pushq $279
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -7975,14 +8515,14 @@ cuMemcpyAtoHAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2096(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2240(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2096(%rip)
+  jmp *_libcuda_so_tramp_table+2240(%rip)
 2:
-  pushq $262
+  pushq $280
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8005,14 +8545,14 @@ cuMemcpyAtoHAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2104(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2248(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2104(%rip)
+  jmp *_libcuda_so_tramp_table+2248(%rip)
 2:
-  pushq $263
+  pushq $281
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8035,14 +8575,14 @@ cuMemcpyAtoH_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2112(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2256(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2112(%rip)
+  jmp *_libcuda_so_tramp_table+2256(%rip)
 2:
-  pushq $264
+  pushq $282
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8065,14 +8605,14 @@ cuMemcpyAtoH_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2120(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2264(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2120(%rip)
+  jmp *_libcuda_so_tramp_table+2264(%rip)
 2:
-  pushq $265
+  pushq $283
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8095,14 +8635,14 @@ cuMemcpyDtoA:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2128(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2272(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2128(%rip)
+  jmp *_libcuda_so_tramp_table+2272(%rip)
 2:
-  pushq $266
+  pushq $284
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8125,14 +8665,14 @@ cuMemcpyDtoA_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2136(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2280(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2136(%rip)
+  jmp *_libcuda_so_tramp_table+2280(%rip)
 2:
-  pushq $267
+  pushq $285
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8155,14 +8695,14 @@ cuMemcpyDtoA_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2144(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2288(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2144(%rip)
+  jmp *_libcuda_so_tramp_table+2288(%rip)
 2:
-  pushq $268
+  pushq $286
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8185,14 +8725,14 @@ cuMemcpyDtoD:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2152(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2296(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2152(%rip)
+  jmp *_libcuda_so_tramp_table+2296(%rip)
 2:
-  pushq $269
+  pushq $287
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8215,14 +8755,14 @@ cuMemcpyDtoDAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2160(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2304(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2160(%rip)
+  jmp *_libcuda_so_tramp_table+2304(%rip)
 2:
-  pushq $270
+  pushq $288
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8245,14 +8785,14 @@ cuMemcpyDtoDAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2168(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2312(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2168(%rip)
+  jmp *_libcuda_so_tramp_table+2312(%rip)
 2:
-  pushq $271
+  pushq $289
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8275,14 +8815,14 @@ cuMemcpyDtoDAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2176(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2320(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2176(%rip)
+  jmp *_libcuda_so_tramp_table+2320(%rip)
 2:
-  pushq $272
+  pushq $290
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8305,14 +8845,14 @@ cuMemcpyDtoD_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2184(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2328(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2184(%rip)
+  jmp *_libcuda_so_tramp_table+2328(%rip)
 2:
-  pushq $273
+  pushq $291
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8335,14 +8875,14 @@ cuMemcpyDtoD_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2192(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2336(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2192(%rip)
+  jmp *_libcuda_so_tramp_table+2336(%rip)
 2:
-  pushq $274
+  pushq $292
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8365,14 +8905,14 @@ cuMemcpyDtoH:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2200(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2344(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2200(%rip)
+  jmp *_libcuda_so_tramp_table+2344(%rip)
 2:
-  pushq $275
+  pushq $293
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8395,14 +8935,14 @@ cuMemcpyDtoHAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2208(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2352(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2208(%rip)
+  jmp *_libcuda_so_tramp_table+2352(%rip)
 2:
-  pushq $276
+  pushq $294
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8425,14 +8965,14 @@ cuMemcpyDtoHAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2216(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2360(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2216(%rip)
+  jmp *_libcuda_so_tramp_table+2360(%rip)
 2:
-  pushq $277
+  pushq $295
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8455,14 +8995,14 @@ cuMemcpyDtoHAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2224(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2368(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2224(%rip)
+  jmp *_libcuda_so_tramp_table+2368(%rip)
 2:
-  pushq $278
+  pushq $296
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8485,14 +9025,14 @@ cuMemcpyDtoH_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2232(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2376(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2232(%rip)
+  jmp *_libcuda_so_tramp_table+2376(%rip)
 2:
-  pushq $279
+  pushq $297
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8515,14 +9055,14 @@ cuMemcpyDtoH_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2240(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2384(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2240(%rip)
+  jmp *_libcuda_so_tramp_table+2384(%rip)
 2:
-  pushq $280
+  pushq $298
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8545,14 +9085,14 @@ cuMemcpyHtoA:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2248(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2392(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2248(%rip)
+  jmp *_libcuda_so_tramp_table+2392(%rip)
 2:
-  pushq $281
+  pushq $299
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8575,14 +9115,14 @@ cuMemcpyHtoAAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2256(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2400(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2256(%rip)
+  jmp *_libcuda_so_tramp_table+2400(%rip)
 2:
-  pushq $282
+  pushq $300
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8605,14 +9145,14 @@ cuMemcpyHtoAAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2264(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2408(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2264(%rip)
+  jmp *_libcuda_so_tramp_table+2408(%rip)
 2:
-  pushq $283
+  pushq $301
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8635,14 +9175,14 @@ cuMemcpyHtoAAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2272(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2416(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2272(%rip)
+  jmp *_libcuda_so_tramp_table+2416(%rip)
 2:
-  pushq $284
+  pushq $302
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8665,14 +9205,14 @@ cuMemcpyHtoA_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2280(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2424(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2280(%rip)
+  jmp *_libcuda_so_tramp_table+2424(%rip)
 2:
-  pushq $285
+  pushq $303
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8695,14 +9235,14 @@ cuMemcpyHtoA_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2288(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2432(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2288(%rip)
+  jmp *_libcuda_so_tramp_table+2432(%rip)
 2:
-  pushq $286
+  pushq $304
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8725,14 +9265,14 @@ cuMemcpyHtoD:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2296(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2440(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2296(%rip)
+  jmp *_libcuda_so_tramp_table+2440(%rip)
 2:
-  pushq $287
+  pushq $305
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8755,14 +9295,14 @@ cuMemcpyHtoDAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2304(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2448(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2304(%rip)
+  jmp *_libcuda_so_tramp_table+2448(%rip)
 2:
-  pushq $288
+  pushq $306
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8785,14 +9325,14 @@ cuMemcpyHtoDAsync_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2312(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2456(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2312(%rip)
+  jmp *_libcuda_so_tramp_table+2456(%rip)
 2:
-  pushq $289
+  pushq $307
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8815,14 +9355,14 @@ cuMemcpyHtoDAsync_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2320(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2464(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2320(%rip)
+  jmp *_libcuda_so_tramp_table+2464(%rip)
 2:
-  pushq $290
+  pushq $308
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8845,14 +9385,14 @@ cuMemcpyHtoD_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2328(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2472(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2328(%rip)
+  jmp *_libcuda_so_tramp_table+2472(%rip)
 2:
-  pushq $291
+  pushq $309
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8875,14 +9415,14 @@ cuMemcpyHtoD_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2336(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2480(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2336(%rip)
+  jmp *_libcuda_so_tramp_table+2480(%rip)
 2:
-  pushq $292
+  pushq $310
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8905,14 +9445,14 @@ cuMemcpyPeer:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2344(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2488(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2344(%rip)
+  jmp *_libcuda_so_tramp_table+2488(%rip)
 2:
-  pushq $293
+  pushq $311
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8935,14 +9475,14 @@ cuMemcpyPeerAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2352(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2496(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2352(%rip)
+  jmp *_libcuda_so_tramp_table+2496(%rip)
 2:
-  pushq $294
+  pushq $312
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8965,14 +9505,14 @@ cuMemcpyPeerAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2360(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2504(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2360(%rip)
+  jmp *_libcuda_so_tramp_table+2504(%rip)
 2:
-  pushq $295
+  pushq $313
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -8995,14 +9535,14 @@ cuMemcpyPeer_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2368(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2512(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2368(%rip)
+  jmp *_libcuda_so_tramp_table+2512(%rip)
 2:
-  pushq $296
+  pushq $314
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9025,14 +9565,14 @@ cuMemcpy_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2376(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2520(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2376(%rip)
+  jmp *_libcuda_so_tramp_table+2520(%rip)
 2:
-  pushq $297
+  pushq $315
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9055,14 +9595,14 @@ cuMemsetD16:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2384(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2528(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2384(%rip)
+  jmp *_libcuda_so_tramp_table+2528(%rip)
 2:
-  pushq $298
+  pushq $316
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9085,14 +9625,14 @@ cuMemsetD16Async:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2392(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2536(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2392(%rip)
+  jmp *_libcuda_so_tramp_table+2536(%rip)
 2:
-  pushq $299
+  pushq $317
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9115,14 +9655,14 @@ cuMemsetD16Async_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2400(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2544(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2400(%rip)
+  jmp *_libcuda_so_tramp_table+2544(%rip)
 2:
-  pushq $300
+  pushq $318
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9145,14 +9685,14 @@ cuMemsetD16_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2408(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2552(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2408(%rip)
+  jmp *_libcuda_so_tramp_table+2552(%rip)
 2:
-  pushq $301
+  pushq $319
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9175,14 +9715,14 @@ cuMemsetD16_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2416(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2560(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2416(%rip)
+  jmp *_libcuda_so_tramp_table+2560(%rip)
 2:
-  pushq $302
+  pushq $320
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9205,14 +9745,14 @@ cuMemsetD2D16:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2424(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2568(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2424(%rip)
+  jmp *_libcuda_so_tramp_table+2568(%rip)
 2:
-  pushq $303
+  pushq $321
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9235,14 +9775,14 @@ cuMemsetD2D16Async:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2432(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2576(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2432(%rip)
+  jmp *_libcuda_so_tramp_table+2576(%rip)
 2:
-  pushq $304
+  pushq $322
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9265,14 +9805,14 @@ cuMemsetD2D16Async_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2440(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2584(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2440(%rip)
+  jmp *_libcuda_so_tramp_table+2584(%rip)
 2:
-  pushq $305
+  pushq $323
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9295,14 +9835,14 @@ cuMemsetD2D16_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2448(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2592(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2448(%rip)
+  jmp *_libcuda_so_tramp_table+2592(%rip)
 2:
-  pushq $306
+  pushq $324
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9325,14 +9865,14 @@ cuMemsetD2D16_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2456(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2600(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2456(%rip)
+  jmp *_libcuda_so_tramp_table+2600(%rip)
 2:
-  pushq $307
+  pushq $325
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9355,14 +9895,14 @@ cuMemsetD2D32:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2464(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2608(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2464(%rip)
+  jmp *_libcuda_so_tramp_table+2608(%rip)
 2:
-  pushq $308
+  pushq $326
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9385,14 +9925,14 @@ cuMemsetD2D32Async:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2472(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2616(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2472(%rip)
+  jmp *_libcuda_so_tramp_table+2616(%rip)
 2:
-  pushq $309
+  pushq $327
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9415,14 +9955,14 @@ cuMemsetD2D32Async_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2480(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2624(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2480(%rip)
+  jmp *_libcuda_so_tramp_table+2624(%rip)
 2:
-  pushq $310
+  pushq $328
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9445,14 +9985,14 @@ cuMemsetD2D32_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2488(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2632(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2488(%rip)
+  jmp *_libcuda_so_tramp_table+2632(%rip)
 2:
-  pushq $311
+  pushq $329
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9475,14 +10015,14 @@ cuMemsetD2D32_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2496(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2640(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2496(%rip)
+  jmp *_libcuda_so_tramp_table+2640(%rip)
 2:
-  pushq $312
+  pushq $330
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9505,14 +10045,14 @@ cuMemsetD2D8:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2504(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2648(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2504(%rip)
+  jmp *_libcuda_so_tramp_table+2648(%rip)
 2:
-  pushq $313
+  pushq $331
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9535,14 +10075,14 @@ cuMemsetD2D8Async:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2512(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2656(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2512(%rip)
+  jmp *_libcuda_so_tramp_table+2656(%rip)
 2:
-  pushq $314
+  pushq $332
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9565,14 +10105,14 @@ cuMemsetD2D8Async_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2520(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2664(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2520(%rip)
+  jmp *_libcuda_so_tramp_table+2664(%rip)
 2:
-  pushq $315
+  pushq $333
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9595,14 +10135,14 @@ cuMemsetD2D8_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2528(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2672(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2528(%rip)
+  jmp *_libcuda_so_tramp_table+2672(%rip)
 2:
-  pushq $316
+  pushq $334
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9625,14 +10165,14 @@ cuMemsetD2D8_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2536(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2680(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2536(%rip)
+  jmp *_libcuda_so_tramp_table+2680(%rip)
 2:
-  pushq $317
+  pushq $335
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9655,14 +10195,14 @@ cuMemsetD32:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2544(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2688(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2544(%rip)
+  jmp *_libcuda_so_tramp_table+2688(%rip)
 2:
-  pushq $318
+  pushq $336
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9685,14 +10225,14 @@ cuMemsetD32Async:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2552(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2696(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2552(%rip)
+  jmp *_libcuda_so_tramp_table+2696(%rip)
 2:
-  pushq $319
+  pushq $337
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9715,14 +10255,14 @@ cuMemsetD32Async_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2560(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2704(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2560(%rip)
+  jmp *_libcuda_so_tramp_table+2704(%rip)
 2:
-  pushq $320
+  pushq $338
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9745,14 +10285,14 @@ cuMemsetD32_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2568(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2712(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2568(%rip)
+  jmp *_libcuda_so_tramp_table+2712(%rip)
 2:
-  pushq $321
+  pushq $339
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9775,14 +10315,14 @@ cuMemsetD32_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2576(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2720(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2576(%rip)
+  jmp *_libcuda_so_tramp_table+2720(%rip)
 2:
-  pushq $322
+  pushq $340
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9805,14 +10345,14 @@ cuMemsetD8:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2584(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2728(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2584(%rip)
+  jmp *_libcuda_so_tramp_table+2728(%rip)
 2:
-  pushq $323
+  pushq $341
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9835,14 +10375,14 @@ cuMemsetD8Async:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2592(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2736(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2592(%rip)
+  jmp *_libcuda_so_tramp_table+2736(%rip)
 2:
-  pushq $324
+  pushq $342
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9865,14 +10405,14 @@ cuMemsetD8Async_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2600(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2744(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2600(%rip)
+  jmp *_libcuda_so_tramp_table+2744(%rip)
 2:
-  pushq $325
+  pushq $343
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9895,14 +10435,14 @@ cuMemsetD8_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2608(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2752(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2608(%rip)
+  jmp *_libcuda_so_tramp_table+2752(%rip)
 2:
-  pushq $326
+  pushq $344
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9925,14 +10465,14 @@ cuMemsetD8_v2_ptds:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2616(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2760(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2616(%rip)
+  jmp *_libcuda_so_tramp_table+2760(%rip)
 2:
-  pushq $327
+  pushq $345
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9955,14 +10495,14 @@ cuMipmappedArrayCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2624(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2768(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2624(%rip)
+  jmp *_libcuda_so_tramp_table+2768(%rip)
 2:
-  pushq $328
+  pushq $346
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -9985,14 +10525,14 @@ cuMipmappedArrayDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2632(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2776(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2632(%rip)
+  jmp *_libcuda_so_tramp_table+2776(%rip)
 2:
-  pushq $329
+  pushq $347
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10015,14 +10555,44 @@ cuMipmappedArrayGetLevel:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2640(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2784(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2640(%rip)
+  jmp *_libcuda_so_tramp_table+2784(%rip)
 2:
-  pushq $330
+  pushq $348
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
+  addq $8, %rsp
+  .cfi_adjust_cfa_offset -8
+  jmp 1b
+  .cfi_endproc
+
+/*
+ * Copyright 2018-2019 Yury Gribov
+ *
+ * The MIT License (MIT)
+ *
+ * Use of this source code is governed by MIT license that can be
+ * found in the LICENSE.txt file.
+ */
+
+  .globl cuMipmappedArrayGetSparseProperties
+  .p2align 4
+  .type cuMipmappedArrayGetSparseProperties, %function
+cuMipmappedArrayGetSparseProperties:
+  .cfi_startproc
+  // Intel opt. manual says to
+  // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
+  // to hint static predictor.
+  cmpq $0, _libcuda_so_tramp_table+2792(%rip)
+  je 2f
+1:
+  jmp *_libcuda_so_tramp_table+2792(%rip)
+2:
+  pushq $349
+  .cfi_adjust_cfa_offset 8
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10045,14 +10615,14 @@ cuModuleGetFunction:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2648(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2800(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2648(%rip)
+  jmp *_libcuda_so_tramp_table+2800(%rip)
 2:
-  pushq $331
+  pushq $350
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10075,14 +10645,14 @@ cuModuleGetGlobal:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2656(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2808(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2656(%rip)
+  jmp *_libcuda_so_tramp_table+2808(%rip)
 2:
-  pushq $332
+  pushq $351
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10105,14 +10675,14 @@ cuModuleGetGlobal_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2664(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2816(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2664(%rip)
+  jmp *_libcuda_so_tramp_table+2816(%rip)
 2:
-  pushq $333
+  pushq $352
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10135,14 +10705,14 @@ cuModuleGetSurfRef:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2672(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2824(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2672(%rip)
+  jmp *_libcuda_so_tramp_table+2824(%rip)
 2:
-  pushq $334
+  pushq $353
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10165,14 +10735,14 @@ cuModuleGetTexRef:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2680(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2832(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2680(%rip)
+  jmp *_libcuda_so_tramp_table+2832(%rip)
 2:
-  pushq $335
+  pushq $354
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10195,14 +10765,14 @@ cuModuleLoad:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2688(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2840(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2688(%rip)
+  jmp *_libcuda_so_tramp_table+2840(%rip)
 2:
-  pushq $336
+  pushq $355
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10225,14 +10795,14 @@ cuModuleLoadData:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2696(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2848(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2696(%rip)
+  jmp *_libcuda_so_tramp_table+2848(%rip)
 2:
-  pushq $337
+  pushq $356
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10255,14 +10825,14 @@ cuModuleLoadDataEx:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2704(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2856(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2704(%rip)
+  jmp *_libcuda_so_tramp_table+2856(%rip)
 2:
-  pushq $338
+  pushq $357
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10285,14 +10855,14 @@ cuModuleLoadFatBinary:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2712(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2864(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2712(%rip)
+  jmp *_libcuda_so_tramp_table+2864(%rip)
 2:
-  pushq $339
+  pushq $358
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10315,14 +10885,14 @@ cuModuleUnload:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2720(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2872(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2720(%rip)
+  jmp *_libcuda_so_tramp_table+2872(%rip)
 2:
-  pushq $340
+  pushq $359
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10345,14 +10915,14 @@ cuOccupancyAvailableDynamicSMemPerBlock:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2728(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2880(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2728(%rip)
+  jmp *_libcuda_so_tramp_table+2880(%rip)
 2:
-  pushq $341
+  pushq $360
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10375,14 +10945,14 @@ cuOccupancyMaxActiveBlocksPerMultiprocessor:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2736(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2888(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2736(%rip)
+  jmp *_libcuda_so_tramp_table+2888(%rip)
 2:
-  pushq $342
+  pushq $361
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10405,14 +10975,14 @@ cuOccupancyMaxActiveBlocksPerMultiprocessorWithFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2744(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2896(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2744(%rip)
+  jmp *_libcuda_so_tramp_table+2896(%rip)
 2:
-  pushq $343
+  pushq $362
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10435,14 +11005,14 @@ cuOccupancyMaxPotentialBlockSize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2752(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2904(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2752(%rip)
+  jmp *_libcuda_so_tramp_table+2904(%rip)
 2:
-  pushq $344
+  pushq $363
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10465,14 +11035,14 @@ cuOccupancyMaxPotentialBlockSizeWithFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2760(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2912(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2760(%rip)
+  jmp *_libcuda_so_tramp_table+2912(%rip)
 2:
-  pushq $345
+  pushq $364
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10495,14 +11065,14 @@ cuParamSetSize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2768(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2920(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2768(%rip)
+  jmp *_libcuda_so_tramp_table+2920(%rip)
 2:
-  pushq $346
+  pushq $365
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10525,14 +11095,14 @@ cuParamSetTexRef:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2776(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2928(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2776(%rip)
+  jmp *_libcuda_so_tramp_table+2928(%rip)
 2:
-  pushq $347
+  pushq $366
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10555,14 +11125,14 @@ cuParamSetf:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2784(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2936(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2784(%rip)
+  jmp *_libcuda_so_tramp_table+2936(%rip)
 2:
-  pushq $348
+  pushq $367
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10585,14 +11155,14 @@ cuParamSeti:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2792(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2944(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2792(%rip)
+  jmp *_libcuda_so_tramp_table+2944(%rip)
 2:
-  pushq $349
+  pushq $368
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10615,14 +11185,14 @@ cuParamSetv:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2800(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2952(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2800(%rip)
+  jmp *_libcuda_so_tramp_table+2952(%rip)
 2:
-  pushq $350
+  pushq $369
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10645,14 +11215,14 @@ cuPointerGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2808(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2960(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2808(%rip)
+  jmp *_libcuda_so_tramp_table+2960(%rip)
 2:
-  pushq $351
+  pushq $370
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10675,14 +11245,14 @@ cuPointerGetAttributes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2816(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2968(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2816(%rip)
+  jmp *_libcuda_so_tramp_table+2968(%rip)
 2:
-  pushq $352
+  pushq $371
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10705,14 +11275,14 @@ cuPointerSetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2824(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2976(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2824(%rip)
+  jmp *_libcuda_so_tramp_table+2976(%rip)
 2:
-  pushq $353
+  pushq $372
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10735,14 +11305,14 @@ cuProfilerInitialize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2832(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2984(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2832(%rip)
+  jmp *_libcuda_so_tramp_table+2984(%rip)
 2:
-  pushq $354
+  pushq $373
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10765,14 +11335,14 @@ cuProfilerStart:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2840(%rip)
+  cmpq $0, _libcuda_so_tramp_table+2992(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2840(%rip)
+  jmp *_libcuda_so_tramp_table+2992(%rip)
 2:
-  pushq $355
+  pushq $374
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10795,14 +11365,14 @@ cuProfilerStop:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2848(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3000(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2848(%rip)
+  jmp *_libcuda_so_tramp_table+3000(%rip)
 2:
-  pushq $356
+  pushq $375
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10825,14 +11395,14 @@ cuSignalExternalSemaphoresAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2856(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3008(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2856(%rip)
+  jmp *_libcuda_so_tramp_table+3008(%rip)
 2:
-  pushq $357
+  pushq $376
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10855,14 +11425,14 @@ cuSignalExternalSemaphoresAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2864(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3016(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2864(%rip)
+  jmp *_libcuda_so_tramp_table+3016(%rip)
 2:
-  pushq $358
+  pushq $377
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10885,14 +11455,14 @@ cuStreamAddCallback:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2872(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3024(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2872(%rip)
+  jmp *_libcuda_so_tramp_table+3024(%rip)
 2:
-  pushq $359
+  pushq $378
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10915,14 +11485,14 @@ cuStreamAddCallback_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2880(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3032(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2880(%rip)
+  jmp *_libcuda_so_tramp_table+3032(%rip)
 2:
-  pushq $360
+  pushq $379
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10945,14 +11515,14 @@ cuStreamAttachMemAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2888(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3040(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2888(%rip)
+  jmp *_libcuda_so_tramp_table+3040(%rip)
 2:
-  pushq $361
+  pushq $380
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -10975,14 +11545,14 @@ cuStreamAttachMemAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2896(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3048(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2896(%rip)
+  jmp *_libcuda_so_tramp_table+3048(%rip)
 2:
-  pushq $362
+  pushq $381
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11005,14 +11575,14 @@ cuStreamBatchMemOp:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2904(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3056(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2904(%rip)
+  jmp *_libcuda_so_tramp_table+3056(%rip)
 2:
-  pushq $363
+  pushq $382
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11035,14 +11605,14 @@ cuStreamBatchMemOp_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2912(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3064(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2912(%rip)
+  jmp *_libcuda_so_tramp_table+3064(%rip)
 2:
-  pushq $364
+  pushq $383
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11065,14 +11635,14 @@ cuStreamBeginCapture:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2920(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3072(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2920(%rip)
+  jmp *_libcuda_so_tramp_table+3072(%rip)
 2:
-  pushq $365
+  pushq $384
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11095,14 +11665,14 @@ cuStreamBeginCapture_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2928(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3080(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2928(%rip)
+  jmp *_libcuda_so_tramp_table+3080(%rip)
 2:
-  pushq $366
+  pushq $385
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11125,14 +11695,14 @@ cuStreamBeginCapture_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2936(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3088(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2936(%rip)
+  jmp *_libcuda_so_tramp_table+3088(%rip)
 2:
-  pushq $367
+  pushq $386
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11155,14 +11725,14 @@ cuStreamBeginCapture_v2_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2944(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3096(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2944(%rip)
+  jmp *_libcuda_so_tramp_table+3096(%rip)
 2:
-  pushq $368
+  pushq $387
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11185,14 +11755,14 @@ cuStreamCopyAttributes:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2952(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3104(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2952(%rip)
+  jmp *_libcuda_so_tramp_table+3104(%rip)
 2:
-  pushq $369
+  pushq $388
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11215,14 +11785,14 @@ cuStreamCopyAttributes_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2960(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3112(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2960(%rip)
+  jmp *_libcuda_so_tramp_table+3112(%rip)
 2:
-  pushq $370
+  pushq $389
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11245,14 +11815,14 @@ cuStreamCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2968(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3120(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2968(%rip)
+  jmp *_libcuda_so_tramp_table+3120(%rip)
 2:
-  pushq $371
+  pushq $390
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11275,14 +11845,14 @@ cuStreamCreateWithPriority:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2976(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3128(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2976(%rip)
+  jmp *_libcuda_so_tramp_table+3128(%rip)
 2:
-  pushq $372
+  pushq $391
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11305,14 +11875,14 @@ cuStreamDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2984(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3136(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2984(%rip)
+  jmp *_libcuda_so_tramp_table+3136(%rip)
 2:
-  pushq $373
+  pushq $392
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11335,14 +11905,14 @@ cuStreamDestroy_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+2992(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3144(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+2992(%rip)
+  jmp *_libcuda_so_tramp_table+3144(%rip)
 2:
-  pushq $374
+  pushq $393
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11365,14 +11935,14 @@ cuStreamEndCapture:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3000(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3152(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3000(%rip)
+  jmp *_libcuda_so_tramp_table+3152(%rip)
 2:
-  pushq $375
+  pushq $394
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11395,14 +11965,14 @@ cuStreamEndCapture_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3008(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3160(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3008(%rip)
+  jmp *_libcuda_so_tramp_table+3160(%rip)
 2:
-  pushq $376
+  pushq $395
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11425,14 +11995,14 @@ cuStreamGetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3016(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3168(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3016(%rip)
+  jmp *_libcuda_so_tramp_table+3168(%rip)
 2:
-  pushq $377
+  pushq $396
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11455,14 +12025,14 @@ cuStreamGetAttribute_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3024(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3176(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3024(%rip)
+  jmp *_libcuda_so_tramp_table+3176(%rip)
 2:
-  pushq $378
+  pushq $397
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11485,14 +12055,14 @@ cuStreamGetCaptureInfo:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3032(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3184(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3032(%rip)
+  jmp *_libcuda_so_tramp_table+3184(%rip)
 2:
-  pushq $379
+  pushq $398
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11515,14 +12085,14 @@ cuStreamGetCaptureInfo_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3040(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3192(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3040(%rip)
+  jmp *_libcuda_so_tramp_table+3192(%rip)
 2:
-  pushq $380
+  pushq $399
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11545,14 +12115,14 @@ cuStreamGetCtx:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3048(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3200(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3048(%rip)
+  jmp *_libcuda_so_tramp_table+3200(%rip)
 2:
-  pushq $381
+  pushq $400
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11575,14 +12145,14 @@ cuStreamGetCtx_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3056(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3208(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3056(%rip)
+  jmp *_libcuda_so_tramp_table+3208(%rip)
 2:
-  pushq $382
+  pushq $401
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11605,14 +12175,14 @@ cuStreamGetFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3064(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3216(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3064(%rip)
+  jmp *_libcuda_so_tramp_table+3216(%rip)
 2:
-  pushq $383
+  pushq $402
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11635,14 +12205,14 @@ cuStreamGetFlags_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3072(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3224(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3072(%rip)
+  jmp *_libcuda_so_tramp_table+3224(%rip)
 2:
-  pushq $384
+  pushq $403
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11665,14 +12235,14 @@ cuStreamGetPriority:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3080(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3232(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3080(%rip)
+  jmp *_libcuda_so_tramp_table+3232(%rip)
 2:
-  pushq $385
+  pushq $404
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11695,14 +12265,14 @@ cuStreamGetPriority_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3088(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3240(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3088(%rip)
+  jmp *_libcuda_so_tramp_table+3240(%rip)
 2:
-  pushq $386
+  pushq $405
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11725,14 +12295,14 @@ cuStreamIsCapturing:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3096(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3248(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3096(%rip)
+  jmp *_libcuda_so_tramp_table+3248(%rip)
 2:
-  pushq $387
+  pushq $406
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11755,14 +12325,14 @@ cuStreamIsCapturing_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3104(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3256(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3104(%rip)
+  jmp *_libcuda_so_tramp_table+3256(%rip)
 2:
-  pushq $388
+  pushq $407
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11785,14 +12355,14 @@ cuStreamQuery:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3112(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3264(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3112(%rip)
+  jmp *_libcuda_so_tramp_table+3264(%rip)
 2:
-  pushq $389
+  pushq $408
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11815,14 +12385,14 @@ cuStreamQuery_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3120(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3272(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3120(%rip)
+  jmp *_libcuda_so_tramp_table+3272(%rip)
 2:
-  pushq $390
+  pushq $409
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11845,14 +12415,14 @@ cuStreamSetAttribute:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3128(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3280(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3128(%rip)
+  jmp *_libcuda_so_tramp_table+3280(%rip)
 2:
-  pushq $391
+  pushq $410
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11875,14 +12445,14 @@ cuStreamSetAttribute_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3136(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3288(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3136(%rip)
+  jmp *_libcuda_so_tramp_table+3288(%rip)
 2:
-  pushq $392
+  pushq $411
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11905,14 +12475,14 @@ cuStreamSynchronize:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3144(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3296(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3144(%rip)
+  jmp *_libcuda_so_tramp_table+3296(%rip)
 2:
-  pushq $393
+  pushq $412
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11935,14 +12505,14 @@ cuStreamSynchronize_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3152(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3304(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3152(%rip)
+  jmp *_libcuda_so_tramp_table+3304(%rip)
 2:
-  pushq $394
+  pushq $413
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11965,14 +12535,14 @@ cuStreamWaitEvent:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3160(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3312(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3160(%rip)
+  jmp *_libcuda_so_tramp_table+3312(%rip)
 2:
-  pushq $395
+  pushq $414
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -11995,14 +12565,14 @@ cuStreamWaitEvent_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3168(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3320(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3168(%rip)
+  jmp *_libcuda_so_tramp_table+3320(%rip)
 2:
-  pushq $396
+  pushq $415
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12025,14 +12595,14 @@ cuStreamWaitValue32:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3176(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3328(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3176(%rip)
+  jmp *_libcuda_so_tramp_table+3328(%rip)
 2:
-  pushq $397
+  pushq $416
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12055,14 +12625,14 @@ cuStreamWaitValue32_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3184(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3336(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3184(%rip)
+  jmp *_libcuda_so_tramp_table+3336(%rip)
 2:
-  pushq $398
+  pushq $417
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12085,14 +12655,14 @@ cuStreamWaitValue64:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3192(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3344(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3192(%rip)
+  jmp *_libcuda_so_tramp_table+3344(%rip)
 2:
-  pushq $399
+  pushq $418
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12115,14 +12685,14 @@ cuStreamWaitValue64_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3200(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3352(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3200(%rip)
+  jmp *_libcuda_so_tramp_table+3352(%rip)
 2:
-  pushq $400
+  pushq $419
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12145,14 +12715,14 @@ cuStreamWriteValue32:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3208(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3360(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3208(%rip)
+  jmp *_libcuda_so_tramp_table+3360(%rip)
 2:
-  pushq $401
+  pushq $420
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12175,14 +12745,14 @@ cuStreamWriteValue32_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3216(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3368(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3216(%rip)
+  jmp *_libcuda_so_tramp_table+3368(%rip)
 2:
-  pushq $402
+  pushq $421
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12205,14 +12775,14 @@ cuStreamWriteValue64:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3224(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3376(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3224(%rip)
+  jmp *_libcuda_so_tramp_table+3376(%rip)
 2:
-  pushq $403
+  pushq $422
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12235,14 +12805,14 @@ cuStreamWriteValue64_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3232(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3384(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3232(%rip)
+  jmp *_libcuda_so_tramp_table+3384(%rip)
 2:
-  pushq $404
+  pushq $423
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12265,14 +12835,14 @@ cuSurfObjectCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3240(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3392(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3240(%rip)
+  jmp *_libcuda_so_tramp_table+3392(%rip)
 2:
-  pushq $405
+  pushq $424
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12295,14 +12865,14 @@ cuSurfObjectDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3248(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3400(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3248(%rip)
+  jmp *_libcuda_so_tramp_table+3400(%rip)
 2:
-  pushq $406
+  pushq $425
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12325,14 +12895,14 @@ cuSurfObjectGetResourceDesc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3256(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3408(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3256(%rip)
+  jmp *_libcuda_so_tramp_table+3408(%rip)
 2:
-  pushq $407
+  pushq $426
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12355,14 +12925,14 @@ cuSurfRefGetArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3264(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3416(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3264(%rip)
+  jmp *_libcuda_so_tramp_table+3416(%rip)
 2:
-  pushq $408
+  pushq $427
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12385,14 +12955,14 @@ cuSurfRefSetArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3272(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3424(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3272(%rip)
+  jmp *_libcuda_so_tramp_table+3424(%rip)
 2:
-  pushq $409
+  pushq $428
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12415,14 +12985,14 @@ cuTexObjectCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3280(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3432(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3280(%rip)
+  jmp *_libcuda_so_tramp_table+3432(%rip)
 2:
-  pushq $410
+  pushq $429
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12445,14 +13015,14 @@ cuTexObjectDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3288(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3440(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3288(%rip)
+  jmp *_libcuda_so_tramp_table+3440(%rip)
 2:
-  pushq $411
+  pushq $430
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12475,14 +13045,14 @@ cuTexObjectGetResourceDesc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3296(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3448(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3296(%rip)
+  jmp *_libcuda_so_tramp_table+3448(%rip)
 2:
-  pushq $412
+  pushq $431
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12505,14 +13075,14 @@ cuTexObjectGetResourceViewDesc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3304(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3456(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3304(%rip)
+  jmp *_libcuda_so_tramp_table+3456(%rip)
 2:
-  pushq $413
+  pushq $432
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12535,14 +13105,14 @@ cuTexObjectGetTextureDesc:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3312(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3464(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3312(%rip)
+  jmp *_libcuda_so_tramp_table+3464(%rip)
 2:
-  pushq $414
+  pushq $433
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12565,14 +13135,14 @@ cuTexRefCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3320(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3472(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3320(%rip)
+  jmp *_libcuda_so_tramp_table+3472(%rip)
 2:
-  pushq $415
+  pushq $434
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12595,14 +13165,14 @@ cuTexRefDestroy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3328(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3480(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3328(%rip)
+  jmp *_libcuda_so_tramp_table+3480(%rip)
 2:
-  pushq $416
+  pushq $435
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12625,14 +13195,14 @@ cuTexRefGetAddress:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3336(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3488(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3336(%rip)
+  jmp *_libcuda_so_tramp_table+3488(%rip)
 2:
-  pushq $417
+  pushq $436
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12655,14 +13225,14 @@ cuTexRefGetAddressMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3344(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3496(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3344(%rip)
+  jmp *_libcuda_so_tramp_table+3496(%rip)
 2:
-  pushq $418
+  pushq $437
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12685,14 +13255,14 @@ cuTexRefGetAddress_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3352(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3504(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3352(%rip)
+  jmp *_libcuda_so_tramp_table+3504(%rip)
 2:
-  pushq $419
+  pushq $438
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12715,14 +13285,14 @@ cuTexRefGetArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3360(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3512(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3360(%rip)
+  jmp *_libcuda_so_tramp_table+3512(%rip)
 2:
-  pushq $420
+  pushq $439
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12745,14 +13315,14 @@ cuTexRefGetBorderColor:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3368(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3520(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3368(%rip)
+  jmp *_libcuda_so_tramp_table+3520(%rip)
 2:
-  pushq $421
+  pushq $440
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12775,14 +13345,14 @@ cuTexRefGetFilterMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3376(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3528(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3376(%rip)
+  jmp *_libcuda_so_tramp_table+3528(%rip)
 2:
-  pushq $422
+  pushq $441
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12805,14 +13375,14 @@ cuTexRefGetFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3384(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3536(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3384(%rip)
+  jmp *_libcuda_so_tramp_table+3536(%rip)
 2:
-  pushq $423
+  pushq $442
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12835,14 +13405,14 @@ cuTexRefGetFormat:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3392(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3544(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3392(%rip)
+  jmp *_libcuda_so_tramp_table+3544(%rip)
 2:
-  pushq $424
+  pushq $443
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12865,14 +13435,14 @@ cuTexRefGetMaxAnisotropy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3400(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3552(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3400(%rip)
+  jmp *_libcuda_so_tramp_table+3552(%rip)
 2:
-  pushq $425
+  pushq $444
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12895,14 +13465,14 @@ cuTexRefGetMipmapFilterMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3408(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3560(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3408(%rip)
+  jmp *_libcuda_so_tramp_table+3560(%rip)
 2:
-  pushq $426
+  pushq $445
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12925,14 +13495,14 @@ cuTexRefGetMipmapLevelBias:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3416(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3568(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3416(%rip)
+  jmp *_libcuda_so_tramp_table+3568(%rip)
 2:
-  pushq $427
+  pushq $446
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12955,14 +13525,14 @@ cuTexRefGetMipmapLevelClamp:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3424(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3576(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3424(%rip)
+  jmp *_libcuda_so_tramp_table+3576(%rip)
 2:
-  pushq $428
+  pushq $447
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -12985,14 +13555,14 @@ cuTexRefGetMipmappedArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3432(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3584(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3432(%rip)
+  jmp *_libcuda_so_tramp_table+3584(%rip)
 2:
-  pushq $429
+  pushq $448
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13015,14 +13585,14 @@ cuTexRefSetAddress:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3440(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3592(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3440(%rip)
+  jmp *_libcuda_so_tramp_table+3592(%rip)
 2:
-  pushq $430
+  pushq $449
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13045,14 +13615,14 @@ cuTexRefSetAddress2D:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3448(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3600(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3448(%rip)
+  jmp *_libcuda_so_tramp_table+3600(%rip)
 2:
-  pushq $431
+  pushq $450
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13075,14 +13645,14 @@ cuTexRefSetAddress2D_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3456(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3608(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3456(%rip)
+  jmp *_libcuda_so_tramp_table+3608(%rip)
 2:
-  pushq $432
+  pushq $451
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13105,14 +13675,14 @@ cuTexRefSetAddress2D_v3:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3464(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3616(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3464(%rip)
+  jmp *_libcuda_so_tramp_table+3616(%rip)
 2:
-  pushq $433
+  pushq $452
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13135,14 +13705,14 @@ cuTexRefSetAddressMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3472(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3624(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3472(%rip)
+  jmp *_libcuda_so_tramp_table+3624(%rip)
 2:
-  pushq $434
+  pushq $453
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13165,14 +13735,14 @@ cuTexRefSetAddress_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3480(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3632(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3480(%rip)
+  jmp *_libcuda_so_tramp_table+3632(%rip)
 2:
-  pushq $435
+  pushq $454
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13195,14 +13765,14 @@ cuTexRefSetArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3488(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3640(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3488(%rip)
+  jmp *_libcuda_so_tramp_table+3640(%rip)
 2:
-  pushq $436
+  pushq $455
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13225,14 +13795,14 @@ cuTexRefSetBorderColor:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3496(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3648(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3496(%rip)
+  jmp *_libcuda_so_tramp_table+3648(%rip)
 2:
-  pushq $437
+  pushq $456
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13255,14 +13825,14 @@ cuTexRefSetFilterMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3504(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3656(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3504(%rip)
+  jmp *_libcuda_so_tramp_table+3656(%rip)
 2:
-  pushq $438
+  pushq $457
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13285,14 +13855,14 @@ cuTexRefSetFlags:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3512(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3664(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3512(%rip)
+  jmp *_libcuda_so_tramp_table+3664(%rip)
 2:
-  pushq $439
+  pushq $458
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13315,14 +13885,14 @@ cuTexRefSetFormat:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3520(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3672(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3520(%rip)
+  jmp *_libcuda_so_tramp_table+3672(%rip)
 2:
-  pushq $440
+  pushq $459
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13345,14 +13915,14 @@ cuTexRefSetMaxAnisotropy:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3528(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3680(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3528(%rip)
+  jmp *_libcuda_so_tramp_table+3680(%rip)
 2:
-  pushq $441
+  pushq $460
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13375,14 +13945,14 @@ cuTexRefSetMipmapFilterMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3536(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3688(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3536(%rip)
+  jmp *_libcuda_so_tramp_table+3688(%rip)
 2:
-  pushq $442
+  pushq $461
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13405,14 +13975,14 @@ cuTexRefSetMipmapLevelBias:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3544(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3696(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3544(%rip)
+  jmp *_libcuda_so_tramp_table+3696(%rip)
 2:
-  pushq $443
+  pushq $462
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13435,14 +14005,14 @@ cuTexRefSetMipmapLevelClamp:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3552(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3704(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3552(%rip)
+  jmp *_libcuda_so_tramp_table+3704(%rip)
 2:
-  pushq $444
+  pushq $463
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13465,14 +14035,14 @@ cuTexRefSetMipmappedArray:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3560(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3712(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3560(%rip)
+  jmp *_libcuda_so_tramp_table+3712(%rip)
 2:
-  pushq $445
+  pushq $464
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13495,14 +14065,14 @@ cuThreadExchangeStreamCaptureMode:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3568(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3720(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3568(%rip)
+  jmp *_libcuda_so_tramp_table+3720(%rip)
 2:
-  pushq $446
+  pushq $465
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13525,14 +14095,14 @@ cuVDPAUCtxCreate:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3576(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3728(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3576(%rip)
+  jmp *_libcuda_so_tramp_table+3728(%rip)
 2:
-  pushq $447
+  pushq $466
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13555,14 +14125,14 @@ cuVDPAUCtxCreate_v2:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3584(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3736(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3584(%rip)
+  jmp *_libcuda_so_tramp_table+3736(%rip)
 2:
-  pushq $448
+  pushq $467
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13585,14 +14155,14 @@ cuVDPAUGetDevice:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3592(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3744(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3592(%rip)
+  jmp *_libcuda_so_tramp_table+3744(%rip)
 2:
-  pushq $449
+  pushq $468
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13615,14 +14185,14 @@ cuWaitExternalSemaphoresAsync:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3600(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3752(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3600(%rip)
+  jmp *_libcuda_so_tramp_table+3752(%rip)
 2:
-  pushq $450
+  pushq $469
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13645,14 +14215,14 @@ cuWaitExternalSemaphoresAsync_ptsz:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3608(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3760(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3608(%rip)
+  jmp *_libcuda_so_tramp_table+3760(%rip)
 2:
-  pushq $451
+  pushq $470
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13675,14 +14245,14 @@ cudbgApiAttach:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3616(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3768(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3616(%rip)
+  jmp *_libcuda_so_tramp_table+3768(%rip)
 2:
-  pushq $452
+  pushq $471
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13705,14 +14275,14 @@ cudbgApiDetach:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3624(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3776(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3624(%rip)
+  jmp *_libcuda_so_tramp_table+3776(%rip)
 2:
-  pushq $453
+  pushq $472
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13735,14 +14305,14 @@ cudbgApiInit:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3632(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3784(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3632(%rip)
+  jmp *_libcuda_so_tramp_table+3784(%rip)
 2:
-  pushq $454
+  pushq $473
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13765,14 +14335,14 @@ cudbgGetAPI:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3640(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3792(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3640(%rip)
+  jmp *_libcuda_so_tramp_table+3792(%rip)
 2:
-  pushq $455
+  pushq $474
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13795,14 +14365,14 @@ cudbgGetAPIVersion:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3648(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3800(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3648(%rip)
+  jmp *_libcuda_so_tramp_table+3800(%rip)
 2:
-  pushq $456
+  pushq $475
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13825,14 +14395,14 @@ cudbgMain:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3656(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3808(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3656(%rip)
+  jmp *_libcuda_so_tramp_table+3808(%rip)
 2:
-  pushq $457
+  pushq $476
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13855,14 +14425,14 @@ cudbgReportDriverApiError:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3664(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3816(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3664(%rip)
+  jmp *_libcuda_so_tramp_table+3816(%rip)
 2:
-  pushq $458
+  pushq $477
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
@@ -13885,14 +14455,14 @@ cudbgReportDriverInternalError:
   // Intel opt. manual says to
   // "make the fall-through code following a conditional branch be the likely target for a branch with a forward target"
   // to hint static predictor.
-  cmpq $0, _libcuda_so_1_tramp_table+3672(%rip)
+  cmpq $0, _libcuda_so_tramp_table+3824(%rip)
   je 2f
 1:
-  jmp *_libcuda_so_1_tramp_table+3672(%rip)
+  jmp *_libcuda_so_tramp_table+3824(%rip)
 2:
-  pushq $459
+  pushq $478
   .cfi_adjust_cfa_offset 8
-  call _libcuda_so_1_save_regs_and_resolve
+  call _libcuda_so_save_regs_and_resolve
   addq $8, %rsp
   .cfi_adjust_cfa_offset -8
   jmp 1b
