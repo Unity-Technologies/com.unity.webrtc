@@ -794,6 +794,11 @@ namespace Unity.WebRTC
 
         public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
         {
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12)
+            {
+                throw new NotSupportedException(
+                    "CommandBuffer.IssuePluginCustomTextureUpdateV2 method is Direct3D12 is not supported ");
+            }
             _command.IssuePluginCustomTextureUpdateV2(callback, texture, rendererId);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
