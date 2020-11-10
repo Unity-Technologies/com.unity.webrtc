@@ -55,9 +55,8 @@ bool VulkanGraphicsDevice::InitV() {
 //---------------------------------------------------------------------------------------------------------------------
 
 void VulkanGraphicsDevice::ShutdownV() {
-    VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
-    vkDestroyDevice(m_device, NULL);
     m_cudaContext.Shutdown();
+    VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
 
     if (s_hModule)
     {
