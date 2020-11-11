@@ -10,10 +10,13 @@ namespace webrtc
 
 //---------------------------------------------------------------------------------------------------------------------
 
-VulkanTexture2D::VulkanTexture2D(const uint32_t w, const uint32_t h) : ITexture2D(w,h),
-    m_textureImage(VK_NULL_HANDLE), m_textureImageMemory(VK_NULL_HANDLE),
-    m_textureImageMemorySize(0), m_device(VK_NULL_HANDLE),
-    m_textureFormat(VK_FORMAT_B8G8R8A8_UNORM)
+VulkanTexture2D::VulkanTexture2D(const uint32_t w, const uint32_t h)
+    : ITexture2D(w,h)
+    , m_textureImage(VK_NULL_HANDLE)
+    , m_textureImageMemory(VK_NULL_HANDLE)
+    , m_textureImageMemorySize(0)
+    , m_device(VK_NULL_HANDLE)
+    , m_textureFormat(VK_FORMAT_B8G8R8A8_UNORM)
 {
 }
 
@@ -21,7 +24,6 @@ VulkanTexture2D::VulkanTexture2D(const uint32_t w, const uint32_t h) : ITexture2
 
 VulkanTexture2D::~VulkanTexture2D() {
     Shutdown();
-
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -138,7 +138,6 @@ inline void VKCHECK(VkResult result)
         throw result;
 }
 }
-std::unique_ptr<UnityVulkanInstance> pVkInstance;
 
 int32_t GetPhysicalDeviceIndex(
     VkInstance instance, std::vector<VkPhysicalDevice>& list, bool* found)
@@ -266,14 +265,22 @@ void* CreateDeviceVulkan()
     VkQueue queue;
     vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
 
-    pVkInstance = std::make_unique<UnityVulkanInstance>();
+    UnityVulkanInstance* pVkInstance = new UnityVulkanInstance;
     pVkInstance->instance = instance;
     pVkInstance->physicalDevice = physicalDevice;
     pVkInstance->device = device;
     pVkInstance->queueFamilyIndex = queueFamilyIndex;
     pVkInstance->graphicsQueue = queue;
-    return pVkInstance.get();
+    return pVkInstance;
 }
+
+void DestroyDeviceVulkan(void* pGfxDevice)
+{
+    UnityVulkanInstance* pVkInstance = static_cast<UnityVulkanInstance*>(pGfxDevice);
+    vkDestroyDevice(pVkInstance->device, nullptr);
+    pVkInstance = nullptr;
+}
+
 #endif
 #if defined(SUPPORT_METAL)  // Metal
 
@@ -328,7 +335,7 @@ IUnityInterface* CreateUnityInterface(UnityGfxRenderer renderer) {
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* CreateDevice(UnityGfxRenderer renderer)
+void* CreateGfxDevice(UnityGfxRenderer renderer)
 {
     switch (renderer)
     {
@@ -354,46 +361,65 @@ void* CreateDevice(UnityGfxRenderer renderer)
 #endif
     }
 }
+//---------------------------------------------------------------------------------------------------------------------
+
+void DestroyGfxDevice(void* pGfxDevice, UnityGfxRenderer renderer)
+{
+    switch (renderer)
+    {
+#if defined(SUPPORT_D3D11)
+    case kUnityGfxRendererD3D11:
+        return;
+#endif
+#if defined(SUPPORT_D3D12)
+    case kUnityGfxRendererD3D12:
+        return;
+#endif
+#if defined(SUPPORT_OPENGL_CORE)
+    case kUnityGfxRendererOpenGLCore:
+        return;
+#endif
+#if defined(SUPPORT_VULKAN)
+    case kUnityGfxRendererVulkan:
+        DestroyDeviceVulkan(pGfxDevice);
+        return;
+#endif
+#if defined(SUPPORT_METAL)
+    case kUnityGfxRendererMetal:
+        return;
+#endif
+    }
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 
 GraphicsDeviceTestBase::GraphicsDeviceTestBase()
+    : m_pNativeGfxDevice(nullptr)
+    , m_device(nullptr)
 {
     std::tie(m_unityGfxRenderer, m_encoderType, m_textureFormat) = GetParam();
-    const auto pGraphicsDevice = CreateDevice(m_unityGfxRenderer);
+    m_pNativeGfxDevice = CreateGfxDevice(m_unityGfxRenderer);
     const auto unityInterface = CreateUnityInterface(m_unityGfxRenderer);
 
     if (m_unityGfxRenderer == kUnityGfxRendererD3D12)
     {
 #if defined(SUPPORT_D3D12)
-        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(pGraphicsDevice), pCommandQueue.Get());
-        m_device->InitV();
+        m_device = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(m_pNativeGfxDevice), pCommandQueue.Get());
 #endif
     }
     else
     {
-        m_device = GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, pGraphicsDevice, unityInterface);
-        m_device->InitV();
+        m_device = GraphicsDevice::GetInstance().Init(m_unityGfxRenderer, m_pNativeGfxDevice, unityInterface);
     }
-
-    if (m_device == nullptr)
-        throw;
+    m_device->InitV();
 }
 
 
 GraphicsDeviceTestBase::~GraphicsDeviceTestBase()
 {
-    if (m_unityGfxRenderer == kUnityGfxRendererD3D12)
-    {
-#if defined(SUPPORT_D3D12)
-        m_device->ShutdownV();
-        m_device = nullptr;
-#endif
-    }
-    else
-    {
-        m_device->ShutdownV();
-    }
+    m_device->ShutdownV();
+    m_device = nullptr;
+    DestroyGfxDevice(m_pNativeGfxDevice, m_unityGfxRenderer);
 }
 
 } // end namespace webrtc

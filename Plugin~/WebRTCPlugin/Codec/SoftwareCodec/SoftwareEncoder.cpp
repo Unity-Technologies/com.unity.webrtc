@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SoftwareEncoder.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
 
 #if defined(_WIN32)
 #else
@@ -16,8 +17,15 @@ namespace webrtc
     m_device(device),
     m_width(width),
     m_height(height),
+    m_encodeTex(nullptr),
     m_textureFormat(textureFormat)
     {
+    }
+
+    SoftwareEncoder::~SoftwareEncoder()
+    {
+        delete m_encodeTex;
+        m_encodeTex = nullptr;
     }
 
     void SoftwareEncoder::InitV()

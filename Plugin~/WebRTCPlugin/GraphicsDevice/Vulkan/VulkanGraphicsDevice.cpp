@@ -115,7 +115,6 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
 ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device)) {
-        vulkanTexture->Shutdown();
         delete (vulkanTexture);
         return nullptr;
     }
@@ -126,11 +125,9 @@ ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, 
         VK_IMAGE_LAYOUT_UNDEFINED, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT))
     {
-        vulkanTexture->Shutdown();
         delete (vulkanTexture);
         return nullptr;
     }
-
     return vulkanTexture;
 }
 

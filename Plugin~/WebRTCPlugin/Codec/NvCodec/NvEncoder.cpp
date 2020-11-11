@@ -3,6 +3,7 @@
 #include "Context.h"
 #include <cstring>
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
 
 #if _WIN32
 #else
@@ -268,7 +269,7 @@ namespace webrtc
     bool NvEncoder::CopyBuffer(void* frame)
     {
         const int curFrameNum = GetCurrentFrameCount() % bufferedFrameNum;
-        const auto tex = renderTextures[curFrameNum];
+        const auto tex = m_renderTextures[curFrameNum];
         if (tex == nullptr)
             return false;
         m_device->CopyResourceFromNativeV(tex, frame);
@@ -386,8 +387,8 @@ namespace webrtc
     {
         for (uint32 i = 0; i < bufferedFrameNum; i++)
         {
-            renderTextures[i] = m_device->CreateDefaultTextureV(m_width, m_height, m_textureFormat);
-            void* buffer = AllocateInputResourceV(renderTextures[i]);
+            m_renderTextures[i] = m_device->CreateDefaultTextureV(m_width, m_height, m_textureFormat);
+            void* buffer = AllocateInputResourceV(m_renderTextures[i]);
 
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
@@ -424,6 +425,12 @@ namespace webrtc
                 checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy output buffer bit stream %d", errorCode).c_str());
                 frame.outputFrame = nullptr;
             }
+        }
+
+        for (uint32 i = 0; i < bufferedFrameNum; i++)
+        {
+            delete m_renderTextures[i];
+            m_renderTextures[i] = nullptr;
         }
     }
     uint32_t NvEncoder::GetNumChromaPlanes(const NV_ENC_BUFFER_FORMAT bufferFormat)
