@@ -102,6 +102,8 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     }
     case kUnityGfxDeviceEventShutdown:
     {
+        s_mapEncoder.clear();
+
         if (s_gfxDevice != nullptr)
         {
             s_gfxDevice->ShutdownV();
@@ -110,7 +112,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 
         //UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
-        s_mapEncoder.clear();
         break;
     }
     case kUnityGfxDeviceEventBeforeReset:

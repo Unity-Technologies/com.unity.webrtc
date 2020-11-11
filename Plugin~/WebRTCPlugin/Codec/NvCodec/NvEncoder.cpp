@@ -427,10 +427,10 @@ namespace webrtc
             }
         }
 
-        for (uint32 i = 0; i < bufferedFrameNum; i++)
+        for (auto& renderTexture : m_renderTextures)
         {
-            delete m_renderTextures[i];
-            m_renderTextures[i] = nullptr;
+            delete renderTexture;
+            renderTexture = nullptr;
         }
     }
     uint32_t NvEncoder::GetNumChromaPlanes(const NV_ENC_BUFFER_FORMAT bufferFormat)
