@@ -47,6 +47,7 @@ elseif(APPLE)
   list (APPEND sources ${append_source})
 elseif(UNIX)
   file(GLOB append_source
+    ../dynlink/*
     GraphicsDevice/OpenGL/*.h
     GraphicsDevice/OpenGL/*.cpp
     GraphicsDevice/Vulkan/*.h
@@ -190,8 +191,6 @@ elseif(UNIX)
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
       ${Vulkan_LIBRARY}
-      ${NVCODEC_LIBRARIES}
-      cuda
   )
   target_include_directories(webrtc
     PRIVATE
