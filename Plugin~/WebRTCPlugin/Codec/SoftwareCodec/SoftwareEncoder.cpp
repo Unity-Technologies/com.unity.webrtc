@@ -18,7 +18,8 @@ namespace webrtc
     m_encodeTex(nullptr),
     m_width(width),
     m_height(height),
-    m_textureFormat(textureFormat)
+    m_textureFormat(textureFormat),
+    m_frameCount(0)
     {
     }
 

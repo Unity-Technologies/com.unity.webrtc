@@ -28,10 +28,10 @@ namespace webrtc
     private:
         IGraphicsDevice* m_device;
         ITexture2D* m_encodeTex;
-        int m_width = 1920;
-        int m_height = 1080;
+        int m_width;
+        int m_height;
         UnityRenderingExtTextureFormat m_textureFormat;
-        uint64 m_frameCount = 0;
+        uint64 m_frameCount;
     };
 //---------------------------------------------------------------------------------------------------------------------
     
