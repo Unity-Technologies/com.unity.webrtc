@@ -18,6 +18,7 @@ public:
     GraphicsDeviceTestBase();
     virtual ~GraphicsDeviceTestBase();
 protected:
+    void* m_pNativeGfxDevice;
     IGraphicsDevice* m_device;
     UnityEncoderType m_encoderType;
     UnityGfxRenderer m_unityGfxRenderer;

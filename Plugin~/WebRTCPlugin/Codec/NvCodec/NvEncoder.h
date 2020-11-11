@@ -84,7 +84,7 @@ namespace webrtc
         NV_ENC_CONFIG nvEncConfig = {};
         NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
-        ITexture2D* renderTextures[bufferedFrameNum];
+        ITexture2D* m_renderTextures[bufferedFrameNum];
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;
