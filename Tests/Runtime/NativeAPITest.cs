@@ -8,7 +8,8 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
+    [TestFixture]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForNvCodec, "Ignored hardware encoder test.")]
     class NativeAPITestWithHardwareEncoder : NativeAPITestWithSoftwareEncoder
     {
         [OneTimeSetUp]
@@ -401,6 +402,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [ConditionalIgnore(ConditionalIgnore.Direct3D12,
+            "VideoDecoderMethods.UpdateRendererTexture is not supported on Direct3D12.")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer })]
         public IEnumerator CallVideoDecoderMethods()
         {
@@ -430,6 +433,7 @@ namespace Unity.WebRTC.RuntimeTest
             VideoEncoderMethods.Encode(renderEvent, track);
             yield return new WaitForSeconds(1.0f);
 
+            // this method is not supported on Direct3D12
             VideoDecoderMethods.UpdateRendererTexture(updateTextureEvent, receiveTexture, rendererId);
             yield return new WaitForSeconds(1.0f);
 
@@ -445,7 +449,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 
-    [TestFixture, ConditionalIgnore("IgnoreHardwareEncoderTest", "Ignored hardware encoder test.")]
+    [TestFixture]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForNvCodec, "Ignored hardware encoder test.")]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
     class NativeAPITestWithHardwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithHardwareEncoder, IPrebuildSetup
     {
