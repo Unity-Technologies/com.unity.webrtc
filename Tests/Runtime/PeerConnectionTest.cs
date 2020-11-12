@@ -74,8 +74,24 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(config.iceServers[0].username, config2.iceServers[0].username);
             Assert.AreEqual(config.iceServers[0].credential, config2.iceServers[0].credential);
             Assert.AreEqual(config.iceServers[0].urls, config2.iceServers[0].urls);
+
             peer.Close();
             peer.Dispose();
+        }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void ConstructWithConfigThrowException()
+        {
+
+            RTCConfiguration config = default;
+
+            // To specify TURN server, also needs `username` and `credential`.
+            config.iceServers = new[]
+            {
+                new RTCIceServer {  urls = new[] {"turn:127.0.0.1?transport=udp"} } 
+            };
+            Assert.That(() => { new RTCPeerConnection(ref config); }, Throws.ArgumentException);
         }
 
         [Test]
