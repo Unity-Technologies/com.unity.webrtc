@@ -25,13 +25,14 @@ bool OpenGLGraphicsDevice::InitV() {
     glDebugMessageCallback(OnOpenGLDebugMessage, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
 #endif
+    m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.InitGL();
     return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 void OpenGLGraphicsDevice::ShutdownV() {
-
+    m_cudaContext.Shutdown();
 }
 
 //---------------------------------------------------------------------------------------------------------------------

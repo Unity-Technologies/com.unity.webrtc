@@ -55,7 +55,7 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
     }
 
     CUdevice cuDevice = 0;
-    bool foundDevice = true;
+    bool foundDevice = false;
 
     result = cuInit(0);
     if (result != CUDA_SUCCESS) {
@@ -91,7 +91,6 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
 
     if (!foundDevice) {
         return CUDA_ERROR_NO_DEVICE;
- 
     }
 
     result = cuCtxCreate(&m_context, 0, cuDevice);
@@ -189,10 +188,18 @@ CUresult CudaContext::Init(ID3D12Device* device) {
 
 //---------------------------------------------------------------------------------------------------------------------
 
+// todo(kazuki):: not supported on windows
+// #if defined(SUPPORT_OPENGL_UNIFIED)
 #if defined(UNITY_LINUX)
 CUresult CudaContext::InitGL() {
 
-    CUresult result = Init();
+    // dll check
+    CUresult result = LoadModule();
+    if (result != CUDA_SUCCESS) {
+        return result;
+    }
+
+    result = cuInit(0);
     if (result != CUDA_SUCCESS) {
         return result;
     }
@@ -206,18 +213,16 @@ CUresult CudaContext::InitGL() {
         return CUDA_ERROR_NO_DEVICE;
     }
 
+    //glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, GLuint index, GLubyte *data)
+
     // TODO:: check GPU capability 
     int cuDevId = 0;
-    CUdevice device;
-    result = cuDeviceGet(&device, cuDevId);
+    CUdevice cuDevice = 0;
+    result = cuDeviceGet(&cuDevice, cuDevId);
     if (CUDA_SUCCESS != result) {
         return result;
     }
-
-    result = cuCtxCreate(&m_context, 0, device);
-    if (CUDA_SUCCESS != result) {
-        return result;
-    }
+    return cuCtxCreate(&m_context, 0, cuDevice);
 }
 #endif
 //---------------------------------------------------------------------------------------------------------------------

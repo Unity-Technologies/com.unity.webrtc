@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
 #include "GraphicsDevice/Cuda/CudaContext.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
@@ -33,7 +33,6 @@ public:
 
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
-    virtual NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
 
     VkResult CreateCommandPool();

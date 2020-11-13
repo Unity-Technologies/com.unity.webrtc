@@ -59,7 +59,6 @@ public:
 
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
-    virtual NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
 
     D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);

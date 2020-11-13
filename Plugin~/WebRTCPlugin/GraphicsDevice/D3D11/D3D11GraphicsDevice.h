@@ -25,7 +25,6 @@ public:
 
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
-    virtual NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
     ID3D11Device* m_d3d11Device;
     ID3D11DeviceContext* m_d3d11Context;
