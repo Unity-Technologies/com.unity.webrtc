@@ -2,7 +2,7 @@
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
-#include "Cuda/CudaContext.h"
+#include "GraphicsDevice/Cuda/CudaContext.h"
 
 namespace unity
 {
