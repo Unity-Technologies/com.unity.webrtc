@@ -10,6 +10,7 @@ set(NVDEC_DIR ${NVCODEC_DIR}/NvCodec/NvDecoder)
 set(NVCODEC_INCLUDE_DIR
   ${NVCODEC_DIR}/include
   ${NVCODEC_DIR}/NvCodec
+  ${NVCODEC_DIR}/Utils
   CACHE PATH
   "NVCODEC INCLUDE PATH"
   )

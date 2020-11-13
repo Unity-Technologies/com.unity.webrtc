@@ -26,6 +26,9 @@ public:
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
     inline virtual GraphicsDeviceType GetDeviceType() const;
 
+    virtual bool IsNvCodecSupport() override { return m_nvCodecSupport; }
+    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+
 private:
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
 };

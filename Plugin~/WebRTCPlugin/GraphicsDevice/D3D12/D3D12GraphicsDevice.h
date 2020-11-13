@@ -1,8 +1,9 @@
 #pragma once
 
-#include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
 #include "D3D12Texture2D.h"
+#include "GraphicsDevice/Cuda/CudaContext.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
@@ -56,6 +57,9 @@ public:
     virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
+    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
+    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+    virtual NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
 
     D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
@@ -71,6 +75,8 @@ private:
     ID3D11Device5* m_d3d11Device;
     ID3D11DeviceContext4* m_d3d11Context;
 
+    bool m_isCudaSupport;
+    CudaContext m_cudaContext;
 
     //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
     ID3D12CommandAllocatorPtr m_commandAllocator;

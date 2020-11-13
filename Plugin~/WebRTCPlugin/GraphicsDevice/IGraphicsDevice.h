@@ -2,6 +2,10 @@
 
 #include "GraphicsDevice/GraphicsDeviceType.h"
 
+#if defined(UNITY_WIN) || defined(UNITY_LINUX)
+#include "Cuda/ICudaDevice.h"
+#endif
+
 namespace unity
 {
 namespace webrtc
@@ -9,7 +13,11 @@ namespace webrtc
 
 class ITexture2D;
 
-class IGraphicsDevice {
+class IGraphicsDevice
+#if defined(UNITY_WIN) || defined(UNITY_LINUX)
+    : public ICudaDevice
+#endif
+{
 public:
 
     IGraphicsDevice();

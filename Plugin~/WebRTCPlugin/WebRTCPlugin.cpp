@@ -92,6 +92,13 @@ extern "C"
 {
     UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
     {
+#if defined(UNITY_WIN) || defined(UNITY_LINUX)
+        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
+        if(!device->IsCudaSupport())
+        {
+            return false;
+        }
+#endif
         return EncoderFactory::GetHardwareEncoderSupport();
     }
 

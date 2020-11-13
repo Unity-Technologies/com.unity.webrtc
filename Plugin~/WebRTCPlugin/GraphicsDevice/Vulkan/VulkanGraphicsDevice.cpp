@@ -45,11 +45,8 @@ bool VulkanGraphicsDevice::InitV() {
 #endif
     }
 
-    if (CUDA_SUCCESS!=m_cudaContext.Init(m_instance, m_physicalDevice))
-        return false;
-
-    return (VK_SUCCESS == CreateCommandPool());
-
+    m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_instance, m_physicalDevice);
+    return VK_SUCCESS == CreateCommandPool();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
