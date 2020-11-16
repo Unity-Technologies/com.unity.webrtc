@@ -4,7 +4,6 @@
 #include <mutex>
 
 #include "Codec/IEncoder.h"
-#include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
 
 namespace unity
 {
