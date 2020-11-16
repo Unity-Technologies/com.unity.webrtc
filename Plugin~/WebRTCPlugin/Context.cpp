@@ -12,7 +12,6 @@
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 
 using namespace ::webrtc;
 

@@ -744,7 +744,7 @@ extern "C"
             dst->encodings[i].hasValueMinBitrate = src.encodings[i].min_bitrate_bps.has_value();
             dst->encodings[i].minBitrate = src.encodings[i].min_bitrate_bps.value_or(0);
             dst->encodings[i].hasValueMaxFramerate = src.encodings[i].max_framerate.has_value();
-            dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value_or(0);
+            dst->encodings[i].maxFramerate = static_cast<uint32_t>(src.encodings[i].max_framerate.value_or(0));
             dst->encodings[i].hasValueScaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.has_value();
             dst->encodings[i].scaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.value_or(0);
             dst->encodings[i].rid = ConvertString(src.encodings[i].rid);

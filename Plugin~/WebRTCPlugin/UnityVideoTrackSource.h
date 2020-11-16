@@ -8,13 +8,12 @@ namespace unity {
 namespace webrtc {
 
 class IEncoder;
-class IGraphicsDevice;
 
 // This class implements webrtc's VideoTrackSourceInterface. To pass frames down
 // the webrtc video pipeline, each received a media::VideoFrame is converted to
 // a webrtc::VideoFrame, taking any adaptation requested by downstream classes
 // into account.
-class   UnityVideoTrackSource :
+class UnityVideoTrackSource :
     public rtc::AdaptedVideoTrackSource,
     public sigslot::has_slots<>
 {
