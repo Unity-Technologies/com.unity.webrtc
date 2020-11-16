@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "GraphicsUtility.h"
 
+#if defined(SUPPORT_VULKAN)
 #include "Vulkan/VulkanGraphicsDevice.h"
+#endif
 
 namespace unity
 {
