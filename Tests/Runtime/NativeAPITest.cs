@@ -371,7 +371,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(CodecInitializationResult.NotInitialized, NativeMethods.GetInitializationResult(context, track));
 
             // todo:: You must call `InitializeEncoder` method after `NativeMethods.ContextCaptureVideoStream`
-            NativeMethods.ContextSetVideoEncoderParameter(context, track, width, height, renderTexture.graphicsFormat);
+            NativeMethods.ContextSetVideoEncoderParameter(
+                context, track, width, height, renderTexture.graphicsFormat, renderTexture.GetNativeTexturePtr());
             VideoEncoderMethods.InitializeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
 
