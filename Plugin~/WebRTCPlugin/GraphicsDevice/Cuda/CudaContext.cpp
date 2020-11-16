@@ -9,7 +9,9 @@
 #include <wrl/client.h>
 #endif
 
+#if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
+#endif
 
 #if defined(SUPPORT_D3D11)
 using namespace Microsoft::WRL;
@@ -69,7 +71,7 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
     }
 
     CUuuid id = {};
-    std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
+    std::array<uint8_t, VK_UUID_SIZE> deviceUUID{};
     if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID)) {
         return CUDA_ERROR_INVALID_DEVICE;
     }
@@ -77,9 +79,14 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
     //Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
     //this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
     for (int i = 0; i < numDevices; i++) {
-        cuDeviceGet(&cuDevice, i);
-
-        cuDeviceGetUuid(&id, cuDevice);
+        result = cuDeviceGet(&cuDevice, i);
+        if (result != CUDA_SUCCESS) {
+            return result;
+        }
+        result = cuDeviceGetUuid(&id, cuDevice);
+        if (result != CUDA_SUCCESS) {
+            return result;
+        }
 
         if (!std::memcmp(static_cast<const void *>(&id),
                 static_cast<const void *>(deviceUUID.data()),
@@ -115,6 +122,9 @@ CUresult CudaContext::Init(ID3D11Device* device) {
     result = cuDeviceGetCount(&numDevices);
     if (result != CUDA_SUCCESS) {
         return result;
+    }
+    if(numDevices == 0) {
+        return CUDA_ERROR_NO_DEVICE;
     }
 
     ComPtr<IDXGIDevice> pDxgiDevice = nullptr;
@@ -212,8 +222,6 @@ CUresult CudaContext::InitGL() {
     if (numDevices == 0) {
         return CUDA_ERROR_NO_DEVICE;
     }
-
-    //glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, GLuint index, GLubyte *data)
 
     // TODO:: check GPU capability 
     int cuDevId = 0;

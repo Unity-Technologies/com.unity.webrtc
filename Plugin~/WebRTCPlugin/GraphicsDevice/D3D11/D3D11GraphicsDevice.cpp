@@ -23,7 +23,6 @@ D3D11GraphicsDevice::~D3D11GraphicsDevice() {
 
 //---------------------------------------------------------------------------------------------------------------------
 bool D3D11GraphicsDevice::InitV() {
-
     m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d11Device);
     return true;
 }
