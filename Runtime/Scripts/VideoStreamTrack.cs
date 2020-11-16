@@ -132,14 +132,14 @@ namespace Unity.WebRTC
         /// See Also: Texture.GetNativeTexturePtr
         /// </summary>
         /// <param name="label"></param>
-        /// <param name="ptr"></param>
+        /// <param name="texturePtr"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="format"></param>
-        public VideoStreamTrack(string label, IntPtr ptr, int width, int height, GraphicsFormat format)
-            : base(WebRTC.Context.CreateVideoTrack(label, ptr))
+        public VideoStreamTrack(string label, IntPtr texturePtr, int width, int height, GraphicsFormat format)
+            : base(WebRTC.Context.CreateVideoTrack(label))
         {
-            WebRTC.Context.SetVideoEncoderParameter(self, width, height, format);
+            WebRTC.Context.SetVideoEncoderParameter(self, width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(self);
             tracks.Add(this);
         }

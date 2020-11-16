@@ -13,6 +13,9 @@ public:
         const uint32_t rowToRowInBytes, const uint8_t* srcData);
     static IGraphicsDevice* GetGraphicsDevice();
     static UnityGfxRenderer GetGfxRenderer();
+    static void* TextureHandleToNativeGraphicsPtr(
+        void* textureHandle, IGraphicsDevice* device, UnityGfxRenderer renderer);
+
 };
 
 } // end namespace webrtc

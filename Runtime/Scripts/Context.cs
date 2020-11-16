@@ -162,9 +162,9 @@ namespace Unity.WebRTC
             return NativeMethods.ContextCreateAudioTrack(self, label);
         }
 
-        public IntPtr CreateVideoTrack(string label, IntPtr texturePtr)
+        public IntPtr CreateVideoTrack(string label)
         {
-            return NativeMethods.ContextCreateVideoTrack(self, label, texturePtr);
+            return NativeMethods.ContextCreateVideoTrack(self, label);
         }
 
         public void StopMediaStreamTrack(IntPtr track)
@@ -192,9 +192,9 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteStatsReport(self, report);
         }
 
-        public void SetVideoEncoderParameter(IntPtr track, int width, int height, GraphicsFormat format)
+        public void SetVideoEncoderParameter(IntPtr track, int width, int height, GraphicsFormat format, IntPtr texturePtr)
         {
-            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, format);
+            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, format, texturePtr);
         }
 
         public CodecInitializationResult GetInitializationResult(IntPtr track)

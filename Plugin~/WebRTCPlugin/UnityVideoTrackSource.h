@@ -8,12 +8,13 @@ namespace unity {
 namespace webrtc {
 
 class IEncoder;
+class IGraphicsDevice;
 
 // This class implements webrtc's VideoTrackSourceInterface. To pass frames down
 // the webrtc video pipeline, each received a media::VideoFrame is converted to
 // a webrtc::VideoFrame, taking any adaptation requested by downstream classes
 // into account.
-class UnityVideoTrackSource :
+class   UnityVideoTrackSource :
     public rtc::AdaptedVideoTrackSource,
     public sigslot::has_slots<>
 {
@@ -30,8 +31,6 @@ class UnityVideoTrackSource :
         };
 
     UnityVideoTrackSource(
-        void* frame,
-        UnityGfxRenderer gfxRenderer,
         bool is_screencast,
         absl::optional<bool> needs_denoising);
     ~UnityVideoTrackSource() override;
@@ -42,7 +41,10 @@ class UnityVideoTrackSource :
     bool is_screencast() const override;
     absl::optional<bool> needs_denoising() const override;
 
-    // todo(kazuki)::
+    // note:: call from render thread
+    void Init(void* frame);
+
+    // note:: call from render thread
     void OnFrameCaptured(int64_t timestampe_us);
 
     // todo(kazuki)::
@@ -88,8 +90,10 @@ class UnityVideoTrackSource :
     std::mutex m_mutex;
     IEncoder* encoder_;
     void* frame_;
+    UnityGfxRenderer gfxRenderer_;
+    IGraphicsDevice* pGfxDevice_;
 
-#if defined(SUPPORT_VULKAN)
+    #if defined(SUPPORT_VULKAN)
     UnityVulkanImage unityVulkanImage_;
 #endif
   webrtc::Clock* clock_;

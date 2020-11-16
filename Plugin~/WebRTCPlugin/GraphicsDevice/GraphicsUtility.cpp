@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "GraphicsUtility.h"
 
+#include "Vulkan/VulkanGraphicsDevice.h"
+
 namespace unity
 {
 namespace webrtc
@@ -46,6 +48,22 @@ rtc::scoped_refptr<webrtc::I420Buffer> GraphicsUtility::ConvertRGBToI420Buffer(c
 
     return i420_buffer;
 
+}
+
+void* GraphicsUtility::TextureHandleToNativeGraphicsPtr(
+    void* textureHandle, IGraphicsDevice* device, UnityGfxRenderer renderer)
+{
+#if defined(SUPPORT_VULKAN)
+    if (renderer == kUnityGfxRendererVulkan)
+    {
+        VulkanGraphicsDevice* vulkanDevice =
+            static_cast<VulkanGraphicsDevice*>(device);
+        std::unique_ptr<UnityVulkanImage> unityVulkanImage =
+            vulkanDevice->AccessTexture(textureHandle);
+        return unityVulkanImage.release();
+    }
+#endif
+    return textureHandle;
 }
 
 } // end namespace webrtc

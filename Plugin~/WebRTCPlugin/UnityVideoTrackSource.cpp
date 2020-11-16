@@ -4,6 +4,7 @@
 #include <mutex>
 
 #include "Codec/IEncoder.h"
+#include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
 
 namespace unity
 {
@@ -11,25 +12,14 @@ namespace webrtc
 {
 
 UnityVideoTrackSource::UnityVideoTrackSource(
-    void* frame,
-    UnityGfxRenderer gfxRenderer,
     bool is_screencast,
     absl::optional<bool> needs_denoising) :
     AdaptedVideoTrackSource(/*required_alignment=*/1),
     is_screencast_(is_screencast),
     needs_denoising_(needs_denoising),
-    encoder_(nullptr),
-    frame_(frame)
+    encoder_(nullptr)
 {
 //  DETACH_FROM_THREAD(thread_checker_);
-
-#if defined(SUPPORT_VULKAN)
-    if(gfxRenderer == kUnityGfxRendererVulkan)
-    {
-        unityVulkanImage_ = *static_cast<UnityVulkanImage*>(frame_);
-        frame_ = &unityVulkanImage_;
-    }
-#endif
 }
 
 UnityVideoTrackSource::~UnityVideoTrackSource()
@@ -37,7 +27,12 @@ UnityVideoTrackSource::~UnityVideoTrackSource()
     {
         std::unique_lock<std::mutex> lock(m_mutex);
     }
-};
+}
+
+void UnityVideoTrackSource::Init(void* frame)
+{
+    frame_ = frame;
+}
 
 UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
 {

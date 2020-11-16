@@ -112,9 +112,11 @@ extern "C"
         return context->GetInitializationResult(track);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat textureFormat)
+    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(
+        Context* context, MediaStreamTrackInterface* track, int width, int height,
+        UnityRenderingExtTextureFormat textureFormat, void* textureHandle)
     {
-        context->SetEncoderParameter(track, width, height, textureFormat);
+        context->SetEncoderParameter(track, width, height, textureFormat, textureHandle);
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
@@ -127,21 +129,9 @@ extern "C"
         context->DeleteMediaStream(stream);
     }
 
-    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt)
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label)
     {
-        UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
-#if defined(SUPPORT_VULKAN)
-        if(gfxRenderer == kUnityGfxRendererVulkan)
-        {
-            void* frame = nullptr;
-            VulkanGraphicsDevice* device =
-                static_cast<VulkanGraphicsDevice*>(GraphicsUtility::GetGraphicsDevice());
-            const std::unique_ptr<UnityVulkanImage> unityVulkanImage =
-                device->AccessTexture(rt);
-            return context->CreateVideoTrack(label, unityVulkanImage.get(), gfxRenderer);
-        }
-#endif
-        return context->CreateVideoTrack(label, rt, gfxRenderer);
+        return context->CreateVideoTrack(label);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
