@@ -285,9 +285,12 @@ extern "C"
         ContextManager::GetInstance()->DestroyContext(uid);
     }
 
-    PeerConnectionObject* _ContextCreatePeerConnection(Context* context, const PeerConnectionInterface::RTCConfiguration& config)
+    PeerConnectionObject* _ContextCreatePeerConnection(
+        Context* context, const PeerConnectionInterface::RTCConfiguration& config)
     {
         const auto obj = context->CreatePeerConnection(config);
+        if (obj == nullptr)
+            return nullptr;
         const auto observer = unity::webrtc::SetSessionDescriptionObserver::Create(obj);
         context->AddObserver(obj->connection, observer);
         return obj;
@@ -303,7 +306,8 @@ extern "C"
     UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnectionWithConfig(Context* context, const char* conf)
     {
         PeerConnectionInterface::RTCConfiguration config;
-        Convert(conf, config);
+        if (!Convert(conf, config))
+            return nullptr;
         return _ContextCreatePeerConnection(context, config);
     }
 
