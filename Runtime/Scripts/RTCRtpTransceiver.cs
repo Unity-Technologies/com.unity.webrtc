@@ -66,10 +66,8 @@ namespace Unity.WebRTC
         /// <param name="direction"></param>
         public void SetDirection(RTCRtpTransceiverDirection direction)
         {
-            // TODO::
-            throw new NotImplementedException();
+            NativeMethods.TransceiverSetDirection(self, direction);
         }
-
 
         public void SetCodecPreferences(RTCRtpCodecCapability[] capabilities)
         {

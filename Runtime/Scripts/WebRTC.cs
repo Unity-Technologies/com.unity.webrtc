@@ -627,6 +627,8 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool TransceiverStop(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
+        public static extern bool TransceiverSetDirection(IntPtr transceiver, RTCRtpTransceiverDirection direction);
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetReceiver(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr TransceiverGetSender(IntPtr transceiver);
