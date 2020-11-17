@@ -698,6 +698,11 @@ extern "C"
         transceiver->Stop();
     }
 
+    UNITY_INTERFACE_EXPORT RtpTransceiverDirection TransceiverGetDirection(RtpTransceiverInterface* transceiver)
+    {
+        return transceiver->direction();
+    }
+
     UNITY_INTERFACE_EXPORT void TransceiverSetDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection direction)
     {
         transceiver->SetDirection(direction);
