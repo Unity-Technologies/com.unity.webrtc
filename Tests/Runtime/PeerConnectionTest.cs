@@ -180,6 +180,61 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.NotNull(peer.GetTransceivers().First());
         }
 
+        [Test]
+        [Category("PeerConnection")]
+        public void GetAndSetDirectionTransceiver()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.NotNull(transceiver);
+            transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
+            Assert.AreEqual(RTCRtpTransceiverDirection.SendOnly, transceiver.Direction);
+            transceiver.Direction = RTCRtpTransceiverDirection.RecvOnly;
+            Assert.AreEqual(RTCRtpTransceiverDirection.RecvOnly, transceiver.Direction);
+
+            peer.Close();
+            peer.Dispose();
+        }
+
+        [UnityTest]
+        [Timeout(1000)]
+        [Category("PeerConnection")]
+        public IEnumerator CurrentDirection()
+        {
+            var config = GetConfiguration();
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+            var audioTrack = new AudioStreamTrack("audio");
+
+            var transceiver1 = peer1.AddTransceiver(audioTrack);
+            transceiver1.Direction = RTCRtpTransceiverDirection.SendOnly;
+
+            RTCOfferOptions options1 = new RTCOfferOptions {offerToReceiveAudio = true};
+            RTCAnswerOptions options2 = default;
+            var op1 = peer1.CreateOffer(ref options1);
+            yield return op1;
+            var desc = op1.Desc;
+            var op2 = peer1.SetLocalDescription(ref desc);
+            yield return op2;
+            var op3 = peer2.SetRemoteDescription(ref desc);
+            yield return op3;
+            var op4 = peer2.CreateAnswer(ref options2);
+            yield return op4;
+            desc = op4.Desc;
+            var op5 = peer2.SetLocalDescription(ref desc);
+            yield return op5;
+            var op6 = peer1.SetRemoteDescription(ref desc);
+            yield return op6;
+
+            Assert.AreEqual(transceiver1.CurrentDirection, RTCRtpTransceiverDirection.SendOnly);
+
+            audioTrack.Dispose();
+            peer1.Close();
+            peer2.Close();
+            peer1.Dispose();
+            peer2.Dispose();
+        }
+
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
