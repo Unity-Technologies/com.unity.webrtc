@@ -22,8 +22,8 @@ if(MSVC)
     NvCodec/*.cpp
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
+    ../WebRTCPlugin/GraphicsDevice/Cuda/*.h
+    ../WebRTCPlugin/GraphicsDevice/Cuda/*.cpp
     ../WebRTCPlugin/GraphicsDevice/D3D11/*.h
     ../WebRTCPlugin/GraphicsDevice/D3D11/*.cpp
     ../WebRTCPlugin/GraphicsDevice/D3D12/*.h
@@ -59,8 +59,8 @@ elseif(UNIX)
     ../WebRTCPlugin/GraphicsDevice/OpenGL/*.cpp
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
     ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.h
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/Cuda/*.cpp
+    ../WebRTCPlugin/GraphicsDevice/Cuda/*.h
+    ../WebRTCPlugin/GraphicsDevice/Cuda/*.cpp
     ../WebRTCPlugin/Codec/SoftwareCodec/*.h
     ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
     ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp

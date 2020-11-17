@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
+#include "GraphicsDevice/Cuda/CudaContext.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
@@ -26,7 +27,12 @@ public:
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
     inline virtual GraphicsDeviceType GetDeviceType() const;
 
+    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
+    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+
 private:
+    CudaContext m_cudaContext;
+    bool m_isCudaSupport;
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
 };
 

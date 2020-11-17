@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
-#include "Cuda/CudaContext.h"
+#include "GraphicsDevice/Cuda/CudaContext.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
@@ -30,6 +30,9 @@ public:
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+
+    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
+    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
 private:
 
     VkResult CreateCommandPool();
@@ -43,9 +46,9 @@ private:
 
     CudaContext m_cudaContext;
     uint32_t m_queueFamilyIndex;
+    bool m_isCudaSupport;
 
     const VkAllocationCallbacks* m_allocator = nullptr;
-
 };
 
 //---------------------------------------------------------------------------------------------------------------------

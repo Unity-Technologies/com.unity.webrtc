@@ -17,8 +17,8 @@ if(MSVC)
   file(GLOB append_source
     GraphicsDevice/Vulkan/*.h
     GraphicsDevice/Vulkan/*.cpp
-    GraphicsDevice/Vulkan/Cuda/*.h
-    GraphicsDevice/Vulkan/Cuda/*.cpp
+    GraphicsDevice/Cuda/*.h
+    GraphicsDevice/Cuda/*.cpp
     GraphicsDevice/D3D11/*.h
     GraphicsDevice/D3D11/*.cpp
     GraphicsDevice/D3D12/*.h
@@ -52,8 +52,8 @@ elseif(UNIX)
     GraphicsDevice/OpenGL/*.cpp
     GraphicsDevice/Vulkan/*.h
     GraphicsDevice/Vulkan/*.cpp
-    GraphicsDevice/Vulkan/Cuda/*.h
-    GraphicsDevice/Vulkan/Cuda/*.cpp
+    GraphicsDevice/Cuda/*.h
+    GraphicsDevice/Cuda/*.cpp
     Codec/SoftwareCodec/*.h
     Codec/SoftwareCodec/*.cpp
     Codec/NvCodec/NvEncoder.cpp

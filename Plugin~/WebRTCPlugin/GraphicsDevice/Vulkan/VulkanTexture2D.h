@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
-#include "Cuda/CudaImage.h"
+#include "GraphicsDevice/ITexture2D.h"
+#include "GraphicsDevice/Cuda/CudaImage.h"
 
 namespace unity
 {

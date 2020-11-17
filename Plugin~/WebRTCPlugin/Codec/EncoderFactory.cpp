@@ -48,7 +48,12 @@ namespace webrtc
     }
 
     //Can throw exception. The caller is expected to catch it.
-    std::unique_ptr<IEncoder> EncoderFactory::Init(int width, int height, IGraphicsDevice* device, UnityEncoderType encoderType, UnityRenderingExtTextureFormat textureFormat)
+    std::unique_ptr<IEncoder> EncoderFactory::Init(
+        int width,
+        int height,
+        IGraphicsDevice* device,
+        UnityEncoderType encoderType,
+        UnityRenderingExtTextureFormat textureFormat)
     {
         std::unique_ptr<IEncoder> encoder;
         const GraphicsDeviceType deviceType = device->GetDeviceType();
