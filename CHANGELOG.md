@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fixed the receiver of video streaming with Vulkan API
 - Fixed a crash bug when the application ended using Vulkan API
+- Fixed a crash bug of the standalone build using Vulkan API
 - Fixed bugs that occur on Linux not installed NVIDIA driver
 - Fixed a bug of the `VideoReceive` sample
 
