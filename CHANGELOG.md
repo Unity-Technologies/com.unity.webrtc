@@ -4,6 +4,20 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2020-11-13
+
+### Added
+
+- Added a `Bandwidth` sample 
+
+### Fixed
+
+- Fixed the receiver of video streaming with Vulkan API
+- Fixed a crash bug when the application ended using Vulkan API
+- Fixed a crash bug of the standalone build using Vulkan API
+- Fixed bugs that occur on Linux not installed NVIDIA driver
+- Fixed a bug of the `VideoReceive` sample
+
 ## [2.2.0] - 2020-10-26
 
 ### Added
