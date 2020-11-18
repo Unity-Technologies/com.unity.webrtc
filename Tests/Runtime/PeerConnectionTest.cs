@@ -206,8 +206,8 @@ namespace Unity.WebRTC.RuntimeTest
             var peer2 = new RTCPeerConnection(ref config);
             var audioTrack = new AudioStreamTrack("audio");
 
-            var transceiver1 = peer1.AddTransceiver(audioTrack);
-            transceiver1.Direction = RTCRtpTransceiverDirection.SendOnly;
+            var transceiver1 = peer1.AddTransceiver(TrackKind.Audio);
+            transceiver1.Direction = RTCRtpTransceiverDirection.RecvOnly;
             Assert.IsNull(transceiver1.CurrentDirection);
 
             RTCOfferOptions options1 = new RTCOfferOptions {offerToReceiveAudio = true};
@@ -219,6 +219,11 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
+
+            var transceiver2 = peer2.GetTransceivers().First(x => x.Receiver.Track.Kind == TrackKind.Audio);
+            Assert.True(transceiver2.Sender.ReplaceTrack(audioTrack));
+            transceiver2.Direction = RTCRtpTransceiverDirection.SendOnly;
+
             var op4 = peer2.CreateAnswer(ref options2);
             yield return op4;
             desc = op4.Desc;
@@ -227,7 +232,8 @@ namespace Unity.WebRTC.RuntimeTest
             var op6 = peer1.SetRemoteDescription(ref desc);
             yield return op6;
 
-            Assert.AreEqual(transceiver1.CurrentDirection, RTCRtpTransceiverDirection.SendOnly);
+            Assert.AreEqual(transceiver1.CurrentDirection, RTCRtpTransceiverDirection.RecvOnly);
+            Assert.AreEqual(transceiver2.CurrentDirection, RTCRtpTransceiverDirection.SendOnly);
 
             audioTrack.Dispose();
             peer1.Close();

@@ -785,6 +785,11 @@ extern "C"
         return error.type();
     }
 
+    UNITY_INTERFACE_EXPORT bool SenderReplaceTrack(RtpSenderInterface* sender, MediaStreamTrackInterface* track)
+    {
+        return sender->SetTrack(track);
+    }
+
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
     {
         return sender->track().get();
