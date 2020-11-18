@@ -4,7 +4,7 @@
      if (is_ios) {
        public_deps += [ ":framework_objc" ]
      }
-+    if(is_mac) {
++    if(is_ios || is_mac) {
 +      public_deps += [ 
 +        ":base_objc",
 +        ":default_codec_factory_objc",

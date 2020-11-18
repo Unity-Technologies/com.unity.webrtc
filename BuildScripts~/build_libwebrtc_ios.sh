@@ -25,7 +25,7 @@ fi
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 # add objc library to use videotoolbox
-patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_mac.patch"
+patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
