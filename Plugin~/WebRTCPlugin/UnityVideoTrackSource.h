@@ -30,10 +30,7 @@ class UnityVideoTrackSource :
         };
 
     UnityVideoTrackSource(
-        void* frame,
-        UnityGfxRenderer gfxRenderer,
-        bool is_screencast,
-        absl::optional<bool> needs_denoising);
+        bool is_screencast, absl::optional<bool> needs_denoising);
     ~UnityVideoTrackSource() override;
 
     SourceState state() const override;
@@ -42,7 +39,10 @@ class UnityVideoTrackSource :
     bool is_screencast() const override;
     absl::optional<bool> needs_denoising() const override;
 
-    // todo(kazuki)::
+    // note:: call from render thread
+    void Init(void* frame);
+
+    // note:: call from render thread
     void OnFrameCaptured(int64_t timestampe_us);
 
     // todo(kazuki)::
@@ -88,11 +88,7 @@ class UnityVideoTrackSource :
     std::mutex m_mutex;
     IEncoder* encoder_;
     void* frame_;
-
-#if defined(SUPPORT_VULKAN)
-    UnityVulkanImage unityVulkanImage_;
-#endif
-  webrtc::Clock* clock_;
+    webrtc::Clock* clock_;
 };
 
 } // end namespace webrtc

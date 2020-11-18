@@ -32,11 +32,10 @@ public:
         m_texture(m_device->CreateDefaultTextureV(width, height, m_textureFormat))
     {
         m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
-            m_texture->GetNativeTexturePtrV(),
-            m_unityGfxRenderer,
             /*is_screencast=*/ false,
             /*needs_denoising=*/ absl::nullopt);
         m_trackSource->AddOrUpdateSink(&mock_sink_, rtc::VideoSinkWants());
+        m_trackSource->Init(m_texture->GetNativeTexturePtrV());
         m_trackSource->SetEncoder(encoder_.get());
 
         EXPECT_NE(nullptr, m_device);

@@ -112,9 +112,11 @@ extern "C"
         return context->GetInitializationResult(track);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(Context* context, MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat textureFormat)
+    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(
+        Context* context, MediaStreamTrackInterface* track, int width, int height,
+        UnityRenderingExtTextureFormat textureFormat, void* textureHandle)
     {
-        context->SetEncoderParameter(track, width, height, textureFormat);
+        context->SetEncoderParameter(track, width, height, textureFormat, textureHandle);
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
@@ -127,21 +129,9 @@ extern "C"
         context->DeleteMediaStream(stream);
     }
 
-    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label, void* rt)
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label)
     {
-        UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
-#if defined(SUPPORT_VULKAN)
-        if(gfxRenderer == kUnityGfxRendererVulkan)
-        {
-            void* frame = nullptr;
-            VulkanGraphicsDevice* device =
-                static_cast<VulkanGraphicsDevice*>(GraphicsUtility::GetGraphicsDevice());
-            const std::unique_ptr<UnityVulkanImage> unityVulkanImage =
-                device->AccessTexture(rt);
-            return context->CreateVideoTrack(label, unityVulkanImage.get(), gfxRenderer);
-        }
-#endif
-        return context->CreateVideoTrack(label, rt, gfxRenderer);
+        return context->CreateVideoTrack(label);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
@@ -754,7 +744,7 @@ extern "C"
             dst->encodings[i].hasValueMinBitrate = src.encodings[i].min_bitrate_bps.has_value();
             dst->encodings[i].minBitrate = src.encodings[i].min_bitrate_bps.value_or(0);
             dst->encodings[i].hasValueMaxFramerate = src.encodings[i].max_framerate.has_value();
-            dst->encodings[i].maxFramerate = src.encodings[i].max_framerate.value_or(0);
+            dst->encodings[i].maxFramerate = static_cast<uint32_t>(src.encodings[i].max_framerate.value_or(0));
             dst->encodings[i].hasValueScaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.has_value();
             dst->encodings[i].scaleResolutionDownBy = src.encodings[i].scale_resolution_down_by.value_or(0);
             dst->encodings[i].rid = ConvertString(src.encodings[i].rid);

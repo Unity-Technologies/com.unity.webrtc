@@ -193,9 +193,9 @@ void* CreateDeviceVulkan()
     std::vector<const char*> layers = { "VK_LAYER_LUNARG_standard_validation" };
     VkInstanceCreateInfo instanceInfo{};
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instanceInfo.enabledExtensionCount = instanceExtensions.size();
+    instanceInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExtensions.size());
     instanceInfo.ppEnabledExtensionNames = instanceExtensions.data();
-    instanceInfo.enabledLayerCount = layers.size();
+    instanceInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
     instanceInfo.ppEnabledLayerNames = layers.data();
     instanceInfo.pApplicationInfo = &appInfo;
     VkInstance instance = nullptr;
@@ -256,7 +256,7 @@ void* CreateDeviceVulkan()
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
-    deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount = 1;
     VkDevice device;
@@ -360,6 +360,7 @@ void* CreateGfxDevice(UnityGfxRenderer renderer)
         return CreateDeviceMetal();
 #endif
     }
+    return nullptr;
 }
 //---------------------------------------------------------------------------------------------------------------------
 

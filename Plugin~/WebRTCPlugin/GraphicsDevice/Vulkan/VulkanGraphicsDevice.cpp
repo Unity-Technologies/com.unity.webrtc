@@ -228,7 +228,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
     VkSubresourceLayout subresourceLayout;
     vkGetImageSubresourceLayout(m_device, vulkanTexture->GetImage(), &subresource,
         &subresourceLayout);
-    size_t rowPitch = subresourceLayout.rowPitch;
+    const uint32_t rowPitch = static_cast<uint32_t>(subresourceLayout.rowPitch);
 
     void* data;
     std::vector<uint8_t> dst;

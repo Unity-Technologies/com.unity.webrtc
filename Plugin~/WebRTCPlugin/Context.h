@@ -41,8 +41,13 @@ namespace webrtc
         int width;
         int height;
         UnityRenderingExtTextureFormat textureFormat;
-        VideoEncoderParameter(int width, int height, UnityRenderingExtTextureFormat textureFormat)
-            : width(width), height(height), textureFormat(textureFormat)
+        void* textureHandle;
+        VideoEncoderParameter(
+            int width, int height, UnityRenderingExtTextureFormat textureFormat, void* textureHandle)
+            : width(width)
+            , height(height)
+            , textureFormat(textureFormat)
+            , textureHandle(textureHandle)
         {
         }
     };
@@ -66,7 +71,7 @@ namespace webrtc
 
         // MediaStreamTrack
         webrtc::VideoTrackInterface* CreateVideoTrack(
-            const std::string& label, void* frame, UnityGfxRenderer gfxRenderer);
+            const std::string& label);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label);
         void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
@@ -99,7 +104,8 @@ namespace webrtc
         bool FinalizeEncoder(IEncoder* encoder);
         // You must call these methods on Rendering thread.
         const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
-        void SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat format);
+        void SetEncoderParameter(const MediaStreamTrackInterface* track, int width, int height,
+            UnityRenderingExtTextureFormat format, void* textureHandle);
 
         // mutex;
         std::mutex mutex;

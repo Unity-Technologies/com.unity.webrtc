@@ -252,9 +252,16 @@ namespace webrtc
         return m_mapVideoEncoderParameter[track].get();
     }
 
-    void Context::SetEncoderParameter(const webrtc::MediaStreamTrackInterface* track, int width, int height, UnityRenderingExtTextureFormat textureFormat)
+    void Context::SetEncoderParameter(
+        const MediaStreamTrackInterface* track,
+        int width,
+        int height,
+        UnityRenderingExtTextureFormat textureFormat,
+        void* textureHandle)
     {
-        m_mapVideoEncoderParameter[track] = std::make_unique<VideoEncoderParameter>(width, height, textureFormat);
+        m_mapVideoEncoderParameter[track] =
+            std::make_unique<VideoEncoderParameter>(
+                width, height, textureFormat, textureHandle);
     }
 
     void Context::SetKeyFrame(uint32_t id)
@@ -309,10 +316,10 @@ namespace webrtc
     }
 
     webrtc::VideoTrackInterface* Context::CreateVideoTrack(
-        const std::string& label, void* frame, UnityGfxRenderer gfxRenderer)
+        const std::string& label)
     {
         const rtc::scoped_refptr<UnityVideoTrackSource> source =
-            new rtc::RefCountedObject<UnityVideoTrackSource>(frame, gfxRenderer, false, nullptr);
+            new rtc::RefCountedObject<UnityVideoTrackSource>(false, nullptr);
 
         const rtc::scoped_refptr<VideoTrackInterface> track =
             m_peerConnectionFactory->CreateVideoTrack(label, source);

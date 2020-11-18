@@ -188,6 +188,11 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         {
             const VideoEncoderParameter* param = s_context->GetEncoderParameter(track);
             const UnityEncoderType encoderType = s_context->GetEncoderType();
+            UnityVideoTrackSource* source = s_context->GetVideoSource(track);
+            UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
+            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
+                param->textureHandle, s_gfxDevice, gfxRenderer);
+            source->Init(ptr);
             s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
                 param->width, param->height, s_gfxDevice, encoderType, param->textureFormat);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))

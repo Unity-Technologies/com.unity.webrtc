@@ -45,7 +45,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
     // copy extension name list
     std::vector<const char*> enabledExtensions;
     enabledExtensions.reserve(pCreateInfo->enabledExtensionCount);
-    for(int i = 0; i < pCreateInfo->enabledExtensionCount; i++)
+    for(uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++)
     {
         enabledExtensions.push_back(newCreateInfo.ppEnabledExtensionNames[i]);
     }
@@ -60,7 +60,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
 
     // replace extension name list
     newCreateInfo.ppEnabledExtensionNames = newExtensions.data();
-    newCreateInfo.enabledExtensionCount = newExtensions.size();
+    newCreateInfo.enabledExtensionCount = static_cast<uint32_t>(newExtensions.size());
     VkResult result = vkCreateDevice(physicalDevice, &newCreateInfo, pAllocator, pDevice);
     if(result != VK_SUCCESS)
     {
@@ -81,7 +81,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     // copy extension name list
     std::vector<const char*> enabledExtensions;
     enabledExtensions.reserve(pCreateInfo->enabledExtensionCount);
-    for (int i = 0; i < pCreateInfo->enabledExtensionCount; i++)
+    for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++)
     {
         enabledExtensions.push_back(newCreateInfo.ppEnabledExtensionNames[i]);
     }
@@ -96,7 +96,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
 
     // replace extension name list
     newCreateInfo.ppEnabledExtensionNames = newExtensions.data();
-    newCreateInfo.enabledExtensionCount = newExtensions.size();
+    newCreateInfo.enabledExtensionCount = static_cast<uint32_t>(newExtensions.size());
 
     VkResult result = s_vkCreateInstance(&newCreateInfo, pAllocator, pInstance);
     if (result != VK_SUCCESS)
