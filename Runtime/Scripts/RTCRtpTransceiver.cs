@@ -44,7 +44,7 @@ namespace Unity.WebRTC
         /// or null if the transceiver is stopped or has never participated in an exchange of offers and answers.
         /// To change the transceiver's directionality, set the value of the <see cref="Direction"/> property.
         /// </summary>
-        public RTCRtpTransceiverDirection CurrentDirection
+        public RTCRtpTransceiverDirection? CurrentDirection
         {
             get
             {
@@ -53,7 +53,8 @@ namespace Unity.WebRTC
                 {
                     return direction;
                 }
-                throw new InvalidOperationException("Transceiver is not running");
+
+                return null;
             }
         }
 

@@ -116,7 +116,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(0, peer.GetTransceivers().Count());
             var transceiver = peer.AddTransceiver(track);
             Assert.NotNull(transceiver);
-            Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
+            Assert.IsNull(transceiver.CurrentDirection);
             RTCRtpSender sender = transceiver.Sender;
             Assert.NotNull(sender);
             Assert.AreEqual(track, sender.Track);
@@ -149,7 +149,7 @@ namespace Unity.WebRTC.RuntimeTest
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Audio);
             Assert.NotNull(transceiver);
-            Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
+            Assert.IsNull(transceiver.CurrentDirection);
             RTCRtpReceiver receiver = transceiver.Receiver;
             Assert.NotNull(receiver);
             MediaStreamTrack track = receiver.Track;
@@ -168,7 +168,7 @@ namespace Unity.WebRTC.RuntimeTest
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Video);
             Assert.NotNull(transceiver);
-            Assert.That(() => Assert.NotNull(transceiver.CurrentDirection), Throws.InvalidOperationException);
+            Assert.IsNull(transceiver.CurrentDirection);
             RTCRtpReceiver receiver = transceiver.Receiver;
             Assert.NotNull(receiver);
             MediaStreamTrack track = receiver.Track;
@@ -208,6 +208,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             var transceiver1 = peer1.AddTransceiver(audioTrack);
             transceiver1.Direction = RTCRtpTransceiverDirection.SendOnly;
+            Assert.IsNull(transceiver1.CurrentDirection);
 
             RTCOfferOptions options1 = new RTCOfferOptions {offerToReceiveAudio = true};
             RTCAnswerOptions options2 = default;
