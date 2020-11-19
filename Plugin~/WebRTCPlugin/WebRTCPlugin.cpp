@@ -698,6 +698,16 @@ extern "C"
         transceiver->Stop();
     }
 
+    UNITY_INTERFACE_EXPORT RtpTransceiverDirection TransceiverGetDirection(RtpTransceiverInterface* transceiver)
+    {
+        return transceiver->direction();
+    }
+
+    UNITY_INTERFACE_EXPORT void TransceiverSetDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection direction)
+    {
+        transceiver->SetDirection(direction);
+    }
+
     UNITY_INTERFACE_EXPORT RtpReceiverInterface* TransceiverGetReceiver(RtpTransceiverInterface* transceiver)
     {
         return transceiver->receiver().get();
@@ -773,6 +783,11 @@ extern "C"
         }
         const ::webrtc::RTCError error = sender->SetParameters(dst);
         return error.type();
+    }
+
+    UNITY_INTERFACE_EXPORT bool SenderReplaceTrack(RtpSenderInterface* sender, MediaStreamTrackInterface* track)
+    {
+        return sender->SetTrack(track);
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
