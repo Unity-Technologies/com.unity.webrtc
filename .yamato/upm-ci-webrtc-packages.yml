@@ -31,6 +31,14 @@ platforms:
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test _plugin_mac.sh
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
+    - name: ios
+    type: Unity::metal::macmini
+    gpu_type: Unity::metal::macmini
+    image: slough-ops/macos-10.14-xcode
+    flavor: m1.mac
+    build_command: BuildScripts~/build_plugin_ios.sh
+    test_command: BuildScripts~/test_plugin_ios.sh
+    plugin_path: Runtime/Plugins/iOS/WebRTC.framework
 
 test_targets:
   - name: win
