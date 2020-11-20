@@ -112,8 +112,8 @@ if(Windows)
       COMPILE_FLAGS "/Yc /Ycpch.h"
   )
   set_target_properties(WebRTCLibTest
-    PROPERTIES 
-      LINK_FLAGS "/SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+    PROPERTIES
+      LINK_FLAGS "/DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 elseif(macOS)

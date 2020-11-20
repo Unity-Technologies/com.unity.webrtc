@@ -1,8 +1,8 @@
 #include "pch.h"
+#include "WebRTCPlugin.h"
 
 #if defined(_DEBUG)
 #include <cstdarg>
-#include "WebRTCPlugin.h"
 #endif
 
 namespace unity
