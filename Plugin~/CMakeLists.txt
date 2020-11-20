@@ -1,15 +1,40 @@
-cmake_minimum_required(VERSION 3.10)
-enable_language(CXX)
+cmake_minimum_required(VERSION 3.18)
 
 project(webrtc
-  LANGUAGES C CXX ASM)
+  VERSION 2.3.0
+  LANGUAGES C CXX ASM
+)
 
+cmake_policy(SET CMP0076 NEW)
+
+# Define flags to determine the build target platform
+# Windows, Linux, macOS, iOS
+if(MSVC)
+  set(Windows TRUE)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+  set(iOS TRUE)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(Linux TRUE)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  set(macOS TRUE)
+endif()
+
+# enable debug output 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -D_DEBUG")
 
-if(MSVC)
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Zi")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /Zi -D_ITERATOR_DEBUG_LEVEL=0")
+# set default DEPLOYMENT_TARGET version for iOS platform
+if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+  set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 10.0)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+endif()
+
+# set iterator debug level
+if(Windows)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0")
 endif()
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
@@ -17,12 +42,11 @@ find_package(Threads REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH 
   "${CMAKE_SOURCE_DIR}/cmake"
-  "${CMAKE_SOURCE_DIR}/NvCodec"
 )
 
 find_package(WebRTC REQUIRED)
 
-if(APPLE)
+if(iOS OR macOS)
   find_package(Framework REQUIRED)
 else()
   find_package(CUDA REQUIRED)
@@ -30,8 +54,6 @@ else()
   add_subdirectory(NvCodec)
 endif()
 
-include(AddPlugin)
 
-enable_testing()
 add_subdirectory(WebRTCPlugin)
 add_subdirectory(WebRTCPluginTest)

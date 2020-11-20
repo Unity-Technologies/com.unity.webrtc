@@ -132,14 +132,6 @@ namespace webrtc
         return std::string(buf.get(), buf.get() + size - 1);
     }
 
-    template<class T>
-    T** ConvertPtrArrayFromRefPtrArray(
-        std::vector<rtc::scoped_refptr<T>> vec, size_t* length);
-    template<typename T>
-    T* ConvertArray(std::vector<T> vec, size_t* length);
-    bool* ConvertArray(std::vector<bool> vec, size_t* length);
-    char* ConvertString(const std::string str);
-
     using byte = unsigned char;
     using uint8 = unsigned char;
     using uint16 = unsigned short int;

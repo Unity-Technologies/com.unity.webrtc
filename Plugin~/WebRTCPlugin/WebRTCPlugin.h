@@ -21,7 +21,6 @@ namespace webrtc
     using DelegateSetSessionDescFailure = void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
 
     void debugLog(const char* buf);
-    void SetResolution(int32* width, int32* length);
     extern DelegateDebugLog delegateDebugLog;
 
     enum class RTCPeerConnectionState

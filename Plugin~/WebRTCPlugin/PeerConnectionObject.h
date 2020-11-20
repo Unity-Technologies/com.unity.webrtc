@@ -29,9 +29,9 @@ namespace webrtc
 
         void Close();
         RTCErrorType SetLocalDescription(
-            const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, char* error[]);
+            const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, std::string& error);
         RTCErrorType SetRemoteDescription(
-            const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, char* error[]);
+            const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, std::string& error);
         
         bool GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
         webrtc::RTCErrorType SetConfiguration(const std::string& config);

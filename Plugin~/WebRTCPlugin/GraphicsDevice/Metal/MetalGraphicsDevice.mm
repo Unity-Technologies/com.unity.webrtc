@@ -97,8 +97,9 @@ namespace webrtc
                         destinationOrigin:outTxtOrigin];
         
         //[TODO-sin: 2019-12-18] We don't need this if we are not using software encoding
+#if TARGET_OS_OSX
         [blit synchronizeResource:dest];
-        
+#endif
         [blit endEncoding];
         blit = nil;
         m_unityGraphicsMetal->EndCurrentCommandEncoder();
@@ -114,8 +115,11 @@ namespace webrtc
         textureDescriptor.width = width;
         textureDescriptor.height = height;
         textureDescriptor.allowGPUOptimizedContents = false;
-        textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeManaged ) ;
-        
+#if TARGET_OS_OSX
+        textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeManaged);
+#else
+        textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeShared);
+#endif
         id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
         return new MetalTexture2D(width, height, texture);
 

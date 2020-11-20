@@ -1,77 +1,64 @@
-cmake_minimum_required(VERSION 3.10)
+add_library(WebRTCLib STATIC)
 
-project(webrtc-plugin)
-
-# Common source files
-file(GLOB sources
-  ../../.editorconfig
-  *.cpp
-  *.h
-  GraphicsDevice/*.h
-  GraphicsDevice/*.cpp
-  Codec/*.h
-  Codec/*.cpp
+# Select runtime library (MT, MTD) on windows platform
+set_property(
+  TARGET WebRTCLib
+  PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
-if(MSVC)
-  file(GLOB append_source
-    GraphicsDevice/Vulkan/*.h
-    GraphicsDevice/Vulkan/*.cpp
-    GraphicsDevice/Cuda/*.h
-    GraphicsDevice/Cuda/*.cpp
-    GraphicsDevice/D3D11/*.h
-    GraphicsDevice/D3D11/*.cpp
-    GraphicsDevice/D3D12/*.h
-    GraphicsDevice/D3D12/*.cpp
-    Codec/SoftwareCodec/*.h
-    Codec/SoftwareCodec/*.cpp
-    Codec/NvCodec/NvEncoderD3D11.cpp
-    Codec/NvCodec/NvEncoderD3D11.h
-    Codec/NvCodec/NvEncoderD3D12.cpp
-    Codec/NvCodec/NvEncoderD3D12.h
-    Codec/NvCodec/NvEncoder.cpp
-    Codec/NvCodec/NvEncoder.h
-    Codec/NvCodec/NvEncoderCuda.cpp
-    Codec/NvCodec/NvEncoderCuda.h
+target_sources(WebRTCLib
+  PRIVATE
+    Context.cpp
+    Context.h
+    DataChannelObject.cpp
+    DataChannelObject.h
+    DummyAudioDevice.cpp
+    DummyAudioDevice.h
+    DummyVideoEncoder.cpp
+    DummyVideoEncoder.h
+    Logger.cpp
+    MediaStreamObserver.cpp
+    MediaStreamObserver.h
+    pch.cpp
+    pch.h
+    PeerConnectionObject.cpp
+    PeerConnectionObject.h
+    PeerConnectionStatsCollectorCallback.cpp
+    PeerConnectionStatsCollectorCallback.h
+    PlatformBase.h
+    SetSessionDescriptionObserver.cpp
+    SetSessionDescriptionObserver.h
+    ScopedProfiler.h
+    ScopedProfiler.cpp
+    targetver.h
+    UnityVideoDecoderFactory.cpp
+    UnityVideoDecoderFactory.h
+    UnityVideoEncoderFactory.cpp
+    UnityVideoEncoderFactory.h
+    UnityVideoRenderer.cpp
+    UnityVideoRenderer.h
+    UnityVideoTrackSource.cpp
+    UnityVideoTrackSource.h
+    WebRTCConstants.h
+    WebRTCMacros.h
+    WebRTCPlugin.h
+)
+
+if(iOS OR macOS)
+  target_sources(WebRTCLib
+    PRIVATE
+      ../libcxx/debug.cpp
   )
-  list (APPEND sources ${append_source})
-elseif(APPLE)
-  file(GLOB append_source
-    ../libcxx/debug.cpp
-    *.mm
-    GraphicsDevice/Metal/*.h
-    GraphicsDevice/Metal/*.mm
-    Codec/SoftwareCodec/*.h
-    Codec/SoftwareCodec/*.cpp
-  )
-  list (APPEND sources ${append_source})
-elseif(UNIX)
-  file(GLOB append_source
-    ../dynlink/*
-    GraphicsDevice/OpenGL/*.h
-    GraphicsDevice/OpenGL/*.cpp
-    GraphicsDevice/Vulkan/*.h
-    GraphicsDevice/Vulkan/*.cpp
-    GraphicsDevice/Cuda/*.h
-    GraphicsDevice/Cuda/*.cpp
-    Codec/SoftwareCodec/*.h
-    Codec/SoftwareCodec/*.cpp
-    Codec/NvCodec/NvEncoder.cpp
-    Codec/NvCodec/NvEncoder.h
-    Codec/NvCodec/NvEncoderGL.cpp
-    Codec/NvCodec/NvEncoderGL.h
-    Codec/NvCodec/NvEncoderCuda.cpp
-    Codec/NvCodec/NvEncoderCuda.h
-  )
-  list (APPEND sources ${append_source})
 endif()
 
-add_plugin(webrtc
-  SOURCES ${sources}
-  PLUGINS_DIR ${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64
-)
+add_subdirectory(Codec)
+add_subdirectory(GraphicsDevice)
 
-if(MSVC)
+if(Linux)
+  add_subdirectory(Dynlink)
+endif()
+
+if(Windows)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -83,25 +70,32 @@ if(MSVC)
                    CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
     string(REPLACE /GR /GR- "${flag_var}" "${${flag_var}}")
   endforeach()
-elseif(APPLE OR UNIX)
-  message(STATUS "macos or linux")
-  target_compile_options(webrtc PRIVATE -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
-  target_compile_features(webrtc PRIVATE cxx_std_14)
 endif()
 
-if(MSVC)
+if(UNIX)
+  target_compile_options(WebRTCLib 
+    PUBLIC
+      -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long
+  )
+  target_compile_features(WebRTCLib 
+    PUBLIC
+      cxx_std_14
+  )
+endif()
+
+if(Windows)
   # Use precompiled header
   set(CMAKE_CXX_FLAGS 
     "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
-  set(PROJECT_BINARY_DIR 
+  set(PROJECT_BINARY_DIR
     "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
-  target_compile_definitions(webrtc
-    PRIVATE
+  target_compile_definitions(WebRTCLib
+    PUBLIC
       WEBRTC_WIN
       NOMINMAX
   )
-  target_link_libraries(webrtc
+  target_link_libraries(WebRTCLib
     PRIVATE
       ${WEBRTC_LIBRARY}
       ${Vulkan_LIBRARY}
@@ -114,96 +108,162 @@ if(MSVC)
       Dmoguids
       wmcodecdspuuid
   )
-  target_include_directories(webrtc
-    PRIVATE
+  target_include_directories(WebRTCLib
+    PUBLIC
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
       ${NVCODEC_INCLUDE_DIR}
   )
 
-  # Set linker option
-  set_target_properties( webrtc 
-    PROPERTIES LINK_FLAGS 
-      "/SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
-  )
-
-  # Change output directory for shared library
-  set_target_properties( webrtc 
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
-      ${PROJECT_BINARY_DIR}
-  )
-  set_target_properties( webrtc 
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG
-      ${PROJECT_BINARY_DIR}
-  )
-
   # Creare precompiled header
   set_source_files_properties(pch.cpp 
-    PROPERTIES COMPILE_FLAGS 
-      "/Yc /Ycpch.h"
+    PROPERTIES 
+      COMPILE_FLAGS "/Yc /Ycpch.h"
   )
-elseif(APPLE)
-  EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
-  message( STATUS "Architecture: ${ARCHITECTURE}" )
+elseif(macOS)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
-  set(CMAKE_C_FLAGS "-x objective-c")
-  set(CMAKE_CXX_FLAGS "-x objective-c++")
-  set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/${ARCHITECTURE}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
+  set(PROJECT_BINARY_DIR
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
-  target_compile_definitions(webrtc
-    PRIVATE
+  target_compile_definitions(WebRTCLib
+    PUBLIC
       WEBRTC_MAC
       WEBRTC_POSIX
   )
-  target_link_libraries(webrtc
+  target_link_libraries(WebRTCLib
     PRIVATE
       ${WEBRTC_LIBRARY}
-      ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
   )
-  set_target_properties( webrtc 
-    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG 
-      ${PROJECT_BINARY_DIR}
-  )
-  set_target_properties( webrtc 
-    PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE 
-      ${PROJECT_BINARY_DIR}
-  )
-  target_include_directories(webrtc
-    PRIVATE
+  target_include_directories(WebRTCLib
+    PUBLIC
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
-
-  set_target_properties( webrtc 
-    PROPERTIES LINK_FLAGS 
-      "-ObjC"
+  set_target_properties(WebRTCLib
+    PROPERTIES 
+      LINK_FLAGS "-ObjC"
   )  
-elseif(UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
+elseif(Linux)
+  set(PROJECT_BINARY_DIR
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
-  target_compile_definitions(webrtc
-    PRIVATE
+  target_compile_definitions(WebRTCLib
+    PUBLIC
       WEBRTC_LINUX
       WEBRTC_POSIX
   )
-  target_link_libraries(webrtc
+  target_link_libraries(WebRTCLib
     PRIVATE
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
       ${Vulkan_LIBRARY}
   )
-  target_include_directories(webrtc
-    PRIVATE
+  target_include_directories(WebRTCLib
+    PUBLIC
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
+      ${OPENGL_INCLUDE_DIR}
       ${NVCODEC_INCLUDE_DIR}
+  )
+
+  # enable -fPIC option
+  set_target_properties(WebRTCLib
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE ON
+  )
+elseif(iOS)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
+  set(PROJECT_BINARY_DIR
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/iOS")
+
+  target_compile_definitions(WebRTCLib
+    PUBLIC
+      WEBRTC_IOS
+      WEBRTC_MAC
+      WEBRTC_POSIX
+  )
+  target_include_directories(WebRTCLib
+    PUBLIC
+      ${WEBRTC_OBJC_INCLUDE_DIR}
+  )
+  target_link_libraries(WebRTCLib
+    PRIVATE
+      ${WEBRTC_LIBRARY}
+      ${FRAMEWORK_LIBS}
+  )
+  set_target_properties(WebRTCLib 
+    PROPERTIES 
+      XCODE_ATTRIBUTE_ENABLE_BITCODE "NO"
+      LINK_FLAGS "-ObjC"
   )
 endif()
 
-target_include_directories(webrtc
-  PRIVATE
+target_include_directories(WebRTCLib
+  PUBLIC
     .
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
-    ${OPENGL_INCLUDE_DIR}
 )
+
+#
+# Configure WebRTC Unity plugin
+#
+
+if(iOS)
+  add_library(WebRTCPlugin SHARED)
+  set_target_properties(WebRTCPlugin 
+    PROPERTIES 
+      FRAMEWORK TRUE
+  )
+elseif(macOS)
+  add_library(WebRTCPlugin MODULE)
+  set_target_properties(WebRTCPlugin 
+    PROPERTIES
+      BUNDLE TRUE
+      BUNDLE_EXTENSION bundle
+  )
+else()
+  add_library(WebRTCPlugin SHARED)
+endif()
+
+target_link_libraries(WebRTCPlugin
+  PRIVATE
+    WebRTCLib
+)
+target_sources(WebRTCPlugin 
+  PRIVATE
+    pch.cpp
+    pch.h
+    WebRTCPlugin.cpp
+    UnityRenderEvent.cpp
+)
+
+# rename dll/framework filename
+set_target_properties(WebRTCPlugin
+  PROPERTIES
+    OUTPUT_NAME webrtc
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}
+)
+
+if(Windows)
+  # Set linker option
+  set_target_properties(WebRTCPlugin
+    PROPERTIES 
+      LINK_FLAGS "/SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+endif()
+
+if(macOS)
+  set_target_properties(WebRTCPlugin
+  PROPERTIES LINK_FLAGS 
+    "-ObjC"
+  )
+endif()

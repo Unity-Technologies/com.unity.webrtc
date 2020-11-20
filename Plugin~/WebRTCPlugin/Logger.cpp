@@ -9,6 +9,15 @@ namespace unity
 {
 namespace webrtc
 {
+    DelegateDebugLog delegateDebugLog = nullptr;
+
+    void debugLog(const char* buf)
+    {
+        if (delegateDebugLog != nullptr)
+        {
+            delegateDebugLog(buf);
+        }
+    }
 
     void LogPrint(const char* fmt, ...)
     {

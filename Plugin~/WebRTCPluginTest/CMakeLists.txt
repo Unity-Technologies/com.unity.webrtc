@@ -1,107 +1,87 @@
-cmake_minimum_required(VERSION 3.10)
+enable_testing()
 
-project(webrtc-test)
+add_executable(WebRTCLibTest)
 
-# Common source files
-file(GLOB sources
-  ../../.editorconfig
-  *.cpp
-  *.h
-  ../WebRTCPlugin/*.h
-  ../WebRTCPlugin/*.cpp
-  ../WebRTCPlugin/GraphicsDevice/*.h
-  ../WebRTCPlugin/GraphicsDevice/*.cpp
-  ../WebRTCPlugin/Codec/*.h
-  ../WebRTCPlugin/Codec/*.cpp
+target_sources(WebRTCLibTest
+  PRIVATE
+    pch.cpp
+    pch.h
+    ContextTest.cpp
+    GraphicsDeviceTest.cpp
+    GraphicsDeviceTestBase.cpp
+    GraphicsDeviceTestBase.h
 )
 
-# Apple/Unix specific source files
-if(MSVC)
-  file(GLOB append_source
-    NvCodec/*.h
-    NvCodec/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/Cuda/*.h
-    ../WebRTCPlugin/GraphicsDevice/Cuda/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/D3D11/*.h
-    ../WebRTCPlugin/GraphicsDevice/D3D11/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/D3D12/*.h
-    ../WebRTCPlugin/GraphicsDevice/D3D12/*.cpp
-    ../WebRTCPlugin/Codec/SoftwareCodec/*.h
-    ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D11.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D11.h
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D12.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderD3D12.h
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
-  )
-  list (APPEND sources ${append_source})
-elseif(APPLE)
-  file(GLOB append_source
-    ../libcxx/debug.cpp
-    ../WebRTCPlugin/*.mm
-    ../WebRTCPlugin/GraphicsDevice/Metal/*.h
-    ../WebRTCPlugin/GraphicsDevice/Metal/*.mm
-    ../WebRTCPlugin/Codec/SoftwareCodec/*.h
-    ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
-  )
-  list (APPEND sources ${append_source})
-elseif(UNIX)
-  file(GLOB append_source
-    ../dynlink/*
-    NvCodec/*.h
-    NvCodec/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/OpenGL/*.h
-    ../WebRTCPlugin/GraphicsDevice/OpenGL/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/*.h
-    ../WebRTCPlugin/GraphicsDevice/Vulkan/*.cpp
-    ../WebRTCPlugin/GraphicsDevice/Cuda/*.h
-    ../WebRTCPlugin/GraphicsDevice/Cuda/*.cpp
-    ../WebRTCPlugin/Codec/SoftwareCodec/*.h
-    ../WebRTCPlugin/Codec/SoftwareCodec/*.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoder.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoder.h
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderGL.h
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.cpp
-    ../WebRTCPlugin/Codec/NvCodec/NvEncoderCuda.h
-  )
-  list (APPEND sources ${append_source})
+# todo(kazuki):: fix linker error on macOS
+if(NOT macOS)
+target_sources(WebRTCLibTest
+  PRIVATE
+    VideoRendererTest.cpp
+    VideoTrackSourceTest.cpp
+)    
 endif()
 
-add_executable(WebRTCPluginTest ${sources} ../unity/include/IUnityGraphicsMetal.h)
-
-if(APPLE OR UNIX)
-  message(STATUS "macos or linux")
-  target_compile_options(WebRTCPluginTest PRIVATE -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long)
-  target_compile_features(WebRTCPluginTest PRIVATE cxx_std_14)
+if(Windows OR Linux)
+  add_subdirectory(NvCodec)
 endif()
 
 # specify gtest root directory
-if(MSVC)
+if(Windows)
   set(GTEST_ROOT "${CMAKE_SOURCE_DIR}/googletest")
   set(GMOCK_ROOT "${CMAKE_SOURCE_DIR}/googletest")
 endif()
 
-find_package(GTest REQUIRED)
-find_package(GMock REQUIRED)
+#find_package(GMock REQUIRED PATHS "/usr/local" NO_CMAKE_FIND_ROOT_PATH)
+#enable_testing()
+#include(FetchContent)
+#FetchContent_Declare(googletest
+#  GIT_REPOSITORY https://github.com/google/googletest.git
+#  GIT_TAG ec44c6c1675c25b9827aacd08c02433cccde7780
+#)
+#FetchContent_GetProperties(googletest)
+#if(NOT googletest_POPULATED)
+#  FetchContent_Populate(googletest)
+#  add_subdirectory(
+#    ${googletest_SOURCE_DIR}
+#    ${googletest_BINARY_DIR}
+#  )
+#endif()
+
+find_package(GTest)
+find_package(GMock)
 include(GoogleTest)
 
-if(MSVC)
+if (NOT GTest_FOUND AND UNIX)
+  message("FindGTest could not find GTest module, so set variables directly.")
+  set(GTEST_INCLUDE_DIRS
+    "/usr/local/include"
+  )
+
+  set(GTEST_LIBRARIES
+    debug "/usr/local/lib/libgtestd.a"
+    optimized "/usr/local/lib/libgtest.a"
+    CACHE STRING "GTEST library"
+  )
+
+  set(GMOCK_LIBRARIES
+    debug "/usr/local/lib/libgmockd.a"
+    optimized "/usr/local/lib/libgmock.a"
+    CACHE STRING "GMOCK library"
+  )
+
+  set(GTEST_MAIN_LIBRARIES
+    debug "/usr/local/lib/libgtest_maind.a"
+    optimized "/usr/local/lib/libgtest_main.a"
+    CACHE STRING "GTEST Main library"
+  )
+endif()  
+
+if(Windows)
   # Use precompiled header
   set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
-
-  target_compile_definitions(WebRTCPluginTest
-      PRIVATE
-        WEBRTC_WIN
-        NOMINMAX
+    "${CMAKE_CXX_FLAGS} /Yu /Yupch.h"
   )
-  target_link_libraries(WebRTCPluginTest
+  target_link_libraries(WebRTCLibTest
       PRIVATE
       ${WEBRTC_LIBRARY}
       ${Vulkan_LIBRARY}
@@ -118,34 +98,33 @@ if(MSVC)
       Msdmo
       Dmoguids
       wmcodecdspuuid
+      WebRTCLib
   )
-  target_include_directories(WebRTCPluginTest
+  target_include_directories(WebRTCLibTest
     PRIVATE
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
       ${NVCODEC_INCLUDE_DIR}
   )
-
   # Creare precompiled header
   set_source_files_properties(pch.cpp 
-    PROPERTIES COMPILE_FLAGS 
-      "/Yc /Ycpch.h"
+    PROPERTIES 
+      COMPILE_FLAGS "/Yc /Ycpch.h"
   )
-elseif(APPLE)
+  set_target_properties(WebRTCLibTest
+    PROPERTIES 
+      LINK_FLAGS "/SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+elseif(macOS)
   set(CMAKE_C_FLAGS "-x objective-c")
   set(CMAKE_CXX_FLAGS "-x objective-c++")
   
-  set_target_properties( WebRTCPluginTest 
-    PROPERTIES LINK_FLAGS 
-      "-ObjC"
-  )  
-
-  target_compile_definitions(WebRTCPluginTest
-    PRIVATE
-      WEBRTC_MAC
-      WEBRTC_POSIX
+  set_target_properties(WebRTCLibTest 
+    PROPERTIES 
+      LINK_FLAGS "-ObjC"
   )
-  target_link_libraries(WebRTCPluginTest
+  target_link_libraries(WebRTCLibTest
     PRIVATE
       ${WEBRTC_LIBRARY}
       ${OPENGL_LIBRARIES}
@@ -153,25 +132,19 @@ elseif(APPLE)
       ${GTEST_MAIN_LIBRARIES}
       ${GTEST_LIBRARIES}
       ${GMOCK_LIBRARIES}
+      WebRTCLib
   )
-
-  target_include_directories(WebRTCPluginTest
+  target_include_directories(WebRTCLibTest
     PRIVATE
       ..
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
-elseif(UNIX)
+elseif(Linux)
   find_package(OpenGL REQUIRED)
   find_package(GLUT REQUIRED)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
 
-  target_compile_definitions(WebRTCPluginTest
-    PRIVATE
-      WEBRTC_LINUX
-      WEBRTC_POSIX
-  )
-
-  target_link_libraries(WebRTCPluginTest
+  target_link_libraries(WebRTCLibTest
     PRIVATE
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
@@ -182,8 +155,9 @@ elseif(UNIX)
       ${GMOCK_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT}
       ${Vulkan_LIBRARY}
+      WebRTCLib
   )
-  target_include_directories(WebRTCPluginTest
+  target_include_directories(WebRTCLibTest
     PRIVATE
       ..
       ${CUDA_INCLUDE_DIRS}
@@ -191,9 +165,9 @@ elseif(UNIX)
   )
 endif()
 
-gtest_add_tests(TARGET WebRTCPluginTest)
+gtest_add_tests(TARGET WebRTCLibTest)
 
-target_include_directories(WebRTCPluginTest
+target_include_directories(WebRTCLibTest
   PRIVATE
     .
     ../WebRTCPlugin

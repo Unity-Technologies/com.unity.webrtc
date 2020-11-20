@@ -293,6 +293,16 @@ namespace webrtc
         {
             return 0;
         }
+#if defined(WEBRTC_IOS)
+        virtual int GetPlayoutAudioParameters(webrtc::AudioParameters* params) const override
+        {
+            return 0;
+        }
+        virtual int GetRecordAudioParameters(webrtc::AudioParameters* params) const override
+        {
+            return 0;
+        }
+#endif
     private:
         std::unique_ptr<webrtc::AudioDeviceBuffer> deviceBuffer;
         std::atomic<bool> started {false};

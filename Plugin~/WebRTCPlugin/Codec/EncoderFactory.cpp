@@ -17,7 +17,7 @@
 
 #include "SoftwareCodec/SoftwareEncoder.h"
 
-#if !defined(UNITY_OSX)
+#if defined(SUPPORT_VULKAN)
 #include "NvCodec/NvEncoderCuda.h"
 #endif
 
