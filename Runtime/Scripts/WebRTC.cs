@@ -231,6 +231,8 @@ namespace Unity.WebRTC
         internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/webrtc.dll";
 #elif UNITY_STANDALONE
         internal const string Lib = "webrtc";
+#elif UNITY_IOS
+        internal const string Lib = "__Internal";
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
