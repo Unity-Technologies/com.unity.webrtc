@@ -1,11 +1,20 @@
 cmake_minimum_required(VERSION 3.18)
 
+# set default DEPLOYMENT_TARGET version for iOS platform
+if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+  set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 10.0)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+endif()
+
 project(webrtc
   VERSION 2.3.0
   LANGUAGES C CXX ASM
 )
 
 cmake_policy(SET CMP0076 NEW)
+
+# Enable unit testing
+enable_testing()
 
 # Define flags to determine the build target platform
 # Windows, Linux, macOS, iOS
@@ -22,15 +31,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   set(macOS TRUE)
 endif()
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # enable debug output 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -D_DEBUG")
-
-# set default DEPLOYMENT_TARGET version for iOS platform
-if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-  set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 10.0)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
-endif()
 
 # set iterator debug level
 if(Windows)

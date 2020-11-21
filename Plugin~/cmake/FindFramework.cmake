@@ -5,6 +5,7 @@ if(iOS)
   find_library(CORE_AUDIO CoreAudio)
   find_library(CORE_VIDEO CoreVideo)
   find_library(CORE_MEDIA CoreMedia)
+  find_library(CORE_GRAPHICS CoreGraphics)
   find_library(AUDIO_TOOLBOX AudioToolbox)
   find_library(VIDEO_TOOLBOX VideoToolbox)
   find_library(METAL Metal)
@@ -18,6 +19,7 @@ if(iOS)
     ${CORE_AUDIO}
     ${CORE_VIDEO}
     ${CORE_MEDIA}
+    ${CORE_GRAPHICS}
     ${AUDIO_TOOLBOX}
     ${VIDEO_TOOLBOX}
     ${METAL}

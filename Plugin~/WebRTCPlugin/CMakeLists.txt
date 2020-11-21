@@ -77,10 +77,6 @@ if(UNIX)
     PUBLIC
       -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long
   )
-  target_compile_features(WebRTCLib 
-    PUBLIC
-      cxx_std_14
-  )
 endif()
 
 if(Windows)
@@ -178,7 +174,8 @@ elseif(iOS)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
   set(PROJECT_BINARY_DIR
-    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/iOS")
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/iOS"
+  )
 
   target_compile_definitions(WebRTCLib
     PUBLIC
@@ -263,7 +260,15 @@ endif()
 
 if(macOS)
   set_target_properties(WebRTCPlugin
-  PROPERTIES LINK_FLAGS 
-    "-ObjC"
+  PROPERTIES 
+    LINK_FLAGS "-ObjC"
   )
+endif()
+
+if(iOS)
+  set_target_properties(WebRTCPlugin
+  PROPERTIES 
+    LINK_FLAGS "-ObjC"
+    XCODE_ATTRIBUTE_ENABLE_BITCODE "NO"
+  )  
 endif()

@@ -31,10 +31,9 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-for target_cpu in "arm64" "x64"
+for is_debug in "true" "false"
 do
-  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
-  for is_debug in "true" "false"
+  for target_cpu in "arm64" "x64"
   do
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
@@ -43,14 +42,20 @@ do
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
 
+    # copy static library
+    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
+  done
     filename="libwebrtc.a"
     if [ $is_debug = "true" ]; then
       filename="libwebrtcd.a"
     fi
+    lipo -create -output \
+    "$ARTIFACTS_DIR/lib/${filename}"
+    "$ARTIFACTS_DIR/lib/arm64/libwebrtc.a"
+    "$ARTIFACTS_DIR/lib/x64/libwebrtc.a"
 
-    # cppy static library
-    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
-  done
+    rm -r "$ARTIFACTS_DIR/lib/arm64"
+    rm -r "$ARTIFACTS_DIR/lib/x64"
 done
 
 # fix error when generate license

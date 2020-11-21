@@ -1,5 +1,3 @@
-enable_testing()
-
 add_executable(WebRTCLibTest)
 
 target_sources(WebRTCLibTest
@@ -58,20 +56,20 @@ if (NOT GTest_FOUND AND UNIX)
   )
 
   set(GTEST_LIBRARIES
-    debug "/usr/local/lib/libgtestd.a"
-    optimized "/usr/local/lib/libgtest.a"
+    debug "${CMAKE_SOURCE_DIR}/googletest/lib/libgtestd.a"
+    optimized "${CMAKE_SOURCE_DIR}/googletest/lib/libgtest.a"
     CACHE STRING "GTEST library"
   )
 
   set(GMOCK_LIBRARIES
-    debug "/usr/local/lib/libgmockd.a"
-    optimized "/usr/local/lib/libgmock.a"
+    debug "${CMAKE_SOURCE_DIR}/googletest/lib/libgmockd.a"
+    optimized "${CMAKE_SOURCE_DIR}/googletest/lib/libgmock.a"
     CACHE STRING "GMOCK library"
   )
 
   set(GTEST_MAIN_LIBRARIES
-    debug "/usr/local/lib/libgtest_maind.a"
-    optimized "/usr/local/lib/libgtest_main.a"
+    debug "${CMAKE_SOURCE_DIR}/googletest/lib/libgtest_maind.a"
+    optimized "${CMAKE_SOURCE_DIR}/googletest/lib/libgtest_main.a"
     CACHE STRING "GTEST Main library"
   )
 endif()  
@@ -163,6 +161,29 @@ elseif(Linux)
       ${CUDA_INCLUDE_DIRS}
       ${NVCODEC_INCLUDE_DIR}
   )
+elseif(iOS)
+  set(CMAKE_C_FLAGS "-x objective-c")
+  set(CMAKE_CXX_FLAGS "-x objective-c++")
+  
+  set_target_properties(WebRTCLibTest 
+    PROPERTIES 
+      LINK_FLAGS "-ObjC"
+  )
+  target_link_libraries(WebRTCLibTest
+    PRIVATE
+      ${WEBRTC_LIBRARY}
+      ${OPENGL_LIBRARIES}
+      ${FRAMEWORK_LIBS}
+      ${GTEST_MAIN_LIBRARIES}
+      ${GTEST_LIBRARIES}
+      ${GMOCK_LIBRARIES}
+      WebRTCLib
+  )
+  target_include_directories(WebRTCLibTest
+    PRIVATE
+      ..
+      ${WEBRTC_OBJC_INCLUDE_DIR}
+  )  
 endif()
 
 gtest_add_tests(TARGET WebRTCLibTest)
