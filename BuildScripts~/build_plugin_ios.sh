@@ -12,14 +12,14 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 
 # todo(kazuki): build for iOS test
 # Install googletest
-# git clone https://github.com/google/googletest.git
-# cd googletest
-# git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
-# mkdir release
-# cd release
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-# make
-# sudo make install
+git clone https://github.com/google/googletest.git
+cd googletest
+git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
+mkdir release
+cd release
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+sudo make install
 
 # Build webrtc Unity plugin 
 cd "$SOLUTION_DIR"
@@ -28,12 +28,11 @@ cmake -G Xcode                                 \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
   -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
-
   .
 
 #xcodebuild -scheme webrtc -configuration Release build
 #xcodebuild -scheme WebRTCPluginTest -configuration Release build
-cmake --build . --config Release --target install
+cmake --build . --config Release --target WebRTCPlugin
 
 # todo(kazuki): enable test
 # Copy and run the test on the Metal device
