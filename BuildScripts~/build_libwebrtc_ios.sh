@@ -34,6 +34,14 @@ do
   for target_cpu in "arm64" "x64"
   do
     # generate ninja files
+    # 
+    # note: `treat_warnings_as_errors=false` is for avoiding LLVM warning.
+    #       https://reviews.llvm.org/D72212
+    #       See below for details.
+    #       https://bugs.chromium.org/p/webrtc/issues/detail?id=11729
+    #
+    # note: `use_xcode_clang=true` is for using bitcode.
+    #
     gn gen "$OUTPUT_DIR" --root="src" \
       --args="is_debug=${is_debug} target_os=\"ios\" target_cpu=\"${target_cpu}\" ios_enable_code_signing=false enable_ios_bitcode=true rtc_use_h264=false rtc_include_tests=false rtc_build_examples=false"
 
