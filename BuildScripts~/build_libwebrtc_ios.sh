@@ -35,12 +35,13 @@ do
   do
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} target_os=\"ios\" target_cpu=\"${target_cpu}\" ios_enable_code_signing=false rtc_use_h264=false rtc_include_tests=false rtc_build_examples=false"
+      --args="is_debug=${is_debug} target_os=\"ios\" target_cpu=\"${target_cpu}\" ios_enable_code_signing=false enable_ios_bitcode=true rtc_use_h264=false rtc_include_tests=false rtc_build_examples=false"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
 
     # copy static library
+    mkdir "$ARTIFACTS_DIR/lib/${target_cpu}/"
     cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
   done
     filename="libwebrtc.a"
