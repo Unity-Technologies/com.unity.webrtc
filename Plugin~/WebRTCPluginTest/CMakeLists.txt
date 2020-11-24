@@ -49,31 +49,6 @@ find_package(GTest)
 find_package(GMock)
 include(GoogleTest)
 
-if (NOT GTest_FOUND AND UNIX)
-  message("FindGTest could not find GTest module, so set variables directly.")
-  set(GTEST_INCLUDE_DIRS
-    "/usr/local/include"
-  )
-
-  set(GTEST_LIBRARIES
-    debug "${CMAKE_SOURCE_DIR}/googletest/lib/libgtestd.a"
-    optimized "${CMAKE_SOURCE_DIR}/googletest/lib/libgtest.a"
-    CACHE STRING "GTEST library"
-  )
-
-  set(GMOCK_LIBRARIES
-    debug "${CMAKE_SOURCE_DIR}/googletest/lib/libgmockd.a"
-    optimized "${CMAKE_SOURCE_DIR}/googletest/lib/libgmock.a"
-    CACHE STRING "GMOCK library"
-  )
-
-  set(GTEST_MAIN_LIBRARIES
-    debug "${CMAKE_SOURCE_DIR}/googletest/lib/libgtest_maind.a"
-    optimized "${CMAKE_SOURCE_DIR}/googletest/lib/libgtest_main.a"
-    CACHE STRING "GTEST Main library"
-  )
-endif()  
-
 if(Windows)
   # Use precompiled header
   set(CMAKE_CXX_FLAGS 

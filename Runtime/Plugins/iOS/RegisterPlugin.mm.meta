@@ -1,13 +1,12 @@
 fileFormatVersion: 2
-guid: 884c0b2c3555845d88730f547f334f10
-folderAsset: yes
+guid: 41655eca91a7c474f87f2a10ce8e35d3
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   defineConstraints: []
-  isPreloaded: 1
+  isPreloaded: 0
   isOverridable: 1
   isExplicitlyReferenced: 0
   validateReferences: 1
@@ -41,34 +40,39 @@ PluginImporter:
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86_64
   - first:
       Standalone: OSXUniversal
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86_64
   - first:
       Standalone: Win
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86
   - first:
       Standalone: Win64
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86_64
   - first:
       iPhone: iOS
     second:
       enabled: 1
       settings:
-        AddToEmbeddedBinaries: true
-        CPU: ARM64
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
         CompileFlags: 
-        FrameworkDependencies: CoreFoundation;CoreAudio;Metal;
+        FrameworkDependencies: 
+  - first:
+      tvOS: tvOS
+    second:
+      enabled: 1
+      settings: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
