@@ -27,6 +27,8 @@ cmake -G Xcode                                 \
   -D CMAKE_SYSTEM_NAME=iOS                     \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
+
   .
 
 #xcodebuild -scheme webrtc -configuration Release build
