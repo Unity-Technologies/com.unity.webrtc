@@ -194,7 +194,6 @@ elseif(iOS)
   )
   set_target_properties(WebRTCLib 
     PROPERTIES 
-      XCODE_ATTRIBUTE_ENABLE_BITCODE "NO"
       LINK_FLAGS "-ObjC"
   )
 endif()
