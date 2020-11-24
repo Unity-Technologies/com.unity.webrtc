@@ -271,6 +271,9 @@ namespace Unity.WebRTC
             }
 
             NativeMethods.RegisterDebugLog(DebugLog);
+#if UNITY_IOS
+            NativeMethods.RegisterRenderingPlugin();
+#endif
             s_context = Context.Create(encoderType:type);
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
@@ -515,6 +518,8 @@ namespace Unity.WebRTC
         public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
+        [DllImport(WebRTC.Lib)]
+        public static extern void RegisterRenderingPlugin();
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
         [DllImport(WebRTC.Lib)]
