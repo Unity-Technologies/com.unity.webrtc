@@ -16,16 +16,7 @@ namespace unity
 namespace webrtc
 {
 
-    DelegateDebugLog delegateDebugLog = nullptr;
     DelegateSetResolution delegateSetResolution = nullptr;
-
-    void debugLog(const char* buf)
-    {
-        if (delegateDebugLog != nullptr)
-        {
-            delegateDebugLog(buf);
-        }
-    }
 
     void SetResolution(int32* width, int32* length)
     {
@@ -544,13 +535,21 @@ extern "C"
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetLocalDescription(
         Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
     {
-        return obj->SetLocalDescription(*desc, context->GetObserver(obj->connection), error);
+        std::string error_;
+        RTCErrorType errorType = obj->SetLocalDescription(
+            *desc, context->GetObserver(obj->connection), error_);
+        *error = ConvertString(error_);
+        return errorType;
     }
     
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetRemoteDescription(
         Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
     {
-        return obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection), error);
+        std::string error_;
+        RTCErrorType errorType = obj->SetRemoteDescription(
+            *desc, context->GetObserver(obj->connection), error_);
+        *error = ConvertString(error_);
+        return errorType;
     }
 
     UNITY_INTERFACE_EXPORT bool PeerConnectionGetLocalDescription(PeerConnectionObject* obj, RTCSessionDescription* desc)

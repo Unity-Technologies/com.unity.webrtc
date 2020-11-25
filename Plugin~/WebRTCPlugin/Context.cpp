@@ -2,7 +2,7 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
-#if !defined(UNITY_OSX)
+#if defined(UNITY_WIN) || defined(UNITY_LINUX)
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
 

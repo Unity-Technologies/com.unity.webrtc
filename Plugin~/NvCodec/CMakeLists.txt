@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
-
-project(NvCodec)
-
 set(NVCODEC_DIR ${CMAKE_SOURCE_DIR}/NvCodec)
 set(NVCODEC_UTIL_DIR ${NVCODEC_DIR}/Utils)
 set(NVENC_DIR ${NVCODEC_DIR}/NvCodec/NvEncoder)

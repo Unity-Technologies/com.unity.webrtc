@@ -14,7 +14,6 @@
 
 #if defined(SUPPORT_METAL)  // Metal
 #import <Metal/Metal.h>
-#include <DummyUnityInterface/DummyUnityGraphicsMetal.h>
 #endif
 
 #if defined(SUPPORT_OPENGL_CORE) // OpenGL
@@ -327,7 +326,7 @@ IUnityInterface* CreateUnityInterface(UnityGfxRenderer renderer) {
 #endif
 #if defined(SUPPORT_METAL)  // Metal
     case kUnityGfxRendererMetal:
-        return new DummyUnityGraphicsMetal();
+        return nullptr;
 #endif
     }
     return nullptr;

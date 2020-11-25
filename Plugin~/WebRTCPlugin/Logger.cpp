@@ -1,14 +1,23 @@
 #include "pch.h"
+#include "WebRTCPlugin.h"
 
 #if defined(_DEBUG)
 #include <cstdarg>
-#include "WebRTCPlugin.h"
 #endif
 
 namespace unity
 {
 namespace webrtc
 {
+    DelegateDebugLog delegateDebugLog = nullptr;
+
+    void debugLog(const char* buf)
+    {
+        if (delegateDebugLog != nullptr)
+        {
+            delegateDebugLog(buf);
+        }
+    }
 
     void LogPrint(const char* fmt, ...)
     {
