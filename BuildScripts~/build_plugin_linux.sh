@@ -30,4 +30,4 @@ cmake -DCMAKE_C_COMPILER="clang" \
       -DCMAKE_BUILD_TYPE="Release" \
       -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
       .
-make
+cmake --build . --config Release --target WebRTCPlugin
