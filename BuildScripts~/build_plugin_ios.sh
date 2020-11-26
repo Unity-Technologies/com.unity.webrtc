@@ -2,7 +2,7 @@
 
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M85/webrtc-ios.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
-export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugin/iOS
+export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugins/iOS
 
 # Install cmake
 brew install cmake
