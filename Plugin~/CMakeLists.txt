@@ -70,7 +70,4 @@ endif()
 
 
 add_subdirectory(WebRTCPlugin)
-# todo(kazuki): enable testing for iOS
-if(NOT iOS)
-  add_subdirectory(WebRTCPluginTest)
-endif()
+add_subdirectory(WebRTCPluginTest)

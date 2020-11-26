@@ -20,12 +20,11 @@ cmake -G Xcode                                 \
   -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
   .
 
-cmake --build . --config Release --target WebRTCPlugin
 xcodebuild -sdk iphonesimulator -configuration Release
 mv "$WEBRTC_FRAMEWORK_DIR/webrtc.framework" "$WEBRTC_FRAMEWORK_DIR/webrtc-sim.framework"
 xcodebuild -sdk iphoneos -configuration Release
 
 cd "$WEBRTC_FRAMEWORK_DIR"
 lipo -create -o webrtc.framework/webrtc \
-  webrtc.framework/webrtc               \ 
+  webrtc.framework/webrtc               \
   webrtc-sim.framework/webrtc

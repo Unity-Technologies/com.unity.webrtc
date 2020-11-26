@@ -14,17 +14,29 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 git clone https://github.com/google/googletest.git
 cd googletest
 git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
-mkdir debug
-cd debug
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-make
-sudo make install
 
-# Build UnityRenderStreaming Plugin 
+cmake .
+  -G Xcode                                     \
+  -D CMAKE_SYSTEM_NAME=iOS                     \
+  -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
+  -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
+  -D CMAKE_IOS_INSTALL_COMBINED=YES            \
+  -D CMAKE_INSTALL_PREFIX=.                    \
+  -B build
+
+cmake --build build --config Debug --target install
+
+# Build webrtc Unity plugin for test
 cd "$SOLUTION_DIR"
-cmake -GXcode .
-xcodebuild -scheme webrtc -configuration Debug build
-xcodebuild -scheme WebRTCPluginTest -configuration Debug build
+cmake -G Xcode                                 \
+  -D CMAKE_SYSTEM_NAME=iOS                     \
+  -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
+  -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
+  .
+
+xcodebuild -sdk iphonesimulator -configuration Debug
 
 # Copy and run the test on the Metal device
 scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/WebRTCPluginTest/Release" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
