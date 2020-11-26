@@ -136,7 +136,7 @@ void PluginUnload();
 // from them by name as we usually do on other platforms)."
 // https://github.com/Unity-Technologies/iOSNativeCodeSamples/blob/2019-dev/Graphics/MetalNativeRenderingPlugin/README.md
 //
-#if UNITY_IPHONE
+#if defined(UNITY_IOS) || defined(UNITY_IOS_SIMULATOR)
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginLoad(IUnityInterfaces* unityInterfaces)
 {
     PluginLoad(unityInterfaces);
