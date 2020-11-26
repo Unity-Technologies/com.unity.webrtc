@@ -36,7 +36,10 @@ cmake -G Xcode                                 \
   -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
   .
 
-xcodebuild -sdk iphonesimulator -configuration Debug
+xcodebuild build-for-testing      \
+  -project build/webrtc.xcodeproj \
+  -target WebRTCPluginTest        \
+  -configuration Debug
 
 # Copy and run the test on the Metal device
 scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/WebRTCPluginTest/Release" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
