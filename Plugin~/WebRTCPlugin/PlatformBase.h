@@ -20,11 +20,11 @@
 #if _MSC_VER
 #define UNITY_WIN 1
 #elif defined(__APPLE__)
-#if defined(TARGET_OS_IOS)
+#if TARGET_OS_IOS
 #define UNITY_IOS 1
-#elif defiend(TARGET_OS_SIMULATOR)
+#elif TARGET_OS_SIMULATOR
 #define UNITY_IOS_SIMULATOR 1
-#else
+#elif TARGET_OS_OSX
 #define UNITY_OSX 1
 #endif
 #elif defined(__ANDROID__)
