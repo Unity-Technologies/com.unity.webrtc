@@ -7,27 +7,17 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install libc++, libc++abi googletest clang glut
+# Install libc++, libc++abi clang glut
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
 sudo apt update
-sudo apt install -y libc++-dev libc++abi-dev googletest clang freeglut3-dev
-
-# Install googletest
-cd /usr/src/googletest
-sudo cmake -Dcxx_no_rtti=ON \
-           -DCMAKE_C_COMPILER="clang" \
-           -DCMAKE_CXX_COMPILER="clang++" \
-           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-           CMakeLists.txt
-sudo make
-sudo cp googlemock/*.a "/usr/lib"
-sudo cp googlemock/gtest/*.a "/usr/lib"
+sudo apt install -y libc++-dev libc++abi-dev clang freeglut3-dev
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
-cmake -DCMAKE_C_COMPILER="clang" \
-      -DCMAKE_CXX_COMPILER="clang++" \
-      -DCMAKE_BUILD_TYPE="Release" \
-      -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+cmake -D CMAKE_C_COMPILER="clang"         \
+      -D CMAKE_CXX_COMPILER="clang++"     \
+      -D CMAKE_CXX_FLAGS="-stdlib=libc++" \
+      -D CMAKE_BUILD_TYPE="Release"       \
       .
-make
+
+cmake --build . --config Release --target WebRTCPlugin

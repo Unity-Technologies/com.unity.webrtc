@@ -28,24 +28,6 @@ choco install cmake -y --version 3.18.0
 # Setting up environment variables
 setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
 setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
-
-#install googletest
-cd %SOLUTION_DIR%
-git clone https://github.com/google/googletest.git
-cd googletest
-git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
-cmake . -G "Visual Studio 15 2017" -A x64 -B "build64" -DCMAKE_CXX_FLAGS_DEBUG="/MTd /Zi -D_ITERATOR_DEBUG_LEVEL=0"
-cmake --build build64 --config Release
-cmake --build build64 --config Debug
-mkdir include\gtest
-xcopy /e googletest\include\gtest include\gtest
-mkdir include\gmock
-xcopy /e googlemock\include\gmock include\gmock
-mkdir lib
-xcopy /e build64\googlemock\Release lib
-xcopy /e build64\googlemock\Debug lib
-xcopy /e build64\googlemock\gtest\Release lib
-xcopy /e build64\googlemock\gtest\Debug lib
 ```
 
 ### How to install dependencies (Ubuntu18.04)
@@ -56,9 +38,9 @@ The below commands shows the build process developing environment on Ubuntu 18.0
 # Install libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
 sudo apt-get install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
 
-# Install libc++, libc++abi googletest clang glut
+# Install libc++, libc++abi clang glut
 sudo apt update
-sudo apt install -y 6googletest clang freeglut3-dev
+sudo apt install -y clang freeglut3-dev
 
 # Install CUDA SDK
 sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
@@ -74,34 +56,24 @@ wget https://github.com/Kitware/CMake/releases/download/v3.18.0/cmake-3.18.0.tar
 tar xvf cmake-3.18.0.tar.gz
 cd cmake-3.18.0
 ./bootstrap && make && sudo make install
-
-# Install googletest
-cd /usr/src/googletest
-sudo cmake -Dcxx_no_rtti=ON \
-           -DCMAKE_C_COMPILER="clang" \
-           -DCMAKE_CXX_COMPILER="clang++" \
-           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-           CMakeLists.txt
-sudo make
-sudo cp googlemock/*.a "/usr/lib"
-sudo cp googlemock/gtest/*.a "/usr/lib"
 ```
 
-### How to install dependencies (MacOS)
+### How to install dependencies (macOS)
 
-On MacOS, [homebrew](https://brew.sh/) is used to install.
+On macOS, [homebrew](https://brew.sh/) is used to install CMake. XCode version **11.0.0 or higher** is used but **Xcode 12 would not work well**.
 
 ```bash
 # Install CMake
 brew install cmake
+```
 
-# Install googletest
-git clone https://github.com/google/googletest.git
-cd googletest
-git checkout 2fe3bd994b3189899d93f1d5a881e725e046fdc2
-cmake .
-make
-sudo make install
+### How to install dependencies (iOS)
+
+On macOS, [homebrew](https://brew.sh/) is used to install CMake. XCode version **11.0.0 or higher** is used but **Xcode 12 would not work well**.
+
+```bash
+# Install CMake
+brew install cmake
 ```
 
 ### Embedding libwebrtc
@@ -115,36 +87,60 @@ Extract the files from the zip, and place them in the `Plugin~` folder.
 
 <img src="../Documentation~/images/deploy_libwebrtc.png" width=500 align=center>
 
-### Project Settings
+## Build plugin
 
 To build plugin, you need to execute CMake command in the `Plugin~` folder.
 
-On Windows
-```
-cmake . -G "Visual Studio 15 2017" -A x64 -B "build64"
-cmake --build build64 --config Release
+### Windows
 
-or 
+```bash
+# Visual Studio 2017
+cmake . -G "Visual Studio 15 2017" -A x64 -B "build"
+cmake --build build --config Release --target WebRTCPlugin
 
-cmake . -G "Visual Studio 16 2019" -A x64 -B "build64"
-cmake --build build64 --config Release
-```
-
-On MacOS
-```
-cmake -GXcode .
-xcodebuild -scheme webrtc -configuration Release build
+# Visual Studio 2019
+cmake . -G "Visual Studio 16 2019" -A x64 -B "build"
+cmake --build build --config Release --target WebRTCPlugin
 ```
 
-On Linux
+### macOS
+```bash
+cmake . -G Xcode -B build
+cmake --build build --config Release --target WebRTCPlugin
 ```
-cmake -DCMAKE_C_COMPILER="clang" \
-      -DCMAKE_CXX_COMPILER="clang++" \
+
+### Linux
+```bash
+cmake -D CMAKE_C_COMPILER="clang"         \
+      -D CMAKE_CXX_COMPILER="clang++"     \
+      -D CMAKE_CXX_FLAGS="-stdlib=libc++" \
+      -B build
       .
-make
+cmake --build build --config Release --target WebRTCPlugin
 ```
 
-### Debug
+### iOS
+```bash
+cmake -G Xcode                                 \
+  -D CMAKE_SYSTEM_NAME=iOS                     \
+  -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
+  -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
+  .
+
+# for iOS simulator
+xcodebuild -sdk iphonesimulator -configuration Release
+
+# for iOS device
+xcodebuild -sdk iphoneos -configuration Release
+
+# If you want to make Universal framework, you need to use lipo command 
+# to combine two binaries
+
+```
+
+
+## Debug
 
 The `WebRTC` project properties must be adjusted to match your environment in order to build the plugin. 
 
