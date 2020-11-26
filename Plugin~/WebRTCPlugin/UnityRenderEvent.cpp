@@ -124,8 +124,42 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     }
     };
 }
+
+// forward declaration for plugin load event
+void PluginLoad(IUnityInterfaces* unityInterfaces);
+void PluginUnload();
+
 // Unity plugin load event
+//
+// "That is simply registering our UnityPluginLoad and UnityPluginUnload,
+// as on iOS we cannot use dynamic libraries (hence we cannot load functions
+// from them by name as we usually do on other platforms)."
+// https://github.com/Unity-Technologies/iOSNativeCodeSamples/blob/2019-dev/Graphics/MetalNativeRenderingPlugin/README.md
+//
+#if UNITY_IOS
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginLoad(IUnityInterfaces* unityInterfaces)
+{
+    PluginLoad(unityInterfaces);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginUnload()
+{
+    PluginUnload();
+}
+#else
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
+{
+    PluginLoad(unityInterfaces);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
+{
+    PluginUnload();
+}
+#endif
+
+// Unity plugin load event
+void PluginLoad(IUnityInterfaces* unityInterfaces)
 {
     s_UnityInterfaces = unityInterfaces;
     s_Graphics = unityInterfaces->Get<IUnityGraphics>();
@@ -158,7 +192,8 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
 
     OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
 }
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
+
+void PluginUnload()
 {
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
 }

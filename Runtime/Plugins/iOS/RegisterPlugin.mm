@@ -3,12 +3,16 @@
 
 bool g_registeredRenderingPlugin = false;
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces);
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload();
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API RegisterRenderingPlugin()
+extern "C"
+{
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginLoad(
+    IUnityInterfaces* unityInterfaces);
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginUnload();
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API RegisterRenderingWebRTCPlugin()
 {
     if(g_registeredRenderingPlugin)
         return;
-    UnityRegisterRenderingPluginV5(&UnityPluginLoad, &UnityPluginUnload);
+    UnityRegisterRenderingPluginV5(&UnityWebRTCPluginLoad, &UnityWebRTCPluginUnload);
     g_registeredRenderingPlugin = true;
+}
 }

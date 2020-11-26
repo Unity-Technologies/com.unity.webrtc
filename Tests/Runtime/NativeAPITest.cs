@@ -43,7 +43,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             NativeMethods.RegisterDebugLog(DebugLog);
 #if UNITY_IOS
-            NativeMethods.RegisterRenderingPlugin();
+            NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
         }
 
