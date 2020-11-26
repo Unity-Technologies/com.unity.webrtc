@@ -24,10 +24,8 @@ fi
 # add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
-mkdir -p "$ARTIFACTS_DIR/lib"
-
-# add jsoncpp
-patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
+# add objc library to use videotoolbox
+patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
@@ -36,26 +34,47 @@ do
   for target_cpu in "arm64" "x64"
   do
     # generate ninja files
+    # 
+    # note: `treat_warnings_as_errors=false` is for avoiding LLVM warning.
+    #       https://reviews.llvm.org/D72212
+    #       See below for details.
+    #       https://bugs.chromium.org/p/webrtc/issues/detail?id=11729
+    #
+    # note: `use_xcode_clang=true` is for using bitcode.
+    #
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} target_os=\"ios\" target_cpu=\"${target_cpu}\" rtc_use_h264=false rtc_include_tests=false rtc_build_examples=false"
+      --args="is_debug=${is_debug}    \
+      target_os=\"ios\"               \
+      target_cpu=\"${target_cpu}\"    \
+      rtc_use_h264=false              \
+      treat_warnings_as_errors=false  \
+      use_xcode_clang=true            \
+      enable_ios_bitcode=true         \
+      ios_enable_code_signing=false   \
+      rtc_include_tests=false         \
+      rtc_build_examples=false"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
 
     # copy static library
+    mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
     cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
   done
-    filename="libwebrtc.a"
-    if [ $is_debug = "true" ]; then
-      filename="libwebrtcd.a"
-    fi
-    lipo -create -output \
-    "$ARTIFACTS_DIR/lib/${filename}"
-    "$ARTIFACTS_DIR/lib/arm64/libwebrtc.a"
-    "$ARTIFACTS_DIR/lib/x64/libwebrtc.a"
 
-    rm -r "$ARTIFACTS_DIR/lib/arm64"
-    rm -r "$ARTIFACTS_DIR/lib/x64"
+  filename="libwebrtc.a"
+  if [ $is_debug = "true" ]; then
+    filename="libwebrtcd.a"
+  fi
+
+  # make universal binary
+  lipo -create -output                   \
+  "$ARTIFACTS_DIR/lib/${filename}"       \
+  "$ARTIFACTS_DIR/lib/arm64/libwebrtc.a" \
+  "$ARTIFACTS_DIR/lib/x64/libwebrtc.a"
+  
+  rm -r "$ARTIFACTS_DIR/lib/arm64"
+  rm -r "$ARTIFACTS_DIR/lib/x64"
 done
 
 # fix error when generate license
