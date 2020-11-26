@@ -34,12 +34,13 @@ endif()
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(XCODE AND 
-  ${XCODE_VERSION} VERSION_GREATER_EQUAL 12.0.0 AND
-  ${XCODE_VERSION} VERSION_LESS 11.0.0
+if(XCODE)
+ if(${XCODE_VERSION} VERSION_GREATER_EQUAL 12.0.0 AND
+    ${XCODE_VERSION} VERSION_LESS 11.0.0
   )
-  message(FATAL_ERROR 
-    "The required Xcode version is 11.0 or higher and 12.0 or higher is not supported.")
+    message(FATAL_ERROR 
+      "The required Xcode version is 11.0 or higher and 12.0 or higher is not supported.")
+  endif()
 endif()
 
 # enable debug output 
