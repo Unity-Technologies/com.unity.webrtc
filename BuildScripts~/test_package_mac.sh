@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export IDENTITY=~/.ssh/id_rsa_macmini
-export REMOTE_SRC_DIR=~/src
+export REMOTE_SRC_DIR="~/src"
 
 # render template
 envsubst '                                    \
@@ -12,7 +12,7 @@ envsubst '                                    \
   $TEST_RESULT_DIR                            \
   $EDITOR_VERSION'                            \
   < BuildScripts~/template/remote.sh.template \
-  > remote.sh
+  > ~/remote.sh
 chmod +x ~/remote.sh
 
 # copy package to remote machine
