@@ -265,6 +265,10 @@ if(macOS)
 endif()
 
 if(iOS)
+  #
+  # Build Setting Reference
+  # https://developer.apple.com/library/archive/documentation/DeveloperTools/Reference/XcodeBuildSettingRef/1-Build_Setting_Reference/build_setting_ref.html
+  #
   set_target_properties(WebRTCPlugin
   PROPERTIES 
     LINK_FLAGS "-ObjC"
@@ -272,5 +276,8 @@ if(iOS)
     MACOSX_FRAMEWORK_BUNDLE_VERSION ${CMAKE_PROJECT_VERSION}
     XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
     XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+    XCODE_ATTRIBUTE_STRIP_STYLE non-global
+    XCODE_ATTRIBUTE_STRIP_INSTALLED_PRODUCT $<IF:$<CONFIG:Debug>,NO,YES>
+    XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "YES"
   )
 endif()
