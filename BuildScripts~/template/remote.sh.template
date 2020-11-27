@@ -26,9 +26,9 @@ utr                                                         \
   --suite=playmode                                          \
   --scripting-backend=${SCRIPTING_BACKEND}                  \
   --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
-  --testproject= ${PACKAGE_DIR}/WebRTC~                     \
+  --testproject= ${REMOTE_SRC_DIR}/WebRTC~                  \
   --editor-location=./.Editor                               \
-  --artifacts_path=${PACKAGE_DIR}/test-results
+  --artifacts_path=${REMOTE_SRC_DIR}/test-results
 result=$?
 
 exit $result
