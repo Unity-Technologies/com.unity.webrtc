@@ -2,7 +2,7 @@
 
 export IDENTITY=~/.ssh/id_rsa_macmini
 
-# render template 
+# render template
 envsubst '                                    \
   $SCRIPTING_BACKEND                          \
   $EXTRA_EDITOR_ARG                           \
