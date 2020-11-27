@@ -30,7 +30,7 @@ unity-downloader-cli    \
   --scripting-backend=${SCRIPTING_BACKEND}                  \
   --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
   --testproject= ${TEST_PROJECT_DIR}                        \
-  --editor-location=./.Editor                               \
+  --editor-location=${HOME}/.Editor                         \
   --artifacts_path=${ARTIFACT_DIR}
 result=$?
 
