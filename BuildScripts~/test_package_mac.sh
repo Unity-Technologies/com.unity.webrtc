@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export IDENTITY=~/.ssh/id_rsa_macmini
-export REMOTE_SRC_DIR="~/src"
+export REMOTE_SRC_DIR="~/com.unity.webrtc"
 
 # render template
 envsubst '                                    \

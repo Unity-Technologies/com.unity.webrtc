@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # install unity-downloader-cli
-export PATH=$PATH:/Users/bokken/Library/Python/3.7/bin
+export PATH=$PATH:/usr/local/bin:/Users/bokken/Library/Python/3.7/bin
 pip3 install unity-downloader-cli                                                     \
   --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \
   --upgrade                                                                           \
