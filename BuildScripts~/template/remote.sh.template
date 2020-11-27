@@ -29,7 +29,7 @@ unity-downloader-cli    \
   --suite=playmode                                          \
   --scripting-backend=${SCRIPTING_BACKEND}                  \
   --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
-  --testproject= ${TEST_PROJECT_DIR}                        \
+  --testproject=${TEST_PROJECT_DIR}                         \
   --editor-location=${HOME}/.Editor                         \
   --artifacts_path=${ARTIFACT_DIR}
 result=$?
