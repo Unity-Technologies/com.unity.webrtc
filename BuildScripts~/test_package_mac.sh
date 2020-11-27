@@ -1,21 +1,19 @@
 #!/bin/bash
 
 export IDENTITY=~/.ssh/id_rsa_macmini
-export REMOTE_SRC_DIR="~/com.unity.webrtc"
 
 # render template
 envsubst '                                    \
   $SCRIPTING_BACKEND                          \
   $EXTRA_EDITOR_ARG                           \
-  $PACKAGE_DIR                                \
-  $REMOTE_SRC_DIR                             \
+  $TEST_PROJECT_DIR                           \
   $EDITOR_VERSION'                            \
-  < BuildScripts~/template/remote.sh.template \
+  < ${TEMPLATE_FILE}                          \
   > ~/remote.sh
 chmod +x ~/remote.sh
 
 # copy package to remote machine
-scp -i ${IDENTITY} -r ${PACKAGE_DIR} bokken@${BOKKEN_DEVICE_IP}:${REMOTE_SRC_DIR}
+scp -i ${IDENTITY} -r ~/${PACKAGE_DIR} bokken@${BOKKEN_DEVICE_IP}:~/${PACKAGE_DIR}
 
 # copy shell script to remote machine
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh

@@ -1,11 +1,10 @@
 # This is a template file to execute remote machine.
 #!/bin/bash
 
-# install unity-downloader-cli
 export PATH=$PATH:/usr/local/bin:/Users/bokken/Library/Python/3.7/bin
-export TEST_PROJECT_DIR=${REMOTE_SRC_DIR}/WebRTC~
 export ARTIFACT_DIR=${PWD}/test-results
 
+# install unity-downloader-cli
 pip3 install unity-downloader-cli                                                     \
   --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \
   --upgrade                                                                           \
@@ -29,9 +28,10 @@ unity-downloader-cli    \
   --suite=playmode                                          \
   --scripting-backend=${SCRIPTING_BACKEND}                  \
   --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
-  --testproject=${TEST_PROJECT_DIR}                         \
+  --testproject=${HOME}/${TEST_PROJECT_DIR}                 \
   --editor-location=${HOME}/.Editor                         \
   --artifacts_path=${ARTIFACT_DIR}
 result=$?
 
+# return exit-code
 exit $result

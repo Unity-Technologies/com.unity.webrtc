@@ -224,9 +224,11 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     image: {{ target.image }}
     flavor: {{ target.flavor }}
   variables:
+      TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
       SCRIPTING_BACKEND: {{ param.backend }}  
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
-      PACKAGE_DIR: ~/com.unity.webrtc
+      PACKAGE_DIR: com.unity.webrtc
+      TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
       TEST_RESULT_DIR: ~/test-results
       EDITOR_VERSION: {{ editor_mac_version }}
   commands:
