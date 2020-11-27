@@ -223,30 +223,19 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
+  variables:
+      SCRIPTING_BACKEND: {{ param.backend }}  
+      EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
+      PACKAGE_DIR: ~/com.unity.webrtc
+      TEST_RESULT_DIR: upm-ci~/test-results
+      EDITOR_VERSION: {{ editor_mac_version }}
   commands:
-    - |
-      cd ../
-      ls com.unity.webrtc/upm-ci~/packages/com.unity.webrtc-*.tgz | xargs tar xzvf
-      cp -rf package/ com.unity.webrtc
-      cd com.unity.webrtc
-    - brew install node
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - git clone git@github.cds.internal.unity3d.com:unity/utr.git
-    - rm -Rf ./utr/.git
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
-    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
-    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
-    - |
-      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --scripting-backend={{ param.backend }} --extra-editor-arg="-{{ gfx_type.extra-editor-arg }}" --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results' 
-      UTR_RESULT=$?
-      mkdir -p upm-ci~/test-results/
-      scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
-      exit $UTR_RESULT
+    - brew install gettext
+    - BuildScripts~/test_package_mac.sh
   artifacts:
-    {{ package.name }}_il2cpp_{{ editor.version }}_{{ target.name }}_test_results: 
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
-        - "upm-ci~/test-results/**/*"
+        - "$TEST_RESULT_DIR/**/*"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
