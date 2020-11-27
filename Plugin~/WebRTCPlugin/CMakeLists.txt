@@ -194,7 +194,6 @@ elseif(iOS)
   )
   set_target_properties(WebRTCLib 
     PROPERTIES 
-      XCODE_ATTRIBUTE_ENABLE_BITCODE "NO"
       LINK_FLAGS "-ObjC"
   )
 endif()
@@ -269,6 +268,9 @@ if(iOS)
   set_target_properties(WebRTCPlugin
   PROPERTIES 
     LINK_FLAGS "-ObjC"
-    XCODE_ATTRIBUTE_ENABLE_BITCODE "NO"
-  )  
+    MACOSX_FRAMEWORK_IDENTIFIER "com.unity.webrtc"
+    MACOSX_FRAMEWORK_BUNDLE_VERSION ${CMAKE_PROJECT_VERSION}
+    XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+    XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+  )
 endif()
