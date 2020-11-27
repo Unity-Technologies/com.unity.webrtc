@@ -9,7 +9,6 @@ envsubst '                                    \
   $EXTRA_EDITOR_ARG                           \
   $PACKAGE_DIR                                \
   $REMOTE_SRC_DIR                             \
-  $TEST_RESULT_DIR                            \
   $EDITOR_VERSION'                            \
   < BuildScripts~/template/remote.sh.template \
   > ~/remote.sh
@@ -22,4 +21,4 @@ scp -i ${IDENTITY} -r ${PACKAGE_DIR} bokken@${BOKKEN_DEVICE_IP}:${REMOTE_SRC_DIR
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 
 ssh -i ${IDENTITY} bokken@${BOKKEN_DEVICE_IP} ~/remote.sh
-scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:${REMOTE_SRC_DIR}/test-results upm-ci~/test-results
+scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results ${TEST_RESULT_DIR}

@@ -227,7 +227,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       SCRIPTING_BACKEND: {{ param.backend }}  
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
       PACKAGE_DIR: ~/com.unity.webrtc
-      TEST_RESULT_DIR: upm-ci~/test-results
+      TEST_RESULT_DIR: ~/test-results
       EDITOR_VERSION: {{ editor_mac_version }}
   commands:
     - brew install gettext

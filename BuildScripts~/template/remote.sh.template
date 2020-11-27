@@ -3,7 +3,7 @@
 
 # install unity-downloader-cli
 export PATH=$PATH:/usr/local/bin:/Users/bokken/Library/Python/3.7/bin
-export TEST_PROJECT_DIR=${PWD}/com.unity.webrtc/WebRTC~
+export TEST_PROJECT_DIR=${REMOTE_SRC_DIR}/WebRTC~
 export ARTIFACT_DIR=${PWD}/test-results
 
 pip3 install unity-downloader-cli                                                     \
