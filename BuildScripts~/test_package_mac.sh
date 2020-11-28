@@ -1,5 +1,19 @@
 #!/bin/bash
 
+#
+# BOKKEN_DEVICE_IP: 
+# TEMPLATE_FILE: 
+# SCRIPTING_BACKEND:
+# EXTRA_EDITOR_ARG:
+# PACKAGE_DIR:
+# TEST_PROJECT_DIR:
+# TEST_RESULT_DIR:
+# EDITOR_VERSION:
+#
+# 
+# brew install gettext
+#
+
 export IDENTITY=~/.ssh/id_rsa_macmini
 
 # render template
