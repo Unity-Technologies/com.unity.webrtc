@@ -36,4 +36,8 @@ scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 
 # run remote.sh on the remote machine
 ssh -i ${IDENTITY} bokken@${BOKKEN_DEVICE_IP} ~/remote.sh
+if [ $? -ne 0 ]; then
+  exit $?
+fi
+
 scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results $(PWD)/${TEST_RESULT_DIR}
