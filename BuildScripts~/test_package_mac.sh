@@ -32,5 +32,6 @@ scp -i ${IDENTITY} -r ${YAMATO_SOURCE_DIR} bokken@${BOKKEN_DEVICE_IP}:~/${PACKAG
 # copy shell script to remote machine
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 
+# run remote.sh on the remote machine
 ssh -i ${IDENTITY} bokken@${BOKKEN_DEVICE_IP} ~/remote.sh
-scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results ${TEST_RESULT_DIR}
+scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results $(PWD)/${TEST_RESULT_DIR}
