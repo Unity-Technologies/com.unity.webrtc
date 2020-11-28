@@ -27,7 +27,7 @@ envsubst '                                    \
 chmod +x ~/remote.sh
 
 # copy package to remote machine
-scp -i ${IDENTITY} -r ~/${PACKAGE_DIR} bokken@${BOKKEN_DEVICE_IP}:~/${PACKAGE_DIR}
+scp -i ${IDENTITY} -r ${YAMATO_SOURCE_DIR} bokken@${BOKKEN_DEVICE_IP}:~/${PACKAGE_DIR}
 
 # copy shell script to remote machine
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
