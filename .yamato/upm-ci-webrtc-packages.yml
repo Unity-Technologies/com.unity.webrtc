@@ -200,7 +200,7 @@ pack_{{ package.name }}:
 
 {% for target in test_targets %}
 {% for editor in editors %}
-{% if target.name != "macos" || target.name != "ios" -%}
+{% if target.name != "macos" && target.name != "ios" -%}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
