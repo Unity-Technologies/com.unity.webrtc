@@ -4,6 +4,12 @@
 export PATH=$PATH:/usr/local/bin:/Users/bokken/Library/Python/3.7/bin
 export ARTIFACT_DIR=${PWD}/test-results
 
+# TEST_TARGET variable can contain `ios` or `macos`
+editor_component=editor
+if [ ${TEST_TARGET} = "ios" ]; then
+  editor_component=iOS
+fi
+
 # install unity-downloader-cli
 pip3 install unity-downloader-cli                                                     \
   --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \
@@ -16,10 +22,10 @@ curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-stand
 chmod +x ./utr
 
 # download unity editor
-unity-downloader-cli    \
-  -u ${EDITOR_VERSION}  \
-  -c editor             \
-  --wait                \
+unity-downloader-cli     \
+  -u ${EDITOR_VERSION}   \
+  -c ${editor_component} \
+  --wait                 \
   --published
 
 # run utr

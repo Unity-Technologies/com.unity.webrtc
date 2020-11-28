@@ -2,6 +2,7 @@
 
 editors:
   - version: 2019.4
+  - version: 2020.1
 
 # Must be the same as the version of the sample project (WebRTC~)
 editor_mac_version: 2019.4
@@ -125,12 +126,20 @@ test_targets:
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
-    is_gpu: true
     gfx_types:
       - name: metal
         extra-editor-arg: force-metal    
     test_params:
       - backend: mono
+      - backend: il2cpp
+  - name: ios
+    type: Unity::mobile::iPhone
+    image: mobile/macos-10.15-testing:stable
+    flavor: b1.medium
+    gfx_types:
+      - name: metal
+        extra-editor-arg: force-metal    
+    test_params:
       - backend: il2cpp
 
 package:
@@ -190,9 +199,8 @@ pack_{{ package.name }}:
     {% endfor %}
 
 {% for target in test_targets %}
-{% if target.name != "macos" -%}
-
 {% for editor in editors %}
+{% if target.name != "macos" || target.name != "ios" -%}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
@@ -212,25 +220,25 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 {% endfor %}
-{% endfor %}
 {% else -%}
 
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor_mac_version }}_{{ gfx_type.name }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor_mac_version }} on {{ target.name }} {{ gfx_type.name }}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
   variables:
       TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
-      SCRIPTING_BACKEND: {{ param.backend }}  
-      EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
       PACKAGE_DIR: com.unity.webrtc
       TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
       TEST_RESULT_DIR: test-results
-      EDITOR_VERSION: {{ editor_mac_version }}
+      TEST_TARGET: {{ target.name }}
+      SCRIPTING_BACKEND: {{ param.backend }}  
+      EDITOR_VERSION: {{ editor.version }}
+      EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
     - brew install gettext
     - BuildScripts~/test_package_mac.sh
@@ -243,6 +251,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 {% endif -%}
+{% endfor %}
 {% endfor %}
 
 test_{{ package.name }}_nogpu:
