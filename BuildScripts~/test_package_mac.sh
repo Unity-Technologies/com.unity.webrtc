@@ -17,6 +17,9 @@
 
 export IDENTITY=~/.ssh/id_rsa_macmini
 
+# install envsubst command
+brew install gettext
+
 # render template
 envsubst '                                    \
   $SCRIPTING_BACKEND                          \
@@ -40,4 +43,5 @@ if [ $? -ne 0 ]; then
   exit $?
 fi
 
-scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results $(PWD)/${TEST_RESULT_DIR}
+mkdir -p ${TEST_RESULT_DIR}
+scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results ${TEST_RESULT_DIR}

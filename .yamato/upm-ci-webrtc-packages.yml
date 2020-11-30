@@ -243,18 +243,17 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
       PACKAGE_DIR: com.unity.webrtc
       TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
-      TEST_RESULT_DIR: test-results
+      TEST_RESULT_DIR: upm-ci~/test-results/
       TEST_TARGET: {{ target.name }}
       SCRIPTING_BACKEND: {{ param.backend }}  
       EDITOR_VERSION: {{ editor.version }}
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
-    - brew install gettext
     - BuildScripts~/test_package_mac.sh
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
-        - "$TEST_RESULT_DIR/**/*"
+        - "upm-ci~/test-results/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
