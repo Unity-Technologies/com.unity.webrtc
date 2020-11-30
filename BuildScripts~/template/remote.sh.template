@@ -7,12 +7,15 @@ export ARTIFACT_DIR=${PWD}/test-results
 
 # TEST_TARGET variable can contain `ios` or `macos`
 additional_component_arg=""
+platform=StandaloneOSX
 architecture=x64
 if [ ${TEST_TARGET} = "ios" ]; then
   additional_component_arg="-c ios"
   architecture=arm64
+  platform=iOS
 elif [ ${TEST_TARGET} = "iossimulator" ]; then 
   additional_component_arg="-c ios"
+  platform=iOS
 fi
 
 # install unity-downloader-cli
@@ -38,6 +41,7 @@ unity-downloader-cli          \
 ./utr                                                       \
   --suite=editor                                            \
   --suite=playmode                                          \
+  --platform=${platform}                                    \
   --scripting-backend=${SCRIPTING_BACKEND}                  \
   --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
   --testproject=${HOME}/${TEST_PROJECT_DIR}                 \
