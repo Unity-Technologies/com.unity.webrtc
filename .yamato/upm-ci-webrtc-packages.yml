@@ -132,6 +132,15 @@ test_targets:
     test_params:
       - backend: mono
       - backend: il2cpp
+  - name: iossimulator
+    type: Unity::metal::macmini
+    image: slough-ops/macos-10.14-xcode
+    flavor: m1.mac
+    gfx_types:
+      - name: metal
+        extra-editor-arg: force-metal    
+    test_params:
+      - backend: il2cpp
   - name: ios
     type: Unity::mobile::iPhone
     image: mobile/macos-10.15-testing:stable
@@ -200,7 +209,7 @@ pack_{{ package.name }}:
 
 {% for target in test_targets %}
 {% for editor in editors %}
-{% if target.name != "macos" and target.name != "ios" -%}
+{% if target.name != "macos" and target.name != "ios" and target.name != "iossimulator" -%}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:

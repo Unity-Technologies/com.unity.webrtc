@@ -1,5 +1,5 @@
-# This is a template file to execute remote machine.
 #!/bin/bash
+# This is a template file to execute remote machine.
 
 # python version is random on each VM
 export PATH=$PATH:/usr/local/bin:/Users/bokken/Library/Python/3.7/bin:/Users/bokken/Library/Python/3.8/bin
@@ -7,7 +7,11 @@ export ARTIFACT_DIR=${PWD}/test-results
 
 # TEST_TARGET variable can contain `ios` or `macos`
 editor_component=editor
+architecture=x64
 if [ ${TEST_TARGET} = "ios" ]; then
+  editor_component=iOS
+  architecture=arm64
+elif [ ${TEST_TARGET} = "iossimulator" ]; then 
   editor_component=iOS
 fi
 
@@ -37,8 +41,8 @@ unity-downloader-cli     \
   --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
   --testproject=${HOME}/${TEST_PROJECT_DIR}                 \
   --editor-location=${HOME}/.Editor                         \
-  --artifacts_path=${ARTIFACT_DIR}
-  --architecture=ARM64
+  --artifacts_path=${ARTIFACT_DIR}                          \
+  --architecture=${architecture}
 result=$?
 
 # return exit-code
