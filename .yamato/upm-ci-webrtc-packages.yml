@@ -199,9 +199,9 @@ pack_{{ package.name }}:
 build_package_ios_{{ editor.version }}:
   name : Build {{ package.packagename }} package for iOS {{ editor.version }}
   agent:
-  type: Unity::VM::osx
-  image: mobile/macos-10.13-testing:stable
-  flavor: b1.large
+    type: Unity::VM::osx
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.large
   commands:
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --fast -w
@@ -210,18 +210,18 @@ build_package_ios_{{ editor.version }}:
     - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=com.unity.webrtc/WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only
   artifacts:
     players:
-        paths:
-          - "build/players/**"
+      paths:
+        - "build/players/**"
     logs:
-        paths:
-          - "build/logs/**"
+      paths:
+        - "build/logs/**"
 
 test_package_ios_{{ editor.version }}:
   name: Run Tests on {{ editor.version }} on ios
   agent:
-      type: Unity::mobile::iPhone
-      image: mobile/macos-10.13-testing:stable
-      flavor: b1.medium
+    type: Unity::mobile::iPhone
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.medium
   skip_checkout: true
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_package_ios_{{ editor.version }}  
@@ -234,8 +234,8 @@ test_package_ios_{{ editor.version }}:
     - ./utr --suite=playmode --platform=iOS --player-load-path=build/players --artifacts_path=build/test-results
   artifacts:
     logs:
-        paths:
-          - "build/test-results/**"           
+      paths:
+        - "build/test-results/**"           
 {% endfor %}
 
 {% for target in test_targets %}
