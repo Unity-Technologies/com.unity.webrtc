@@ -4,6 +4,7 @@
 # BOKKEN_DEVICE_IP: 
 # TEMPLATE_FILE: 
 # TEST_TARGET:
+# TEST_PLATFORM:
 # SCRIPTING_BACKEND:
 # EXTRA_EDITOR_ARG:
 # PACKAGE_DIR:
@@ -26,6 +27,7 @@ envsubst '                                    \
   $EXTRA_EDITOR_ARG                           \
   $TEST_PROJECT_DIR                           \
   $TEST_TARGET                                \
+  $TEST_PLATFORM                              \
   $EDITOR_VERSION'                            \
   < ${TEMPLATE_FILE}                          \
   > ~/remote.sh

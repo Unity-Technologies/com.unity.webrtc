@@ -121,17 +121,23 @@ test_targets:
       - backend: mono
         platform: standalone
       - backend: il2cpp
-        platform: standalone        
+        platform: standalone
   - name: macos
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     gfx_types:
       - name: metal
-        extra-editor-arg: force-metal    
+        extra-editor-arg: force-metal
     test_params:
       - backend: mono
+        platform: editmode
+      - backend: mono
+        platform: playmode
+      - backend: mono
+        platform: standalone
       - backend: il2cpp
+        platform: standalone
   - name: iossimulator
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
@@ -141,6 +147,7 @@ test_targets:
         extra-editor-arg: force-metal    
     test_params:
       - backend: il2cpp
+        platform: standalone
   - name: ios
     type: Unity::mobile::iPhone
     image: mobile/macos-10.15-testing:stable
@@ -150,6 +157,7 @@ test_targets:
         extra-editor-arg: force-metal    
     test_params:
       - backend: il2cpp
+        platform: standalone
 
 package:
   name: webrtc
@@ -245,6 +253,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
       TEST_RESULT_DIR: upm-ci~/test-results/
       TEST_TARGET: {{ target.name }}
+      TEST_PLATFORM: {{ param.platform }}
       SCRIPTING_BACKEND: {{ param.backend }}  
       EDITOR_VERSION: {{ editor.version }}
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
