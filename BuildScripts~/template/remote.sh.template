@@ -31,7 +31,7 @@ if [ ${TEST_PLATFORM} = "standalone" ]; then
   fi
 fi
 
-if [ ${TEST_PLATFORM} = "editmode" ]
+if [ ${TEST_PLATFORM} = "editmode" ]; then
   suite=editor
 fi
 
