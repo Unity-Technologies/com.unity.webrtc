@@ -138,26 +138,6 @@ test_targets:
         platform: standalone
       - backend: il2cpp
         platform: standalone
-  - name: iossimulator
-    type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode
-    flavor: m1.mac
-    gfx_types:
-      - name: metal
-        extra-editor-arg: force-metal    
-    test_params:
-      - backend: il2cpp
-        platform: standalone
-  - name: ios
-    type: Unity::mobile::iPhone
-    image: mobile/macos-10.15-testing:stable
-    flavor: b1.medium
-    gfx_types:
-      - name: metal
-        extra-editor-arg: force-metal    
-    test_params:
-      - backend: il2cpp
-        platform: standalone
 
 package:
   name: webrtc
@@ -215,9 +195,52 @@ pack_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
 
+{% for editor in editors %}
+build_package_ios_{{ editor.version }}:
+  name : Build {{ package.packagename }} package for iOS {{ editor.version }}
+  agent:
+  type: Unity::VM::osx
+  image: mobile/macos-10.13-testing:stable
+  flavor: b1.large
+  commands:
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --fast -w
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
+    - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=com.unity.webrtc/WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only
+  artifacts:
+    players:
+        paths:
+          - "build/players/**"
+    logs:
+        paths:
+          - "build/logs/**"
+
+test_package_ios_{{ editor.version }}:
+  name: Run Tests on {{ editor.version }} on ios
+  agent:
+      type: Unity::mobile::iPhone
+      image: mobile/macos-10.13-testing:stable
+      flavor: b1.medium
+  skip_checkout: true
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_package_ios_{{ editor.version }}  
+  commands:
+    # Download standalone UnityTestRunner
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    # Give UTR execution permissions
+    - chmod +x ./utr
+    # Run the test build on the device
+    - ./utr --suite=playmode --platform=iOS --player-load-path=build/players --artifacts_path=build/test-results
+  artifacts:
+    logs:
+        paths:
+          - "build/test-results/**"           
+{% endfor %}
+
 {% for target in test_targets %}
 {% for editor in editors %}
-{% if target.name != "macos" and target.name != "ios" and target.name != "iossimulator" -%}
+{% if target.name != "macos" -%}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
