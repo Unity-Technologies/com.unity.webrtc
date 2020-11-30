@@ -207,7 +207,7 @@ build_package_ios_{{ editor.version }}:
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=com.unity.webrtc/WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only
+    - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only
   artifacts:
     players:
       paths:
