@@ -197,7 +197,7 @@ pack_{{ package.name }}:
 
 {% for editor in editors %}
 build_package_ios_{{ editor.version }}:
-  name : Build {{ package.packagename }} package for iOS {{ editor.version }}
+  name : Build {{ package.packagename }} package test for iOS {{ editor.version }}
   agent:
     type: Unity::VM::osx
     image: mobile/macos-10.13-testing:stable
@@ -215,9 +215,11 @@ build_package_ios_{{ editor.version }}:
     logs:
       paths:
         - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
 test_package_ios_{{ editor.version }}:
-  name: Run Tests on {{ editor.version }} on ios
+  name: Run tests on {{ editor.version }} on ios
   agent:
     type: Unity::mobile::iPhone
     image: mobile/macos-10.13-testing:stable
