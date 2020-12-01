@@ -296,11 +296,22 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
-test_{{ package.name }}_nogpu:
-  name : Test {{ package.packagename }} all platforms without GPU
+trigger_test_{{ package.name }}_2019_gpu:
+  name : Trigger test {{ package.packagename }} 2019.4 all platforms with GPU
+  dependencies:
+    test_{{ package.name }}_2019.4_gpu
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
+
+{% for editor in editors %}
+test_{{ package.name }}_{{ editor.version }}_nogpu:
+  name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
   dependencies:
     {% for target in test_targets %}
-    {% for editor in editors %}
     {% for param in target.test_params %}
     {% for gfx_type in target.gfx_types %}
     {% if target.is_gpu == "false" -%}
@@ -309,16 +320,9 @@ test_{{ package.name }}_nogpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
-    {% endfor %}
 
-test_{{ package.name }}_gpu:
-  name : Test {{ package.packagename }} all platforms with GPU
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
+test_{{ package.name }}_{{ editor.version }}_gpu:
+  name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
     {% for target in test_targets %}
     {% for editor in editors %}
@@ -330,7 +334,7 @@ test_{{ package.name }}_gpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
-    {% endfor %}
+{% endfor %}
 
 {% for platform in platforms %}
 {% if platform.name != "macos" -%}
