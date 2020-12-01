@@ -208,7 +208,9 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void AddAndRemoveVideoTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
@@ -239,7 +241,9 @@ namespace Unity.WebRTC.RuntimeTest
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
+        // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void AddAndRemoveAudioTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
