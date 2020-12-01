@@ -300,6 +300,7 @@ trigger_test_{{ package.name }}_2019_gpu:
   name : Trigger test {{ package.packagename }} 2019.4 all platforms with GPU
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_2019.4_ios
   triggers:
     branches:
       only:
