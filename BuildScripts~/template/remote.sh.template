@@ -23,7 +23,7 @@ if [ ${TEST_PLATFORM} = "standalone" ]; then
     platform=iOS
   elif [ ${TEST_TARGET} = "macos" ]; then
     platform=StandaloneOSX
-    if [${SCRIPTING_BACKEND} = "il2cpp" ]; then
+    if [ ${SCRIPTING_BACKEND} = "il2cpp" ]; then
       additional_component_arg="-c editor -c StandaloneSupport-IL2CPP"
     else
       additional_component_arg="-c editor -c StandaloneSupport-Mono"
