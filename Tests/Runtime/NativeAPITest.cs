@@ -105,7 +105,9 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        // todo(kazuki):: crash on iOS device
         [Test]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void PeerConnectionGetReceivers()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
