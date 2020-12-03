@@ -106,6 +106,19 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void PeerConnectionGetReceivers()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var connection = NativeMethods.ContextCreatePeerConnection(context);
+            uint length = 0;
+            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(connection, ref length);
+            Assert.AreEqual(0, length);
+            NativeMethods.ContextDeletePeerConnection(context, connection);
+            NativeMethods.ContextDestroy(0);
+        }
+
+
+        [Test]
         public void CreateAndDeleteDataChannel()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
@@ -210,7 +223,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer })]
         public void AddAndRemoveVideoTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
@@ -243,7 +256,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer })]
         public void AddAndRemoveAudioTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);

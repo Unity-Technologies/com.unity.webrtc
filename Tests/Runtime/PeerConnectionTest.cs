@@ -41,6 +41,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("PeerConnection")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void Construct()
         {
             var peer = new RTCPeerConnection();
@@ -89,7 +90,7 @@ namespace Unity.WebRTC.RuntimeTest
             // To specify TURN server, also needs `username` and `credential`.
             config.iceServers = new[]
             {
-                new RTCIceServer {  urls = new[] {"turn:127.0.0.1?transport=udp"} } 
+                new RTCIceServer {  urls = new[] {"turn:127.0.0.1?transport=udp"} }
             };
             Assert.That(() => { new RTCPeerConnection(ref config); }, Throws.ArgumentException);
         }
@@ -108,6 +109,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("PeerConnection")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void AddTransceiver()
         {
             var peer = new RTCPeerConnection();
@@ -144,6 +146,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("PeerConnection")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void AddTransceiverTrackKindAudio()
         {
             var peer = new RTCPeerConnection();
@@ -163,6 +166,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("PeerConnection")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void AddTransceiverTrackKindVideo()
         {
             var peer = new RTCPeerConnection();
@@ -199,6 +203,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator CurrentDirection()
         {
             var config = GetConfiguration();
@@ -478,6 +483,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator IceConnectionStateChange()
         {
             RTCConfiguration config = default;
@@ -526,6 +532,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator GetStatsReturnsReport()
         {
             var camObj = new GameObject("Camera");

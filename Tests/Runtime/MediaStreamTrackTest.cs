@@ -61,7 +61,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStreamTrack")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.OSXPlayer })]
         public IEnumerator CaptureStreamTrack()
         {
             var camObj = new GameObject("Camera");
@@ -77,6 +77,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("MediaStreamTrack")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void AddAndRemoveAudioStreamTrack()
         {
             var stream = new MediaStream();
@@ -110,7 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStreamTrack")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.OSXPlayer })]
         public IEnumerator VideoStreamTrackInstantiateMultiple()
         {
             var width = 256;
