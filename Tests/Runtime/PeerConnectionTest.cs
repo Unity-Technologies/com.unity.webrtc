@@ -448,6 +448,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator SetRemoteDescriptionFailed()
         {
             var config = GetConfiguration();
