@@ -98,7 +98,6 @@ namespace Unity.WebRTC.RuntimeTest
             sendStream.Dispose();
             pc2.Dispose();
             pc1.Dispose();
-            Object.DestroyImmediate(receiveImage);
         }
 
         private static IEnumerator SignalingPeers(RTCPeerConnection offerPc, RTCPeerConnection answerPc)

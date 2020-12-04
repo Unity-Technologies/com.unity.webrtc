@@ -19,6 +19,6 @@ cd "$SOLUTION_DIR"
 cmake . -G Xcode \
         -B build
 
-cmake --build build   \
-      --config Release \
+cmake --build build         \
+      --config Release       \
       --target WebRTCPlugin

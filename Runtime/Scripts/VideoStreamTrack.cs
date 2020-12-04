@@ -165,6 +165,8 @@ namespace Unity.WebRTC
                 if (IsEncoderInitialized)
                 {
                     WebRTC.Context.FinalizeEncoder(self);
+                    if (RenderTexture.active == m_destTexture)
+                        RenderTexture.active = null;
                     UnityEngine.Object.DestroyImmediate(m_destTexture);
                 }
 

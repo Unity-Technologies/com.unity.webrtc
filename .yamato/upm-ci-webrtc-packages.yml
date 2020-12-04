@@ -2,6 +2,7 @@
 
 editors:
   - version: 2019.4
+  - version: 2020.1
 
 # Must be the same as the version of the sample project (WebRTC~)
 editor_mac_version: 2019.4
@@ -120,18 +121,23 @@ test_targets:
       - backend: mono
         platform: standalone
       - backend: il2cpp
-        platform: standalone        
+        platform: standalone
   - name: macos
     type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
-    is_gpu: true
     gfx_types:
       - name: metal
-        extra-editor-arg: force-metal    
+        extra-editor-arg: force-metal
     test_params:
       - backend: mono
+        platform: editmode
+      - backend: mono
+        platform: playmode
+      - backend: mono
+        platform: standalone
       - backend: il2cpp
+        platform: standalone
 
 package:
   name: webrtc
@@ -189,10 +195,54 @@ pack_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
 
-{% for target in test_targets %}
-{% if target.name != "macos" -%}
-
 {% for editor in editors %}
+build_{{ package.name }}_{{ editor.version }}_ios:
+  name : Build {{ package.packagename }} with {{ editor.version }} for ios device
+  agent:
+    type: Unity::VM::osx
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.large
+  commands:
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --fast -w
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
+    - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --build-only
+  artifacts:
+    players:
+      paths:
+        - "build/players/**"
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
+test_{{ package.name }}_{{ editor.version }}_ios:
+  name: Test {{ package.packagename }} with {{ editor.version }} on ios device
+  agent:
+    type: Unity::mobile::iPhone
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.medium
+  skip_checkout: true
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_ios
+  commands:
+    # Download standalone UnityTestRunner
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    # Give UTR execution permissions
+    - chmod +x ./utr
+    # Run the test build on the device
+    - ./utr --suite=playmode --platform=iOS --player-load-path=build/players --artifacts_path=build/test-results
+  artifacts:
+    logs:
+      paths:
+        - "build/test-results/**"           
+{% endfor %}
+
+{% for target in test_targets %}
+{% for editor in editors %}
+{% if target.name != "macos" -%}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
@@ -212,53 +262,57 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 {% endfor %}
-{% endfor %}
 {% else -%}
 
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor_mac_version }}_{{ gfx_type.name }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor_mac_version }} on {{ target.name }} {{ gfx_type.name }}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
+  variables:
+      TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
+      PACKAGE_DIR: com.unity.webrtc
+      TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
+      TEST_RESULT_DIR: upm-ci~/test-results/
+      TEST_TARGET: {{ target.name }}
+      TEST_PLATFORM: {{ param.platform }}
+      SCRIPTING_BACKEND: {{ param.backend }}  
+      EDITOR_VERSION: {{ editor.version }}
+      EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
-    - |
-      cd ../
-      ls com.unity.webrtc/upm-ci~/packages/com.unity.webrtc-*.tgz | xargs tar xzvf
-      cp -rf package/ com.unity.webrtc
-      cd com.unity.webrtc
-    - brew install node
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - git clone git@github.cds.internal.unity3d.com:unity/utr.git
-    - rm -Rf ./utr/.git
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
-    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
-    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
-    - |
-      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --scripting-backend={{ param.backend }} --extra-editor-arg="-{{ gfx_type.extra-editor-arg }}" --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results' 
-      UTR_RESULT=$?
-      mkdir -p upm-ci~/test-results/
-      scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
-      exit $UTR_RESULT
+    - BuildScripts~/test_package_mac.sh
   artifacts:
-    {{ package.name }}_il2cpp_{{ editor.version }}_{{ target.name }}_test_results: 
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
-        - "upm-ci~/test-results/**/*"
+        - "upm-ci~/test-results/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 {% endfor %}
 {% endif -%}
 {% endfor %}
+{% endfor %}
 
-test_{{ package.name }}_nogpu:
-  name : Test {{ package.packagename }} all platforms without GPU
+trigger_test_{{ package.name }}_2019_gpu:
+  name : Trigger test {{ package.packagename }} 2019.4 all platforms with GPU
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_2019.4_ios
+  triggers:
+    branches:
+      only:
+      - "/.*/"
+      except:
+      - "master"
+
+{% for editor in editors %}
+test_{{ package.name }}_{{ editor.version }}_nogpu:
+  name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
   dependencies:
     {% for target in test_targets %}
-    {% for editor in editors %}
     {% for param in target.test_params %}
     {% for gfx_type in target.gfx_types %}
     {% if target.is_gpu == "false" -%}
@@ -267,28 +321,20 @@ test_{{ package.name }}_nogpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
-    {% endfor %}
 
-test_{{ package.name }}_gpu:
-  name : Test {{ package.packagename }} all platforms with GPU
-  triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
+test_{{ package.name }}_{{ editor.version }}_gpu:
+  name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
     {% for target in test_targets %}
-    {% for editor in editors %}
     {% for param in target.test_params %}
     {% for gfx_type in target.gfx_types %}
-    {% if target.is_gpu == "true" -%}
+    {% if target.is_gpu == "true" or target.name == "macos" -%}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
     {% endif -%}
     {% endfor %}
     {% endfor %}
     {% endfor %}
-    {% endfor %}
+{% endfor %}
 
 {% for platform in platforms %}
 {% if platform.name != "macos" -%}

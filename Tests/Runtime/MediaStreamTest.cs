@@ -71,6 +71,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void AddAndRemoveAudioStreamTrack()
         {
             var stream = new MediaStream();
@@ -88,6 +89,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator CameraCaptureStream()
         {
             var camObj = new GameObject("Camera");
@@ -109,6 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public void AddAndRemoveAudioStream()
         {
             var audioStream = Audio.CaptureStream();
@@ -124,6 +127,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator AddAndRemoveAudioMediaTrack()
         {
             RTCConfiguration config = default;
@@ -145,6 +149,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator CaptureStream()
         {
             var camObj = new GameObject("Camera");
@@ -170,6 +175,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator SenderGetStats()
         {
             var camObj = new GameObject("Camera");
@@ -215,6 +221,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator ReceiverGetStats()
         {
             var camObj = new GameObject("Camera");
@@ -258,6 +265,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator SetParametersReturnNoError()
         {
             var camObj = new GameObject("Camera");
@@ -301,7 +309,7 @@ namespace Unity.WebRTC.RuntimeTest
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.OSXPlayer })]
         public IEnumerator OnAddTrackDelegatesWithEvent()
         {
             var camObj = new GameObject("Camera");

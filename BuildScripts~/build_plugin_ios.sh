@@ -13,13 +13,13 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 
 # Build webrtc Unity plugin 
 cd "$SOLUTION_DIR"
-cmake -G Xcode                                 \
+cmake .                                        \
+  -G Xcode                                     \
   -D CMAKE_SYSTEM_NAME=iOS                     \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
   -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
   -B build
-  .
 
 xcodebuild -sdk iphonesimulator   \
   -project build/webrtc.xcodeproj \
