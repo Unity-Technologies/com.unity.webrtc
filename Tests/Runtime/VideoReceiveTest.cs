@@ -49,7 +49,8 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.Direct3D12,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] {
+            RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.OSXEditor})]
         public IEnumerator VideoReceive()
         {
             var config = new RTCConfiguration
