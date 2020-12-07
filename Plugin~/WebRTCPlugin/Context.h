@@ -68,7 +68,6 @@ namespace webrtc
         void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
         MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
 
-
         // MediaStreamTrack
         webrtc::VideoTrackInterface* CreateVideoTrack(
             const std::string& label);
@@ -98,6 +97,14 @@ namespace webrtc
         UnityVideoRenderer* CreateVideoRenderer();
         UnityVideoRenderer* GetVideoRenderer(uint32_t id);
         void DeleteVideoRenderer(UnityVideoRenderer* renderer);
+
+        // RtpSender
+        void GetRtpSenderCapabilities(
+            cricket::MediaType kind, RtpCapabilities* capabilities) const;
+
+        // RtpReceiver
+        void GetRtpReceiverCapabilities(
+            cricket::MediaType kind, RtpCapabilities* capabilities) const;
 
         // You must call these methods on Rendering thread.
         bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);

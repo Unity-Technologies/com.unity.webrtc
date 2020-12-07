@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtpSender
     {
         internal IntPtr self;
@@ -14,11 +17,33 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <returns></returns>
+        public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
+        {
+            WebRTC.Context.GetSenderCapabilities(kind, out IntPtr ptr);
+            RTCRtpCapabilitiesInternal capabilitiesInternal =
+                Marshal.PtrToStructure<RTCRtpCapabilitiesInternal>(ptr);
+            RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
+            Marshal.FreeHGlobal(ptr);
+            return capabilities;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
         {
             return peer.GetStats(this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MediaStreamTrack Track
         {
             get
@@ -28,6 +53,10 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(self, out var ptr);
@@ -37,6 +66,11 @@ namespace Unity.WebRTC
             return parameters;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
         {
             IntPtr ptr = parameters.CreatePtr();
@@ -46,6 +80,11 @@ namespace Unity.WebRTC
             return error;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
         public bool ReplaceTrack(MediaStreamTrack track)
         {
             return NativeMethods.SenderReplaceTrack(self, track.self);

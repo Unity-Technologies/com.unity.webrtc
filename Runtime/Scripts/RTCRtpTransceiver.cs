@@ -2,22 +2,6 @@ using System;
 
 namespace Unity.WebRTC
 {
-    public enum RTCRtpTransceiverDirection
-    {
-        SendRecv = 0,
-        SendOnly = 1,
-        RecvOnly = 2,
-        Inactive = 3,
-        Stopped  = 4
-    }
-
-    /// <summary>
-    /// Not implemented
-    /// </summary>
-    public struct RTCRtpCodecCapability
-    {
-    }
-
     public class RTCRtpTransceiver
     {
         internal IntPtr self;
