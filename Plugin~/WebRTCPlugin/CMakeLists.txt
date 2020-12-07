@@ -1,11 +1,5 @@
 add_library(WebRTCLib STATIC)
 
-# Select runtime library (MT, MTD) on windows platform
-set_property(
-  TARGET WebRTCLib
-  PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-)
-
 target_sources(WebRTCLib
   PRIVATE
     Context.cpp
@@ -109,6 +103,11 @@ if(Windows)
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
       ${NVCODEC_INCLUDE_DIR}
+  )
+
+  # Select runtime library (MT, MTD) on windows platform
+  set_target_properties(WebRTCLib
+    PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 
   # Creare precompiled header
