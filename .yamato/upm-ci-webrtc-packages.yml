@@ -203,6 +203,9 @@ build_{{ package.name }}_{{ editor.version }}_ios:
     image: mobile/macos-10.13-testing:stable
     flavor: b1.large
   commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
@@ -283,6 +286,9 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       EDITOR_VERSION: {{ editor.version }}
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
     - BuildScripts~/test_package_mac.sh
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
