@@ -1,10 +1,4 @@
-using System;
-using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
-using System.Collections;
-using System.Linq;
-using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -30,7 +24,9 @@ namespace Unity.WebRTC.RuntimeTest
             RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
             Assert.NotNull(capabilities);
             Assert.NotNull(capabilities.codecs);
+            Assert.IsNotEmpty(capabilities.codecs);
             Assert.NotNull(capabilities.headerExtensions);
+            Assert.IsNotEmpty(capabilities.headerExtensions);
 
             foreach (var codec in capabilities.codecs)
             {
@@ -51,7 +47,55 @@ namespace Unity.WebRTC.RuntimeTest
             RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Audio);
             Assert.NotNull(capabilities);
             Assert.NotNull(capabilities.codecs);
+            Assert.IsNotEmpty(capabilities.codecs);
             Assert.NotNull(capabilities.headerExtensions);
+            Assert.IsNotEmpty(capabilities.headerExtensions);
+
+            foreach (var codec in capabilities.codecs)
+            {
+                Assert.NotNull(codec);
+                Assert.IsNotEmpty(codec.mimeType);
+            }
+            foreach (var extensions in capabilities.headerExtensions)
+            {
+                Assert.NotNull(extensions);
+                Assert.IsNotEmpty(extensions.uri);
+            }
+        }
+
+        [Test]
+        [Category("RTCRtpReceiver")]
+        public void ReceiverGetVideoCapabilities()
+        {
+            RTCRtpCapabilities capabilities = RTCRtpReceiver.GetCapabilities(TrackKind.Video);
+            Assert.NotNull(capabilities);
+            Assert.NotNull(capabilities.codecs);
+            Assert.IsNotEmpty(capabilities.codecs);
+            Assert.NotNull(capabilities.headerExtensions);
+            Assert.IsNotEmpty(capabilities.headerExtensions);
+
+            foreach (var codec in capabilities.codecs)
+            {
+                Assert.NotNull(codec);
+                Assert.IsNotEmpty(codec.mimeType);
+            }
+            foreach (var extensions in capabilities.headerExtensions)
+            {
+                Assert.NotNull(extensions);
+                Assert.IsNotEmpty(extensions.uri);
+            }
+        }
+
+        [Test]
+        [Category("RTCRtpSender")]
+        public void ReceiverGetAudioCapabilities()
+        {
+            RTCRtpCapabilities capabilities = RTCRtpReceiver.GetCapabilities(TrackKind.Audio);
+            Assert.NotNull(capabilities);
+            Assert.NotNull(capabilities.codecs);
+            Assert.IsNotEmpty(capabilities.codecs);
+            Assert.NotNull(capabilities.headerExtensions);
+            Assert.IsNotEmpty(capabilities.headerExtensions);
 
             foreach (var codec in capabilities.codecs)
             {

@@ -207,6 +207,12 @@ namespace Unity.WebRTC
             NativeMethods.ContextGetSenderCapabilities(self, kind, out capabilities);
         }
 
+        public void GetReceiverCapabilities(TrackKind kind, out IntPtr capabilities)
+        {
+            NativeMethods.ContextGetReceiverCapabilities(self, kind, out capabilities);
+        }
+
+
         internal void InitializeEncoder(IntPtr track)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;

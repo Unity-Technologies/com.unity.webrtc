@@ -49,6 +49,25 @@ namespace webrtc
     }
 
     template<typename T>
+    struct MarshallArray
+    {
+        int32_t length;
+        T* values;
+    };
+
+    template<typename T, typename U>
+    void ConvertArray(std::vector<U>& src, MarshallArray<T>& dst)
+    {
+        dst.length = static_cast<uint32_t>(src.size());
+        dst.values = static_cast<T*>(CoTaskMemAlloc(sizeof(T) * src.size()));
+
+        for (size_t i = 0; i < src.size(); i++)
+        {
+            dst.values[i] = src[i];
+        }
+    }
+
+    template<typename T>
     struct Optional
     {
         bool hasValue;
@@ -822,22 +841,36 @@ extern "C"
         Optional<int32_t> clockRate;
         Optional<int32_t> channels;
         char* sdpFmtpLine;
+
+        RTCRtpCodecCapability& operator = (const RtpCodecCapability& obj)
+        {
+            this->mimeType = ConvertString(obj.mime_type());
+            this->clockRate = ConvertOptional(obj.clock_rate);
+            this->channels = ConvertOptional(obj.num_channels);
+            this->sdpFmtpLine = ConvertString(ConvertSdp(obj.parameters));
+            return *this;
+        }
     };
 
     struct RTCRtpHeaderExtensionCapability
     {
         char* uri;
+
+        RTCRtpHeaderExtensionCapability& operator = (const RtpHeaderExtensionCapability& obj)
+        {
+            this->uri = ConvertString(obj.uri);
+            return *this;
+        }
     };
 
     struct RTCRtpCapabilities
     {
-        int32_t codecsLength;
-        RTCRtpCodecCapability* codecs;
-        int32_t extensionHeadersLength;
-        RTCRtpHeaderExtensionCapability* extensionHeaders;
+        MarshallArray<RTCRtpCodecCapability> codecs;
+        MarshallArray<RTCRtpHeaderExtensionCapability> extensionHeaders;
     };
 
-    UNITY_INTERFACE_EXPORT void ContextGetSenderCapabilities(Context* context, TrackKind trackKind, RTCRtpCapabilities** parameters)
+    UNITY_INTERFACE_EXPORT void ContextGetSenderCapabilities(
+        Context* context, TrackKind trackKind, RTCRtpCapabilities** parameters)
     {
         RtpCapabilities src;
         cricket::MediaType type =
@@ -845,26 +878,26 @@ extern "C"
             cricket::MEDIA_TYPE_AUDIO : cricket::MEDIA_TYPE_VIDEO;
         context->GetRtpSenderCapabilities(type, &src);
 
-        RTCRtpCapabilities* dst = static_cast<RTCRtpCapabilities*>(CoTaskMemAlloc(sizeof(RTCRtpCapabilities)));
-        dst->codecsLength = static_cast<uint32_t>(src.codecs.size());
-        dst->codecs = static_cast<RTCRtpCodecCapability*>(
-            CoTaskMemAlloc(sizeof(RTCRtpCodecCapability) * src.codecs.size()));
+        RTCRtpCapabilities* dst =
+            static_cast<RTCRtpCapabilities*>(CoTaskMemAlloc(sizeof(RTCRtpCapabilities)));
+        ConvertArray(src.codecs, dst->codecs);
+        ConvertArray(src.header_extensions, dst->extensionHeaders);
+        *parameters = dst;
+    }
 
-        for (size_t i = 0; i < src.codecs.size(); i++)
-        {
-            dst->codecs[i].mimeType = ConvertString(src.codecs[i].mime_type());
-            dst->codecs[i].clockRate = ConvertOptional(src.codecs[i].clock_rate);
-            dst->codecs[i].channels = ConvertOptional(src.codecs[i].num_channels);
-            dst->codecs[i].sdpFmtpLine = ConvertString(ConvertSdp(src.codecs[i].parameters));
-        }
+    UNITY_INTERFACE_EXPORT void ContextGetReceiverCapabilities(
+        Context* context, TrackKind trackKind, RTCRtpCapabilities** parameters)
+    {
+        RtpCapabilities src;
+        cricket::MediaType type =
+            trackKind == TrackKind::Audio ?
+            cricket::MEDIA_TYPE_AUDIO : cricket::MEDIA_TYPE_VIDEO;
+        context->GetRtpReceiverCapabilities(type, &src);
 
-        dst->extensionHeadersLength = static_cast<uint32_t>(src.header_extensions.size());
-        dst->extensionHeaders = static_cast<RTCRtpHeaderExtensionCapability*>(
-            CoTaskMemAlloc(sizeof(RTCRtpHeaderExtensionCapability) * src.header_extensions.size()));
-        for (size_t i = 0; i < src.header_extensions.size(); i++)
-        {
-            dst->extensionHeaders[i].uri = ConvertString(src.header_extensions[i].uri);
-        }
+        RTCRtpCapabilities* dst =
+            static_cast<RTCRtpCapabilities*>(CoTaskMemAlloc(sizeof(RTCRtpCapabilities)));
+        ConvertArray(src.codecs, dst->codecs);
+        ConvertArray(src.header_extensions, dst->extensionHeaders);
         *parameters = dst;
     }
 
