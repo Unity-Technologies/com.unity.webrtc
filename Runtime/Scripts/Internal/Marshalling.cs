@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalInt
     {
         [MarshalAs(UnmanagedType.U1)]
@@ -20,7 +20,7 @@ namespace Unity.WebRTC
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalUlong
     {
         [MarshalAs(UnmanagedType.U1)]
@@ -37,7 +37,7 @@ namespace Unity.WebRTC
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalUint
     {
         [MarshalAs(UnmanagedType.U1)]
@@ -54,7 +54,7 @@ namespace Unity.WebRTC
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalDouble
     {
         [MarshalAs(UnmanagedType.U1)]
@@ -71,7 +71,7 @@ namespace Unity.WebRTC
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct MarshallingArray<T> where T : struct
     {
         public int length;
