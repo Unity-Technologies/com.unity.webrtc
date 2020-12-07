@@ -346,7 +346,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void RTCRtpSendParametersCreateAndDeletePtr()
         {
-            RTCRtpSendParametersInternal parametersInternal = new RTCRtpSendParametersInternal();
+            RTCRtpSendParametersInternal parametersInternal = default;
 
             int encodingsLength = 2;
             RTCRtpEncodingParametersInternal[] encodings = new RTCRtpEncodingParametersInternal[encodingsLength];
@@ -361,9 +361,10 @@ namespace Unity.WebRTC.RuntimeTest
             }
             parametersInternal.transactionId = Marshal.StringToCoTaskMemAnsi(string.Empty);
             parametersInternal.encodings.Set(encodings);
-            RTCRtpSendParameters parameter = new RTCRtpSendParameters(parametersInternal);
-            IntPtr ptr = parameter.CreatePtr();
-            RTCRtpSendParameters.DeletePtr(ptr);
+
+            RTCRtpSendParameters parameter = new RTCRtpSendParameters(ref parametersInternal);
+            parameter.CreateInstance(out var instance);
+            instance.Dispose();
         }
 
         /// <todo>

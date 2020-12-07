@@ -46,34 +46,24 @@ namespace Unity.WebRTC
         readonly RTCRtpEncodingParameters[] _encodings;
         readonly string _transactionId;
 
-        internal RTCRtpSendParameters(RTCRtpSendParametersInternal parameters)
+        internal RTCRtpSendParameters(ref RTCRtpSendParametersInternal parameters)
         {
             RTCRtpEncodingParametersInternal[] encodings = parameters.encodings.ToArray();
             _encodings = Array.ConvertAll(encodings, _ => new RTCRtpEncodingParameters(_));
             _transactionId = parameters.transactionId.AsAnsiStringWithFreeMem();
         }
 
-        internal IntPtr CreatePtr()
+        internal void CreateInstance(out RTCRtpSendParametersInternal instance)
         {
+            instance = default;
             RTCRtpEncodingParametersInternal[] encodings =
                 new RTCRtpEncodingParametersInternal[_encodings.Length];
             for(int i = 0; i < _encodings.Length; i++)
             {
                 _encodings[i].CopyInternal(ref encodings[i]);
             }
-            RTCRtpSendParametersInternal instance = default;
             instance.encodings.Set(encodings);
             instance.transactionId = Marshal.StringToCoTaskMemAnsi(_transactionId);
-            IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(instance));
-            Marshal.StructureToPtr(instance, ptr, false);
-            return ptr;
-        }
-
-        static internal void DeletePtr(IntPtr ptr)
-        {
-            var instance = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
-            Marshal.FreeCoTaskMem(instance.encodings.ptr);
-            Marshal.FreeCoTaskMem(ptr);
         }
     }
 
@@ -166,6 +156,16 @@ namespace Unity.WebRTC
     {
         public MarshallingArray<RTCRtpEncodingParametersInternal> encodings;
         public IntPtr transactionId;
+
+        public void Dispose()
+        {
+            encodings.Dispose();
+            if (transactionId != IntPtr.Zero)
+            {
+                Marshal.FreeCoTaskMem(transactionId);
+                transactionId = IntPtr.Zero;
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

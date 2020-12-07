@@ -61,7 +61,7 @@ namespace Unity.WebRTC
         {
             NativeMethods.SenderGetParameters(self, out var ptr);
             RTCRtpSendParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
-            RTCRtpSendParameters parameters = new RTCRtpSendParameters(parametersInternal);
+            RTCRtpSendParameters parameters = new RTCRtpSendParameters(ref parametersInternal);
             Marshal.FreeHGlobal(ptr);
             return parameters;
         }
@@ -73,10 +73,11 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
         {
-            IntPtr ptr = parameters.CreatePtr();
+            parameters.CreateInstance(out RTCRtpSendParametersInternal instance);
+            IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(instance));
+            Marshal.StructureToPtr(instance, ptr, false);
             RTCErrorType error = NativeMethods.SenderSetParameters(self, ptr);
-            RTCRtpSendParameters.DeletePtr(ptr);
-
+            Marshal.FreeCoTaskMem(ptr);
             return error;
         }
 

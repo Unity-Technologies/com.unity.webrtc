@@ -79,13 +79,25 @@ namespace Unity.WebRTC
 
         public T[] ToArray()
         {
-            return ptr.AsArray<T>(length);
+            var array = ptr.AsArray<T>(length);
+            ptr = IntPtr.Zero;
+            return array;
         }
 
         public void Set(T[] array)
         {
             length = array.Length;
             ptr = IntPtrExtension.ToPtr(array);
+        }
+
+        public void Dispose()
+        {
+            if (ptr != IntPtr.Zero)
+            {
+                Marshal.FreeCoTaskMem(ptr);
+                ptr = IntPtr.Zero;
+            }
+            length = 0;
         }
     }
 }
