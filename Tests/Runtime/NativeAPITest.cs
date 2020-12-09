@@ -112,8 +112,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
             var connection = NativeMethods.ContextCreatePeerConnection(context);
-            uint length = 0;
-            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(connection, ref length);
+            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(connection, out ulong length);
             Assert.AreEqual(0, length);
             NativeMethods.ContextDeletePeerConnection(context, connection);
             NativeMethods.ContextDestroy(0);
@@ -225,7 +224,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void AddAndRemoveVideoTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
@@ -236,8 +235,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateVideoTrack(context, "video");
             NativeMethods.MediaStreamAddTrack(stream, track);
 
-            uint length = 0;
-            IntPtr buf = NativeMethods.MediaStreamGetVideoTracks(stream, ref length);
+            IntPtr buf = NativeMethods.MediaStreamGetVideoTracks(stream, out ulong length);
             Assert.AreNotEqual(buf, IntPtr.Zero);
             Assert.Greater(length, 0);
 
@@ -258,7 +256,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void AddAndRemoveAudioTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
@@ -266,13 +264,11 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             NativeMethods.MediaStreamAddTrack(stream, track);
 
-            uint trackSize = 0;
-            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, ref trackSize);
+            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, out ulong trackSize);
             Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
             Assert.Greater(trackSize, 0);
 
-            uint length = 0;
-            IntPtr buf = NativeMethods.MediaStreamGetAudioTracks(stream, ref length);
+            IntPtr buf = NativeMethods.MediaStreamGetAudioTracks(stream, out ulong length);
             Assert.AreNotEqual(buf, IntPtr.Zero);
             Assert.Greater(length, 0);
 

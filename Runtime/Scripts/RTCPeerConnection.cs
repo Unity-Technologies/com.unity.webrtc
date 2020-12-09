@@ -139,8 +139,7 @@ namespace Unity.WebRTC
         /// <seealso cref="GetTransceivers()"/>
         public IEnumerable<RTCRtpReceiver> GetReceivers()
         {
-            uint length = 0;
-            var buf = NativeMethods.PeerConnectionGetReceivers(self, ref length);
+            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(self, out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpReceiver(ptr, this));
         }
 
@@ -157,8 +156,7 @@ namespace Unity.WebRTC
         /// <seealso cref="GetTransceivers()"/>
         public IEnumerable<RTCRtpSender> GetSenders()
         {
-            uint length = 0;
-            var buf = NativeMethods.PeerConnectionGetSenders(self, ref length);
+            var buf = NativeMethods.PeerConnectionGetSenders(self, out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpSender(ptr, this));
         }
 
@@ -175,8 +173,7 @@ namespace Unity.WebRTC
         /// <seealso cref="GetReceivers()"/>
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
-            uint length = 0;
-            var buf = NativeMethods.PeerConnectionGetTransceivers(self, ref length);
+            var buf = NativeMethods.PeerConnectionGetTransceivers(self, out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpTransceiver(ptr, this));
         }
 

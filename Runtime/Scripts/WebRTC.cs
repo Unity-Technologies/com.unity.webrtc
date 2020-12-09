@@ -612,11 +612,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetReceivers(IntPtr ptr, ref uint length);
+        public static extern IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetSenders(IntPtr ptr, ref uint length);
+        public static extern IntPtr PeerConnectionGetSenders(IntPtr ptr, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetTransceivers(IntPtr ptr, ref uint length);
+        public static extern IntPtr PeerConnectionGetTransceivers(IntPtr ptr, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern RTCIceConnectionState PeerConnectionIceConditionState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -683,9 +683,9 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool MediaStreamRemoveTrack(IntPtr stream, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr MediaStreamGetVideoTracks(IntPtr stream, ref uint length);
+        public static extern IntPtr MediaStreamGetVideoTracks(IntPtr stream, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr MediaStreamGetAudioTracks(IntPtr stream, ref uint length);
+        public static extern IntPtr MediaStreamGetAudioTracks(IntPtr stream, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr MediaStreamGetID(IntPtr stream);
         [DllImport(WebRTC.Lib)]
@@ -722,7 +722,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsReportGetStatsList(IntPtr report, ref uint length, ref IntPtr types);
+        public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsGetJson(IntPtr stats);
         [DllImport(WebRTC.Lib)]
@@ -732,7 +732,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern long StatsGetTimestamp(IntPtr stats);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsGetMembers(IntPtr stats, ref uint length);
+        public static extern IntPtr StatsGetMembers(IntPtr stats, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetName(IntPtr member);
         [DllImport(WebRTC.Lib)]
@@ -756,19 +756,19 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetString(IntPtr member);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetBoolArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetBoolArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetIntArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetIntArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetUnsignedIntArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetUnsignedIntArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetLongArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetLongArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetUnsignedLongArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetUnsignedLongArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetDoubleArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetDoubleArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr StatsMemberGetStringArray(IntPtr member, ref uint length);
+        public static extern IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length);
     }
 
     internal static class VideoEncoderMethods

@@ -108,7 +108,7 @@ namespace Unity.WebRTC
                 return null;
             }
 
-            uint length = 0;
+            ulong length = 0;
             switch (type)
             {
                 case StatsMemberType.Bool:
@@ -126,19 +126,19 @@ namespace Unity.WebRTC
                 case StatsMemberType.String:
                     return NativeMethods.StatsMemberGetString(self).AsAnsiStringWithFreeMem();
                 case StatsMemberType.SequenceBool:
-                    return NativeMethods.StatsMemberGetBoolArray(self, ref length).AsArray<bool>((int)length);
+                    return NativeMethods.StatsMemberGetBoolArray(self, out length).AsArray<bool>((int)length);
                 case StatsMemberType.SequenceInt32:
-                    return NativeMethods.StatsMemberGetIntArray(self, ref length).AsArray<int>((int)length);
+                    return NativeMethods.StatsMemberGetIntArray(self, out length).AsArray<int>((int)length);
                 case StatsMemberType.SequenceUint32:
-                    return NativeMethods.StatsMemberGetUnsignedIntArray(self, ref length).AsArray<uint>((int)length);
+                    return NativeMethods.StatsMemberGetUnsignedIntArray(self, out length).AsArray<uint>((int)length);
                 case StatsMemberType.SequenceInt64:
-                    return NativeMethods.StatsMemberGetLongArray(self, ref length).AsArray<long>((int)length);
+                    return NativeMethods.StatsMemberGetLongArray(self, out length).AsArray<long>((int)length);
                 case StatsMemberType.SequenceUint64:
-                    return NativeMethods.StatsMemberGetUnsignedLongArray(self, ref length).AsArray<ulong>((int)length);
+                    return NativeMethods.StatsMemberGetUnsignedLongArray(self, out length).AsArray<ulong>((int)length);
                 case StatsMemberType.SequenceDouble:
-                    return NativeMethods.StatsMemberGetDoubleArray(self, ref length).AsArray<double>((int)length);
+                    return NativeMethods.StatsMemberGetDoubleArray(self, out length).AsArray<double>((int)length);
                 case StatsMemberType.SequenceString:
-                    return NativeMethods.StatsMemberGetStringArray(self, ref length).AsArray<string>((int)length);
+                    return NativeMethods.StatsMemberGetStringArray(self, out length).AsArray<string>((int)length);
                 default:
                     throw new ArgumentException();
             }
@@ -251,8 +251,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetBoolArray(m_members[key].self, ref length).AsArray<bool>((int)length);
+            return NativeMethods.StatsMemberGetBoolArray(m_members[key].self, out ulong length).AsArray<bool>((int)length);
         }
         internal int[] GetIntArray(string key)
         {
@@ -260,8 +259,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetIntArray(m_members[key].self, ref length).AsArray<int>((int)length);
+            return NativeMethods.StatsMemberGetIntArray(m_members[key].self, out ulong length).AsArray<int>((int)length);
         }
 
         internal uint[] GetUnsignedIntArray(string key)
@@ -270,8 +268,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetUnsignedIntArray(m_members[key].self, ref length).AsArray<uint>((int)length);
+            return NativeMethods.StatsMemberGetUnsignedIntArray(m_members[key].self, out ulong length).AsArray<uint>((int)length);
         }
         internal long[] GetLongArray(string key)
         {
@@ -279,8 +276,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetLongArray(m_members[key].self, ref length).AsArray<long>((int)length);
+            return NativeMethods.StatsMemberGetLongArray(m_members[key].self, out ulong length).AsArray<long>((int)length);
         }
         internal ulong[] GetUnsignedLongArray(string key)
         {
@@ -288,8 +284,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetUnsignedLongArray(m_members[key].self, ref length).AsArray<ulong>((int)length);
+            return NativeMethods.StatsMemberGetUnsignedLongArray(m_members[key].self, out ulong length).AsArray<ulong>((int)length);
         }
         internal double[] GetDoubleArray(string key)
         {
@@ -297,8 +292,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetDoubleArray(m_members[key].self, ref length).AsArray<double>((int)length);
+            return NativeMethods.StatsMemberGetDoubleArray(m_members[key].self, out ulong length).AsArray<double>((int)length);
         }
         internal string[] GetStringArray(string key)
         {
@@ -306,8 +300,7 @@ namespace Unity.WebRTC
             {
                 return default;
             }
-            uint length = 0;
-            return NativeMethods.StatsMemberGetStringArray(m_members[key].self, ref length).AsArray<string>((int)length);
+            return NativeMethods.StatsMemberGetStringArray(m_members[key].self, out ulong length).AsArray<string>((int)length);
         }
 
         internal RTCStats(IntPtr ptr)
@@ -323,12 +316,11 @@ namespace Unity.WebRTC
 
         RTCStatsMember[] GetMembers()
         {
-            uint length = 0;
-            IntPtr ptr = NativeMethods.StatsGetMembers(self, ref length);
+            IntPtr ptr = NativeMethods.StatsGetMembers(self, out ulong length);
             IntPtr[] array = ptr.AsArray<IntPtr>((int)length);
 
             RTCStatsMember[] members = new RTCStatsMember[length];
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < (int)length; i++)
             {
                 members[i] = new RTCStatsMember(array[i]);
             }
@@ -740,15 +732,14 @@ namespace Unity.WebRTC
             self = ptr;
             WebRTC.Table.Add(self, this);
 
-            uint length = 0;
             IntPtr ptrStatsTypeArray = IntPtr.Zero;
-            IntPtr ptrStatsArray = NativeMethods.StatsReportGetStatsList(self, ref length, ref ptrStatsTypeArray);
+            IntPtr ptrStatsArray = NativeMethods.StatsReportGetStatsList(self, out ulong length, ref ptrStatsTypeArray);
 
             IntPtr[] array = ptrStatsArray.AsArray<IntPtr>((int)length);
             byte[] types = ptrStatsTypeArray.AsArray<byte>((int)length);
 
             m_dictStats = new Dictionary<string, RTCStats>();
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < (int)length; i++)
             {
                 RTCStatsType type = (RTCStatsType)types[i];
                 RTCStats stats = StatsFactory.Create(type, array[i]);
