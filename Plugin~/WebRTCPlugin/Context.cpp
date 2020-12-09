@@ -174,7 +174,7 @@ namespace webrtc
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
             std::make_unique<UnityVideoDecoderFactory>();
 
-        m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+        m_peerConnectionFactory = CreatePeerConnectionFactory(
                                 m_workerThread.get(),
                                 m_workerThread.get(),
                                 m_signalingThread.get(),
@@ -443,6 +443,18 @@ namespace webrtc
     {
         m_mapVideoRenderer.erase(renderer->GetId());
         renderer = nullptr;
+    }
+
+    void Context::GetRtpSenderCapabilities(
+        cricket::MediaType kind, RtpCapabilities* capabilities) const
+    {
+        *capabilities = m_peerConnectionFactory->GetRtpSenderCapabilities(kind);
+    }
+
+    void Context::GetRtpReceiverCapabilities(
+        cricket::MediaType kind, RtpCapabilities* capabilities) const
+    {
+        *capabilities = m_peerConnectionFactory->GetRtpReceiverCapabilities(kind);
     }
 
 } // end namespace webrtc

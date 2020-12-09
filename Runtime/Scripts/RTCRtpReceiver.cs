@@ -14,6 +14,21 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <returns></returns>
+        public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
+        {
+            WebRTC.Context.GetReceiverCapabilities(kind, out IntPtr ptr);
+            RTCRtpCapabilitiesInternal capabilitiesInternal =
+                Marshal.PtrToStructure<RTCRtpCapabilitiesInternal>(ptr);
+            RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
+            Marshal.FreeHGlobal(ptr);
+            return capabilities;
+        }
+
         public RTCStatsReportAsyncOperation GetStats()
         {
             return peer.GetStats(this);
