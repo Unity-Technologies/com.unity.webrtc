@@ -90,24 +90,24 @@ namespace Unity.WebRTC
 
         internal RTCRtpParameters(ref RTCRtpSendParametersInternal src)
         {
-//            headerExtensions = Array.ConvertAll(src.headerExtensions.ToArray(),
-//                v => new RTCRtpHeaderExtensionParameters(ref v));
-//            rtcp = new RTCRtcpParameters(ref src.rtcp);
-//            codecs = Array.ConvertAll(src.codecs.ToArray(),
-//                v => new RTCRtpCodecParameters(ref v));
+            headerExtensions = Array.ConvertAll(src.headerExtensions.ToArray(),
+                v => new RTCRtpHeaderExtensionParameters(ref v));
+            rtcp = new RTCRtcpParameters(ref src.rtcp);
+            codecs = Array.ConvertAll(src.codecs.ToArray(),
+                v => new RTCRtpCodecParameters(ref v));
         }
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class RTCRtpSendParameters // : RTCRtpParameters
+    public class RTCRtpSendParameters : RTCRtpParameters
     {
         public RTCRtpEncodingParameters[] encodings;
         public readonly string transactionId;
 
         internal RTCRtpSendParameters(ref RTCRtpSendParametersInternal src)
-//            : base(ref src)
+            : base(ref src)
         {
             this.encodings = Array.ConvertAll(src.encodings.ToArray(),
                 v => new RTCRtpEncodingParameters(ref v));
@@ -248,6 +248,7 @@ namespace Unity.WebRTC
     {
         public IntPtr uri;
         public ushort id;
+        [MarshalAs(UnmanagedType.U1)]
         public bool encrypted;
     }
 
@@ -255,8 +256,8 @@ namespace Unity.WebRTC
     internal struct RTCRtcpParametersInternal
     {
         public IntPtr cname;
+        [MarshalAs(UnmanagedType.U1)]
         public bool reducedSize;
-
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -264,9 +265,9 @@ namespace Unity.WebRTC
     {
         public MarshallingArray<RTCRtpEncodingParametersInternal> encodings;
         public IntPtr transactionId;
-//        public MarshallingArray<RTCRtpCodecParametersInternal> codecs;
-//        public MarshallingArray<RTCRtpHeaderExtensionParametersInternal> headerExtensions;
-//        public RTCRtcpParametersInternal rtcp;
+        public MarshallingArray<RTCRtpCodecParametersInternal> codecs;
+        public MarshallingArray<RTCRtpHeaderExtensionParametersInternal> headerExtensions;
+        public RTCRtcpParametersInternal rtcp;
 
         public void Dispose()
         {

@@ -965,17 +965,17 @@ extern "C"
     {
         MarshallArray<RTCRtpEncodingParameters> encodings;
         char* transactionId;
-//        MarshallArray<RTCRtpCodecParameters> codecs;
-//        MarshallArray<RTCRtpExtension> headerExtensions;
-//        RTCRtcpParameters rtcp;
+        MarshallArray<RTCRtpCodecParameters> codecs;
+        MarshallArray<RTCRtpExtension> headerExtensions;
+        RTCRtcpParameters rtcp;
 
         RTCRtpSendParameters& operator=(const RtpParameters& src)
         {
             encodings = src.encodings;
             transactionId = ConvertString(src.transaction_id);
-//            codecs = src.codecs;
-//            headerExtensions = src.header_extensions;
-//            rtcp = src.rtcp;
+            codecs = src.codecs;
+            headerExtensions = src.header_extensions;
+            rtcp = src.rtcp;
             return *this;
         }
     };
