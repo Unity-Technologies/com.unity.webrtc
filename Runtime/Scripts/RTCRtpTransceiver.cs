@@ -61,12 +61,14 @@ namespace Unity.WebRTC
 
         public RTCErrorType SetCodecPreferences(RTCRtpCodecCapability[] codecs)
         {
-            MarshallingArray<RTCRtpCodecCapabilityInternal> instance =
-                Array.ConvertAll(codecs, v => v.Cast());
-            IntPtr ptr = IntPtr.Zero;
-            Marshal.StructureToPtr(instance, ptr, false);
-            RTCErrorType error = NativeMethods.TransceiverSetCodecPreferences(self, ptr);
-            Marshal.FreeCoTaskMem(ptr);
+            RTCRtpCodecCapabilityInternal[] array = Array.ConvertAll(codecs, v => v.Cast());
+            MarshallingArray<RTCRtpCodecCapabilityInternal> instance = array;
+            RTCErrorType error = NativeMethods.TransceiverSetCodecPreferences(self, instance.ptr, instance.length);
+            foreach (var v in array)
+            {
+                v.Dispose();
+            }
+            instance.Dispose();
             return error;
         }
 

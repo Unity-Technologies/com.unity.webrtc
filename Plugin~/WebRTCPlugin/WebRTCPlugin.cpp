@@ -96,6 +96,10 @@ namespace webrtc
             {
                 value = static_cast<T>(src.value());
             }
+            else
+            {
+                value = T();
+            }
             return *this;
         }
     };
@@ -130,8 +134,17 @@ namespace webrtc
         std::vector<std::string> dst;
         std::string s = str;
         size_t pos = 0;
-        while ((pos = s.find(delimiter)) != std::string::npos) {
-            dst.push_back(str.substr(0, pos));
+        while (true)
+        {
+            pos = s.find(delimiter);
+            int length = pos;
+            if(pos == std::string::npos)
+                length = str.length();
+            if (length == 0)
+                break;
+            dst.push_back(s.substr(0, length));
+            if(pos == std::string::npos)
+                break;
             s.erase(0, pos + delimiter.length());
         }
         return dst;
@@ -139,9 +152,9 @@ namespace webrtc
 
     std::tuple<cricket::MediaType, std::string> ConvertMimeType(const std::string& mimeType)
     {
-        std::vector<std::string> vec = Split(mimeType, "/");
-        std::string kind = vec[0];
-        std::string name = vec[1];
+        const std::vector<std::string> vec = Split(mimeType, "/");
+        const std::string kind = vec[0];
+        const std::string name = vec[1];
         cricket::MediaType mediaType;
         if (kind == "video")
         {
@@ -843,16 +856,16 @@ extern "C"
         }
     };
      
-    UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetCodecPreferences(RtpTransceiverInterface* transceiver, MarshallArray<RTCRtpCodecCapability>* codecs)
+    UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetCodecPreferences(RtpTransceiverInterface* transceiver, RTCRtpCodecCapability* codecs, size_t length)
     {
-        std::vector<RtpCodecCapability> _codecs(codecs->length);
-        for(int i = 0; i < codecs->length; i++)
+        std::vector<RtpCodecCapability> _codecs(length);
+        for(int i = 0; i < length; i++)
         {
-            std::string mimeType = ConvertString(codecs->values[i].mimeType);
+            std::string mimeType = ConvertString(codecs[i].mimeType);
             std::tie(_codecs[i].kind, _codecs[i].name) = ConvertMimeType(mimeType);
-            _codecs[i].clock_rate = ConvertOptional(codecs->values[i].clockRate);
-            _codecs[i].num_channels = ConvertOptional(codecs->values[i].channels);
-            _codecs[i].parameters = ConvertSdp(codecs->values[i].sdpFmtpLine);
+            _codecs[i].clock_rate = ConvertOptional(codecs[i].clockRate);
+            _codecs[i].num_channels = ConvertOptional(codecs[i].channels);
+            _codecs[i].parameters = ConvertSdp(codecs[i].sdpFmtpLine);
         }
         return transceiver->SetCodecPreferences(_codecs).type();
     }
@@ -905,8 +918,8 @@ extern "C"
     {
         int payloadType;
         char* mimeType;
-        Optional<unsigned long> clockRate;
-        Optional<unsigned short> channels;
+        Optional<uint64_t> clockRate;
+        Optional<uint16_t> channels;
         char* sdpFmtpLine;
 
         RTCRtpCodecParameters& operator=(const RtpCodecParameters& src)
@@ -923,7 +936,7 @@ extern "C"
     struct RTCRtpExtension
     {
         char* uri;
-        unsigned short id;
+        uint16_t id;
         bool encrypted;
 
         RTCRtpExtension& operator=(const RtpExtension& src)
@@ -952,14 +965,17 @@ extern "C"
     {
         MarshallArray<RTCRtpEncodingParameters> encodings;
         char* transactionId;
-        MarshallArray<RTCRtpCodecParameters> codecs;
-        MarshallArray<RTCRtpExtension> headerExtensions;
-        RTCRtcpParameters rtcp;
+//        MarshallArray<RTCRtpCodecParameters> codecs;
+//        MarshallArray<RTCRtpExtension> headerExtensions;
+//        RTCRtcpParameters rtcp;
 
         RTCRtpSendParameters& operator=(const RtpParameters& src)
         {
             encodings = src.encodings;
             transactionId = ConvertString(src.transaction_id);
+//            codecs = src.codecs;
+//            headerExtensions = src.header_extensions;
+//            rtcp = src.rtcp;
             return *this;
         }
     };

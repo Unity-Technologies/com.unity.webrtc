@@ -136,6 +136,24 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.IsNotEmpty(parameters.transactionId);
             Assert.AreEqual(1, peer.GetTransceivers().Count());
             Assert.NotNull(peer.GetTransceivers().First());
+            //Assert.NotNull(parameters.codecs);
+            //foreach (var codec in parameters.codecs)
+            //{
+            //    Assert.NotNull(codec);
+            //    Assert.NotZero(codec.payloadType);
+            //    Assert.IsNotEmpty(codec.mimeType);
+            //    Assert.IsNotEmpty(codec.sdpFmtpLine);
+            //    Assert.Null(codec.clockRate);
+            //    Assert.Null(codec.channels);
+            //}
+
+            //Assert.NotNull(parameters.headerExtensions);
+            //foreach (var extension in parameters.headerExtensions)
+            //{
+            //    Assert.NotNull(extension);
+            //    Assert.IsNotEmpty(extension.uri);
+            //    Assert.NotZero(extension.id);
+            //}
 
             track.Dispose();
             stream.Dispose();

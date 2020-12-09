@@ -247,13 +247,13 @@ public class BandwidthSample : MonoBehaviour
         RTCRtpSendParameters parameters = sender.GetParameters();
         if (bandwidth == null)
         {
-            parameters.Encodings[0].maxBitrate = null;
-            parameters.Encodings[0].minBitrate = null;
+            parameters.encodings[0].maxBitrate = null;
+            parameters.encodings[0].minBitrate = null;
         }
         else
         {
-            parameters.Encodings[0].maxBitrate = bandwidth * 1000;
-            parameters.Encodings[0].minBitrate = bandwidth * 1000;
+            parameters.encodings[0].maxBitrate = bandwidth * 1000;
+            parameters.encodings[0].minBitrate = bandwidth * 1000;
         }
 
         RTCErrorType error = sender.SetParameters(parameters);
