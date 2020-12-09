@@ -15,7 +15,6 @@ namespace unity
 {
 namespace webrtc
 {
-
     DelegateSetResolution delegateSetResolution = nullptr;
 
     void SetResolution(int32* width, int32* length)
@@ -53,17 +52,33 @@ namespace webrtc
     {
         int32_t length;
         T* values;
+
+        T& operator[](int i) const
+        {
+            return values[i];
+        }
+
+        template<typename U>
+        MarshallArray& operator=(const std::vector<U>& src)
+        {
+            length = static_cast<uint32_t>(src.size());
+            values = static_cast<T*>(CoTaskMemAlloc(sizeof(T) * src.size()));
+
+            for (size_t i = 0; i < src.size(); i++)
+            {
+                values[i] = src[i];
+            }
+            return *this;
+        }
     };
 
     template<typename T, typename U>
-    void ConvertArray(std::vector<U>& src, MarshallArray<T>& dst)
+    void ConvertArray(const MarshallArray<T>& src, std::vector<U>& dst)
     {
-        dst.length = static_cast<uint32_t>(src.size());
-        dst.values = static_cast<T*>(CoTaskMemAlloc(sizeof(T) * src.size()));
-
-        for (size_t i = 0; i < src.size(); i++)
+        dst.resize(src.length);
+        for (size_t i = 0; i < dst.size(); i++)
         {
-            dst.values[i] = src[i];
+            dst[i] = src.values[i];
         }
     }
 
@@ -72,19 +87,18 @@ namespace webrtc
     {
         bool hasValue;
         T value;
-    };
 
-    template<typename T>
-    Optional<T> ConvertOptional(const absl::optional<T>& value)
-    {
-        Optional<T> dst = {0};
-        dst.hasValue = value.has_value();
-        if(dst.hasValue)
+        template<typename U>
+        Optional& operator=(const absl::optional<U>& src)
         {
-            dst.value = value.value();
+            hasValue = src.has_value();
+            if (hasValue)
+            {
+                value = static_cast<T>(src.value());
+            }
+            return *this;
         }
-        return dst;
-    }
+    };
 
     template<typename T>
     absl::optional<T> ConvertOptional(const Optional<T>& value)
@@ -97,7 +111,7 @@ namespace webrtc
         return dst;
     }
 
-    std::string ConvertSdp(std::map<std::string, std::string> map)
+    std::string ConvertSdp(const std::map<std::string, std::string>& map)
     {
         std::string str = "";
         for (const auto& pair : map)
@@ -109,6 +123,48 @@ namespace webrtc
             str += pair.first + "=" + pair.second;
         }
         return str;
+    }
+
+    std::vector<std::string> Split(const std::string& str, const std::string& delimiter)
+    {
+        std::vector<std::string> dst;
+        std::string s = str;
+        size_t pos = 0;
+        while ((pos = s.find(delimiter)) != std::string::npos) {
+            dst.push_back(str.substr(0, pos));
+            s.erase(0, pos + delimiter.length());
+        }
+        return dst;
+    }
+
+    std::tuple<cricket::MediaType, std::string> ConvertMimeType(const std::string& mimeType)
+    {
+        std::vector<std::string> vec = Split(mimeType, "/");
+        std::string kind = vec[0];
+        std::string name = vec[1];
+        cricket::MediaType mediaType;
+        if (kind == "video")
+        {
+            mediaType = cricket::MEDIA_TYPE_VIDEO;
+        }
+        else if (kind == "audio")
+        {
+            mediaType = cricket::MEDIA_TYPE_AUDIO;
+        }
+        return { mediaType, name };
+    }
+
+    std::map<std::string, std::string> ConvertSdp(const std::string& src)
+    {
+        std::map<std::string, std::string> map;
+        std::vector<std::string> vec = Split(src, ";");
+
+        for (const auto& str : vec)
+        {
+            std::vector<std::string> pair = Split(str, "=");
+            map.emplace(pair[0], pair[1]);
+        }
+        return map;
     }
 
     ///
@@ -770,6 +826,37 @@ extern "C"
         transceiver->SetDirection(direction);
     }
 
+    struct RTCRtpCodecCapability
+    {
+        char* mimeType;
+        Optional<int32_t> clockRate;
+        Optional<int32_t> channels;
+        char* sdpFmtpLine;
+
+        RTCRtpCodecCapability& operator = (const RtpCodecCapability& obj)
+        {
+            this->mimeType = ConvertString(obj.mime_type());
+            this->clockRate = obj.clock_rate;
+            this->channels = obj.num_channels;
+            this->sdpFmtpLine = ConvertString(ConvertSdp(obj.parameters));
+            return *this;
+        }
+    };
+     
+    UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetCodecPreferences(RtpTransceiverInterface* transceiver, MarshallArray<RTCRtpCodecCapability>* codecs)
+    {
+        std::vector<RtpCodecCapability> _codecs(codecs->length);
+        for(int i = 0; i < codecs->length; i++)
+        {
+            std::string mimeType = ConvertString(codecs->values[i].mimeType);
+            std::tie(_codecs[i].kind, _codecs[i].name) = ConvertMimeType(mimeType);
+            _codecs[i].clock_rate = ConvertOptional(codecs->values[i].clockRate);
+            _codecs[i].num_channels = ConvertOptional(codecs->values[i].channels);
+            _codecs[i].parameters = ConvertSdp(codecs->values[i].sdpFmtpLine);
+        }
+        return transceiver->SetCodecPreferences(_codecs).type();
+    }
+
     UNITY_INTERFACE_EXPORT RtpReceiverInterface* TransceiverGetReceiver(RtpTransceiverInterface* transceiver)
     {
         return transceiver->receiver().get();
@@ -788,32 +875,100 @@ extern "C"
         Optional<uint32_t> maxFramerate;
         Optional<double> scaleResolutionDownBy;
         char* rid;
+
+        RTCRtpEncodingParameters& operator=(const RtpEncodingParameters& obj)
+        {
+            active = obj.active;
+            maxBitrate = obj.max_bitrate_bps;
+            minBitrate = obj.min_bitrate_bps;
+            maxFramerate = obj.max_framerate;
+            scaleResolutionDownBy = obj.scale_resolution_down_by;
+            rid = ConvertString(obj.rid);
+            return *this;
+        }
+
+        operator RtpEncodingParameters() const
+        {
+            RtpEncodingParameters dst = {};
+            dst.active = active;
+            dst.max_bitrate_bps = static_cast<absl::optional<int>>(ConvertOptional(maxBitrate));
+            dst.min_bitrate_bps = static_cast<absl::optional<int>>(ConvertOptional(minBitrate));
+            dst.max_framerate = static_cast<absl::optional<double>>(ConvertOptional(maxFramerate));
+            dst.scale_resolution_down_by = ConvertOptional(scaleResolutionDownBy);
+            if(rid != nullptr)
+                dst.rid = std::string(rid);
+            return dst;
+        }
+    };
+
+    struct RTCRtpCodecParameters
+    {
+        int payloadType;
+        char* mimeType;
+        Optional<unsigned long> clockRate;
+        Optional<unsigned short> channels;
+        char* sdpFmtpLine;
+
+        RTCRtpCodecParameters& operator=(const RtpCodecParameters& src)
+        {
+            payloadType = src.payload_type;
+            mimeType = ConvertString(src.mime_type());
+            clockRate = src.clock_rate;
+            channels = src.num_channels;
+            sdpFmtpLine = ConvertString(ConvertSdp(src.parameters));
+            return *this;
+        }
+    };
+
+    struct RTCRtpExtension
+    {
+        char* uri;
+        unsigned short id;
+        bool encrypted;
+
+        RTCRtpExtension& operator=(const RtpExtension& src)
+        {
+            uri = ConvertString(src.uri);
+            id = src.id;
+            encrypted = src.encrypt;
+            return *this;
+        }
+    };
+
+    struct RTCRtcpParameters
+    {
+        char* cname;
+        bool reducedSize;
+
+        RTCRtcpParameters& operator=(const RtcpParameters& src)
+        {
+            cname = ConvertString(src.cname);
+            reducedSize = src.reduced_size;
+            return *this;
+        }
     };
 
     struct RTCRtpSendParameters
     {
-        uint32_t encodingsLength;
-        RTCRtpEncodingParameters* encodings;
+        MarshallArray<RTCRtpEncodingParameters> encodings;
         char* transactionId;
+        MarshallArray<RTCRtpCodecParameters> codecs;
+        MarshallArray<RTCRtpExtension> headerExtensions;
+        RTCRtcpParameters rtcp;
+
+        RTCRtpSendParameters& operator=(const RtpParameters& src)
+        {
+            encodings = src.encodings;
+            transactionId = ConvertString(src.transaction_id);
+            return *this;
+        }
     };
 
     UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, RTCRtpSendParameters** parameters)
     {
         const RtpParameters src = sender->GetParameters();
         RTCRtpSendParameters* dst = static_cast<RTCRtpSendParameters*>(CoTaskMemAlloc(sizeof(RTCRtpSendParameters)));
-        dst->encodingsLength = static_cast<uint32_t>(src.encodings.size());
-        dst->encodings = static_cast<RTCRtpEncodingParameters*>(CoTaskMemAlloc(sizeof(RTCRtpEncodingParameters) * src.encodings.size()));
-
-        for(size_t i = 0; i < src.encodings.size(); i++)
-        {
-            dst->encodings[i].active = src.encodings[i].active;
-            dst->encodings[i].maxBitrate = ConvertOptional(static_cast<absl::optional<uint64_t>>(src.encodings[i].max_bitrate_bps));
-            dst->encodings[i].minBitrate = ConvertOptional(static_cast<absl::optional<uint64_t>>(src.encodings[i].min_bitrate_bps));
-            dst->encodings[i].maxFramerate = ConvertOptional(static_cast<absl::optional<uint32_t>>(src.encodings[i].max_framerate));
-            dst->encodings[i].scaleResolutionDownBy = ConvertOptional(src.encodings[i].scale_resolution_down_by);
-            dst->encodings[i].rid = ConvertString(src.encodings[i].rid);
-        }
-        dst->transactionId = ConvertString(src.transaction_id);
+        *dst = src;
         *parameters = dst;
     }
 
@@ -835,23 +990,6 @@ extern "C"
         return error.type();
     }
 
-    struct RTCRtpCodecCapability
-    {
-        char* mimeType;
-        Optional<int32_t> clockRate;
-        Optional<int32_t> channels;
-        char* sdpFmtpLine;
-
-        RTCRtpCodecCapability& operator = (const RtpCodecCapability& obj)
-        {
-            this->mimeType = ConvertString(obj.mime_type());
-            this->clockRate = ConvertOptional(obj.clock_rate);
-            this->channels = ConvertOptional(obj.num_channels);
-            this->sdpFmtpLine = ConvertString(ConvertSdp(obj.parameters));
-            return *this;
-        }
-    };
-
     struct RTCRtpHeaderExtensionCapability
     {
         char* uri;
@@ -867,6 +1005,13 @@ extern "C"
     {
         MarshallArray<RTCRtpCodecCapability> codecs;
         MarshallArray<RTCRtpHeaderExtensionCapability> extensionHeaders;
+
+        RTCRtpCapabilities& operator=(const RtpCapabilities& src)
+        {
+            codecs = src.codecs;
+            extensionHeaders = src.header_extensions;
+            return *this;
+        }
     };
 
     UNITY_INTERFACE_EXPORT void ContextGetSenderCapabilities(
@@ -880,8 +1025,7 @@ extern "C"
 
         RTCRtpCapabilities* dst =
             static_cast<RTCRtpCapabilities*>(CoTaskMemAlloc(sizeof(RTCRtpCapabilities)));
-        ConvertArray(src.codecs, dst->codecs);
-        ConvertArray(src.header_extensions, dst->extensionHeaders);
+        *dst = src;
         *parameters = dst;
     }
 
@@ -896,8 +1040,7 @@ extern "C"
 
         RTCRtpCapabilities* dst =
             static_cast<RTCRtpCapabilities*>(CoTaskMemAlloc(sizeof(RTCRtpCapabilities)));
-        ConvertArray(src.codecs, dst->codecs);
-        ConvertArray(src.header_extensions, dst->extensionHeaders);
+        *dst = src;
         *parameters = dst;
     }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -84,10 +85,12 @@ namespace Unity.WebRTC
             return array;
         }
 
-        public void Set(T[] array)
+        public static implicit operator MarshallingArray<T>(T[] src)
         {
-            length = array.Length;
-            ptr = IntPtrExtension.ToPtr(array);
+            MarshallingArray<T> dst = default;
+            dst.length = src.Length;
+            dst.ptr = src.ToPtr();
+            return dst;
         }
 
         public void Dispose()

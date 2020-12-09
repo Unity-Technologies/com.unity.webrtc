@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
@@ -58,9 +59,15 @@ namespace Unity.WebRTC
             get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self), peer); }
         }
 
-        public void SetCodecPreferences(RTCRtpCodecCapability[] capabilities)
+        public RTCErrorType SetCodecPreferences(RTCRtpCodecCapability[] codecs)
         {
-            throw new NotImplementedException("SetCodecPreferences is not implemented");
+            MarshallingArray<RTCRtpCodecCapabilityInternal> instance =
+                Array.ConvertAll(codecs, v => v.Cast());
+            IntPtr ptr = IntPtr.Zero;
+            Marshal.StructureToPtr(instance, ptr, false);
+            RTCErrorType error = NativeMethods.TransceiverSetCodecPreferences(self, ptr);
+            Marshal.FreeCoTaskMem(ptr);
+            return error;
         }
 
         public void Stop()

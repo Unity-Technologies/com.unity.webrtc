@@ -87,7 +87,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpSender")]
+        [Category("RTCRtpReceiver")]
         public void ReceiverGetAudioCapabilities()
         {
             RTCRtpCapabilities capabilities = RTCRtpReceiver.GetCapabilities(TrackKind.Audio);
@@ -107,6 +107,15 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.NotNull(extensions);
                 Assert.IsNotEmpty(extensions.uri);
             }
+        }
+
+        [Test]
+        [Category("RTCRtpTransceiver")]
+        public void TransceiverSetCodecPreferences()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            transceiver.SetCodecPreferences(codecs);
         }
     }
 }
