@@ -108,7 +108,12 @@ namespace Unity.WebRTC
             return ret;
         }
 
-        public static IntPtr ToPtr(string[] array)
+        public static IntPtr ToPtrAnsi(this string str)
+        {
+            return Marshal.StringToCoTaskMemAnsi(str);
+        }
+
+        public static IntPtr ToPtr(this string[] array)
         {
             int size = Marshal.SizeOf(typeof(IntPtr));
             int length = size * array.Length;
@@ -123,9 +128,8 @@ namespace Unity.WebRTC
             return dst;
         }
 
-        public static IntPtr ToPtr<T>(T[] array)
+        public static IntPtr ToPtr<T>(this T[] array)
         {
-            
             int size = Marshal.SizeOf(typeof(T));
             int length = size * array.Length;
             IntPtr ptr = Marshal.AllocCoTaskMem(length);

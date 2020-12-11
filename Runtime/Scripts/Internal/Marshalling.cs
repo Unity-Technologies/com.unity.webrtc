@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -34,6 +35,40 @@ namespace Unity.WebRTC
         public static implicit operator OptionalUlong(ulong? a)
         {
             return new OptionalUlong { hasValue = a.HasValue, value = a.GetValueOrDefault() };
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct OptionalUshort
+    {
+        [MarshalAs(UnmanagedType.U1)]
+        public bool hasValue;
+        public ushort value;
+
+        public static implicit operator ushort?(OptionalUshort a)
+        {
+            return a.hasValue ? a.value : (ushort?)null;
+        }
+        public static implicit operator OptionalUshort(ushort? a)
+        {
+            return new OptionalUshort { hasValue = a.HasValue, value = a.GetValueOrDefault() };
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct OptionalShort
+    {
+        [MarshalAs(UnmanagedType.U1)]
+        public bool hasValue;
+        public short value;
+
+        public static implicit operator short?(OptionalShort a)
+        {
+            return a.hasValue ? a.value : (short?)null;
+        }
+        public static implicit operator OptionalShort(short? a)
+        {
+            return new OptionalShort { hasValue = a.HasValue, value = a.GetValueOrDefault() };
         }
     }
 
@@ -84,19 +119,18 @@ namespace Unity.WebRTC
             return array;
         }
 
-        public void Set(T[] array)
+        public static implicit operator MarshallingArray<T>(T[] src)
         {
-            length = array.Length;
-            ptr = IntPtrExtension.ToPtr(array);
+            MarshallingArray<T> dst = default;
+            dst.length = src.Length;
+            dst.ptr = src.ToPtr();
+            return dst;
         }
 
         public void Dispose()
         {
-            if (ptr != IntPtr.Zero)
-            {
-                Marshal.FreeCoTaskMem(ptr);
-                ptr = IntPtr.Zero;
-            }
+            Marshal.FreeCoTaskMem(ptr);
+            ptr = IntPtr.Zero;
             length = 0;
         }
     }

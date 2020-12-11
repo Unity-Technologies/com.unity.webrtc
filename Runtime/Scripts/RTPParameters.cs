@@ -12,7 +12,7 @@ namespace Unity.WebRTC
         public double? scaleResolutionDownBy;
         public string rid;
 
-        internal RTCRtpEncodingParameters(RTCRtpEncodingParametersInternal parameter)
+        internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)
         {
             active = parameter.active;
             maxBitrate = parameter.maxBitrate;
@@ -34,36 +34,97 @@ namespace Unity.WebRTC
         }
     }
 
+    public class RTCRtpCodecParameters
+    {
+        public readonly int payloadType;
+        public readonly string mimeType;
+        public readonly ulong? clockRate;
+        public readonly ushort? channels;
+        public readonly string sdpFmtpLine;
+        internal RTCRtpCodecParameters(ref RTCRtpCodecParametersInternal src)
+        {
+            payloadType = src.payloadType;
+            if (src.mimeType != IntPtr.Zero)
+                mimeType = src.mimeType.AsAnsiStringWithFreeMem();
+            clockRate = src.clockRate;
+            channels = src.channels;
+            if (src.sdpFmtpLine != IntPtr.Zero)
+                sdpFmtpLine = src.sdpFmtpLine.AsAnsiStringWithFreeMem();
+        }
+    };
+
+    public class RTCRtpHeaderExtensionParameters
+    {
+        public readonly string uri;
+        public readonly ushort id;
+        public readonly bool encrypted;
+        internal RTCRtpHeaderExtensionParameters(ref RTCRtpHeaderExtensionParametersInternal src)
+        {
+            if (src.uri != IntPtr.Zero)
+                uri = src.uri.AsAnsiStringWithFreeMem();
+            id = src.id;
+            encrypted = src.encrypted;
+        }
+    }
+
+    public class RTCRtcpParameters
+    {
+        public readonly string cname;
+        public readonly bool reducedSize;
+        internal RTCRtcpParameters(ref RTCRtcpParametersInternal src)
+        {
+            if (src.cname != IntPtr.Zero)
+                cname = src.cname.AsAnsiStringWithFreeMem();
+            reducedSize = src.reducedSize;
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
-    public class RTCRtpSendParameters
+    public class RTCRtpParameters
     {
-        public string TransactionId => _transactionId;
+        public readonly RTCRtpHeaderExtensionParameters[] headerExtensions;
+        public readonly RTCRtcpParameters rtcp;
+        public readonly RTCRtpCodecParameters[] codecs;
 
-        public RTCRtpEncodingParameters[] Encodings => _encodings;
-
-        readonly RTCRtpEncodingParameters[] _encodings;
-        readonly string _transactionId;
-
-        internal RTCRtpSendParameters(ref RTCRtpSendParametersInternal parameters)
+        internal RTCRtpParameters(ref RTCRtpSendParametersInternal src)
         {
-            RTCRtpEncodingParametersInternal[] encodings = parameters.encodings.ToArray();
-            _encodings = Array.ConvertAll(encodings, _ => new RTCRtpEncodingParameters(_));
-            _transactionId = parameters.transactionId.AsAnsiStringWithFreeMem();
+            headerExtensions = Array.ConvertAll(src.headerExtensions.ToArray(),
+                v => new RTCRtpHeaderExtensionParameters(ref v));
+            rtcp = new RTCRtcpParameters(ref src.rtcp);
+            codecs = Array.ConvertAll(src.codecs.ToArray(),
+                v => new RTCRtpCodecParameters(ref v));
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class RTCRtpSendParameters : RTCRtpParameters
+    {
+        public RTCRtpEncodingParameters[] encodings;
+        public readonly string transactionId;
+
+        internal RTCRtpSendParameters(ref RTCRtpSendParametersInternal src)
+            : base(ref src)
+        {
+            this.encodings = Array.ConvertAll(src.encodings.ToArray(),
+                v => new RTCRtpEncodingParameters(ref v));
+            transactionId = src.transactionId.AsAnsiStringWithFreeMem();
         }
 
         internal void CreateInstance(out RTCRtpSendParametersInternal instance)
         {
             instance = default;
             RTCRtpEncodingParametersInternal[] encodings =
-                new RTCRtpEncodingParametersInternal[_encodings.Length];
-            for(int i = 0; i < _encodings.Length; i++)
+                new RTCRtpEncodingParametersInternal[this.encodings.Length];
+            for(int i = 0; i < this.encodings.Length; i++)
             {
-                _encodings[i].CopyInternal(ref encodings[i]);
+                this.encodings[i].CopyInternal(ref encodings[i]);
             }
-            instance.encodings.Set(encodings);
-            instance.transactionId = Marshal.StringToCoTaskMemAnsi(_transactionId);
+            instance.encodings = encodings;
+            instance.transactionId = Marshal.StringToCoTaskMemAnsi(transactionId);
         }
     }
 
@@ -89,13 +150,25 @@ namespace Unity.WebRTC
         public string mimeType;
         public string sdpFmtpLine;
 
-        internal RTCRtpCodecCapability(RTCRtpCodecCapabilityInternal v)
+        internal RTCRtpCodecCapability(ref RTCRtpCodecCapabilityInternal v)
         {
             mimeType = v.mimeType.AsAnsiStringWithFreeMem();
             clockRate = v.clockRate;
             channels = v.channels;
             sdpFmtpLine =
                 v.sdpFmtpLine != IntPtr.Zero ? v.sdpFmtpLine.AsAnsiStringWithFreeMem() : null;
+        }
+
+        internal RTCRtpCodecCapabilityInternal Cast()
+        {
+            RTCRtpCodecCapabilityInternal instance = new RTCRtpCodecCapabilityInternal
+            {
+                channels = this.channels,
+                clockRate = this.clockRate,
+                mimeType = this.mimeType.ToPtrAnsi(),
+                sdpFmtpLine = this.sdpFmtpLine.ToPtrAnsi()
+            };
+            return instance;
         }
     }
 
@@ -106,7 +179,7 @@ namespace Unity.WebRTC
     {
         public string uri;
 
-        internal RTCRtpHeaderExtensionCapability(RTCRtpHeaderExtensionCapabilityInternal v)
+        internal RTCRtpHeaderExtensionCapability(ref RTCRtpHeaderExtensionCapabilityInternal v)
         {
             uri = v.uri.AsAnsiStringWithFreeMem();
         }
@@ -117,15 +190,15 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpCapabilities
     {
-        public RTCRtpCodecCapability[] codecs;
-        public RTCRtpHeaderExtensionCapability[] headerExtensions;
+        public readonly RTCRtpCodecCapability[] codecs;
+        public readonly RTCRtpHeaderExtensionCapability[] headerExtensions;
 
         internal RTCRtpCapabilities(RTCRtpCapabilitiesInternal capabilities)
         {
             codecs = Array.ConvertAll(capabilities.codecs.ToArray(),
-                v => new RTCRtpCodecCapability(v));
+                v => new RTCRtpCodecCapability(ref v));
             headerExtensions = Array.ConvertAll(capabilities.extensionHeaders.ToArray(),
-                v => new RTCRtpHeaderExtensionCapability(v));
+                v => new RTCRtpHeaderExtensionCapability(ref v));
         }
     }
 
@@ -136,6 +209,14 @@ namespace Unity.WebRTC
         public OptionalInt clockRate;
         public OptionalInt channels;
         public IntPtr sdpFmtpLine;
+
+        public void Dispose()
+        {
+            Marshal.FreeCoTaskMem(mimeType);
+            mimeType = IntPtr.Zero;
+            Marshal.FreeCoTaskMem(sdpFmtpLine);
+            sdpFmtpLine = IntPtr.Zero;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -152,19 +233,47 @@ namespace Unity.WebRTC
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpCodecParametersInternal
+    {
+        public int payloadType;
+        public IntPtr mimeType;
+        public OptionalUlong clockRate;
+        public OptionalUshort channels;
+        public IntPtr sdpFmtpLine;
+
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpHeaderExtensionParametersInternal
+    {
+        public IntPtr uri;
+        public ushort id;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool encrypted;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtcpParametersInternal
+    {
+        public IntPtr cname;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool reducedSize;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     internal struct RTCRtpSendParametersInternal
     {
         public MarshallingArray<RTCRtpEncodingParametersInternal> encodings;
         public IntPtr transactionId;
+        public MarshallingArray<RTCRtpCodecParametersInternal> codecs;
+        public MarshallingArray<RTCRtpHeaderExtensionParametersInternal> headerExtensions;
+        public RTCRtcpParametersInternal rtcp;
 
         public void Dispose()
         {
             encodings.Dispose();
-            if (transactionId != IntPtr.Zero)
-            {
-                Marshal.FreeCoTaskMem(transactionId);
-                transactionId = IntPtr.Zero;
-            }
+            Marshal.FreeCoTaskMem(transactionId);
+            transactionId = IntPtr.Zero;
         }
     }
 

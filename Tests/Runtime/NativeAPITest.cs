@@ -356,7 +356,7 @@ namespace Unity.WebRTC.RuntimeTest
                 encodings[i].rid = Marshal.StringToCoTaskMemAnsi(string.Empty);
             }
             parametersInternal.transactionId = Marshal.StringToCoTaskMemAnsi(string.Empty);
-            parametersInternal.encodings.Set(encodings);
+            parametersInternal.encodings = encodings;
 
             RTCRtpSendParameters parameter = new RTCRtpSendParameters(ref parametersInternal);
             parameter.CreateInstance(out var instance);

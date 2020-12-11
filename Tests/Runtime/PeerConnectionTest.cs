@@ -123,8 +123,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             RTCRtpSendParameters parameters = sender.GetParameters();
             Assert.NotNull(parameters);
-            Assert.NotNull(parameters.Encodings);
-            foreach (var encoding in parameters.Encodings)
+            Assert.NotNull(parameters.encodings);
+            foreach (var encoding in parameters.encodings)
             {
                 Assert.True(encoding.active);
                 Assert.Null(encoding.maxBitrate);
@@ -133,9 +133,27 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.Null(encoding.scaleResolutionDownBy);
                 Assert.IsNotEmpty(encoding.rid);
             }
-            Assert.IsNotEmpty(parameters.TransactionId);
+            Assert.IsNotEmpty(parameters.transactionId);
             Assert.AreEqual(1, peer.GetTransceivers().Count());
             Assert.NotNull(peer.GetTransceivers().First());
+            Assert.NotNull(parameters.codecs);
+            foreach (var codec in parameters.codecs)
+            {
+                Assert.NotNull(codec);
+                Assert.NotZero(codec.payloadType);
+                Assert.IsNotEmpty(codec.mimeType);
+                Assert.IsNotEmpty(codec.sdpFmtpLine);
+                Assert.Null(codec.clockRate);
+                Assert.Null(codec.channels);
+            }
+            Assert.NotNull(parameters.rtcp);
+            Assert.NotNull(parameters.headerExtensions);
+            foreach (var extension in parameters.headerExtensions)
+            {
+                Assert.NotNull(extension);
+                Assert.IsNotEmpty(extension.uri);
+                Assert.NotZero(extension.id);
+            }
 
             track.Dispose();
             stream.Dispose();
