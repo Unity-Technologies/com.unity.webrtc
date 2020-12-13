@@ -36,7 +36,7 @@ namespace webrtc
         static MTLPixelFormat ConvertFormat(UnityRenderingExtTextureFormat format);
     };
 
-    void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device; }
+    void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return (__bridge void*)m_device; }
     GraphicsDeviceType MetalGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_METAL;}
 
 //---------------------------------------------------------------------------------------------------------------------

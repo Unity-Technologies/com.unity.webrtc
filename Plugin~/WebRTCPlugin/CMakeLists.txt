@@ -74,6 +74,7 @@ target_compile_definitions(WebRTCLib
 )
 
 if(iOS OR macOS)
+  set_property (TARGET WebRTCLib APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
   target_sources(WebRTCLib
     PRIVATE
       ../libcxx/debug.cpp

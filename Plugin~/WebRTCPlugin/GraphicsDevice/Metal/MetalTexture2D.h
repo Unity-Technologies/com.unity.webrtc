@@ -25,10 +25,10 @@ namespace webrtc
 
 //---------------------------------------------------------------------------------------------------------------------
 
-    void* MetalTexture2D::GetNativeTexturePtrV() { return m_texture; }
-    const void* MetalTexture2D::GetNativeTexturePtrV() const { return m_texture; };
-    void* MetalTexture2D::GetEncodeTexturePtrV() { return m_texture; }
-    const void* MetalTexture2D::GetEncodeTexturePtrV() const { return m_texture; }
+    void* MetalTexture2D::GetNativeTexturePtrV() { return (__bridge void*)m_texture; }
+    const void* MetalTexture2D::GetNativeTexturePtrV() const { return (__bridge void*)m_texture; };
+    void* MetalTexture2D::GetEncodeTexturePtrV() { return (__bridge void*)m_texture; }
+    const void* MetalTexture2D::GetEncodeTexturePtrV() const { return (__bridge void*)m_texture; }
 
 } // end namespace webrtc
 } // end namespace unity
