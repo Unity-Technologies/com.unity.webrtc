@@ -9,6 +9,7 @@
     "web"
   ],
   "dependencies": {
+    "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.editorcoroutines": "1.0.0"
   },
   "samples": [{
