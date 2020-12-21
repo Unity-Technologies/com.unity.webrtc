@@ -103,6 +103,14 @@ namespace webrtc
             return *this;
         }
 
+        explicit operator const absl::optional<T>&() const
+        {
+            absl::optional<T> dst = absl::nullopt;
+            if (hasValue)
+                dst = value;
+            return dst;
+        }
+
         const T& value_or(const T& v) const
         {
             return hasValue ? value : v;
@@ -757,10 +765,9 @@ extern "C"
     UNITY_INTERFACE_EXPORT DataChannelObject* ContextCreateDataChannel(Context* ctx, PeerConnectionObject* obj, const char* label, const RTCDataChannelInit* options)
     {
         DataChannelInit _options;
-        _options.reliable = true;
         _options.ordered = options->ordered.value_or(true);
-        _options.maxRetransmitTime = options->maxRetransmitTime.value;
-        _options.maxRetransmits = options->maxRetransmits.value;
+        _options.maxRetransmitTime = static_cast<absl::optional<int32_t>>(options->maxRetransmitTime);
+        _options.maxRetransmits = static_cast<absl::optional<int32_t>>(options->maxRetransmits);
         _options.protocol = options->protocol == nullptr ? "" : options->protocol;
         _options.negotiated = options->negotiated.value_or(false);
         _options.id = options->id.value_or(-1);

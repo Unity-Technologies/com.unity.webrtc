@@ -47,7 +47,7 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 id = 231,
                 maxRetransmits = 1,
-                maxPacketLifeTime = 1,
+                maxPacketLifeTime = null,
                 negotiated = false,
                 ordered = false,
                 protocol = ""
@@ -73,7 +73,18 @@ namespace Unity.WebRTC.RuntimeTest
             RTCConfiguration config = default;
             config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer = new RTCPeerConnection(ref config);
-            Assert.Throws<System.ArgumentException>(() => peer.CreateDataChannel("test1"));
+
+            // Cannot be set along with "maxRetransmits" and "maxPacketLifeTime" 
+            var options = new RTCDataChannelInit
+            {
+                id = 231,
+                maxRetransmits = 1,
+                maxPacketLifeTime = 1,
+                negotiated = false,
+                ordered = false,
+                protocol = ""
+            };
+            Assert.Throws<ArgumentException>(() => peer.CreateDataChannel("test1", options));
             peer.Close();
         }
 

@@ -3,24 +3,43 @@ using System;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCDataChannelInit
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public bool? ordered;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// <see cref="RTCDataChannelInit.maxRetransmits"/> Cannot be set along with `maxRetransmits` />
+        /// </remarks>
+        /// <seealso cref="RTCDataChannelInit.maxRetransmits"/>
         public int? maxPacketLifeTime;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// <see cref="RTCDataChannelInit.maxPacketLifeTime"/> Cannot be set along with `maxPacketLifeTime` />
+        /// </remarks>
+        /// <seealso cref="RTCDataChannelInit.maxPacketLifeTime"/>
         public int? maxRetransmits;
+        /// <summary>
+        /// 
+        /// </summary>
         public string protocol;
+        /// <summary>
+        /// 
+        /// </summary>
         public bool? negotiated;
+        /// <summary>
+        /// 
+        /// </summary>
         public int? id;
-
-        public RTCDataChannelInit()
-        {
-            ordered = true;
-            maxPacketLifeTime = null;
-            maxRetransmits = null;
-            protocol = "";
-            negotiated = false;
-            id = null;
-        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
