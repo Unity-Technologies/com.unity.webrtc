@@ -24,32 +24,6 @@ namespace Unity.WebRTC
         public int sdpMLineIndex;
     }
 
-    public struct RTCDataChannelInit
-    {
-        [MarshalAs(UnmanagedType.U1)]
-        public bool reliable;
-        [MarshalAs(UnmanagedType.U1)]
-        public bool ordered;
-        public int maxRetransmitTime;
-        public int maxRetransmits;
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string protocol;
-        [MarshalAs(UnmanagedType.U1)]
-        public bool negotiated;
-        public int id;
-
-        public RTCDataChannelInit(bool reliable)
-        {
-            this.reliable = reliable;
-            ordered = true;
-            maxRetransmitTime = -1;
-            maxRetransmits = -1;
-            negotiated = false;
-            id = -1;
-            protocol = "";
-        }
-    }
-
     public enum RTCErrorDetailType
     {
         DataChannelFailure,
@@ -535,7 +509,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetConfiguration(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string conf);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateDataChannel(IntPtr ptr, IntPtr ptrPeer, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInit options);
+        public static extern IntPtr ContextCreateDataChannel(IntPtr ptr, IntPtr ptrPeer, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label, ref RTCDataChannelInitInternal options);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
         [DllImport(WebRTC.Lib)]
@@ -662,6 +636,20 @@ namespace Unity.WebRTC
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DataChannelGetLabel(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr DataChannelGetProtocol(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern ushort DataChannelGetMaxRetransmits(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern ushort DataChannelGetMaxRetransmitTime(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool DataChannelGetOrdered(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern ulong DataChannelGetBufferedAmount(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool DataChannelGetNegotiated(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern RTCDataChannelState DataChannelGetReadyState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

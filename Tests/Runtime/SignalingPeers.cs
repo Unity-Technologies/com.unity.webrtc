@@ -12,7 +12,8 @@ namespace Unity.WebRTC.RuntimeTest
     {
         private MediaStream m_stream;
         RTCPeerConnection[] peers = new RTCPeerConnection[2];
-        RTCDataChannel dataChannel;
+        Dictionary<RTCPeerConnection, List<RTCDataChannel>> dataChannels
+            = new Dictionary<RTCPeerConnection, List<RTCDataChannel>>();
 
         public bool IsTestFinished { get; private set; }
 
@@ -21,10 +22,16 @@ namespace Unity.WebRTC.RuntimeTest
             m_stream = stream;
         }
 
-        public RTCDataChannel AddDataChannel(int indexPeer)
+        public RTCDataChannel CreateDataChannel(int indexPeer, string label, RTCDataChannelInit option = null)
         {
-            var option = new RTCDataChannelInit(true);
-            return peers[indexPeer].CreateDataChannel("test1", ref option);
+            RTCDataChannel channel =  peers[indexPeer].CreateDataChannel(label, option);
+            dataChannels[peers[indexPeer]].Add(channel);
+            return channel;
+        }
+
+        public RTCDataChannel GetDataChannel(int indexPeer, int indexDataChannel)
+        {
+            return dataChannels[peers[indexPeer]][indexDataChannel];
         }
 
         public RTCStatsReportAsyncOperation GetPeerStats(int indexPeer)
@@ -67,8 +74,11 @@ namespace Unity.WebRTC.RuntimeTest
 
             peers[0] = new RTCPeerConnection(ref config);
             peers[1] = new RTCPeerConnection(ref config);
-            RTCDataChannelInit conf = new RTCDataChannelInit(true);
-            dataChannel = peers[0].CreateDataChannel("data", ref conf);
+            dataChannels[peers[0]] = new List<RTCDataChannel>();
+            dataChannels[peers[1]] = new List<RTCDataChannel>();
+
+            RTCDataChannel channel = peers[0].CreateDataChannel("data");
+            dataChannels[peers[0]].Add(channel);
 
             peers[0].OnIceCandidate = candidate =>
             {
@@ -89,6 +99,16 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.NotNull(e.Receiver);
                 Assert.NotNull(e.Transceiver);
                 peers[1].AddTrack(e.Track);
+            };
+            peers[0].OnDataChannel = e =>
+            {
+                if (peers[0].ConnectionState == RTCPeerConnectionState.Connected)
+                    dataChannels[peers[0]].Add(e);
+            };
+            peers[1].OnDataChannel = e =>
+            {
+                if(peers[1].ConnectionState == RTCPeerConnectionState.Connected)
+                    dataChannels[peers[1]].Add(e);
             };
 
             if (m_stream != null)
@@ -231,7 +251,7 @@ a=ssrc-group");
 
         public void Dispose()
         {
-            dataChannel.Dispose();
+            dataChannels.Clear();
             peers[0].Close();
             peers[1].Close();
         }

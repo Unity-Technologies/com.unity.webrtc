@@ -94,8 +94,7 @@ public class PeerConnectionSample : MonoBehaviour
         pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         Debug.Log("pc1 createOffer start");
 
-        var conf = new RTCDataChannelInit(true);
-        dataChannel = pc1.CreateDataChannel("data", ref conf);
+        dataChannel = pc1.CreateDataChannel("data");
 
         var op = pc1.CreateOffer(ref OfferOptions);
         yield return op;

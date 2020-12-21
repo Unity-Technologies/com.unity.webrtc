@@ -102,6 +102,11 @@ namespace webrtc
             }
             return *this;
         }
+
+        const T& value_or(const T& v) const
+        {
+            return hasValue ? value : v;
+        }
     };
 
     template<typename T>
@@ -739,9 +744,28 @@ extern "C"
         obj->CreateAnswer(*options);
     }
 
+    struct RTCDataChannelInit
+    {
+        Optional<bool> ordered;
+        Optional<int32_t> maxRetransmitTime;
+        Optional<int32_t> maxRetransmits;
+        char* protocol;
+        Optional<bool> negotiated;
+        Optional<int32_t> id;
+    };
+
     UNITY_INTERFACE_EXPORT DataChannelObject* ContextCreateDataChannel(Context* ctx, PeerConnectionObject* obj, const char* label, const RTCDataChannelInit* options)
     {
-        return ctx->CreateDataChannel(obj, label, *options);
+        DataChannelInit _options;
+        _options.reliable = true;
+        _options.ordered = options->ordered.value_or(true);
+        _options.maxRetransmitTime = options->maxRetransmitTime.value;
+        _options.maxRetransmits = options->maxRetransmits.value;
+        _options.protocol = options->protocol == nullptr ? "" : options->protocol;
+        _options.negotiated = options->negotiated.value_or(false);
+        _options.id = options->id.value_or(-1);
+
+        return ctx->CreateDataChannel(obj, label, _options);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteDataChannel(Context* ctx, DataChannelObject* channel)
@@ -1077,12 +1101,42 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)
     {
-        return dataChannelObj->GetID();
+        return dataChannelObj->dataChannel->id();
     }
 
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelObject* dataChannelObj)
     {
-        return ConvertString(dataChannelObj->GetLabel());
+        return ConvertString(dataChannelObj->dataChannel->label());
+    }
+
+    UNITY_INTERFACE_EXPORT char* DataChannelGetProtocol(DataChannelObject* dataChannelObj)
+    {
+        return ConvertString(dataChannelObj->dataChannel->protocol());
+    }
+
+    UNITY_INTERFACE_EXPORT uint16_t DataChannelGetMaxRetransmits(DataChannelObject* dataChannelObj)
+    {
+        return dataChannelObj->dataChannel->maxRetransmits();
+    }
+
+    UNITY_INTERFACE_EXPORT uint16_t DataChannelGetMaxRetransmitTime(DataChannelObject* dataChannelObj)
+    {
+        return dataChannelObj->dataChannel->maxRetransmitTime();
+    }
+
+    UNITY_INTERFACE_EXPORT bool DataChannelGetOrdered(DataChannelObject* dataChannelObj)
+    {
+        return dataChannelObj->dataChannel->ordered();
+    }
+
+    UNITY_INTERFACE_EXPORT uint64_t DataChannelGetBufferedAmount(DataChannelObject* dataChannelObj)
+    {
+        return dataChannelObj->dataChannel->buffered_amount();
+    }
+
+    UNITY_INTERFACE_EXPORT bool DataChannelGetNegotiated(DataChannelObject* dataChannelObj)
+    {
+        return dataChannelObj->dataChannel->negotiated();
     }
 
     UNITY_INTERFACE_EXPORT DataChannelInterface::DataState DataChannelGetReadyState(

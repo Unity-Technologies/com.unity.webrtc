@@ -190,8 +190,7 @@ public class MediaStreamSample : MonoBehaviour
         _pc2.OnNegotiationNeeded = pc2OnNegotiationNeeded;
         _pc2.OnTrack = pc2Ontrack;
 
-        RTCDataChannelInit conf = new RTCDataChannelInit(true);
-        _pc1.CreateDataChannel("data", ref conf);
+        _pc1.CreateDataChannel("data");
         audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720, 1000000);
         RtImage.texture = cam.targetTexture;

@@ -107,6 +107,24 @@ namespace Unity.WebRTC
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    internal struct OptionalBool
+    {
+        [MarshalAs(UnmanagedType.U1)]
+        public bool hasValue;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool value;
+
+        public static implicit operator bool?(OptionalBool a)
+        {
+            return a.hasValue ? a.value : (bool?)null;
+        }
+        public static implicit operator OptionalBool(bool? a)
+        {
+            return new OptionalBool { hasValue = a.HasValue, value = a.GetValueOrDefault() };
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     internal struct MarshallingArray<T> where T : struct
     {
         public int length;

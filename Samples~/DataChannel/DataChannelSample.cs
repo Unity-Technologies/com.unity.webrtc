@@ -142,8 +142,8 @@ public class DataChannelSample : MonoBehaviour
         pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         pc2.OnDataChannel = onDataChannel;
 
-        RTCDataChannelInit conf = new RTCDataChannelInit(true);
-        dataChannel = pc1.CreateDataChannel("data", ref conf);
+        RTCDataChannelInit conf = new RTCDataChannelInit();
+        dataChannel = pc1.CreateDataChannel("data", conf);
         dataChannel.OnOpen = onDataChannelOpen;
 
         Debug.Log("pc1 createOffer start");

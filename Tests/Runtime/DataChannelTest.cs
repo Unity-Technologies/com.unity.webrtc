@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
@@ -28,9 +27,38 @@ namespace Unity.WebRTC.RuntimeTest
             RTCConfiguration config = default;
             config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
             var peer = new RTCPeerConnection(ref config);
-            var option1 = new RTCDataChannelInit(true);
-            var channel1 = peer.CreateDataChannel("test1", ref option1);
+            var channel1 = peer.CreateDataChannel("test1");
             Assert.AreEqual("test1", channel1.Label);
+
+            // It is return -1 when channel is not connected.
+            Assert.AreEqual(channel1.Id, -1);
+
+            channel1.Close();
+            peer.Close();
+        }
+
+        [Test]
+        public void CreateDataChannelWithOption()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+            var peer = new RTCPeerConnection(ref config);
+            var options = new RTCDataChannelInit
+            {
+                id = 231,
+                maxRetransmits = 1,
+                maxPacketLifeTime = 1,
+                negotiated = false,
+                ordered = false,
+                protocol = ""
+            };
+            var channel1 = peer.CreateDataChannel("test1", options);
+            Assert.AreEqual("test1", channel1.Label);
+            Assert.AreEqual("", channel1.Protocol);
+            Assert.NotZero(channel1.MaxRetransmitTime);
+            Assert.NotZero(channel1.MaxRetransmits);
+            Assert.False(channel1.Ordered);
+            Assert.False(channel1.Negotiated);
 
             // It is return -1 when channel is not connected.
             Assert.AreEqual(channel1.Id, -1);
@@ -45,19 +73,17 @@ namespace Unity.WebRTC.RuntimeTest
             RTCConfiguration config = default;
             config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer = new RTCPeerConnection(ref config);
-
-            RTCDataChannelInit option1 = default;
-            Assert.Throws<System.ArgumentException>(() => peer.CreateDataChannel("test1", ref option1));
+            Assert.Throws<System.ArgumentException>(() => peer.CreateDataChannel("test1"));
             peer.Close();
         }
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator SendMessageThrowExceptionAfterCloseDataChannel()
+        public IEnumerator SendThrowsExceptionAfterClose()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
             yield return test;
-            RTCDataChannel channel = test.component.AddDataChannel(0);
+            RTCDataChannel channel = test.component.CreateDataChannel(0, "test");
             byte[] message1 = { 1, 2, 3 };
             string message2 = "123";
 
@@ -85,8 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
             peer2.OnDataChannel = channel => { channel2 = channel; };
 
-            var conf = new RTCDataChannelInit(true);
-            var channel1 = peer1.CreateDataChannel("data", ref conf);
+            var channel1 = peer1.CreateDataChannel("data");
             bool channel1Opened = false;
             bool channel1Closed = false;
             channel1.OnOpen = () => { channel1Opened = true; };
