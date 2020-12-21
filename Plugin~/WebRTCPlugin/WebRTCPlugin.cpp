@@ -1149,7 +1149,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT DataChannelInterface::DataState DataChannelGetReadyState(
         DataChannelObject* dataChannelObj)
     {
-        return dataChannelObj->GetReadyState();
+        return dataChannelObj->dataChannel->state();
     }
 
     UNITY_INTERFACE_EXPORT void DataChannelSend(DataChannelObject* dataChannelObj, const char* msg)
