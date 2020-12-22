@@ -19,6 +19,15 @@ namespace Unity.WebRTC
         private static RenderTexture CreateRenderTexture(int width, int height,
             GraphicsFormat format)
         {
+            // todo::(kazuki) Increase the supported formats.
+            GraphicsFormat supportedFormat
+                = WebRTC.GetSupportedGraphicsFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            if (format != supportedFormat)
+            {
+                throw new ArgumentException(
+                    $"This graphics format is not supported for streaming: {format} supportedFormat: {supportedFormat}");
+            }
+
             var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
             return tex;
