@@ -89,7 +89,7 @@ namespace webrtc
         void DeleteStatsReport(const webrtc::RTCStatsReport* report);
     
         // DataChannel
-        DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options);
+        DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options);
         void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
         void DeleteDataChannel(DataChannelObject* obj);
 

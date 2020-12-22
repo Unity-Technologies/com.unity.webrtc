@@ -309,8 +309,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
-            var conf = new RTCDataChannelInit(true);
-            peer1.CreateDataChannel("data", ref conf);
+            peer1.CreateDataChannel("data");
 
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
@@ -382,8 +381,7 @@ namespace Unity.WebRTC.RuntimeTest
             var config = GetConfiguration();
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
-            var conf = new RTCDataChannelInit(true);
-            var channel1 = peer1.CreateDataChannel("data", ref conf);
+            var channel1 = peer1.CreateDataChannel("data");
 
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;

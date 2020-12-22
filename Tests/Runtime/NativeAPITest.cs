@@ -5,6 +5,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -118,13 +119,13 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
-
         [Test]
         public void CreateAndDeleteDataChannel()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
-            var init = new RTCDataChannelInit(true);
+
+            var init = (RTCDataChannelInitInternal)new RTCDataChannelInit();
             var channel = NativeMethods.ContextCreateDataChannel(context, peer, "test", ref init);
             NativeMethods.ContextDeleteDataChannel(context, channel);
             NativeMethods.ContextDeletePeerConnection(context, peer);

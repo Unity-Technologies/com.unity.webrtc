@@ -64,7 +64,7 @@ namespace Unity.WebRTC.RuntimeTest
             var context = Context.Create(
                 encoderType: value ? EncoderType.Hardware : EncoderType.Software);
             var peerPtr = context.CreatePeerConnection();
-            var init = new RTCDataChannelInit(true);
+            var init = (RTCDataChannelInitInternal) new RTCDataChannelInit();
             var channelPtr = context.CreateDataChannel(peerPtr, "test", ref init);
             context.DeleteDataChannel(channelPtr);
             context.DeletePeerConnection(peerPtr);

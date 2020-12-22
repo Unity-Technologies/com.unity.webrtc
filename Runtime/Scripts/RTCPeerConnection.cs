@@ -536,9 +536,12 @@ namespace Unity.WebRTC
         /// This string may be checked by <see cref="RTCDataChannel.Label"/>. </param>
         /// <param name="options"> A struct provides configuration options for the data channel. </param>
         /// <returns> A new data channel. </returns>
-        public RTCDataChannel CreateDataChannel(string label, ref RTCDataChannelInit options)
+        public RTCDataChannel CreateDataChannel(string label, RTCDataChannelInit options = null)
         {
-            IntPtr ptr = WebRTC.Context.CreateDataChannel(self, label, ref options);
+            RTCDataChannelInitInternal _options =
+                options == null ? new RTCDataChannelInitInternal() : (RTCDataChannelInitInternal)options;
+
+            IntPtr ptr = WebRTC.Context.CreateDataChannel(self, label, ref _options);
             if (ptr == IntPtr.Zero)
                 throw new ArgumentException("RTCDataChannelInit object is incorrect.");
             return new RTCDataChannel(ptr, this);

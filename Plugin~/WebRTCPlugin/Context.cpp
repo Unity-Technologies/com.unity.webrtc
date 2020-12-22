@@ -376,17 +376,9 @@ namespace webrtc
         m_listStatsReport.erase(found);
 	}
 
-    DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const RTCDataChannelInit& options)
+    DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
     {
-        webrtc::DataChannelInit config;
-        config.reliable = options.reliable;
-        config.ordered = options.ordered;
-        config.maxRetransmitTime = options.maxRetransmitTime;
-        config.maxRetransmits = options.maxRetransmits;
-        config.protocol = options.protocol == nullptr ? "" : options.protocol;
-        config.negotiated = options.negotiated;
-
-        auto channel = obj->connection->CreateDataChannel(label, &config);
+        auto channel = obj->connection->CreateDataChannel(label, &options);
         if (channel == nullptr)
             return nullptr;
         auto dataChannelObj = std::make_unique<DataChannelObject>(channel, *obj);

@@ -145,17 +145,6 @@ namespace webrtc
         bool offerToReceiveVideo;
     };
 
-    struct RTCDataChannelInit
-    {
-        bool reliable = false;
-        bool ordered = true;
-        int maxRetransmitTime = -1;
-        int maxRetransmits = -1;
-        char* protocol;
-        bool negotiated = false;
-        int id = -1;
-    };
-
     struct RTCAnswerOptions
     {
         bool iceRestart;
