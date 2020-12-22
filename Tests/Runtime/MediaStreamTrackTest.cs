@@ -28,7 +28,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var width = 256;
             var height = 256;
-            var format = RenderTextureFormat.Default;
+            var format = RenderTextureFormat.R8;
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
             Assert.Throws<ArgumentException>(() =>
@@ -37,7 +37,6 @@ namespace Unity.WebRTC.RuntimeTest
             });
             Object.DestroyImmediate(rt);
         }
-
 
         // todo(kazuki): Crash on windows standalone player
         [UnityTest]

@@ -17,11 +17,11 @@ namespace Unity.WebRTC
         UnityVideoRenderer m_renderer;
 
         private static RenderTexture CreateRenderTexture(int width, int height,
-            GraphicsFormat format)
+            RenderTextureFormat format)
         {
             // todo::(kazuki) Increase the supported formats.
-            GraphicsFormat supportedFormat
-                = WebRTC.GetSupportedGraphicsFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            RenderTextureFormat supportedFormat
+                = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             if (format != supportedFormat)
             {
                 throw new ArgumentException(
@@ -71,7 +71,8 @@ namespace Unity.WebRTC
             m_needFlip = true;
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, format);
+            var renderTextureFormat = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, renderTextureFormat);
 
             m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
 
@@ -117,7 +118,7 @@ namespace Unity.WebRTC
         /// <param name="width"></param>
         /// <param name="height"></param>
         public VideoStreamTrack(string label, UnityEngine.RenderTexture source)
-            : this(label, source, CreateRenderTexture(source.width, source.height, source.graphicsFormat), source.width,
+            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width,
                 source.height)
         {
         }
@@ -126,7 +127,7 @@ namespace Unity.WebRTC
             : this(label,
                 source,
                 CreateRenderTexture(source.width, source.height,
-                    WebRTC.GetSupportedGraphicsFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
+                    WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType)),
                 source.width,
                 source.height)
         {
