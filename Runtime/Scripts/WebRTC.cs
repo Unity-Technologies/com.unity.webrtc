@@ -15,15 +15,6 @@ namespace Unity.WebRTC
         Hardware = 1
     }
 
-    public struct RTCIceCandidate
-    {
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string candidate;
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string sdpMid;
-        public int sdpMLineIndex;
-    }
-
     public enum RTCErrorDetailType
     {
         DataChannelFailure,
@@ -586,7 +577,16 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, ref RTCIceCandidate candidate);
+        public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, IntPtr candidate);
+        [DllImport(WebRTC.Lib)]
+        public static extern RTCErrorType IceCandidateCreate(ref RTCIceCandidateInitInternal options, out IntPtr candidate);
+        [DllImport(WebRTC.Lib)]
+        public static extern void IceCandidateGetCandidate(IntPtr candidate, out CandidateInternal dst);
+        [DllImport(WebRTC.Lib)]
+        public static extern int IceCandidateGetSdpLineIndex(IntPtr candidate);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string IceCandidateGetSdpMid(IntPtr candidate);
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

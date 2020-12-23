@@ -83,14 +83,14 @@ namespace Unity.WebRTC.RuntimeTest
             peers[0].OnIceCandidate = candidate =>
             {
                 Assert.NotNull(candidate);
-                Assert.NotNull(candidate.candidate);
-                peers[1].AddIceCandidate(ref candidate);
+                Assert.NotNull(candidate.Candidate);
+                peers[1].AddIceCandidate(candidate);
             };
             peers[1].OnIceCandidate = candidate =>
             {
                 Assert.NotNull(candidate);
-                Assert.NotNull(candidate.candidate);
-                peers[0].AddIceCandidate(ref candidate);
+                Assert.NotNull(candidate.Candidate);
+                peers[0].AddIceCandidate(candidate);
             };
             peers[1].OnTrack = e =>
             {

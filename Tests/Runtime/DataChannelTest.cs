@@ -118,8 +118,8 @@ namespace Unity.WebRTC.RuntimeTest
             var peer2 = new RTCPeerConnection(ref config);
             RTCDataChannel channel2 = null;
 
-            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(ref candidate); };
-            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
             peer2.OnDataChannel = channel => { channel2 = channel; };
 
             var channel1 = peer1.CreateDataChannel("data");

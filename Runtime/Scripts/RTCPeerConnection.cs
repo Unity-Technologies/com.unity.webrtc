@@ -273,8 +273,13 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    var candidate =
-                        new RTCIceCandidate { candidate = sdp, sdpMid = sdpMid, sdpMLineIndex = sdpMlineIndex };
+                    var options = new RTCIceCandidateInit
+                    {
+                        candidate = sdp,
+                        sdpMid = sdpMid,
+                        sdpMLineIndex = sdpMlineIndex
+                    };
+                    var candidate = new RTCIceCandidate(options);
                     connection.OnIceCandidate?.Invoke(candidate);
                 }
             });
@@ -497,9 +502,9 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         /// <param name="candidate"></param>
-        public void AddIceCandidate(ref RTCIceCandidate candidate)
+        public bool AddIceCandidate(RTCIceCandidate candidate)
         {
-            NativeMethods.PeerConnectionAddIceCandidate(self, ref candidate);
+            return NativeMethods.PeerConnectionAddIceCandidate(self, candidate.self);
         }
 
         /// <summary>

@@ -38,7 +38,6 @@ namespace webrtc
         std::string GetConfiguration() const;
         void CreateOffer(const RTCOfferOptions& options);
         void CreateAnswer(const RTCAnswerOptions& options);
-        void AddIceCandidate(const RTCIceCandidate& candidate);
         void ReceiveStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report);
 
         void RegisterCallbackCreateSD(DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)
