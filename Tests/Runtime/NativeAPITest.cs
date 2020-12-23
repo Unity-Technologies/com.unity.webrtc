@@ -61,6 +61,11 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void NothingToDo()
+        {
+        }
+
+        [Test]
         public void CreateAndDestroyContext()
         {
             var context = NativeMethods.ContextCreate(0, encoderType);

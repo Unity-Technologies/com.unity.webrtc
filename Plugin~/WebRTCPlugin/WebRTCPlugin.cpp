@@ -857,7 +857,7 @@ extern "C"
         }
     };
 
-    UNITY_INTERFACE_EXPORT RTCErrorType IceCandidateCreate(const RTCIceCandidateInit* options, IceCandidateInterface** candidate)
+    UNITY_INTERFACE_EXPORT RTCErrorType CreateIceCandidate(const RTCIceCandidateInit* options, IceCandidateInterface** candidate)
     {
         SdpParseError error;
         IceCandidateInterface* _candidate = CreateIceCandidate(options->sdpMid, options->sdpMLineIndex, options->candidate, &error);
@@ -865,6 +865,11 @@ extern "C"
             return RTCErrorType::INVALID_PARAMETER;
         *candidate = _candidate;
         return RTCErrorType::NONE;
+    }
+
+    UNITY_INTERFACE_EXPORT void DeleteIceCandidate(IceCandidateInterface* candidate)
+    {
+        delete candidate;
     }
 
     UNITY_INTERFACE_EXPORT void IceCandidateGetCandidate(const IceCandidateInterface* candidate, Candidate* dst)

@@ -30,16 +30,16 @@ namespace webrtc
     IUnityGraphics* s_Graphics = nullptr;
     Context* s_context = nullptr;
     std::map<const MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
-    Clock* s_clock;
+    std::unique_ptr <Clock> s_clock;
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
-    IGraphicsDevice* s_gfxDevice = nullptr;
+    std::unique_ptr<IGraphicsDevice> s_gfxDevice;
 
     IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
     {
-        RTC_DCHECK(s_gfxDevice);
-        return s_gfxDevice;
+        RTC_DCHECK(s_gfxDevice.get());
+        return s_gfxDevice.get();
     }
 
     UnityGfxRenderer GraphicsUtility::GetGfxRenderer()
@@ -93,7 +93,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         if (renderer == kUnityGfxRendererNull)
             break;
 
-        s_gfxDevice = GraphicsDevice::GetInstance().Init(s_UnityInterfaces);
+        s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces));
         if(s_gfxDevice != nullptr)
         {
             s_gfxDevice->InitV();
@@ -107,7 +107,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         if (s_gfxDevice != nullptr)
         {
             s_gfxDevice->ShutdownV();
-            s_gfxDevice = nullptr;
+            s_gfxDevice.reset();
         }
 
         //UnityPluginUnload not called normally
@@ -161,10 +161,14 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 // Unity plugin load event
 void PluginLoad(IUnityInterfaces* unityInterfaces)
 {
+#if WIN32 && _DEBUG
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
     s_UnityInterfaces = unityInterfaces;
     s_Graphics = unityInterfaces->Get<IUnityGraphics>();
     s_Graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
-    s_clock = Clock::GetRealTimeClock();
+    s_clock.reset(Clock::GetRealTimeClock());
 
 #if defined(SUPPORT_VULKAN)
     IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
@@ -196,6 +200,7 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
 void PluginUnload()
 {
     s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
+    s_clock.reset();
 }
 
 // Notice: When DebugLog is used in a method called from RenderingThread, 
@@ -226,10 +231,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             UnityVideoTrackSource* source = s_context->GetVideoSource(track);
             UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
             void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
-                param->textureHandle, s_gfxDevice, gfxRenderer);
+                param->textureHandle, s_gfxDevice.get(), gfxRenderer);
             source->Init(ptr);
             s_mapEncoder[track] = EncoderFactory::GetInstance().Init(
-                param->width, param->height, s_gfxDevice, encoderType, param->textureFormat);
+                param->width, param->height, s_gfxDevice.get(), encoderType, param->textureFormat);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
                 // DebugLog("Encoder initialization faild.");

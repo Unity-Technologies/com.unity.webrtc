@@ -150,7 +150,7 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
-    public class RTCIceCandidate
+    public class RTCIceCandidate : IDisposable
     {
         /// <summary>
         /// 
@@ -212,6 +212,32 @@ namespace Unity.WebRTC
 
         internal IntPtr self;
         private CandidateInternal _candidate;
+        private bool disposed;
+
+        ~RTCIceCandidate()
+        {
+            this.Dispose();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero)
+            {
+                NativeMethods.DeleteIceCandidate(self);
+                self = IntPtr.Zero;
+            }
+
+            this.disposed = true;
+            GC.SuppressFinalize(this);
+        }
 
         /// <summary>
         /// 
@@ -221,7 +247,7 @@ namespace Unity.WebRTC
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
             RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
-            RTCErrorType error = NativeMethods.IceCandidateCreate(ref option, out self);
+            RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
             if (error != RTCErrorType.None)
                 throw new ArgumentException();
 

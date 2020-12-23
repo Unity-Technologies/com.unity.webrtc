@@ -579,7 +579,9 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionAddIceCandidate(IntPtr ptr, IntPtr candidate);
         [DllImport(WebRTC.Lib)]
-        public static extern RTCErrorType IceCandidateCreate(ref RTCIceCandidateInitInternal options, out IntPtr candidate);
+        public static extern RTCErrorType CreateIceCandidate(ref RTCIceCandidateInitInternal options, out IntPtr candidate);
+        [DllImport(WebRTC.Lib)]
+        public static extern RTCErrorType DeleteIceCandidate(IntPtr candidate);
         [DllImport(WebRTC.Lib)]
         public static extern void IceCandidateGetCandidate(IntPtr candidate, out CandidateInternal dst);
         [DllImport(WebRTC.Lib)]
