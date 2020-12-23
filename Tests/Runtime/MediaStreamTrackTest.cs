@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Linq;
 using System.Collections;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -19,6 +21,21 @@ namespace Unity.WebRTC.RuntimeTest
         public void TearDown()
         {
             WebRTC.Dispose();
+        }
+
+        [Test]
+        public void ConstructorThrowsException()
+        {
+            var width = 256;
+            var height = 256;
+            var format = RenderTextureFormat.R8;
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+            Assert.Throws<ArgumentException>(() =>
+            {
+                var track = new VideoStreamTrack("video", rt);
+            });
+            Object.DestroyImmediate(rt);
         }
 
         // todo(kazuki): Crash on windows standalone player
