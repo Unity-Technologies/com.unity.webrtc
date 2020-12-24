@@ -115,6 +115,10 @@ namespace webrtc
             }
             config.servers.push_back(iceServer);
         }
+        int iceTransportPolicy = configJson["iceTransportPolicy"].asInt();
+        if(iceTransportPolicy != 0) config.type = static_cast<PeerConnectionInterface::IceTransportsType>(iceTransportPolicy);
+        config.ice_candidate_pool_size = configJson["iceCandidatePoolSize"].asInt();
+        config.bundle_policy = static_cast<PeerConnectionInterface::BundlePolicy>(configJson["bundlePolicy"].asInt());
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
         return true;
     }

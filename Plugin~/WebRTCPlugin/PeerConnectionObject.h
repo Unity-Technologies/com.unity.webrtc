@@ -15,6 +15,7 @@ namespace webrtc
     using DelegateLocalSdpReady = void(*)(PeerConnectionObject*, const char*, const char*);
     using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
     using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);
+    using DelegateOnIceGatheringChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceGatheringState);
     using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
@@ -49,13 +50,10 @@ namespace webrtc
         void RegisterLocalSdpReady(DelegateLocalSdpReady callback) { onLocalSdpReady = callback; }
         void RegisterIceCandidate(DelegateIceCandidate callback) { onIceCandidate = callback; }
         void RegisterIceConnectionChange(DelegateOnIceConnectionChange callback) { onIceConnectionChange = callback; };
+        void RegisterIceGatheringChange(DelegateOnIceGatheringChange callback) { onIceGatheringChange = callback; }
         void RegisterOnDataChannel(DelegateOnDataChannel callback) { onDataChannel = callback; }
         void RegisterOnRenegotiationNeeded(DelegateOnRenegotiationNeeded callback) { onRenegotiationNeeded = callback; }
         void RegisterOnTrack(DelegateOnTrack callback) { onTrack = callback; }
-
-        RTCPeerConnectionState GetConnectionState();
-        RTCIceConnectionState GetIceCandidateState();
-        RTCSignalingState GetSignalingState();
 
         //webrtc::CreateSessionDescriptionObserver
         // This callback transfers the ownership of the |desc|.
@@ -103,6 +101,7 @@ namespace webrtc
         DelegateIceCandidate onIceCandidate = nullptr;
         DelegateLocalSdpReady onLocalSdpReady = nullptr;
         DelegateOnIceConnectionChange onIceConnectionChange = nullptr;
+        DelegateOnIceGatheringChange onIceGatheringChange = nullptr;
         DelegateOnDataChannel onDataChannel = nullptr;
         DelegateOnRenegotiationNeeded onRenegotiationNeeded = nullptr;
         DelegateOnTrack onTrack = nullptr;

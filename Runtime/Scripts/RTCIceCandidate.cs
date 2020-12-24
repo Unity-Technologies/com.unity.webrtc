@@ -35,8 +35,6 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         Rtcp = 2,
-
-        Default = 1
     }
 
     /// <summary>

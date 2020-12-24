@@ -118,7 +118,10 @@ namespace webrtc
     // Called any time the IceGatheringState changes.
     void PeerConnectionObject::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state)
     {
-        DebugLog("OnIceGatheringChange");
+        if (onIceGatheringChange != nullptr)
+        {
+            onIceGatheringChange(this, new_state);
+        }
     }
 
     void PeerConnectionObject::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state)
@@ -223,6 +226,10 @@ namespace webrtc
             }
             root["iceServers"].append(jsonIceServer);
         }
+        root["iceTransportPolicy"] = _config.type;
+        root["iceCandidatePoolSize"] = _config.ice_candidate_pool_size;
+        root["bundlePolicy"] = _config.bundle_policy;
+
         Json::StreamWriterBuilder builder;
         return Json::writeString(builder, root);
     }
@@ -264,76 +271,5 @@ namespace webrtc
         desc.sdp[out.size()] = '\0';
         return true;
     }
-
-#pragma warning(push)
-#pragma warning(disable: 4715)
-    RTCIceConnectionState PeerConnectionObject::GetIceCandidateState()
-    {
-        auto state = connection->ice_connection_state();
-        switch (state)
-        {
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionNew:
-            return RTCIceConnectionState::New;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionChecking:
-            return RTCIceConnectionState::Checking;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionConnected:
-            return RTCIceConnectionState::Connected;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionCompleted:
-            return RTCIceConnectionState::Completed;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionFailed:
-            return RTCIceConnectionState::Failed;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionDisconnected:
-            return RTCIceConnectionState::Disconnected;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionClosed:
-            return RTCIceConnectionState::Closed;
-        case webrtc::PeerConnectionInterface::IceConnectionState::kIceConnectionMax:
-            return RTCIceConnectionState::Max;
-        }
-        throw std::invalid_argument("Unknown ice connection type");
-    }
-
-    RTCPeerConnectionState PeerConnectionObject::GetConnectionState()
-    {
-        auto state = connection->peer_connection_state();
-        switch (state)
-        {
-        case webrtc::PeerConnectionInterface::PeerConnectionState::kClosed:
-            return RTCPeerConnectionState::Closed;
-        case webrtc::PeerConnectionInterface::PeerConnectionState::kConnected:
-            return RTCPeerConnectionState::Connected;
-        case webrtc::PeerConnectionInterface::PeerConnectionState::kConnecting:
-            return RTCPeerConnectionState::Connecting;
-        case webrtc::PeerConnectionInterface::PeerConnectionState::kDisconnected:
-            return RTCPeerConnectionState::Disconnected;
-        case webrtc::PeerConnectionInterface::PeerConnectionState::kFailed:
-            return RTCPeerConnectionState::Failed;
-        case webrtc::PeerConnectionInterface::PeerConnectionState::kNew:
-            return RTCPeerConnectionState::New;
-        }
-        throw std::invalid_argument("Unknown peer connection type");
-    }
-
-    RTCSignalingState PeerConnectionObject::GetSignalingState()
-    {
-        auto state = connection->signaling_state();
-        switch (state)
-        {
-        case webrtc::PeerConnectionInterface::SignalingState::kStable:
-            return RTCSignalingState::Stable;
-        case webrtc::PeerConnectionInterface::SignalingState::kHaveLocalOffer:
-            return RTCSignalingState::HaveLocalOffer;
-        case webrtc::PeerConnectionInterface::SignalingState::kHaveRemoteOffer:
-            return RTCSignalingState::HaveRemoteOffer;
-        case webrtc::PeerConnectionInterface::SignalingState::kHaveLocalPrAnswer:
-            return RTCSignalingState::HaveLocalPranswer;
-        case webrtc::PeerConnectionInterface::SignalingState::kHaveRemotePrAnswer:
-            return RTCSignalingState::HaveRemotePranswer;
-        case webrtc::PeerConnectionInterface::SignalingState::kClosed:
-            return RTCSignalingState::Closed;
-        }
-        throw std::invalid_argument("Unknown signaling type");
-    }
-#pragma warning(pop)
-    
 } // end namespace webrtc
 } // end namespace unity

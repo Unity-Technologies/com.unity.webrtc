@@ -10,7 +10,7 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class PeerConnectionTest
     {
-        static RTCConfiguration GetConfiguration()
+        static RTCConfiguration GetDefaultConfiguration()
         {
             RTCConfiguration config = default;
             config.iceServers = new[]
@@ -23,6 +23,7 @@ namespace Unity.WebRTC.RuntimeTest
                     credentialType = RTCIceCredentialType.Password
                 }
             };
+            config.iceTransportPolicy = RTCIceTransportPolicy.All;
             return config;
         }
 
@@ -62,9 +63,9 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("PeerConnection")]
-        public void ConstructWithConfig()
+        public void GetConfiguration()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var peer = new RTCPeerConnection(ref config);
 
             var config2 = peer.GetConfiguration();
@@ -74,6 +75,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(config.iceServers[0].username, config2.iceServers[0].username);
             Assert.AreEqual(config.iceServers[0].credential, config2.iceServers[0].credential);
             Assert.AreEqual(config.iceServers[0].urls, config2.iceServers[0].urls);
+            Assert.AreEqual(config.iceTransportPolicy, config2.iceTransportPolicy);
+            Assert.AreEqual(config.iceCandidatePoolSize, config2.iceCandidatePoolSize);
+            Assert.AreEqual(config.bundlePolicy, config2.bundlePolicy);
 
             peer.Close();
             peer.Dispose();
@@ -99,7 +103,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void SetConfiguration()
         {
             var peer = new RTCPeerConnection();
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var result = peer.SetConfiguration(ref config);
             Assert.AreEqual(RTCErrorType.None, result);
             peer.Close();
@@ -220,7 +224,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator CurrentDirection()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
             var audioTrack = new AudioStreamTrack("audio");
@@ -266,7 +270,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("PeerConnection")]
         public IEnumerator CreateOffer()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var peer = new RTCPeerConnection(ref config);
             RTCOfferOptions options = default;
             var op = peer.CreateOffer(ref options);
@@ -284,7 +288,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("PeerConnection")]
         public IEnumerator CreateAnswerFailed()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var peer = new RTCPeerConnection(ref config);
             RTCAnswerOptions options = default;
             var op = peer.CreateAnswer(ref options);
@@ -305,7 +309,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("PeerConnection")]
         public IEnumerator CreateAnswer()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
 
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
@@ -378,7 +382,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator SetRemoteDescription()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
             var channel1 = peer1.CreateDataChannel("data");
@@ -463,7 +467,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("PeerConnection")]
         public IEnumerator SetRemoteDescriptionFailed()
         {
-            var config = GetConfiguration();
+            var config = GetDefaultConfiguration();
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
 
