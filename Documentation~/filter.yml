@@ -3,8 +3,12 @@ apiRules:
     uidRegex: Unity.WebRTC
     type: Namespace
 - exclude:
-    uidRegex: ^System\.Object
-    type: Type
+    uidRegex: ^System\.Object\..*$
+    type: Method
 - exclude:
-    uidRegex: ^System\.ValueType
+    uidRegex: ^System\.ValueType\..*$
+    type: Method
+- exclude:
+    hasAttribute:
+      uid: System.ObsoleteAttribute
     type: Type
