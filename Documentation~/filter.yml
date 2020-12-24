@@ -1,4 +1,10 @@
 apiRules:
   - include:
-      uidRegex: ^Unity\.WebRTC
+      uidRegex: Unity.WebRTC
+      type: Namespace
+  - exclude:
+      uidRegex: Unity.​Web​RTC.Editor
+      type: Namespace
+  - exclude:
+      uidRegex: Unity.​Web​RTC.​Runtime​Test
       type: Namespace
