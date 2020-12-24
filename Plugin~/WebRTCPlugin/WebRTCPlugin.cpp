@@ -785,6 +785,11 @@ extern "C"
         obj->RegisterIceConnectionChange(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterIceGatheringChange(PeerConnectionObject* obj, DelegateOnIceGatheringChange callback)
+    {
+        obj->RegisterIceGatheringChange(callback);
+    }
+    
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnIceCandidate(PeerConnectionObject*obj, DelegateIceCandidate callback)
     {
         obj->RegisterIceCandidate(callback);
@@ -887,20 +892,26 @@ extern "C"
         return ConvertString(candidate->sdp_mid());
     }
 
-    UNITY_INTERFACE_EXPORT RTCPeerConnectionState PeerConnectionState(PeerConnectionObject* obj)
+    UNITY_INTERFACE_EXPORT PeerConnectionInterface::PeerConnectionState PeerConnectionState(PeerConnectionObject* obj)
     {
-        return obj->GetConnectionState();
+        return obj->connection->peer_connection_state();
     }
 
-    UNITY_INTERFACE_EXPORT RTCIceConnectionState PeerConnectionIceConditionState(PeerConnectionObject* obj)
+    UNITY_INTERFACE_EXPORT PeerConnectionInterface::IceConnectionState PeerConnectionIceConditionState(PeerConnectionObject* obj)
     {
-        return obj->GetIceCandidateState();
+        return obj->connection->ice_connection_state();
     }
 
-    UNITY_INTERFACE_EXPORT RTCSignalingState PeerConnectionSignalingState(PeerConnectionObject* obj)
+    UNITY_INTERFACE_EXPORT PeerConnectionInterface::SignalingState PeerConnectionSignalingState(PeerConnectionObject* obj)
     {
-        return obj->GetSignalingState();
+        return obj->connection->signaling_state();
     }
+
+    UNITY_INTERFACE_EXPORT PeerConnectionInterface::IceGatheringState PeerConnectionIceGatheringState(PeerConnectionObject* obj)
+    {
+        return obj->connection->ice_gathering_state();
+    }
+
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnDataChannel(PeerConnectionObject* obj, DelegateOnDataChannel callback)
     {

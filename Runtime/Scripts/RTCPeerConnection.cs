@@ -6,6 +6,7 @@ namespace Unity.WebRTC
 {
     public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
+    public delegate void DelegateOnIceGatheringStateChange(RTCIceGatheringState state);
     public delegate void DelegateOnNegotiationNeeded();
     public delegate void DelegateOnTrack(RTCTrackEvent e);
     public delegate void DelegateSetSessionDescSuccess();
@@ -27,6 +28,7 @@ namespace Unity.WebRTC
 
         private int m_id;
         private DelegateOnIceConnectionChange onIceConnectionChange;
+        private DelegateOnIceGatheringStateChange onIceGatheringStateChange;
         private DelegateOnIceCandidate onIceCandidate;
         private DelegateOnDataChannel onDataChannel;
         private DelegateOnTrack onTrack;
@@ -78,13 +80,7 @@ namespace Unity.WebRTC
         /// </code>
         /// </example>
         /// <seealso cref="ConnectionState"/>
-        public RTCIceConnectionState IceConnectionState
-        {
-            get
-            {
-                return NativeMethods.PeerConnectionIceConditionState(self);
-            }
-        }
+        public RTCIceConnectionState IceConnectionState => NativeMethods.PeerConnectionIceConditionState(self);
 
         /// <summary>
         /// The readonly property of the <see cref="RTCPeerConnection"/> indicates
@@ -98,13 +94,7 @@ namespace Unity.WebRTC
         /// </code>
         /// </example>
         /// <seealso cref="IceConnectionState"/>
-        public RTCPeerConnectionState ConnectionState
-        {
-            get
-            {
-                return NativeMethods.PeerConnectionState(self);
-            }
-        }
+        public RTCPeerConnectionState ConnectionState => NativeMethods.PeerConnectionState(self);
 
         /// <summary>
         /// The readonly property of the <see cref="RTCPeerConnection"/> indicates
@@ -118,13 +108,12 @@ namespace Unity.WebRTC
         /// </code>
         /// </example>
         /// <seealso cref="ConnectionState"/>
-        public RTCSignalingState SignalingState
-        {
-            get
-            {
-                return NativeMethods.PeerConnectionSignalingState(self);
-            }
-        }
+        public RTCSignalingState SignalingState => NativeMethods.PeerConnectionSignalingState(self);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public RTCIceGatheringState GatheringState => NativeMethods.PeerConnectionIceGatheringState(self);
 
         /// <summary>
         /// Returns array of objects each of which represents one RTP receiver.
@@ -196,6 +185,15 @@ namespace Unity.WebRTC
             set
             {
                 onIceConnectionChange = value;
+            }
+        }
+
+        public DelegateOnIceGatheringStateChange OnIceGatheringStateChange
+        {
+            private get => onIceGatheringStateChange;
+            set
+            {
+                onIceGatheringStateChange = value;
             }
         }
 
@@ -293,6 +291,18 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     connection.OnIceConnectionChange?.Invoke(state);
+                }
+            });
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceGatheringChange))]
+        static void PCOnIceGatheringChange(IntPtr ptr, RTCIceGatheringState state)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    connection.OnIceGatheringStateChange?.Invoke(state);
                 }
             });
         }
@@ -433,6 +443,7 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, OnSuccessCreateSessionDesc, OnFailureCreateSessionDesc);
             NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, OnStatsDeliveredCallback);
             NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
+            NativeMethods.PeerConnectionRegisterIceGatheringChange(self, PCOnIceGatheringChange);
             NativeMethods.PeerConnectionRegisterOnIceCandidate(self, PCOnIceCandidate);
             NativeMethods.PeerConnectionRegisterOnDataChannel(self, PCOnDataChannel);
             NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);

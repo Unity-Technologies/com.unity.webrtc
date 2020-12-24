@@ -40,36 +40,43 @@ namespace Unity.WebRTC
         public string message;
     }
 
-    public enum RTCPeerConnectionState
+    public enum RTCPeerConnectionState : int
     {
-        New,
-        Connecting,
-        Connected,
-        Disconnected,
-        Failed,
-        Closed
+        New = 0,
+        Connecting = 1,
+        Connected = 2,
+        Disconnected = 3,
+        Failed = 4,
+        Closed = 5
     }
 
-    public enum RTCIceConnectionState
+    public enum RTCIceConnectionState : int
     {
-        New,
-        Checking,
-        Connected,
-        Completed,
-        Failed,
-        Disconnected,
-        Closed,
-        Max
+        New = 0,
+        Checking = 1,
+        Connected = 2,
+        Completed = 3,
+        Failed = 4,
+        Disconnected = 5,
+        Closed = 6,
+        Max =7
     }
 
-    public enum RTCSignalingState
+    public enum RTCIceGatheringState : int
     {
-        Stable,
-        HaveLocalOffer,
-        HaveRemoteOffer,
-        HaveLocalPranswer,
-        HaveRemotePranswer,
-        Closed
+        New = 0,
+        Gathering = 1,
+        Complete = 2
+    }
+
+    public enum RTCSignalingState : int
+    {
+        Stable = 0,
+        HaveLocalOffer = 1,
+        HaveRemoteOffer = 2,
+        HaveLocalPranswer = 3,
+        HaveRemotePranswer = 4,
+        Closed = 5
     }
 
     public enum RTCErrorType
@@ -105,11 +112,11 @@ namespace Unity.WebRTC
         Rollback
     }
 
-    public enum RTCBundlePolicy
+    public enum RTCBundlePolicy : int
     {
-        BundlePolicyBalanced,
-        BundlePolicyMaxBundle,
-        BundlePolicyMaxCompat
+        BundlePolicyBalanced = 0,
+        BundlePolicyMaxBundle = 1,
+        BundlePolicyMaxCompat = 2
     }
 
     public enum RTCDataChannelState
@@ -162,10 +169,19 @@ namespace Unity.WebRTC
         public string username;
     }
 
-    public enum RTCIceTransportPolicy
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum RTCIceTransportPolicy : int
     {
-        Relay,
-        All
+        /// <summary>
+        /// 
+        /// </summary>
+        Relay = 1,
+        /// <summary>
+        /// 
+        /// </summary>
+        All = 3
     }
 
     [Serializable]
@@ -174,6 +190,7 @@ namespace Unity.WebRTC
         public RTCIceServer[] iceServers;
         public RTCIceTransportPolicy iceTransportPolicy;
         public RTCBundlePolicy bundlePolicy;
+        public int iceCandidatePoolSize;
     }
 
     public enum CodecInitializationResult
@@ -457,6 +474,8 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateNativeOnIceGatheringChange(IntPtr ptr, RTCIceGatheringState state);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceCandidate(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string candidate, [MarshalAs(UnmanagedType.LPStr)] string sdpMid, int sdpMlineIndex);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     //according to JS API naming, use OnNegotiationNeeded instead of OnRenegotiationNeeded
@@ -534,6 +553,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionRegisterIceGatheringChange(IntPtr ptr, DelegateNativeOnIceGatheringChange callback);
+        [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, ref IntPtr error);
@@ -601,6 +622,8 @@ namespace Unity.WebRTC
         public static extern RTCIceConnectionState PeerConnectionIceConditionState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern RTCSignalingState PeerConnectionSignalingState(IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern RTCIceGatheringState PeerConnectionIceGatheringState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnDataChannel(IntPtr ptr, DelegateNativeOnDataChannel callback);
         [DllImport(WebRTC.Lib)]

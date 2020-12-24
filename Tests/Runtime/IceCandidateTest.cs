@@ -30,7 +30,7 @@ namespace Unity.WebRTC.RuntimeTest
             };
             var candidate = new RTCIceCandidate(option);
             Assert.IsNotEmpty(candidate.Candidate);
-            Assert.AreEqual(RTCIceComponent.Default, candidate.Component);
+            Assert.AreEqual(RTCIceComponent.Rtp, candidate.Component);
             Assert.IsNotEmpty(candidate.Foundation);
             Assert.NotNull(candidate.Port);
             Assert.NotNull(candidate.Priority);
