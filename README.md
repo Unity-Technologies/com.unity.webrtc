@@ -1,6 +1,7 @@
 # WebRTC for Unity
 
 <img src="https://img.shields.io/badge/unity-2019.4-green.svg?style=flat-square" alt="unity 2019.4">
+<img src="https://img.shields.io/badge/unity-2020.2-green.svg?style=flat-square" alt="unity 2020.2">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -84,6 +85,7 @@ This package uses GPU hardware acceleration for video encoding, so it only runs 
 | `2.1`   | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0/m/A5X253_ZAQAJ) | - Profiler tool <br>- Bitrate control                                                          | Aug 2020 |
 | `2.2`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (VP8, VP9 only) <br>- Vulkan HW encoder support <br>- MacOS HW encoder support | Oct 2020 |
 | `2.3`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS platform suppport                                                                        | Dec 2020 |
+| `2.4`   | [M88](https://groups.google.com/g/discuss-webrtc/c/A0FjOcTW2c0/m/UAv-veyPCAAJ) | - Android platform suppport                                                                        | Feb 2021 |
 
 ## Licenses
 
