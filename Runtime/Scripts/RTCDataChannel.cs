@@ -6,6 +6,7 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
+    /// <seealso cref="RTCPeerConnection.CreateDataChannel(string, RTCDataChannelInit)"/>
     public class RTCDataChannelInit
     {
         /// <summary>
@@ -16,7 +17,7 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         /// <remarks>
-        /// <see cref="RTCDataChannelInit.maxRetransmits"/> Cannot be set along with `maxRetransmits` />
+        /// Cannot be set along with <see cref="RTCDataChannelInit.maxRetransmits"/>.
         /// </remarks>
         /// <seealso cref="RTCDataChannelInit.maxRetransmits"/>
         public int? maxPacketLifeTime;
@@ -24,7 +25,7 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         /// <remarks>
-        /// <see cref="RTCDataChannelInit.maxPacketLifeTime"/> Cannot be set along with `maxPacketLifeTime` />
+        /// Cannot be set along with <see cref="RTCDataChannelInit.maxPacketLifeTime"/>.
         /// </remarks>
         /// <seealso cref="RTCDataChannelInit.maxPacketLifeTime"/>
         public int? maxRetransmits;
@@ -83,7 +84,9 @@ namespace Unity.WebRTC
         private int id;
         private bool disposed;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public DelegateOnMessage OnMessage
         {
             get { return onMessage; }
@@ -93,6 +96,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DelegateOnOpen OnOpen
         {
             get { return onOpen; }
@@ -101,6 +107,10 @@ namespace Unity.WebRTC
                 onOpen = value;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public DelegateOnClose OnClose
         {
             get { return onClose; }
