@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
 
-public class PeerConnectionSample : MonoBehaviour
+class PeerConnectionSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Button callButton;

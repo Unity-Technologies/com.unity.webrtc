@@ -3,7 +3,7 @@ using Unity.WebRTC;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MungeSDPSample : MonoBehaviour
+class MungeSDPSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Button startButton;

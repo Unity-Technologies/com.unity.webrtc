@@ -7,7 +7,7 @@ using Unity.WebRTC;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
-public class ChangeCodecsSample : MonoBehaviour
+class ChangeCodecsSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Dropdown codecSelector;

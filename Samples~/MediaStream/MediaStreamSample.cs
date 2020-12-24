@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using System.Text;
 
 [RequireComponent(typeof(AudioListener))]
-public class MediaStreamSample : MonoBehaviour
+class MediaStreamSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Button callButton;
