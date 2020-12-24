@@ -179,7 +179,7 @@ namespace Unity.WebRTC.Editor
         }
     }
 
-    public class PeerConnectionRecord
+    internal class PeerConnectionRecord
     {
         private readonly RTCConfiguration m_config;
         private readonly Dictionary<string, StatsRecord> m_statsRecordMap;
@@ -214,7 +214,7 @@ namespace Unity.WebRTC.Editor
         }
     }
 
-    public class StatsRecord
+    internal class StatsRecord
     {
         private const int MAX_BUFFER_SIZE = 1000;
         private readonly Dictionary<string, List<(long timeStamp, object value)>> m_memberRecord;

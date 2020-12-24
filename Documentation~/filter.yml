@@ -2,3 +2,9 @@ apiRules:
 - include:
     uidRegex: Unity.WebRTC
     type: Namespace
+- exclude:
+    uidRegex: ^System\.Object
+    type: Type
+- exclude:
+    uidRegex: ^System\.ValueType
+    type: Type
