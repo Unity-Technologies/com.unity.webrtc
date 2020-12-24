@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Toggle = UnityEngine.UI.Toggle;
 
-public class BandwidthSample : MonoBehaviour
+class BandwidthSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Dropdown bandwidthSelector;
