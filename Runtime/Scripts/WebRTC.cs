@@ -139,9 +139,10 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// <see cref="RTCConfiguration.bundlePolicy"/>
     /// </summary>
     /// <seealso cref="RTCConfiguration.bundlePolicy"/>
+    /// <see cref="RTCConfiguration.bundlePolicy"/>
     public enum RTCBundlePolicy : int
     {
         BundlePolicyBalanced = 0,
