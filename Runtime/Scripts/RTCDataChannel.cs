@@ -74,6 +74,10 @@ namespace Unity.WebRTC
     public delegate void DelegateOnMessage(byte[] bytes);
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCPeerConnection.CreateDataChannel(string, RTCDataChannelInit)"/>
     public class RTCDataChannel : IDisposable
     {
         private IntPtr self;

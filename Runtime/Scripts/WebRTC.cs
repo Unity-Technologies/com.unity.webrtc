@@ -139,7 +139,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCConfiguration.bundlePolicy">RTCConfiguration.bundlePolicy</see>.
+    /// Please check the <see cref="RTCConfiguration.bundlePolicy"/> in the <see cref="RTCConfiguration"/> class.
     /// </summary>
     /// <seealso cref="RTCConfiguration.bundlePolicy"/>
     public enum RTCBundlePolicy : int
@@ -150,7 +150,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCDataChannel.ReadyState">RTCDataChannel.ReadyState</see>.
+    /// Please check the <see cref="RTCDataChannel.ReadyState"> in the <see cref="RTCDataChannel"/> class.
     /// </summary>
     /// <seealso cref="RTCDataChannel.ReadyState"/>
     public enum RTCDataChannelState
@@ -191,7 +191,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Please check the <see cref="RTCIceServer.credentialType"> in the <see cref="RTCIceServer"/> struct.
     /// </summary>
     /// <seealso cref="RTCIceServer.credentialType"/>
     public enum RTCIceCredentialType
@@ -203,7 +203,7 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="RTCConfiguration.iceServers"/>
+    /// <seealso cref="RTCConfiguration"/>
     [Serializable]
     public struct RTCIceServer
     {
@@ -218,7 +218,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Please check the <see cref="RTCConfiguration.iceTransportPolicy"> in the <see cref="RTCConfiguration"/> class.
     /// </summary>
     /// <seealso cref="RTCConfiguration.iceTransportPolicy"/>
     public enum RTCIceTransportPolicy : int
@@ -236,6 +236,8 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
+    /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
+    /// <seealso cref="RTCPeerConnection.SetConfiguration(ref RTCConfiguration)"/>
     [Serializable]
     public struct RTCConfiguration
     {
