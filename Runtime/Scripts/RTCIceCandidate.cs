@@ -23,8 +23,9 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Enumerated type to specify a ICE component.
     /// </summary>
+    /// <seealso cref="RTCIceCandidate"/>
     public enum RTCIceComponent : int
     {
         /// <summary>

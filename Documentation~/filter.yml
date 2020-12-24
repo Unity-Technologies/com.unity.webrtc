@@ -1,0 +1,4 @@
+apiRules:
+  - include:
+      uidRegex: ^Unity\.WebRTC
+      type: Namespace
