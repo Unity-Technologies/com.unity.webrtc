@@ -139,10 +139,9 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// <see cref="RTCConfiguration.bundlePolicy"/>
+    /// Please check the <see cref="RTCConfiguration.bundlePolicy">RTCConfiguration.bundlePolicy</see>.
     /// </summary>
     /// <seealso cref="RTCConfiguration.bundlePolicy"/>
-    /// <see cref="RTCConfiguration.bundlePolicy"/>
     public enum RTCBundlePolicy : int
     {
         BundlePolicyBalanced = 0,
@@ -151,7 +150,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Please check the <see cref="RTCDataChannel.ReadyState">RTCDataChannel.ReadyState</see>.
     /// </summary>
     /// <seealso cref="RTCDataChannel.ReadyState"/>
     public enum RTCDataChannelState
