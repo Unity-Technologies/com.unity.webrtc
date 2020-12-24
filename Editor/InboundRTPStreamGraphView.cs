@@ -1,8 +1,8 @@
-﻿using UnityEngine.UIElements;
+using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public class InboundRTPStreamGraphView
+    internal class InboundRTPStreamGraphView
     {
         private GraphView firCountGraph = new GraphView("firCount");
         private GraphView pliCountGraph = new GraphView("pliCount");

@@ -1,8 +1,8 @@
-﻿using UnityEngine.UIElements;
+using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public class CandidatePairGraphView
+    internal class CandidatePairGraphView
     {
         private GraphView bytesSentGraph = new GraphView("bytesSent");
         private GraphView bytesReceivedGraph = new GraphView("bytesReceived");

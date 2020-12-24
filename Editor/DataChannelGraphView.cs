@@ -1,8 +1,8 @@
-﻿using UnityEngine.UIElements;
+using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public class DataChannelGraphView
+    internal class DataChannelGraphView
     {
         private GraphView messageSentGraph = new GraphView("messageSent");
         private GraphView bytesSentGraph = new GraphView("bytesSent");
