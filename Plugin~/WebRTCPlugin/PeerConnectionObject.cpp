@@ -243,19 +243,6 @@ namespace webrtc
         connection->CreateAnswer(this, _options);
     }
 
-    void PeerConnectionObject::AddIceCandidate(const RTCIceCandidate& candidate)
-    {
-        if(connection.get() == nullptr) {
-            LogPrint("peer connection is not initialized %d", this);
-            return;
-        }
-
-        webrtc::SdpParseError error;
-        const std::unique_ptr<webrtc::IceCandidateInterface> _candidate(
-            webrtc::CreateIceCandidate(candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate, &error));
-        connection->AddIceCandidate(_candidate.get());
-    }
-
     void PeerConnectionObject::ReceiveStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
     {
         context.AddStatsReport(report);

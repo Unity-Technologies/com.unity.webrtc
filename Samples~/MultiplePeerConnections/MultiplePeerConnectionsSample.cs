@@ -99,15 +99,15 @@ public class MultiplePeerConnectionsSample : MonoBehaviour
         pc1Local = new RTCPeerConnection(ref configuration);
         pc1Remote = new RTCPeerConnection(ref configuration);
         pc1Remote.OnTrack = e => receiveVideoStream1.AddTrack(e.Track);
-        pc1Local.OnIceCandidate = candidate => pc1Remote.AddIceCandidate(ref candidate);
-        pc1Remote.OnIceCandidate = candidate => pc1Local.AddIceCandidate(ref candidate);
+        pc1Local.OnIceCandidate = candidate => pc1Remote.AddIceCandidate(candidate);
+        pc1Remote.OnIceCandidate = candidate => pc1Local.AddIceCandidate(candidate);
         Debug.Log("pc1: created local and remote peer connection object");
 
         pc2Local = new RTCPeerConnection(ref configuration);
         pc2Remote = new RTCPeerConnection(ref configuration);
         pc2Remote.OnTrack = e => receiveVideoStream2.AddTrack(e.Track);
-        pc2Local.OnIceCandidate = candidate => pc2Remote.AddIceCandidate(ref candidate);
-        pc2Remote.OnIceCandidate = candidate => pc2Local.AddIceCandidate(ref candidate);
+        pc2Local.OnIceCandidate = candidate => pc2Remote.AddIceCandidate(candidate);
+        pc2Remote.OnIceCandidate = candidate => pc2Local.AddIceCandidate(candidate);
         Debug.Log("pc2: created local and remote peer connection object");
 
         foreach (var track in sourceVideoStream.GetTracks())

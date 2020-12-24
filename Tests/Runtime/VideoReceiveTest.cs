@@ -103,8 +103,8 @@ namespace Unity.WebRTC.RuntimeTest
 
         private static IEnumerator SignalingPeers(RTCPeerConnection offerPc, RTCPeerConnection answerPc)
         {
-            offerPc.OnIceCandidate = candidate => answerPc.AddIceCandidate(ref candidate);
-            answerPc.OnIceCandidate = candidate => offerPc.AddIceCandidate(ref candidate);
+            offerPc.OnIceCandidate = candidate => answerPc.AddIceCandidate(candidate);
+            answerPc.OnIceCandidate = candidate => offerPc.AddIceCandidate(candidate);
 
             var offerOption = new RTCOfferOptions {offerToReceiveVideo = true};
             var answerOption = new RTCAnswerOptions {iceRestart = false};

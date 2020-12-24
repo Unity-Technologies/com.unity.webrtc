@@ -503,8 +503,8 @@ namespace Unity.WebRTC.RuntimeTest
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
 
-            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(ref candidate); };
-            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(ref candidate); };
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
             MediaStream stream = Audio.CaptureStream();
             peer1.AddTrack(stream.GetTracks().First());

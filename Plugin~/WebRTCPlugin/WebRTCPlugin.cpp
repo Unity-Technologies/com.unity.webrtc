@@ -810,9 +810,81 @@ extern "C"
         context->GetObserver(obj->connection)->RegisterDelegateOnFailure(onFailure);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionAddIceCandidate(PeerConnectionObject* obj, const RTCIceCandidate* candidate)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionAddIceCandidate(PeerConnectionObject* obj, const IceCandidateInterface* candidate)
     {
-        return obj->AddIceCandidate(*candidate);
+        return obj->connection->AddIceCandidate(candidate);
+    }
+
+    struct RTCIceCandidateInit
+    {
+        char* candidate;
+        char* sdpMid;
+        int32_t sdpMLineIndex;
+    };
+
+    struct Candidate
+    {
+        char* candidate;
+        int32_t component;
+        char* foundation;
+        char* ip;
+        uint16_t port;
+        uint32_t priority;
+        char* address;
+        char* protocol;
+        char* relatedAddress;
+        uint16_t relatedPort;
+        char* tcpType;
+        char* type;
+        char* usernameFragment;
+
+        Candidate& operator =(const cricket::Candidate& obj)
+        {
+            candidate = ConvertString(obj.ToString());
+            component = obj.component();
+            foundation = ConvertString(obj.foundation());
+            ip = ConvertString(obj.address().ipaddr().ToString());
+            port = obj.address().port();
+            priority = obj.priority();
+            address = ConvertString(obj.address().ToString());
+            protocol = ConvertString(obj.protocol());
+            relatedAddress = ConvertString(obj.related_address().ToString());
+            relatedPort = obj.related_address().port();
+            tcpType = ConvertString(obj.tcptype());
+            type = ConvertString(obj.type());
+            usernameFragment = ConvertString(obj.username());
+            return *this;
+        }
+    };
+
+    UNITY_INTERFACE_EXPORT RTCErrorType CreateIceCandidate(const RTCIceCandidateInit* options, IceCandidateInterface** candidate)
+    {
+        SdpParseError error;
+        IceCandidateInterface* _candidate = CreateIceCandidate(options->sdpMid, options->sdpMLineIndex, options->candidate, &error);
+        if (_candidate == nullptr)
+            return RTCErrorType::INVALID_PARAMETER;
+        *candidate = _candidate;
+        return RTCErrorType::NONE;
+    }
+
+    UNITY_INTERFACE_EXPORT void DeleteIceCandidate(IceCandidateInterface* candidate)
+    {
+        delete candidate;
+    }
+
+    UNITY_INTERFACE_EXPORT void IceCandidateGetCandidate(const IceCandidateInterface* candidate, Candidate* dst)
+    {
+        *dst = candidate->candidate();
+    }
+
+    UNITY_INTERFACE_EXPORT int32_t IceCandidateGetSdpLineIndex(const IceCandidateInterface* candidate)
+    {
+        return candidate->sdp_mline_index();
+    }
+
+    UNITY_INTERFACE_EXPORT const char* IceCandidateGetSdpMid(const IceCandidateInterface* candidate)
+    {
+        return ConvertString(candidate->sdp_mid());
     }
 
     UNITY_INTERFACE_EXPORT RTCPeerConnectionState PeerConnectionState(PeerConnectionObject* obj)
