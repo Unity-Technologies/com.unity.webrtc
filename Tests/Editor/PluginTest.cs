@@ -1,13 +1,13 @@
-﻿using UnityEngine;           // RuntimePlatform
+using UnityEngine;           // RuntimePlatform
 using System.Diagnostics;    // Process
 using System.Linq;
 using UnityEngine.TestTools; // UnityPlatform
 using NUnit.Framework;       // Assert
 using UnityEditor;
 
-namespace Unity.WebRTC.Editor {
+namespace Unity.WebRTC.EditorTest {
 
-public class PluginTest {
+class PluginTest {
 
     /// <todo>
     /// This test is only supported on Linux Editor, OSX Editor
@@ -49,4 +49,4 @@ public class PluginTest {
 
 }
 
-} //namespace Unity.WebRTC.Editor
+} //namespace Unity.WebRTC.EditorTest

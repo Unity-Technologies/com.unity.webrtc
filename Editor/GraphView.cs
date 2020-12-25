@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public class GraphView
+    internal class GraphView
     {
         private const float GraphWidth = 200f;
         private const float GraphHeight = 100f;

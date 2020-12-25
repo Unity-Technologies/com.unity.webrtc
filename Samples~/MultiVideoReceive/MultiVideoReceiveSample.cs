@@ -5,7 +5,7 @@ using UnityEngine;
 using Unity.WebRTC;
 using UnityEngine.UI;
 
-public class MultiVideoReceiveSample : MonoBehaviour
+class MultiVideoReceiveSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Button callButton;

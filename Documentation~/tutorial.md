@@ -56,10 +56,10 @@ An ICE (Interactive Connectivity Establishment) exchange is required to establis
 
 ```CSharp
 localConnection.OnIceCandidate = e => { !string.IsNullOrEmpty(e.candidate)
-        || remoteConnection.AddIceCandidate(ref e); }
+        || remoteConnection.AddIceCandidate(e); }
 
 remoteConnection.OnIceCandidate = e => { !string.IsNullOrEmpty(e.candidate)
-        || localConnection.AddIceCandidate(ref e); }
+        || localConnection.AddIceCandidate(e); }
 
 ```
 

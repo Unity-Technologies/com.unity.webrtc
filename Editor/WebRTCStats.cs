@@ -5,18 +5,17 @@ using System.IO;
 using System.Linq;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
-using UnityEditor.Experimental;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public delegate void OnPeerListHandler(IEnumerable<WeakReference<RTCPeerConnection>> peerList);
+    internal delegate void OnPeerListHandler(IEnumerable<WeakReference<RTCPeerConnection>> peerList);
 
-    public delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
+    internal delegate void OnStatsReportHandler(RTCPeerConnection peer, RTCStatsReport statsReport);
 
-    public class WebRTCStats : EditorWindow
+    internal class WebRTCStats : EditorWindow
     {
         [MenuItem("Window/Analysis/WebRTC Stats")]
         public static void Init()
@@ -180,7 +179,7 @@ namespace Unity.WebRTC.Editor
         }
     }
 
-    public class PeerConnectionRecord
+    internal class PeerConnectionRecord
     {
         private readonly RTCConfiguration m_config;
         private readonly Dictionary<string, StatsRecord> m_statsRecordMap;
@@ -215,7 +214,7 @@ namespace Unity.WebRTC.Editor
         }
     }
 
-    public class StatsRecord
+    internal class StatsRecord
     {
         private const int MAX_BUFFER_SIZE = 1000;
         private readonly Dictionary<string, List<(long timeStamp, object value)>> m_memberRecord;

@@ -9,12 +9,19 @@ using UnityEngine.Rendering;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="WebRTC.Initialize(EncoderType)"/>
     public enum EncoderType
     {
         Software = 0,
         Hardware = 1
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum RTCErrorDetailType
     {
         DataChannelFailure,
@@ -40,6 +47,10 @@ namespace Unity.WebRTC
         public string message;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCPeerConnection.ConnectionState"/>
     public enum RTCPeerConnectionState : int
     {
         New = 0,
@@ -50,6 +61,10 @@ namespace Unity.WebRTC
         Closed = 5
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCPeerConnection.IceConnectionState"/>
     public enum RTCIceConnectionState : int
     {
         New = 0,
@@ -62,6 +77,10 @@ namespace Unity.WebRTC
         Max =7
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCPeerConnection.GatheringState"/>
     public enum RTCIceGatheringState : int
     {
         New = 0,
@@ -69,6 +88,10 @@ namespace Unity.WebRTC
         Complete = 2
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCPeerConnection.SignalingState"/>
     public enum RTCSignalingState : int
     {
         Stable = 0,
@@ -79,6 +102,9 @@ namespace Unity.WebRTC
         Closed = 5
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum RTCErrorType
     {
         None,
@@ -112,6 +138,10 @@ namespace Unity.WebRTC
         Rollback
     }
 
+    /// <summary>
+    /// Please check the <see cref="RTCConfiguration.bundlePolicy"/> in the <see cref="RTCConfiguration"/> class.
+    /// </summary>
+    /// <seealso cref="RTCConfiguration.bundlePolicy"/>
     public enum RTCBundlePolicy : int
     {
         BundlePolicyBalanced = 0,
@@ -119,6 +149,10 @@ namespace Unity.WebRTC
         BundlePolicyMaxCompat = 2
     }
 
+    /// <summary>
+    /// Please check the <see cref="RTCDataChannel.ReadyState"> in the <see cref="RTCDataChannel"/> class.
+    /// </summary>
+    /// <seealso cref="RTCDataChannel.ReadyState"/>
     public enum RTCDataChannelState
     {
         Connecting,
@@ -127,6 +161,9 @@ namespace Unity.WebRTC
         Closed
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public struct RTCSessionDescription
     {
         public RTCSdpType type;
@@ -134,6 +171,9 @@ namespace Unity.WebRTC
         public string sdp;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public struct RTCOfferOptions
     {
         [MarshalAs(UnmanagedType.U1)]
@@ -150,12 +190,20 @@ namespace Unity.WebRTC
         public bool iceRestart;
     }
 
+    /// <summary>
+    /// Please check the <see cref="RTCIceServer.credentialType"> in the <see cref="RTCIceServer"/> struct.
+    /// </summary>
+    /// <seealso cref="RTCIceServer.credentialType"/>
     public enum RTCIceCredentialType
     {
         Password,
         OAuth
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCConfiguration"/>
     [Serializable]
     public struct RTCIceServer
     {
@@ -170,8 +218,9 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Please check the <see cref="RTCConfiguration.iceTransportPolicy"> in the <see cref="RTCConfiguration"/> class.
     /// </summary>
+    /// <seealso cref="RTCConfiguration.iceTransportPolicy"/>
     public enum RTCIceTransportPolicy : int
     {
         /// <summary>
@@ -184,15 +233,35 @@ namespace Unity.WebRTC
         All = 3
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
+    /// <seealso cref="RTCPeerConnection.SetConfiguration(ref RTCConfiguration)"/>
     [Serializable]
     public struct RTCConfiguration
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCIceServer[] iceServers;
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCIceTransportPolicy iceTransportPolicy;
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCBundlePolicy bundlePolicy;
+        /// <summary>
+        /// 
+        /// </summary>
         public int iceCandidatePoolSize;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum CodecInitializationResult
     {
         NotInitialized,

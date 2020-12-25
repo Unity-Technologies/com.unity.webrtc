@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Unity.WebRTC.RuntimeTest
 {
 
-    public class IntPtrTest
+    class IntPtrTest
     {
         [Test]
         public void AsAnsiStringWithFreeMemThrowException()

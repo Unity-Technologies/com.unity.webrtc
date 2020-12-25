@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public class PeerStatsView
+    internal class PeerStatsView
     {
         private readonly WebRTCStats m_parent;
         private readonly RTCPeerConnection m_peerConnection;

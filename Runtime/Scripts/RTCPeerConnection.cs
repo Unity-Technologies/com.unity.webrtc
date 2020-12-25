@@ -188,6 +188,10 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <seealso cref="GatheringState"/>
         public DelegateOnIceGatheringStateChange OnIceGatheringStateChange
         {
             private get => onIceGatheringStateChange;
@@ -213,6 +217,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
+        /// <seealso cref="RTCDataChannel"/>
         public DelegateOnDataChannel OnDataChannel
         {
             private get => onDataChannel;
@@ -237,6 +242,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
+        /// <seealso cref="RTCTrackEvent"/>
         public DelegateOnTrack OnTrack
         {
             private get => onTrack;
@@ -504,6 +510,11 @@ namespace Unity.WebRTC
             return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(self, track.self), this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(TrackKind kind)
         {
             return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiverWithType(self, kind), this);

@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    public class VideoReceiveTest
+    class VideoReceiveTest
     {
         [SetUp]
         public void SetUp()

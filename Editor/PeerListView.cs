@@ -1,12 +1,12 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public delegate void OnChangeSelectPeerHandler(RTCPeerConnection peer);
+    internal delegate void OnChangeSelectPeerHandler(RTCPeerConnection peer);
 
-    public class PeerListView
+    internal class PeerListView
     {
         private static readonly Color ButtonBackground = new Color(70 / 255f, 70 / 255f, 70 / 255f);
 

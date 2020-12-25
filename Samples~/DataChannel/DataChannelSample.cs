@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using Unity.WebRTC;
 using System;
 
-public class DataChannelSample : MonoBehaviour
+class DataChannelSample : MonoBehaviour
 {
     #pragma warning disable 0649
     [SerializeField] private Button callButton;

@@ -23,22 +23,22 @@ This version of the package is compatible with the following versions of the Uni
 | Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
 | Linux x64   | Vulkan       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
 | MacOS       | Metal        | :white_check_mark:                              	                                                                        | :white_check_mark: |
-| iOS         | Metal        |                               	                                                                                        |                    |
+| iOS         | Metal        | :white_check_mark:                              	                                                                        | :white_check_mark: | 
 | Android     | Vulkan       |                               	                                                                                        |                    |
 
 ### Decoder support
 
 | Platform    | Graphics API | Hardware Decoder                                                                                                         | Software Decoder   |
-| ----------- | ------------ | -- | ------------------ |
-| Windows x64 | DirectX11    |    | :white_check_mark: | 
-| Windows x64 | DirectX12    |    | :white_check_mark: | 
-| Windows x64 | OpenGL       |    | :white_check_mark: |
-| Windows x64 | Vulkan       |    | :white_check_mark: | 
-| Linux x64   | OpenGL       |    | :white_check_mark: |
-| Linux x64   | Vulkan       |    | :white_check_mark: |
-| MacOS       | Metal        |    | :white_check_mark: |
-| iOS         | Metal        |    |                    |
-| Android     | Vulkan       |    |                    |
+| ----------- | ------------ | ------------------ | ------------------ |
+| Windows x64 | DirectX11    |                    | :white_check_mark: | 
+| Windows x64 | DirectX12    |                    | :white_check_mark: | 
+| Windows x64 | OpenGL       |                    | :white_check_mark: |
+| Windows x64 | Vulkan       |                    | :white_check_mark: | 
+| Linux x64   | OpenGL       |                    | :white_check_mark: |
+| Linux x64   | Vulkan       |                    | :white_check_mark: |
+| MacOS       | Metal        | :white_check_mark: | :white_check_mark: |
+| iOS         | Metal        | :white_check_mark: | :white_check_mark: |
+| Android     | Vulkan       |                    |                    |
 
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
@@ -71,7 +71,8 @@ The package contains the following samples.
 | VideoReceive            | Sending and receiving video stream             |
 | MultiVideoReceive       | Receiving multiple video streams with one peer |
 | MultiplePeerConnections | Receiving video stream with multiple peers     |
-
+| ChangeCodecs            | Controlling codecs of the video sender         |
+| TricleIce               | Checking the trickle ICE functionality         |
 
 To get these samples, Push the `Import into Project` button on Package Manager.
 

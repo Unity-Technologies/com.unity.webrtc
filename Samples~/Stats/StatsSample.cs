@@ -6,7 +6,7 @@ using Unity.WebRTC;
 using System;
 using System.Linq;
 
-public class StatsSample : MonoBehaviour
+class StatsSample : MonoBehaviour
 {
     #pragma warning disable 0649
     [SerializeField] private Button callButton;

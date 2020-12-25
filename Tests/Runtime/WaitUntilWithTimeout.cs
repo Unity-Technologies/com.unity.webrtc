@@ -1,30 +1,33 @@
 using UnityEngine;
 
-public class WaitUntilWithTimeout : CustomYieldInstruction
+namespace Unity.WebRTC.RuntimeTest
 {
-    public bool IsCompleted { get; private set; }
-
-    private readonly float timeoutTime;
-
-    private readonly System.Func<bool> predicate;
-
-    public override bool keepWaiting
+    internal class WaitUntilWithTimeout : CustomYieldInstruction
     {
-        get
+        public bool IsCompleted { get; private set; }
+
+        private readonly float timeoutTime;
+
+        private readonly System.Func<bool> predicate;
+
+        public override bool keepWaiting
         {
-            IsCompleted = predicate();
-            if (IsCompleted)
+            get
             {
-                return false;
+                IsCompleted = predicate();
+                if (IsCompleted)
+                {
+                    return false;
+                }
+
+                return !(Time.realtimeSinceStartup >= timeoutTime);
             }
-
-            return !(Time.realtimeSinceStartup >= timeoutTime);
         }
-    }
 
-    public WaitUntilWithTimeout(System.Func<bool> predicate, int timeout)
-    {
-        this.timeoutTime = Time.realtimeSinceStartup + timeout * 0.001f;
-        this.predicate = predicate;
+        public WaitUntilWithTimeout(System.Func<bool> predicate, int timeout)
+        {
+            this.timeoutTime = Time.realtimeSinceStartup + timeout * 0.001f;
+            this.predicate = predicate;
+        }
     }
 }

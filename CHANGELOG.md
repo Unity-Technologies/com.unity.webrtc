@@ -4,6 +4,39 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2020-12-28
+
+### Added 
+
+- iOS platform support
+- H.264 HW decoder (VideoToolbox) support on macOS
+- Added `GetCapabilities` method to the `RTCRtpSender` class and the `RTCRtpReceiver` class
+- Added `SetCodecPreferences` method to the `RTCRtpTransceiver` class.
+- Added two samples (`ChangeCodecs`, `TrickleIce`)
+- Added properties to the `RTCIceCandidate` class 
+- Added properties tp the `RTCDataChannelInit` class
+
+### Changed
+
+- Changed `RTCIceCandidate` type from `struct` to `class`
+- Changed `RTCIceCandidateInit` type from `struct` to `class`
+- Changed `RTCDataChannelInit` type from `struct` to `class`
+- Changed argumments of the `RTCPeerConnection.AddIceCandidate` method
+```csharp
+// old
+public void AddIceCandidate(ref RTCIceCandidate candidate);
+// new
+public bool AddIceCandidate(RTCIceCandidate candidate);
+```
+
+- Changed arguments of the `RTCPeerConnection.CreateDataChannel` method
+```csharp
+// old
+public RTCDataChannel CreateDataChannel(string label, ref RTCDataChannelInit options);
+// new
+public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options = null);
+```
+
 ## [2.2.1] - 2020-11-13
 
 ### Added

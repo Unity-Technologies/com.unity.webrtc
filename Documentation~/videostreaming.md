@@ -30,7 +30,7 @@ In this case, `VP8` or `VP9` can be used as a codec.
 > Currently, HardwareDecoder is not supported.
 > We plan about HardwareDecoder support in 2.x release.
 
-## <a id="videotrack"/> Video Track
+## Video Track
 
 To implement video streaming, create a
  `VideoStreamTrack` instance.
@@ -53,7 +53,7 @@ var rt = new RenderTexture(width, height, 0, format);
 var track = new VideoStreamTrack("video", renderTexture);
 ```
 
-### <a id="add-track"/> Add Track
+### Add Track
 
 Add the created video track to the `PeerConnection` instance. The track can be added by calling the `AddTrack` method. Next, call the `PeerConnection`'s `CreateOffer` or `CreateAnswer` to create an SDP.
 
@@ -67,7 +67,7 @@ var op = pc.CreateAnswer(ref options);
 yield return op;
 ```
 
-### <a id="multi-track"/> Multi track
+### Multi track
 
 It's possible to use multiple video tracks simultaneously. Simply call the `PeerConnection`'s `AddTrack` method multiple times and add the tracks. 
 

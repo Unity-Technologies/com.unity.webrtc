@@ -1,8 +1,8 @@
-﻿using UnityEngine.UIElements;
+using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
-    public class MediaSourceGraphView
+    internal class MediaSourceGraphView
     {
         private GraphView widthGraph = new GraphView("width");
         private GraphView heightGraph = new GraphView("height");
