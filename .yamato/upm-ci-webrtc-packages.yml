@@ -440,8 +440,8 @@ publish_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
 
 publish_dry_run_{{ package.name }}:
   name: Publish Dry Run {{ package.packagename }}
