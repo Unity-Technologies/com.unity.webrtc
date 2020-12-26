@@ -1,6 +1,9 @@
 {
     "name": "Unity.WebRTC",
-    "references": [],
+    "rootNamespace": "",
+    "references": [
+        "GUID:b46779583a009f04ba9f5f31d0e7e6ac"
+    ],
     "includePlatforms": [
         "Android",
         "Editor",
@@ -15,6 +18,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.profiling.core",
+            "expression": "1.0.0-pre",
+            "define": "UNITY_WEBRTC_ENABLE_PROFILING_CORE"
+        }
+    ],
     "noEngineReferences": false
 }
