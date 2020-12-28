@@ -60,14 +60,35 @@ namespace webrtc
             webrtc::H264::kProfileConstrainedBaseline,
             webrtc::H264::kLevel5_1, "1") };
 #else
+        bool h264EncoderFound = false;
         auto formats = internal_encoder_factory_->GetSupportedFormats();
         std::vector<webrtc::SdpVideoFormat> filtered;
         std::copy_if(formats.begin(), formats.end(), std::back_inserter(filtered),
-            [](webrtc::SdpVideoFormat format) {
-                if(format.name.find("H264") == std::string::npos)
+            [&h264EncoderFound](webrtc::SdpVideoFormat format) {
+                if(format.name.find("H264") != std::string::npos)
+                {
+                    h264EncoderFound = true;
+                    // On iOS, WebRTC's Apple H264 encoder backend tries to keep up maintaining a list of device
+                    // specific max profiles, but on a Mac it's defaulting to baseline/high profile at @ Level 3.1,
+                    // which is not enough for meaningful streaming situations
+                    //
+                    // Regardless of the internal encoder factory, just filter them out and introduce your own
+                    //
+                    // Codec name: H264, parameters: { level-asymmetry-allowed=1 packetization-mode=1 profile-level-id=640c1f }
+                    // Codec name: H264, parameters: { level-asymmetry-allowed=1 packetization-mode=1 profile-level-id=42e01f }
                     return false;
+                }
                 return true;
             });
+
+        if (h264EncoderFound == true)
+        {
+            // While most decoders should be just fine with High profile these days, we're advertising kProfileConstrainedBaseline
+            // in the SDP for maximum browser compatibility, some browsers have issues picking up other profiles before decoding work
+            webrtc::SdpVideoFormat h264 = webrtc::CreateH264Format(webrtc::H264::kProfileConstrainedBaseline, webrtc::H264::kLevel5_1, "1");
+            filtered.insert(filtered.begin(), h264);
+        }
+
         return filtered;
 #endif
     }

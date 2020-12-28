@@ -21,6 +21,10 @@
 #include "NvCodec/NvEncoderCuda.h"
 #endif
 
+#if defined(SUPPORT_METAL)
+#include "VideoToolboxCodec/VideoToolboxEncoder.h"
+#endif
+
 #include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
@@ -111,7 +115,7 @@ namespace webrtc
 #endif            
 #if SUPPORT_METAL
             case GRAPHICS_DEVICE_METAL: {
-                encoder = std::make_unique<SoftwareEncoder>(width, height, device, textureFormat);
+                encoder = std::make_unique<VideoToolboxEncoder>(width, height, device, textureFormat);
                 break;
             }
 #endif            

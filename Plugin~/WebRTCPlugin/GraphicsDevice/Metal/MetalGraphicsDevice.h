@@ -24,7 +24,7 @@ namespace webrtc
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         inline virtual GraphicsDeviceType GetDeviceType() const override;
-        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override { return nullptr; };
 
         
     private:

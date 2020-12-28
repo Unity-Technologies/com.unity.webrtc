@@ -2,7 +2,6 @@
 #include "MetalGraphicsDevice.h"
 #include "MetalTexture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
-#import <Metal/Metal.h>
 
 namespace unity
 {
@@ -110,50 +109,33 @@ namespace webrtc
 //---------------------------------------------------------------------------------------------------------------------
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
-        MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
-        textureDescriptor.width = width;
-        textureDescriptor.height = height;
-        if (@available(macOS 10.14, iOS 12.0, *)) {
-            textureDescriptor.allowGPUOptimizedContents = false;
-        } else {
-            // Fallback on earlier versions
+        OSType pixelFormat = kCVPixelFormatType_32BGRA;
+        CVPixelBufferRef pixelBuffer = NULL;
+        CVMetalTextureCacheRef textureCache = NULL;
+        CVMetalTextureRef textureRef = NULL;
+
+        CVReturn err = CVMetalTextureCacheCreate(kCFAllocatorDefault, NULL, m_device, NULL, &textureCache);
+        NSCAssert(err == kCVReturnSuccess, @"CVMetalTextureCacheCreate failed: %d", err);
+
+        NSDictionary *attrs = @{
+            (id) kCVPixelBufferMetalCompatibilityKey: @YES,
+        };
+
+        CFDictionaryRef cfAttrs = (__bridge_retained CFDictionaryRef) attrs;
+        err = CVPixelBufferCreate(kCFAllocatorDefault, width, height, pixelFormat, cfAttrs, &pixelBuffer);
+        CFRelease(cfAttrs);
+        NSCAssert(err == kCVReturnSuccess, @"CVPixelBufferCreate failed: %d", err);
+
+        OSType bufferPixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
+        NSCAssert(pixelFormat == bufferPixelFormat, @"wrong pixel format: %u", (unsigned int) bufferPixelFormat);
+
+        err = CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, pixelBuffer, NULL, ConvertFormat(textureFormat), width, height, 0, &textureRef);
+        if (!textureRef || err) {
+            NSLog(@"CVMetalTextureCacheCreateTextureFromImage failed (error: %d)", err);
         }
-#if TARGET_OS_OSX
-        textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeManaged);
-#else
-        textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeShared);
-#endif
-        id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
-        return new MetalTexture2D(width, height, texture);
+        NSCAssert(err == kCVReturnSuccess, @"CVMetalTextureCacheCreateTextureFromImage failed: %d", err);
 
-    }
-
-//---------------------------------------------------------------------------------------------------------------------
-    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex){
-        id<MTLTexture> nativeTex = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
-        if (nil == nativeTex)
-            return nullptr;
-
-        const uint32_t BYTES_PER_PIXEL = 4;        
-        const uint32_t width  = tex->GetWidth();
-        const uint32_t height = tex->GetHeight();
-        const uint32_t bytesPerRow = width * BYTES_PER_PIXEL;
-        const uint32_t bufferSize = bytesPerRow * height;
-
-        std::vector<uint8_t> buffer;
-        buffer.resize(bufferSize);
-        
-        [nativeTex getBytes:buffer.data()
-            bytesPerRow:bytesPerRow
-            fromRegion:MTLRegionMake2D(0,0,width,height)
-            mipmapLevel:0];
-
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-            width, height,
-            bytesPerRow, buffer.data()
-        );
-        return i420_buffer;
+        return new MetalTexture2D(width, height, CVMetalTextureGetTexture(textureRef), pixelBuffer, textureCache, textureRef);
     }
 
 //---------------------------------------------------------------------------------------------------------------------
