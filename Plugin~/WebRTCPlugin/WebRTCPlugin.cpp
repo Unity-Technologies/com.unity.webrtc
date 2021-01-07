@@ -887,6 +887,14 @@ extern "C"
         return candidate->sdp_mline_index();
     }
 
+    UNITY_INTERFACE_EXPORT const char* IceCandidateGetSdp(const IceCandidateInterface* candidate)
+    {
+        std::string str;
+        if (!candidate->ToString(&str))
+            return nullptr;
+        return ConvertString(str);
+    }
+
     UNITY_INTERFACE_EXPORT const char* IceCandidateGetSdpMid(const IceCandidateInterface* candidate)
     {
         return ConvertString(candidate->sdp_mid());

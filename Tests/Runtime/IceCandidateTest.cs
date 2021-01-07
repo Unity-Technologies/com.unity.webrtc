@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace Unity.WebRTC.RuntimeTest
@@ -21,6 +22,13 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("IceCandidate")]
         public void Construct()
         {
+            Assert.Throws<ArgumentException>(() => new RTCIceCandidate());
+        }
+
+        [Test]
+        [Category("IceCandidate")]
+        public void ConstructWithOption()
+        {
             var option = new RTCIceCandidateInit
             {
                 sdpMid = "0",
@@ -30,6 +38,9 @@ namespace Unity.WebRTC.RuntimeTest
             };
             var candidate = new RTCIceCandidate(option);
             Assert.IsNotEmpty(candidate.Candidate);
+            Assert.AreEqual(candidate.Candidate, option.candidate);
+            Assert.AreEqual(candidate.SdpMLineIndex, option.sdpMLineIndex);
+            Assert.AreEqual(candidate.SdpMid, option.sdpMid);
             Assert.AreEqual(RTCIceComponent.Rtp, candidate.Component);
             Assert.IsNotEmpty(candidate.Foundation);
             Assert.NotNull(candidate.Port);
