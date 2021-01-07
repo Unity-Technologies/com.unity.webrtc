@@ -154,7 +154,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public string Candidate => _candidate.candidate;
+        public string Candidate => NativeMethods.IceCandidateGetSdp(self);
         /// <summary>
         /// 
         /// </summary>
@@ -245,10 +245,17 @@ namespace Unity.WebRTC
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
+            if(candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
+                throw new ArgumentException("sdpMid and sdpMLineIndex are both null");
+
             RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
             RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
             if (error != RTCErrorType.None)
-                throw new ArgumentException();
+                throw new ArgumentException(
+                        $"create candidate is failed. error type:{error}, " +
+                        $"sdpMid:{candidateInfo.candidate}\n" +
+                        $"sdpMid:{candidateInfo.sdpMid}\n" +
+                        $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
 
             NativeMethods.IceCandidateGetCandidate(self, out _candidate);
         }
