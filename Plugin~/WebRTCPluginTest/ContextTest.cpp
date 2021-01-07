@@ -89,7 +89,7 @@ TEST_P(ContextTest, CreateAndDeletePeerConnection) {
 TEST_P(ContextTest, CreateAndDeleteDataChannel) {
     const webrtc::PeerConnectionInterface::RTCConfiguration config;
     const auto connection = context->CreatePeerConnection(config);
-    RTCDataChannelInit init;
+    DataChannelInit init;
     init.protocol = "";
     const auto channel = context->CreateDataChannel(connection, "test", init);
     context->DeleteDataChannel(channel);
