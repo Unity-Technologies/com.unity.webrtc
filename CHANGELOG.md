@@ -4,6 +4,12 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2021-01-07
+
+### Fixed
+
+- Fixed `RTCIceCandidate.candidate` property in order to return a correct SDP formatted string
+
 ## [2.3.0] - 2020-12-28
 
 ### Added 
