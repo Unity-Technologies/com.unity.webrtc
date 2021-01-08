@@ -167,7 +167,7 @@ test_webrtc_plugin_{{ platform.name }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
-    - {{ platform.build_command }}
+    - {{ platform.test_command }}
 {% endfor %}
 
 test_webrtc_plugin_all_platform:
