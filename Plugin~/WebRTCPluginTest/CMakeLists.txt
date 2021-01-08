@@ -23,12 +23,6 @@ if(Windows OR Linux)
   add_subdirectory(NvCodec)
 endif()
 
-# specify gtest root directory
-#if(Windows)
-#  set(GTEST_ROOT "${CMAKE_SOURCE_DIR}/googletest")
-#  set(GMOCK_ROOT "${CMAKE_SOURCE_DIR}/googletest")
-#endif()
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -40,6 +34,7 @@ FetchContent_Declare(
 FetchContent_GetProperties(googletest)
 if(NOT googletest_POPULATED)
   FetchContent_Populate(googletest)
+
   add_subdirectory(
     ${googletest_SOURCE_DIR} 
     ${googletest_BINARY_DIR}
@@ -55,6 +50,22 @@ if(NOT iOS)
       $<TARGET_PROPERTY:gtest_main,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
       $<TARGET_PROPERTY:gmock,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
       $<TARGET_PROPERTY:gmock_main,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+  )
+  set_target_properties(gtest
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+  set_target_properties(gtest_main
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+  set_target_properties(gmock
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+  set_target_properties(gmock_main
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 else()
   set(GOOGLETEST_ROOT_DIR ${CMAKE_SOURCE_DIR}/googletest)
