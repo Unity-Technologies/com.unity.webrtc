@@ -30,7 +30,7 @@ platforms:
     image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_mac.sh
-    test_command: BuildScripts~/test _plugin_mac.sh
+    test_command: BuildScripts~/test_plugin_mac.sh
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
   - name: ios
     type: Unity::metal::macmini
