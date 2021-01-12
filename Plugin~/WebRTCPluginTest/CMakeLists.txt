@@ -23,15 +23,50 @@ if(Windows OR Linux)
   add_subdirectory(NvCodec)
 endif()
 
-# specify gtest root directory
-if(Windows)
-  set(GTEST_ROOT "${CMAKE_SOURCE_DIR}/googletest")
-  set(GMOCK_ROOT "${CMAKE_SOURCE_DIR}/googletest")
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.10.0
+)
+
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+  FetchContent_Populate(googletest)
+
+  add_subdirectory(
+    ${googletest_SOURCE_DIR} 
+    ${googletest_BINARY_DIR}
+  )
 endif()
 
+include(GoogleTest)
+
 if(NOT iOS)
-  find_package(GTest)
-  find_package(GMock)
+  target_include_directories(WebRTCLibTest
+    PRIVATE
+      $<TARGET_PROPERTY:gtest,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+      $<TARGET_PROPERTY:gtest_main,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+      $<TARGET_PROPERTY:gmock,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+      $<TARGET_PROPERTY:gmock_main,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+  )
+  set_target_properties(gtest
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+  set_target_properties(gtest_main
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+  set_target_properties(gmock
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+  set_target_properties(gmock_main
+    PROPERTIES
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
 else()
   set(GOOGLETEST_ROOT_DIR ${CMAKE_SOURCE_DIR}/googletest)
   set(GTEST_INCLUDE_DIRS
@@ -51,8 +86,6 @@ else()
   )
 endif()
 
-include(GoogleTest)
-
 if(Windows)
   # Use precompiled header
   set(CMAKE_CXX_FLAGS 
@@ -63,10 +96,10 @@ if(Windows)
       ${WEBRTC_LIBRARY}
       ${Vulkan_LIBRARY}
       ${CUDA_CUDA_LIBRARY}
-      ${GTEST_MAIN_LIBRARIES}
-      ${GTEST_LIBRARIES}
-      ${GMOCK_LIBRARIES}
       ${NVCODEC_LIBRARIES}
+      gtest
+      gmock
+      gtest_main
       d3d11
       d3d12
       dxgi
@@ -106,9 +139,9 @@ elseif(macOS)
       ${WEBRTC_LIBRARY}
       ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
-      ${GTEST_MAIN_LIBRARIES}
-      ${GTEST_LIBRARIES}
-      ${GMOCK_LIBRARIES}
+      gtest
+      gmock
+      gtest_main
       WebRTCLib
   )
   target_include_directories(WebRTCLibTest
@@ -127,11 +160,11 @@ elseif(Linux)
       ${OPENGL_opengl_LIBRARY}
       ${GLUT_LIBRARY}
       ${CMAKE_DL_LIBS}
-      ${GTEST_MAIN_LIBRARIES}
-      ${GTEST_LIBRARIES}
-      ${GMOCK_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT}
       ${Vulkan_LIBRARY}
+      gtest
+      gmock
+      gtest_main
       WebRTCLib
   )
   target_include_directories(WebRTCLibTest
@@ -156,9 +189,9 @@ elseif(iOS)
       ${WEBRTC_LIBRARY}
       ${OPENGL_LIBRARIES}
       ${FRAMEWORK_LIBS}
-      ${GTEST_MAIN_LIBRARIES}
-      ${GTEST_LIBRARIES}
-      ${GMOCK_LIBRARIES}
+      gtest
+      gmock
+      gtest_main
       WebRTCLib
   )
   target_include_directories(WebRTCLibTest
@@ -177,5 +210,4 @@ target_include_directories(WebRTCLibTest
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
-    ${GTEST_INCLUDE_DIRS}
 )

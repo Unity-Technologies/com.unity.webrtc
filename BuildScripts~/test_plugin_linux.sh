@@ -10,26 +10,18 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # Install libc++, libc++abi googletest clang glut
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
 sudo apt update
-sudo apt install -y libc++-dev libc++abi-dev googletest clang freeglut3-dev
-
-# Install googletest
-cd /usr/src/googletest
-sudo cmake -Dcxx_no_rtti=ON \
-           -DCMAKE_C_COMPILER="clang" \
-           -DCMAKE_CXX_COMPILER="clang++" \
-           -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-           CMakeLists.txt
-sudo make
-sudo cp googlemock/*.a "/usr/lib"
-sudo cp googlemock/gtest/*.a "/usr/lib"
+sudo apt install -y libc++-dev libc++abi-dev clang freeglut3-dev
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
 cmake -DCMAKE_C_COMPILER="clang" \
       -DCMAKE_CXX_COMPILER="clang++" \
       -DCMAKE_BUILD_TYPE="Debug" \
+      -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+      -Dcxx_no_rtti=ON \
+      -B "build" \
       .
-make
+cmake --build build --config Debug
 
 # Run UnitTest
-"$SOLUTION_DIR/WebRTCPluginTest/WebRTCPluginTest"
+"$SOLUTION_DIR/build/WebRTCPluginTest/WebRTCLibTest"
