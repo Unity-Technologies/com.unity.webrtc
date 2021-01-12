@@ -152,7 +152,24 @@ elseif(macOS)
 elseif(Linux)
   find_package(OpenGL REQUIRED)
   find_package(GLUT REQUIRED)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -stdlib=libc++")
+
+  target_compile_options(WebRTCLibTest
+    PUBLIC
+      -fno-lto
+      -fno-rtti
+      -stdlib=libc++
+      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
+  )
+
+  target_link_options(WebRTCLibTest
+    PUBLIC
+      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
+  )
+
+  target_compile_definitions(WebRTCLibTest
+    PRIVATE
+      $<$<CONFIG:Debug>:LEAK_SANITIZER>
+  )
 
   target_link_libraries(WebRTCLibTest
     PRIVATE

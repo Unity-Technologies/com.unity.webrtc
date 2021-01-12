@@ -17,6 +17,8 @@ class GraphicsDeviceTestBase
 public:
     GraphicsDeviceTestBase();
     virtual ~GraphicsDeviceTestBase();
+    void SetUp() override;
+    void TearDown() override;
 protected:
     void* m_pNativeGfxDevice;
     IGraphicsDevice* m_device;

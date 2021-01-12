@@ -414,6 +414,26 @@ namespace webrtc
         m_mapSetSessionDescriptionObserver.erase(connection);
     }
 
+    PeerConnectionObject* Context::CreatePeerConnection(
+            const webrtc::PeerConnectionInterface::RTCConfiguration& config)
+    {
+        rtc::scoped_refptr<PeerConnectionObject> obj =
+                new rtc::RefCountedObject<PeerConnectionObject>(*this);
+        PeerConnectionDependencies dependencies(obj);
+        obj->connection = m_peerConnectionFactory->CreatePeerConnection(
+                config, std::move(dependencies));
+        if (obj->connection == nullptr)
+            return nullptr;
+        const PeerConnectionObject* ptr = obj.get();
+        m_mapClients[ptr] = std::move(obj);
+        return m_mapClients[ptr].get();
+    }
+
+    void Context::DeletePeerConnection(PeerConnectionObject *obj)
+    {
+        m_mapClients.erase(obj);
+    }
+
     SetSessionDescriptionObserver* Context::GetObserver(webrtc::PeerConnectionInterface* connection)
     {
         return m_mapSetSessionDescriptionObserver[connection];

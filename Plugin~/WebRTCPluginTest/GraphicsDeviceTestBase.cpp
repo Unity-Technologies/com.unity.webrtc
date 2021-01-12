@@ -277,6 +277,7 @@ void DestroyDeviceVulkan(void* pGfxDevice)
 {
     UnityVulkanInstance* pVkInstance = static_cast<UnityVulkanInstance*>(pGfxDevice);
     vkDestroyDevice(pVkInstance->device, nullptr);
+    delete pVkInstance;
     pVkInstance = nullptr;
 }
 
@@ -414,10 +415,25 @@ GraphicsDeviceTestBase::GraphicsDeviceTestBase()
     m_device->InitV();
 }
 
+void GraphicsDeviceTestBase::SetUp()
+{
+#if defined(LEAK_SANITIZER)
+    __lsan_disable();
+    __lsan_enable();
+#endif
+}
+
+void GraphicsDeviceTestBase::TearDown()
+{
+#if defined(LEAK_SANITIZER)
+    ASSERT_EQ(__lsan_do_recoverable_leak_check(),0);
+#endif
+}
 
 GraphicsDeviceTestBase::~GraphicsDeviceTestBase()
 {
     m_device->ShutdownV();
+    delete m_device;
     m_device = nullptr;
     DestroyGfxDevice(m_pNativeGfxDevice, m_unityGfxRenderer);
 }
