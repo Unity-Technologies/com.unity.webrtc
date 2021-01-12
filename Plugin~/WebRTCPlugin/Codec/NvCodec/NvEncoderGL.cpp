@@ -16,6 +16,7 @@ namespace webrtc
 
     NvEncoderGL::~NvEncoderGL()
     {
+        ReleaseEncoderResources();
     }
 
     void* NvEncoderGL::AllocateInputResourceV(ITexture2D* tex) {
@@ -23,6 +24,13 @@ namespace webrtc
         pResource->texture = (GLuint)(size_t)(tex->GetEncodeTexturePtrV());
         pResource->target = GL_TEXTURE_2D;
         return pResource;
+    }
+
+    void NvEncoderGL::ReleaseInputResourceV(void* pResource)
+    {
+        NV_ENC_INPUT_RESOURCE_OPENGL_TEX* tex =
+            static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(pResource);
+        delete tex;
     }
 
 } // end namespace webrtc

@@ -14,10 +14,10 @@ namespace webrtc
 class ContextTest : public GraphicsDeviceTestBase
 {
 protected:
-    std::unique_ptr<IEncoder> encoder_;
     const int width = 256;
     const int height = 256;
     std::unique_ptr<Context> context;
+    std::unique_ptr<IEncoder> encoder_;
 
     void SetUp() override {
         GraphicsDeviceTestBase::SetUp();

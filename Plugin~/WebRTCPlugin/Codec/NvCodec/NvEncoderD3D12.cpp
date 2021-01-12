@@ -16,6 +16,7 @@ namespace webrtc
 
     NvEncoderD3D12::~NvEncoderD3D12()
     {
+        ReleaseEncoderResources();
     }
 
     void* NvEncoderD3D12::AllocateInputResourceV(ITexture2D* tex) {

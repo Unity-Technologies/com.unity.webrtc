@@ -6,7 +6,6 @@
 
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
-#include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
 
 namespace unity
 {
@@ -27,6 +26,11 @@ namespace webrtc
         device,
         textureFormat)
     {
+    }
+
+    NvEncoderCuda::~NvEncoderCuda()
+    {
+        ReleaseEncoderResources();
     }
 
     void NvEncoderCuda::InitV()
@@ -55,6 +59,5 @@ namespace webrtc
     {
         return tex->GetEncodeTexturePtrV();
     }
-
 } // end namespace webrtc
 } // end namespace unity

@@ -9,9 +9,10 @@ namespace webrtc
     class NvEncoderGL : public NvEncoder {
     public:
         NvEncoderGL(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat);
-        virtual ~NvEncoderGL();
+        ~NvEncoderGL() override;
     protected:
         virtual void* AllocateInputResourceV(ITexture2D* tex) override;
+        virtual void ReleaseInputResourceV(void* pResource) override;
     };
 
 } // end namespace webrtc
