@@ -70,11 +70,12 @@ namespace webrtc
         bool m_isNvEncoderSupported = false;
 
         virtual void* AllocateInputResourceV(ITexture2D* tex) = 0;
+        virtual void ReleaseInputResourceV(void* pResource) = 0;
 
-    private:
         void InitEncoderResources();
         void ReleaseEncoderResources();
 
+    private:
         void ReleaseFrameInputBuffer(Frame& frame);
         void ProcessEncodedFrame(Frame& frame, int64_t timestamp_us);
         NV_ENC_REGISTERED_PTR RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE type, void *pBuffer);
@@ -85,6 +86,7 @@ namespace webrtc
         NVENCSTATUS errorCode;
         Frame bufferedFrames[bufferedFrameNum];
         ITexture2D* m_renderTextures[bufferedFrameNum];
+        std::vector<void*> m_buffers;
         uint64 frameCount = 0;
         void* pEncoderInterface = nullptr;
         bool isIdrFrame = false;

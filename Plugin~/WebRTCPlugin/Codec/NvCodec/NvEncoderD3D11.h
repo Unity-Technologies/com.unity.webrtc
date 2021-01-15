@@ -10,10 +10,11 @@ namespace webrtc
     {
     public:
         NvEncoderD3D11(uint32_t nWidth, uint32_t nHeight, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFromat);
-        virtual ~NvEncoderD3D11();
+        ~NvEncoderD3D11() override;
     protected:
 
-        virtual void* AllocateInputResourceV(ITexture2D* tex) override;
+        void* AllocateInputResourceV(ITexture2D* tex) override;
+        void ReleaseInputResourceV(void* pResource) override {}
     };
 
 } // end namespace webrtc

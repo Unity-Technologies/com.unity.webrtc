@@ -16,7 +16,7 @@ namespace webrtc
 {
 
     static void* s_hModule = nullptr;
-    static std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI;
+    static std::unique_ptr<NV_ENCODE_API_FUNCTION_LIST> pNvEncodeAPI = nullptr;
 
     NvEncoder::NvEncoder(
         const NV_ENC_DEVICE_TYPE type,
@@ -56,7 +56,10 @@ namespace webrtc
         openEncodeSessionExParams.device = m_device->GetEncodeDevicePtrV();
         openEncodeSessionExParams.deviceType = m_deviceType;
         openEncodeSessionExParams.apiVersion = NVENCAPI_VERSION;
-        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &pEncoderInterface);
+
+        void* hEncoder = nullptr;
+        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &hEncoder);
+        pEncoderInterface = hEncoder;
 
         if(!NV_RESULT(errorCode))
         {
@@ -125,9 +128,6 @@ namespace webrtc
 
     NvEncoder::~NvEncoder()
     {
-        RTC_LOG(LS_INFO) << "NvEncoder destructor";
-
-        ReleaseEncoderResources();
         if (pEncoderInterface)
         {
             errorCode = pNvEncodeAPI->nvEncDestroyEncoder(pEncoderInterface);
@@ -389,7 +389,7 @@ namespace webrtc
         {
             m_renderTextures[i] = m_device->CreateDefaultTextureV(m_width, m_height, m_textureFormat);
             void* buffer = AllocateInputResourceV(m_renderTextures[i]);
-
+            m_buffers.push_back(buffer);
             Frame& frame = bufferedFrames[i];
             frame.inputFrame.registeredResource = RegisterResource(m_inputType, buffer);
             frame.inputFrame.bufferFormat = m_bufferFormat;
@@ -413,26 +413,29 @@ namespace webrtc
             checkf(NV_RESULT(errorCode), StringFormat("Failed to unregister input buffer resource %d", errorCode).c_str());
             frame.inputFrame.registeredResource = nullptr;
         }
+
     }
-    void NvEncoder::ReleaseEncoderResources()
-    {
-        for (Frame& frame : bufferedFrames)
-        {
+    void NvEncoder::ReleaseEncoderResources() {
+        for (Frame &frame : bufferedFrames) {
             ReleaseFrameInputBuffer(frame);
-            if(frame.outputFrame != nullptr)
-            {
+            if (frame.outputFrame != nullptr) {
                 errorCode = pNvEncodeAPI->nvEncDestroyBitstreamBuffer(pEncoderInterface, frame.outputFrame);
-                checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy output buffer bit stream %d", errorCode).c_str());
+                checkf(NV_RESULT(errorCode),
+                       StringFormat("Failed to destroy output buffer bit stream %d", errorCode).c_str());
                 frame.outputFrame = nullptr;
             }
         }
 
-        for (auto& renderTexture : m_renderTextures)
-        {
+        for (auto &renderTexture : m_renderTextures) {
             delete renderTexture;
             renderTexture = nullptr;
         }
+        for (auto &buffer : m_buffers)
+        {
+            ReleaseInputResourceV(buffer);
+        }
     }
+
     uint32_t NvEncoder::GetNumChromaPlanes(const NV_ENC_BUFFER_FORMAT bufferFormat)
     {
         switch (bufferFormat)

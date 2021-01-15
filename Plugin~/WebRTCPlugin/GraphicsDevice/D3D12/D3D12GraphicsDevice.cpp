@@ -32,8 +32,8 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12Comma
 
 
 //---------------------------------------------------------------------------------------------------------------------
-D3D12GraphicsDevice::~D3D12GraphicsDevice() {
-
+D3D12GraphicsDevice::~D3D12GraphicsDevice()
+{
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -80,8 +80,6 @@ bool D3D12GraphicsDevice::InitV() {
 //---------------------------------------------------------------------------------------------------------------------
 void D3D12GraphicsDevice::ShutdownV() {
     m_cudaContext.Shutdown();
-    m_commandList->Release();
-    m_commandAllocator->Release();
     SAFE_RELEASE(m_d3d11Device);
     SAFE_RELEASE(m_d3d11Context);
     SAFE_RELEASE(m_copyResourceFence);
