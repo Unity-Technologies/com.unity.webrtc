@@ -456,6 +456,11 @@ extern "C"
         obj->Close();
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionRestartIce(PeerConnectionObject* obj)
+    {
+        obj->connection->RestartIce();
+    }    
+
     UNITY_INTERFACE_EXPORT RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId)
     {
         return obj->connection->AddTrack(rtc::scoped_refptr <MediaStreamTrackInterface>(track), { streamId }).value().get();

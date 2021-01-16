@@ -485,6 +485,11 @@ namespace Unity.WebRTC
                 self, OnSetSessionDescFailure);
         }
 
+        public void RestartIce()
+        {
+            NativeMethods.PeerConnectionRestartIce(GetSelfOrThrow());
+        }
+
         /// <summary>
         ///
         /// </summary>
