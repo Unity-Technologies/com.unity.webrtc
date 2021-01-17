@@ -1,6 +1,8 @@
 {
     "name": "Unity.WebRTC",
-    "references": [],
+    "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
     "includePlatforms": [
         "Android",
         "Editor",
@@ -15,6 +17,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "UNITY_WEBRTC_ENABLE_INPUT_SYSTEM"
+        }
+    ],
     "noEngineReferences": false
 }
