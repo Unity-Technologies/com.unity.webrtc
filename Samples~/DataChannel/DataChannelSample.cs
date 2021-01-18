@@ -56,7 +56,7 @@ class DataChannelSample : MonoBehaviour
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(pc1, candidate); };
-        pc2OnIceCandidate = candidate => { OnIceCandidate(pc1, candidate); };
+        pc2OnIceCandidate = candidate => { OnIceCandidate(pc2, candidate); };
         onDataChannel = channel =>
         {
             remoteDataChannel = channel;
