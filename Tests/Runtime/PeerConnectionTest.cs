@@ -67,7 +67,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             peer.Dispose();
-            Assert.Throws<InvalidOperationException>(() => {  var state = peer.ConnectionState; });
+            Assert.That(() => {  var state = peer.ConnectionState; }, Throws.TypeOf<InvalidOperationException>());
         }
 
         [Test]

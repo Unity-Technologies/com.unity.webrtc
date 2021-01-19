@@ -25,8 +25,6 @@ namespace Unity.WebRTC
         private IntPtr self;
 
         internal Action<IntPtr> OnStatsDelivered = null;
-
-        private int m_id;
         private DelegateOnIceConnectionChange onIceConnectionChange;
         private DelegateOnIceGatheringStateChange onIceGatheringStateChange;
         private DelegateOnIceCandidate onIceCandidate;
@@ -493,7 +491,7 @@ namespace Unity.WebRTC
             }
 
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
-            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.self, streamId), this);
+            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow(), streamId), this);
         }
 
         /// <summary>
@@ -513,7 +511,7 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track)
         {
-            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(GetSelfOrThrow(), track.self), this);
+            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(GetSelfOrThrow(), track.GetSelfOrThrow()), this);
         }
 
         /// <summary>

@@ -51,7 +51,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                return WebRTC.Context.GetInitializationResult(self) == CodecInitializationResult.Success;
+                return WebRTC.Context.GetInitializationResult(GetSelfOrThrow()) == CodecInitializationResult.Success;
             }
         }
 
@@ -242,7 +242,7 @@ namespace Unity.WebRTC
         {
             self = ptr;
             this.track = track;
-            NativeMethods.VideoTrackAddOrUpdateSink(track.self, self);
+            NativeMethods.VideoTrackAddOrUpdateSink(track.GetSelfOrThrow(), self);
             WebRTC.Table.Add(self, this);
         }
 
@@ -260,9 +260,10 @@ namespace Unity.WebRTC
 
             if (self != IntPtr.Zero)
             {
-                if (track.self != IntPtr.Zero)
+                IntPtr trackPtr = track.GetSelfOrThrow();
+                if (trackPtr != IntPtr.Zero)
                 {
-                    NativeMethods.VideoTrackRemoveSink(track.self, self);
+                    NativeMethods.VideoTrackRemoveSink(trackPtr, self);
                 }
 
                 WebRTC.Context.DeleteVideoRenderer(self);

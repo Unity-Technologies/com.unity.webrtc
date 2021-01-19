@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Linq;
 using System.Collections;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -22,11 +24,20 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CreateAndDeleteMediaStream()
+        public void Construct()
         {
             var stream = new MediaStream();
             Assert.That(stream, Is.Not.Null);
             stream.Dispose();
+        }
+
+        [Test]
+        [Category("MediaStream")]
+        public void AccessAfterDisposed()
+        {
+            var stream = new MediaStream();
+            stream.Dispose();
+            Assert.That(() => { var id = stream.Id; }, Throws.TypeOf<InvalidOperationException>());
         }
 
         [Test]

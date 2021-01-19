@@ -88,7 +88,7 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public bool ReplaceTrack(MediaStreamTrack track)
         {
-            return NativeMethods.SenderReplaceTrack(self, track.self);
+            return NativeMethods.SenderReplaceTrack(self, track.GetSelfOrThrow());
         }
     }
 }
