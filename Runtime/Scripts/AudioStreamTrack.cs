@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Unity.WebRTC
 {
@@ -22,7 +22,7 @@ namespace Unity.WebRTC
             started = true;
 
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
-            var track = new MediaStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
+            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
             stream.AddTrack(track);
             return stream;
         }

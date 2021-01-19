@@ -25,7 +25,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void CreateAndDeleteMediaStream()
         {
             var stream = new MediaStream();
-            Assert.NotNull(stream);
+            Assert.That(stream, Is.Not.Null);
             stream.Dispose();
         }
 
@@ -56,13 +56,13 @@ namespace Unity.WebRTC.RuntimeTest
             // wait for the end of the initialization for encoder on the render thread.
             yield return 0;
 
-            Assert.AreEqual(TrackKind.Video, track.Kind);
-            Assert.AreEqual(0, stream.GetVideoTracks().Count());
-            Assert.True(stream.AddTrack(track));
-            Assert.AreEqual(1, stream.GetVideoTracks().Count());
-            Assert.NotNull(stream.GetVideoTracks().First());
-            Assert.True(stream.RemoveTrack(track));
-            Assert.AreEqual(0, stream.GetVideoTracks().Count());
+            Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
+            Assert.That(stream.GetVideoTracks(), Has.Count.EqualTo(0));
+            Assert.That(stream.AddTrack(track), Is.True);
+            Assert.That(stream.GetVideoTracks(), Has.Count.EqualTo(1));
+            Assert.That(stream.GetVideoTracks(), Has.All.Not.Null);
+            Assert.That(stream.RemoveTrack(track), Is.True);
+            Assert.That(stream.GetVideoTracks(), Has.Count.EqualTo(0));
             track.Dispose();
             // wait for disposing video track.
             yield return 0;
@@ -76,13 +76,13 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var stream = new MediaStream();
             var track = new AudioStreamTrack("audio");
-            Assert.AreEqual(TrackKind.Audio, track.Kind);
-            Assert.AreEqual(0, stream.GetAudioTracks().Count());
-            Assert.True(stream.AddTrack(track));
-            Assert.AreEqual(1, stream.GetAudioTracks().Count());
-            Assert.NotNull(stream.GetAudioTracks().First());
-            Assert.True(stream.RemoveTrack(track));
-            Assert.AreEqual(0, stream.GetAudioTracks().Count());
+            Assert.That(TrackKind.Audio, Is.EqualTo(track.Kind));
+            Assert.That(stream.GetAudioTracks(), Has.Count.EqualTo(0));
+            Assert.That(stream.AddTrack(track), Is.True);
+            Assert.That(stream.GetAudioTracks(), Has.Count.EqualTo(1));
+            Assert.That(stream.GetAudioTracks(), Has.All.Not.Null);
+            Assert.That(stream.RemoveTrack(track), Is.True);
+            Assert.That(stream.GetAudioTracks(), Has.Count.EqualTo(0));
             track.Dispose();
             stream.Dispose();
         }
@@ -95,9 +95,9 @@ namespace Unity.WebRTC.RuntimeTest
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
             yield return new WaitForSeconds(0.1f);
-            Assert.AreEqual(1, videoStream.GetVideoTracks().Count());
-            Assert.AreEqual(0, videoStream.GetAudioTracks().Count());
-            Assert.AreEqual(1, videoStream.GetTracks().Count());
+            Assert.That(videoStream.GetVideoTracks(), Has.Count.EqualTo(1));
+            Assert.That(videoStream.GetAudioTracks(), Has.Count.EqualTo(0));
+            Assert.That(videoStream.GetTracks().ToList(), Has.Count.EqualTo(1).And.All.InstanceOf<VideoStreamTrack>());
             foreach (var track in videoStream.GetTracks())
             {
                 track.Dispose();
@@ -113,9 +113,10 @@ namespace Unity.WebRTC.RuntimeTest
         public void AddAndRemoveAudioStream()
         {
             var audioStream = Audio.CaptureStream();
-            Assert.AreEqual(1, audioStream.GetAudioTracks().Count());
-            Assert.AreEqual(0, audioStream.GetVideoTracks().Count());
-            Assert.AreEqual(1, audioStream.GetTracks().Count());
+            Assert.That(audioStream.GetAudioTracks(), Has.Count.EqualTo(1));
+            Assert.That(audioStream.GetVideoTracks(), Has.Count.EqualTo(0));
+            Assert.That(audioStream.GetTracks().ToList(),
+                Has.Count.EqualTo(1).And.All.InstanceOf<AudioStreamTrack>());
             foreach (var track in audioStream.GetTracks())
             {
                 track.Dispose();
@@ -137,6 +138,8 @@ namespace Unity.WebRTC.RuntimeTest
             test.component.SetStream(audioStream);
             yield return test;
             test.component.Dispose();
+            Assert.That(audioStream.GetTracks().ToList(),
+                Has.Count.EqualTo(1).And.All.InstanceOf<AudioStreamTrack>());
             foreach (var track in audioStream.GetTracks())
             {
                 track.Dispose();
@@ -158,6 +161,8 @@ namespace Unity.WebRTC.RuntimeTest
             yield return test;
             yield return new WaitForSeconds(0.1f);
             test.component.Dispose();
+            Assert.That(videoStream.GetTracks().ToList(),
+                Has.Count.EqualTo(1).And.All.InstanceOf<VideoStreamTrack>());
             foreach (var track in videoStream.GetTracks())
             {
                 track.Dispose();
@@ -185,18 +190,17 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetSenderStats(0, 0);
             yield return op;
-            Assert.True(op.IsDone);
-            Assert.IsNotEmpty(op.Value.Stats);
-            Assert.Greater(op.Value.Stats.Count, 0);
+            Assert.That(op.IsDone, Is.True);
+            Assert.That(op.Value.Stats, Has.No.Empty.And.Count.GreaterThan(0));
 
             foreach (RTCStats stats in op.Value.Stats.Values)
             {
-                Assert.NotNull(stats);
-                Assert.Greater(stats.Timestamp, 0);
-                Assert.IsNotEmpty(stats.Id);
+                Assert.That(stats, Is.Not.Null);
+                Assert.That(stats.Timestamp, Is.GreaterThan(0));
+                Assert.That(stats.Id, Is.Not.Empty);
                 foreach (var pair in stats.Dict)
                 {
-                    Assert.IsNotEmpty(pair.Key);
+                    Assert.That(pair.Key, Is.Not.Empty);
                 }
                 StatsCheck.Test(stats);
             }
@@ -230,18 +234,17 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetReceiverStats(1, 0);
             yield return op;
-            Assert.True(op.IsDone);
-            Assert.IsNotEmpty(op.Value.Stats);
-            Assert.Greater(op.Value.Stats.Count, 0);
+            Assert.That(op.IsDone, Is.True);
+            Assert.That(op.Value.Stats, Has.No.Empty.And.Count.GreaterThan(0));
 
             foreach (RTCStats stats in op.Value.Stats.Values)
             {
-                Assert.NotNull(stats);
-                Assert.Greater(stats.Timestamp, 0);
-                Assert.IsNotEmpty(stats.Id);
+                Assert.That(stats, Is.Not.Null);
+                Assert.That(stats.Timestamp, Is.GreaterThan(0));
+                Assert.That(stats.Id, Is.Not.Empty);
                 foreach (var pair in stats.Dict)
                 {
-                    Assert.IsNotEmpty(pair.Key);
+                    Assert.That(pair.Key, Is.Not.Empty);
                 }
                 StatsCheck.Test(stats);
             }
@@ -273,18 +276,18 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
 
             var senders = test.component.GetPeerSenders(0);
-            Assert.IsNotEmpty(senders);
+            Assert.That(senders, Has.Count.GreaterThan(0));
 
             foreach(var sender in senders)
             {
                 var parameters = sender.GetParameters();
-                Assert.IsNotEmpty(parameters.encodings);
+                Assert.That(parameters.encodings, Has.Length.GreaterThan(0).And.All.Not.Null);
                 const uint framerate = 20;
                 parameters.encodings[0].maxFramerate = framerate;
                 RTCErrorType error = sender.SetParameters(parameters);
-                Assert.AreEqual(RTCErrorType.None, error);
+                Assert.That(error, Is.EqualTo(RTCErrorType.None));
                 var parameters2 = sender.GetParameters();
-                Assert.AreEqual(framerate, parameters2.encodings[0].maxFramerate);
+                Assert.That(parameters2.encodings[0].maxFramerate, Is.EqualTo(framerate));
             }
 
             test.component.Dispose();
@@ -321,12 +324,12 @@ namespace Unity.WebRTC.RuntimeTest
 
             videoStream.OnAddTrack = e =>
             {
-                Assert.NotNull(e.Track);
+                Assert.That(e.Track, Is.Not.Null);
                 isCalledOnAddTrack = true;
             };
             videoStream.OnRemoveTrack = e =>
             {
-                Assert.NotNull(e.Track);
+                Assert.That(e.Track, Is.Not.Null);
                 isCalledOnRemoveTrack = true;
             };
 

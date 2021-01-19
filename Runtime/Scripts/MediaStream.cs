@@ -80,21 +80,21 @@ namespace Unity.WebRTC
             }
         }
 
-        public IEnumerable<MediaStreamTrack> GetVideoTracks()
+        public IEnumerable<VideoStreamTrack> GetVideoTracks()
         {
             var buf = NativeMethods.MediaStreamGetVideoTracks(self, out ulong length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new MediaStreamTrack(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new VideoStreamTrack(ptr));
         }
 
-        public IEnumerable<MediaStreamTrack> GetAudioTracks()
+        public IEnumerable<AudioStreamTrack> GetAudioTracks()
         {
             var buf = NativeMethods.MediaStreamGetAudioTracks(self, out ulong length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new MediaStreamTrack(ptr));
+            return WebRTC.Deserialize(buf, (int)length, ptr => new AudioStreamTrack(ptr));
         }
 
         public IEnumerable<MediaStreamTrack> GetTracks()
         {
-            return GetAudioTracks().Concat(GetVideoTracks());
+            return GetAudioTracks().Cast<MediaStreamTrack>().Concat(GetVideoTracks());
         }
 
         public bool AddTrack(MediaStreamTrack track)
