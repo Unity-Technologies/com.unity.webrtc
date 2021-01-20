@@ -218,6 +218,22 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
         }
 
+        [Test]
+        [Category("PeerConnection")]
+        public void GetTransceivers()
+        {
+            var peer = new RTCPeerConnection();
+            var track = new AudioStreamTrack("audio");
+
+            var sender = peer.AddTrack(track);
+            Assert.That(peer.GetTransceivers().ToList(), Has.Count.EqualTo(1));
+            Assert.That(peer.GetTransceivers().Select(t => t.Sender).ToList(), Has.Member(sender));
+
+            track.Dispose();
+            peer.Close();
+            peer.Dispose();
+        }
+
         [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]

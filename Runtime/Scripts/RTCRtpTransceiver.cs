@@ -48,7 +48,11 @@ namespace Unity.WebRTC
         /// </summary>
         public RTCRtpReceiver Receiver
         {
-            get { return new RTCRtpReceiver(NativeMethods.TransceiverGetReceiver(self), peer); }
+            get
+            {
+                IntPtr receiverPtr = NativeMethods.TransceiverGetReceiver(self);
+                return WebRTC.FindOrCreate(receiverPtr, ptr => new RTCRtpReceiver(ptr, peer));
+            }
         }
 
         /// <summary>
@@ -56,7 +60,11 @@ namespace Unity.WebRTC
         /// </summary>
         public RTCRtpSender Sender
         {
-            get { return new RTCRtpSender(NativeMethods.TransceiverGetSender(self), peer); }
+            get
+            {
+                IntPtr senderPtr = NativeMethods.TransceiverGetSender(self);
+                return WebRTC.FindOrCreate(senderPtr, ptr => new RTCRtpSender(ptr, peer));
+            }
         }
 
         public RTCErrorType SetCodecPreferences(RTCRtpCodecCapability[] codecs)

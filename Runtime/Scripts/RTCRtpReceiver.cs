@@ -11,7 +11,13 @@ namespace Unity.WebRTC
         internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
             this.peer = peer;
+        }
+
+        ~RTCRtpReceiver()
+        {
+            WebRTC.Table.Remove(self);
         }
 
         /// <summary>

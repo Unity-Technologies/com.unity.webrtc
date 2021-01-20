@@ -14,7 +14,13 @@ namespace Unity.WebRTC
         internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
             this.peer = peer;
+        }
+
+        ~RTCRtpSender()
+        {
+            WebRTC.Table.Remove(self);
         }
 
         /// <summary>
