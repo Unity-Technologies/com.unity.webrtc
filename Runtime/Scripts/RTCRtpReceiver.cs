@@ -3,10 +3,14 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
-    public class RTCRtpReceiver
+    /// <summary>
+    /// 
+    /// </summary>
+    public class RTCRtpReceiver : IDisposable
     {
         internal IntPtr self;
         private RTCPeerConnection peer;
+        private bool disposed;
 
         internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer)
         {
@@ -17,7 +21,22 @@ namespace Unity.WebRTC
 
         ~RTCRtpReceiver()
         {
-            WebRTC.Table.Remove(self);
+            this.Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Table.Remove(self);
+                self = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

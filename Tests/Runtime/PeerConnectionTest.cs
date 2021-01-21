@@ -230,7 +230,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(peer.GetTransceivers().Select(t => t.Sender).ToList(), Has.Member(sender));
 
             track.Dispose();
-            peer.Close();
             peer.Dispose();
         }
 
