@@ -63,6 +63,15 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("PeerConnection")]
+        public void AccessAfterDisposed()
+        {
+            var peer = new RTCPeerConnection();
+            peer.Dispose();
+            Assert.That(() => {  var state = peer.ConnectionState; }, Throws.TypeOf<InvalidOperationException>());
+        }
+
+        [Test]
+        [Category("PeerConnection")]
         public void GetConfiguration()
         {
             var config = GetDefaultConfiguration();

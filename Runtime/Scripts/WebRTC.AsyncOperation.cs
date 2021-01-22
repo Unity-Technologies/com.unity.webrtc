@@ -36,7 +36,7 @@ namespace Unity.WebRTC
 
         internal RTCStatsReportAsyncOperation(RTCPeerConnection connection)
         {
-            NativeMethods.PeerConnectionGetStats(connection.self);
+            NativeMethods.PeerConnectionGetStats(connection.GetSelfOrThrow());
 
             connection.OnStatsDelivered = ptr =>
             {
@@ -48,7 +48,7 @@ namespace Unity.WebRTC
 
         internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpSender sender)
         {
-            NativeMethods.PeerConnectionSenderGetStats(connection.self, sender.self);
+            NativeMethods.PeerConnectionSenderGetStats(connection.GetSelfOrThrow(), sender.self);
 
             connection.OnStatsDelivered = ptr =>
             {
@@ -59,7 +59,7 @@ namespace Unity.WebRTC
         }
         internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpReceiver receiver)
         {
-            NativeMethods.PeerConnectionReceiverGetStats(connection.self, receiver.self);
+            NativeMethods.PeerConnectionReceiverGetStats(connection.GetSelfOrThrow(), receiver.self);
 
             connection.OnStatsDelivered = ptr =>
             {

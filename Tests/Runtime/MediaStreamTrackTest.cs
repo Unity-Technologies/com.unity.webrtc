@@ -24,6 +24,35 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void Construct()
+        {
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack("video", rt);
+            Assert.That(track, Is.Not.Null);
+            track.Dispose();
+            Object.DestroyImmediate(rt);
+        }
+
+        [Test]
+        public void AccessAfterDisposed()
+        {
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack("video", rt);
+            Assert.That(track, Is.Not.Null);
+            track.Dispose();
+            Assert.That(() => { var id = track.Id; }, Throws.TypeOf<InvalidOperationException>());
+            Object.DestroyImmediate(rt);
+        }
+
+        [Test]
         public void ConstructorThrowsException()
         {
             var width = 256;
@@ -31,10 +60,8 @@ namespace Unity.WebRTC.RuntimeTest
             var format = RenderTextureFormat.R8;
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
-            Assert.Throws<ArgumentException>(() =>
-            {
-                var track = new VideoStreamTrack("video", rt);
-            });
+
+            Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
             Object.DestroyImmediate(rt);
         }
 

@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace Unity.WebRTC
 {
     public class MediaStreamTrack : IDisposable
     {
-        internal IntPtr self;
+        protected IntPtr self;
         protected bool disposed;
         private bool enabled;
         private TrackState readyState;
@@ -18,41 +16,36 @@ namespace Unity.WebRTC
         {
             get
             {
-                return NativeMethods.MediaStreamTrackGetEnabled(self);
+                return NativeMethods.MediaStreamTrackGetEnabled(GetSelfOrThrow());
             }
             set
             {
-                NativeMethods.MediaStreamTrackSetEnabled(self, value);
+                NativeMethods.MediaStreamTrackSetEnabled(GetSelfOrThrow(), value);
             }
         }
 
         /// <summary>
         ///
         /// </summary>
-        public TrackState ReadyState
-        {
-            get
-            {
-                return NativeMethods.MediaStreamTrackGetReadyState(self);
-            }
-        }
+        public TrackState ReadyState =>
+            NativeMethods.MediaStreamTrackGetReadyState(GetSelfOrThrow());
 
         /// <summary>
         ///
         /// </summary>
-        public TrackKind Kind { get; }
+        public TrackKind Kind =>
+            NativeMethods.MediaStreamTrackGetKind(GetSelfOrThrow());
 
         /// <summary>
         ///
         /// </summary>
-        public string Id { get; }
+        public string Id =>
+            NativeMethods.MediaStreamTrackGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         internal MediaStreamTrack(IntPtr ptr)
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
-            Kind = NativeMethods.MediaStreamTrackGetKind(self);
-            Id = NativeMethods.MediaStreamTrackGetID(self).AsAnsiStringWithFreeMem();
         }
 
         ~MediaStreamTrack()
@@ -81,7 +74,7 @@ namespace Unity.WebRTC
         //Disassociate track from its source(video or audio), not for destroying the track
         public void Stop()
         {
-            WebRTC.Context.StopMediaStreamTrack(self);
+            WebRTC.Context.StopMediaStreamTrack(GetSelfOrThrow());
         }
 
         internal static MediaStreamTrack Create(IntPtr ptr)
@@ -92,6 +85,15 @@ namespace Unity.WebRTC
             }
 
             return new AudioStreamTrack(ptr);
+        }
+
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
         }
     }
 

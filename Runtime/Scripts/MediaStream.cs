@@ -1,9 +1,6 @@
-using UnityEngine;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
@@ -15,18 +12,14 @@ namespace Unity.WebRTC
         private DelegateOnAddTrack onAddTrack;
         private DelegateOnRemoveTrack onRemoveTrack;
 
-        internal IntPtr self;
-        private readonly string id;
+        private IntPtr self;
         private bool disposed;
 
-
-        public string Id
-        {
-            get
-            {
-                return id;
-            }
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Id =>
+            NativeMethods.MediaStreamGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         ~MediaStream()
         {
@@ -72,7 +65,7 @@ namespace Unity.WebRTC
 
             if (track.Kind == TrackKind.Video)
             {
-                WebRTC.Context.StopMediaStreamTrack(track.self);
+                WebRTC.Context.StopMediaStreamTrack(track.GetSelfOrThrow());
             }
             else
             {
@@ -82,13 +75,13 @@ namespace Unity.WebRTC
 
         public IEnumerable<VideoStreamTrack> GetVideoTracks()
         {
-            var buf = NativeMethods.MediaStreamGetVideoTracks(self, out ulong length);
+            var buf = NativeMethods.MediaStreamGetVideoTracks(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new VideoStreamTrack(ptr));
         }
 
         public IEnumerable<AudioStreamTrack> GetAudioTracks()
         {
-            var buf = NativeMethods.MediaStreamGetAudioTracks(self, out ulong length);
+            var buf = NativeMethods.MediaStreamGetAudioTracks(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new AudioStreamTrack(ptr));
         }
 
@@ -99,23 +92,30 @@ namespace Unity.WebRTC
 
         public bool AddTrack(MediaStreamTrack track)
         {
-            return NativeMethods.MediaStreamAddTrack(self, track.self);
+            return NativeMethods.MediaStreamAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow());
         }
         public bool RemoveTrack(MediaStreamTrack track)
         {
-            return NativeMethods.MediaStreamRemoveTrack(self, track.self);
+            return NativeMethods.MediaStreamRemoveTrack(GetSelfOrThrow(), track.GetSelfOrThrow());
         }
 
         public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
         {
         }
 
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
+        }
+
         internal MediaStream(IntPtr ptr)
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
-            id = NativeMethods.MediaStreamGetID(self).AsAnsiStringWithFreeMem();
-
             WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
             WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);
         }
