@@ -6,15 +6,38 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
-    public class RTCRtpSender
+    public class RTCRtpSender : IDisposable
     {
         internal IntPtr self;
         private RTCPeerConnection peer;
+        private bool disposed;
+
 
         internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
             this.peer = peer;
+        }
+
+        ~RTCRtpSender()
+        {
+            this.Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Table.Remove(self);
+                self = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

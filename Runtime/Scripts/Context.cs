@@ -56,7 +56,7 @@ namespace Unity.WebRTC
                     if (value == null)
                         continue;
                     var disposable = value as IDisposable;
-                    disposable.Dispose();
+                    disposable?.Dispose();
                 }
                 table.Clear();
 
