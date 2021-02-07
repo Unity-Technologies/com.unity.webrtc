@@ -17,12 +17,12 @@ namespace Unity.WebRTC
     {
         private static bool started;
 
-        public static MediaStream CaptureStream()
+        public static MediaStream CaptureStream(string streamlabel = "audiostream", string label="audio")
         {
             started = true;
 
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
-            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream(streamlabel));
+            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(label));
             stream.AddTrack(track);
             return stream;
         }
