@@ -4,22 +4,35 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.2] - 2021-02-12
+
+### Changed
+
+- Changed `Audio.CaptureStream` method to allow setting of audio track label.
+
+### Fixed
+
+- Fixed memory leaks in native code.
+- Fixed a crash bug when access an instance after disposed of it.
+- Fixed `MediaStream.GetVideoStreamTrack` method and `MediaStream.GetVideoStreamTrack` method to return a correct value.
+- Fixed `RTCRtpTransceiver.Receiver` property and `RTCRtpTransceiver.Sender` property to return a correct value.
+
 ## [2.3.1] - 2021-01-07
 
 ### Fixed
 
-- Fixed `RTCIceCandidate.candidate` property in order to return a correct SDP formatted string
+- Fixed `RTCIceCandidate.candidate` property in order to return a correct SDP formatted string.
 
 ## [2.3.0] - 2020-12-28
 
 ### Added 
 
-- iOS platform support
-- H.264 HW decoder (VideoToolbox) support on macOS
+- Supported iOS platform
+- Supported H.264 HW decoder (VideoToolbox) on macOS
 - Added `GetCapabilities` method to the `RTCRtpSender` class and the `RTCRtpReceiver` class
-- Added `SetCodecPreferences` method to the `RTCRtpTransceiver` class.
+- Added `SetCodecPreferences` method to the `RTCRtpTransceiver` class
 - Added two samples (`ChangeCodecs`, `TrickleIce`)
-- Added properties to the `RTCIceCandidate` class 
+- Added properties to the `RTCIceCandidate` class
 - Added properties tp the `RTCDataChannelInit` class
 
 ### Changed
@@ -47,7 +60,7 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 
 ### Added
 
-- Added a `Bandwidth` sample 
+- Added a `Bandwidth` sample
 
 ### Fixed
 
