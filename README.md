@@ -24,7 +24,7 @@ Please see [Install package](Documentation~/install.md).
 
 ## Requirements
 
-Please see [Requeirements](Documentation~/index.md#requirements).
+Please see [Requirements](Documentation~/index.md#requirements).
 
 ### Limitations
 
