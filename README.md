@@ -9,8 +9,9 @@ If you are interested in the streaming solution with WebRTC, you can check [Unit
 
 ## Documentation
 
-- [English](https://docs.unity3d.com/Packages/com.unity.webrtc@2.3/manual/index.html)
-- [Japanese](https://docs.unity3d.com/Packages/com.unity.webrtc@2.3/manual/jp/index.html)
+- [English](https://docs.unity3d.com/Packages/com.unity.webrtc@latest/index.html)
+- [Japanese](https://docs.unity3d.com/ja/Packages/com.unity.webrtc@latest/index.html
+)
 
 ### Guide
 
