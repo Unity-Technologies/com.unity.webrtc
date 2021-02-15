@@ -97,7 +97,7 @@ Or, obtained from `AddTrack` method as its return value.
 var sender = peerConnection.AddTrack(track);
 ```
 
-After obtained the instance of `RTCRtpSender`, To get the settings about the sending stream, call the `GetParameter` method is able. And call the `SetParameter` method with customized settings. as a result, the settings are reflected.
+After obtained the instance of `RTCRtpSender`, to get the settings about the sending stream, call the `GetParameter` method is able. And call the `SetParameter` method with customized settings. as a result, the settings are reflected.
 
 ```CSharp
 var parameters = sender.GetParameters();
@@ -148,7 +148,7 @@ peerConnection.OnTrack = (RTCTrackEvent e) => {
 ### Receiving multi video
 
 Multiple VideoTracks can be received in a single `PeerConnection`.
-It is a good idea to call the `AddTransciver` method on the `PeerConnection` instance as needed track count, and then do signaling.
+It is a good idea to call the `AddTransceiver` method on the `PeerConnection` instance as needed track count, and then do signaling.
 
 ```CSharp
 // call AddTransceiver as needed track count
