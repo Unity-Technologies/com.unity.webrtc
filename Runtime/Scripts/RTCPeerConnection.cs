@@ -4,12 +4,43 @@ using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="candidate"></param>
     public delegate void DelegateOnIceCandidate(RTCIceCandidate candidate);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="state"></param>
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="state"></param>
+    public delegate void DelegateOnConnectionStateChange(RTCPeerConnectionState state);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="state"></param>
     public delegate void DelegateOnIceGatheringStateChange(RTCIceGatheringState state);
+    /// <summary>
+    /// 
+    /// </summary>
     public delegate void DelegateOnNegotiationNeeded();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void DelegateOnTrack(RTCTrackEvent e);
+    /// <summary>
+    /// 
+    /// </summary>
     public delegate void DelegateSetSessionDescSuccess();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="error"></param>
     public delegate void DelegateSetSessionDescFailure(RTCError error);
 
     /// <summary>
@@ -25,14 +56,6 @@ namespace Unity.WebRTC
         private IntPtr self;
 
         internal Action<IntPtr> OnStatsDelivered = null;
-        private DelegateOnIceConnectionChange onIceConnectionChange;
-        private DelegateOnIceGatheringStateChange onIceGatheringStateChange;
-        private DelegateOnIceCandidate onIceCandidate;
-        private DelegateOnDataChannel onDataChannel;
-        private DelegateOnTrack onTrack;
-        private DelegateOnNegotiationNeeded onNegotiationNeeded;
-        private DelegateSetSessionDescSuccess onSetSessionDescSuccess;
-        private DelegateSetSessionDescFailure onSetSetSessionDescFailure;
 
         private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
         private RTCSessionDescriptionAsyncOperation m_opSetRemoteDesc;
@@ -177,78 +200,41 @@ namespace Unity.WebRTC
         /// </code>
         /// </example>
         /// <seealso cref="IceConnectionState"/>
-        public DelegateOnIceConnectionChange OnIceConnectionChange
-        {
-            private get => onIceConnectionChange;
-            set
-            {
-                onIceConnectionChange = value;
-            }
-        }
+        public DelegateOnIceConnectionChange OnIceConnectionChange { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DelegateOnConnectionStateChange OnConnectionStateChange { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <seealso cref="GatheringState"/>
-        public DelegateOnIceGatheringStateChange OnIceGatheringStateChange
-        {
-            private get => onIceGatheringStateChange;
-            set
-            {
-                onIceGatheringStateChange = value;
-            }
-        }
+        public DelegateOnIceGatheringStateChange OnIceGatheringStateChange { get; set; }
 
         /// <summary>
         ///
         /// </summary>
         /// <seealso cref="RTCIceCandidate"/>
-        public DelegateOnIceCandidate OnIceCandidate
-        {
-            private get => onIceCandidate;
-            set
-            {
-                onIceCandidate = value;
-            }
-        }
+        public DelegateOnIceCandidate OnIceCandidate { get; set; }
 
         /// <summary>
         ///
         /// </summary>
         /// <seealso cref="RTCDataChannel"/>
-        public DelegateOnDataChannel OnDataChannel
-        {
-            private get => onDataChannel;
-            set
-            {
-                onDataChannel = value;
-            }
-        }
+        public DelegateOnDataChannel OnDataChannel { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        public DelegateOnNegotiationNeeded OnNegotiationNeeded
-        {
-            private get => onNegotiationNeeded;
-            set
-            {
-                onNegotiationNeeded = value;
-            }
-        }
+        public DelegateOnNegotiationNeeded OnNegotiationNeeded { get; set; }
 
         /// <summary>
         ///
         /// </summary>
         /// <seealso cref="RTCTrackEvent"/>
-        public DelegateOnTrack OnTrack
-        {
-            private get => onTrack;
-            set
-            {
-                onTrack = value;
-            }
-        }
+        public DelegateOnTrack OnTrack { get; set; }
 
         internal IntPtr GetSelfOrThrow()
         {
@@ -259,23 +245,9 @@ namespace Unity.WebRTC
             return self;
         }
 
-        internal DelegateSetSessionDescSuccess OnSetSessionDescriptionSuccess
-        {
-            private get => onSetSessionDescSuccess;
-            set
-            {
-                onSetSessionDescSuccess = value;
-            }
-        }
+        internal DelegateSetSessionDescSuccess OnSetSessionDescriptionSuccess { get; set; }
 
-        internal DelegateSetSessionDescFailure OnSetSessionDescriptionFailure
-        {
-            private get => onSetSetSessionDescFailure;
-            set
-            {
-                onSetSetSessionDescFailure = value;
-            }
-        }
+        internal DelegateSetSessionDescFailure OnSetSessionDescriptionFailure { get; set; }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceCandidate))]
         static void PCOnIceCandidate(IntPtr ptr, string sdp, string sdpMid, int sdpMlineIndex)
@@ -304,6 +276,18 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     connection.OnIceConnectionChange?.Invoke(state);
+                }
+            });
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnConnectionStateChange))]
+        static void PCOnConnectionStateChange(IntPtr ptr, RTCPeerConnectionState state)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    connection.OnConnectionStateChange?.Invoke(state);
                 }
             });
         }
@@ -456,6 +440,7 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, OnSuccessCreateSessionDesc, OnFailureCreateSessionDesc);
             NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, OnStatsDeliveredCallback);
             NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
+            NativeMethods.PeerConnectionRegisterConnectionStateChange(self, PCOnConnectionStateChange);
             NativeMethods.PeerConnectionRegisterIceGatheringChange(self, PCOnIceGatheringChange);
             NativeMethods.PeerConnectionRegisterOnIceCandidate(self, PCOnIceCandidate);
             NativeMethods.PeerConnectionRegisterOnDataChannel(self, PCOnDataChannel);
