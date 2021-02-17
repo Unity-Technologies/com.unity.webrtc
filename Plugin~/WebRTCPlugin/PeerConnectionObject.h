@@ -16,6 +16,7 @@ namespace webrtc
     using DelegateIceCandidate = void(*)(PeerConnectionObject*, const char*, const char*, const int);
     using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);
     using DelegateOnIceGatheringChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceGatheringState);
+    using DelegateOnConnectionStateChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::PeerConnectionState);
     using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
@@ -49,7 +50,8 @@ namespace webrtc
 
         void RegisterLocalSdpReady(DelegateLocalSdpReady callback) { onLocalSdpReady = callback; }
         void RegisterIceCandidate(DelegateIceCandidate callback) { onIceCandidate = callback; }
-        void RegisterIceConnectionChange(DelegateOnIceConnectionChange callback) { onIceConnectionChange = callback; };
+        void RegisterIceConnectionChange(DelegateOnIceConnectionChange callback) { onIceConnectionChange = callback; }
+        void RegisterConnectionStateChange(DelegateOnConnectionStateChange callback) { onConnectionStateChange = callback; }
         void RegisterIceGatheringChange(DelegateOnIceGatheringChange callback) { onIceGatheringChange = callback; }
         void RegisterOnDataChannel(DelegateOnDataChannel callback) { onDataChannel = callback; }
         void RegisterOnRenegotiationNeeded(DelegateOnRenegotiationNeeded callback) { onRenegotiationNeeded = callback; }
@@ -74,11 +76,17 @@ namespace webrtc
         // has begun.
         void OnRenegotiationNeeded() override;
         // Called any time the IceConnectionState changes.
-        void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) override;
+        void OnIceConnectionChange(
+            PeerConnectionInterface::IceConnectionState new_state) override;
+        // Called any time the PeerConnectionState changes.
+        virtual void OnConnectionChange(
+            PeerConnectionInterface::PeerConnectionState new_state) override;
         // Called any time the IceGatheringState changes.
-        void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
+        void OnIceGatheringChange(
+            PeerConnectionInterface::IceGatheringState new_state) override;
         // A new ICE candidate has been gathered.
-        void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
+        void OnIceCandidate(
+            const IceCandidateInterface* candidate) override;
         // Ice candidates have been removed.
         void OnIceCandidatesRemoved(const std::vector<cricket::Candidate>& candidates) override {}
         // Called when the ICE connection receiving status changes.
@@ -100,6 +108,7 @@ namespace webrtc
         DelegateCreateSDFailure onCreateSDFailure = nullptr;
         DelegateIceCandidate onIceCandidate = nullptr;
         DelegateLocalSdpReady onLocalSdpReady = nullptr;
+        DelegateOnConnectionStateChange onConnectionStateChange = nullptr;
         DelegateOnIceConnectionChange onIceConnectionChange = nullptr;
         DelegateOnIceGatheringChange onIceGatheringChange = nullptr;
         DelegateOnDataChannel onDataChannel = nullptr;

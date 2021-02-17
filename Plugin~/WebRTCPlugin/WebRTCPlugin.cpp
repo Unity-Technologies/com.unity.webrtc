@@ -789,6 +789,12 @@ extern "C"
     {
         obj->RegisterIceGatheringChange(callback);
     }
+
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterConnectionStateChange(PeerConnectionObject* obj, DelegateOnConnectionStateChange callback)
+    {
+        obj->RegisterConnectionStateChange(callback);
+    }
+
     
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnIceCandidate(PeerConnectionObject*obj, DelegateIceCandidate callback)
     {
