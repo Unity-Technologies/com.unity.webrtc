@@ -12,6 +12,7 @@ platforms:
     type: Unity::VM
     gpu_type: Unity::VM::GPU
     image: renderstreaming/win10:latest
+    gpu_image: renderstreaming/win10:latest
     flavor: b1.large
     build_command: BuildScripts~/build_plugin_win.cmd
     test_command: BuildScripts~/test_plugin_win.cmd
@@ -19,7 +20,8 @@ platforms:
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.13-668913
+    gpu_image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     build_command: BuildScripts~/build_plugin_linux.sh
     test_command: BuildScripts~/test_plugin_linux.sh
@@ -28,6 +30,7 @@ platforms:
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
+    gpu_image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test_plugin_mac.sh
@@ -36,6 +39,7 @@ platforms:
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
     image: slough-ops/macos-10.14-xcode
+    gpu_image: slough-ops/macos-10.14-xcode
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_ios.sh
     test_command: BuildScripts~/test_plugin_ios.sh
@@ -164,7 +168,7 @@ test_webrtc_plugin_{{ platform.name }}:
   name: Test webrtc plugin {{ platform.name }}
   agent:
     type: {{ platform.gpu_type }}
-    image: {{ platform.image }}
+    image: {{ platform.gpu_image }}
     flavor: {{ platform.flavor }}
   commands:
     - {{ platform.test_command }}
