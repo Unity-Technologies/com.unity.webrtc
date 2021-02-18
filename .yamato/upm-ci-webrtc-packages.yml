@@ -65,7 +65,7 @@ test_targets:
         platform: standalone
   - name: linux
     type: Unity::VM
-    image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.13-668913
     flavor: b1.large
     is_gpu: false
     gfx_types:
