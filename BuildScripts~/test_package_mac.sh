@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 #
 # BOKKEN_DEVICE_IP: 

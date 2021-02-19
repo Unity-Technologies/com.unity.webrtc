@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M85/webrtc-linux.zip
 export SOLUTION_DIR=$(pwd)/Plugin~

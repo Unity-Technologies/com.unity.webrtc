@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 if [ ! -e "$(pwd)/depot_tools" ]
 then
