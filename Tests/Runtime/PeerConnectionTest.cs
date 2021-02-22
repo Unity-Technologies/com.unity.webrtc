@@ -621,8 +621,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(op7.IsCompleted, Is.True);
 
             var op8 = new WaitUntilWithTimeout(() =>
-                iceState1 == RTCIceConnectionState.Connected &&
-                iceState2 == RTCIceConnectionState.Connected, 5000);
+                (iceState1 == RTCIceConnectionState.Connected || iceState1 == RTCIceConnectionState.Completed) &&
+                (iceState2 == RTCIceConnectionState.Connected || iceState2 == RTCIceConnectionState.Completed)
+                , 5000);
             yield return op8;
             Assert.That(op8.IsCompleted, Is.True);
 
