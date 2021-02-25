@@ -29,6 +29,7 @@ namespace webrtc
         {
             connection->Close();
         }
+        connection.release();
         connection = nullptr;
     }
 
