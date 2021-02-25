@@ -29,8 +29,6 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                Sender?.Dispose();
-                Receiver?.Dispose();
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }

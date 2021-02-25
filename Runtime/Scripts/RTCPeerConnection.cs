@@ -96,6 +96,12 @@ namespace Unity.WebRTC
             var transceivers = GetTransceivers();
             foreach (var transceiver in transceivers)
             {
+                // Dispose of MediaStreamTrack when disposing of RTCRtpReceiver.
+                // On the other hand, do not dispose a track when disposing of RTCRtpSender.
+                transceiver.Receiver?.Track?.Dispose();
+
+                transceiver.Receiver?.Dispose();
+                transceiver.Sender?.Dispose();
                 transceiver.Dispose();
             }
         }

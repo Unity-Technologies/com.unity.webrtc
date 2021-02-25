@@ -32,9 +32,6 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                // Dispose of MediaStreamTrack when disposing of RTCRtpReceiver.
-                // On the other hand, do not dispose a track when disposing of RTCRtpSender.
-                Track?.Dispose();
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
