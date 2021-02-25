@@ -12,9 +12,12 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
-cmake -GXcode .
-xcodebuild -scheme WebRTCPlugin -configuration Debug build
-xcodebuild -scheme WebRTCLibTest -configuration Debug build
+cmake . -G Xcode \
+        -B build
+
+cmake --build build         \
+      --config Debug        \
+      --target WebRTCLibTest
 
 # Copy and run the test on the Metal device
 scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/WebRTCPluginTest/Debug" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
