@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Unity.WebRTC
 {
@@ -80,6 +81,7 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 Close();
+                DisposeAllTransceivers();
                 WebRTC.Context.DeletePeerConnection(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
@@ -87,6 +89,15 @@ namespace Unity.WebRTC
 
             this.disposed = true;
             GC.SuppressFinalize(this);
+        }
+
+        private void DisposeAllTransceivers()
+        {
+            var transceivers = GetTransceivers();
+            foreach (var transceiver in transceivers)
+            {
+                transceiver.Dispose();
+            }
         }
 
         /// <summary>
@@ -150,7 +161,7 @@ namespace Unity.WebRTC
         public IEnumerable<RTCRtpReceiver> GetReceivers()
         {
             IntPtr buf = NativeMethods.PeerConnectionGetReceivers(GetSelfOrThrow(), out ulong length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpReceiver(ptr, this));
+            return WebRTC.Deserialize(buf, (int)length, CreateReceiver);
         }
 
         /// <summary>
@@ -167,7 +178,7 @@ namespace Unity.WebRTC
         public IEnumerable<RTCRtpSender> GetSenders()
         {
             var buf = NativeMethods.PeerConnectionGetSenders(GetSelfOrThrow(), out ulong length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpSender(ptr, this));
+            return WebRTC.Deserialize(buf, (int)length, CreateSender);
         }
 
         /// <summary>
@@ -184,8 +195,24 @@ namespace Unity.WebRTC
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
             var buf = NativeMethods.PeerConnectionGetTransceivers(GetSelfOrThrow(), out ulong length);
-            return WebRTC.Deserialize(buf, (int)length, ptr => new RTCRtpTransceiver(ptr, this));
+            return WebRTC.Deserialize(buf, (int)length, CreateTransceiver);
         }
+
+        RTCRtpReceiver CreateReceiver(IntPtr ptr)
+        {
+            return WebRTC.FindOrCreate(ptr, _ptr => new RTCRtpReceiver(_ptr, this));
+        }
+
+        RTCRtpSender CreateSender(IntPtr ptr)
+        {
+            return WebRTC.FindOrCreate(ptr, _ptr => new RTCRtpSender(_ptr, this));
+        }
+
+        RTCRtpTransceiver CreateTransceiver(IntPtr ptr)
+        {
+            return WebRTC.FindOrCreate(ptr, _ptr => new RTCRtpTransceiver(_ptr, this));
+        }
+
 
         /// <summary>
         /// This property is delegate to be called when the <see cref ="IceConnectionState"/> is changed.

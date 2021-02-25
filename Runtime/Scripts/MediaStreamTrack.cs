@@ -131,7 +131,8 @@ namespace Unity.WebRTC
 
         internal RTCTrackEvent(IntPtr ptrTransceiver, RTCPeerConnection peer)
         {
-            Transceiver = new RTCRtpTransceiver(ptrTransceiver, peer);
+            Transceiver = WebRTC.FindOrCreate(
+                ptrTransceiver, ptr => new RTCRtpTransceiver(ptr, peer));
         }
     }
 
