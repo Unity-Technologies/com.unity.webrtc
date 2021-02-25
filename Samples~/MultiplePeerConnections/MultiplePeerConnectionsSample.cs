@@ -129,6 +129,23 @@ class MultiplePeerConnectionsSample : MonoBehaviour
     {
         StopCoroutine(updateCoroutine);
         updateCoroutine = null;
+
+        foreach (var track in sourceVideoStream.GetTracks())
+        {
+            sourceVideoStream.RemoveTrack(track);
+            track.Dispose();
+        }
+        foreach (var track in receiveVideoStream1.GetTracks())
+        {
+            receiveVideoStream1.RemoveTrack(track);
+            track.Dispose();
+        }
+        foreach (var track in receiveVideoStream2.GetTracks())
+        {
+            receiveVideoStream2.RemoveTrack(track);
+            track.Dispose();
+        }
+
         sourceVideoStream.Dispose();
         sourceVideoStream = null;
         sourceImage.texture = null;

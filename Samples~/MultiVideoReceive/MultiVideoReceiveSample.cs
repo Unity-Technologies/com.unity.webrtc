@@ -217,6 +217,11 @@ class MultiVideoReceiveSample : MonoBehaviour
     {
         foreach (var stream in receiveStreamList)
         {
+            foreach (var track in stream.GetVideoTracks())
+            {
+                stream.RemoveTrack(track);
+                track.Dispose();
+            }
             stream.Dispose();
         }
         receiveStreamList.Clear();

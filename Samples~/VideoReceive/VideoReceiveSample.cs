@@ -159,6 +159,12 @@ class VideoReceiveSample : MonoBehaviour
             _pc1.RemoveTrack(sender);
         }
 
+        foreach (var track in receiveStream.GetTracks())
+        {
+            receiveStream.RemoveTrack(track);
+            track.Dispose();
+        }
+
         pc1Senders.Clear();
         addTracksButton.interactable = true;
         removeTracksButton.interactable = false;
@@ -199,6 +205,8 @@ class VideoReceiveSample : MonoBehaviour
 
     private void HangUp()
     {
+        RemoveTracks();
+
         videoStream.Dispose();
         receiveStream.Dispose();
         videoStream = null;

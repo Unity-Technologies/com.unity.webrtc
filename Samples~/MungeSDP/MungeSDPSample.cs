@@ -208,6 +208,18 @@ class MungeSDPSample : MonoBehaviour
     {
         StopCoroutine(updateCoroutine);
         updateCoroutine = null;
+
+        foreach (var track in sourceVideoStream.GetTracks())
+        {
+            sourceVideoStream.RemoveTrack(track);
+            track.Dispose();
+        }
+        foreach (var track in receiveVideoStream.GetTracks())
+        {
+            receiveVideoStream.RemoveTrack(track);
+            track.Dispose();
+        }
+
         sourceVideoStream.Dispose();
         sourceVideoStream = null;
         sourceImage.texture = null;
