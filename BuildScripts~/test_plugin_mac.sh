@@ -20,7 +20,7 @@ cmake --build build         \
       --target WebRTCLibTest
 
 # Copy and run the test on the Metal device
-scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/WebRTCPluginTest/Debug" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
+scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/build/WebRTCPluginTest/Debug" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
 ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '~/com.unity.webrtc/WebRTCLibTest'
 
 # Running test locally. Left as a reference
