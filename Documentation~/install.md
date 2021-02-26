@@ -32,7 +32,7 @@ Check Package Manager window, Click `+` button and select `Add package from git 
 Input the string below to the input field.
 
 ```
-com.unity.webrtc@2.3.2-preview
+com.unity.webrtc@2.3.3-preview
 ```
 
 The list of version string is [here](https://github.com/Unity-Technologies/com.unity.webrtc/tags). In most cases, the latest version is recommended to use.
