@@ -17,7 +17,7 @@ namespace Unity.WebRTC
         UnityVideoRenderer m_renderer;
 
         private static RenderTexture CreateRenderTexture(int width, int height,
-            RenderTextureFormat format)
+            RenderTextureFormat format, int antiAliasing = 1)
         {
             // todo::(kazuki) Increase the supported formats.
             RenderTextureFormat supportedFormat
@@ -29,6 +29,7 @@ namespace Unity.WebRTC
             }
 
             var tex = new RenderTexture(width, height, 0, format);
+            tex.antiAliasing = antiAliasing;
             tex.Create();
             return tex;
         }
@@ -118,7 +119,7 @@ namespace Unity.WebRTC
         /// <param name="width"></param>
         /// <param name="height"></param>
         public VideoStreamTrack(string label, UnityEngine.RenderTexture source)
-            : this(label, source, CreateRenderTexture(source.width, source.height, source.format), source.width,
+            : this(label, source, CreateRenderTexture(source.width, source.height, source.format, source.antiAliasing), source.width,
                 source.height)
         {
         }
@@ -200,7 +201,7 @@ namespace Unity.WebRTC
     public static class CameraExtension
     {
         public static VideoStreamTrack CaptureStreamTrack(this UnityEngine.Camera cam, int width, int height, int bitrate,
-            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24, int antiAliasing = 1)
         {
             switch (depth)
             {
@@ -215,6 +216,7 @@ namespace Unity.WebRTC
             int depthValue = (int)depth;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
+            rt.antiAliasing = antiAliasing;
             rt.Create();
             cam.targetTexture = rt;
             return new VideoStreamTrack(cam.name, rt);
@@ -222,10 +224,10 @@ namespace Unity.WebRTC
 
 
         public static MediaStream CaptureStream(this UnityEngine.Camera cam, int width, int height, int bitrate,
-            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24, int antiAliasing = 1)
         {
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
-            var track = cam.CaptureStreamTrack(width, height, bitrate, depth);
+            var track = cam.CaptureStreamTrack(width, height, bitrate, depth, antiAliasing);
             stream.AddTrack(track);
             return stream;
         }
