@@ -98,14 +98,15 @@ namespace Unity.WebRTC.RuntimeTest
             byte[] message1 = { 1, 2, 3 };
             string message2 = "123";
 
-            Assert.DoesNotThrow(() => channel.Send(message1));
-            Assert.DoesNotThrow(() => channel.Send(message2));
+            var op1 = new WaitUntilWithTimeout(() => channel.ReadyState == RTCDataChannelState.Open, 5000);
+            yield return op1;
+            Assert.That(op1.IsCompleted, Is.True);
+            Assert.That(() => channel.Send(message1), Throws.Nothing);
+            Assert.That(() => channel.Send(message2), Throws.Nothing);
             channel.Close();
-            Assert.Throws<InvalidOperationException>(() => channel.Send(message1));
-            Assert.Throws<InvalidOperationException>(() => channel.Send(message2));
-
+            Assert.That(() => channel.Send(message1), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message2), Throws.TypeOf<InvalidOperationException>());
             test.component.Dispose();
-            yield return 0;
         }
 
         [UnityTest]

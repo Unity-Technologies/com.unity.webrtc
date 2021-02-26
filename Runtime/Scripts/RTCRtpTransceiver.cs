@@ -7,11 +7,33 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         private RTCPeerConnection peer;
+        private bool disposed;
 
         internal RTCRtpTransceiver(IntPtr ptr, RTCPeerConnection peer)
         {
             self = ptr;
+            WebRTC.Table.Add(self, this);
             this.peer = peer;
+        }
+
+        ~RTCRtpTransceiver()
+        {
+            this.Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Table.Remove(self);
+                self = IntPtr.Zero;
+            }
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
