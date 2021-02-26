@@ -86,7 +86,8 @@ This package uses GPU hardware acceleration for video encoding, so it only runs 
 | `2.1`   | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0/m/A5X253_ZAQAJ) | - Profiler tool <br>- Bitrate control                                                          | Aug 2020 |
 | `2.2`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (VP8, VP9 only) <br>- Vulkan HW encoder support <br>- MacOS HW encoder support | Oct 2020 |
 | `2.3`   | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS platform suppport                                                                        | Dec 2020 |
-| `2.4`   | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Android platform suppport<br> - Audio renderer support                                                                        | Mar 2021 |
+| `2.4`   | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Android platform suppport                                                                        | Apr 2021 |
+| `2.5`   | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Audio renderer support                                                                        | Jun 2021 |
 
 ## Licenses
 
