@@ -624,6 +624,61 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        public IEnumerator TransceiverReturnsSender()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
+
+            MediaStream stream1 = Audio.CaptureStream();
+            peer1.AddTrack(stream1.GetTracks().First());
+
+            RTCOfferOptions options1 = default;
+            RTCAnswerOptions options2 = default;
+            var op1 = peer1.CreateOffer(ref options1);
+            yield return op1;
+            var desc = op1.Desc;
+            var op2 = peer1.SetLocalDescription(ref desc);
+            yield return op2;
+            var op3 = peer2.SetRemoteDescription(ref desc);
+            yield return op3;
+            var op4 = peer2.CreateAnswer(ref options2);
+            yield return op4;
+            desc = op4.Desc;
+            var op5 = peer2.SetLocalDescription(ref desc);
+            yield return op5;
+            var op6 = peer1.SetRemoteDescription(ref desc);
+            yield return op6;
+
+            var op7 = new WaitUntilWithTimeout(
+                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
+                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op7;
+            Assert.True(op7.IsCompleted);
+            var op8 = new WaitUntilWithTimeout(
+                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
+                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op8;
+
+            Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
+            RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
+            Assert.That(sender1, Is.Not.Null);
+
+            MediaStream stream2 = Audio.CaptureStream();
+            RTCRtpSender sender2 = peer2.AddTrack(stream2.GetTracks().First());
+            Assert.That(sender2, Is.Not.Null);
+            Assert.That(sender1, Is.EqualTo(sender2));
+
+            peer1.Dispose();
+            peer2.Dispose();
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
         public IEnumerator PeerConnectionStateChange()
         {
             RTCConfiguration config = default;
