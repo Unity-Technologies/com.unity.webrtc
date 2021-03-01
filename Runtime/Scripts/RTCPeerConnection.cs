@@ -509,7 +509,9 @@ namespace Unity.WebRTC
             }
 
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
-            return new RTCRtpSender(NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow(), streamId), this);
+            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(
+                GetSelfOrThrow(), track.GetSelfOrThrow(), streamId);
+            return CreateSender(ptr);
         }
 
         /// <summary>
@@ -519,7 +521,8 @@ namespace Unity.WebRTC
         /// <seealso cref="AddTrack"/>
         public void RemoveTrack(RTCRtpSender sender)
         {
-            NativeMethods.PeerConnectionRemoveTrack(GetSelfOrThrow(), sender.self);
+            NativeMethods.PeerConnectionRemoveTrack(
+                GetSelfOrThrow(), sender.self);
         }
 
         /// <summary>
@@ -529,7 +532,9 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track)
         {
-            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiver(GetSelfOrThrow(), track.GetSelfOrThrow()), this);
+            IntPtr ptr = NativeMethods.PeerConnectionAddTransceiver(
+                GetSelfOrThrow(), track.GetSelfOrThrow());
+            return CreateTransceiver(ptr);
         }
 
         /// <summary>
@@ -539,7 +544,9 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(TrackKind kind)
         {
-            return new RTCRtpTransceiver(NativeMethods.PeerConnectionAddTransceiverWithType(GetSelfOrThrow(), kind), this);
+            IntPtr ptr = NativeMethods.PeerConnectionAddTransceiverWithType(
+                GetSelfOrThrow(), kind);
+            return CreateTransceiver(ptr);
         }
 
         /// <summary>
@@ -548,7 +555,8 @@ namespace Unity.WebRTC
         /// <param name="candidate"></param>
         public bool AddIceCandidate(RTCIceCandidate candidate)
         {
-            return NativeMethods.PeerConnectionAddIceCandidate(GetSelfOrThrow(), candidate.self);
+            return NativeMethods.PeerConnectionAddIceCandidate(
+                GetSelfOrThrow(), candidate.self);
         }
 
         /// <summary>
