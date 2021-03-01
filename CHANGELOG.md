@@ -4,6 +4,16 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.3] - 2021-02-26
+
+### Added
+
+- Added `OnConnectionStateChange` event to the `RTCPeerConnection` class
+
+### Fixed
+
+- Fixed a crash bug that occurs when accessing `MediaStreamTrack` properties after disposing of `RTCPeerConnection`
+
 ## [2.3.2] - 2021-02-12
 
 ### Changed

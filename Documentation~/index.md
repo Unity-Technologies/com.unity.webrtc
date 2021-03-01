@@ -12,6 +12,16 @@ This version of the package is compatible with the following versions of the Uni
 
 - **Unity 2019.4**
 
+### Platform
+
+- **Windows**
+- **Linux**
+- **macOS** (**Apple Slicon** is not supported yet)
+- **iOS**
+
+> [!NOTE]
+> **Android** platform is not supported yet.
+
 ### Encoder support
 
 | Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
