@@ -13,9 +13,6 @@ export ARTIFACTS_DIR="$(pwd)/artifacts"
 
 if [ ! -e "$(pwd)/src" ]
 then
-  # To avoid error: "/etc/gitconfig: Permission denied"
-  sudo chmod +w /etc/gitconfig
-
   fetch --nohooks webrtc_android
   cd src
   git config --system core.longpaths true
