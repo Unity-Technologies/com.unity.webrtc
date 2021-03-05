@@ -16,10 +16,11 @@ rm -r "$BUNDLE_FILE"
 
 # Build UnityRenderStreaming Plugin
 cd "$SOLUTION_DIR"
-cmake .    \
+cmake . \
   -G Xcode \
   -B build
 
-cmake --build build     \
-  --config Release      \
+cmake \
+  --build build \
+  --config Release \
   --target WebRTCPlugin
