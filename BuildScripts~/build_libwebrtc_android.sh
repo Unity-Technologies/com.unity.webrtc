@@ -35,14 +35,14 @@ do
   do
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug}    \
-      target_os=\"android\"           \
-      target_cpu=\"${target_cpu}\"    \
-      rtc_use_h264=false              \
-      rtc_include_tests=false         \
-      rtc_build_examples=false        \
-      is_component_build=false        \
-      use_rtti=true                   \
+      --args="is_debug=${is_debug} \
+      target_os=\"android\" \
+      target_cpu=\"${target_cpu}\" \
+      rtc_use_h264=false \
+      rtc_include_tests=false \
+      rtc_build_examples=false \
+      is_component_build=false \
+      use_rtti=true \
       use_custom_libcxx=false"
 
     # build static library
