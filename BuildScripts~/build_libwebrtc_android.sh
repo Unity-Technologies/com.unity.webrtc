@@ -29,6 +29,8 @@ mkdir -p "$ARTIFACTS_DIR/lib"
 
 for target_cpu in "arm64"
 do
+  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+
   for is_debug in "true" "false"
   do
     # generate ninja files
@@ -51,8 +53,7 @@ do
       filename="libwebrtcd.a"
     fi
 
-    # cppy static library
-    mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+    # copy static library
     cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
   done
 done
