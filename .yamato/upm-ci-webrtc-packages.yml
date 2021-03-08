@@ -44,7 +44,15 @@ platforms:
     build_command: BuildScripts~/build_plugin_ios.sh
     test_command: BuildScripts~/test_plugin_ios.sh
     plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
-
+  - name: android
+    type: Unity::VM
+    gpu_type: Unity::VM
+    image: mobile/android-linux-build:latest
+    gpu_image: mobile/android-linux-build:latest
+    flavor: b1.large
+    build_command: BuildScripts~/build_plugin_android.sh
+    test_command: BuildScripts~/test_plugin_android.sh
+    plugin_path: Runtime/Plugins/Android/libwebrtc.aar
 test_targets:
   - name: win
     type: Unity::VM
