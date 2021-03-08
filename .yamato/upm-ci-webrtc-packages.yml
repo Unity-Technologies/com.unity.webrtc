@@ -204,7 +204,9 @@ pack_{{ package.name }}:
         - "upm-ci~/packages/**/*"
   dependencies:
     {% for platform in platforms %}
+    {% if target.name != "android" -%} # todo(kazuki)
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
+    {% endif -%}
     {% endfor %}
 
 {% for editor in editors %}
