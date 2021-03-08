@@ -20,8 +20,12 @@
 #include <GL/glut.h>
 #endif
 
-#if defined(SUPPORT_VULKAN)
+#if defined(SUPPORT_VULKAN) // Vulkan
+
+#if defined(CUDA_PLATFORM)
 #include <cuda.h>
+#endif
+
 #if defined(_WIN32)
 #include <vulkan/vulkan_win32.h>
 #endif

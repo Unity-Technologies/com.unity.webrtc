@@ -68,6 +68,7 @@
 #pragma endregion
 
 #include "PlatformBase.h"
+#include "IUnityGraphics.h"
 #include "IUnityRenderingExtensions.h"
 
 #if defined(SUPPORT_D3D11)
@@ -93,12 +94,8 @@
 #include "IUnityGraphicsMetal.h"
 #endif
 
-#include "IUnityGraphics.h"
-
 #if defined(SUPPORT_VULKAN)
-#define VK_NO_PROTOTYPES
 #include "IUnityGraphicsVulkan.h"
-#include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
 #endif
 
 #if _WIN32 && _DEBUG

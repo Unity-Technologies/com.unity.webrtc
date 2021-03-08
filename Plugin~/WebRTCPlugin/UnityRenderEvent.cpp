@@ -11,7 +11,7 @@
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #if defined(SUPPORT_VULKAN)
-//#include <IUnityGraphicsVulkan.h>
+#define VK_NO_PROTOTYPES
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
 #endif
 

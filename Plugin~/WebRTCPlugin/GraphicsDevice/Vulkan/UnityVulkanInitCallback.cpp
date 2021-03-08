@@ -35,6 +35,19 @@ static std::vector<const char*> requestedDeviceExtensions =
 #endif
 };
 
+static void LoadVulkanAPI(PFN_vkGetInstanceProcAddr getInstanceProcAddr, VkInstance instance)
+{
+    if (!vkGetInstanceProcAddr && getInstanceProcAddr)
+        vkGetInstanceProcAddr = getInstanceProcAddr;
+
+    if (!vkCreateInstance)
+        vkCreateInstance = (PFN_vkCreateInstance)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkCreateInstance");
+
+#define LOAD_VULKAN_FUNC(fn) if (!fn) fn = (PFN_##fn)vkGetInstanceProcAddr(instance, #fn)
+    UNITY_USED_VULKAN_API_FUNCTIONS(LOAD_VULKAN_FUNC);
+#undef LOAD_VULKAN_FUNC
+}
+
 static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
     VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo* pCreateInfo,
     const VkAllocationCallbacks* pAllocator, VkDevice* pDevice)
@@ -103,6 +116,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     {
         RTC_LOG(LS_ERROR) << "vkCreateInstance:" << result;
     }
+    LoadVulkanAPI(s_vkGetInstanceProcAddr, *pInstance);
     return result;
 }
 

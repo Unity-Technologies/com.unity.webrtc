@@ -3,15 +3,6 @@
 namespace unity {
 namespace webrtc {
 
-/// <summary>
-///
-/// </summary>
-/// <param name="getInstanceProcAddr"></param>
-/// <param name="userdata"></param>
-/// <returns></returns>
-PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
-    PFN_vkGetInstanceProcAddr getInstanceProcAddr, void* userdata);
-
 #define UNITY_USED_VULKAN_API_FUNCTIONS(apply) \
     apply(vkCreateInstance); \
     apply(vkCreateDevice); \
@@ -62,9 +53,22 @@ PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
     apply(vkDestroyPipelineLayout);
 
 #define VULKAN_DEFINE_API_FUNCPTR(func) static PFN_##func func
-VULKAN_DEFINE_API_FUNCPTR(vkGetInstanceProcAddr);
-UNITY_USED_VULKAN_API_FUNCTIONS(VULKAN_DEFINE_API_FUNCPTR);
+    VULKAN_DEFINE_API_FUNCPTR(vkGetInstanceProcAddr);
+    UNITY_USED_VULKAN_API_FUNCTIONS(VULKAN_DEFINE_API_FUNCPTR);
 #undef VULKAN_DEFINE_API_FUNCPTR
+
+/// <summary>
+///
+/// </summary>
+/// <param name="getInstanceProcAddr"></param>
+/// <param name="userdata"></param>
+/// <returns></returns>
+PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
+    PFN_vkGetInstanceProcAddr getInstanceProcAddr, void* userdata);
+
+
+
+static void LoadVulkanAPI(PFN_vkGetInstanceProcAddr getInstanceProcAddr, VkInstance instance);
 
 } // namespace webrtc
 } // namespace unity

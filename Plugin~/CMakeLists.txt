@@ -70,11 +70,8 @@ endif()
 
 if(Windows OR Linux)
   find_package(CUDA REQUIRED)
-  add_subdirectory(NvCodec)
-endif()
-
-if(Windows OR Linux)
   find_package(Vulkan REQUIRED)
+  add_subdirectory(NvCodec)
 endif()
 
 add_subdirectory(WebRTCPlugin)
