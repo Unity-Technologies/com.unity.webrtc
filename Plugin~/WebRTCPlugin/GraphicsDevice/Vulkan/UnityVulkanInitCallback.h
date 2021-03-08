@@ -20,10 +20,13 @@ PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
     apply(vkCreateBuffer); \
     apply(vkGetPhysicalDeviceMemoryProperties); \
     apply(vkGetBufferMemoryRequirements); \
+    apply(vkGetImageSubresourceLayout); \
     apply(vkMapMemory); \
     apply(vkBindBufferMemory); \
     apply(vkAllocateMemory); \
     apply(vkAllocateCommandBuffers); \
+    apply(vkCreateCommandPool); \
+    apply(vkDestroyCommandPool); \
     apply(vkDestroyBuffer); \
     apply(vkDestroyImage); \
     apply(vkFreeMemory); \
@@ -41,6 +44,16 @@ PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
     apply(vkCmdPushConstants); \
     apply(vkCmdBindVertexBuffers); \
     apply(vkDestroyPipeline); \
+    apply(vkBeginCommandBuffer); \
+    apply(vkBindImageMemory); \
+    apply(vkCmdCopyImage); \
+    apply(vkCmdPipelineBarrier); \
+    apply(vkCreateImageView); \
+    apply(vkEndCommandBuffer); \
+    apply(vkFreeCommandBuffers); \
+    apply(vkGetDeviceProcAddr); \
+    apply(vkGetImageMemoryRequirements); \
+    apply(vkQueueSubmit); \
     apply(vkDestroyPipelineLayout);
 
 #define VULKAN_DEFINE_API_FUNCPTR(func) static PFN_##func func
