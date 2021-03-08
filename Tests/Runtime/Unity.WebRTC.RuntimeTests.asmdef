@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
+        "Android",
         "Editor",
         "iOS",
         "LinuxStandalone64",

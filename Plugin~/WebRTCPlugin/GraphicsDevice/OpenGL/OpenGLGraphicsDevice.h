@@ -1,8 +1,11 @@
-﻿#pragma once
+#pragma once
 
 #include "WebRTCConstants.h"
-#include "GraphicsDevice/Cuda/CudaContext.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
+
+#if defined(CUDA_PLATFORM)
+#include "GraphicsDevice/Cuda/CudaContext.h"
+#endif
 
 namespace unity
 {
@@ -27,13 +30,17 @@ public:
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
     inline virtual GraphicsDeviceType GetDeviceType() const;
 
+#if defined(CUDA_PLATFORM)
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
-
+#endif
 private:
+    bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
+
+#if defined(CUDA_PLATFORM)
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
-    bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
+#endif
 };
 
 void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }

@@ -11,7 +11,7 @@
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #if defined(SUPPORT_VULKAN)
-#include <IUnityGraphicsVulkan.h>
+//#include <IUnityGraphicsVulkan.h>
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
 #endif
 
@@ -174,7 +174,11 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
     if(vulkan != nullptr)
     {
+#if defined(CUDA_PLATFORM)
         vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+#elif defined(UNITY_ANDROID)
+        InitVulkan();
+#endif
     }
 #endif
 

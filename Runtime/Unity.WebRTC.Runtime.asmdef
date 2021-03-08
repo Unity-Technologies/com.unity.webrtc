@@ -2,6 +2,7 @@
     "name": "Unity.WebRTC",
     "references": [],
     "includePlatforms": [
+        "Android",
         "Editor",
         "iOS",
         "LinuxStandalone64",

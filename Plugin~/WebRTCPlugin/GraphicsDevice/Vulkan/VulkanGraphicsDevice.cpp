@@ -45,14 +45,18 @@ bool VulkanGraphicsDevice::InitV() {
 #endif
     }
 
+#if defined(CUDA_PLATFORM)
     m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_instance, m_physicalDevice);
+#endif
     return VK_SUCCESS == CreateCommandPool();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 void VulkanGraphicsDevice::ShutdownV() {
+#if defined(CUDA_PLATFORM)
     m_cudaContext.Shutdown();
+#endif
     VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
 
     if (s_hModule)

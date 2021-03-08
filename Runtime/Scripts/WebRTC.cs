@@ -284,6 +284,8 @@ namespace Unity.WebRTC
         internal const string Lib = "webrtc";
 #elif UNITY_IOS
         internal const string Lib = "__Internal";
+#elif UNITY_ANDROID
+        internal const string Lib = "webrtc";
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
