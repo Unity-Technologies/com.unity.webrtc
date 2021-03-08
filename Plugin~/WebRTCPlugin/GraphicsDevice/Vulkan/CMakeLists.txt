@@ -8,7 +8,7 @@ target_sources(WebRTCLib
     VulkanUtility.h
 )
 
-if(Windows OR Linux)
+if(Windows OR Linux OR Android)
   target_sources(WebRTCLib
     PRIVATE
       UnityVulkanInitCallback.cpp
