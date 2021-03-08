@@ -15,7 +15,8 @@ if [ ! -e "$(pwd)/src" ]
 then
   fetch --nohooks webrtc_android
   cd src
-  git config --system core.longpaths true
+  sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
+  sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
   gclient sync -f
@@ -26,15 +27,23 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-for target_cpu in "arm64" "x64"
+for target_cpu in "arm64"
 do
   mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+
   for is_debug in "true" "false"
   do
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} target_os=\"android\" target_cpu=\"${target_cpu}\" rtc_use_h264=false rtc_include_tests=false rtc_build_examples=false"
-
+      --args="is_debug=${is_debug} \
+      target_os=\"android\" \
+      target_cpu=\"${target_cpu}\" \
+      rtc_use_h264=false \
+      rtc_include_tests=false \
+      rtc_build_examples=false \
+      is_component_build=false \
+      use_rtti=true \
+      use_custom_libcxx=false"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
@@ -44,10 +53,36 @@ do
       filename="libwebrtcd.a"
     fi
 
-    # cppy static library
+    # copy static library
     cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
   done
 done
+
+pushd src
+
+for is_debug in "true" "false"
+do
+  python tools_webrtc/android/build_aar.py \
+    --build-dir $OUTPUT_DIR \
+    --output $OUTPUT_DIR/libwebrtc.aar \
+    --arch arm64-v8a \
+    --extra-gn-args "is_debug=${is_debug} \
+      rtc_use_h264=false \
+      rtc_include_tests=false \
+      rtc_build_examples=false \
+      is_component_build=false \
+      use_rtti=true \
+      use_custom_libcxx=false"
+
+  filename="libwebrtc.aar"
+  if [ $is_debug = "true" ]; then
+    filename="libwebrtc-debug.aar"
+  fi
+  # copy aar
+  cp "$OUTPUT_DIR/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
+done
+
+popd
 
 # fix error when generate license
 patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
