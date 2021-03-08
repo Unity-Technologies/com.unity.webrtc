@@ -16,14 +16,17 @@ sudo apt install -y libc++-dev libc++abi-dev clang freeglut3-dev
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
-cmake -DCMAKE_C_COMPILER="clang" \
-      -DCMAKE_CXX_COMPILER="clang++" \
-      -DCMAKE_BUILD_TYPE="Debug" \
-      -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-      -Dcxx_no_rtti=ON \
-      -B "build" \
-      .
-cmake --build build --config Debug
+cmake . \
+  -D CMAKE_C_COMPILER="clang" \
+  -D CMAKE_CXX_COMPILER="clang++" \
+  -D CMAKE_BUILD_TYPE="Debug" \
+  -D CMAKE_CXX_FLAGS="-stdlib=libc++" \
+  -D cxx_no_rtti=ON \
+  -B build
+
+cmake \ 
+  --build build \
+  --config Debug
 
 # Run UnitTest
 "$SOLUTION_DIR/build/WebRTCPluginTest/WebRTCLibTest"

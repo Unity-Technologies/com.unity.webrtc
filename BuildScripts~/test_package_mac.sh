@@ -22,14 +22,14 @@ export IDENTITY=~/.ssh/id_rsa_macmini
 brew install gettext
 
 # render template
-envsubst '                                    \
-  $SCRIPTING_BACKEND                          \
-  $EXTRA_EDITOR_ARG                           \
-  $TEST_PROJECT_DIR                           \
-  $TEST_TARGET                                \
-  $TEST_PLATFORM                              \
-  $EDITOR_VERSION'                            \
-  < ${TEMPLATE_FILE}                          \
+envsubst ' \
+  $SCRIPTING_BACKEND \
+  $EXTRA_EDITOR_ARG \
+  $TEST_PROJECT_DIR \
+  $TEST_TARGET \
+  $TEST_PLATFORM \
+  $EDITOR_VERSION' \
+  < ${TEMPLATE_FILE} \
   > ~/remote.sh
 chmod +x ~/remote.sh
 
