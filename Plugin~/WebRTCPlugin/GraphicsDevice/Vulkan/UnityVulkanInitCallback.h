@@ -15,10 +15,12 @@ PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
 #define UNITY_USED_VULKAN_API_FUNCTIONS(apply) \
     apply(vkCreateInstance); \
     apply(vkCreateDevice); \
+    apply(vkDestroyDevice); \
     apply(vkCreateImage); \
     apply(vkCmdBeginRenderPass); \
     apply(vkCreateBuffer); \
     apply(vkGetPhysicalDeviceMemoryProperties); \
+    apply(vkGetPhysicalDeviceQueueFamilyProperties); \
     apply(vkGetBufferMemoryRequirements); \
     apply(vkGetImageSubresourceLayout); \
     apply(vkMapMemory); \
@@ -29,6 +31,9 @@ PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
     apply(vkDestroyCommandPool); \
     apply(vkDestroyBuffer); \
     apply(vkDestroyImage); \
+    apply(vkEnumerateDeviceExtensionProperties); \
+    apply(vkEnumeratePhysicalDevices); \
+    apply(vkGetDeviceQueue); \
     apply(vkFreeMemory); \
     apply(vkUnmapMemory); \
     apply(vkQueueWaitIdle); \
