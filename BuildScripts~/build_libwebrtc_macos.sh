@@ -15,7 +15,8 @@ if [ ! -e "$(pwd)/src" ]
 then
   fetch --nohooks webrtc
   cd src
-  git config --system core.longpaths true
+  sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
+  sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
   gclient sync -f
