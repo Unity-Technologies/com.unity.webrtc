@@ -82,7 +82,7 @@ done
 patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
   "$COMMAND_DIR/patches/generate_licenses.patch"
 
-python "./src/tools_webrtc/libs/generate_licenses.py" \
+vpython "./src/tools_webrtc/libs/generate_licenses.py" \
   --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
