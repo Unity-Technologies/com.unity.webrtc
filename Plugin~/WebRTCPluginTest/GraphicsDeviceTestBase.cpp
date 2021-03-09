@@ -144,7 +144,7 @@ inline void VKCHECK(VkResult result)
 
 LIBRARY_TYPE s_library = nullptr;
 
-bool LoadModule()
+bool LoadVulkanModule()
 {
     if (!LoadVulkanLibrary(s_library))
         return false;
@@ -204,7 +204,7 @@ void* CreateDeviceVulkan()
     appInfo.apiVersion = VK_API_VERSION_1_1;
     appInfo.engineVersion = 1;
 
-    if(!LoadModule())
+    if(!LoadVulkanModule())
         assert("failed loading vulkan module");
 
     std::vector<const char*> layers = { "VK_LAYER_LUNARG_standard_validation" };
