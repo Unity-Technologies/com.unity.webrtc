@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #if defined(_WIN32)
-#define VK_NO_PROTOTYPES
 #include <vulkan/vulkan_win32.h>
 #elif defined(__linux)
 #include <dlfcn.h>
