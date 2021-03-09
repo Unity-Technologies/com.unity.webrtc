@@ -28,6 +28,9 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 # add objc library to use videotoolbox
 patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
+# use included python
+export PATH="$(pwd)/depot_tools/bootstrap-3.8.0.chromium.8_bin/python/bin:$PATH"
+
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 for is_debug in "true" "false"
