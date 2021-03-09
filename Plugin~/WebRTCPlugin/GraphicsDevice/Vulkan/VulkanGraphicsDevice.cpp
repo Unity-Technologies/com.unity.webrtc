@@ -2,8 +2,6 @@
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
 
-#include "IUnityGraphicsVulkan.h"
-#include "vulkan/vulkan.h"
 #include "VulkanUtility.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 

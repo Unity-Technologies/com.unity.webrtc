@@ -1,5 +1,8 @@
 target_sources(WebRTCLib
   PRIVATE
+    ListOfVulkanFunctions.inl
+    UnityVulkanInitCallback.cpp
+    UnityVulkanInitCallback.h
     VulkanGraphicsDevice.cpp
     VulkanGraphicsDevice.h
     VulkanTexture2D.cpp
@@ -7,11 +10,3 @@ target_sources(WebRTCLib
     VulkanUtility.cpp
     VulkanUtility.h
 )
-
-if(Windows OR Linux OR Android)
-  target_sources(WebRTCLib
-    PRIVATE
-      UnityVulkanInitCallback.cpp
-      UnityVulkanInitCallback.h
-  )
-endif()

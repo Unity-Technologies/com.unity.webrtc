@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cuda.h"
-#include <vulkan/vulkan.h>
 
 namespace unity
 {

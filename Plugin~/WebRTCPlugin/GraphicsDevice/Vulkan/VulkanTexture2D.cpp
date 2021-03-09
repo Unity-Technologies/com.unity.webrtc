@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "VulkanTexture2D.h"
-
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 
 namespace unity

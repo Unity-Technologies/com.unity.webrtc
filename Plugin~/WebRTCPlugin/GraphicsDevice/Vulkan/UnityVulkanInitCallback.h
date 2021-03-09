@@ -1,61 +1,21 @@
 #pragma once
+#include <vulkan/vulkan.h>
+
+#ifdef _WIN32
+#define LIBRARY_TYPE HMODULE
+#elif defined __linux
+#define LIBRARY_TYPE void*
+#endif
 
 namespace unity {
 namespace webrtc {
 
-#define UNITY_USED_VULKAN_API_FUNCTIONS(apply) \
-    apply(vkCreateInstance); \
-    apply(vkCreateDevice); \
-    apply(vkDestroyDevice); \
-    apply(vkCreateImage); \
-    apply(vkCmdBeginRenderPass); \
-    apply(vkCreateBuffer); \
-    apply(vkGetPhysicalDeviceMemoryProperties); \
-    apply(vkGetPhysicalDeviceQueueFamilyProperties); \
-    apply(vkGetBufferMemoryRequirements); \
-    apply(vkGetImageSubresourceLayout); \
-    apply(vkMapMemory); \
-    apply(vkBindBufferMemory); \
-    apply(vkAllocateMemory); \
-    apply(vkAllocateCommandBuffers); \
-    apply(vkCreateCommandPool); \
-    apply(vkDestroyCommandPool); \
-    apply(vkDestroyBuffer); \
-    apply(vkDestroyImage); \
-    apply(vkEnumerateDeviceExtensionProperties); \
-    apply(vkEnumeratePhysicalDevices); \
-    apply(vkGetDeviceQueue); \
-    apply(vkFreeMemory); \
-    apply(vkUnmapMemory); \
-    apply(vkQueueWaitIdle); \
-    apply(vkDeviceWaitIdle); \
-    apply(vkCmdCopyBufferToImage); \
-    apply(vkFlushMappedMemoryRanges); \
-    apply(vkCreatePipelineLayout); \
-    apply(vkCreateShaderModule); \
-    apply(vkDestroyShaderModule); \
-    apply(vkCreateGraphicsPipelines); \
-    apply(vkCmdBindPipeline); \
-    apply(vkCmdDraw); \
-    apply(vkCmdPushConstants); \
-    apply(vkCmdBindVertexBuffers); \
-    apply(vkDestroyPipeline); \
-    apply(vkBeginCommandBuffer); \
-    apply(vkBindImageMemory); \
-    apply(vkCmdCopyImage); \
-    apply(vkCmdPipelineBarrier); \
-    apply(vkCreateImageView); \
-    apply(vkEndCommandBuffer); \
-    apply(vkFreeCommandBuffers); \
-    apply(vkGetDeviceProcAddr); \
-    apply(vkGetImageMemoryRequirements); \
-    apply(vkQueueSubmit); \
-    apply(vkDestroyPipelineLayout);
+#define EXPORTED_VULKAN_FUNCTION(func) extern PFN_##func func;
+#define GLOBAL_VULKAN_FUNCTION(func) extern PFN_##func func;
+#define INSTANCE_VULKAN_FUNCTION(func) extern PFN_##func func;
+#define DEVICE_VULKAN_FUNCTION(func) extern PFN_##func func;
 
-#define VULKAN_DEFINE_API_FUNCPTR(func) static PFN_##func func
-    VULKAN_DEFINE_API_FUNCPTR(vkGetInstanceProcAddr);
-    UNITY_USED_VULKAN_API_FUNCTIONS(VULKAN_DEFINE_API_FUNCPTR);
-#undef VULKAN_DEFINE_API_FUNCPTR
+#include "ListOfVulkanFunctions.inl"
 
 /// <summary>
 ///
@@ -66,9 +26,12 @@ namespace webrtc {
 PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
     PFN_vkGetInstanceProcAddr getInstanceProcAddr, void* userdata);
 
+bool LoadVulkanLibrary(LIBRARY_TYPE& library);
+bool LoadExportedVulkanFunction(LIBRARY_TYPE const& library);
+bool LoadGlobalVulkanFunction();
+bool LoadInstanceVulkanFunction(VkInstance instance);
+bool LoadDeviceVulkanFunction(VkDevice device);
 
-
-static void LoadVulkanAPI(PFN_vkGetInstanceProcAddr getInstanceProcAddr, VkInstance instance);
 
 } // namespace webrtc
 } // namespace unity

@@ -84,6 +84,7 @@ if(Windows)
     PUBLIC
       WEBRTC_WIN
       NOMINMAX
+      VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
     PRIVATE
@@ -148,6 +149,7 @@ elseif(Linux)
     PUBLIC
       WEBRTC_LINUX
       WEBRTC_POSIX
+      VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
     PRIVATE
@@ -200,6 +202,7 @@ elseif(Android)
     PUBLIC
       WEBRTC_ANDROID
       WEBRTC_POSIX
+      VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
     PRIVATE

@@ -142,6 +142,17 @@ inline void VKCHECK(VkResult result)
 }
 }
 
+LIBRARY_TYPE s_library = nullptr;
+
+bool LoadModule()
+{
+    if (!LoadVulkanLibrary(s_library))
+        return false;
+    if (!LoadExportedVulkanFunction(s_library))
+        return false;
+    return LoadGlobalVulkanFunction();
+}
+
 int32_t GetPhysicalDeviceIndex(
     VkInstance instance, std::vector<VkPhysicalDevice>& list, bool* found)
 {
@@ -193,6 +204,9 @@ void* CreateDeviceVulkan()
     appInfo.apiVersion = VK_API_VERSION_1_1;
     appInfo.engineVersion = 1;
 
+    if(!LoadModule())
+        assert("failed loading vulkan module");
+
     std::vector<const char*> layers = { "VK_LAYER_LUNARG_standard_validation" };
     VkInstanceCreateInfo instanceInfo{};
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -203,6 +217,7 @@ void* CreateDeviceVulkan()
     instanceInfo.pApplicationInfo = &appInfo;
     VkInstance instance = nullptr;
     VKCHECK(vkCreateInstance(&instanceInfo, nullptr, &instance));
+    LoadInstanceVulkanFunction(instance);
 
     // create physical device
     uint32_t devCount = 0;
@@ -213,9 +228,8 @@ void* CreateDeviceVulkan()
     int32_t physicalDeviceIndex =
         GetPhysicalDeviceIndex(instance, physicalDeviceList, &found);
     if(!found)
-    {
         assert("vulkan physical device not found");
-    }
+
     const VkPhysicalDevice physicalDevice = physicalDeviceList[physicalDeviceIndex];
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
@@ -264,6 +278,8 @@ void* CreateDeviceVulkan()
     deviceCreateInfo.queueCreateInfoCount = 1;
     VkDevice device;
     VKCHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
+
+    LoadDeviceVulkanFunction(device);
 
     VkQueue queue;
     vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
