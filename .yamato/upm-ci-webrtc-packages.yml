@@ -47,8 +47,8 @@ platforms:
   - name: android
     type: Unity::VM
     gpu_type: Unity::VM
-    image: mobile/android-linux-build:latest
-    gpu_image: mobile/android-linux-build:latest
+    image: renderstreaming/android-linux-build:latest
+    gpu_image: renderstreaming/android-linux-build:latest
     flavor: b1.large
     build_command: BuildScripts~/build_plugin_android.sh
     test_command: BuildScripts~/test_plugin_android.sh
