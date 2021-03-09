@@ -96,7 +96,7 @@
 
 #if defined(SUPPORT_VULKAN)
 #include "IUnityGraphicsVulkan.h"
-#include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
+#include "GraphicsDevice/Vulkan/LoadVulkanFunctions.h"
 
 #endif
 
