@@ -75,7 +75,7 @@
 #define SUPPORT_VULKAN 1
 #endif 
 
-#if defined(UNITY_LINUX) || defined(UNITY_WIN)
+#if UNITY_LINUX || UNITY_WIN
 #define CUDA_PLATFORM
 #endif
 

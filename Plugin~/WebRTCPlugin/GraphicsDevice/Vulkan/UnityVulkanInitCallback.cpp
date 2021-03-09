@@ -72,7 +72,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
 {
 
     if (!LoadGlobalVulkanFunction())
-        return VK_ERROR_DEVICE_LOST;
+        return VK_ERROR_INITIALIZATION_FAILED;
 
     // copy value 
     VkInstanceCreateInfo newCreateInfo = *pCreateInfo;
@@ -104,7 +104,7 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     }
 
     if (!LoadInstanceVulkanFunction(*pInstance))
-        return VK_ERROR_DEVICE_LOST;
+        return VK_ERROR_INITIALIZATION_FAILED;
     return result;
 }
 

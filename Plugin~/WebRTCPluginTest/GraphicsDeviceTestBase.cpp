@@ -217,7 +217,9 @@ void* CreateDeviceVulkan()
     instanceInfo.pApplicationInfo = &appInfo;
     VkInstance instance = nullptr;
     VKCHECK(vkCreateInstance(&instanceInfo, nullptr, &instance));
-    LoadInstanceVulkanFunction(instance);
+
+    if(!LoadInstanceVulkanFunction(instance))
+        assert("failed loading vulkan module");
 
     // create physical device
     uint32_t devCount = 0;
@@ -279,7 +281,8 @@ void* CreateDeviceVulkan()
     VkDevice device;
     VKCHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
 
-    LoadDeviceVulkanFunction(device);
+    if(!LoadDeviceVulkanFunction(device))
+        assert("failed loading vulkan module");
 
     VkQueue queue;
     vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
