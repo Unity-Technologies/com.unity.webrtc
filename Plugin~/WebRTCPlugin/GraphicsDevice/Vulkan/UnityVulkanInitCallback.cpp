@@ -3,6 +3,8 @@
 #if defined(_WIN32)
 #define VK_NO_PROTOTYPES
 #include <vulkan/vulkan_win32.h>
+#elif defined(__linux)
+#include <dlfcn.h>
 #endif
 
 namespace unity
@@ -18,9 +20,9 @@ namespace webrtc
 #include "ListOfVulkanFunctions.inl"
 
 bool LoadVulkanLibrary(LIBRARY_TYPE& library) {
-#if defined _WIN32
+#if defined(_WIN32)
     library = LoadLibrary("vulkan-1.dll");
-#elif defined __linux
+#elif defined(__linux)
     library = dlopen("libvulkan.so.1", RTLD_NOW);
 #endif
     if (library == nullptr)
@@ -29,10 +31,9 @@ bool LoadVulkanLibrary(LIBRARY_TYPE& library) {
 }
 
 bool LoadExportedVulkanFunction(LIBRARY_TYPE const& library) {
-
-#if defined _WIN32
+#if defined(_WIN32)
 #define LoadFunction GetProcAddress
-#elif defined __linux
+#elif defined(__linux)
 #define LoadFunction dlsym
 #endif
 
