@@ -17,6 +17,8 @@ set PYPI_URL=https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/si
 set vs2017_install=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools
 
 if not exist src (
+  powershell -Command "get-content depot_tools\update_depot_tools.bat | foreach-object {$_ -replace \"origin/master\",\"origin/main\"} | add-content depot_tools\update_depot_tools.bat.edited"
+  move /Y depot_tools\update_depot_tools.bat.edited depot_tools\update_depot_tools.bat
   call fetch.bat --nohooks webrtc
   cd src
   call git.bat config --system core.longpaths true
