@@ -7,7 +7,7 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=4183
+export WEBRTC_VERSION=4389
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 
@@ -15,7 +15,8 @@ if [ ! -e "$(pwd)/src" ]
 then
   fetch --nohooks webrtc
   cd src
-  git config --system core.longpaths true
+  sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
+  sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
   gclient sync -f
@@ -52,7 +53,7 @@ done
 patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
   "$COMMAND_DIR/patches/generate_licenses.patch"
 
-python "./src/tools_webrtc/libs/generate_licenses.py" \
+vpython "./src/tools_webrtc/libs/generate_licenses.py" \
   --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src

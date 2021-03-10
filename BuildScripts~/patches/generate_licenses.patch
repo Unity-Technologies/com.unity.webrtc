@@ -1,10 +1,17 @@
---- ./src/tools_webrtc/libs/generate_licenses.py	2020-08-08 11:02:57.064616700 +0900
-+++ ./src/tools_webrtc/libs/generate_licenses.py.edited	2020-08-29 10:58:18.826417100 +0900
-@@ -70,6 +70,7 @@ LIB_TO_LICENSES_DICT = {
+--- ./src/tools_webrtc/libs/generate_licenses.py	2021-03-09 15:23:53.000000000 +0900
++++ ./src/tools_webrtc/libs/generate_licenses.py.edited	2021-03-09 15:28:56.000000000 +0900
+@@ -74,6 +74,14 @@
      'g722': ['modules/third_party/g722/LICENSE'],
      'ooura': ['common_audio/third_party/ooura/LICENSE'],
      'spl_sqrt_floor': ['common_audio/third_party/spl_sqrt_floor/LICENSE'],
 +    'catapult': ['third_party/catapult/LICENSE'],
++    'modp_b64': ['third_party/modp_b64/LICENSE'],
++    'double_conversion': ['base/third_party/double_conversion/LICENSE'],
++    'dynamic_annotations': ['base/third_party/dynamic_annotations/LICENSE'],
++    'icu': ['base/third_party/icu/LICENSE'],
++    'symbolize': ['base/third_party/symbolize/LICENSE'],
++    'xdg_mime': ['base/third_party/xdg_mime/LICENSE'],
++    'xdg_user_dirs': ['base/third_party/xdg_user_dirs/LICENSE'],
  
      # TODO(bugs.webrtc.org/1110): Remove this hack. This is not a lib.
      # For some reason it is listed as so in _GetThirdPartyLibraries.

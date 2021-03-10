@@ -7,7 +7,7 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=4183
+export WEBRTC_VERSION=4389
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 
@@ -15,7 +15,8 @@ if [ ! -e "$(pwd)/src" ]
 then
   fetch --nohooks webrtc_ios
   cd src
-  git config --system core.longpaths true
+  sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
+  sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
   gclient sync -f
@@ -26,6 +27,9 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 # add objc library to use videotoolbox
 patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
+
+# use included python
+export PATH="$(pwd)/depot_tools/bootstrap-3.8.0.chromium.8_bin/python/bin:$PATH"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
@@ -81,7 +85,7 @@ done
 patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
   "$COMMAND_DIR/patches/generate_licenses.patch"
 
-python "./src/tools_webrtc/libs/generate_licenses.py" \
+vpython "./src/tools_webrtc/libs/generate_licenses.py" \
   --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
