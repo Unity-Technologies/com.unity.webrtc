@@ -56,7 +56,7 @@ platforms:
 test_targets:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:v0.3.5-725259
+    image: renderstreaming/win10:v0.3.4-622799
     flavor: b1.large
     is_gpu: false
     gfx_types:
