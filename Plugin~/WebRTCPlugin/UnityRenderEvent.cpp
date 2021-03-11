@@ -123,17 +123,19 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             break;
 
 #if defined(SUPPORT_VULKAN)
-        IUnityGraphicsVulkan* vulkan = s_UnityInterfaces->Get<IUnityGraphicsVulkan>();
-        if (vulkan != nullptr)
+        if (renderer == kUnityGfxRendererVulkan)
         {
-            UnityVulkanInstance instance = vulkan->Instance();
-            if (!LoadVulkanFunctions(instance))
+            IUnityGraphicsVulkan* vulkan = s_UnityInterfaces->Get<IUnityGraphicsVulkan>();
+            if (vulkan != nullptr)
             {
-                return;
+                UnityVulkanInstance instance = vulkan->Instance();
+                if (!LoadVulkanFunctions(instance))
+                {
+                    return;
+                }
             }
         }
 #endif
-
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces));
         if(s_gfxDevice != nullptr)
         {
