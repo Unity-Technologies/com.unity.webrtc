@@ -74,6 +74,10 @@ namespace webrtc
 
 using namespace unity::webrtc;
 
+#if defined(SUPPORT_VULKAN)
+LIBRARY_TYPE s_vulkanLibrary = nullptr;
+#endif
+
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch (eventType)
@@ -91,6 +95,36 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
         if (renderer == kUnityGfxRendererNull)
             break;
+
+#if defined(SUPPORT_VULKAN)
+        IUnityGraphicsVulkan* vulkan = s_UnityInterfaces->Get<IUnityGraphicsVulkan>();
+        if (vulkan != nullptr)
+        {
+            UnityVulkanInstance instance = vulkan->Instance();
+
+            if (!LoadVulkanLibrary(s_vulkanLibrary))
+            {
+                RTC_LOG(LS_ERROR) << "Failed loading vulkan library";
+                return;
+            }
+            if (!LoadExportedVulkanFunction(s_vulkanLibrary))
+            {
+                RTC_LOG(LS_ERROR) << "Failed loading vulkan exported function";
+                return;
+            }
+
+            if (!LoadInstanceVulkanFunction(instance.instance))
+            {
+                RTC_LOG(LS_ERROR) << "Failed loading vulkan instance function";
+                return;
+            }
+            if(!LoadDeviceVulkanFunction(instance.device))
+            {
+                RTC_LOG(LS_ERROR) << "Failed loading vulkan device function";
+                return;
+            }
+        }
+#endif
 
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces));
         if(s_gfxDevice != nullptr)
