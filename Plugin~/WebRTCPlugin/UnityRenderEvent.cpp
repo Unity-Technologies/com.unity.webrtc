@@ -76,6 +76,32 @@ using namespace unity::webrtc;
 
 #if defined(SUPPORT_VULKAN)
 LIBRARY_TYPE s_vulkanLibrary = nullptr;
+
+bool LoadVulkanFunctions(UnityVulkanInstance& instance)
+{
+    if (!LoadVulkanLibrary(s_vulkanLibrary))
+    {
+        RTC_LOG(LS_ERROR) << "Failed loading vulkan library";
+        return false;
+    }
+    if (!LoadExportedVulkanFunction(s_vulkanLibrary))
+    {
+        RTC_LOG(LS_ERROR) << "Failed loading vulkan exported function";
+        return false;
+    }
+
+    if (!LoadInstanceVulkanFunction(instance.instance))
+    {
+        RTC_LOG(LS_ERROR) << "Failed loading vulkan instance function";
+        return false;
+    }
+    if (!LoadDeviceVulkanFunction(instance.device))
+    {
+        RTC_LOG(LS_ERROR) << "Failed loading vulkan device function";
+        return false;
+    }
+    return true;
+}
 #endif
 
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
@@ -101,26 +127,8 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         if (vulkan != nullptr)
         {
             UnityVulkanInstance instance = vulkan->Instance();
-
-            if (!LoadVulkanLibrary(s_vulkanLibrary))
+            if (!LoadVulkanFunctions(instance))
             {
-                RTC_LOG(LS_ERROR) << "Failed loading vulkan library";
-                return;
-            }
-            if (!LoadExportedVulkanFunction(s_vulkanLibrary))
-            {
-                RTC_LOG(LS_ERROR) << "Failed loading vulkan exported function";
-                return;
-            }
-
-            if (!LoadInstanceVulkanFunction(instance.instance))
-            {
-                RTC_LOG(LS_ERROR) << "Failed loading vulkan instance function";
-                return;
-            }
-            if(!LoadDeviceVulkanFunction(instance.device))
-            {
-                RTC_LOG(LS_ERROR) << "Failed loading vulkan device function";
                 return;
             }
         }
