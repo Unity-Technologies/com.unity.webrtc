@@ -10,11 +10,11 @@ set WEBRTC_VERSION=4389
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set CPPFLAGS=/WX-
 set GYP_GENERATORS=ninja,msvs-ninja
-set GYP_MSVS_VERSION=2017
+set GYP_MSVS_VERSION=2019
 set OUTPUT_DIR=out
 set ARTIFACTS_DIR=%cd%\artifacts
 set PYPI_URL=https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-set vs2017_install=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools
+set vs2019_install=C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional
 
 if not exist src (
   powershell -Command "get-content depot_tools\update_depot_tools.bat | foreach-object {$_ -replace \"origin/master\",\"origin/main\"} | add-content depot_tools\update_depot_tools.bat.edited"
