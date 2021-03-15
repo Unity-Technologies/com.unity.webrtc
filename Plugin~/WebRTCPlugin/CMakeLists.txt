@@ -259,6 +259,13 @@ target_sources(WebRTCPlugin
     UnityRenderEvent.cpp
 )
 
+if(Android)
+  target_sources(WebRTCPlugin
+    PRIVATE
+      Jni.cpp
+  )
+endif()
+
 # rename dll/framework filename
 set_target_properties(WebRTCPlugin
   PROPERTIES

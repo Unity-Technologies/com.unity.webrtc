@@ -64,7 +64,7 @@ namespace webrtc
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SInt:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
-            return webrtc::VideoType::kABGR;
+            return webrtc::VideoType::kBGRA;
         default:
             return webrtc::VideoType::kUnknown;
         }
