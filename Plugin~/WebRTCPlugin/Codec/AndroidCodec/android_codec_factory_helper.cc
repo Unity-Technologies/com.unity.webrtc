@@ -25,8 +25,6 @@
 namespace webrtc {
 namespace test {
 
-namespace {
-
 std::unique_ptr<VideoEncoderFactory> CreateAndroidEncoderFactory() {
   JNIEnv* env = AttachCurrentThreadIfNeeded();
   ScopedJavaLocalRef<jclass> factory_class =

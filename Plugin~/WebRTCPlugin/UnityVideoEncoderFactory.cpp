@@ -38,7 +38,7 @@ namespace webrtc
         return webrtc::ObjCToNativeVideoEncoderFactory(
             [[RTCDefaultVideoEncoderFactory alloc] init]).release();
 #elif UNITY_ANDROID
-        return webrtc::test::CreateAndroidEncoderFactory().release();
+        return CreateAndroidEncoderFactory().release();
 #else
         return new webrtc::InternalEncoderFactory();
 #endif
