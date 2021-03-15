@@ -30,6 +30,9 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   set(macOS TRUE)
 endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+  set(Android TRUE)
+endif()
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -63,12 +66,13 @@ find_package(WebRTC REQUIRED)
 
 if(iOS OR macOS)
   find_package(Framework REQUIRED)
-else()
+endif()
+
+if(Windows OR Linux)
   find_package(CUDA REQUIRED)
   find_package(Vulkan REQUIRED)
   add_subdirectory(NvCodec)
 endif()
-
 
 add_subdirectory(WebRTCPlugin)
 add_subdirectory(WebRTCPluginTest)

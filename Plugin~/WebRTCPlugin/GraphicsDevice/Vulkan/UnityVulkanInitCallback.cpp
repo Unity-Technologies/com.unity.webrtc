@@ -1,19 +1,13 @@
 #include "pch.h"
-#include <IUnityGraphicsVulkan.h>
 
 #if defined(_WIN32)
 #include <vulkan/vulkan_win32.h>
 #endif
-#include "UnityVulkanInitCallback.h"
 
 namespace unity
 {
 namespace webrtc
 {
-
-static PFN_vkGetInstanceProcAddr s_vkGetInstanceProcAddr;
-static PFN_vkCreateInstance s_vkCreateInstance;
-
 const std::vector<const char*> requestedInstanceExtensions =
 {
     //VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
@@ -26,10 +20,10 @@ static std::vector<const char*> requestedDeviceExtensions =
 {
     VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
     VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
-#ifndef _WIN32
+#ifdef UNITY_LINUX
     VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
     VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
-#else
+#elif UNITY_WIN
     VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
     VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME
 #endif
@@ -65,15 +59,20 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
     if(result != VK_SUCCESS)
     {
         RTC_LOG(LS_ERROR) << "vkCreateDevice:" << result;
+        return result;
     }
+    if (!LoadDeviceVulkanFunction(*pDevice))
+        return VK_ERROR_INITIALIZATION_FAILED;
     return result;
 }
+
 
 static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)
 {
-    s_vkCreateInstance = reinterpret_cast<PFN_vkCreateInstance>(
-        s_vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkCreateInstance"));
+
+    if (!LoadGlobalVulkanFunction())
+        return VK_ERROR_INITIALIZATION_FAILED;
 
     // copy value 
     VkInstanceCreateInfo newCreateInfo = *pCreateInfo;
@@ -98,11 +97,14 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     newCreateInfo.ppEnabledExtensionNames = newExtensions.data();
     newCreateInfo.enabledExtensionCount = static_cast<uint32_t>(newExtensions.size());
 
-    VkResult result = s_vkCreateInstance(&newCreateInfo, pAllocator, pInstance);
+    VkResult result = vkCreateInstance(&newCreateInfo, pAllocator, pInstance);
     if (result != VK_SUCCESS)
     {
         RTC_LOG(LS_ERROR) << "vkCreateInstance:" << result;
     }
+
+    if (!LoadInstanceVulkanFunction(*pInstance))
+        return VK_ERROR_INITIALIZATION_FAILED;
     return result;
 }
 
@@ -127,7 +129,7 @@ static VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Hook_vkGetInstanceProcAddr(VkIns
 PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
     PFN_vkGetInstanceProcAddr getInstanceProcAddr, void* userdata)
 {
-    s_vkGetInstanceProcAddr = getInstanceProcAddr;
+    vkGetInstanceProcAddr = getInstanceProcAddr;
     return Hook_vkGetInstanceProcAddr;
 }
 

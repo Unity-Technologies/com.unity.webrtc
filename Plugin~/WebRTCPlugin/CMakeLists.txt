@@ -84,6 +84,7 @@ if(Windows)
     PUBLIC
       WEBRTC_WIN
       NOMINMAX
+      VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
     PRIVATE
@@ -148,6 +149,7 @@ elseif(Linux)
     PUBLIC
       WEBRTC_LINUX
       WEBRTC_POSIX
+      VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
     PRIVATE
@@ -194,6 +196,26 @@ elseif(iOS)
   set_target_properties(WebRTCLib 
     PROPERTIES 
       LINK_FLAGS "-ObjC"
+  )
+elseif(Android)
+  target_compile_definitions(WebRTCLib
+    PUBLIC
+      WEBRTC_ANDROID
+      WEBRTC_POSIX
+      VK_NO_PROTOTYPES
+  )
+  target_link_libraries(WebRTCLib
+    PRIVATE
+      ${WEBRTC_LIBRARY}
+      log
+      OpenSLES
+  )
+  target_compile_options(WebRTCLib
+    PUBLIC 
+      -fno-lto -fno-rtti
+  )
+  set(PROJECT_BINARY_DIR
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/Android"
   )
 endif()
 

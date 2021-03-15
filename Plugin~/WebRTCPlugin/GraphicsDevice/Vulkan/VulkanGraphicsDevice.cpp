@@ -2,8 +2,6 @@
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
 
-#include "IUnityGraphicsVulkan.h"
-#include "vulkan/vulkan.h"
 #include "VulkanUtility.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
@@ -12,13 +10,11 @@ namespace unity
 namespace webrtc
 {
 
-static void* s_hModule = nullptr;
-
 VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
     const VkPhysicalDevice physicalDevice,
     const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex)
     : m_unityVulkan(unityVulkan)
-    , m_instance (instance)
+    , m_instance(instance)
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
@@ -28,41 +24,21 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, c
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-bool VulkanGraphicsDevice::InitV() {
-
-    if (s_hModule == nullptr)
-    {
-        // dll delay load
-#if defined(_WIN32)
-        HMODULE module = LoadLibrary(TEXT("vulkan-1.dll"));
-        if (module == nullptr)
-        {
-            LogPrint("vulkan-1.dll is not found. Please be sure the environment supports vulkan API.");
-            return false;
-        }
-        s_hModule = module;
-#else
-#endif
-    }
-
+bool VulkanGraphicsDevice::InitV()
+{
+#if defined(CUDA_PLATFORM)
     m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_instance, m_physicalDevice);
+#endif
     return VK_SUCCESS == CreateCommandPool();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 void VulkanGraphicsDevice::ShutdownV() {
+#if defined(CUDA_PLATFORM)
     m_cudaContext.Shutdown();
-    VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
-
-    if (s_hModule)
-    {
-#if _WIN32
-        FreeLibrary((HMODULE)s_hModule);
-#else
 #endif
-        s_hModule = nullptr;
-    }
+    VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

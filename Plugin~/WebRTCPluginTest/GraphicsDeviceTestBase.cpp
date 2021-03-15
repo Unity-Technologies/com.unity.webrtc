@@ -20,8 +20,12 @@
 #include <GL/glut.h>
 #endif
 
-#if defined(SUPPORT_VULKAN)
+#if defined(SUPPORT_VULKAN) // Vulkan
+
+#if defined(CUDA_PLATFORM)
 #include <cuda.h>
+#endif
+
 #if defined(_WIN32)
 #include <vulkan/vulkan_win32.h>
 #endif
@@ -138,6 +142,17 @@ inline void VKCHECK(VkResult result)
 }
 }
 
+LIBRARY_TYPE s_library = nullptr;
+
+bool LoadVulkanModule()
+{
+    if (!LoadVulkanLibrary(s_library))
+        return false;
+    if (!LoadExportedVulkanFunction(s_library))
+        return false;
+    return LoadGlobalVulkanFunction();
+}
+
 int32_t GetPhysicalDeviceIndex(
     VkInstance instance, std::vector<VkPhysicalDevice>& list, bool* found)
 {
@@ -189,6 +204,9 @@ void* CreateDeviceVulkan()
     appInfo.apiVersion = VK_API_VERSION_1_1;
     appInfo.engineVersion = 1;
 
+    if(!LoadVulkanModule())
+        assert("failed loading vulkan module");
+
     std::vector<const char*> layers = { "VK_LAYER_LUNARG_standard_validation" };
     VkInstanceCreateInfo instanceInfo{};
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -200,6 +218,9 @@ void* CreateDeviceVulkan()
     VkInstance instance = nullptr;
     VKCHECK(vkCreateInstance(&instanceInfo, nullptr, &instance));
 
+    if(!LoadInstanceVulkanFunction(instance))
+        assert("failed loading vulkan module");
+
     // create physical device
     uint32_t devCount = 0;
     VKCHECK(vkEnumeratePhysicalDevices(instance, &devCount, nullptr));
@@ -209,9 +230,8 @@ void* CreateDeviceVulkan()
     int32_t physicalDeviceIndex =
         GetPhysicalDeviceIndex(instance, physicalDeviceList, &found);
     if(!found)
-    {
         assert("vulkan physical device not found");
-    }
+
     const VkPhysicalDevice physicalDevice = physicalDeviceList[physicalDeviceIndex];
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
@@ -260,6 +280,9 @@ void* CreateDeviceVulkan()
     deviceCreateInfo.queueCreateInfoCount = 1;
     VkDevice device;
     VKCHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
+
+    if(!LoadDeviceVulkanFunction(device))
+        assert("failed loading vulkan module");
 
     VkQueue queue;
     vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);

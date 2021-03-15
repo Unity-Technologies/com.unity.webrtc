@@ -213,6 +213,8 @@ ClientBin/
 Bin~/
 upm-ci~/
 Plugin~/webrtc/*
+WebRTC~/CodeCoverage
+WebRTC~/TestResults-*
 *.dbmdl
 *.dbproj.schemaview
 *.jfm

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "WebRTCConstants.h"
+#if defined(CUDA_PLATFORM)
 #include "GraphicsDevice/Cuda/CudaContext.h"
+#endif
 #include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
@@ -31,8 +33,10 @@ public:
     inline virtual GraphicsDeviceType GetDeviceType() const override;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
+#if defined(CUDA_PLATFORM)
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+#endif
 private:
 
     VkResult CreateCommandPool();
@@ -43,17 +47,25 @@ private:
     VkDevice                m_device;
     VkQueue                 m_graphicsQueue;
     VkCommandPool           m_commandPool;
-
-    CudaContext m_cudaContext;
     uint32_t m_queueFamilyIndex;
-    bool m_isCudaSupport;
 
+#if defined(CUDA_PLATFORM)
+    CudaContext m_cudaContext;
+    bool m_isCudaSupport;
+#endif
     const VkAllocationCallbacks* m_allocator = nullptr;
 };
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void* VulkanGraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_cudaContext.GetContext()); }
+void* VulkanGraphicsDevice::GetEncodeDevicePtrV()
+{
+#if defined(CUDA_PLATFORM)
+    return reinterpret_cast<void*>(m_cudaContext.GetContext());
+#else
+    return nullptr;
+#endif
+}
 GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_VULKAN; }
 
 } // end namespace webrtc

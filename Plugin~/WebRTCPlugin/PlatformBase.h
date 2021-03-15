@@ -71,6 +71,14 @@
 #define SUPPORT_METAL 1
 #endif
 
+#if UNITY_ANDROID
+#define SUPPORT_VULKAN 1
+#endif 
+
+#if UNITY_LINUX || UNITY_WIN
+#define CUDA_PLATFORM
+#endif
+
 // COM-like Release macro
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(a) if (a) { a->Release(); a = NULL; }

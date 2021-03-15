@@ -25,6 +25,9 @@ if(Windows OR macOS OR Linux)
   set(SYSTEM_PROCESSOR x64)
   set(WEBRTC_LIBRARY_DIR ${WEBRTC_LIBRARY_DIR}/${SYSTEM_PROCESSOR})
 endif()
+if(Android)
+  set(WEBRTC_LIBRARY_DIR ${WEBRTC_LIBRARY_DIR}/${CMAKE_ANDROID_ARCH})
+endif()
 
 find_library(WEBRTC_LIBRARY_DEBUG
   NAMES webrtcd

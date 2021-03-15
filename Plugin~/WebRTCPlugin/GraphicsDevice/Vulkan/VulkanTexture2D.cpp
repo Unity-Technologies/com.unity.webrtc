@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "VulkanTexture2D.h"
-
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 
 namespace unity
@@ -36,7 +35,9 @@ void VulkanTexture2D::Shutdown()
     m_textureImageMemorySize = 0;
     m_device = VK_NULL_HANDLE;
 
-    m_cudaImage.Shutdown();    
+#if defined(CUDA_PLATFORM)
+    m_cudaImage.Shutdown();
+#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -62,7 +63,11 @@ bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice
     m_textureImageMemory = m_unityVulkanImage.memory.memory;
     m_textureImageMemorySize = m_unityVulkanImage.memory.size;
 
+#if defined(CUDA_PLATFORM)
     return (CUDA_SUCCESS == m_cudaImage.Init(m_device, this));
+#else
+    return true;
+#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------

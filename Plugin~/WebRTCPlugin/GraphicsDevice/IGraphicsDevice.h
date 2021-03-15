@@ -2,7 +2,7 @@
 
 #include "GraphicsDevice/GraphicsDeviceType.h"
 
-#if defined(UNITY_WIN) || defined(UNITY_LINUX)
+#if defined(CUDA_PLATFORM)
 #include "Cuda/ICudaDevice.h"
 #endif
 
@@ -14,7 +14,7 @@ namespace webrtc
 class ITexture2D;
 
 class IGraphicsDevice
-#if defined(UNITY_WIN) || defined(UNITY_LINUX)
+#if defined(CUDA_PLATFORM)
     : public ICudaDevice
 #endif
 {

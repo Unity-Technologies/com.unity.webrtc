@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
 
@@ -25,14 +25,19 @@ bool OpenGLGraphicsDevice::InitV() {
     glDebugMessageCallback(OnOpenGLDebugMessage, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
 #endif
+
+#if defined(CUDA_PLATFORM)
     m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.InitGL();
+#endif
     return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 void OpenGLGraphicsDevice::ShutdownV() {
+#if defined(CUDA_PLATFORM)
     m_cudaContext.Shutdown();
+#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------

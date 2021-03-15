@@ -2,7 +2,10 @@
 
 #include "WebRTCMacros.h"
 #include "GraphicsDevice/ITexture2D.h"
+
+#if defined(CUDA_PLATFORM)
 #include "GraphicsDevice/Cuda/CudaImage.h"
+#endif
 
 namespace unity
 {
@@ -35,7 +38,9 @@ private:
     VkDeviceSize        m_textureImageMemorySize;
     VkDevice            m_device;
 
+#if defined(CUDA_PLATFORM)
     CudaImage           m_cudaImage;
+#endif
     VkFormat            m_textureFormat;
 
     UnityVulkanImage    m_unityVulkanImage;
@@ -48,8 +53,22 @@ private:
 
 void* VulkanTexture2D::GetNativeTexturePtrV() { return  &m_unityVulkanImage; }
 const void* VulkanTexture2D::GetNativeTexturePtrV() const { return &m_unityVulkanImage; };
-void* VulkanTexture2D::GetEncodeTexturePtrV() { return m_cudaImage.GetArray(); }
-const void* VulkanTexture2D::GetEncodeTexturePtrV() const { return m_cudaImage.GetArray(); }
+void* VulkanTexture2D::GetEncodeTexturePtrV()
+{
+#if defined(CUDA_PLATFORM)
+    return m_cudaImage.GetArray();
+#else
+    return nullptr;
+#endif
+}
+const void* VulkanTexture2D::GetEncodeTexturePtrV() const
+{
+#if defined(CUDA_PLATFORM)
+    return m_cudaImage.GetArray();
+#else
+    return nullptr;
+#endif
+}
 
 VkImage         VulkanTexture2D::GetImage() const               { return m_textureImage; }
 VkDeviceMemory  VulkanTexture2D::GetTextureImageMemory() const  { return m_textureImageMemory; }

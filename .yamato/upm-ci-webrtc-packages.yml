@@ -47,8 +47,8 @@ platforms:
   - name: android
     type: Unity::VM
     gpu_type: Unity::VM
-    image: mobile/android-linux-build:latest
-    gpu_image: mobile/android-linux-build:latest
+    image: renderstreaming/android-linux-build:latest
+    gpu_image: renderstreaming/android-linux-build:latest
     flavor: b1.large
     build_command: BuildScripts~/build_plugin_android.sh
     test_command: BuildScripts~/test_plugin_android.sh
@@ -56,7 +56,7 @@ platforms:
 test_targets:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:latest
+    image: renderstreaming/win10:v0.3.4-622802
     flavor: b1.large
     is_gpu: false
     gfx_types:
@@ -96,7 +96,7 @@ test_targets:
         platform: standalone
   - name: win-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/win10:latest
+    image: renderstreaming/win10:v0.3.4-622799
     flavor: b1.large
     is_gpu: true
     gfx_types:
@@ -206,9 +206,7 @@ pack_{{ package.name }}:
         - "upm-ci~/packages/**/*"
   dependencies:
     {% for platform in platforms %}
-    {% if platform.name != "android" -%} # todo(kazuki)
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
-    {% endif -%}
     {% endfor %}
 
 {% for editor in editors %}
