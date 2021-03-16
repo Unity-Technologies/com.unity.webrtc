@@ -13,7 +13,7 @@ echo -------------------
 echo Build com.unity.webrtc Plugin
 
 cd %SOLUTION_DIR%
-cmake . -G "Visual Studio 15 2017" -A x64 -B "build"
+cmake . -G "Visual Studio 16 2019" -A x64 -B "build"
 cmake --build build --config Debug
 
 echo -------------------
