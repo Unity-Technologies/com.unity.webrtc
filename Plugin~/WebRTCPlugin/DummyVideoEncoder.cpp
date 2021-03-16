@@ -96,10 +96,9 @@ namespace webrtc
         m_encodedImage.SetEncodedData(webrtc::EncodedImageBuffer::Create(&frameDataBuffer[0], frameDataBuffer.size()));
         m_encodedImage.set_size(frameDataBuffer.size());
 
-        int qp;
-        m_h264BitstreamParser.ParseBitstream(frameDataBuffer.data(), frameDataBuffer.size());
-        m_h264BitstreamParser.GetLastSliceQp(&qp);
-        m_encodedImage.qp_ = qp;
+        rtc::ArrayView<const uint8_t> bitstream(frameDataBuffer.data(), frameDataBuffer.size());
+        m_h264BitstreamParser.ParseBitstream(bitstream);
+        m_encodedImage.qp_ = m_h264BitstreamParser.GetLastSliceQp().value();
 
         webrtc::CodecSpecificInfo codecInfo;
         codecInfo.codecType = webrtc::kVideoCodecH264;
