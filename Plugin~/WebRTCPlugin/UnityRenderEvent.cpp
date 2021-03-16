@@ -181,7 +181,7 @@ void PluginUnload();
 //
 // If Android plugin is contained aar, UnityPluginLoad is not called from Unity runtime.
 //
-#if defined(UNITY_IOS) || defined(UNITY_IOS_SIMULATOR) || defined(UNITY_ANDROID)
+#if defined(UNITY_IOS) || defined(UNITY_IOS_SIMULATOR)
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginLoad(IUnityInterfaces* unityInterfaces)
 {
     PluginLoad(unityInterfaces);
