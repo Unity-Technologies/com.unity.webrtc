@@ -20,7 +20,12 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
 //  LoadGlobalClassReferenceHolder();
 //  unity_plugin::LoadGlobalClassReferenceHolder();
   InitAndroid(jvm);
-  return 1;
+
+  JNIEnv* jni = nullptr;
+  if (jvm->GetEnv(reinterpret_cast<void**>(&jni), JNI_VERSION_1_6) != JNI_OK)
+    return -1;
+
+  return JNI_VERSION_1_6;
 }
 
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM* jvm, void* reserved) {
