@@ -472,7 +472,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.False(op.IsError);
             var desc = op.Desc;
             // change sdp to cannot parse
-            desc.sdp = desc.sdp.Replace("m=audio", "m=audiable");
+            desc.sdp = desc.sdp.Replace("a=mid:0", "a=mid:10");
             var op2 = peer.SetLocalDescription(ref desc);
             yield return op2;
             Assert.True(op2.IsDone);
@@ -506,7 +506,7 @@ namespace Unity.WebRTC.RuntimeTest
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             // change sdp to cannot parse
-            desc.sdp = desc.sdp.Replace("m=audio", "m=audiable");
+            desc.sdp = desc.sdp.Replace("a=mid:0", "a=mid:10");
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
             Assert.True(op3.IsDone);
