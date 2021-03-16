@@ -262,6 +262,7 @@ target_sources(WebRTCPlugin
 if(Android)
   target_sources(WebRTCPlugin
     PRIVATE
+      RegisterPlugin.cpp
       Jni.cpp
   )
 endif()
