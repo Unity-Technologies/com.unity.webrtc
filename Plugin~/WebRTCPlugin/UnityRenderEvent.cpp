@@ -47,7 +47,7 @@ namespace webrtc
         return s_Graphics->GetRenderer();
     }
 
-    static webrtc::VideoType ConvertTextureFormat(UnityRenderingExtTextureFormat type)
+    static libyuv::FourCC ConvertTextureFormat(UnityRenderingExtTextureFormat type)
     {
         switch (type)
         {
@@ -56,7 +56,7 @@ namespace webrtc
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SNorm:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UInt:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SInt:
-            return webrtc::VideoType::kARGB;
+            return libyuv::FOURCC_ARGB;
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SRGB:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_UNorm:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SNorm:
@@ -64,9 +64,9 @@ namespace webrtc
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SInt:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
-            return webrtc::VideoType::kABGR;
+            return libyuv::FOURCC_ABGR;
         default:
-            return webrtc::VideoType::kUnknown;
+            return libyuv::FOURCC_ANY;
         }
     }
 } // end namespace webrtc

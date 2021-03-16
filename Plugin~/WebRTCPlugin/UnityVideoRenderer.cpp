@@ -56,7 +56,7 @@ void UnityVideoRenderer::SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuf
     m_frameBuffer = buffer;
 }
 
-void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, webrtc::VideoType format)
+void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format)
 {
     auto frame = GetFrameBuffer();
     if (frame == nullptr)
@@ -83,8 +83,7 @@ void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, i
     libyuv::ConvertFromI420(
         i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),
         i420_buffer->StrideU(), i420_buffer->DataV(), i420_buffer->StrideV(),
-        tempBuffer.data(), 0, width, height,
-        ConvertVideoType(format));
+        tempBuffer.data(), 0, width, height, format);
 }
 
 } // end namespace webrtc
