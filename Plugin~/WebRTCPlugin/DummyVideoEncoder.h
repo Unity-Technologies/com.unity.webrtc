@@ -35,7 +35,6 @@ namespace webrtc
     private:
         webrtc::EncodedImageCallback* callback = nullptr;
         webrtc::EncodedImage m_encodedImage;
-        webrtc::RTPFragmentationHeader m_fragHeader;
         webrtc::H264BitstreamParser m_h264BitstreamParser;
         webrtc::VideoCodec m_codec;
 
