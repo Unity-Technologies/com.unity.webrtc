@@ -22,8 +22,8 @@
 #include "sdk/android/native_api/jni/jvm.h"
 #include "sdk/android/native_api/jni/scoped_java_ref.h"
 
+namespace unity {
 namespace webrtc {
-namespace test {
 
 std::unique_ptr<VideoEncoderFactory> CreateAndroidEncoderFactory() {
   JNIEnv* env = AttachCurrentThreadIfNeeded();
@@ -51,5 +51,5 @@ std::unique_ptr<VideoDecoderFactory> CreateAndroidDecoderFactory() {
   return JavaToNativeVideoDecoderFactory(env, factory_object.obj());
 }
 
-}  // namespace test
 }  // namespace webrtc
+}  // namespace unity

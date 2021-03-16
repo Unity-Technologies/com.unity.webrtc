@@ -9,6 +9,8 @@
 #include "sdk/android/src/jni/jni_helpers.h"
 #include "sdk/android/native_api/base/init.h"
 
+using namespace ::webrtc;
+
 namespace unity {
 namespace webrtc {
 
