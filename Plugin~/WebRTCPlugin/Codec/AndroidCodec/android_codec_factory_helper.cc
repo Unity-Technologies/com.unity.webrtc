@@ -22,6 +22,8 @@
 #include "sdk/android/native_api/jni/jvm.h"
 #include "sdk/android/native_api/jni/scoped_java_ref.h"
 
+using namespace ::webrtc;
+
 namespace unity {
 namespace webrtc {
 

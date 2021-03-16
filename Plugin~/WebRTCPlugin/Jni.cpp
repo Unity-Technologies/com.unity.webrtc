@@ -11,21 +11,16 @@
 
 using namespace ::webrtc;
 
+
 namespace unity {
 namespace webrtc {
 
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
-  jint ret = webrtc_jni::InitGlobalJniVariables(jvm);
-  RTC_DCHECK_GE(ret, 0);
-  if (ret < 0)
-    return -1;
-
 //  RTC_CHECK(rtc::InitializeSSL()) << "Failed to InitializeSSL()";
 //  LoadGlobalClassReferenceHolder();
 //  unity_plugin::LoadGlobalClassReferenceHolder();
   InitAndroid(jvm);
-
-  return ret;
+  return 1;
 }
 
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM* jvm, void* reserved) {
