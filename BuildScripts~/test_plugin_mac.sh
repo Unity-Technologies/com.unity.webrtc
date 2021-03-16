@@ -16,7 +16,7 @@ cmake . \
   -G Xcode \
   -B build
 
-cmake \ 
+cmake \
   --build build \
   --config Debug \
   --target WebRTCLibTest

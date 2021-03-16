@@ -24,7 +24,7 @@ cmake . \
   -D cxx_no_rtti=ON \
   -B build
 
-cmake \ 
+cmake \
   --build build \
   --config Debug
 
