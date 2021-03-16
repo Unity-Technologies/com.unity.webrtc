@@ -37,6 +37,12 @@ namespace webrtc
 
     std::unique_ptr<webrtc::VideoDecoder> UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat & format)
     {
+
+        if (absl::EqualsIgnoreCase(format.name, cricket::kAv1CodecName))
+        {
+            RTC_LOG(LS_INFO) << "AV1 codec is not supported";
+            return nullptr;
+        }
         return internal_decoder_factory_->CreateVideoDecoder(format);
     }
 

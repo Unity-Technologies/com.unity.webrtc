@@ -20,7 +20,7 @@ bool LoadVulkanLibrary(LIBRARY_TYPE& library) {
 #if defined(_WIN32)
     library = LoadLibrary("vulkan-1.dll");
 #elif defined(__linux)
-    library = dlopen("libvulkan.so.1", RTLD_NOW);
+    library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
 #endif
     if (library == nullptr)
         return false;
