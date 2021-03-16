@@ -94,7 +94,7 @@ TEST_P(VideoRendererTest, ConvertVideoFrameToTexture)
     EXPECT_EQ(0, m_renderer->tempBuffer.size());
     EXPECT_EQ(nullptr, m_renderer->tempBuffer.data());
 
-    m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(width, height, webrtc::VideoType::kARGB);
+    m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(width, height, libyuv::FOURCC_ARGB);
     auto bufferSize = width * height * 4;
     EXPECT_EQ(bufferSize, m_renderer->tempBuffer.size());
     EXPECT_NE(nullptr, m_renderer->tempBuffer.data());
