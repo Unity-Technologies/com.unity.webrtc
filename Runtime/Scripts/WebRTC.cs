@@ -324,7 +324,7 @@ namespace Unity.WebRTC
             }
 
             NativeMethods.RegisterDebugLog(DebugLog);
-#if UNITY_IOS && !UNITY_EDITOR
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create(encoderType:type);
@@ -570,13 +570,15 @@ namespace Unity.WebRTC
 
     internal static class NativeMethods
     {
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
+        [DllImport("__internal")]
+        public static extern void RegisterRenderingWebRTCPlugin();
+#endif
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
-        [DllImport(WebRTC.Lib)]
-        public static extern void RegisterRenderingWebRTCPlugin();
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
         [DllImport(WebRTC.Lib)]

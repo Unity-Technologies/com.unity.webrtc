@@ -179,7 +179,9 @@ void PluginUnload();
 // from them by name as we usually do on other platforms)."
 // https://github.com/Unity-Technologies/iOSNativeCodeSamples/blob/2019-dev/Graphics/MetalNativeRenderingPlugin/README.md
 //
-#if defined(UNITY_IOS) || defined(UNITY_IOS_SIMULATOR)
+// If Android plugin is contained aar, UnityPluginLoad is not called from Unity runtime.
+//
+#if defined(UNITY_IOS) || defined(UNITY_IOS_SIMULATOR) || defined(UNITY_ANDROID)
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginLoad(IUnityInterfaces* unityInterfaces)
 {
     PluginLoad(unityInterfaces);
