@@ -68,7 +68,6 @@ namespace webrtc
         // todo(kazuki): remove it when refactor video encoding process.
         m_encoderId = frameBuffer->encoderId();
 
-        m_encodedImage._completeFrame = true;
         m_encodedImage.SetTimestamp(frame.timestamp());
         m_encodedImage._encodedWidth = frame.video_frame_buffer()->width();
         m_encodedImage._encodedHeight = frame.video_frame_buffer()->height();
