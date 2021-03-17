@@ -768,6 +768,16 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.IsNotEmpty(op.Value.Stats.Values);
             Assert.Greater(op.Value.Stats.Count, 0);
 
+            var builder = new System.Text.StringBuilder();
+            foreach (var status in op.Value.Stats.Values)
+            {
+                builder.AppendLine($"status type:{status.Type}, key count:{status.Dict.Count}");
+                builder.AppendLine(string.Join(";", status.Dict.Select(x => $"name:{x.Key}, type:{x.Value}")));
+                builder.AppendLine("    ");
+            }
+
+            Debug.Log(builder.ToString());
+
             foreach (RTCStats stats in op.Value.Stats.Values)
             {
                 Assert.NotNull(stats);
