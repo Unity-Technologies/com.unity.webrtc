@@ -26,7 +26,8 @@ cmake . \
 
 cmake \
   --build build \
-  --config Debug
+  --config Debug \
+  --target WebRTCLibTest
 
 # Run UnitTest
 "$SOLUTION_DIR/build/WebRTCPluginTest/WebRTCLibTest"
