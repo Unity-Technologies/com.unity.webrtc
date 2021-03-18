@@ -24,6 +24,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [Category("MediaStream")]
         public void Construct()
         {
             var stream = new MediaStream();
@@ -41,6 +42,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [Category("MediaStream")]
         public void RegisterDelegate()
         {
             var stream = new MediaStream();
@@ -53,7 +55,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStream")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.WindowsPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator VideoStreamAddTrackAndRemoveTrack()
         {
             var width = 256;
@@ -350,16 +352,21 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
             var track2 = new VideoStreamTrack("video2", rt);
+            yield return 0;
 
-            videoStream.AddTrack(track2);
+            Assert.That(videoStream.AddTrack(track2), Is.True);
             var op1 = new WaitUntilWithTimeout(() => isCalledOnAddTrack, 5000);
             yield return op1;
-            videoStream.RemoveTrack(track2);
+            Assert.That(videoStream.RemoveTrack(track2), Is.True);
             var op2 = new WaitUntilWithTimeout(() => isCalledOnRemoveTrack, 5000);
             yield return op2;
 
             test.component.Dispose();
             track2.Dispose();
+            foreach (var track in videoStream.GetTracks())
+            {
+                track.Dispose();
+            }
             // wait for disposing video track.
             yield return 0;
 

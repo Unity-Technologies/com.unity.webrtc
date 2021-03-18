@@ -135,7 +135,6 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(inboundRtpStreamStats.audioLevel);
                     Ignore.Pass(inboundRtpStreamStats.totalAudioEnergy);
                     Ignore.Pass(inboundRtpStreamStats.roundTripTime);
-                    Ignore.Pass(inboundRtpStreamStats.roundTripTime);
                     Ignore.Pass(inboundRtpStreamStats.packetsDiscarded);
                     Ignore.Pass(inboundRtpStreamStats.packetsRepaired);
                     Ignore.Pass(inboundRtpStreamStats.burstPacketsLost);
