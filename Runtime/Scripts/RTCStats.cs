@@ -455,7 +455,7 @@ namespace Unity.WebRTC
         public double burstDiscardRate { get { return GetDouble("burstDiscardRate"); } }
         public double gapLossRate { get { return GetDouble("gapLossRate"); } }
         public double gapDiscardRate { get { return GetDouble("gapDiscardRate"); } }
-        public uint framesReceived { get { return GetUnsignedInt("framesReceived"); } }
+        public int framesReceived { get { return GetInt("framesReceived"); } }
         public uint frameWidth { get { return GetUnsignedInt("frameWidth"); } }
         public uint frameHeight { get { return GetUnsignedInt("frameHeight"); } }
         public uint frameBitDepth { get { return GetUnsignedInt("frameBitDepth"); } }
@@ -683,8 +683,8 @@ namespace Unity.WebRTC
     {
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
         public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
-        public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
-        public uint packetsReceived { get { return GetUnsignedInt("packetsReceived"); } }
+        public ulong packetsSent { get { return GetUnsignedLong("packetsSent"); } }
+        public ulong packetsReceived { get { return GetUnsignedLong("packetsReceived"); } }
         public string rtcpTransportStatsId { get { return GetString("rtcpTransportStatsId"); } }
         public string dtlsState { get { return GetString("dtlsState"); } }
         public string selectedCandidatePairId { get { return GetString("selectedCandidatePairId"); } }
