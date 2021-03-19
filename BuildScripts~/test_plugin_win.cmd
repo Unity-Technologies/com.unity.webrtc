@@ -19,6 +19,6 @@ cmake --build build64 --config Debug --target WebRTCLibTest
 echo -------------------
 echo Test com.unity.webrtc Plugin
 
-%SOLUTION_DIR%\build\WebRTCPluginTest\Debug\WebRTCLibTest.exe
+%SOLUTION_DIR%\build64\WebRTCPluginTest\Debug\WebRTCLibTest.exe
 if not %errorlevel% == 0 exit 1
 echo -------------------
