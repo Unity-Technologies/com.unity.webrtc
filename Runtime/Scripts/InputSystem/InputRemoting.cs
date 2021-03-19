@@ -1,3 +1,5 @@
+// note:: This script is using code snippets in InputSystem.
+// https://github.com/Unity-Technologies/InputSystem/blob/develop/Packages/com.unity.inputsystem/InputSystem/Devices/Remote/InputRemoting.cs
 #if UNITY_WEBRTC_ENABLE_INPUT_SYSTEM
 using System;
 using System.Linq;
@@ -32,7 +34,7 @@ namespace Unity.WebRTC.InputSystem
     /// Makes the activity and data of an InputManager observable in message form.
     /// </summary>
     /// <remarks>
-    /// Can act as both the sender and receiver of these message so the flow is fully bidirectional,
+    /// Can act as both the sender and Receiver of these message so the flow is fully bidirectional,
     /// i.e. the InputManager on either end can mirror its layouts, devices, and events over
     /// to the other end. This permits streaming input not just from the player to the editor but
     /// also feeding input from the editor back into the player.
@@ -74,21 +76,11 @@ namespace Unity.WebRTC.InputSystem
         {
             /// <summary>
             /// For messages coming in, numeric ID of the sender of the message. For messages
-            /// going out, numeric ID of the targeted receiver of the message.
+            /// going out, numeric ID of the targeted Receiver of the message.
             /// </summary>
             public int participantId;
             public MessageType type;
             public byte[] data;
-
-            public byte[] Serialize()
-            {
-                return new byte[0];
-            }
-
-            public static void Deserialize(byte[] bytes, out Message message)
-            {
-                message = new Message();
-            }
         }
 
         public bool sending
@@ -135,6 +127,7 @@ namespace Unity.WebRTC.InputSystem
 
             sending = true;
 
+            SendAllLayouts();
             SendAllDevices();
         }
 
@@ -218,6 +211,13 @@ namespace Unity.WebRTC.InputSystem
         {
             var message = NewDeviceMsg.Create(device);
             Send(message);
+        }
+
+        private void SendAllLayouts()
+        {
+            var layouts = m_LocalManager.layouts.ToArray();
+            foreach(var layout in layouts)
+                SendLayoutChange(layout, InputControlLayoutChange.Added);
         }
 
         private unsafe void SendEvent(InputEventPtr eventPtr, InputDevice device)
@@ -382,30 +382,30 @@ namespace Unity.WebRTC.InputSystem
 
         private static class ConnectMsg
         {
-            public static void Process(InputRemoting receiver)
+            public static void Process(InputRemoting Receiver)
             {
-                if (receiver.sending)
+                if (Receiver.sending)
                 {
-                    receiver.SendAllDevices();
+                    Receiver.SendAllDevices();
                 }
-                else if ((receiver.m_Flags & Flags.StartSendingOnConnect) == Flags.StartSendingOnConnect)
-                    receiver.StartSending();
+                else if ((Receiver.m_Flags & Flags.StartSendingOnConnect) == Flags.StartSendingOnConnect)
+                    Receiver.StartSending();
             }
         }
 
         private static class StartSendingMsg
         {
-            public static void Process(InputRemoting receiver)
+            public static void Process(InputRemoting Receiver)
             {
-                receiver.StartSending();
+                Receiver.StartSending();
             }
         }
 
         private static class StopSendingMsg
         {
-            public static void Process(InputRemoting receiver)
+            public static void Process(InputRemoting Receiver)
             {
-                receiver.StopSending();
+                Receiver.StopSending();
             }
         }
 
@@ -431,12 +431,12 @@ namespace Unity.WebRTC.InputSystem
 
         private static class DisconnectMsg
         {
-            public static void Process(InputRemoting receiver, Message msg)
+            public static void Process(InputRemoting Receiver, Message msg)
             {
                 Debug.Log("DisconnectMsg.Process");
 
-                receiver.RemoveRemoteDevices(msg.participantId);
-                receiver.StopSending();
+                Receiver.RemoveRemoteDevices(msg.participantId);
+                Receiver.StopSending();
             }
         }
 
@@ -477,14 +477,13 @@ namespace Unity.WebRTC.InputSystem
                 };
             }
 
-            public static void Process(InputRemoting receiver, Message msg)
+            public static void Process(InputRemoting Receiver, Message msg)
             {
                 var json = Encoding.UTF8.GetString(msg.data);
-                var senderIndex = receiver.FindOrCreateSenderRecord(msg.participantId);
+                var senderIndex = Receiver.FindOrCreateSenderRecord(msg.participantId);
 
-                //receiver.m_LocalManager.RegisterLayout(json);
-                receiver.m_LocalManager.RegisterLayout(json);
-                ArrayHelpers.Append(ref receiver.m_Senders[senderIndex].layouts, json);
+                Receiver.m_LocalManager.RegisterLayout(json);
+                ArrayHelpers.Append(ref Receiver.m_Senders[senderIndex].layouts, json);
             }
         }
 
@@ -500,11 +499,11 @@ namespace Unity.WebRTC.InputSystem
                 };
             }
 
-            public static void Process(InputRemoting receiver, Message msg)
+            public static void Process(InputRemoting Receiver, Message msg)
             {
                 ////REVIEW: we probably don't want to do this blindly
                 var layoutName = Encoding.UTF8.GetString(msg.data);
-                receiver.m_LocalManager.RemoveLayout(layoutName);
+                Receiver.m_LocalManager.RemoveLayout(layoutName);
             }
         }
 
@@ -542,13 +541,13 @@ namespace Unity.WebRTC.InputSystem
                 };
             }
 
-            public static void Process(InputRemoting receiver, Message msg)
+            public static void Process(InputRemoting Receiver, Message msg)
             {
-                var senderIndex = receiver.FindOrCreateSenderRecord(msg.participantId);
+                var senderIndex = Receiver.FindOrCreateSenderRecord(msg.participantId);
                 var data = DeserializeData<Data>(msg.data);
 
                 // Make sure we haven't already seen the device.
-                var devices = receiver.m_Senders[senderIndex].devices;
+                var devices = Receiver.m_Senders[senderIndex].devices;
                 if (devices != null)
                 {
                     foreach (var entry in devices)
@@ -567,9 +566,11 @@ namespace Unity.WebRTC.InputSystem
                 try
                 {
                     ////REVIEW: this gives remote devices names the same way that local devices receive them; should we make remote status visible in the name?
-                    device = receiver.m_LocalManager.AddDevice(data.layout);
-                    //device.m_ParticipantId = msg.participantId;
-                    //device.m_ParticipantId = msg.participantId;
+                    device = Receiver.m_LocalManager.AddDevice(data.layout);
+
+                    // todo(kazuki)::Avoid to use reflection
+                    // device.m_ParticipantId = msg.participantId;
+                    device.SetParticipantId(msg.participantId);
                 }
                 catch (Exception exception)
                 {
@@ -577,8 +578,12 @@ namespace Unity.WebRTC.InputSystem
                         $"Could not create remote device '{data.description}' with layout '{data.layout}' locally (exception: {exception})");
                     return;
                 }
-                //device.m_Description = data.description;
-                //device.m_DeviceFlags |= InputDevice.DeviceFlags.Remote;
+                // todo(kazuki)::Avoid to use reflection
+                // device.m_Description = data.description;
+                // device.m_DeviceFlags |= InputDevice.DeviceFlags.Remote;
+                device.SetDescription(data.description);
+                var deviceFlagsRemote = 1 << 3;
+                device.SetDeviceFlags(device.GetDeviceFlags() | deviceFlagsRemote);
 
                 // Remember it.
                 var record = new RemoteInputDevice
@@ -588,7 +593,7 @@ namespace Unity.WebRTC.InputSystem
                     description = data.description,
                     layoutName = data.layout
                 };
-                ArrayHelpers.Append(ref receiver.m_Senders[senderIndex].devices, record);
+                ArrayHelpers.Append(ref Receiver.m_Senders[senderIndex].devices, record);
             }
         }
 
@@ -622,22 +627,22 @@ namespace Unity.WebRTC.InputSystem
                 };
             }
 
-            public static unsafe void Process(InputRemoting receiver, Message msg)
+            public static unsafe void Process(InputRemoting Receiver, Message msg)
             {
-                var manager = receiver.m_LocalManager;
+                var manager = Receiver.m_LocalManager;
 
                 fixed (byte* dataPtr = msg.data)
                 {
                     var dataEndPtr = new IntPtr(dataPtr + msg.data.Length);
                     var eventCount = 0;
                     var eventPtr = new InputEventPtr((InputEvent*)dataPtr);
-                    var senderIndex = receiver.FindOrCreateSenderRecord(msg.participantId);
+                    var senderIndex = Receiver.FindOrCreateSenderRecord(msg.participantId);
 
                     while ((Int64)eventPtr.data < dataEndPtr.ToInt64())
                     {
                         // Patch up device ID to refer to local device and send event.
                         var remoteDeviceId = eventPtr.deviceId;
-                        var localDeviceId = receiver.FindLocalDeviceId(remoteDeviceId, senderIndex);
+                        var localDeviceId = Receiver.FindLocalDeviceId(remoteDeviceId, senderIndex);
                         eventPtr.deviceId = localDeviceId;
 
                         if (localDeviceId != InputDevice.InvalidDeviceId)
@@ -677,18 +682,18 @@ namespace Unity.WebRTC.InputSystem
                 };
             }
 
-            public static void Process(InputRemoting receiver, Message msg)
+            public static void Process(InputRemoting Receiver, Message msg)
             {
-                var senderIndex = receiver.FindOrCreateSenderRecord(msg.participantId);
+                var senderIndex = Receiver.FindOrCreateSenderRecord(msg.participantId);
                 var data = DeserializeData<Data>(msg.data);
 
-                var device = receiver.TryGetDeviceByRemoteId(data.deviceId, senderIndex);
+                var device = Receiver.TryGetDeviceByRemoteId(data.deviceId, senderIndex);
                 if (device != null)
                 {
                     ////TODO: clearing usages and setting multiple usages
 
                     if (data.usages.Length == 1)
-                        receiver.m_LocalManager.SetDeviceUsage(device, new InternedString(data.usages[0]));
+                        Receiver.m_LocalManager.SetDeviceUsage(device, new InternedString(data.usages[0]));
                 }
             }
         }
@@ -704,14 +709,14 @@ namespace Unity.WebRTC.InputSystem
                 };
             }
 
-            public static void Process(InputRemoting receiver, Message msg)
+            public static void Process(InputRemoting Receiver, Message msg)
             {
-                var senderIndex = receiver.FindOrCreateSenderRecord(msg.participantId);
+                var senderIndex = Receiver.FindOrCreateSenderRecord(msg.participantId);
                 var remoteDeviceId = BitConverter.ToInt32(msg.data, 0);
 
-                var device = receiver.TryGetDeviceByRemoteId(remoteDeviceId, senderIndex);
+                var device = Receiver.TryGetDeviceByRemoteId(remoteDeviceId, senderIndex);
                 if (device != null)
-                    receiver.m_LocalManager.RemoveDevice(device);
+                    Receiver.m_LocalManager.RemoveDevice(device);
             }
         }
 
@@ -755,7 +760,6 @@ namespace Unity.WebRTC.InputSystem
             m_LocalManager = manager;
             m_Senders = state.senders;
         }
-
 #endif
     }
 }

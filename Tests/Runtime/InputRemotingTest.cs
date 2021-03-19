@@ -1,3 +1,4 @@
+#if UNITY_WEBRTC_ENABLE_INPUT_SYSTEM
 using System;
 using NUnit.Framework;
 using UnityEngine.InputSystem;
@@ -146,3 +147,4 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 }
+#endif
