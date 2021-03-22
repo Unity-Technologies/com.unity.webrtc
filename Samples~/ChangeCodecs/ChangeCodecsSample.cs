@@ -383,6 +383,8 @@ class ChangeCodecsSample : MonoBehaviour
     IEnumerator CheckActualCodec()
     {
         yield return new WaitForSeconds(1f);
+        if (_pc1 == null)
+            yield break;
 
         var op = _pc1.GetStats();
         yield return op;
@@ -405,20 +407,6 @@ class ChangeCodecsSample : MonoBehaviour
 
         RTCCodecStats codecStats =
             codecStatsList.First(stats => stats.Id == codecId);
-
-        var arr = outBoundStatsList.ToArray();
-        var arr2 = codecStatsList.ToArray();
-
-
-        Debug.Log(arr);
-        Debug.Log(arr2);
-
-        //foreach (var s in report.Stats.Values.Where(stats => stats is RTCCodecStats))
-        //{
-        //    var s2 = s as RTCCodecStats;
-        //    Debug.Log(s2.Type + " " + s2.Id);
-        //}
-
 
         actualCodecText.text = string.Format("Using {0} {1}, payloadType={2}.",
             codecStats.mimeType,

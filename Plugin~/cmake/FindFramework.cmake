@@ -4,13 +4,14 @@ if(iOS)
     "-framework AVFoundation"
     "-framework CoreServices"
     "-framework CoreAudio"
-    "-framework CoreVideo"    
+    "-framework CoreVideo"
     "-framework CoreMedia"
     "-framework CoreGraphics"
     "-framework AudioToolbox"
     "-framework VideoToolbox"
     "-framework Metal"
     "-framework UIKit"
+    "-framework Network"
   )
 else()
   find_library(CORE_FOUNDATION Foundation)

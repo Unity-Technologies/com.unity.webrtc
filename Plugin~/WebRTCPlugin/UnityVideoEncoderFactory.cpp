@@ -83,7 +83,7 @@ namespace webrtc
     {
         if (IsFormatSupported(GetHardwareEncoderFormats(), format))
         {
-            return CodecInfo{ true, false };
+            return CodecInfo{ false };
         }
         RTC_DCHECK(IsFormatSupported(GetSupportedFormats(), format));
         return internal_encoder_factory_->QueryVideoEncoder(format);

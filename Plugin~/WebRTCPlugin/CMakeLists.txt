@@ -145,6 +145,9 @@ elseif(Linux)
   set(PROJECT_BINARY_DIR
     "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(GLIB REQUIRED glib-2.0)
+
   target_compile_definitions(WebRTCLib
     PUBLIC
       WEBRTC_LINUX
@@ -156,6 +159,7 @@ elseif(Linux)
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
       ${Vulkan_LIBRARY}
+      ${GLIB_LIBRARIES}
   )
   target_include_directories(WebRTCLib
     PUBLIC

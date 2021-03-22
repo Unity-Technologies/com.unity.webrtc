@@ -152,23 +152,28 @@ elseif(macOS)
 elseif(Linux)
   find_package(OpenGL REQUIRED)
   find_package(GLUT REQUIRED)
+  find_package(PkgConfig REQUIRED)
+
+  pkg_check_modules(GLIB REQUIRED glib-2.0)
+
+# todo: fix sanitize option
 
   target_compile_options(WebRTCLibTest
     PUBLIC
       -fno-lto
       -fno-rtti
       -stdlib=libc++
-      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
+#      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
   )
 
   target_link_options(WebRTCLibTest
     PUBLIC
-      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
+#      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
   )
 
   target_compile_definitions(WebRTCLibTest
     PRIVATE
-      $<$<CONFIG:Debug>:LEAK_SANITIZER>
+#      $<$<CONFIG:Debug>:LEAK_SANITIZER>
   )
 
   target_link_libraries(WebRTCLibTest
@@ -179,6 +184,7 @@ elseif(Linux)
       ${CMAKE_DL_LIBS}
       ${CMAKE_THREAD_LIBS_INIT}
       ${Vulkan_LIBRARY}
+      ${GLIB_LIBRARIES}
       gtest
       gmock
       gtest_main
@@ -189,6 +195,7 @@ elseif(Linux)
       ..
       ${CUDA_INCLUDE_DIRS}
       ${NVCODEC_INCLUDE_DIR}
+      ${GLIB_INCLUDE_DIRS}
   )
 elseif(iOS)
   set(CMAKE_C_FLAGS "-x objective-c")

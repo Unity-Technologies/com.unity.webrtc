@@ -91,8 +91,9 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.Codec:
                     var codecStats = stats as RTCCodecStats;
                     Assert.NotNull(codecStats);
-                    Assert.AreEqual(5, codecStats.Dict.Count);
+                    Assert.AreEqual(6, codecStats.Dict.Count);
                     Assert.IsNotEmpty(codecStats.mimeType);
+                    Assert.IsNotEmpty(codecStats.transportId);
                     Ignore.Pass(codecStats.sdpFmtpLine);
                     Ignore.Pass(codecStats.payloadType);
                     Ignore.Pass(codecStats.clockRate);
@@ -101,7 +102,7 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.InboundRtp:
                     var inboundRtpStreamStats = stats as RTCInboundRTPStreamStats;
                     Assert.NotNull(inboundRtpStreamStats);
-                    Assert.AreEqual(39, inboundRtpStreamStats.Dict.Count);
+                    Assert.AreEqual(56, inboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(inboundRtpStreamStats.ssrc);
                     Ignore.Pass(inboundRtpStreamStats.isRemote);
                     Assert.IsNotEmpty(inboundRtpStreamStats.mediaType);
@@ -122,6 +123,17 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(inboundRtpStreamStats.packetsLost);
                     Ignore.Pass(inboundRtpStreamStats.lastPacketReceivedTimestamp);
                     Ignore.Pass(inboundRtpStreamStats.jitter);
+                    Ignore.Pass(inboundRtpStreamStats.jitterBufferDelay);
+                    Ignore.Pass(inboundRtpStreamStats.jitterBufferEmittedCount);
+                    Ignore.Pass(inboundRtpStreamStats.totalSamplesReceived);
+                    Ignore.Pass(inboundRtpStreamStats.totalSamplesDuration);
+                    Ignore.Pass(inboundRtpStreamStats.concealedSamples);
+                    Ignore.Pass(inboundRtpStreamStats.silentConcealedSamples);
+                    Ignore.Pass(inboundRtpStreamStats.concealmentEvents);
+                    Ignore.Pass(inboundRtpStreamStats.insertedSamplesForDeceleration);
+                    Ignore.Pass(inboundRtpStreamStats.removedSamplesForAcceleration);
+                    Ignore.Pass(inboundRtpStreamStats.audioLevel);
+                    Ignore.Pass(inboundRtpStreamStats.totalAudioEnergy);
                     Ignore.Pass(inboundRtpStreamStats.roundTripTime);
                     Ignore.Pass(inboundRtpStreamStats.packetsDiscarded);
                     Ignore.Pass(inboundRtpStreamStats.packetsRepaired);
@@ -133,6 +145,11 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(inboundRtpStreamStats.burstDiscardRate);
                     Ignore.Pass(inboundRtpStreamStats.gapLossRate);
                     Ignore.Pass(inboundRtpStreamStats.gapDiscardRate);
+                    Ignore.Pass(inboundRtpStreamStats.framesReceived);
+                    Ignore.Pass(inboundRtpStreamStats.frameWidth);
+                    Ignore.Pass(inboundRtpStreamStats.frameHeight);
+                    Ignore.Pass(inboundRtpStreamStats.frameBitDepth);
+                    Ignore.Pass(inboundRtpStreamStats.framesPerSecond);
                     Ignore.Pass(inboundRtpStreamStats.framesDecoded);
                     Ignore.Pass(inboundRtpStreamStats.keyFramesDecoded);
                     Ignore.Pass(inboundRtpStreamStats.totalDecodeTime);
@@ -158,9 +175,11 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.Transport:
                     var transportStats = stats as RTCTransportStats;
                     Assert.NotNull(transportStats);
-                    Assert.AreEqual(11, transportStats.Dict.Count);
+                    Assert.AreEqual(13, transportStats.Dict.Count);
                     Ignore.Pass(transportStats.bytesSent);
                     Ignore.Pass(transportStats.bytesReceived);
+                    Ignore.Pass(transportStats.packetsSent);
+                    Ignore.Pass(transportStats.packetsReceived);
                     Ignore.Pass(transportStats.rtcpTransportStatsId);
                     Ignore.Pass(transportStats.dtlsState);
                     Ignore.Pass(transportStats.selectedCandidatePairId);
