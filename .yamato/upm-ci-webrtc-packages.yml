@@ -242,7 +242,7 @@ build_{{ package.name }}_{{ editor.version }}_android:
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast --wait
     - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output utr.bat
-     # Build player(s)
+    # Build player(s)
     - ./utr.bat --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
   artifacts:
     players:
