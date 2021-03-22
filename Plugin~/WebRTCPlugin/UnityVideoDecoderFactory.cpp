@@ -2,9 +2,11 @@
 #include "UnityVideoDecoderFactory.h"
 #include "absl/strings/match.h"
 
-#if defined(__APPLE__)
+#if UNITY_MAC || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoDecoderFactory.h"
 #import "sdk/objc/native/api/video_decoder_factory.h"
+#elif UNITY_ANDROID
+#include "Codec/AndroidCodec/android_codec_factory_helper.h"
 #endif
 
 namespace unity
@@ -13,11 +15,14 @@ namespace webrtc
 {
     webrtc::VideoDecoderFactory* CreateDecoderFactory()
     {
-#if defined(__APPLE__)
+#if UNITY_MAC || UNITY_IOS
         return webrtc::ObjCToNativeVideoDecoderFactory(
             [[RTCDefaultVideoDecoderFactory alloc] init]).release();
-#endif
+#elif UNITY_ANDROID
+        return CreateAndroidDecoderFactory().release();
+#else
         return new webrtc::InternalDecoderFactory();
+#endif
     }
 
     UnityVideoDecoderFactory::UnityVideoDecoderFactory()
@@ -32,6 +37,12 @@ namespace webrtc
 
     std::unique_ptr<webrtc::VideoDecoder> UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat & format)
     {
+
+        if (absl::EqualsIgnoreCase(format.name, cricket::kAv1CodecName))
+        {
+            RTC_LOG(LS_INFO) << "AV1 codec is not supported";
+            return nullptr;
+        }
         return internal_decoder_factory_->CreateVideoDecoder(format);
     }
 

@@ -222,7 +222,15 @@ elseif(iOS)
     PRIVATE
       ..
       ${WEBRTC_OBJC_INCLUDE_DIR}
-  )  
+  )
+elseif(Android)
+  target_link_libraries(WebRTCLibTest
+    PRIVATE
+      gtest
+      gmock
+      gtest_main
+      WebRTCLib
+    )
 endif()
 
 gtest_add_tests(TARGET WebRTCLibTest)
