@@ -301,6 +301,7 @@ test_{{ package.name }}_{{ editor.version }}_android:
        # List the connected devices
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
        ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results  artifacts:
+  artifacts:
     logs:
       paths:
         - "build/test-results/**"
