@@ -2,10 +2,10 @@
 
 editors:
   - version: 2019.4
-  - version: 2020.1
+  - version: 2020.3
 
 # Must be the same as the version of the sample project (WebRTC~)
-editor_mac_version: 2019.4
+editor_mac_version: 2020.3
 
 platforms:
   - name: win
