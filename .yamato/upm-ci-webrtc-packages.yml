@@ -4,9 +4,6 @@ editors:
   - version: 2019.4
   - version: 2020.3
 
-# Must be the same as the version of the sample project (WebRTC~)
-editor_mac_version: 2020.3
-
 platforms:
   - name: win
     type: Unity::VM
@@ -366,12 +363,10 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
-{% for editor in editors %}
-trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
-  name : Trigger test {{ package.packagename }} {{ editor.version }} all platforms with GPU
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
+trigger_test_{{ package.name }}_2019.4.22_gpu:
+  name : Trigger test {{ package.packagename }} 2019.4.22 all platforms with GPU
+  dependencies: 
+    - test_{{ package.name }}_2019.4.22_gpu
   triggers:
     branches:
       only:
@@ -391,6 +386,8 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_android
 
 test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
@@ -404,6 +401,8 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_android
 {% endfor %}
 
 {% for platform in platforms %}
@@ -448,7 +447,7 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
+    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor.version }} -c editor --wait --published'
     - |
       ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --extra-editor-arg="-enablePackageManagerTraces" --enable-code-coverage --coverage-results-path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --coverage-options="generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"'
       UTR_RESULT=$?
@@ -485,8 +484,8 @@ push_plugin:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_nogpu
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
@@ -504,8 +503,8 @@ publish_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_nogpu
 
 publish_dry_run_{{ package.name }}:
   name: Publish Dry Run {{ package.packagename }}
