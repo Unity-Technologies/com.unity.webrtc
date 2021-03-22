@@ -380,30 +380,31 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_android
-    {% for target in test_targets %}
-    {% for param in target.test_params %}
-    {% for gfx_type in target.gfx_types %}
-    {% if target.is_gpu == "false" -%}
+{% for target in test_targets %}
+{% for param in target.test_params %}
+{% for gfx_type in target.gfx_types %}
+{% if target.is_gpu == "false" -%}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-    {% endif -%}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
+{% endif -%}
+{% endfor %}
+{% endfor %}
+{% endfor %}
 
 test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_android
-    {% for target in test_targets %}
-    {% for param in target.test_params %}
-    {% for gfx_type in target.gfx_types %}
-    {% if target.is_gpu == "true" or target.name == "macos" -%}
+{% for target in test_targets %}
+{% for param in target.test_params %}
+{% for gfx_type in target.gfx_types %}
+{% if target.is_gpu == "true" or target.name == "macos" -%}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-    {% endif -%}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
+{% endif -%}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
 {% endfor %}
 
 {% for platform in platforms %}
