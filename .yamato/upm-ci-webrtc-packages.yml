@@ -234,20 +234,16 @@ build_{{ package.name }}_{{ editor.version }}_android:
   name : Build {{ package.packagename }} with {{ editor.version }} for android device
   agent:
     type: Unity::VM
-    image: package-ci/ubuntu:stable
+    image: package-ci/win10:stable
     flavor: b1.xlarge
   commands:
     - |
-      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
-      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
-    - curl -L https://artifactory.prd.it.unity3d.com/artifactory/api/gpg/key/public | sudo apt-key add -
-    - sudo sh -c "echo 'deb https://artifactory.prd.it.unity3d.com/artifactory/unity-apt-local bionic main' > /etc/apt/sources.list.d/unity.list"
-    - sudo apt update
-    - sudo apt install unity-downloader-cli -y
+    # Download unity-downloader-cli
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast --wait
-    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
-    - chmod +x ./utr    
-    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --build-only
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output utr.bat
+     # Build player(s)
+    - ./utr.bat --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
   artifacts:
     players:
       paths:
@@ -364,10 +360,10 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
-trigger_test_{{ package.name }}_2019.4.22_gpu:
-  name : Trigger test {{ package.packagename }} 2019.4.22 all platforms with GPU
+trigger_test_{{ package.name }}_2019.4_gpu:
+  name : Trigger test {{ package.packagename }} 2019.4 all platforms with GPU
   dependencies: 
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
   triggers:
     branches:
       only:
@@ -486,8 +482,8 @@ push_plugin:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
@@ -505,8 +501,8 @@ publish_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
 
 publish_dry_run_{{ package.name }}:
   name: Publish Dry Run {{ package.packagename }}
