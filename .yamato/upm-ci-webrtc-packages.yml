@@ -279,7 +279,31 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   artifacts:
     logs:
       paths:
-        - "build/test-results/**"           
+        - "build/test-results/**"
+
+test_{{ package.name }}_{{ editor.version }}_android:
+  name: Test {{ package.packagename }} with {{ editor.version }} on android device
+  agent:
+    type: Unity::mobile::shield
+    image: mobile/android-execution-base:stable
+    flavor: b1.medium
+  skip_checkout: true
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_android
+  commands:
+    - |
+       # Download standalone UnityTestRunner
+       curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output utr.bat
+       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       # Establish an ADB connection with the device
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       # List the connected devices
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results  artifacts:
+    logs:
+      paths:
+        - "build/test-results/**"
 {% endfor %}
 
 {% for target in test_targets %}
