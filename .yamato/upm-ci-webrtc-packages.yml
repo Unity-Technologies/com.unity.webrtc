@@ -380,6 +380,8 @@ trigger_test_{{ package.name }}_2019.4.22_gpu:
 test_{{ package.name }}_{{ editor.version }}_nogpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
   dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_android
     {% for target in test_targets %}
     {% for param in target.test_params %}
     {% for gfx_type in target.gfx_types %}
@@ -389,12 +391,12 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_android
 
 test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_android
     {% for target in test_targets %}
     {% for param in target.test_params %}
     {% for gfx_type in target.gfx_types %}
@@ -404,8 +406,6 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
     {% endfor %}
     {% endfor %}
     {% endfor %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_android
 {% endfor %}
 
 {% for platform in platforms %}
