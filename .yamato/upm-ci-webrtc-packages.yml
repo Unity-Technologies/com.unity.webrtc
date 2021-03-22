@@ -237,7 +237,6 @@ build_{{ package.name }}_{{ editor.version }}_android:
     image: package-ci/win10:stable
     flavor: b1.xlarge
   commands:
-    - |
     # Download unity-downloader-cli
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast --wait
