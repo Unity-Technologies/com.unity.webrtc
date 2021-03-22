@@ -369,7 +369,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 trigger_test_{{ package.name }}_2019.4.22_gpu:
   name : Trigger test {{ package.packagename }} 2019.4.22 all platforms with GPU
   dependencies: 
-    - test_{{ package.name }}_2019.4.22_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4.22_gpu
   triggers:
     branches:
       only:
