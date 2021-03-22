@@ -242,7 +242,10 @@ build_{{ package.name }}_{{ editor.version }}_android:
     - |
       find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
       cp -rf upm-ci~/package/Runtime/Plugins Runtime/
-    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - curl -L https://artifactory.prd.it.unity3d.com/artifactory/api/gpg/key/public | sudo apt-key add -
+    - sudo sh -c "echo 'deb https://artifactory.prd.it.unity3d.com/artifactory/unity-apt-local bionic main' > /etc/apt/sources.list.d/unity.list"
+    - sudo apt update
+    - sudo apt install unity-downloader-cli -y
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast --wait
     - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
     - chmod +x ./utr    
