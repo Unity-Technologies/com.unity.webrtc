@@ -2,7 +2,7 @@
 #include "UnityVideoEncoderFactory.h"
 #include "DummyVideoEncoder.h"
 
-#if UNITY_MAC || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h"
 #import "sdk/objc/native/api/video_encoder_factory.h"
 #elif UNITY_ANDROID
@@ -34,7 +34,7 @@ namespace webrtc
 
     webrtc::VideoEncoderFactory* CreateEncoderFactory()
     {
-#if UNITY_MAC || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoEncoderFactory(
             [[RTCDefaultVideoEncoderFactory alloc] init]).release();
 #elif UNITY_ANDROID

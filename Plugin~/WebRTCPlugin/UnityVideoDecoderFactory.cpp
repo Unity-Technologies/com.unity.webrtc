@@ -2,7 +2,7 @@
 #include "UnityVideoDecoderFactory.h"
 #include "absl/strings/match.h"
 
-#if UNITY_MAC || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoDecoderFactory.h"
 #import "sdk/objc/native/api/video_decoder_factory.h"
 #elif UNITY_ANDROID
@@ -15,7 +15,7 @@ namespace webrtc
 {
     webrtc::VideoDecoderFactory* CreateDecoderFactory()
     {
-#if UNITY_MAC || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoDecoderFactory(
             [[RTCDefaultVideoDecoderFactory alloc] init]).release();
 #elif UNITY_ANDROID
