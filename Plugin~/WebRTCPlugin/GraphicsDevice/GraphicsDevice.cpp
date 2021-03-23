@@ -92,7 +92,6 @@ IGraphicsDevice* GraphicsDevice::Init(
     }
     case kUnityGfxRendererD3D12: {
 #if defined(SUPPORT_D3D12)
-        RTC_DCHECK(unityInterface);
         RTC_DCHECK(device);
         pDevice = new D3D12GraphicsDevice(static_cast<ID3D12Device*>(device),
             reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface)
@@ -108,7 +107,6 @@ IGraphicsDevice* GraphicsDevice::Init(
     }
 #if defined(SUPPORT_VULKAN)
     case kUnityGfxRendererVulkan: {
-        RTC_DCHECK(unityInterface);
         RTC_DCHECK(device);
         const UnityVulkanInstance* vulkan =
             static_cast<const UnityVulkanInstance*>(device);
@@ -125,7 +123,6 @@ IGraphicsDevice* GraphicsDevice::Init(
 #endif
 #if defined(SUPPORT_METAL)
     case kUnityGfxRendererMetal: {
-        RTC_DCHECK(unityInterface);
         RTC_DCHECK(device);
         id<MTLDevice> metalDevice = reinterpret_cast<id<MTLDevice>>(device);
         IUnityGraphicsMetal* metalUnityInterface =
