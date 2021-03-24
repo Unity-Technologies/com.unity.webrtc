@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WebRTCConstants.h"
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #endif
 #include "GraphicsDevice/IGraphicsDevice.h"
@@ -33,7 +33,7 @@ public:
     inline virtual GraphicsDeviceType GetDeviceType() const override;
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
 #endif
@@ -49,7 +49,7 @@ private:
     VkCommandPool           m_commandPool;
     uint32_t m_queueFamilyIndex;
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
 #endif
@@ -60,7 +60,7 @@ private:
 
 void* VulkanGraphicsDevice::GetEncodeDevicePtrV()
 {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     return reinterpret_cast<void*>(m_cudaContext.GetContext());
 #else
     return nullptr;

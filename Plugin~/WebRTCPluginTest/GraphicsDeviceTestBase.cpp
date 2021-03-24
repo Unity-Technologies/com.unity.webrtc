@@ -4,7 +4,7 @@
 #include "PlatformBase.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 
-#if defined(SUPPORT_D3D11) // D3D11
+#if SUPPORT_D3D11 // D3D11
 
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -12,21 +12,21 @@
 
 #endif
 
-#if defined(SUPPORT_METAL)  // Metal
+#if SUPPORT_METAL  // Metal
 #import <Metal/Metal.h>
 #endif
 
-#if defined(SUPPORT_OPENGL_CORE) // OpenGL
+#if SUPPORT_OPENGL_CORE // OpenGL
 #include <GL/glut.h>
 #endif
 
-#if defined(SUPPORT_VULKAN) // Vulkan
+#if SUPPORT_VULKAN // Vulkan
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
 #include <cuda.h>
 #endif
 
-#if defined(_WIN32)
+#if _WIN32
 #include <vulkan/vulkan_win32.h>
 #endif
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
