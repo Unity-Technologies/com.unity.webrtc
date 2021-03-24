@@ -361,6 +361,8 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
+{% for editor in editors %}
+
 trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Trigger test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies: 
@@ -402,6 +404,8 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% endif -%}
 {% endfor %}
 {% endfor %}
+{% endfor %}
+
 {% endfor %}
 
 {% for platform in platforms %}
