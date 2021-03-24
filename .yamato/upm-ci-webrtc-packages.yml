@@ -404,8 +404,6 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% endfor %}
 {% endfor %}
 
-{% endfor %}
-
 {% for platform in platforms %}
 {% if platform.name != "macos" -%}
 {% for editor in editors %}
