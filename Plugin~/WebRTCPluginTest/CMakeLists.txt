@@ -156,24 +156,22 @@ elseif(Linux)
 
   pkg_check_modules(GLIB REQUIRED glib-2.0)
 
-# todo: fix sanitize option
-
   target_compile_options(WebRTCLibTest
     PUBLIC
       -fno-lto
       -fno-rtti
       -stdlib=libc++
-#      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
+      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
   )
 
   target_link_options(WebRTCLibTest
     PUBLIC
-#      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
+      $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
   )
 
   target_compile_definitions(WebRTCLibTest
     PRIVATE
-#      $<$<CONFIG:Debug>:LEAK_SANITIZER>
+      $<$<CONFIG:Debug>:LEAK_SANITIZER>
   )
 
   target_link_libraries(WebRTCLibTest
