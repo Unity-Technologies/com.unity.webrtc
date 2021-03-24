@@ -361,16 +361,18 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
-trigger_test_{{ package.name }}_2019.4_gpu:
+trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Trigger test {{ package.packagename }} 2019.4 all platforms with GPU
   dependencies: 
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_gpu
+{% if editor.version == "2020.3" -%}
   triggers:
     branches:
       only:
       - "/.*/"
       except:
       - "master"
+{% endif -%}
 
 test_{{ package.name }}_{{ editor.version }}_nogpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
