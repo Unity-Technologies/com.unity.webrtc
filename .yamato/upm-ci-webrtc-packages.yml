@@ -2,10 +2,10 @@
 
 editors:
   - version: 2019.4
-  - version: 2020.1
+  - version: 2020.3
 
 # Must be the same as the version of the sample project (WebRTC~)
-editor_mac_version: 2019.4
+editor_mac_version: 2020.3
 
 platforms:
   - name: win
@@ -316,11 +316,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
-trigger_test_{{ package.name }}_2019_gpu:
-  name : Trigger test {{ package.packagename }} 2019.4 all platforms with GPU
+{% for editor in editors %}
+trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
+  name : Trigger test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_2019.4_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
   triggers:
     branches:
       only:
@@ -328,7 +329,6 @@ trigger_test_{{ package.name }}_2019_gpu:
       except:
       - "master"
 
-{% for editor in editors %}
 test_{{ package.name }}_{{ editor.version }}_nogpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
   dependencies:
