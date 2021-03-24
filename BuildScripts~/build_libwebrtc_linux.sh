@@ -34,11 +34,11 @@ do
   do
     args="is_debug=${is_debug} target_os=\"linux\" target_cpu=\"${target_cpu}\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false";
     if [ $is_debug = "true" ]; then
-      args += " is_asan=true is_lsan=true";
+      args="${args} is_asan=true is_lsan=true";
     fi
 
     # generate ninja files
-    gn gen "$OUTPUT_DIR" --root="src" --args=${args}
+    gn gen "$OUTPUT_DIR" --root="src" --args="${args}"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
