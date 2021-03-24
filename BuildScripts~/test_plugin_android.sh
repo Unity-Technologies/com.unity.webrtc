@@ -8,11 +8,6 @@ export ARCH_ABI=arm64-v8a
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install clang cmake
-# TODO:: Remove this install process from here and recreate an image to build the plugin.
-sudo apt update
-sudo apt install -y clang cmake
-
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
 cmake . \
@@ -24,6 +19,6 @@ cmake . \
   -D CMAKE_BUILD_TYPE=Debug \
   -D CMAKE_ANDROID_STL_TYPE=c++_static
 
-cmake 
-  --build build 
-  --target WebRTCPluginTest
+cmake \
+  --build build \
+  --target WebRTCLibTest

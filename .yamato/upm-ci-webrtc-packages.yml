@@ -4,9 +4,6 @@ editors:
   - version: 2019.4
   - version: 2020.3
 
-# Must be the same as the version of the sample project (WebRTC~)
-editor_mac_version: 2020.3
-
 platforms:
   - name: win
     type: Unity::VM
@@ -186,9 +183,7 @@ test_webrtc_plugin_all_platform:
   name: Test webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
-    {% if platform.name != "android" -%} # todo(kazuki)
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
-    {% endif -%}
     {% endfor %}
 
 pack_{{ package.name }}:
@@ -235,6 +230,31 @@ build_{{ package.name }}_{{ editor.version }}_ios:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
+build_{{ package.name }}_{{ editor.version }}_android:
+  name : Build {{ package.packagename }} with {{ editor.version }} for android device
+  agent:
+    type: Unity::VM::osx
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.xlarge
+  commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
+    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
+  artifacts:
+    players:
+      paths:
+        - "build/players/**"
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
 test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
@@ -254,7 +274,32 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   artifacts:
     logs:
       paths:
-        - "build/test-results/**"           
+        - "build/test-results/**"
+
+test_{{ package.name }}_{{ editor.version }}_android:
+  name: Test {{ package.packagename }} with {{ editor.version }} on android device
+  agent:
+    type: Unity::mobile::shield
+    image: mobile/android-execution-base:stable
+    flavor: b1.medium
+  skip_checkout: true
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_android
+  commands:
+    - |
+       # Download standalone UnityTestRunner
+       curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output utr.bat
+       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       # Establish an ADB connection with the device
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       # List the connected devices
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results  
+  artifacts:
+    logs:
+      paths:
+        - "build/test-results/**"
 {% endfor %}
 
 {% for target in test_targets %}
@@ -317,43 +362,50 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 
 {% for editor in editors %}
+
 trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Trigger test {{ package.packagename }} {{ editor.version }} all platforms with GPU
-  dependencies:
+  dependencies: 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_{{ editor.version }}_ios
+{% if editor.version == "2020.3" -%}
   triggers:
     branches:
       only:
       - "/.*/"
       except:
       - "master"
+{% endif -%}
 
 test_{{ package.name }}_{{ editor.version }}_nogpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
   dependencies:
-    {% for target in test_targets %}
-    {% for param in target.test_params %}
-    {% for gfx_type in target.gfx_types %}
-    {% if target.is_gpu == "false" -%}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_android
+{% for target in test_targets %}
+{% for param in target.test_params %}
+{% for gfx_type in target.gfx_types %}
+{% if target.is_gpu == "false" -%}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-    {% endif -%}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
+{% endif -%}
+{% endfor %}
+{% endfor %}
+{% endfor %}
 
 test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
-    {% for target in test_targets %}
-    {% for param in target.test_params %}
-    {% for gfx_type in target.gfx_types %}
-    {% if target.is_gpu == "true" or target.name == "macos" -%}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_android
+{% for target in test_targets %}
+{% for param in target.test_params %}
+{% for gfx_type in target.gfx_types %}
+{% if target.is_gpu == "true" or target.name == "macos" -%}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-    {% endif -%}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
+{% endif -%}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
 {% endfor %}
 
 {% for platform in platforms %}
@@ -398,7 +450,7 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
     - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor_mac_version }} -c editor --wait --published'
+    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor.version }} -c editor --wait --published'
     - |
       ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --extra-editor-arg="-enablePackageManagerTraces" --enable-code-coverage --coverage-results-path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --coverage-options="generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"'
       UTR_RESULT=$?
@@ -435,8 +487,8 @@ push_plugin:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_nogpu
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
@@ -454,8 +506,8 @@ publish_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2019.4_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_nogpu
 
 publish_dry_run_{{ package.name }}:
   name: Publish Dry Run {{ package.packagename }}

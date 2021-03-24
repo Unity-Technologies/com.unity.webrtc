@@ -570,13 +570,15 @@ namespace Unity.WebRTC
 
     internal static class NativeMethods
     {
+#if UNITY_IOS && !UNITY_EDITOR
+        [DllImport(WebRTC.Lib)]
+        public static extern void RegisterRenderingWebRTCPlugin();
+#endif
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
-        [DllImport(WebRTC.Lib)]
-        public static extern void RegisterRenderingWebRTCPlugin();
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
         [DllImport(WebRTC.Lib)]

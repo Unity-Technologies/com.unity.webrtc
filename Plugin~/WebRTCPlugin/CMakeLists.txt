@@ -218,6 +218,18 @@ elseif(Android)
     PUBLIC 
       -fno-lto -fno-rtti
   )
+
+  # Linker excludes unused symbols from the shared library 
+  # when linking the archive file (libwebrtc.a).
+  file(READ "${CMAKE_SOURCE_DIR}/tools/android/jni_symbols.txt" JNI_SYMBOLS)
+  string(REPLACE "\n" ";" JNI_SYMBOLS ${JNI_SYMBOLS})
+  list(TRANSFORM JNI_SYMBOLS PREPEND "-Wl,--require-defined=")
+
+  target_link_options(WebRTCLib
+    PUBLIC
+      ${JNI_SYMBOLS}
+  )
+
   set(PROJECT_BINARY_DIR
     "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/Android"
   )
@@ -262,6 +274,13 @@ target_sources(WebRTCPlugin
     WebRTCPlugin.cpp
     UnityRenderEvent.cpp
 )
+
+if(Android)
+  target_sources(WebRTCPlugin
+    PRIVATE
+      Jni.cpp
+  )
+endif()
 
 # rename dll/framework filename
 set_target_properties(WebRTCPlugin

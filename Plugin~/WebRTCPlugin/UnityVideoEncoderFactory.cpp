@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "UnityVideoEncoderFactory.h"
-
 #include "DummyVideoEncoder.h"
 
-#if defined(__APPLE__)
+#if UNITY_OSX || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h"
 #import "sdk/objc/native/api/video_encoder_factory.h"
+#elif UNITY_ANDROID
+#include "Codec/AndroidCodec/android_codec_factory_helper.h"
 #endif
 
 using namespace ::webrtc::H264;
@@ -33,11 +34,14 @@ namespace webrtc
 
     webrtc::VideoEncoderFactory* CreateEncoderFactory()
     {
-#if defined(__APPLE__)
+#if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoEncoderFactory(
             [[RTCDefaultVideoEncoderFactory alloc] init]).release();
-#endif
+#elif UNITY_ANDROID
+        return CreateAndroidEncoderFactory().release();
+#else
         return new webrtc::InternalEncoderFactory();
+#endif
     }
 
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IVideoEncoderObserver* observer)
@@ -51,7 +55,11 @@ namespace webrtc
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetHardwareEncoderFormats() const
     {
-#if defined(__APPLE__)
+#if defined(CUDA_PLATFORM)
+        return { webrtc::CreateH264Format(
+            webrtc::H264::kProfileConstrainedBaseline,
+            webrtc::H264::kLevel5_1, "1") };
+#else
         auto formats = internal_encoder_factory_->GetSupportedFormats();
         std::vector<webrtc::SdpVideoFormat> filtered;
         std::copy_if(formats.begin(), formats.end(), std::back_inserter(filtered),
@@ -61,10 +69,6 @@ namespace webrtc
                 return true;
             });
         return filtered;
-#else
-        return { webrtc::CreateH264Format(
-            webrtc::H264::kProfileConstrainedBaseline,
-            webrtc::H264::kLevel5_1, "1") };
 #endif
     }
 
@@ -91,7 +95,7 @@ namespace webrtc
 
     std::unique_ptr<webrtc::VideoEncoder> UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-#if !defined(__APPLE__)
+#if defined(CUDA_PLATFORM)
         if (IsFormatSupported(GetHardwareEncoderFormats(), format))
         {
             return std::make_unique<DummyVideoEncoder>(m_observer);
