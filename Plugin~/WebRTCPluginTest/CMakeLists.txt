@@ -160,7 +160,6 @@ elseif(Linux)
     PUBLIC
       -fno-lto
       -fno-rtti
-      -stdlib=libc++
       $<$<CONFIG:Debug>:-fsanitize=address$<COMMA>undefined>
   )
 
