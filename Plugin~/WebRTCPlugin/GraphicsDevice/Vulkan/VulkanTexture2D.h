@@ -3,7 +3,7 @@
 #include "WebRTCMacros.h"
 #include "GraphicsDevice/ITexture2D.h"
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaImage.h"
 #endif
 
@@ -38,7 +38,7 @@ private:
     VkDeviceSize        m_textureImageMemorySize;
     VkDevice            m_device;
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     CudaImage           m_cudaImage;
 #endif
     VkFormat            m_textureFormat;
@@ -55,7 +55,7 @@ void* VulkanTexture2D::GetNativeTexturePtrV() { return  &m_unityVulkanImage; }
 const void* VulkanTexture2D::GetNativeTexturePtrV() const { return &m_unityVulkanImage; };
 void* VulkanTexture2D::GetEncodeTexturePtrV()
 {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     return m_cudaImage.GetArray();
 #else
     return nullptr;
@@ -63,7 +63,7 @@ void* VulkanTexture2D::GetEncodeTexturePtrV()
 }
 const void* VulkanTexture2D::GetEncodeTexturePtrV() const
 {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     return m_cudaImage.GetArray();
 #else
     return nullptr;

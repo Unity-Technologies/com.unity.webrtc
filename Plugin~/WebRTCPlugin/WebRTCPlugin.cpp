@@ -228,7 +228,7 @@ extern "C"
 {
     UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
     {
-#if defined(UNITY_WIN) || defined(UNITY_LINUX)
+#if CUDA_PLATFORM
         IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
         if(!device->IsCudaSupport())
         {

@@ -10,7 +10,7 @@ using Unity.Collections.LowLevel.Unsafe;
 namespace Unity.WebRTC.RuntimeTest
 {
     [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForNvCodec, "Ignored hardware encoder test.")]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForHardwareCodec, "Ignored hardware encoder test.")]
     class NativeAPITestWithHardwareEncoder : NativeAPITestWithSoftwareEncoder
     {
         [OneTimeSetUp]
@@ -471,7 +471,7 @@ namespace Unity.WebRTC.RuntimeTest
     }
 
     [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForNvCodec, "Ignored hardware encoder test.")]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForHardwareCodec, "Ignored hardware encoder test.")]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
     class NativeAPITestWithHardwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithHardwareEncoder, IPrebuildSetup
     {

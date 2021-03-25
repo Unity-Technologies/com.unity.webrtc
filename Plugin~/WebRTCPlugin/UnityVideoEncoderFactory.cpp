@@ -55,7 +55,7 @@ namespace webrtc
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetHardwareEncoderFormats() const
     {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
         return { webrtc::CreateH264Format(
             webrtc::H264::kProfileConstrainedBaseline,
             webrtc::H264::kLevel5_1, "1") };
@@ -95,7 +95,7 @@ namespace webrtc
 
     std::unique_ptr<webrtc::VideoEncoder> UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
         if (IsFormatSupported(GetHardwareEncoderFormats(), format))
         {
             return std::make_unique<DummyVideoEncoder>(m_observer);

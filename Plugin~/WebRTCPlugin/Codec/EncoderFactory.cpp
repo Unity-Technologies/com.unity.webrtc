@@ -3,21 +3,21 @@
 #include "Context.h"
 #include "EncoderFactory.h"
 
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE
 #include "NvCodec/NvEncoderGL.h"
 #endif
 
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
 #include "NvCodec/NvEncoderD3D11.h"
 #endif
 
-#if defined(SUPPORT_D3D12)
+#if SUPPORT_D3D12
 #include "NvCodec/NvEncoderD3D12.h"
 #endif
 
 #include "SoftwareCodec/SoftwareEncoder.h"
 
-#if defined(SUPPORT_VULKAN) && defined(CUDA_PLATFORM)
+#if SUPPORT_VULKAN && CUDA_PLATFORM
 #include "NvCodec/NvEncoderCuda.h"
 #endif
 
@@ -35,10 +35,13 @@ namespace webrtc
 
     bool EncoderFactory::GetHardwareEncoderSupport()
     {
-#if defined(SUPPORT_METAL)
+#if UNITY_OSX || UNITY_IOS
         // todo(kazuki): check VideoToolbox compatibility
         return true;
-#elif defined(CUDA_PLATFORM)
+#elif UNITY_ANDROID
+        // todo(kazuki): check Android hwcodec compatibility
+        return true;
+#elif CUDA_PLATFORM
         if(!NvEncoder::LoadModule())
         {
             return false;
@@ -59,7 +62,7 @@ namespace webrtc
         std::unique_ptr<IEncoder> encoder;
         const GraphicsDeviceType deviceType = device->GetDeviceType();
         switch (deviceType) {
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
             case GRAPHICS_DEVICE_D3D11: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
@@ -70,7 +73,7 @@ namespace webrtc
                 break;
             }
 #endif
-#if defined(SUPPORT_D3D12)
+#if SUPPORT_D3D12
             case GRAPHICS_DEVICE_D3D12: {
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
@@ -81,15 +84,15 @@ namespace webrtc
                 break;
             }
 #endif
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE
             case GRAPHICS_DEVICE_OPENGL: {
                 encoder = std::make_unique<NvEncoderGL>(width, height, device, textureFormat);
                 break;
             }
 #endif
-#if defined(SUPPORT_VULKAN)
+#if SUPPORT_VULKAN
             case GRAPHICS_DEVICE_VULKAN: {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
                 if (encoderType == UnityEncoderType::UnityEncoderHardware)
                 {
                     encoder = std::make_unique<NvEncoderCuda>(width, height, device, textureFormat);
@@ -100,7 +103,7 @@ namespace webrtc
                 break;
             }
 #endif            
-#if defined(SUPPORT_METAL)
+#if SUPPORT_METAL
             case GRAPHICS_DEVICE_METAL: {
                 encoder = std::make_unique<SoftwareEncoder>(width, height, device, textureFormat);
                 break;

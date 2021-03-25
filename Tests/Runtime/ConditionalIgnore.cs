@@ -6,14 +6,14 @@ namespace Unity.WebRTC.RuntimeTest
 {
     internal class ConditionalIgnore
     {
-        public const string UnsupportedHardwareForNvCodec = "IgnoreUnsupportedHardwareForNvCodec";
+        public const string UnsupportedHardwareForHardwareCodec = "IgnoreUnsupportedHardwareForHardwareCodec";
         public const string Direct3D12 = "IgnoreDirect3D12";
 
         [RuntimeInitializeOnLoadMethod]
         static void OnLoad()
         {
             var ignoreHardwareEncoderTest = !NativeMethods.GetHardwareEncoderSupport();
-            ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedHardwareForNvCodec,
+            ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedHardwareForHardwareCodec,
                 ignoreHardwareEncoderTest);
 
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(Direct3D12,

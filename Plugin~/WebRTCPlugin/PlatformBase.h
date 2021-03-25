@@ -76,7 +76,7 @@
 #endif 
 
 #if UNITY_LINUX || UNITY_WIN
-#define CUDA_PLATFORM
+#define CUDA_PLATFORM 1
 #endif
 
 // COM-like Release macro
