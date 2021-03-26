@@ -166,11 +166,14 @@ int32_t GetPhysicalDeviceIndex(
         {
             continue;
         }
-        if(CudaContext::FindCudaDevice(deviceUUID.data(), nullptr) == CUDA_SUCCESS)
+#if CUDA_PLATFORM
+        if (CudaContext::FindCudaDevice(deviceUUID.data(), nullptr) != CUDA_SUCCESS)
         {
-            *found = true;
-            return i;
+            continue;
         }
+#endif
+        * found = true;
+        return i;
     }
     *found = false;
     return 0;
