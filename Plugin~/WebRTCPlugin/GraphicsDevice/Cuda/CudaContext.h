@@ -13,6 +13,8 @@ public:
     ~CudaContext() = default;
 
     CUresult Init(const VkInstance instance, VkPhysicalDevice physicalDevice);
+    static CUresult FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice);
+
 #if defined(UNITY_WIN)
     CUresult Init(ID3D11Device* device);
     CUresult Init(ID3D12Device* device);

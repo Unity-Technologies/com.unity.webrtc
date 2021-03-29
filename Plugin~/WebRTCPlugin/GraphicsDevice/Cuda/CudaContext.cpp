@@ -48,6 +48,40 @@ CudaContext::CudaContext() : m_context(nullptr) {
 
 //---------------------------------------------------------------------------------------------------------------------
 
+CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
+{
+    CUdevice _cuDevice = 0;
+    CUresult result = CUDA_SUCCESS;
+    int numDevices = 0;
+    result = cuDeviceGetCount(&numDevices);
+    if (result != CUDA_SUCCESS) {
+        return result;
+    }
+    CUuuid id = {};
+
+    //Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
+    //this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
+    for (int i = 0; i < numDevices; i++) {
+        result = cuDeviceGet(&_cuDevice, i);
+        if (result != CUDA_SUCCESS) {
+            return result;
+        }
+        result = cuDeviceGetUuid(&id, _cuDevice);
+        if (result != CUDA_SUCCESS) {
+            return result;
+        }
+
+        if (!std::memcmp(static_cast<const void *>(&id),
+                         static_cast<const void *>(uuid),
+                         sizeof(CUuuid))) {
+            if(cuDevice != nullptr)
+                *cuDevice = _cuDevice;
+            return CUDA_SUCCESS;
+        }
+    }
+    return CUDA_ERROR_NO_DEVICE;
+}
+
 CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice) {
 
     // dll check
@@ -64,42 +98,16 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
         return result;
     }
 
-    int numDevices = 0;
-    result = cuDeviceGetCount(&numDevices);
-    if (result != CUDA_SUCCESS) {
-        return result;
-    }
-
-    CUuuid id = {};
     std::array<uint8_t, VK_UUID_SIZE> deviceUUID{};
     if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID)) {
         return CUDA_ERROR_INVALID_DEVICE;
     }
 
-    //Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
-    //this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
-    for (int i = 0; i < numDevices; i++) {
-        result = cuDeviceGet(&cuDevice, i);
-        if (result != CUDA_SUCCESS) {
-            return result;
-        }
-        result = cuDeviceGetUuid(&id, cuDevice);
-        if (result != CUDA_SUCCESS) {
-            return result;
-        }
-
-        if (!std::memcmp(static_cast<const void *>(&id),
-                static_cast<const void *>(deviceUUID.data()),
-                sizeof(CUuuid))) {
-            foundDevice = true;
-            break;
-        }
+    result = FindCudaDevice(deviceUUID.data(), &cuDevice);
+    if(result != CUDA_SUCCESS)
+    {
+        return result;
     }
-
-    if (!foundDevice) {
-        return CUDA_ERROR_NO_DEVICE;
-    }
-
     result = cuCtxCreate(&m_context, 0, cuDevice);
     return result;
 }

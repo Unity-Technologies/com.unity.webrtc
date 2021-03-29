@@ -24,6 +24,7 @@
 
 #if CUDA_PLATFORM
 #include <cuda.h>
+#include "GraphicsDevice/Cuda/CudaContext.h"
 #endif
 
 #if _WIN32
@@ -160,12 +161,19 @@ int32_t GetPhysicalDeviceIndex(
     for(int i = 0; i < list.size(); ++i)
     {
         VkPhysicalDevice physicalDevice = list[i];
-        if (VulkanUtility::GetPhysicalDeviceUUIDInto(
+        if (!VulkanUtility::GetPhysicalDeviceUUIDInto(
             instance, physicalDevice, &deviceUUID))
         {
-            *found = true;
-            return i;
+            continue;
         }
+#if CUDA_PLATFORM
+        if (CudaContext::FindCudaDevice(deviceUUID.data(), nullptr) != CUDA_SUCCESS)
+        {
+            continue;
+        }
+#endif
+        * found = true;
+        return i;
     }
     *found = false;
     return 0;

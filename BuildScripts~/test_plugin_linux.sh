@@ -12,13 +12,13 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # Install libc++, libc++abi googletest clang glut
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
 sudo apt update
-sudo apt install -y libc++-dev libc++abi-dev clang freeglut3-dev
+sudo apt install -y clang-10 libc++-10-dev libc++abi-10-dev freeglut3-dev
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
 cmake . \
-  -D CMAKE_C_COMPILER="clang" \
-  -D CMAKE_CXX_COMPILER="clang++" \
+  -D CMAKE_C_COMPILER="clang-10" \
+  -D CMAKE_CXX_COMPILER="clang++-10" \
   -D CMAKE_BUILD_TYPE="Debug" \
   -D CMAKE_CXX_FLAGS="-stdlib=libc++" \
   -D cxx_no_rtti=ON \
