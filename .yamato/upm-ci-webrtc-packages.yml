@@ -50,6 +50,7 @@ platforms:
     build_command: BuildScripts~/build_plugin_android.sh
     test_command: BuildScripts~/test_plugin_android.sh
     plugin_path: Runtime/Plugins/Android/libwebrtc.aar
+
 test_targets:
   - name: win
     type: Unity::VM
@@ -147,6 +148,12 @@ test_targets:
         platform: standalone
       - backend: il2cpp
         platform: standalone
+
+test_targets_android:
+  - name: vulkan
+    editorarg: Vulkan
+  - name: opengles3
+    editorarg: OpenGLES3
 
 package:
   name: webrtc
@@ -276,8 +283,9 @@ test_{{ package.name }}_{{ editor.version }}_ios:
       paths:
         - "build/test-results/**"
 
-test_{{ package.name }}_{{ editor.version }}_android:
-  name: Test {{ package.packagename }} with {{ editor.version }} on android device
+{% for target in test_targets_android %}
+test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
+  name: Test {{ package.packagename }} with {{ editor.version }} on android device {{ target.name }}
   agent:
     type: Unity::mobile::shield
     image: mobile/android-execution-base:stable
@@ -295,11 +303,12 @@ test_{{ package.name }}_{{ editor.version }}_android:
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
        # List the connected devices
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
-       ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results  
+       ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results --extra-editor-arg="-playergraphicsapi={{ target.editorarg }}"
   artifacts:
     logs:
       paths:
         - "build/test-results/**"
+{% endfor %}
 {% endfor %}
 
 {% for target in test_targets %}
