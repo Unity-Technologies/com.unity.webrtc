@@ -3,7 +3,7 @@
 #include "Context.h"
 #include "EncoderFactory.h"
 
-#if SUPPORT_OPENGL_CORE
+#if SUPPORT_OPENGL_CORE && CUDA_PLATFORM
 #include "NvCodec/NvEncoderGL.h"
 #endif
 
@@ -84,10 +84,16 @@ namespace webrtc
                 break;
             }
 #endif
-#if SUPPORT_OPENGL_CORE
+#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
             case GRAPHICS_DEVICE_OPENGL: {
-                encoder = std::make_unique<NvEncoderGL>(width, height, device, textureFormat);
-                break;
+#if CUDA_PLATFORM
+                if (encoderType == UnityEncoderType::UnityEncoderHardware)
+                {
+                    encoder = std::make_unique<NvEncoderGL>(width, height, device, textureFormat);
+                    break;
+                }
+#endif
+                encoder = std::make_unique<SoftwareEncoder>(width, height, device, textureFormat);
             }
 #endif
 #if SUPPORT_VULKAN

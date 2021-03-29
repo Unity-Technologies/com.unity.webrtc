@@ -19,16 +19,16 @@ public:
     OpenGLGraphicsDevice();
     virtual ~OpenGLGraphicsDevice();
 
-    virtual bool InitV();
-    virtual void ShutdownV();
-    inline virtual void* GetEncodeDevicePtrV();
+    virtual bool InitV() override;
+    virtual void ShutdownV() override;
+    inline virtual void* GetEncodeDevicePtrV() override;
 
-    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat);
-    virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat);
-    virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src);
-    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex);
-    virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr);
-    inline virtual GraphicsDeviceType GetDeviceType() const;
+    virtual ITexture2D* CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
+    virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
+    virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+    virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+    virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+    inline virtual GraphicsDeviceType GetDeviceType() const override;
 
 #if defined(CUDA_PLATFORM)
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }

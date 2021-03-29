@@ -306,8 +306,9 @@ namespace Unity.WebRTC
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
 #endif
-            if (Application.platform != RuntimePlatform.LinuxEditor &&
-                Application.platform != RuntimePlatform.LinuxPlayer)
+            // OpenGL APIs on windows are not supported 
+            if (Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.WindowsPlayer)
             {
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
                     SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||

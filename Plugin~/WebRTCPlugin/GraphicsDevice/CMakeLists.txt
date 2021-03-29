@@ -24,6 +24,5 @@ elseif(Linux)
   add_subdirectory(Cuda)
 elseif(Android)
   add_subdirectory(Vulkan)
-#  todo(kazuki):: OpenGL support on Android platform
-#  add_subdirectory(OpenGL) 
+  add_subdirectory(OpenGL) 
 endif()

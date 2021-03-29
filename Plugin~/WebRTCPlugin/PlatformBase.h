@@ -52,6 +52,7 @@
 #define SUPPORT_D3D11 1 // comment this out if you don't have D3D11 header/library files
 #define SUPPORT_D3D12 1 // comment this out if you don't have D3D12 header/library files
 #define SUPPORT_OPENGL_UNIFIED 1
+// #define SUPPORT_OPENGL_CORE 1
 #define SUPPORT_VULKAN 1 // Requires Vulkan SDK to be installed
 #define SUPPORT_SOFTWARE_ENCODER 1
 #elif UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL
@@ -73,6 +74,7 @@
 
 #if UNITY_ANDROID
 #define SUPPORT_VULKAN 1
+#define SUPPORT_OPENGL_ES 1
 #endif 
 
 #if UNITY_LINUX || UNITY_WIN

@@ -49,6 +49,8 @@ static tuple<UnityGfxRenderer, UnityEncoderType, UnityRenderingExtTextureFormat>
 #if defined(SUPPORT_OPENGL_UNIFIED) & defined(UNITY_LINUX)
     { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
+    { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
+    { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
 #endif // defined(SUPPORT_OPENGL_UNIFIED)
 #if defined(SUPPORT_VULKAN)
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
