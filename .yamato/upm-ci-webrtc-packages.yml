@@ -237,31 +237,6 @@ build_{{ package.name }}_{{ editor.version }}_ios:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
-build_{{ package.name }}_{{ editor.version }}_android:
-  name : Build {{ package.packagename }} with {{ editor.version }} for android device
-  agent:
-    type: Unity::VM::osx
-    image: mobile/macos-10.13-testing:stable
-    flavor: b1.xlarge
-  commands:
-    - |
-      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
-      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
-    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
-    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
-    - chmod +x ./utr
-    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
-  artifacts:
-    players:
-      paths:
-        - "build/players/**"
-    logs:
-      paths:
-        - "build/logs/**"
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-
 test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
@@ -284,6 +259,31 @@ test_{{ package.name }}_{{ editor.version }}_ios:
         - "build/test-results/**"
 
 {% for target in test_targets_android %}
+build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
+  name : Build {{ package.packagename }} with {{ editor.version }} for android device {{ target.name }}
+  agent:
+    type: Unity::VM::osx
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.xlarge
+  commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
+    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only --extra-editor-arg="-playergraphicsapi={{ target.editorarg }}"
+  artifacts:
+    players:
+      paths:
+        - "build/players/**"
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
 test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   name: Test {{ package.packagename }} with {{ editor.version }} on android device {{ target.name }}
   agent:
@@ -292,7 +292,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
     flavor: b1.medium
   skip_checkout: true
   dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_android
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}
   commands:
     - |
        # Download standalone UnityTestRunner
@@ -303,7 +303,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
        # List the connected devices
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
-       ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results --extra-editor-arg="-playergraphicsapi={{ target.editorarg }}"
+       ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results
   artifacts:
     logs:
       paths:
