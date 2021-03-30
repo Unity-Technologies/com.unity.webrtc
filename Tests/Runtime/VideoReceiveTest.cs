@@ -6,6 +6,7 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
+    [ConditionalIgnore(ConditionalIgnore.OpenGLOnLinux, "Software encoder is not supported on OpenGL on Linux")]
     class VideoReceiveTest
     {
         [SetUp]
@@ -44,13 +45,10 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
-        // todo::Software encoder does not support yet on linux
         [UnityTest]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.Direct3D12,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
-        [UnityPlatform(exclude = new[] {
-            RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.OSXEditor})]
         public IEnumerator VideoReceive()
         {
             var config = new RTCConfiguration
