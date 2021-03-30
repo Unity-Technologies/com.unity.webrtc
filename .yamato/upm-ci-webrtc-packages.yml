@@ -271,11 +271,14 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
     - |
       find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
       cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+{% if target.name == "vulkan" -%}
+      cp -f WebRTC~/ProjectSettings/ProjectSettings-android-vulkan.asset WebRTC~/ProjectSettings/ProjectSettings.asset
+{% endif -%}
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only --extra-editor-arg="{{ target.extra-editor-arg }}" --extra-editor-arg="-playergraphicsapi={{ target.playergraphicsapi }}"
+    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
   artifacts:
     players:
       paths:
