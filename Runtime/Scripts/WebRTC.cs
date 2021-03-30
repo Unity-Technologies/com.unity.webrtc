@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="WebRTC.Initialize(EncoderType)"/>
     public enum EncoderType
@@ -20,7 +20,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum RTCErrorDetailType
     {
@@ -48,7 +48,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.ConnectionState"/>
     public enum RTCPeerConnectionState : int
@@ -62,7 +62,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.IceConnectionState"/>
     public enum RTCIceConnectionState : int
@@ -78,7 +78,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.GatheringState"/>
     public enum RTCIceGatheringState : int
@@ -89,7 +89,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.SignalingState"/>
     public enum RTCSignalingState : int
@@ -103,7 +103,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum RTCErrorType
     {
@@ -162,7 +162,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public struct RTCSessionDescription
     {
@@ -172,7 +172,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public struct RTCOfferOptions
     {
@@ -201,7 +201,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCConfiguration"/>
     [Serializable]
@@ -224,17 +224,17 @@ namespace Unity.WebRTC
     public enum RTCIceTransportPolicy : int
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Relay = 1,
         /// <summary>
-        /// 
+        ///
         /// </summary>
         All = 3
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
     /// <seealso cref="RTCPeerConnection.SetConfiguration(ref RTCConfiguration)"/>
@@ -242,25 +242,25 @@ namespace Unity.WebRTC
     public struct RTCConfiguration
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCIceServer[] iceServers;
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCIceTransportPolicy iceTransportPolicy;
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCBundlePolicy bundlePolicy;
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int iceCandidatePoolSize;
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum CodecInitializationResult
     {
@@ -306,22 +306,35 @@ namespace Unity.WebRTC
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
 #endif
-            if (Application.platform != RuntimePlatform.LinuxEditor &&
-                Application.platform != RuntimePlatform.LinuxPlayer)
+
+            bool isLinux = Application.platform == RuntimePlatform.LinuxEditor ||
+                           Application.platform == RuntimePlatform.LinuxPlayer;
+            bool isOpenGL = SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
+                            SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
+                            SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3;
+
+            if (!isLinux && isOpenGL)
             {
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
-                {
-                    Debug.LogError($"Not Support OpenGL API on {Application.platform}.");
+                Debug.LogError($"Not Support OpenGL API on {Application.platform}.");
 #if UNITY_EDITOR
-                    UnityEditor.EditorApplication.isPlaying = false;
-                    return;
+                UnityEditor.EditorApplication.isPlaying = false;
+                return;
 #else
-                    throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
+                throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
 #endif
-                }
             }
+
+            if (type == EncoderType.Software && isLinux && isOpenGL)
+            {
+                Debug.LogError($"Not Support Software encoder on OpenGL API on {Application.platform}.");
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+                return;
+#else
+                throw new NotSupportedException($"Not Support Software encoder on OpenGL API on {Application.platform} in Unity WebRTC.");
+#endif
+            }
+
 
             NativeMethods.RegisterDebugLog(DebugLog);
 #if UNITY_IOS && !UNITY_EDITOR
