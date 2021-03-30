@@ -4,16 +4,31 @@ using UnityEditor.Build.Reporting;
 
 namespace Unity.WebRTC.Editor
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class PreprocessBuild : IPreprocessBuildWithReport
     {
-        public int callbackOrder => 1;
+        /// <summary>
+        /// 
+        /// </summary>
+        int IOrderedCallback.callbackOrder => 1;
 
-        public const int RequiredMinSdkVersion = 21;
+        /// <summary>
+        /// 
+        /// </summary>
+        public const AndroidSdkVersions RequiredMinSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public const AndroidArchitecture RequiredTargetArchitectures = AndroidArchitecture.ARM64;
 
-
-        public void OnPreprocessBuild(BuildReport report)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="report"></param>
+        void IPreprocessBuildWithReport.OnPreprocessBuild(BuildReport report)
         {
             if (report.summary.platform == BuildTarget.Android)
             {
@@ -22,10 +37,12 @@ namespace Unity.WebRTC.Editor
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         static void EnsureMinSdkVersion()
         {
-            if ((int)PlayerSettings.Android.minSdkVersion < RequiredMinSdkVersion)
+            if ((int)PlayerSettings.Android.minSdkVersion < (int)RequiredMinSdkVersion)
             {
                 throw new BuildFailedException(
                     $"WebRTC apps require a minimum SDK version of {RequiredMinSdkVersion}. " +
@@ -33,6 +50,9 @@ namespace Unity.WebRTC.Editor
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         static void EnsureArchitecture()
         {
             if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64)
