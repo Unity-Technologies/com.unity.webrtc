@@ -151,9 +151,11 @@ test_targets:
 
 test_targets_android:
   - name: vulkan
-    editorarg: Vulkan
+    playergraphicsapi: Vulkan
+    extra-editor-arg: vulkan
   - name: opengles3
-    editorarg: OpenGLES3
+    playergraphicsapi: OpenGLES3
+    extra-editor-arg: elgs3
 
 package:
   name: webrtc
@@ -273,7 +275,7 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only --extra-editor-arg="-playergraphicsapi={{ target.editorarg }}"
+    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only --extra-editor-arg="{{ target.playergraphicsapi }}" --extra-editor-arg="-playergraphicsapi={{ target.playergraphicsapi }}"
   artifacts:
     players:
       paths:
