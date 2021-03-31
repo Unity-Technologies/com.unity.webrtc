@@ -50,6 +50,8 @@ IGraphicsDevice* GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
         }
 #endif
 #if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
+        case kUnityGfxRendererOpenGLES20:
+        case kUnityGfxRendererOpenGLES30:
         case kUnityGfxRendererOpenGLCore: {
             return Init(rendererType, nullptr, nullptr);
         }
@@ -102,6 +104,8 @@ IGraphicsDevice* GraphicsDevice::Init(
     }
 #endif
 #if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
+    case kUnityGfxRendererOpenGLES20:
+    case kUnityGfxRendererOpenGLES30:
     case kUnityGfxRendererOpenGLCore: {
         pDevice = new OpenGLGraphicsDevice();
         break;

@@ -103,10 +103,22 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
         RTC_LOG(LS_INFO) << "dstName is not texture";
         return false;
     }
+#if SUPPORT_OPENGL_CORE
     glCopyImageSubData(
             srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
             dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
             width, height, 1);
+#elif SUPPORT_OPENGL_ES
+    GLuint fbo = 0;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    
+    glFramebufferTexture2D(
+        GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, srcName, 0);
+    glBindTexture(GL_TEXTURE_2D, dstName);
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width, height, 0);
+    glDeleteFramebuffers(1, &fbo);
+#endif
     return true;
 }
 

@@ -213,6 +213,8 @@ elseif(Android)
       ${WEBRTC_LIBRARY}
       log
       OpenSLES
+      GLESv3
+      EGL
   )
   target_compile_options(WebRTCLib
     PUBLIC 

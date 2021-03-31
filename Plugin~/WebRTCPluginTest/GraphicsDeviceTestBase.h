@@ -28,36 +28,41 @@ protected:
 };
 
 static tuple<UnityGfxRenderer, UnityEncoderType, UnityRenderingExtTextureFormat> VALUES_TEST_ENV[] = {
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
     { kUnityGfxRendererD3D11, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB},
     { kUnityGfxRendererD3D11, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
     { kUnityGfxRendererD3D11, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererD3D11, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
-#endif // defined(SUPPORT_D3D11)
-#if defined(SUPPORT_D3D12)
+#endif // SUPPORT_D3D11
+#if SUPPORT_D3D12
     { kUnityGfxRendererD3D12, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererD3D12, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
     { kUnityGfxRendererD3D12, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererD3D12, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
-#endif // defined(SUPPORT_D3D12)
-#if defined(SUPPORT_METAL)
+#endif // SUPPORT_D3D12
+#if SUPPORT_METAL
     { kUnityGfxRendererMetal, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererMetal, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm }
-#endif // defined(SUPPORT_METAL)
+#endif // SUPPORT_METAL
 // todo::(kazuki) windows support
-// todo::(kazuki) software encoder support
-#if defined(SUPPORT_OPENGL_UNIFIED) & defined(UNITY_LINUX)
+#if SUPPORT_OPENGL_UNIFIED & UNITY_LINUX
     { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
     { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererOpenGLCore, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
-#endif // defined(SUPPORT_OPENGL_UNIFIED)
-#if defined(SUPPORT_VULKAN)
+#endif // SUPPORT_OPENGL_UNIFIED
+#if SUPPORT_OPENGL_ES
+    { kUnityGfxRendererOpenGLES30, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
+    { kUnityGfxRendererOpenGLES30, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
+    { kUnityGfxRendererOpenGLES30, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
+    { kUnityGfxRendererOpenGLES30, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
+#endif // SUPPORT_OPENGL_ES
+#if SUPPORT_VULKAN
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderHardware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm },
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_SRGB },
     { kUnityGfxRendererVulkan, UnityEncoderType::UnityEncoderSoftware, UnityRenderingExtTextureFormat::kUnityRenderingExtFormatB8G8R8A8_UNorm }
-#endif // defined(SUPPORT_VULKAN)
+#endif // SUPPORT_VULKAN
 };
 
 } // end namespace webrtc
