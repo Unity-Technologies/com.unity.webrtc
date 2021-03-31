@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "WebRTCPlugin.h"
 
-#if defined(_DEBUG)
+#if _DEBUG
 #include <cstdarg>
 #endif
 
@@ -21,11 +21,11 @@ namespace webrtc
 
     void LogPrint(const char* fmt, ...)
     {
-#if defined(_DEBUG)
+#if _DEBUG
         va_list vl;
         va_start(vl, fmt);
         char buf[2048];
-#if defined(_WIN32)
+#if _WIN32
         vsprintf_s(buf, fmt, vl);
 #else
         vsprintf(buf, fmt, vl);
@@ -42,7 +42,7 @@ namespace webrtc
         }
     }
 
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
     void OnOpenGLDebugMessage(
             GLenum source,
             GLenum type,
