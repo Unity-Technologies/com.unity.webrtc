@@ -83,6 +83,7 @@ The package contains the following samples.
 | MultiplePeerConnections | Receiving video stream with multiple peers     |
 | ChangeCodecs            | Controlling codecs of the video sender         |
 | TricleIce               | Checking the trickle ICE functionality         |
+| RestartIce              | Checking do an ICE restart                     |
 
 To get these samples, Push the `Import into Project` button on Package Manager.
 
