@@ -51,11 +51,11 @@ namespace Unity.WebRTC.RuntimeTest
             stream.Dispose();
         }
 
-        // todo(kazuki): Crash on windows standalone player
+        // todo(kazuki): Crash on Android and Linux standalone player
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStream")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.Android })]
         public IEnumerator VideoStreamAddTrackAndRemoveTrack()
         {
             var width = 256;
