@@ -89,6 +89,16 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
+        [Test]
+        public void RestartIcePeerConnection()
+        {
+            var context = NativeMethods.ContextCreate(0, encoderType);
+            var peer = NativeMethods.ContextCreatePeerConnection(context);
+            NativeMethods.PeerConnectionRestartIce(peer);
+            NativeMethods.ContextDeletePeerConnection(context, peer);
+            NativeMethods.ContextDestroy(0);
+        }
+
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
         static void PeerConnectionSetSessionDescSuccess(IntPtr connection)
         {
