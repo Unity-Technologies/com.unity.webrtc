@@ -1,171 +1,304 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using Unity.WebRTC;
+using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
 
 class PeerConnectionSample : MonoBehaviour
 {
 #pragma warning disable 0649
+    [SerializeField] private Button startButton;
     [SerializeField] private Button callButton;
-    [SerializeField] private Button hangupButton;
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button hangUpButton;
+    [SerializeField] private Text localCandidateId;
+    [SerializeField] private Text remoteCandidateId;
+
+    [SerializeField] private Camera cam;
+    [SerializeField] private RawImage sourceImage;
+    [SerializeField] private RawImage receiveImage;
+    [SerializeField] private Transform rotateObject;
 #pragma warning restore 0649
 
-    private RTCPeerConnection pc1, pc2;
-    private Coroutine sdpCheck;
+    private RTCPeerConnection _pc1, _pc2;
+    private List<RTCRtpSender> pc1Senders;
+    private MediaStream videoStream, receiveStream;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
-    private RTCDataChannel dataChannel;
+    private DelegateOnTrack pc2Ontrack;
+    private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
+    private bool videoUpdateStarted;
 
-    private RTCOfferOptions OfferOptions = new RTCOfferOptions
+    private const int width = 1280;
+    private const int height = 720;
+
+    private RTCOfferOptions _offerOptions = new RTCOfferOptions
     {
-        iceRestart = false,
-        offerToReceiveAudio = true,
-        offerToReceiveVideo = true
+        iceRestart = false, offerToReceiveAudio = true, offerToReceiveVideo = true
     };
 
-    private RTCAnswerOptions AnswerOptions = new RTCAnswerOptions
-    {
-        iceRestart = false,
-    };
+    private RTCAnswerOptions _answerOptions = new RTCAnswerOptions {iceRestart = false,};
 
     private void Awake()
     {
-        WebRTC.Initialize();
-
-        callButton.onClick.AddListener(() => { StartCoroutine(Call()); });
-        hangupButton.onClick.AddListener(() => { Hangup(); });
+        WebRTC.Initialize(EncoderType.Software);
+        startButton.onClick.AddListener(OnStart);
+        callButton.onClick.AddListener(Call);
+        restartButton.onClick.AddListener(RestartIce);
+        hangUpButton.onClick.AddListener(HangUp);
+        receiveStream = new MediaStream();
     }
 
     private void OnDestroy()
     {
-        if (pc1 != null)
-            pc1.Close();
-        if (pc1 != null)
-            pc2.Close();
         WebRTC.Dispose();
     }
 
     private void Start()
     {
+        pc1Senders = new List<RTCRtpSender>();
         callButton.interactable = true;
-        pc1OnIceConnectionChange = new DelegateOnIceConnectionChange(state => { OnIceConnectionChange(pc1, state); });
-        pc2OnIceConnectionChange = new DelegateOnIceConnectionChange(state => { OnIceConnectionChange(pc2, state); });
-        pc1OnIceCandidate = new DelegateOnIceCandidate(candidate => { OnIceCandidate(pc2, candidate); });
-        pc2OnIceCandidate = new DelegateOnIceCandidate(candidate => { OnIceCandidate(pc1, candidate); });
+        restartButton.interactable = false;
+        hangUpButton.interactable = false;
+
+        pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
+        pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
+        pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
+        pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
+        pc2Ontrack = e =>
+        {
+            receiveStream.AddTrack(e.Track);
+        };
+        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
+
+        receiveStream.OnAddTrack = e =>
+        {
+            if (e.Track is VideoStreamTrack track)
+            {
+                receiveImage.texture = track.InitializeReceiver(width, height);
+                receiveImage.color = Color.white;
+            }
+        };
     }
 
-    private IEnumerator Loop()
+    private void OnStart()
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(1);
+        startButton.interactable = false;
+        callButton.interactable = true;
 
-            var desc = pc1.LocalDescription;
-            Debug.Log($"pc1 sdp: {desc.sdp}");
+        if (videoStream == null)
+        {
+            videoStream = cam.CaptureStream(width, height, 1000000);
+        }
+
+        sourceImage.texture = cam.targetTexture;
+        sourceImage.color = Color.white;
+    }
+
+    private void Update()
+    {
+        if (rotateObject != null)
+        {
+            float t = Time.deltaTime;
+            rotateObject.Rotate(100 * t, 200 * t, 300 * t);
         }
     }
 
-    RTCConfiguration GetSelectedSdpSemantics()
+    private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new RTCIceServer[]
-        {
-            new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:19302" } }
-        };
+        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
 
         return config;
     }
-    IEnumerator Call()
+
+    private void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
     {
-        callButton.interactable = false;
-        hangupButton.interactable = true;
+        Debug.Log($"{GetName(pc)} IceConnectionState: {state}");
 
-        Debug.Log("GetSelectedSdpSemantics");
-        var configuration = GetSelectedSdpSemantics();
-        pc1 = new RTCPeerConnection(ref configuration);
-        Debug.Log("Created local peer connection object pc1");
-        pc1.OnIceCandidate = pc1OnIceCandidate;
-        pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
-        pc2 = new RTCPeerConnection(ref configuration);
-        Debug.Log("Created remote peer connection object pc2");
-        pc2.OnIceCandidate = pc2OnIceCandidate;
-        pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
-        Debug.Log("pc1 createOffer start");
+        if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
+        {
+            StartCoroutine(CheckStats(pc));
+        }
+    }
 
-        dataChannel = pc1.CreateDataChannel("data");
+    // Display the video codec that is actually used.
+    IEnumerator CheckStats(RTCPeerConnection pc)
+    {
+        yield return new WaitForSeconds(0.1f);
+        if (pc == null)
+            yield break;
 
-        var op = pc1.CreateOffer(ref OfferOptions);
+        var op = pc.GetStats();
+        yield return op;
+        if (op.IsError)
+        {
+            Debug.LogErrorFormat("RTCPeerConnection.GetStats failed: {0}", op.Error);
+            yield break;
+        }
+
+        RTCStatsReport report = op.Value;
+        RTCIceCandidatePairStats activeCandidatePairStats = null;
+        RTCIceCandidateStats remoteCandidateStats = null;
+
+        foreach (var transportStatus in report.Stats.Values.OfType<RTCTransportStats>())
+        {
+            if (report.Stats.TryGetValue(transportStatus.selectedCandidatePairId, out var tmp))
+            {
+                activeCandidatePairStats = tmp as RTCIceCandidatePairStats;
+            }
+        }
+
+        if (activeCandidatePairStats == null || string.IsNullOrEmpty(activeCandidatePairStats.remoteCandidateId))
+        {
+            yield break;
+        }
+
+        foreach (var iceCandidateStatus in report.Stats.Values.OfType<RTCIceCandidateStats>())
+        {
+            if (iceCandidateStatus.Id == activeCandidatePairStats.remoteCandidateId)
+            {
+                remoteCandidateStats = iceCandidateStatus;
+            }
+        }
+
+        if (remoteCandidateStats == null || string.IsNullOrEmpty(remoteCandidateStats.Id))
+        {
+            yield break;
+        }
+
+        Debug.Log($"{GetName(pc)} candidate stats Id:{remoteCandidateStats.Id}, Type:{remoteCandidateStats.candidateType}");
+        var updateText = GetName(pc) == "pc1" ? localCandidateId : remoteCandidateId;
+        updateText.text = remoteCandidateStats.Id;
+    }
+
+    IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
+    {
+        var op = pc.CreateOffer(ref _offerOptions);
         yield return op;
 
         if (!op.IsError)
         {
-            yield return StartCoroutine(OnCreateOfferSuccess(op.Desc));
+            if (pc.SignalingState != RTCSignalingState.Stable)
+            {
+                Debug.LogError($"{GetName(pc)} signaling state is not stable.");
+                yield break;
+            }
+
+            yield return StartCoroutine(OnCreateOfferSuccess(pc, op.Desc));
         }
         else
         {
             OnCreateSessionDescriptionError(op.Error);
         }
-        sdpCheck = StartCoroutine(Loop());
     }
-    void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
+
+    private void AddTracks()
     {
-        switch (state)
+        foreach (var track in videoStream.GetTracks())
         {
-            case RTCIceConnectionState.New:
-                Debug.Log($"{GetName(pc)} IceConnectionState: New");
-                break;
-            case RTCIceConnectionState.Checking:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Checking");
-                break;
-            case RTCIceConnectionState.Closed:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Closed");
-                break;
-            case RTCIceConnectionState.Completed:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Completed");
-                break;
-            case RTCIceConnectionState.Connected:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Connected");
-                break;
-            case RTCIceConnectionState.Disconnected:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Disconnected");
-                break;
-            case RTCIceConnectionState.Failed:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Failed");
-                break;
-            case RTCIceConnectionState.Max:
-                Debug.Log($"{GetName(pc)} IceConnectionState: Max");
-                break;
-            default:
-                break;
+            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
+        }
+
+        if (!videoUpdateStarted)
+        {
+            StartCoroutine(WebRTC.Update());
+            videoUpdateStarted = true;
         }
     }
-    void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
+
+    private void RemoveTracks()
+    {
+        foreach (var sender in pc1Senders)
+        {
+            _pc1.RemoveTrack(sender);
+        }
+
+        pc1Senders.Clear();
+
+        MediaStreamTrack[] tracks = receiveStream.GetTracks().ToArray();
+        foreach (var track in tracks)
+        {
+            receiveStream.RemoveTrack(track);
+            track.Dispose();
+        }
+    }
+
+    private void Call()
+    {
+        callButton.interactable = false;
+        hangUpButton.interactable = true;
+        restartButton.interactable = true;
+
+        var configuration = GetSelectedSdpSemantics();
+        _pc1 = new RTCPeerConnection(ref configuration);
+        _pc1.OnIceCandidate = pc1OnIceCandidate;
+        _pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
+        _pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
+        _pc2 = new RTCPeerConnection(ref configuration);
+        _pc2.OnIceCandidate = pc2OnIceCandidate;
+        _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
+        _pc2.OnTrack = pc2Ontrack;
+
+        AddTracks();
+    }
+
+    private void RestartIce()
+    {
+        restartButton.interactable = false;
+
+        _pc1.RestartIce();
+    }
+
+    private void HangUp()
+    {
+        RemoveTracks();
+
+        _pc1.Close();
+        _pc2.Close();
+        _pc1.Dispose();
+        _pc2.Dispose();
+        _pc1 = null;
+        _pc2 = null;
+
+        callButton.interactable = true;
+        restartButton.interactable = false;
+        hangUpButton.interactable = false;
+
+        receiveImage.color = Color.black;
+    }
+
+    private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
         GetOtherPc(pc).AddIceCandidate(candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.Candidate}");
     }
-    string GetName(RTCPeerConnection pc)
+
+    private string GetName(RTCPeerConnection pc)
     {
-        return (pc == pc1) ? "pc1" : "pc2";
+        return (pc == _pc1) ? "pc1" : "pc2";
     }
 
-    RTCPeerConnection GetOtherPc(RTCPeerConnection pc)
+    private RTCPeerConnection GetOtherPc(RTCPeerConnection pc)
     {
-        return (pc == pc1) ? pc2 : pc1;
+        return (pc == _pc1) ? _pc2 : _pc1;
     }
 
-    IEnumerator OnCreateOfferSuccess(RTCSessionDescription desc)
+    private IEnumerator OnCreateOfferSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
     {
-        Debug.Log($"Offer from pc1\n{desc.sdp}");
-        Debug.Log("pc1 setLocalDescription start");
-        var op = pc1.SetLocalDescription(ref desc);
+        Debug.Log($"Offer from {GetName(pc)}\n{desc.sdp}");
+        Debug.Log($"{GetName(pc)} setLocalDescription start");
+        var op = pc.SetLocalDescription(ref desc);
         yield return op;
 
         if (!op.IsError)
         {
-            OnSetLocalSuccess(pc1);
+            OnSetLocalSuccess(pc);
         }
         else
         {
@@ -173,28 +306,30 @@ class PeerConnectionSample : MonoBehaviour
             OnSetSessionDescriptionError(ref error);
         }
 
-        Debug.Log("pc2 setRemoteDescription start");
-        var op2 = pc2.SetRemoteDescription(ref desc);
+        var otherPc = GetOtherPc(pc);
+        Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
+        var op2 = otherPc.SetRemoteDescription(ref desc);
         yield return op2;
         if (!op2.IsError)
         {
-            OnSetRemoteSuccess(pc2);
+            OnSetRemoteSuccess(otherPc);
         }
         else
         {
             var error = op2.Error;
             OnSetSessionDescriptionError(ref error);
         }
-        Debug.Log("pc2 createAnswer start");
+
+        Debug.Log($"{GetName(otherPc)} createAnswer start");
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
 
-        var op3 = pc2.CreateAnswer(ref AnswerOptions);
+        var op3 = otherPc.CreateAnswer(ref _answerOptions);
         yield return op3;
         if (!op3.IsError)
         {
-            yield return OnCreateAnswerSuccess(op3.Desc);
+            yield return OnCreateAnswerSuccess(otherPc, op3.Desc);
         }
         else
         {
@@ -202,28 +337,31 @@ class PeerConnectionSample : MonoBehaviour
         }
     }
 
-    void OnSetLocalSuccess(RTCPeerConnection pc)
+    private void OnSetLocalSuccess(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} SetLocalDescription complete");
     }
 
-    void OnSetSessionDescriptionError(ref RTCError error) { }
+    static void OnSetSessionDescriptionError(ref RTCError error)
+    {
+        Debug.LogError($"Error Detail Type: {error.message}");
+    }
 
-    void OnSetRemoteSuccess(RTCPeerConnection pc)
+    private void OnSetRemoteSuccess(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} SetRemoteDescription complete");
     }
 
-    IEnumerator OnCreateAnswerSuccess(RTCSessionDescription desc)
+    IEnumerator OnCreateAnswerSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
     {
-        Debug.Log($"Answer from pc2:\n{desc.sdp}");
-        Debug.Log("pc2 setLocalDescription start");
-        var op = pc2.SetLocalDescription(ref desc);
+        Debug.Log($"Answer from {GetName(pc)}:\n{desc.sdp}");
+        Debug.Log($"{GetName(pc)} setLocalDescription start");
+        var op = pc.SetLocalDescription(ref desc);
         yield return op;
 
         if (!op.IsError)
         {
-            OnSetLocalSuccess(pc2);
+            OnSetLocalSuccess(pc);
         }
         else
         {
@@ -231,13 +369,14 @@ class PeerConnectionSample : MonoBehaviour
             OnSetSessionDescriptionError(ref error);
         }
 
-        Debug.Log("pc1 setRemoteDescription start");
+        var otherPc = GetOtherPc(pc);
+        Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
 
-        var op2 = pc1.SetRemoteDescription(ref desc);
+        var op2 = otherPc.SetRemoteDescription(ref desc);
         yield return op2;
         if (!op2.IsError)
         {
-            OnSetRemoteSuccess(pc1);
+            OnSetRemoteSuccess(otherPc);
         }
         else
         {
@@ -246,19 +385,8 @@ class PeerConnectionSample : MonoBehaviour
         }
     }
 
-    void OnCreateSessionDescriptionError(RTCError e)
+    private static void OnCreateSessionDescriptionError(RTCError error)
     {
-
-    }
-    void Hangup()
-    {
-        Debug.Log("Ending call");
-        StopCoroutine(sdpCheck);
-        pc1.Close();
-        pc2.Close();
-        pc1 = null;
-        pc2 = null;
-        hangupButton.interactable = false;
-        callButton.interactable = true;
+        Debug.LogError($"Error Detail Type: {error.message}");
     }
 }

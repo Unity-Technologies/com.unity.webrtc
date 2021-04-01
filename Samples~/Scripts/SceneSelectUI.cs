@@ -49,6 +49,5 @@ namespace Unity.WebRTC.Samples
         {
             SceneManager.LoadScene("Bandwidth", LoadSceneMode.Single);
         }
-
     }
 }
