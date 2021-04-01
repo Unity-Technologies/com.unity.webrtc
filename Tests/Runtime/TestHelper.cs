@@ -12,7 +12,6 @@ namespace Unity.WebRTC.RuntimeTest
                 return false;
             WebRTC.Initialize(EncoderType.Hardware);
             var isSupported = CheckVideoCodecCapabilities();
-            Debug.Log("HardwareCodecSupport:" + isSupported);
             WebRTC.Dispose();
             return isSupported;
         }
