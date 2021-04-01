@@ -177,18 +177,6 @@ class PeerConnectionSample : MonoBehaviour
         updateText.text = remoteCandidateStats.Id;
     }
 
-    static bool TryGetTypedStatus<T>(IDictionary<string, RTCStats> data, string key, out T value) where T : RTCStats
-    {
-        if (data.TryGetValue(key, out var tmp))
-        {
-            value = tmp as T;
-            return value != null;
-        }
-
-        value = default;
-        return false;
-    }
-
     IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
     {
         var op = pc.CreateOffer(ref _offerOptions);
