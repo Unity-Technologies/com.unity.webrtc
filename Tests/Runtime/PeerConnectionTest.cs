@@ -843,11 +843,14 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.OnNegotiationNeeded = () => isInvokeOnNegotiationNeeded2 = true;
 
             peer1.RestartIce();
-            peer2.RestartIce();
-            var op9 = new WaitUntilWithTimeout(() => isInvokeOnNegotiationNeeded1 && isInvokeOnNegotiationNeeded2,
-                5000);
+            var op9 = new WaitUntilWithTimeout(() => isInvokeOnNegotiationNeeded1, 5000);
             yield return op9;
             Assert.That(op9.IsCompleted, Is.True);
+
+            peer2.RestartIce();
+            var op10 = new WaitUntilWithTimeout(() => isInvokeOnNegotiationNeeded2, 5000);
+            yield return op10;
+            Assert.That(op10.IsCompleted, Is.True);
 
             stream.Dispose();
             peer1.Close();
