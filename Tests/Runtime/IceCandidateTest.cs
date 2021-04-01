@@ -8,7 +8,7 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
+            var value = TestHelper.HardwareCodecSupport();
             WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
         }
 

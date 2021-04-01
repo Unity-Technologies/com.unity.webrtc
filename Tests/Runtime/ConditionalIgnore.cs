@@ -12,7 +12,7 @@ namespace Unity.WebRTC.RuntimeTest
         [RuntimeInitializeOnLoadMethod]
         static void OnLoad()
         {
-            var ignoreHardwareEncoderTest = !NativeMethods.GetHardwareEncoderSupport();
+            var ignoreHardwareEncoderTest = !TestHelper.HardwareCodecSupport();
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedHardwareForHardwareCodec,
                 ignoreHardwareEncoderTest);
 

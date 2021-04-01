@@ -82,8 +82,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             peers[0].OnIceCandidate = candidate =>
             {
-                Assert.NotNull(candidate);
-                Assert.NotNull(candidate.Candidate);
+                Assert.That(candidate, Is.Not.Null);
+                Assert.That(candidate, Is.Not.Null);
                 peers[1].AddIceCandidate(candidate);
             };
             peers[1].OnIceCandidate = candidate =>
@@ -118,55 +118,52 @@ namespace Unity.WebRTC.RuntimeTest
                     peers[0].AddTrack(track, m_stream);
                 }
             }
-
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
             var op1 = peers[0].CreateOffer(ref options1);
             yield return op1;
-            Assert.False(op1.IsError);
+            Assert.That(op1.IsError, Is.False, op1.Error.message);
             var desc = op1.Desc;
             var op2 = peers[0].SetLocalDescription(ref desc);
             yield return op2;
-            Assert.False(op2.IsError);
+            Assert.That(op2.IsError, Is.False, op2.Error.message);
 
             desc.sdp = ReplaceOfferSdpForHardwareEncodeTest(desc.sdp);
-
             var op3 = peers[1].SetRemoteDescription(ref desc);
             yield return op3;
-            Assert.False(op3.IsError);
+            Assert.That(op3.IsError, Is.False, op3.Error.message);
             var op4 = peers[1].CreateAnswer(ref options2);
             yield return op4;
-            Assert.False(op4.IsError);
+            Assert.That(op4.IsError, Is.False, op4.Error.message);
             desc = op4.Desc;
             var op5 = peers[1].SetLocalDescription(ref desc);
             yield return op5;
-            Assert.False(op5.IsError);
+            Assert.That(op5.IsError, Is.False, op5.Error.message);
 
             desc.sdp = ReplaceAnswerSdpForHardwareEncodeTest(desc.sdp);
 
             var op6 = peers[0].SetRemoteDescription(ref desc);
             yield return op6;
-            Assert.False(op6.IsError);
+            Assert.That(op6.IsError, Is.False, op6.Error.message);
 
             var op7 = new WaitUntilWithTimeout(() =>
                 peers[0].IceConnectionState == RTCIceConnectionState.Connected ||
                 peers[0].IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return op7;
-            Assert.True(op7.IsCompleted);
+            Assert.That(op7.IsCompleted, Is.True);
 
             var op8 = new WaitUntilWithTimeout(() =>
                 peers[1].IceConnectionState == RTCIceConnectionState.Connected ||
                 peers[1].IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return op8;
-            Assert.True(op8.IsCompleted);
+            Assert.That(op8.IsCompleted, Is.True);
 
             if (m_stream != null)
             {
                 var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any(), 5000);
                 yield return op9;
-                Assert.True(op9.IsCompleted);
+                Assert.That(op9.IsCompleted, Is.True);
             }
-
             IsTestFinished = true;
         }
 
