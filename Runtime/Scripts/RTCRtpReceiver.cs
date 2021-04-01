@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpReceiver : IDisposable
     {
@@ -40,7 +41,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
@@ -65,6 +66,15 @@ namespace Unity.WebRTC
             {
                 IntPtr ptrTrack = NativeMethods.ReceiverGetTrack(self);
                 return WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
+            }
+        }
+
+        public IEnumerable<MediaStream> Streams
+        {
+            get
+            {
+                IntPtr ptrStreams = NativeMethods.ReceiverGetStreams(self, out ulong length);
+                return WebRTC.Deserialize(ptrStreams, (int)length, ptr => new MediaStream(ptr));
             }
         }
     }

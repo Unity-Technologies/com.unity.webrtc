@@ -1208,6 +1208,11 @@ extern "C"
         return receiver->track().get();
     }
 
+    UNITY_INTERFACE_EXPORT MediaStreamInterface** ReceiverGetStreams(RtpReceiverInterface* receiver, size_t* length)
+    {
+        return ConvertPtrArrayFromRefPtrArray<MediaStreamInterface>(receiver->streams(), length);
+    }
+
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)
     {
         return dataChannelObj->dataChannel->id();

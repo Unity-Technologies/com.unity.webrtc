@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="WebRTC.Initialize(EncoderType)"/>
     public enum EncoderType
@@ -20,7 +20,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum RTCErrorDetailType
     {
@@ -48,7 +48,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.ConnectionState"/>
     public enum RTCPeerConnectionState : int
@@ -62,7 +62,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.IceConnectionState"/>
     public enum RTCIceConnectionState : int
@@ -78,7 +78,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.GatheringState"/>
     public enum RTCIceGatheringState : int
@@ -89,7 +89,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.SignalingState"/>
     public enum RTCSignalingState : int
@@ -103,7 +103,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum RTCErrorType
     {
@@ -162,7 +162,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public struct RTCSessionDescription
     {
@@ -172,7 +172,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public struct RTCOfferOptions
     {
@@ -201,7 +201,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCConfiguration"/>
     [Serializable]
@@ -224,17 +224,17 @@ namespace Unity.WebRTC
     public enum RTCIceTransportPolicy : int
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Relay = 1,
         /// <summary>
-        /// 
+        ///
         /// </summary>
         All = 3
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
     /// <seealso cref="RTCPeerConnection.SetConfiguration(ref RTCConfiguration)"/>
@@ -242,25 +242,25 @@ namespace Unity.WebRTC
     public struct RTCConfiguration
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCIceServer[] iceServers;
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCIceTransportPolicy iceTransportPolicy;
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCBundlePolicy bundlePolicy;
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int iceCandidatePoolSize;
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum CodecInitializationResult
     {
@@ -739,6 +739,8 @@ namespace Unity.WebRTC
         public static extern bool SenderReplaceTrack(IntPtr sender, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ReceiverGetTrack(IntPtr receiver);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ReceiverGetStreams(IntPtr receiver, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

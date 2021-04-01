@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
@@ -126,6 +127,14 @@ namespace Unity.WebRTC
             get
             {
                 return Receiver.Track;
+            }
+        }
+
+        public IEnumerable<MediaStream> Streams
+        {
+            get
+            {
+                return Receiver.Streams;
             }
         }
 
