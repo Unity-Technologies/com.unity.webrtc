@@ -27,9 +27,6 @@ EditorBuildSettings:
     path: Assets/Samples/MediaStream/MediaStream.unity
     guid: 6a553b4932fd56b45ab503ea0f990e2d
   - enabled: 1
-    path: Assets/Samples/PeerConnection/PeerConnection.unity
-    guid: d8a7abe953efe47b28ce74316cfecd0a
-  - enabled: 1
     path: Assets/Samples/ChangeCodecs/ChangeCodecs.unity
     guid: e9c13f6cf7516b24495a3ed0779dcc70
   - enabled: 1
@@ -42,6 +39,6 @@ EditorBuildSettings:
     path: Assets/Samples/MultiVideoReceive/MultiVideoReceive.unity
     guid: 2849cfdf020a0464bac96e5c43bd6726
   - enabled: 1
-    path: Assets/Samples/RestartIce/RestartIce.unity
+    path: Assets/Samples/PeerConnection/PeerConnection.unity
     guid: b6162a25306134a9ea9c9c7556e5f136
   m_configObjects: {}

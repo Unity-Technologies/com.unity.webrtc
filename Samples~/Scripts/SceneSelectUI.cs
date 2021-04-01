@@ -49,10 +49,5 @@ namespace Unity.WebRTC.Samples
         {
             SceneManager.LoadScene("Bandwidth", LoadSceneMode.Single);
         }
-
-        public void OnPressedPeerRestartIceButton()
-        {
-            SceneManager.LoadScene("RestartIce", LoadSceneMode.Single);
-        }
     }
 }
