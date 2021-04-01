@@ -130,40 +130,30 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     const uint32_t width = sourceTex->GetWidth();
     const uint32_t height = sourceTex->GetHeight();
     const uint32_t pitch = sourceTex->GetPitch();
+    const uint32_t bufferSize = sourceTex->GetBufferSize();
+    byte* data = sourceTex->GetBuffer();
 
     // Send normal texture data to the PBO
     glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
-#if UNITY_ANDROID
+#if SUPPORT_OPENGL_ES
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_TEXTURE_2D, sourceId);
-
-    uint32_t bufferSize = sourceTex->GetBufferSize();
-    byte* data = sourceTex->GetBuffer();
 
     // Send PBO to main memory
     GLubyte* pboPtr = static_cast<GLubyte*>(glMapBufferRange(
             GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
+#elif SUPPORT_OPENGL_CORE
+    glBindTexture(GL_TEXTURE_2D, sourceId);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+
+    // Send PBO to main memory
+    GLubyte* pboPtr = static_cast<GLubyte*>(glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
+#endif
     if (pboPtr != nullptr)
     {
         memcpy(data, pboPtr, bufferSize);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
     }
-#else
-    glBindTexture(GL_TEXTURE_2D, sourceId);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
-
-    uint32_t buffSize = sourceTex->GetBufferSize();
-    byte* data = sourceTex->GetBuffer();
-
-    // Send PBO to main memory
-    GLubyte* pboPtr = static_cast<GLubyte*>(glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
-    if (pboPtr)
-    {
-        memcpy(data, pboPtr, buffSize);
-        glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-    }
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-#endif
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
