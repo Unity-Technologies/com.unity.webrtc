@@ -179,17 +179,20 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Audio);
-            Assert.NotNull(transceiver);
-            Assert.IsNull(transceiver.CurrentDirection);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
             RTCRtpReceiver receiver = transceiver.Receiver;
-            Assert.NotNull(receiver);
+            Assert.That(receiver, Is.Not.Null);
             MediaStreamTrack track = receiver.Track;
-            Assert.NotNull(track);
-            Assert.AreEqual(TrackKind.Audio, track.Kind);
-            Assert.True(track is AudioStreamTrack);
+            Assert.That(track, Is.Not.Null);
+            Assert.That(track.Kind, Is.EqualTo(TrackKind.Audio));
+            Assert.That(track, Is.TypeOf<AudioStreamTrack>());
+            Assert.That(receiver.Streams, Has.Count.EqualTo(0));
 
-            Assert.AreEqual(1, peer.GetTransceivers().Count());
-            Assert.NotNull(peer.GetTransceivers().First());
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            Assert.That(peer.GetTransceivers(), Has.All.Not.Null);
+
+            peer.Dispose();
         }
 
         [Test]
@@ -198,17 +201,20 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Video);
-            Assert.NotNull(transceiver);
-            Assert.IsNull(transceiver.CurrentDirection);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
             RTCRtpReceiver receiver = transceiver.Receiver;
-            Assert.NotNull(receiver);
+            Assert.That(receiver, Is.Not.Null);
             MediaStreamTrack track = receiver.Track;
-            Assert.NotNull(track);
-            Assert.AreEqual(TrackKind.Video, track.Kind);
-            Assert.True(track is VideoStreamTrack);
+            Assert.That(track, Is.Not.Null);
+            Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
+            Assert.That(track, Is.TypeOf<VideoStreamTrack>());
+            Assert.That(receiver.Streams, Has.Count.EqualTo(0));
 
-            Assert.AreEqual(1, peer.GetTransceivers().Count());
-            Assert.NotNull(peer.GetTransceivers().First());
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            Assert.That(peer.GetTransceivers(), Has.All.Not.Null);
+
+            peer.Dispose();
         }
 
         [Test]
@@ -855,6 +861,72 @@ namespace Unity.WebRTC.RuntimeTest
             stream.Dispose();
             peer1.Close();
             peer2.Close();
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator RemoteOnRemoveTrack()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
+
+            MediaStreamTrack track = null;
+            MediaStream stream = Audio.CaptureStream();
+            RTCRtpSender sender = peer1.AddTrack(stream.GetTracks().First());
+
+            bool isInvokeOnRemoveTrack = false;
+            peer2.OnTrack = e =>
+            {
+                track = e.Track;
+                Assert.That(e.Streams, Has.Count.EqualTo(1));
+                MediaStream receiveStream = e.Streams.First();
+                receiveStream.OnRemoveTrack = ev => isInvokeOnRemoveTrack = true;
+            };
+
+            RTCOfferOptions options1 = default;
+            RTCAnswerOptions options2 = default;
+            var op1 = peer1.CreateOffer(ref options1);
+            yield return op1;
+            var desc = op1.Desc;
+            var op2 = peer1.SetLocalDescription(ref desc);
+            yield return op2;
+            var op3 = peer2.SetRemoteDescription(ref desc);
+            yield return op3;
+            var op4 = peer2.CreateAnswer(ref options2);
+            yield return op4;
+            desc = op4.Desc;
+            var op5 = peer2.SetLocalDescription(ref desc);
+            yield return op5;
+            var op6 = peer1.SetRemoteDescription(ref desc);
+            yield return op6;
+
+            var op7 = new WaitUntilWithTimeout(
+                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
+                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op7;
+            Assert.That(op7.IsCompleted, Is.True);
+            var op8 = new WaitUntilWithTimeout(
+                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
+                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op8;
+            Assert.That(op8.IsCompleted, Is.True);
+
+            Assert.That(track, Is.Not.Null);
+
+            peer1.RemoveTrack(sender);
+
+            var op9 = new WaitUntilWithTimeout(() => isInvokeOnRemoveTrack, 5000);
+            yield return op9;
+            Assert.That(op9.IsCompleted, Is.True);
+
+            stream.Dispose();
+            peer1.Dispose();
+            peer2.Dispose();
         }
     }
 }
