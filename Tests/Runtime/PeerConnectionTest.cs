@@ -595,33 +595,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             peer2.OnTrack = e => { track = e.Track; };
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
-            yield return op1;
-            var desc = op1.Desc;
-            var op2 = peer1.SetLocalDescription(ref desc);
-            yield return op2;
-            var op3 = peer2.SetRemoteDescription(ref desc);
-            yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
-            yield return op4;
-            desc = op4.Desc;
-            var op5 = peer2.SetLocalDescription(ref desc);
-            yield return op5;
-            var op6 = peer1.SetRemoteDescription(ref desc);
-            yield return op6;
+            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
 
-            var op7 = new WaitUntilWithTimeout(
-                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op7;
-            Assert.True(op7.IsCompleted);
-            var op8 = new WaitUntilWithTimeout(
-                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op8;
-            Assert.True(op8.IsCompleted);
             Assert.That(track, Is.Not.Null);
             peer2.Dispose();
             Assert.That(() => track.Id, Throws.TypeOf<InvalidOperationException>());
@@ -643,32 +618,7 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream1 = Audio.CaptureStream();
             peer1.AddTrack(stream1.GetTracks().First());
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
-            yield return op1;
-            var desc = op1.Desc;
-            var op2 = peer1.SetLocalDescription(ref desc);
-            yield return op2;
-            var op3 = peer2.SetRemoteDescription(ref desc);
-            yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
-            yield return op4;
-            desc = op4.Desc;
-            var op5 = peer2.SetLocalDescription(ref desc);
-            yield return op5;
-            var op6 = peer1.SetRemoteDescription(ref desc);
-            yield return op6;
-
-            var op7 = new WaitUntilWithTimeout(
-                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op7;
-            Assert.True(op7.IsCompleted);
-            var op8 = new WaitUntilWithTimeout(
-                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op8;
+            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
 
             Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
             RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
@@ -814,33 +764,7 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream = Audio.CaptureStream();
             peer1.AddTrack(stream.GetTracks().First());
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
-            yield return op1;
-            var desc = op1.Desc;
-            var op2 = peer1.SetLocalDescription(ref desc);
-            yield return op2;
-            var op3 = peer2.SetRemoteDescription(ref desc);
-            yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
-            yield return op4;
-            desc = op4.Desc;
-            var op5 = peer2.SetLocalDescription(ref desc);
-            yield return op5;
-            var op6 = peer1.SetRemoteDescription(ref desc);
-            yield return op6;
-
-            var op7 = new WaitUntilWithTimeout(
-                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op7;
-            Assert.That(op7.IsCompleted, Is.True);
-            var op8 = new WaitUntilWithTimeout(
-                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op8;
-            Assert.That(op8.IsCompleted, Is.True);
+            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
 
             bool isInvokeOnNegotiationNeeded1 = false;
             bool isInvokeOnNegotiationNeeded2 = false;
@@ -875,19 +799,44 @@ namespace Unity.WebRTC.RuntimeTest
             peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
-            MediaStreamTrack track = null;
-            MediaStream stream = Audio.CaptureStream();
-            RTCRtpSender sender = peer1.AddTrack(stream.GetTracks().First());
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"), false);
+            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
+            stream.AddTrack(track);
+            RTCRtpSender sender = peer1.AddTrack(track, stream);
+
+            bool isInvokeNegotiationNeeded1 = false;
+            peer1.OnNegotiationNeeded = () => isInvokeNegotiationNeeded1 = true;
 
             bool isInvokeOnRemoveTrack = false;
             peer2.OnTrack = e =>
             {
-                track = e.Track;
                 Assert.That(e.Streams, Has.Count.EqualTo(1));
                 MediaStream receiveStream = e.Streams.First();
                 receiveStream.OnRemoveTrack = ev => isInvokeOnRemoveTrack = true;
             };
 
+            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+
+            peer1.RemoveTrack(sender);
+
+            var op9 = new WaitUntilWithTimeout(() => isInvokeNegotiationNeeded1, 5000);
+            yield return op9;
+            Assert.That(op9.IsCompleted, Is.True);
+
+            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+
+            var op10 = new WaitUntilWithTimeout(() => isInvokeOnRemoveTrack, 5000);
+            yield return op10;
+            Assert.That(op10.IsCompleted, Is.True);
+
+            stream.Dispose();
+            track.Dispose();
+            peer1.Dispose();
+            peer2.Dispose();
+        }
+
+        private IEnumerator SignalingOfferFromPeer1ToPeer2(RTCPeerConnection peer1, RTCPeerConnection peer2)
+        {
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
             var op1 = peer1.CreateOffer(ref options1);
@@ -915,18 +864,6 @@ namespace Unity.WebRTC.RuntimeTest
                       peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return op8;
             Assert.That(op8.IsCompleted, Is.True);
-
-            Assert.That(track, Is.Not.Null);
-
-            peer1.RemoveTrack(sender);
-
-            var op9 = new WaitUntilWithTimeout(() => isInvokeOnRemoveTrack, 5000);
-            yield return op9;
-            Assert.That(op9.IsCompleted, Is.True);
-
-            stream.Dispose();
-            peer1.Dispose();
-            peer2.Dispose();
         }
     }
 }
