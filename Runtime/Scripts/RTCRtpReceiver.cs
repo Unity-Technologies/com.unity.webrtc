@@ -74,7 +74,7 @@ namespace Unity.WebRTC
             get
             {
                 IntPtr ptrStreams = NativeMethods.ReceiverGetStreams(self, out ulong length);
-                return WebRTC.Deserialize(ptrStreams, (int)length, ptr => new MediaStream(ptr));
+                return WebRTC.Deserialize(ptrStreams, (int)length, ptr => new MediaStream(ptr, true));
             }
         }
     }
