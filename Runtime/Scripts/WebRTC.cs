@@ -778,6 +778,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteMediaStream(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
+        public static extern void ContextRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextUnRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]

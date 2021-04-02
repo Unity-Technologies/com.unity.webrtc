@@ -65,6 +65,8 @@ namespace webrtc
 
         // MediaStream
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& streamId);
+        void RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream);
+        void UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream);
         void DeleteMediaStream(webrtc::MediaStreamInterface* stream);
         MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
 
