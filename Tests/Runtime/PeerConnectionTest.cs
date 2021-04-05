@@ -595,7 +595,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             peer2.OnTrack = e => { track = e.Track; };
 
-            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+            yield return SignalingOffer(peer1, peer2);
 
             Assert.That(track, Is.Not.Null);
             peer2.Dispose();
@@ -618,7 +618,7 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream1 = Audio.CaptureStream();
             peer1.AddTrack(stream1.GetTracks().First());
 
-            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+            yield return SignalingOffer(peer1, peer2);
 
             Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
             RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
@@ -764,7 +764,7 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream = Audio.CaptureStream();
             peer1.AddTrack(stream.GetTracks().First());
 
-            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+            yield return SignalingOffer(peer1, peer2);
 
             bool isInvokeOnNegotiationNeeded1 = false;
             bool isInvokeOnNegotiationNeeded2 = false;
@@ -815,7 +815,7 @@ namespace Unity.WebRTC.RuntimeTest
                 receiveStream.OnRemoveTrack = ev => isInvokeOnRemoveTrack = true;
             };
 
-            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+            yield return SignalingOffer(peer1, peer2);
 
             peer1.RemoveTrack(sender);
 
@@ -823,7 +823,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op9;
             Assert.That(op9.IsCompleted, Is.True);
 
-            yield return SignalingOfferFromPeer1ToPeer2(peer1, peer2);
+            yield return SignalingOffer(peer1, peer2);
 
             var op10 = new WaitUntilWithTimeout(() => isInvokeOnRemoveTrack, 5000);
             yield return op10;
@@ -835,33 +835,33 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.Dispose();
         }
 
-        private IEnumerator SignalingOfferFromPeer1ToPeer2(RTCPeerConnection peer1, RTCPeerConnection peer2)
+        private IEnumerator SignalingOffer(RTCPeerConnection @from, RTCPeerConnection to)
         {
             RTCOfferOptions options1 = default;
             RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = @from.CreateOffer(ref options1);
             yield return op1;
             var desc = op1.Desc;
-            var op2 = peer1.SetLocalDescription(ref desc);
+            var op2 = @from.SetLocalDescription(ref desc);
             yield return op2;
-            var op3 = peer2.SetRemoteDescription(ref desc);
+            var op3 = to.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = to.CreateAnswer(ref options2);
             yield return op4;
             desc = op4.Desc;
-            var op5 = peer2.SetLocalDescription(ref desc);
+            var op5 = to.SetLocalDescription(ref desc);
             yield return op5;
-            var op6 = peer1.SetRemoteDescription(ref desc);
+            var op6 = @from.SetRemoteDescription(ref desc);
             yield return op6;
 
             var op7 = new WaitUntilWithTimeout(
-                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+                () => @from.IceConnectionState == RTCIceConnectionState.Connected ||
+                      @from.IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return op7;
             Assert.That(op7.IsCompleted, Is.True);
             var op8 = new WaitUntilWithTimeout(
-                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+                () => to.IceConnectionState == RTCIceConnectionState.Connected ||
+                      to.IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return op8;
             Assert.That(op8.IsCompleted, Is.True);
         }
