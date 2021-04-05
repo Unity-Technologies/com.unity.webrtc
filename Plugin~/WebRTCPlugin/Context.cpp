@@ -202,7 +202,7 @@ namespace webrtc
             m_mapIdAndEncoder.clear();
             m_mediaSteamTrackList.clear();
             m_mapClients.clear();
-            m_mapMediaStream.clear();
+            m_mapLocalMediaStream.clear();
             m_mapMediaStreamObserver.clear();
             m_mapSetSessionDescriptionObserver.clear();
             m_mapVideoEncoderParameter.clear();
@@ -301,15 +301,15 @@ namespace webrtc
     {
         rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
             m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        m_mapMediaStream[streamId] = stream.release();
-        return m_mapMediaStream[streamId];
+        m_mapLocalMediaStream[streamId] = stream.release();
+        return m_mapLocalMediaStream[streamId];
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
-        if (m_mapMediaStream.find(stream->id()) != m_mapMediaStream.end())
+        if (m_mapLocalMediaStream.find(stream->id()) != m_mapLocalMediaStream.end())
         {
-            m_mapMediaStream.erase(stream->id());
+            m_mapLocalMediaStream.erase(stream->id());
             stream->Release();
         }
     }
