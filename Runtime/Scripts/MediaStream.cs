@@ -13,7 +13,6 @@ namespace Unity.WebRTC
         private DelegateOnRemoveTrack onRemoveTrack;
 
         private IntPtr self;
-        private bool isRemote;
         private bool disposed;
 
         /// <summary>
@@ -35,14 +34,8 @@ namespace Unity.WebRTC
             }
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                if (isRemote)
-                {
-                    WebRTC.Context.UnRegisterMediaStreamObserver(this);
-                }
-                else
-                {
-                    WebRTC.Context.DeleteMediaStream(this);
-                }
+                WebRTC.Context.UnRegisterMediaStreamObserver(this);
+                WebRTC.Context.DeleteMediaStream(this);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
@@ -107,7 +100,7 @@ namespace Unity.WebRTC
             return NativeMethods.MediaStreamRemoveTrack(GetSelfOrThrow(), track.GetSelfOrThrow());
         }
 
-        public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()), false)
+        public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
         {
         }
 
@@ -120,16 +113,11 @@ namespace Unity.WebRTC
             return self;
         }
 
-        internal MediaStream(IntPtr ptr, bool isRemote)
+        internal MediaStream(IntPtr ptr)
         {
             self = ptr;
-            this.isRemote = isRemote;
             WebRTC.Table.Add(self, this);
-            if (isRemote)
-            {
-                WebRTC.Context.RegisterMediaStreamObserver(self);
-            }
-
+            WebRTC.Context.RegisterMediaStreamObserver(self);
             WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
             WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);
         }

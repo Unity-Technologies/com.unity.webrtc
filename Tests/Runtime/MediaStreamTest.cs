@@ -380,7 +380,7 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator ReceiverGetStreams()
         {
             var audioTrack = new AudioStreamTrack("audio");
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"), false);
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
             stream.AddTrack(audioTrack);
             yield return 0;
 

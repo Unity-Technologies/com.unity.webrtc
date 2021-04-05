@@ -301,14 +301,17 @@ namespace webrtc
     {
         rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
             m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        RegisterMediaStreamObserver(stream);
-        return stream.release();
+        m_mapMediaStream[streamId] = stream.release();
+        return m_mapMediaStream[streamId];
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
-        UnRegisterMediaStreamObserver(stream);
-        stream->Release();
+        if (m_mapMediaStream.find(stream->id()) != m_mapMediaStream.end())
+        {
+            m_mapMediaStream.erase(stream->id());
+            stream->Release();
+        }
     }
 
     void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)

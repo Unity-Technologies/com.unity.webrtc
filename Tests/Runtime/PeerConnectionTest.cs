@@ -799,7 +799,7 @@ namespace Unity.WebRTC.RuntimeTest
             peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"), false);
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
             var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
             stream.AddTrack(track);
             RTCRtpSender sender = peer1.AddTrack(track, stream);

@@ -224,7 +224,7 @@ namespace Unity.WebRTC
         public static MediaStream CaptureStream(this UnityEngine.Camera cam, int width, int height, int bitrate,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"), false);
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));
             var track = cam.CaptureStreamTrack(width, height, bitrate, depth);
             stream.AddTrack(track);
             return stream;
