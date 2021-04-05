@@ -117,9 +117,9 @@ namespace Unity.WebRTC
         {
             self = ptr;
             WebRTC.Table.Add(self, this);
-            WebRTC.Context.RegisterMediaStreamObserver(self);
-            WebRTC.Context.MediaStreamRegisterOnAddTrack(self, MediaStreamOnAddTrack);
-            WebRTC.Context.MediaStreamRegisterOnRemoveTrack(self, MediaStreamOnRemoveTrack);
+            WebRTC.Context.RegisterMediaStreamObserver(this);
+            WebRTC.Context.MediaStreamRegisterOnAddTrack(this, MediaStreamOnAddTrack);
+            WebRTC.Context.MediaStreamRegisterOnRemoveTrack(this, MediaStreamOnRemoveTrack);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
