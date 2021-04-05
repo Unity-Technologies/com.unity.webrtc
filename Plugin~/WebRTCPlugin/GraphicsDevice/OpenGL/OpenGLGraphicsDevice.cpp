@@ -24,11 +24,13 @@ bool OpenGLGraphicsDevice::InitV()
     GLuint unusedIds = 0;
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#if SUPPORT_OPENGL_CORE
     glDebugMessageCallback(OnOpenGLDebugMessage, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
+#endif    
 #endif
 
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.InitGL();
 #endif
     return true;
@@ -37,17 +39,11 @@ bool OpenGLGraphicsDevice::InitV()
 //---------------------------------------------------------------------------------------------------------------------
 
 void OpenGLGraphicsDevice::ShutdownV() {
-#if defined(CUDA_PLATFORM)
+#if CUDA_PLATFORM
     m_cudaContext.Shutdown();
 #endif
 }
 
-//---------------------------------------------------------------------------------------------------------------------
-//ITexture2D* OpenGLGraphicsDevice::CreateTextureV(
-//    uint32_t width, uint32_t height, void* tex)
-//{
-//    return new OpenGLTexture2D(width, height, reinterpret_cast<uintptr_t>(tex));
-//}
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(
     uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) 
@@ -136,18 +132,19 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     // Send normal texture data to the PBO
     glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
 #if SUPPORT_OPENGL_ES
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+//    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_TEXTURE_2D, sourceId);
 
     // Send PBO to main memory
     GLubyte* pboPtr = static_cast<GLubyte*>(glMapBufferRange(
-            GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
+        GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
 #elif SUPPORT_OPENGL_CORE
     glBindTexture(GL_TEXTURE_2D, sourceId);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 
     // Send PBO to main memory
-    GLubyte* pboPtr = static_cast<GLubyte*>(glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
+    GLubyte* pboPtr = static_cast<GLubyte*>(glMapBuffer(
+        GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
 #endif
     if (pboPtr != nullptr)
     {
