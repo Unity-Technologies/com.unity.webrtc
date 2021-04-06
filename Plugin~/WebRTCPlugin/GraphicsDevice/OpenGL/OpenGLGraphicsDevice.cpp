@@ -3,10 +3,18 @@
 #include "OpenGLTexture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
+#if SUPPORT_OPENGL_ES
+#define GL_BGRA GL_BGRA_EXT
+#endif
+
 namespace unity
 {
 namespace webrtc
 {
+
+#if SUPPORT_OPENGL_ES
+GLuint fbo;
+#endif
 
 OpenGLGraphicsDevice::OpenGLGraphicsDevice()
 {
@@ -30,6 +38,10 @@ bool OpenGLGraphicsDevice::InitV()
 #endif    
 #endif
 
+#if SUPPORT_OPENGL_ES
+    glGenFramebuffers(1, &fbo);
+#endif
+
 #if CUDA_PLATFORM
     m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.InitGL();
 #endif
@@ -39,6 +51,11 @@ bool OpenGLGraphicsDevice::InitV()
 //---------------------------------------------------------------------------------------------------------------------
 
 void OpenGLGraphicsDevice::ShutdownV() {
+
+#if SUPPORT_OPENGL_ES
+    glDeleteFramebuffers(1, &fbo);
+#endif
+
 #if CUDA_PLATFORM
     m_cudaContext.Shutdown();
 #endif
@@ -99,23 +116,37 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
         RTC_LOG(LS_INFO) << "dstName is not texture";
         return false;
     }
-#if SUPPORT_OPENGL_CORE
     glCopyImageSubData(
-            srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
-            dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
-            width, height, 1);
-#elif SUPPORT_OPENGL_ES
-    GLuint fbo = 0;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    
-    glFramebufferTexture2D(
-        GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, srcName, 0);
-    glBindTexture(GL_TEXTURE_2D, dstName);
-    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width, height, 0);
-    glDeleteFramebuffers(1, &fbo);
-#endif
+        srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
+        dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
+        width, height, 1);
     return true;
+}
+
+void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels)
+{
+#if SUPPORT_OPENGL_CORE
+    glGetTexImage(target, level, format, type, pixels);
+#elif SUPPORT_OPENGL_ES
+    glBindFramebuffer( GL_FRAMEBUFFER, fbo );
+
+    int width = 0;
+    int height = 0;
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+
+    GLint tex;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex);
+    
+    glFramebufferTexture2D(GL_FRAMEBUFFER,
+    GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+    // read pixels from framebuffer to PBO
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glReadPixels(0, 0, width, height, format, type, pixels);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 }
 
 rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
@@ -129,28 +160,21 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     const uint32_t bufferSize = sourceTex->GetBufferSize();
     byte* data = sourceTex->GetBuffer();
 
-    // Send normal texture data to the PBO
     glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
-#if SUPPORT_OPENGL_ES
-//    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glBindBuffer(GL_TEXTURE_2D, sourceId);
+    glBindTexture(GL_TEXTURE_2D, sourceId);
+
+    GetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 
     // Send PBO to main memory
     GLubyte* pboPtr = static_cast<GLubyte*>(glMapBufferRange(
         GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
-#elif SUPPORT_OPENGL_CORE
-    glBindTexture(GL_TEXTURE_2D, sourceId);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 
-    // Send PBO to main memory
-    GLubyte* pboPtr = static_cast<GLubyte*>(glMapBuffer(
-        GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
-#endif
     if (pboPtr != nullptr)
     {
         memcpy(data, pboPtr, bufferSize);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
