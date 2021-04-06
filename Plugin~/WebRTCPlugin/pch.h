@@ -92,6 +92,8 @@
 
 // Android platform
 #if SUPPORT_OPENGL_ES
+#include <GLES/gl.h>
+#include <GLES/glext.h>
 #include <GLES3/gl32.h>
 #include <GLES3/gl3ext.h>
 #endif
