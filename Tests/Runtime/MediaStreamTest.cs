@@ -374,5 +374,33 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(camObj);
             Object.DestroyImmediate(rt);
         }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator ReceiverGetStreams()
+        {
+            var audioTrack = new AudioStreamTrack("audio");
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
+            stream.AddTrack(audioTrack);
+            yield return 0;
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.SetStream(stream);
+            yield return test;
+
+            foreach (var receiver in test.component.GetReceivers(1))
+            {
+                Assert.That(receiver.Streams, Has.Count.EqualTo(1));
+            }
+
+            test.component.Dispose();
+
+            foreach (var track in stream.GetTracks())
+            {
+                track.Dispose();
+            }
+
+            stream.Dispose();
+        }
     }
 }

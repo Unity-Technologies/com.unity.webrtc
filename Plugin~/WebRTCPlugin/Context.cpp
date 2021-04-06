@@ -202,7 +202,7 @@ namespace webrtc
             m_mapIdAndEncoder.clear();
             m_mediaSteamTrackList.clear();
             m_mapClients.clear();
-            m_mapMediaStream.clear();
+            m_mapLocalMediaStream.clear();
             m_mapMediaStreamObserver.clear();
             m_mapSetSessionDescriptionObserver.clear();
             m_mapVideoEncoderParameter.clear();
@@ -301,16 +301,29 @@ namespace webrtc
     {
         rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
             m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream);
-        stream->RegisterObserver(m_mapMediaStreamObserver[stream].get());
-        return stream.release();
+        m_mapLocalMediaStream[streamId] = stream.release();
+        return m_mapLocalMediaStream[streamId];
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
+        if (m_mapLocalMediaStream.find(stream->id()) != m_mapLocalMediaStream.end())
+        {
+            m_mapLocalMediaStream.erase(stream->id());
+            stream->Release();
+        }
+    }
+
+    void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
+    {
+        m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream);
+        stream->RegisterObserver(m_mapMediaStreamObserver[stream].get());
+    }
+
+    void Context::UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
+    {
         stream->UnregisterObserver(m_mapMediaStreamObserver[stream].get());
         m_mapMediaStreamObserver.erase(stream);
-        stream->Release();
     }
 
     MediaStreamObserver* Context::GetObserver(

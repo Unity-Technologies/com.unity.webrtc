@@ -265,6 +265,16 @@ extern "C"
         context->DeleteMediaStream(stream);
     }
 
+    UNITY_INTERFACE_EXPORT void ContextRegisterMediaStreamObserver(Context* context, MediaStreamInterface* stream)
+    {
+        context->RegisterMediaStreamObserver(stream);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextUnRegisterMediaStreamObserver(Context* context, MediaStreamInterface* stream)
+    {
+        context->UnRegisterMediaStreamObserver(stream);
+    }
+
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label)
     {
         return context->CreateVideoTrack(label);
@@ -931,7 +941,6 @@ extern "C"
         return obj->connection->ice_gathering_state();
     }
 
-
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnDataChannel(PeerConnectionObject* obj, DelegateOnDataChannel callback)
     {
         obj->RegisterOnDataChannel(callback);
@@ -1206,6 +1215,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ReceiverGetTrack(RtpReceiverInterface* receiver)
     {
         return receiver->track().get();
+    }
+
+    UNITY_INTERFACE_EXPORT MediaStreamInterface** ReceiverGetStreams(RtpReceiverInterface* receiver, size_t* length)
+    {
+        return ConvertPtrArrayFromRefPtrArray<MediaStreamInterface>(receiver->streams(), length);
     }
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelObject* dataChannelObj)

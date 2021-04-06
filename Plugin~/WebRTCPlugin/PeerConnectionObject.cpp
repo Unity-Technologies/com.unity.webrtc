@@ -94,6 +94,7 @@ namespace webrtc
     // Called any time the IceConnectionState changes.
     void PeerConnectionObject::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state)
     {
+        DebugLog("OnIceConnectionChange %d", new_state);
         if (onIceConnectionChange != nullptr)
         {
             onIceConnectionChange(this, new_state);
@@ -102,6 +103,7 @@ namespace webrtc
 
     void PeerConnectionObject::OnConnectionChange(PeerConnectionInterface::PeerConnectionState new_state)
     {
+        DebugLog("OnConnectionChange %d", new_state);
         if(onConnectionStateChange != nullptr)
         {
             onConnectionStateChange(this, new_state);
@@ -111,6 +113,7 @@ namespace webrtc
     // Called any time the IceGatheringState changes.
     void PeerConnectionObject::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state)
     {
+        DebugLog("OnIceGatheringChange %d", new_state);
         if (onIceGatheringChange != nullptr)
         {
             onIceGatheringChange(this, new_state);

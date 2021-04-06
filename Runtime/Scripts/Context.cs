@@ -137,14 +137,24 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteMediaStream(self, stream.GetSelfOrThrow());
         }
 
-        public void MediaStreamRegisterOnAddTrack(IntPtr stream, DelegateNativeMediaStreamOnAddTrack callback)
+        public void RegisterMediaStreamObserver(MediaStream stream)
         {
-            NativeMethods.MediaStreamRegisterOnAddTrack(self, stream, callback);
+            NativeMethods.ContextRegisterMediaStreamObserver(self, stream.GetSelfOrThrow());
         }
 
-        public void MediaStreamRegisterOnRemoveTrack(IntPtr stream, DelegateNativeMediaStreamOnRemoveTrack callback)
+        public void UnRegisterMediaStreamObserver(MediaStream stream)
         {
-            NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream, callback);
+            NativeMethods.ContextRegisterMediaStreamObserver(self, stream.GetSelfOrThrow());
+        }
+
+        public void MediaStreamRegisterOnAddTrack(MediaStream stream, DelegateNativeMediaStreamOnAddTrack callback)
+        {
+            NativeMethods.MediaStreamRegisterOnAddTrack(self, stream.GetSelfOrThrow(), callback);
+        }
+
+        public void MediaStreamRegisterOnRemoveTrack(MediaStream stream, DelegateNativeMediaStreamOnRemoveTrack callback)
+        {
+            NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream.GetSelfOrThrow(), callback);
         }
 
         public IntPtr GetRenderEventFunc()

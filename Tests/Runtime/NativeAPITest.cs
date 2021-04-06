@@ -167,9 +167,12 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var context = NativeMethods.ContextCreate(0, encoderType);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
+            NativeMethods.ContextRegisterMediaStreamObserver(context, stream);
 
             NativeMethods.MediaStreamRegisterOnAddTrack(context, stream, MediaStreamOnAddTrack);
             NativeMethods.MediaStreamRegisterOnRemoveTrack(context, stream, MediaStreamOnRemoveTrack);
+
+            NativeMethods.ContextUnRegisterMediaStreamObserver(context, stream);
             NativeMethods.ContextDeleteMediaStream(context, stream);
             NativeMethods.ContextDestroy(0);
         }
