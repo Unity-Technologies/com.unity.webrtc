@@ -171,6 +171,12 @@ namespace webrtc
         return RTCErrorType::NONE;
     }
 
+    RTCErrorType PeerConnectionObject::SetLocalDescriptionWithoutDescription(webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+    {
+        connection->SetLocalDescription(observer);
+        return RTCErrorType::NONE;
+    }
+
     RTCErrorType PeerConnectionObject::SetRemoteDescription(
         const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, std::string& error)
     {

@@ -701,7 +701,15 @@ extern "C"
         *error = ConvertString(error_);
         return errorType;
     }
-    
+
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetLocalDescriptionWithotDescription(Context* context, PeerConnectionObject* obj, char* error[])
+    {
+        std::string error_;
+        RTCErrorType errorType = obj->SetLocalDescriptionWithoutDescription(context->GetObserver(obj->connection), error_);
+        *error = ConvertString(error_);
+        return errorType;
+    }
+
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetRemoteDescription(
         Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
     {
