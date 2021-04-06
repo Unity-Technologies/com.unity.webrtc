@@ -116,6 +116,9 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
         RTC_LOG(LS_INFO) << "dstName is not texture";
         return false;
     }
+
+    // todo(kazuki): "glCopyImageSubData" is available since OpenGL ES 3.2 on Android platform.
+    // OpenGL ES 3.2 is needed to use API level 24.
     glCopyImageSubData(
         srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
         dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
