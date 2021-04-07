@@ -641,6 +641,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
+        public static extern RTCErrorType PeerConnectionSetLocalDescriptionWithoutDescription(IntPtr context, IntPtr ptr, ref IntPtr error);
+        [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionGetStats(IntPtr ptr);
