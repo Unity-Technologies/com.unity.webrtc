@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.WebRTC;
+using Unity.WebRTC.Samples;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -45,7 +46,7 @@ class TrickleIceSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         addServerButton.onClick.AddListener(OnAddServer);
         removeServerButton.onClick.AddListener(OnRemoveServer);
         resetToDefaultButton.onClick.AddListener(OnResetToDefault);

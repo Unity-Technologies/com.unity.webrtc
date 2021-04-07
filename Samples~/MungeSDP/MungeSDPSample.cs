@@ -1,5 +1,6 @@
 using System.Collections;
 using Unity.WebRTC;
+using Unity.WebRTC.Samples;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,7 +40,7 @@ class MungeSDPSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
     }
 
     private void OnDestroy()

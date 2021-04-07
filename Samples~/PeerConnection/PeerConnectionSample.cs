@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.WebRTC;
+using Unity.WebRTC.Samples;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -46,7 +47,7 @@ class PeerConnectionSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(Call);
         restartButton.onClick.AddListener(RestartIce);

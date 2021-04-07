@@ -5,6 +5,7 @@ using UnityEngine;
 using Unity.WebRTC;
 using UnityEngine.UI;
 using System.Text;
+using Unity.WebRTC.Samples;
 
 [RequireComponent(typeof(AudioListener))]
 class MediaStreamSample : MonoBehaviour
@@ -48,7 +49,7 @@ class MediaStreamSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize();
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         callButton.onClick.AddListener(Call);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
