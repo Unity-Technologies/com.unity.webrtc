@@ -96,10 +96,10 @@ namespace Unity.WebRTC
     {
         Stable = 0,
         HaveLocalOffer = 1,
-        HaveRemoteOffer = 2,
-        HaveLocalPranswer = 3,
-        HaveRemotePranswer = 4,
-        Closed = 5
+        HaveLocalPrAnswer = 2,
+        HaveRemoteOffer = 3,
+        HaveRemotePrAnswer = 4,
+        Closed = 5,
     }
 
     /// <summary>
