@@ -71,30 +71,38 @@
 #include "IUnityGraphics.h"
 #include "IUnityRenderingExtensions.h"
 
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
 #include <comdef.h>
 
 #include "d3d11.h"
 #include "IUnityGraphicsD3D11.h"
 #endif
 
-#if defined(SUPPORT_D3D12)
+#if SUPPORT_D3D12
 #include "d3d12.h"
 #include "d3d11_4.h"
 #include "IUnityGraphicsD3D12.h"
 #endif
 
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
 
-#if defined(SUPPORT_METAL)
+// Android platform
+#if SUPPORT_OPENGL_ES
+#include <GLES/gl.h>
+#include <GLES/glext.h>
+#include <GLES3/gl32.h>
+#include <GLES3/gl3ext.h>
+#endif
+
+#if SUPPORT_METAL
 #include "IUnityGraphicsMetal.h"
 #endif
 
-#if defined(SUPPORT_VULKAN)
+#if SUPPORT_VULKAN
 #include "IUnityGraphicsVulkan.h"
 #include "GraphicsDevice/Vulkan/LoadVulkanFunctions.h"
 
@@ -122,12 +130,12 @@ namespace webrtc
 #define DebugErrorW(...)    LogPrint(L"webrtc Error: "  __VA_ARGS__)
 #define NV_RESULT(NvFunction) NvFunction == NV_ENC_SUCCESS
 
-#if !defined(UNITY_WIN)
+#if !UNITY_WIN
 #define CoTaskMemAlloc(p) malloc(p)
 #define CoTaskMemFree(p) free(p)
 #endif
 
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
     void OnOpenGLDebugMessage( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 #endif
     template<class ... Args>

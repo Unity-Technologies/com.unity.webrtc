@@ -30,11 +30,12 @@ This version of the package is compatible with the following versions of the Uni
 | Windows x64 | DirectX12    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
 | Windows x64 | OpenGL       |                                                                                                                          |                    |
 | Windows x64 | Vulkan       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
-| Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) |                    |
+| Linux x64   | OpenGL       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
 | Linux x64   | Vulkan       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
 | MacOS       | Metal        | :white_check_mark:                              	                                                                        | :white_check_mark: |
 | iOS         | Metal        | :white_check_mark:                              	                                                                        | :white_check_mark: | 
-| Android     | Vulkan       |                               	                                                                                        |                    |
+| Android     | Vulkan       | :white_check_mark:            	                                                                                        | :white_check_mark: |
+| Android     | OpenGL       | :white_check_mark:            	                                                                                        | :white_check_mark: |
 
 ### Decoder support
 
@@ -48,8 +49,8 @@ This version of the package is compatible with the following versions of the Uni
 | Linux x64   | Vulkan       |                    | :white_check_mark: |
 | MacOS       | Metal        | :white_check_mark: | :white_check_mark: |
 | iOS         | Metal        | :white_check_mark: | :white_check_mark: |
-| Android     | Vulkan       |                    |                    |
-
+| Android     | Vulkan       | :white_check_mark: | :white_check_mark: |
+| Android     | OpenGL       | :white_check_mark: | :white_check_mark: |
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
 

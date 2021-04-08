@@ -354,7 +354,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "resource is not initialized";
         registerResource.width = m_width;
         registerResource.height = m_height;
-        if (inputType !=NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY)
+        if (inputType != NV_ENC_INPUT_RESOURCE_TYPE_CUDAARRAY)
         {
             registerResource.pitch = GetWidthInBytes(m_bufferFormat, m_width);          
         } else{
