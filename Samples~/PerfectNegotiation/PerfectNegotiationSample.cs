@@ -1,57 +1,105 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Unity.WebRTC;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 class PerfectNegotiationSample : MonoBehaviour
 {
 #pragma warning disable 0649
-    [SerializeField] private Button callButton;
-    [SerializeField] private Button hangUpButton;
-    [SerializeField] private Camera cam1;
-    [SerializeField] private Camera cam2;
-    [SerializeField] private RawImage sourceImage1;
-    [SerializeField] private RawImage sourceImage2;
-    [SerializeField] private RawImage receiveImage1;
-    [SerializeField] private RawImage receiveImage2;
-    [SerializeField] private Transform rotateObject;
+    [SerializeField] private Button politeSwapButton;
+    [SerializeField] private Button impoliteSwapButton;
+    [SerializeField] private Button swapPoliteFirstButton;
+    [SerializeField] private Button swapImpoliteFirstButton;
+    [SerializeField] private RawImage politeSourceImage1;
+    [SerializeField] private RawImage politeSourceImage2;
+    [SerializeField] private RawImage impoliteSourceImage1;
+    [SerializeField] private RawImage impoliteSourceImage2;
+    [SerializeField] private RawImage politeReceiveImage;
+    [SerializeField] private RawImage impoliteReceiveImage;
 #pragma warning restore 0649
 
-    private Peer politePeer, imPolitePeer;
+    private Peer politePeer, impolitePeer;
 
     private void Awake()
     {
         WebRTC.Initialize(EncoderType.Software);
-        politePeer = new Peer(this, true);
-        imPolitePeer = new Peer(this, false);
+        politeSourceImage1.texture = CreateTexture();
+        politeSourceImage2.texture = CreateTexture();
+        impoliteSourceImage1.texture = CreateTexture();
+        impoliteSourceImage2.texture = CreateTexture();
+    }
+
+    private static Texture CreateTexture()
+    {
+        var format = WebRTC.GetSupportedTextureFormat(SystemInfo.graphicsDeviceType);
+        var tex = new Texture2D(100, 100, format, false);
+        for (int y = 0; y < tex.height; y++)
+        {
+            for (int x = 0; x < tex.width; x++)
+            {
+                tex.SetPixel(x, y, Color.white);
+            }
+        }
+
+        tex.Apply();
+        return tex;
     }
 
     private void OnDestroy()
     {
         politePeer.Dispose();
-        imPolitePeer.Dispose();
+        impolitePeer.Dispose();
         WebRTC.Dispose();
     }
 
     private void Start()
     {
-        callButton.interactable = true;
-        hangUpButton.interactable = false;
+        politePeer = new Peer(this, true, politeSourceImage1, politeSourceImage2, politeReceiveImage);
+        impolitePeer = new Peer(this, false, impoliteSourceImage1, impoliteSourceImage2, impoliteReceiveImage);
+
+        politeSwapButton.onClick.AddListener(politePeer.SwapTransceivers);
+        impoliteSwapButton.onClick.AddListener(impolitePeer.SwapTransceivers);
+        swapPoliteFirstButton.onClick.AddListener(() =>
+        {
+            politePeer.SwapTransceivers();
+            impolitePeer.SwapTransceivers();
+        });
+        swapImpoliteFirstButton.onClick.AddListener(() =>
+        {
+            impolitePeer.SwapTransceivers();
+            politePeer.SwapTransceivers();
+        });
+
+        StartCoroutine(WebRTC.Update());
     }
 
     private void Update()
     {
-        if (rotateObject != null)
-        {
-            rotateObject.Rotate(1, 2, 3);
-        }
+        UpdateRed(politeSourceImage1);
+        UpdateRed(politeSourceImage2);
+        UpdateBlue(impoliteSourceImage1);
+        UpdateBlue(impoliteSourceImage2);
+    }
+
+    private void UpdateRed(RawImage source)
+    {
+        var current = source.color;
+        source.color = new Color(Random.Range(0f, 1f), current.g, current.b);
+    }
+
+    private void UpdateBlue(RawImage source)
+    {
+        var current = source.color;
+        source.color = new Color(current.r, current.g, Random.Range(0f, 1f));
     }
 
     public void PostMessage(Peer from, Message message)
     {
-        var other = from == politePeer ? imPolitePeer : politePeer;
+        var other = from == politePeer ? impolitePeer : politePeer;
         other.OnMessage(message);
     }
 }
@@ -66,26 +114,39 @@ class Message
 
 class Peer : IDisposable
 {
+    private readonly PerfectNegotiationSample parent;
+    private readonly RawImage receive;
     private readonly bool polite;
-    private PerfectNegotiationSample parent;
-    private RTCPeerConnection pc;
+    private readonly RTCPeerConnection pc;
+    private readonly VideoStreamTrack sourceVideoTrack1;
+    private readonly VideoStreamTrack sourceVideoTrack2;
 
     private bool makingOffer;
     private bool ignoreOffer;
     private bool srdAnswerPending;
+    private List<RTCRtpTransceiver> sendingTransceiverList = new List<RTCRtpTransceiver>();
 
-    public Peer(PerfectNegotiationSample parent, bool polite)
+    public Peer(
+        PerfectNegotiationSample parent,
+        bool polite,
+        RawImage source1,
+        RawImage source2,
+        RawImage receive)
     {
         this.parent = parent;
         this.polite = polite;
+        this.receive = receive;
+
         var config = GetSelectedSdpSemantics();
         pc = new RTCPeerConnection(ref config);
 
         pc.OnTrack = e =>
         {
             Debug.Log($"{this} OnTrack");
-            // remoteVideo.srcObject = new MediaStream();
-            // remoteVideo.srcObject.addTrack(e.Track);
+            if (e.Track is VideoStreamTrack video)
+            {
+                this.receive.texture = video.InitializeReceiver(100, 100);
+            }
         };
 
         pc.OnIceCandidate = candidate =>
@@ -98,6 +159,9 @@ class Peer : IDisposable
         {
             this.parent.StartCoroutine(NegotiationProcess());
         };
+
+        sourceVideoTrack1 = new VideoStreamTrack($"{this}1", source1.texture);
+        sourceVideoTrack2 = new VideoStreamTrack($"{this}2", source2.texture);
     }
 
     private IEnumerator NegotiationProcess()
@@ -128,14 +192,16 @@ class Peer : IDisposable
 
     public void Dispose()
     {
+        sendingTransceiverList.Clear();
+        sourceVideoTrack1.Dispose();
+        sourceVideoTrack2.Dispose();
         pc.Dispose();
-        parent = null;
     }
 
     public override string ToString()
     {
         var str = polite ? "polite" : "impolite";
-        return $"{str} {base.ToString()}";
+        return $"{str}-{base.ToString()}";
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
@@ -150,25 +216,25 @@ class Peer : IDisposable
     {
         if (message.runCommand)
         {
-            //ToDO: run command
+            SwapTransceivers();
             return;
         }
 
         if (message.candidate != null)
         {
-            if (!pc.AddIceCandidate(message.candidate) && ! ignoreOffer)
+            if (!pc.AddIceCandidate(message.candidate) && !ignoreOffer)
             {
                 throw new ArgumentException("this candidate can not accept.");
             }
+
             return;
         }
 
-        parent.StartCoroutine(OfferAnswerProcess(message));
+        parent.StartCoroutine(OfferAnswerProcess(message.description));
     }
 
-    private IEnumerator OfferAnswerProcess(Message message)
+    private IEnumerator OfferAnswerProcess(RTCSessionDescription description)
     {
-        var description = message.description;
         var isStable =
             pc.SignalingState == RTCSignalingState.Stable ||
             (pc.SignalingState == RTCSignalingState.HaveLocalOffer && srdAnswerPending);
@@ -205,6 +271,41 @@ class Peer : IDisposable
         {
             Assert.AreEqual(pc.RemoteDescription.type, RTCSdpType.Answer, "Answer was set");
             Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, "answered");
+        }
+    }
+
+    public void SwapTransceivers()
+    {
+        Debug.Log($"{this} swapTransceivers");
+        if (sendingTransceiverList.Count == 0)
+        {
+            // This is the first time swapTransceivers is called.
+            // Add the initial transceivers, which are remembered for future swaps.
+
+            var transceiver1 = pc.AddTransceiver(sourceVideoTrack1);
+            transceiver1.Direction = RTCRtpTransceiverDirection.SendOnly;
+            var transceiver2 = pc.AddTransceiver(sourceVideoTrack2);
+            transceiver2.Direction = RTCRtpTransceiverDirection.Inactive;
+
+            sendingTransceiverList.Add(transceiver1);
+            sendingTransceiverList.Add(transceiver2);
+            return;
+        }
+
+        // We have sent before. Swap which transceiver is the sending one.
+        if (sendingTransceiverList[0].CurrentDirection == RTCRtpTransceiverDirection.SendOnly)
+        {
+            sendingTransceiverList[0].Direction = RTCRtpTransceiverDirection.Inactive;
+            sendingTransceiverList[0].Sender.ReplaceTrack(null);
+            sendingTransceiverList[1].Direction = RTCRtpTransceiverDirection.SendOnly;
+            sendingTransceiverList[1].Sender.ReplaceTrack(sourceVideoTrack2);
+        }
+        else
+        {
+            sendingTransceiverList[1].Direction = RTCRtpTransceiverDirection.Inactive;
+            sendingTransceiverList[1].Sender.ReplaceTrack(null);
+            sendingTransceiverList[0].Direction = RTCRtpTransceiverDirection.SendOnly;
+            sendingTransceiverList[0].Sender.ReplaceTrack(sourceVideoTrack1);
         }
     }
 }

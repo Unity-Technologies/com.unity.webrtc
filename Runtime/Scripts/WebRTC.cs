@@ -306,7 +306,7 @@ namespace Unity.WebRTC
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
 #endif
-            // OpenGL APIs on windows/osx are not supported 
+            // OpenGL APIs on windows/osx are not supported
             if (Application.platform == RuntimePlatform.WindowsEditor ||
                 Application.platform == RuntimePlatform.WindowsPlayer ||
                 Application.platform == RuntimePlatform.OSXEditor ||
@@ -445,6 +445,24 @@ namespace Unity.WebRTC
                     return GraphicsFormat.R8G8B8A8_SRGB;
                 case UnityEngine.Rendering.GraphicsDeviceType.Metal:
                     return GraphicsFormat.B8G8R8A8_SRGB;
+            }
+            throw new ArgumentException("Graphics device type not supported");
+        }
+
+        public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
+        {
+            switch (type)
+            {
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
+                case UnityEngine.Rendering.GraphicsDeviceType.Vulkan:
+                    return TextureFormat.BGRA32;
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2:
+                case UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3:
+                    return TextureFormat.ARGB32;
+                case UnityEngine.Rendering.GraphicsDeviceType.Metal:
+                    return TextureFormat.BGRA32;
             }
             throw new ArgumentException("Graphics device type not supported");
         }
