@@ -1,11 +1,9 @@
 #include "pch.h"
+#include "third_party/libyuv/include/libyuv.h"
+
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
-
-#if SUPPORT_OPENGL_ES
-#define GL_BGRA GL_BGRA_EXT
-#endif
 
 namespace unity
 {
@@ -13,7 +11,7 @@ namespace webrtc
 {
 
 #if SUPPORT_OPENGL_ES
-GLuint fbo;
+GLuint fbo[2];
 #endif
 
 OpenGLGraphicsDevice::OpenGLGraphicsDevice()
@@ -39,7 +37,7 @@ bool OpenGLGraphicsDevice::InitV()
 #endif
 
 #if SUPPORT_OPENGL_ES
-    glGenFramebuffers(1, &fbo);
+    glGenFramebuffers(2, fbo);
 #endif
 
 #if CUDA_PLATFORM
@@ -53,7 +51,7 @@ bool OpenGLGraphicsDevice::InitV()
 void OpenGLGraphicsDevice::ShutdownV() {
 
 #if SUPPORT_OPENGL_ES
-    glDeleteFramebuffers(1, &fbo);
+    glDeleteFramebuffers(2, fbo);
 #endif
 
 #if CUDA_PLATFORM
@@ -119,10 +117,22 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
 
     // todo(kazuki): "glCopyImageSubData" is available since OpenGL ES 3.2 on Android platform.
     // OpenGL ES 3.2 is needed to use API level 24.
+//#if SUPPORT_OPENGL_CORE
     glCopyImageSubData(
         srcName, GL_TEXTURE_2D, 0, 0, 0, 0,
         dstName, GL_TEXTURE_2D, 0, 0, 0, 0,
         width, height, 1);
+// #elif SUPPORT_OPENGL_ES
+//     glBindTexture(GL_TEXTURE_2D, srcName);
+//     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo[1]);
+//     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+//         GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, srcName, 0);
+
+//     glBindTexture(GL_TEXTURE_2D, dstName);
+//     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+//     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+//     glBindTexture(GL_TEXTURE_2D, 0);
+// #endif
     return true;
 }
 
@@ -131,7 +141,7 @@ void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *p
 #if SUPPORT_OPENGL_CORE
     glGetTexImage(target, level, format, type, pixels);
 #elif SUPPORT_OPENGL_ES
-    glBindFramebuffer( GL_FRAMEBUFFER, fbo );
+    glBindFramebuffer( GL_FRAMEBUFFER, fbo[0] );
 
     int width = 0;
     int height = 0;
@@ -142,12 +152,11 @@ void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *p
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex);
     
     glFramebufferTexture2D(GL_FRAMEBUFFER,
-    GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+        GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 
     // read pixels from framebuffer to PBO
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glReadPixels(0, 0, width, height, format, type, pixels);
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
 }
@@ -157,21 +166,20 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     OpenGLTexture2D* sourceTex = static_cast<OpenGLTexture2D*>(tex);
     const GLuint sourceId = reinterpret_cast<uintptr_t>(sourceTex->GetNativeTexturePtrV());
     const GLuint pbo = sourceTex->GetPBO();
+    const GLenum format = GL_RGBA;
     const uint32_t width = sourceTex->GetWidth();
     const uint32_t height = sourceTex->GetHeight();
-    const uint32_t pitch = sourceTex->GetPitch();
     const uint32_t bufferSize = sourceTex->GetBufferSize();
     byte* data = sourceTex->GetBuffer();
 
     glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
     glBindTexture(GL_TEXTURE_2D, sourceId);
 
-    GetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+    GetTexImage(GL_TEXTURE_2D, 0, format, GL_UNSIGNED_BYTE, nullptr);
 
     // Send PBO to main memory
     GLubyte* pboPtr = static_cast<GLubyte*>(glMapBufferRange(
         GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
-
     if (pboPtr != nullptr)
     {
         memcpy(data, pboPtr, bufferSize);
@@ -180,9 +188,20 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
-            GraphicsUtility::ConvertRGBToI420Buffer(
-                    width, height, pitch, static_cast<uint8_t*>(data));
+    // RGBA -> I420
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
+    libyuv::ABGRToI420(
+        static_cast<uint8_t*>(data),
+        width * 4,
+        i420_buffer->MutableDataY(),
+        width,
+        i420_buffer->MutableDataU(),
+        (width+1)/2,
+        i420_buffer->MutableDataV(),
+        (width+1)/2,
+        width,
+        height
+    );
     return i420_buffer;
 }
 

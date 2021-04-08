@@ -62,9 +62,10 @@ namespace webrtc
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SNorm:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_UInt:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatR8G8B8A8_SInt:
+            return libyuv::FOURCC_ABGR;
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_SRGB:
         case UnityRenderingExtTextureFormat::kUnityRenderingExtFormatA8R8G8B8_UNorm:
-            return libyuv::FOURCC_ABGR;
+            return libyuv::FOURCC_BGRA;
         default:
             return libyuv::FOURCC_ANY;
         }
