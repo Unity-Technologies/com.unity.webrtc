@@ -166,10 +166,10 @@ class Peer : IDisposable
 
     private IEnumerator NegotiationProcess()
     {
-        Debug.Log("SLD due to negotiationneeded");
+        Debug.Log($"{this} SLD due to negotiationneeded");
         Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable,
-            "negotiationneeded always fires in stable state");
-        Assert.AreEqual(makingOffer, false, "negotiationneeded not already in progress");
+            $"{this} negotiationneeded always fires in stable state");
+        Assert.AreEqual(makingOffer, false, $"{this} negotiationneeded not already in progress");
 
         makingOffer = true;
         var op = pc.SetLocalDescription();
@@ -182,8 +182,8 @@ class Peer : IDisposable
         }
 
         Assert.AreEqual(pc.SignalingState, RTCSignalingState.HaveLocalOffer,
-            "negotiationneeded always fires in stable state");
-        Assert.AreEqual(pc.LocalDescription.type, RTCSdpType.Offer, "negotiationneeded SLD worked");
+            $"{this} negotiationneeded always fires in stable state");
+        Assert.AreEqual(pc.LocalDescription.type, RTCSdpType.Offer, $"{this} negotiationneeded SLD worked");
 
         var offer = new Message {description = pc.LocalDescription};
         parent.PostMessage(this, offer);
@@ -224,7 +224,7 @@ class Peer : IDisposable
         {
             if (!pc.AddIceCandidate(message.candidate) && !ignoreOffer)
             {
-                throw new ArgumentException("this candidate can not accept.");
+                throw new ArgumentException($"{this} this candidate can not accept.");
             }
 
             return;
@@ -247,30 +247,30 @@ class Peer : IDisposable
         }
 
         srdAnswerPending = description.type == RTCSdpType.Answer;
-        Debug.Log($"SRD {description.type}");
+        Debug.Log($"{this} SRD {description.type}");
         var op1 = pc.SetRemoteDescription(ref description);
         yield return op1;
 
         srdAnswerPending = false;
         if (description.type == RTCSdpType.Offer)
         {
-            Assert.AreEqual(pc.SignalingState, RTCSignalingState.HaveRemoteOffer, "Remote offer");
-            Assert.AreEqual(pc.RemoteDescription.type, RTCSdpType.Offer, "SRD worked");
-            Debug.Log("SLD to get back to stable");
+            Assert.AreEqual(pc.SignalingState, RTCSignalingState.HaveRemoteOffer, $"{this} Remote offer");
+            Assert.AreEqual(pc.RemoteDescription.type, RTCSdpType.Offer, $"{this} SRD worked");
+            Debug.Log($"{this} SLD to get back to stable");
 
             var op2 = pc.SetLocalDescription();
             yield return op2;
 
-            Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, "onmessage not racing with negotiationneeded");
-            Assert.AreEqual(pc.LocalDescription.type, RTCSdpType.Answer, "onmessage SLD worked");
+            Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, $"{this} onmessage not racing with negotiationneeded");
+            Assert.AreEqual(pc.LocalDescription.type, RTCSdpType.Answer, $"{this} onmessage SLD worked");
 
             var answer = new Message {description = pc.LocalDescription};
             parent.PostMessage(this, answer);
         }
         else
         {
-            Assert.AreEqual(pc.RemoteDescription.type, RTCSdpType.Answer, "Answer was set");
-            Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, "answered");
+            Assert.AreEqual(pc.RemoteDescription.type, RTCSdpType.Answer, $"{this} Answer was set");
+            Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, $"{this} answered");
         }
     }
 
