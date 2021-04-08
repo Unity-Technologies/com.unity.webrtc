@@ -5,7 +5,6 @@ using UnityEngine;
 using Unity.WebRTC;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 class PerfectNegotiationSample : MonoBehaviour
 {
@@ -37,12 +36,14 @@ class PerfectNegotiationSample : MonoBehaviour
     {
         var format = WebRTC.GetSupportedTextureFormat(SystemInfo.graphicsDeviceType);
         var tex = new Texture2D(100, 100, format, false);
+        var colorCache = Color.white;
         for (int y = 0; y < tex.height; y++)
+        for (int x = 0; x < tex.width; x++)
         {
-            for (int x = 0; x < tex.width; x++)
-            {
-                tex.SetPixel(x, y, Color.white);
-            }
+            var xCoord = x / (float) tex.width * 5f;
+            var yCoord = y / (float) tex.height * 5f;
+            colorCache.r = colorCache.g = colorCache.b = Mathf.PerlinNoise(xCoord, yCoord);
+            tex.SetPixel(x, y, colorCache);
         }
 
         tex.Apply();
@@ -77,26 +78,6 @@ class PerfectNegotiationSample : MonoBehaviour
         StartCoroutine(WebRTC.Update());
     }
 
-    private void Update()
-    {
-        UpdateRed(politeSourceImage1);
-        UpdateRed(politeSourceImage2);
-        UpdateBlue(impoliteSourceImage1);
-        UpdateBlue(impoliteSourceImage2);
-    }
-
-    private void UpdateRed(RawImage source)
-    {
-        var current = source.color;
-        source.color = new Color(Random.Range(0f, 1f), current.g, current.b);
-    }
-
-    private void UpdateBlue(RawImage source)
-    {
-        var current = source.color;
-        source.color = new Color(current.r, current.g, Random.Range(0f, 1f));
-    }
-
     public void PostMessage(Peer from, Message message)
     {
         var other = from == politePeer ? impolitePeer : politePeer;
@@ -109,22 +90,21 @@ class Message
 {
     public RTCSessionDescription description;
     public RTCIceCandidate candidate;
-    public bool runCommand;
 }
 
 class Peer : IDisposable
 {
     private readonly PerfectNegotiationSample parent;
-    private readonly RawImage receive;
     private readonly bool polite;
     private readonly RTCPeerConnection pc;
     private readonly VideoStreamTrack sourceVideoTrack1;
     private readonly VideoStreamTrack sourceVideoTrack2;
+    private readonly MediaStream receiveStream;
+    private readonly List<RTCRtpTransceiver> sendingTransceiverList = new List<RTCRtpTransceiver>();
 
     private bool makingOffer;
     private bool ignoreOffer;
     private bool srdAnswerPending;
-    private List<RTCRtpTransceiver> sendingTransceiverList = new List<RTCRtpTransceiver>();
 
     public Peer(
         PerfectNegotiationSample parent,
@@ -135,7 +115,15 @@ class Peer : IDisposable
     {
         this.parent = parent;
         this.polite = polite;
-        this.receive = receive;
+
+        receiveStream = new MediaStream();
+        receiveStream.OnAddTrack = e =>
+        {
+            if (e.Track is VideoStreamTrack video)
+            {
+                receive.texture = video.InitializeReceiver(100, 100);
+            }
+        };
 
         var config = GetSelectedSdpSemantics();
         pc = new RTCPeerConnection(ref config);
@@ -143,10 +131,7 @@ class Peer : IDisposable
         pc.OnTrack = e =>
         {
             Debug.Log($"{this} OnTrack");
-            if (e.Track is VideoStreamTrack video)
-            {
-                this.receive.texture = video.InitializeReceiver(100, 100);
-            }
+            receiveStream.AddTrack(e.Track);
         };
 
         pc.OnIceCandidate = candidate =>
@@ -160,8 +145,8 @@ class Peer : IDisposable
             this.parent.StartCoroutine(NegotiationProcess());
         };
 
-        sourceVideoTrack1 = new VideoStreamTrack($"{this}1", source1.texture);
-        sourceVideoTrack2 = new VideoStreamTrack($"{this}2", source2.texture);
+        sourceVideoTrack1 = new VideoStreamTrack($"{this}1", source1.mainTexture);
+        sourceVideoTrack2 = new VideoStreamTrack($"{this}2", source2.mainTexture);
     }
 
     private IEnumerator NegotiationProcess()
@@ -177,6 +162,7 @@ class Peer : IDisposable
 
         if (op.IsError)
         {
+            Debug.LogError( $"{this} {op.Error.message}");
             makingOffer = false;
             yield break;
         }
@@ -193,6 +179,11 @@ class Peer : IDisposable
     public void Dispose()
     {
         sendingTransceiverList.Clear();
+        foreach (var track in receiveStream.GetTracks())
+        {
+            track.Dispose();
+        }
+        receiveStream.Dispose();
         sourceVideoTrack1.Dispose();
         sourceVideoTrack2.Dispose();
         pc.Dispose();
@@ -214,12 +205,6 @@ class Peer : IDisposable
 
     public void OnMessage(Message message)
     {
-        if (message.runCommand)
-        {
-            SwapTransceivers();
-            return;
-        }
-
         if (message.candidate != null)
         {
             if (!pc.AddIceCandidate(message.candidate) && !ignoreOffer)
@@ -247,22 +232,24 @@ class Peer : IDisposable
         }
 
         srdAnswerPending = description.type == RTCSdpType.Answer;
-        Debug.Log($"{this} SRD {description.type}");
+        Debug.Log($"{this} SRD {description.type} SignalingState {pc.SignalingState}");
         var op1 = pc.SetRemoteDescription(ref description);
         yield return op1;
+        Assert.IsFalse(op1.IsError, $"{this} {op1.Error.message}");
 
         srdAnswerPending = false;
         if (description.type == RTCSdpType.Offer)
         {
-            Assert.AreEqual(pc.SignalingState, RTCSignalingState.HaveRemoteOffer, $"{this} Remote offer");
             Assert.AreEqual(pc.RemoteDescription.type, RTCSdpType.Offer, $"{this} SRD worked");
+            Assert.AreEqual(pc.SignalingState, RTCSignalingState.HaveRemoteOffer, $"{this} Remote offer");
             Debug.Log($"{this} SLD to get back to stable");
 
             var op2 = pc.SetLocalDescription();
             yield return op2;
+            Assert.IsFalse(op2.IsError, $"{this} {op2.Error.message}");
 
-            Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, $"{this} onmessage not racing with negotiationneeded");
             Assert.AreEqual(pc.LocalDescription.type, RTCSdpType.Answer, $"{this} onmessage SLD worked");
+            Assert.AreEqual(pc.SignalingState, RTCSignalingState.Stable, $"{this} onmessage not racing with negotiationneeded");
 
             var answer = new Message {description = pc.LocalDescription};
             parent.PostMessage(this, answer);
