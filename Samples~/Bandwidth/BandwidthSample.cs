@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 using Unity.WebRTC;
+using Unity.WebRTC.Samples;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Toggle = UnityEngine.UI.Toggle;
@@ -58,7 +59,7 @@ class BandwidthSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         bandwidthSelector.options = bandwidthOptions
             .Select(pair => new Dropdown.OptionData{text = pair.Key })
             .ToList();

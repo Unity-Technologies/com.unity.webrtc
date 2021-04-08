@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
 using System;
+using Unity.WebRTC.Samples;
 
 class DataChannelSample : MonoBehaviour
 {
@@ -39,7 +40,7 @@ class DataChannelSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize();
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         callButton.onClick.AddListener(() => { StartCoroutine(Call()); });
         hangupButton.onClick.AddListener(() => { Hangup(); });
 

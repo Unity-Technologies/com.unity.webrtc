@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.WebRTC;
+using Unity.WebRTC.Samples;
 using UnityEngine.UI;
 
 class MultiVideoReceiveSample : MonoBehaviour
@@ -44,7 +45,7 @@ class MultiVideoReceiveSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(EncoderType.Software);
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
         addTracksButton.onClick.AddListener(AddTransceiver);

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Unity.WebRTC;
 using System;
 using System.Linq;
+using Unity.WebRTC.Samples;
 
 class StatsSample : MonoBehaviour
 {
@@ -44,7 +45,7 @@ class StatsSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize();
+        WebRTC.Initialize(WebRTCSettings.EncoderType);
         callButton.onClick.AddListener(() =>
         {
             callButton.interactable = false;

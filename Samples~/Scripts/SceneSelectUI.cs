@@ -1,10 +1,39 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Unity.WebRTC.Samples
 {
+    public static class WebRTCSettings
+    {
+        private static bool s_enableHWCodec = false;
+
+        public static bool EnableHWCodec
+        {
+            get { return s_enableHWCodec; }
+            set { s_enableHWCodec = value; }
+        }
+
+        public static EncoderType EncoderType
+        {
+            get { return s_enableHWCodec ? EncoderType.Hardware : EncoderType.Software; }
+        }
+    }
+    
     public class SceneSelectUI : MonoBehaviour
     {
+        [SerializeField] private Toggle toggleEnableHWCodec;
+
+        void Start()
+        {
+            toggleEnableHWCodec.isOn = WebRTCSettings.EnableHWCodec;
+        }
+
+        public void OnChangeHWCodec(bool enable)
+        {
+            WebRTCSettings.EnableHWCodec = enable;
+        }
+
         public void OnPressedPeerConnectionButton()
         {
             SceneManager.LoadScene("PeerConnection", LoadSceneMode.Single);
@@ -49,5 +78,6 @@ namespace Unity.WebRTC.Samples
         {
             SceneManager.LoadScene("Bandwidth", LoadSceneMode.Single);
         }
+
     }
 }
