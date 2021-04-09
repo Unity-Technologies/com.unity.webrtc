@@ -80,10 +80,13 @@ void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, i
     if (tempBuffer.size() != size)
         tempBuffer.resize(size);
 
-    libyuv::ConvertFromI420(
+    if(0 > libyuv::ConvertFromI420(
         i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),
         i420_buffer->StrideU(), i420_buffer->DataV(), i420_buffer->StrideV(),
-        tempBuffer.data(), 0, width, height, format);
+        tempBuffer.data(), 0, width, height, format))
+    {
+        RTC_LOG(LS_INFO) << "failed libyuv::ConvertFromI420";
+    }
 }
 
 } // end namespace webrtc
