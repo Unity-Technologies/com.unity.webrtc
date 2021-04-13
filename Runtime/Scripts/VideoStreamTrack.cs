@@ -63,7 +63,12 @@ namespace Unity.WebRTC
             }
         }
 
-        public UnityEngine.Texture InitializeReceiver(int width, int height)
+        /// <summary>
+        /// encoded / decoded texture
+        /// </summary>
+        public Texture Texture => m_destTexture;
+
+        public Texture InitializeReceiver(int width, int height)
         {
             if (IsDecoderInitialized)
                 throw new InvalidOperationException("Already initialized receiver");

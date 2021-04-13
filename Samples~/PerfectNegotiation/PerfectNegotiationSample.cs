@@ -106,7 +106,6 @@ class Peer : IDisposable
     private readonly RTCPeerConnection pc;
     private readonly VideoStreamTrack sourceVideoTrack1;
     private readonly VideoStreamTrack sourceVideoTrack2;
-    private readonly MediaStream receiveStream;
     private readonly List<RTCRtpTransceiver> sendingTransceiverList = new List<RTCRtpTransceiver>();
 
     private bool makingOffer;
@@ -124,14 +123,6 @@ class Peer : IDisposable
         this.parent = parent;
         this.polite = polite;
 
-        receiveStream = new MediaStream();
-        receiveStream.OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack video)
-            {
-                receive.texture = video.InitializeReceiver(100, 100);
-            }
-        };
 
         var config = GetSelectedSdpSemantics();
         pc = new RTCPeerConnection(ref config);
@@ -139,7 +130,16 @@ class Peer : IDisposable
         pc.OnTrack = e =>
         {
             Debug.Log($"{this} OnTrack");
-            receiveStream.AddTrack(e.Track);
+            if (e.Track is VideoStreamTrack video)
+            {
+                if (video.IsDecoderInitialized)
+                {
+                    receive.texture = video.Texture;
+                    return;
+                }
+
+                receive.texture = video.InitializeReceiver(100, 100);
+            }
         };
 
         pc.OnIceCandidate = candidate =>
@@ -190,12 +190,6 @@ class Peer : IDisposable
     public void Dispose()
     {
         sendingTransceiverList.Clear();
-        foreach (var track in receiveStream.GetTracks())
-        {
-            track.Dispose();
-        }
-
-        receiveStream.Dispose();
         sourceVideoTrack1.Dispose();
         sourceVideoTrack2.Dispose();
         pc.Dispose();
