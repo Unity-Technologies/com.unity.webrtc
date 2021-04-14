@@ -31,14 +31,14 @@ namespace webrtc
         return nullptr;
     }
 
-    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
+    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType, bool useDirectAudio)
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
-        auto ctx = new Context(uid, encoderType);
+        auto ctx = new Context(uid, encoderType, useDirectAudio);
         s_instance.m_contexts[uid].reset(ctx);
         return ctx;
     }
@@ -79,7 +79,7 @@ namespace webrtc
 #pragma region open an encode session
     uint32_t Context::s_encoderId = 0;
     uint32_t Context::GenerateUniqueId() { return s_encoderId++; }
-#pragma endregion 
+#pragma endregion
 
     bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -159,7 +159,7 @@ namespace webrtc
     }
 #pragma warning(pop)
 
-    Context::Context(int uid, UnityEncoderType encoderType)
+    Context::Context(int uid, UnityEncoderType encoderType, bool useDirectAudio)
         : m_uid(uid)
         , m_encoderType(encoderType)
     {
@@ -170,7 +170,17 @@ namespace webrtc
 
         rtc::InitializeSSL();
 
-        m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        if (useDirectAudio)
+        {
+            // For this case we don't bother to create a DummyAudioDevice
+            // because when CreatePeerConnectionFactory() is supplied with a null
+            // AudioDeviceModule pointer... webrtc will create the default
+            // module under the hood and that will speak directly hardware.
+        }
+        else
+        {
+            m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        }
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
@@ -379,7 +389,10 @@ namespace webrtc
 
     void Context::ProcessAudioData(const float* data, int32 size)
     {
-        m_audioDevice->ProcessAudioData(data, size);
+        if (m_audioDevice)
+        {
+            m_audioDevice->ProcessAudioData(data, size);
+        }
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

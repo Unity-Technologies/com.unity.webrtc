@@ -22,9 +22,9 @@ namespace webrtc
     {
     public:
         static ContextManager* GetInstance() { return &s_instance; }
-     
+
         Context* GetContext(int uid) const;
-        Context* CreateContext(int uid, UnityEncoderType encoderType);
+        Context* CreateContext(int uid, UnityEncoderType encoderType, bool useDirectAudio);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
         bool Exists(Context* context);
@@ -55,8 +55,8 @@ namespace webrtc
     class Context : public IVideoEncoderObserver
     {
     public:
-        
-        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
+
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware, bool useDirectAudio=false);
         ~Context();
 
         // Utility
@@ -89,7 +89,7 @@ namespace webrtc
         // StatsReport
         void AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report);
         void DeleteStatsReport(const webrtc::RTCStatsReport* report);
-    
+
         // DataChannel
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options);
         void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
@@ -136,7 +136,7 @@ namespace webrtc
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
- 
+
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
 
