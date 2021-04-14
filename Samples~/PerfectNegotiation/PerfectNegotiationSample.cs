@@ -93,7 +93,6 @@ class PerfectNegotiationSample : MonoBehaviour
     }
 }
 
-[Serializable]
 class Message
 {
     public RTCSessionDescription description;
