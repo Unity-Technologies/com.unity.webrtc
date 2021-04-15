@@ -443,6 +443,7 @@ extern "C"
     {
         PeerConnectionInterface::RTCConfiguration config;
         config.sdp_semantics = SdpSemantics::kUnifiedPlan;
+        config.enable_implicit_rollback = true;
         return _ContextCreatePeerConnection(context, config);
     }
 
@@ -451,6 +452,9 @@ extern "C"
         PeerConnectionInterface::RTCConfiguration config;
         if (!Convert(conf, config))
             return nullptr;
+
+        config.sdp_semantics = SdpSemantics::kUnifiedPlan;
+        config.enable_implicit_rollback = true;
         return _ContextCreatePeerConnection(context, config);
     }
 
@@ -469,7 +473,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT void PeerConnectionRestartIce(PeerConnectionObject* obj)
     {
         obj->connection->RestartIce();
-    }    
+    } 
 
     UNITY_INTERFACE_EXPORT RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId)
     {
@@ -701,7 +705,15 @@ extern "C"
         *error = ConvertString(error_);
         return errorType;
     }
-    
+
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetLocalDescriptionWithoutDescription(Context* context, PeerConnectionObject* obj, char* error[])
+    {
+        std::string error_;
+        RTCErrorType errorType = obj->SetLocalDescriptionWithoutDescription(context->GetObserver(obj->connection), error_);
+        *error = ConvertString(error_);
+        return errorType;
+    }
+
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetRemoteDescription(
         Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
     {

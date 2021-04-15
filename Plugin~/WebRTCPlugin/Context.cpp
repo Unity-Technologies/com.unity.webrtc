@@ -120,6 +120,7 @@ namespace webrtc
         config.ice_candidate_pool_size = configJson["iceCandidatePoolSize"].asInt();
         config.bundle_policy = static_cast<PeerConnectionInterface::BundlePolicy>(configJson["bundlePolicy"].asInt());
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
+        config.enable_implicit_rollback = true;
         return true;
     }
 #pragma warning(push)

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpSender : IDisposable
     {
@@ -41,7 +41,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
@@ -56,7 +56,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
@@ -65,7 +65,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public MediaStreamTrack Track
         {
@@ -77,7 +77,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCRtpSendParameters GetParameters()
@@ -90,7 +90,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -105,13 +105,14 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>
         public bool ReplaceTrack(MediaStreamTrack track)
         {
-            return NativeMethods.SenderReplaceTrack(self, track.GetSelfOrThrow());
+            IntPtr trackPtr = track?.GetSelfOrThrow() ?? IntPtr.Zero;
+            return NativeMethods.SenderReplaceTrack(self, trackPtr);
         }
     }
 }

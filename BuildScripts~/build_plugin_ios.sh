@@ -5,6 +5,7 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugins/iOS
 
 # Install cmake
+export HOMEBREW_NO_AUTO_UPDATE=1
 brew install cmake
 
 # Download webrtc 

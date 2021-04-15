@@ -19,7 +19,7 @@ namespace Unity.WebRTC.Samples
             get { return s_enableHWCodec ? EncoderType.Hardware : EncoderType.Software; }
         }
     }
-    
+
     public class SceneSelectUI : MonoBehaviour
     {
         [SerializeField] private Toggle toggleEnableHWCodec;
@@ -78,6 +78,9 @@ namespace Unity.WebRTC.Samples
         {
             SceneManager.LoadScene("Bandwidth", LoadSceneMode.Single);
         }
-
+        public void OnPressedPeerPerfectNegotiationButton()
+        {
+            SceneManager.LoadScene("PerfectNegotiation", LoadSceneMode.Single);
+        }
     }
 }

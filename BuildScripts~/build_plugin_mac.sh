@@ -5,6 +5,7 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 export BUNDLE_FILE=$(pwd)/Runtime/Plugins/x86_64/webrtc.bundle
 
 # Install cmake
+export HOMEBREW_NO_AUTO_UPDATE=1
 brew install cmake
 
 # Download LibWebRTC 
