@@ -582,9 +582,7 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream = Audio.CaptureStream();
             peer1.AddTrack(stream.GetTracks().First());
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
@@ -599,7 +597,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             Assert.That(peer2.AddIceCandidate(peer2ReceiveCandidateQueue.Dequeue()), Is.True);
 
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);
