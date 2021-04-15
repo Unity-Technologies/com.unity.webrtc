@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Object = UnityEngine.Object;
 
@@ -576,6 +577,85 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.Close();
         }
 
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator AddIceCandidate()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+
+            var peer1ReceiveCandidateQueue = new Queue<RTCIceCandidate>();
+            var peer2ReceiveCandidateQueue = new Queue<RTCIceCandidate>();
+
+            peer1.OnIceCandidate = candidate => { peer2ReceiveCandidateQueue.Enqueue(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1ReceiveCandidateQueue.Enqueue(candidate); };
+
+            MediaStream stream = Audio.CaptureStream();
+            peer1.AddTrack(stream.GetTracks().First());
+
+            RTCOfferOptions options1 = default;
+            RTCAnswerOptions options2 = default;
+            var op1 = peer1.CreateOffer(ref options1);
+            yield return op1;
+            var desc = op1.Desc;
+            var op2 = peer1.SetLocalDescription(ref desc);
+            yield return op2;
+
+            yield return new WaitUntil(() => peer2ReceiveCandidateQueue.Any());
+
+            Assert.That(peer2.AddIceCandidate(peer2ReceiveCandidateQueue.Peek()), Is.False);
+
+            var op3 = peer2.SetRemoteDescription(ref desc);
+            yield return op3;
+
+            Assert.That(peer2.AddIceCandidate(peer2ReceiveCandidateQueue.Dequeue()), Is.True);
+
+            var op4 = peer2.CreateAnswer(ref options2);
+            yield return op4;
+            desc = op4.Desc;
+            var op5 = peer2.SetLocalDescription(ref desc);
+            yield return op5;
+
+            yield return new WaitUntil(() => peer1ReceiveCandidateQueue.Any());
+
+            Assert.That(peer1.AddIceCandidate(peer1ReceiveCandidateQueue.Peek()), Is.False);
+
+            var op6 = peer1.SetRemoteDescription(ref desc);
+            yield return op6;
+
+            Assert.That(peer1.AddIceCandidate(peer1ReceiveCandidateQueue.Dequeue()), Is.True);
+
+            var op7 = new WaitUntilWithTimeout(
+                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
+                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op7;
+            Assert.That(op7.IsCompleted, Is.True);
+            var op8 = new WaitUntilWithTimeout(
+                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
+                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
+            yield return op8;
+            Assert.That(op8.IsCompleted, Is.True);
+
+            foreach (var candidate in peer1ReceiveCandidateQueue)
+            {
+                Assert.That(peer1.AddIceCandidate(candidate), Is.True);
+            }
+
+            peer1ReceiveCandidateQueue.Clear();
+
+            foreach (var candidate in peer2ReceiveCandidateQueue)
+            {
+                Assert.That(peer2.AddIceCandidate(candidate), Is.True);
+            }
+
+            peer2ReceiveCandidateQueue.Clear();
+
+            stream.Dispose();
+            peer1.Close();
+            peer2.Close();
+        }
 
         [UnityTest]
         [Timeout(5000)]
