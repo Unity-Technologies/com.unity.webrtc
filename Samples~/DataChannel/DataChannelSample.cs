@@ -26,18 +26,6 @@ class DataChannelSample : MonoBehaviour
     private DelegateOnClose onDataChannelClose;
     private DelegateOnDataChannel onDataChannel;
 
-    private RTCOfferOptions OfferOptions = new RTCOfferOptions
-    {
-        iceRestart = false,
-        offerToReceiveAudio = true,
-        offerToReceiveVideo = false
-    };
-
-    private RTCAnswerOptions AnswerOptions = new RTCAnswerOptions
-    {
-        iceRestart = false,
-    };
-
     private void Awake()
     {
         WebRTC.Initialize(WebRTCSettings.EncoderType);
@@ -158,7 +146,7 @@ class DataChannelSample : MonoBehaviour
         dataChannel.OnOpen = onDataChannelOpen;
 
         Debug.Log("pc1 createOffer start");
-        var op = pc1.CreateOffer(ref OfferOptions);
+        var op = pc1.CreateOffer();
         yield return op;
 
         if (!op.IsError)
@@ -188,7 +176,7 @@ class DataChannelSample : MonoBehaviour
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="pc"></param>
     /// <param name="streamEvent"></param>
@@ -246,7 +234,7 @@ class DataChannelSample : MonoBehaviour
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
 
-        var op3 = pc2.CreateAnswer(ref AnswerOptions);
+        var op3 = pc2.CreateAnswer();
         yield return op3;
         if (!op3.IsError)
         {

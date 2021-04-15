@@ -33,16 +33,7 @@ class TrickleIceSample : MonoBehaviour
     private Dictionary<GameObject, RTCIceServer> iceServers
         = new Dictionary<GameObject, RTCIceServer>();
 
-    private GameObject selectedOption = null; 
-
-    private RTCOfferOptions _offerOptions = new RTCOfferOptions
-    {
-        iceRestart = false,
-        offerToReceiveAudio = true,
-        offerToReceiveVideo = true
-    };
-
-    private RTCAnswerOptions _answerOptions = new RTCAnswerOptions { iceRestart = false, };
+    private GameObject selectedOption = null;
 
     private void Awake()
     {
@@ -153,7 +144,7 @@ class TrickleIceSample : MonoBehaviour
 
     IEnumerator CreateOffer(RTCPeerConnection pc)
     {
-        var op = pc.CreateOffer(ref _offerOptions);
+        var op = pc.CreateOffer();
         yield return op;
 
         if (!op.IsError)
