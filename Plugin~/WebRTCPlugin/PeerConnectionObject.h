@@ -39,8 +39,8 @@ namespace webrtc
         bool GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
         webrtc::RTCErrorType SetConfiguration(const std::string& config);
         std::string GetConfiguration() const;
-        void CreateOffer(const RTCOfferOptions& options);
-        void CreateAnswer(const RTCAnswerOptions& options);
+        void CreateOffer(const RTCOfferAnswerOptions& options);
+        void CreateAnswer(const RTCOfferAnswerOptions& options);
         void ReceiveStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report);
 
         void RegisterCallbackCreateSD(DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)
