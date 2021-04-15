@@ -118,6 +118,13 @@ namespace Unity.WebRTC.RuntimeTest
                     peers[0].AddTrack(track, m_stream);
                 }
             }
+
+            // Because some platform can't accept H264 codec for receive.
+            foreach (var transceiver in peers[0].GetTransceivers())
+            {
+                transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
+            }
+
             var op1 = peers[0].CreateOffer();
             yield return op1;
             Assert.That(op1.IsError, Is.False, op1.Error.message);
