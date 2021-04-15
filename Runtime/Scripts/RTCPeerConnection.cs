@@ -571,7 +571,7 @@ namespace Unity.WebRTC
         /// <param name="options"> A parameter to request for the offer. </param>
         /// <returns></returns>
         /// <seealso cref="CreateAnswer"/>
-        public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferOptions options)
+        public RTCSessionDescriptionAsyncOperation CreateOffer(RTCOfferAnswerOptions options = default)
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
@@ -584,7 +584,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCAnswerOptions options)
+        public RTCSessionDescriptionAsyncOperation CreateAnswer(RTCOfferAnswerOptions options = default)
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);

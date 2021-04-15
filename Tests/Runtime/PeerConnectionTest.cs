@@ -264,9 +264,7 @@ namespace Unity.WebRTC.RuntimeTest
             transceiver1.Direction = RTCRtpTransceiverDirection.RecvOnly;
             Assert.IsNull(transceiver1.CurrentDirection);
 
-            RTCOfferOptions options1 = new RTCOfferOptions {offerToReceiveAudio = true};
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
@@ -278,7 +276,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.True(transceiver2.Sender.ReplaceTrack(audioTrack));
             transceiver2.Direction = RTCRtpTransceiverDirection.SendOnly;
 
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);
@@ -303,8 +301,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var config = GetDefaultConfiguration();
             var peer = new RTCPeerConnection(ref config);
-            RTCOfferOptions options = default;
-            var op = peer.CreateOffer(ref options);
+            var op = peer.CreateOffer();
 
             yield return op;
             Assert.True(op.IsDone);
@@ -321,8 +318,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var config = GetDefaultConfiguration();
             var peer = new RTCPeerConnection(ref config);
-            RTCAnswerOptions options = default;
-            var op = peer.CreateAnswer(ref options);
+            var op = peer.CreateAnswer();
 
             yield return op;
             Assert.True(op.IsDone);
@@ -346,16 +342,14 @@ namespace Unity.WebRTC.RuntimeTest
             var peer2 = new RTCPeerConnection(ref config);
             peer1.CreateDataChannel("data");
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
 
             Assert.True(op4.IsDone);
@@ -373,8 +367,7 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator SetLocalDescription()
         {
             var peer = new RTCPeerConnection();
-            RTCOfferOptions options = default;
-            var op = peer.CreateOffer(ref options);
+            var op = peer.CreateOffer();
             yield return op;
             Assert.True(op.IsDone);
             Assert.False(op.IsError);
@@ -418,16 +411,14 @@ namespace Unity.WebRTC.RuntimeTest
             var peer2 = new RTCPeerConnection(ref config);
             var channel1 = peer1.CreateDataChannel("data");
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);
@@ -472,8 +463,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new AudioStreamTrack("audio");
             var sender = peer.AddTrack(track, stream);
 
-            RTCOfferOptions options = default;
-            var op = peer.CreateOffer(ref options);
+            var op = peer.CreateOffer();
             yield return op;
             Assert.True(op.IsDone);
             Assert.False(op.IsError);
@@ -506,8 +496,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new AudioStreamTrack("audio");
             var sender = peer1.AddTrack(track, stream);
 
-            RTCOfferOptions options1 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
@@ -544,16 +533,14 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream = Audio.CaptureStream();
             peer1.AddTrack(stream.GetTracks().First());
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);
@@ -740,16 +727,14 @@ namespace Unity.WebRTC.RuntimeTest
             MediaStream stream = Audio.CaptureStream();
             peer1.AddTrack(stream.GetTracks().First());
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);
@@ -917,16 +902,14 @@ namespace Unity.WebRTC.RuntimeTest
 
         private IEnumerator SignalingOffer(RTCPeerConnection @from, RTCPeerConnection to)
         {
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = @from.CreateOffer(ref options1);
+            var op1 = @from.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = @from.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = to.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = to.CreateAnswer(ref options2);
+            var op4 = to.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = to.SetLocalDescription(ref desc);

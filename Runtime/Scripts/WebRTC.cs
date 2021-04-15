@@ -174,17 +174,7 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    public struct RTCOfferOptions
-    {
-        [MarshalAs(UnmanagedType.U1)]
-        public bool iceRestart;
-        [MarshalAs(UnmanagedType.U1)]
-        public bool offerToReceiveAudio;
-        [MarshalAs(UnmanagedType.U1)]
-        public bool offerToReceiveVideo;
-    }
-
-    public struct RTCAnswerOptions
+    public struct RTCOfferAnswerOptions
     {
         [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
@@ -637,9 +627,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferOptions options);
+        public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCAnswerOptions options);
+        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackCreateSD(IntPtr ptr, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
