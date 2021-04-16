@@ -127,42 +127,42 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public int Id => NativeMethods.DataChannelGetID(self);
+        public int Id => NativeMethods.DataChannelGetID(GetSelfOrThrow());
 
         /// <summary>
         /// 
         /// </summary>
-        public string Label => NativeMethods.DataChannelGetLabel(self).AsAnsiStringWithFreeMem();
+        public string Label => NativeMethods.DataChannelGetLabel(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
         /// 
         /// </summary>
-        public string Protocol => NativeMethods.DataChannelGetProtocol(self).AsAnsiStringWithFreeMem();
+        public string Protocol => NativeMethods.DataChannelGetProtocol(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
         /// 
         /// </summary>
-        public ushort MaxRetransmits => NativeMethods.DataChannelGetMaxRetransmits(self);
+        public ushort MaxRetransmits => NativeMethods.DataChannelGetMaxRetransmits(GetSelfOrThrow());
 
         /// <summary>
         /// 
         /// </summary>
-        public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(self);
+        public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
 
         /// <summary>
         /// 
         /// </summary>
-        public bool Ordered => NativeMethods.DataChannelGetOrdered(self);
+        public bool Ordered => NativeMethods.DataChannelGetOrdered(GetSelfOrThrow());
 
         /// <summary>
         /// 
         /// </summary>
-        public ulong BufferedAmount => NativeMethods.DataChannelGetBufferedAmount(self);
+        public ulong BufferedAmount => NativeMethods.DataChannelGetBufferedAmount(GetSelfOrThrow());
 
         /// <summary>
         /// 
         /// </summary>
-        public bool Negotiated => NativeMethods.DataChannelGetNegotiated(self);
+        public bool Negotiated => NativeMethods.DataChannelGetNegotiated(GetSelfOrThrow());
 
         /// <summary>
         /// The property returns an enum of the <c>RTCDataChannelState</c> which shows 
@@ -172,7 +172,7 @@ namespace Unity.WebRTC
         /// <see cref="Send(string)"/> method must be called when the state is <b>Open</b>.
         /// </remarks>
         /// <seealso cref="RTCDataChannelState"/>
-        public RTCDataChannelState ReadyState => NativeMethods.DataChannelGetReadyState(self);
+        public RTCDataChannelState ReadyState => NativeMethods.DataChannelGetReadyState(GetSelfOrThrow());
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
         static void DataChannelNativeOnMessage(IntPtr ptr, byte[] msg, int len)
@@ -219,6 +219,15 @@ namespace Unity.WebRTC
             NativeMethods.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
         }
 
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
+        }
+
         ~RTCDataChannel()
         {
             this.Dispose();
@@ -256,7 +265,7 @@ namespace Unity.WebRTC
             {
                 throw new InvalidOperationException("DataChannel is not open");
             }
-            NativeMethods.DataChannelSend(self, msg);
+            NativeMethods.DataChannelSend(GetSelfOrThrow(), msg);
         }
 
         /// <summary>
@@ -274,15 +283,12 @@ namespace Unity.WebRTC
             {
                 throw new InvalidOperationException("DataChannel is not open");
             }
-            NativeMethods.DataChannelSendBinary(self, msg, msg.Length);
+            NativeMethods.DataChannelSendBinary(GetSelfOrThrow(), msg, msg.Length);
         }
 
         public void Close()
         {
-            if (self != IntPtr.Zero)
-            {
-                NativeMethods.DataChannelClose(self);
-            }
+            NativeMethods.DataChannelClose(GetSelfOrThrow());
         }
     }
 }
