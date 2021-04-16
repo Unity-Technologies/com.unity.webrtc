@@ -568,12 +568,11 @@ namespace Unity.WebRTC
         /// Create an SDP (Session Description Protocol) offer to start a new connection
         /// to a remote peer.
         /// </summary>
-        /// <param name="iceRestart"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
         /// <seealso cref="CreateAnswer"/>
-        public RTCSessionDescriptionAsyncOperation CreateOffer(bool iceRestart = false)
+        public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferAnswerOptions options)
         {
-            RTCOfferAnswerOptions options = new RTCOfferAnswerOptions {iceRestart = iceRestart};
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
             return m_opSessionDesc;
@@ -583,11 +582,10 @@ namespace Unity.WebRTC
         /// Create an SDP (Session Description Protocol) answer to start a new connection
         /// to a remote peer.
         /// </summary>
-        /// <param name="iceRestart"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        public RTCSessionDescriptionAsyncOperation CreateAnswer(bool iceRestart = false)
+        public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCOfferAnswerOptions options)
         {
-            RTCOfferAnswerOptions options = new RTCOfferAnswerOptions {iceRestart = iceRestart};
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
             return m_opSessionDesc;

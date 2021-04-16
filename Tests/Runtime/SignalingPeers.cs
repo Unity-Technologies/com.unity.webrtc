@@ -125,7 +125,7 @@ namespace Unity.WebRTC.RuntimeTest
                 transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
             }
 
-            var op1 = peers[0].CreateOffer();
+            var op1 = peers[0].CreateOffer(ref RTCOfferAnswerOptions.Default);
             yield return op1;
             Assert.That(op1.IsError, Is.False, op1.Error.message);
             var desc = op1.Desc;
@@ -137,7 +137,7 @@ namespace Unity.WebRTC.RuntimeTest
             var op3 = peers[1].SetRemoteDescription(ref desc);
             yield return op3;
             Assert.That(op3.IsError, Is.False, op3.Error.message);
-            var op4 = peers[1].CreateAnswer();
+            var op4 = peers[1].CreateAnswer(ref RTCOfferAnswerOptions.Default);
             yield return op4;
             Assert.That(op4.IsError, Is.False, op4.Error.message);
             desc = op4.Desc;

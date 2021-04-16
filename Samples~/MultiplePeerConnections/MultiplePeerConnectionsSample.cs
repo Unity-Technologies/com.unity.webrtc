@@ -158,7 +158,7 @@ class MultiplePeerConnectionsSample : MonoBehaviour
 
     private static IEnumerator NegotiationPeer(RTCPeerConnection localPeer, RTCPeerConnection remotePeer)
     {
-        var opCreateOffer = localPeer.CreateOffer();
+        var opCreateOffer = localPeer.CreateOffer(ref RTCOfferAnswerOptions.Default);
         yield return opCreateOffer;
 
         if (opCreateOffer.IsError)
@@ -172,7 +172,7 @@ class MultiplePeerConnectionsSample : MonoBehaviour
         Debug.Log($"Offer from LocalPeer \n {offerDesc.sdp}");
         yield return remotePeer.SetRemoteDescription(ref offerDesc);
 
-        var opCreateAnswer = remotePeer.CreateAnswer();
+        var opCreateAnswer = remotePeer.CreateAnswer(ref RTCOfferAnswerOptions.Default);
         yield return opCreateAnswer;
 
         if (opCreateAnswer.IsError)

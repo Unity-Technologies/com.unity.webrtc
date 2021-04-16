@@ -141,6 +141,7 @@ namespace webrtc
     struct RTCOfferAnswerOptions
     {
         bool iceRestart;
+        bool voiceActivityDetection;
     };
     
 } // end namespace webrtc

@@ -176,8 +176,13 @@ namespace Unity.WebRTC
     /// </summary>
     public struct RTCOfferAnswerOptions
     {
+        public static RTCOfferAnswerOptions Default =
+            new RTCOfferAnswerOptions {iceRestart = false, voiceActivityDetection = true};
+
         [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool voiceActivityDetection; // this property is not supported yet.
     }
 
     /// <summary>

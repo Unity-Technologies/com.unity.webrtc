@@ -114,7 +114,7 @@ class MungeSDPSample : MonoBehaviour
 
     private IEnumerator CreateOffer()
     {
-        var op = pcLocal.CreateOffer();
+        var op = pcLocal.CreateOffer(ref RTCOfferAnswerOptions.Default);
         yield return op;
 
         if (op.IsError)
@@ -157,7 +157,7 @@ class MungeSDPSample : MonoBehaviour
 
     private IEnumerator CreateAnswer()
     {
-        var op = pcRemote.CreateAnswer();
+        var op = pcRemote.CreateAnswer(ref RTCOfferAnswerOptions.Default);
         yield return op;
 
         if (op.IsError)

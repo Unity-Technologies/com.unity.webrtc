@@ -129,7 +129,7 @@ class MultiVideoReceiveSample : MonoBehaviour
     IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} createOffer start");
-        var op = pc.CreateOffer();
+        var op = pc.CreateOffer(ref RTCOfferAnswerOptions.Default);
         yield return op;
 
         if (!op.IsError)
@@ -288,7 +288,7 @@ class MultiVideoReceiveSample : MonoBehaviour
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
-        var op3 = otherPc.CreateAnswer();
+        var op3 = otherPc.CreateAnswer(ref RTCOfferAnswerOptions.Default);
         yield return op3;
         if (!op3.IsError)
         {

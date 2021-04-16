@@ -240,6 +240,7 @@ namespace webrtc
     {
         webrtc::PeerConnectionInterface::RTCOfferAnswerOptions _options;
         _options.ice_restart = options.iceRestart;
+        _options.voice_activity_detection = options.voiceActivityDetection;
         connection->CreateOffer(this, _options);
     }
 
@@ -247,6 +248,7 @@ namespace webrtc
     {
         webrtc::PeerConnectionInterface::RTCOfferAnswerOptions _options;
         _options.ice_restart = options.iceRestart;
+        _options.voice_activity_detection = options.voiceActivityDetection;
         connection->CreateAnswer(this, _options);
     }
 
