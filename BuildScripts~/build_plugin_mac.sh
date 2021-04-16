@@ -19,6 +19,7 @@ rm -r "$BUNDLE_FILE"
 cd "$SOLUTION_DIR"
 cmake . \
   -G Xcode \
+  -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -B build
 
 cmake \
