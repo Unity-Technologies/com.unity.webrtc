@@ -30,11 +30,11 @@ patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-for is_debug in "true" "false"
+for target_cpu in "x64" "arm64"
 do
-  for target_cpu in "x64" "arm64"
+  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+  for is_debug in "true" "false"
   do
-    mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
 
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
