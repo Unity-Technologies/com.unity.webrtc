@@ -2,6 +2,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 namespace Unity.WebRTC.Editor
 {
@@ -68,7 +69,7 @@ namespace Unity.WebRTC.Editor
         {
             if ((int)PlayerSettings.Android.minSdkVersion < (int)RequiredAndroidSdkVersion)
             {
-                throw new BuildFailedException(
+                Debug.LogWarning(
                     $"WebRTC apps require a minimum SDK version of {RequiredAndroidSdkVersion}. " +
                     $"Currently set to {PlayerSettings.Android.minSdkVersion}");
             }
@@ -81,7 +82,7 @@ namespace Unity.WebRTC.Editor
         {
             if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64)
             {
-                throw new BuildFailedException(
+                Debug.LogWarning(
                     $"WebRTC apps require a target architecture to be set {RequiredAndroidArchitectures}. " +
                     $"Currently set to {PlayerSettings.Android.targetArchitectures}");
             }
@@ -101,7 +102,7 @@ namespace Unity.WebRTC.Editor
 
             if(architecture != iOSArchitecture.ARM64)
             {
-                throw new BuildFailedException(
+                Debug.LogWarning(
                     $"WebRTC apps require a target architecture to be set {RequiredIOSArchitectures}. " +
                     $"Currently set to {architecture}");
             }
@@ -119,7 +120,7 @@ namespace Unity.WebRTC.Editor
             // throws exception when selecting  "ARM64" or "x64ARM64" for the architecture
             if (architecture != "x64")
             {
-                throw new BuildFailedException(
+                Debug.LogWarning(
                     $"Apple Silicon architecture is not supported by WebRTC package" +
                     $"Currently set to {architecture}");
             }
