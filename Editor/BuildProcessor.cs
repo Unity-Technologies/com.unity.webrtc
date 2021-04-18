@@ -1,9 +1,20 @@
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
 namespace Unity.WebRTC.Editor
 {
+    /// <summary>
+    /// This type express a return value of "PlayerSettings.GetArchitecture(BuildTargetGroup.iOS)"
+    /// </summary>
+    public enum iOSArchitecture
+    {
+        ARMv7 = 0,
+        ARM64 = 1,
+        Universal = 2
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -17,12 +28,17 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
-        public const AndroidSdkVersions RequiredMinSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
+        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
 
         /// <summary>
         ///
         /// </summary>
-        public const AndroidArchitecture RequiredTargetArchitectures = AndroidArchitecture.ARM64;
+        public const AndroidArchitecture RequiredAndroidArchitectures = AndroidArchitecture.ARM64;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public const iOSArchitecture RequiredIOSArchitectures = iOSArchitecture.ARM64;
 
         /// <summary>
         ///
@@ -33,8 +49,11 @@ namespace Unity.WebRTC.Editor
             switch (report.summary.platform)
             {
                 case BuildTarget.Android:
-                    EnsureMinSdkVersion();
+                    EnsureAndroidSdkVersion();
                     EnsureAndroidArchitecture();
+                    break;
+                case BuildTarget.iOS:
+                    EnsureIOSArchitecture();
                     break;
                 case BuildTarget.StandaloneOSX:
                     EnsureOSXArchitecture();
@@ -45,12 +64,12 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
-        static void EnsureMinSdkVersion()
+        static void EnsureAndroidSdkVersion()
         {
-            if ((int)PlayerSettings.Android.minSdkVersion < (int)RequiredMinSdkVersion)
+            if ((int)PlayerSettings.Android.minSdkVersion < (int)RequiredAndroidSdkVersion)
             {
                 throw new BuildFailedException(
-                    $"WebRTC apps require a minimum SDK version of {RequiredMinSdkVersion}. " +
+                    $"WebRTC apps require a minimum SDK version of {RequiredAndroidSdkVersion}. " +
                     $"Currently set to {PlayerSettings.Android.minSdkVersion}");
             }
         }
@@ -63,8 +82,28 @@ namespace Unity.WebRTC.Editor
             if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64)
             {
                 throw new BuildFailedException(
-                    $"WebRTC apps require a target architecture to be set {RequiredTargetArchitectures}. " +
+                    $"WebRTC apps require a target architecture to be set {RequiredAndroidArchitectures}. " +
                     $"Currently set to {PlayerSettings.Android.targetArchitectures}");
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="BuildFailedException"></exception>
+        static void EnsureIOSArchitecture()
+        {
+            // Architecture value is ignored when using SimulatorSDK
+            if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK)
+                return;
+
+            var architecture = (iOSArchitecture)PlayerSettings.GetArchitecture(BuildTargetGroup.iOS);
+
+            if(architecture != iOSArchitecture.ARM64)
+            {
+                throw new BuildFailedException(
+                    $"WebRTC apps require a target architecture to be set {RequiredIOSArchitectures}. " +
+                    $"Currently set to {architecture}");
             }
         }
 
