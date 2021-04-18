@@ -17,7 +17,7 @@ platforms:
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu-18.04:v0.2.13-668913
+    image: renderstreaming/ubuntu-18.04:latest
     gpu_image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     build_command: BuildScripts~/build_plugin_linux.sh
@@ -75,7 +75,7 @@ test_targets:
         platform: standalone
   - name: linux
     type: Unity::VM
-    image: renderstreaming/ubuntu-18.04:v0.2.13-668913
+    image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
     is_gpu: false
     gfx_types:
