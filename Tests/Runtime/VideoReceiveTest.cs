@@ -106,7 +106,7 @@ namespace Unity.WebRTC.RuntimeTest
             offerPc.OnIceCandidate = candidate => answerPc.AddIceCandidate(candidate);
             answerPc.OnIceCandidate = candidate => offerPc.AddIceCandidate(candidate);
 
-            var pc1CreateOffer = offerPc.CreateOffer(ref RTCOfferAnswerOptions.Default);
+            var pc1CreateOffer = offerPc.CreateOffer();
             yield return pc1CreateOffer;
             Assert.False(pc1CreateOffer.IsError);
             var offerDesc = pc1CreateOffer.Desc;
@@ -119,7 +119,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return pc2SetRemoteDescription;
             Assert.False(pc2SetRemoteDescription.IsError);
 
-            var pc2CreateAnswer = answerPc.CreateAnswer(ref RTCOfferAnswerOptions.Default);
+            var pc2CreateAnswer = answerPc.CreateAnswer();
             yield return pc2CreateAnswer;
             Assert.False(pc2CreateAnswer.IsError);
             var answerDesc = pc2CreateAnswer.Desc;

@@ -129,14 +129,14 @@ namespace Unity.WebRTC.RuntimeTest
             channel1.OnOpen = () => { channel1Opened = true; };
             channel1.OnClose = () => { channel1Closed = true; };
 
-            var op1 = peer1.CreateOffer(ref RTCOfferAnswerOptions.Default);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref RTCOfferAnswerOptions.Default);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);
