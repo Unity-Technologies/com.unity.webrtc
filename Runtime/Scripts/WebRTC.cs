@@ -425,20 +425,8 @@ namespace Unity.WebRTC
 
         public static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
         {
-            switch (type)
-            {
-                case GraphicsDeviceType.Direct3D11:
-                case GraphicsDeviceType.Direct3D12:
-                case GraphicsDeviceType.Vulkan:
-                    return RenderTextureFormat.BGRA32;
-                case GraphicsDeviceType.OpenGLCore:
-                case GraphicsDeviceType.OpenGLES2:
-                case GraphicsDeviceType.OpenGLES3:
-                    return RenderTextureFormat.ARGB32;
-                case GraphicsDeviceType.Metal:
-                    return RenderTextureFormat.BGRA32;
-            }
-            throw new ArgumentException($"Graphics device type {type} not supported");
+            var graphicsFormat = GetSupportedGraphicsFormat(type);
+            return GraphicsFormatUtility.GetRenderTextureFormat(graphicsFormat);
         }
 
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
@@ -462,20 +450,8 @@ namespace Unity.WebRTC
 
         public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
         {
-            switch (type)
-            {
-                case GraphicsDeviceType.Direct3D11:
-                case GraphicsDeviceType.Direct3D12:
-                case GraphicsDeviceType.Vulkan:
-                    return TextureFormat.BGRA32;
-                case GraphicsDeviceType.OpenGLCore:
-                case GraphicsDeviceType.OpenGLES2:
-                case GraphicsDeviceType.OpenGLES3:
-                    return TextureFormat.ARGB32;
-                case GraphicsDeviceType.Metal:
-                    return TextureFormat.BGRA32;
-            }
-            throw new ArgumentException($"Graphics device type {type} not supported");
+            var graphicsFormat = GetSupportedGraphicsFormat(type);
+            return GraphicsFormatUtility.GetTextureFormat(graphicsFormat);
         }
 
         internal static IEnumerable<T> Deserialize<T>(IntPtr buf, int length, Func<IntPtr, T> constructor) where T : class
