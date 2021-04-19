@@ -412,6 +412,17 @@ namespace Unity.WebRTC
             return System.IO.Path.GetFileName(Lib);
         }
 
+        public static void ValidateGraphicsFormat(GraphicsFormat format)
+        {
+            // ToDo: Increase the supported formats.
+            GraphicsFormat supportedFormat = GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            if (format != supportedFormat)
+            {
+                throw new ArgumentException(
+                    $"This graphics format {format} is not supported for streaming, please use supportedFormat: {supportedFormat}");
+            }
+        }
+
         public static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
         {
             switch (type)
