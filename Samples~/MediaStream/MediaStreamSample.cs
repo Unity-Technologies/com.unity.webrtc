@@ -112,7 +112,7 @@ class MediaStreamSample : MonoBehaviour
     IEnumerator PcOnNegotiationNeeded(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} createOffer start");
-        var op = pc.CreateOffer(ref RTCOfferAnswerOptions.Default);
+        var op = pc.CreateOffer();
         yield return op;
 
         if (!op.IsError)
@@ -245,7 +245,7 @@ class MediaStreamSample : MonoBehaviour
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
 
-        var op3 = otherPc.CreateAnswer(ref RTCOfferAnswerOptions.Default);
+        var op3 = otherPc.CreateAnswer();
         yield return op3;
         if (!op3.IsError)
         {

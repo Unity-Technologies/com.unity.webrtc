@@ -179,10 +179,19 @@ namespace Unity.WebRTC
         public static RTCOfferAnswerOptions Default =
             new RTCOfferAnswerOptions {iceRestart = false, voiceActivityDetection = true};
 
+        /// <summary>
+        ///
+        /// </summary>
         [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
+        /// <summary>
+        ///
+        /// </summary>
+        /// <remarks>
+        /// this property is not supported yet.
+        /// </remarks>
         [MarshalAs(UnmanagedType.U1)]
-        public bool voiceActivityDetection; // this property is not supported yet.
+        public bool voiceActivityDetection;
     }
 
     /// <summary>

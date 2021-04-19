@@ -152,7 +152,7 @@ class StatsSample : MonoBehaviour
         dataChannel.OnOpen = onDataChannelOpen;
 
         Debug.Log("pc1 createOffer start");
-        var op = pc1.CreateOffer(ref RTCOfferAnswerOptions.Default);
+        var op = pc1.CreateOffer();
         yield return op;
 
         if (!op.IsError)
@@ -227,7 +227,7 @@ class StatsSample : MonoBehaviour
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
 
-        var op3 = pc2.CreateAnswer(ref RTCOfferAnswerOptions.Default);
+        var op3 = pc2.CreateAnswer();
         yield return op3;
         if (!op3.IsError)
         {

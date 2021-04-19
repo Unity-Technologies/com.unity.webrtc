@@ -578,6 +578,13 @@ namespace Unity.WebRTC
             return m_opSessionDesc;
         }
 
+        public RTCSessionDescriptionAsyncOperation CreateOffer()
+        {
+            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+            return m_opSessionDesc;
+        }
+
         /// <summary>
         /// Create an SDP (Session Description Protocol) answer to start a new connection
         /// to a remote peer.
@@ -588,6 +595,13 @@ namespace Unity.WebRTC
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
+            return m_opSessionDesc;
+        }
+
+        public RTCSessionDescriptionAsyncOperation CreateAnswer()
+        {
+            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
+            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
             return m_opSessionDesc;
         }
 

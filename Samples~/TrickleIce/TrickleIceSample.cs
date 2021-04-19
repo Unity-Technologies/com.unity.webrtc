@@ -144,7 +144,7 @@ class TrickleIceSample : MonoBehaviour
 
     IEnumerator CreateOffer(RTCPeerConnection pc)
     {
-        var op = pc.CreateOffer(ref RTCOfferAnswerOptions.Default);
+        var op = pc.CreateOffer();
         yield return op;
 
         if (!op.IsError)
