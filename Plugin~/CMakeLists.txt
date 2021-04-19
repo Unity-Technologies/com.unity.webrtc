@@ -7,7 +7,7 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
 endif()
 
 project(webrtc
-  VERSION 2.3.3
+  VERSION 2.4.0
   LANGUAGES C CXX ASM
 )
 
