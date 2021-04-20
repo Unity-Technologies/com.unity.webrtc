@@ -24,6 +24,24 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void GraphicsFormat()
+        {
+            var graphicsFormat = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            var renderTextureFormat = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var textureFormat = WebRTC.GetSupportedTextureFormat(SystemInfo.graphicsDeviceType);
+
+            var rt = new RenderTexture(10, 10, 0, renderTextureFormat);
+            rt.Create();
+            Assert.That(rt.graphicsFormat, Is.EqualTo(graphicsFormat));
+
+            var tx = new Texture2D(10, 10, textureFormat, false);
+            Assert.That(tx.graphicsFormat, Is.EqualTo(graphicsFormat));
+
+            Object.DestroyImmediate(rt);
+            Object.DestroyImmediate(tx);
+        }
+
+        [Test]
         public void Construct()
         {
             var width = 256;
