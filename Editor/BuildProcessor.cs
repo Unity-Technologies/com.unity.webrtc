@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -91,7 +90,6 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
-        /// <exception cref="BuildFailedException"></exception>
         static void EnsureIOSArchitecture()
         {
             // Architecture value is ignored when using SimulatorSDK
@@ -111,7 +109,6 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
-        /// <exception cref="BuildFailedException"></exception>
         static void EnsureOSXArchitecture()
         {
             var platformName = BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneOSX);
