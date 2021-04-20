@@ -118,9 +118,14 @@ namespace Unity.WebRTC.RuntimeTest
                     peers[0].AddTrack(track, m_stream);
                 }
             }
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peers[0].CreateOffer(ref options1);
+
+            // Because some platform can't accept H264 codec for receive.
+            foreach (var transceiver in peers[0].GetTransceivers())
+            {
+                transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
+            }
+
+            var op1 = peers[0].CreateOffer();
             yield return op1;
             Assert.That(op1.IsError, Is.False, op1.Error.message);
             var desc = op1.Desc;
@@ -132,7 +137,7 @@ namespace Unity.WebRTC.RuntimeTest
             var op3 = peers[1].SetRemoteDescription(ref desc);
             yield return op3;
             Assert.That(op3.IsError, Is.False, op3.Error.message);
-            var op4 = peers[1].CreateAnswer(ref options2);
+            var op4 = peers[1].CreateAnswer();
             yield return op4;
             Assert.That(op4.IsError, Is.False, op4.Error.message);
             desc = op4.Desc;

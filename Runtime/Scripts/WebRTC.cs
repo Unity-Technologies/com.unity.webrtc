@@ -174,20 +174,24 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    public struct RTCOfferOptions
+    public struct RTCOfferAnswerOptions
     {
-        [MarshalAs(UnmanagedType.U1)]
-        public bool iceRestart;
-        [MarshalAs(UnmanagedType.U1)]
-        public bool offerToReceiveAudio;
-        [MarshalAs(UnmanagedType.U1)]
-        public bool offerToReceiveVideo;
-    }
+        public static RTCOfferAnswerOptions Default =
+            new RTCOfferAnswerOptions {iceRestart = false, voiceActivityDetection = true};
 
-    public struct RTCAnswerOptions
-    {
+        /// <summary>
+        ///
+        /// </summary>
         [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
+        /// <summary>
+        ///
+        /// </summary>
+        /// <remarks>
+        /// this property is not supported yet.
+        /// </remarks>
+        [MarshalAs(UnmanagedType.U1)]
+        public bool voiceActivityDetection;
     }
 
     /// <summary>
@@ -637,9 +641,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferOptions options);
+        public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCAnswerOptions options);
+        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackCreateSD(IntPtr ptr, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure);
         [DllImport(WebRTC.Lib)]

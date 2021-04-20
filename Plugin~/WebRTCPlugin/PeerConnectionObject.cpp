@@ -236,19 +236,19 @@ namespace webrtc
         return Json::writeString(builder, root);
     }
 
-    void PeerConnectionObject::CreateOffer(const RTCOfferOptions & options)
+    void PeerConnectionObject::CreateOffer(const RTCOfferAnswerOptions & options)
     {
         webrtc::PeerConnectionInterface::RTCOfferAnswerOptions _options;
         _options.ice_restart = options.iceRestart;
-        _options.offer_to_receive_audio = options.offerToReceiveAudio;
-        _options.offer_to_receive_video = options.offerToReceiveVideo;
+        _options.voice_activity_detection = options.voiceActivityDetection;
         connection->CreateOffer(this, _options);
     }
 
-    void PeerConnectionObject::CreateAnswer(const RTCAnswerOptions& options)
+    void PeerConnectionObject::CreateAnswer(const RTCOfferAnswerOptions& options)
     {
         webrtc::PeerConnectionInterface::RTCOfferAnswerOptions _options;
         _options.ice_restart = options.iceRestart;
+        _options.voice_activity_detection = options.voiceActivityDetection;
         connection->CreateAnswer(this, _options);
     }
 

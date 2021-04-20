@@ -22,13 +22,6 @@ class MungeSDPSample : MonoBehaviour
     [SerializeField] private Transform rotateObject;
 #pragma warning restore 0649
 
-    private RTCOfferOptions offerOptions = new RTCOfferOptions
-    {
-        iceRestart = false, offerToReceiveAudio = true, offerToReceiveVideo = true
-    };
-
-    private RTCAnswerOptions answerOptions = new RTCAnswerOptions {iceRestart = false,};
-
     private RTCConfiguration configuration = new RTCConfiguration
     {
         iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}}
@@ -121,7 +114,7 @@ class MungeSDPSample : MonoBehaviour
 
     private IEnumerator CreateOffer()
     {
-        var op = pcLocal.CreateOffer(ref offerOptions);
+        var op = pcLocal.CreateOffer();
         yield return op;
 
         if (op.IsError)
@@ -164,7 +157,7 @@ class MungeSDPSample : MonoBehaviour
 
     private IEnumerator CreateAnswer()
     {
-        var op = pcRemote.CreateAnswer(ref answerOptions);
+        var op = pcRemote.CreateAnswer();
         yield return op;
 
         if (op.IsError)

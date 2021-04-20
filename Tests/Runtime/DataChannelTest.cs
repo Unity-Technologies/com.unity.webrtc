@@ -74,7 +74,7 @@ namespace Unity.WebRTC.RuntimeTest
             config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer = new RTCPeerConnection(ref config);
 
-            // Cannot be set along with "maxRetransmits" and "maxPacketLifeTime" 
+            // Cannot be set along with "maxRetransmits" and "maxPacketLifeTime"
             var options = new RTCDataChannelInit
             {
                 id = 231,
@@ -129,16 +129,14 @@ namespace Unity.WebRTC.RuntimeTest
             channel1.OnOpen = () => { channel1Opened = true; };
             channel1.OnClose = () => { channel1Closed = true; };
 
-            RTCOfferOptions options1 = default;
-            RTCAnswerOptions options2 = default;
-            var op1 = peer1.CreateOffer(ref options1);
+            var op1 = peer1.CreateOffer();
             yield return op1;
             var desc = op1.Desc;
             var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer(ref options2);
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             desc = op4.Desc;
             var op5 = peer2.SetLocalDescription(ref desc);

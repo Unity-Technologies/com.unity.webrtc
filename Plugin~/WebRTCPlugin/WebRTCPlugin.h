@@ -138,16 +138,10 @@ namespace webrtc
         int sdpMLineIndex;
     };
 
-    struct RTCOfferOptions
+    struct RTCOfferAnswerOptions
     {
         bool iceRestart;
-        bool offerToReceiveAudio;
-        bool offerToReceiveVideo;
-    };
-
-    struct RTCAnswerOptions
-    {
-        bool iceRestart;
+        bool voiceActivityDetection;
     };
     
 } // end namespace webrtc

@@ -568,13 +568,20 @@ namespace Unity.WebRTC
         /// Create an SDP (Session Description Protocol) offer to start a new connection
         /// to a remote peer.
         /// </summary>
-        /// <param name="options"> A parameter to request for the offer. </param>
+        /// <param name="options"></param>
         /// <returns></returns>
         /// <seealso cref="CreateAnswer"/>
-        public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferOptions options)
+        public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferAnswerOptions options)
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
+            return m_opSessionDesc;
+        }
+
+        public RTCSessionDescriptionAsyncOperation CreateOffer()
+        {
+            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
             return m_opSessionDesc;
         }
 
@@ -584,10 +591,17 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCAnswerOptions options)
+        public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCOfferAnswerOptions options)
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
+            return m_opSessionDesc;
+        }
+
+        public RTCSessionDescriptionAsyncOperation CreateAnswer()
+        {
+            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
+            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
             return m_opSessionDesc;
         }
 
