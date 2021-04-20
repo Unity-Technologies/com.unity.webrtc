@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Unity 2020.3 support
 - Upgrade libwebrtc [m89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ)
-- Changed the argument type of the `RTCPeerConnection.CreateOffer` method and the `RTCPeerConnection.CreateOffer` method
+- Changed the argument type of the `RTCPeerConnection.CreateOffer` method and the `RTCPeerConnection.CreateAnswer` method
 
 ### Fixed
 
