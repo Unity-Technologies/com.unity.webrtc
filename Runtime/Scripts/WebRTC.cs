@@ -431,20 +431,41 @@ namespace Unity.WebRTC
 
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
         {
-            switch (type)
+            if (QualitySettings.activeColorSpace == ColorSpace.Linear)
             {
-                case GraphicsDeviceType.Direct3D11:
-                case GraphicsDeviceType.Direct3D12:
-                    return GraphicsFormat.B8G8R8A8_SRGB;
-                case GraphicsDeviceType.Vulkan:
-                    return GraphicsFormat.R8G8B8A8_SRGB;
-                case GraphicsDeviceType.OpenGLCore:
-                case GraphicsDeviceType.OpenGLES2:
-                case GraphicsDeviceType.OpenGLES3:
-                    return GraphicsFormat.R8G8B8A8_SRGB;
-                case GraphicsDeviceType.Metal:
-                    return GraphicsFormat.B8G8R8A8_SRGB;
+                switch (type)
+                {
+                    case GraphicsDeviceType.Direct3D11:
+                    case GraphicsDeviceType.Direct3D12:
+                        return GraphicsFormat.B8G8R8A8_SRGB;
+                    case GraphicsDeviceType.Vulkan:
+                        return GraphicsFormat.R8G8B8A8_SRGB;
+                    case GraphicsDeviceType.OpenGLCore:
+                    case GraphicsDeviceType.OpenGLES2:
+                    case GraphicsDeviceType.OpenGLES3:
+                        return GraphicsFormat.R8G8B8A8_SRGB;
+                    case GraphicsDeviceType.Metal:
+                        return GraphicsFormat.B8G8R8A8_SRGB;
+                }
             }
+            else
+            {
+                switch (type)
+                {
+                    case GraphicsDeviceType.Direct3D11:
+                    case GraphicsDeviceType.Direct3D12:
+                        return GraphicsFormat.B8G8R8A8_UNorm;
+                    case GraphicsDeviceType.Vulkan:
+                        return GraphicsFormat.R8G8B8A8_UNorm;
+                    case GraphicsDeviceType.OpenGLCore:
+                    case GraphicsDeviceType.OpenGLES2:
+                    case GraphicsDeviceType.OpenGLES3:
+                        return GraphicsFormat.R8G8B8A8_UNorm;
+                    case GraphicsDeviceType.Metal:
+                        return GraphicsFormat.B8G8R8A8_UNorm;
+                }
+            }
+
             throw new ArgumentException($"Graphics device type {type} not supported");
         }
 
