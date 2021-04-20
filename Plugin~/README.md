@@ -36,6 +36,10 @@ The below commands shows the build process developing environment on Ubuntu `18.
 
 ```bash
 # Install libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
+# Ubuntu `18.04`
+sudo apt install -y libc++-10-dev libc++abi-10-dev clang-10 vulkan-utils libvulkan1 libvulkan-dev
+
+# Ubuntu `20.04`
 sudo apt install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
 
 # Install freeglut3-dev
@@ -117,4 +121,3 @@ Set the Unity.exe path under `Command` and the project path under `Command Argum
 When you run the build, `webrtc.dll` will be placed in `Packages\com.unity.webrtc\Runtime\Plugins\x86_64`. You should then be able to verify the following settings in the Unity Inspector window. 
 
 <img src="../Documentation~/images/inspector_webrtc_plugin.png" width=400 align=center>
-
