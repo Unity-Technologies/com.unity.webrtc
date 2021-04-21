@@ -4,7 +4,29 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.3.3] - 2021-02-26
+## [2.4.0-exp.1] - 2021-04-23
+
+### Added
+
+- Android ARM64 platform support
+- Added a sample scene "Menu" which developers can go back and forth between sample scenes
+- Added a sample scene "PerfectNegotiation"
+- Added the software encoder on Linux support when using OpenGL Core graphics API 
+- Added the `RestartIce` method to the `RTCPeerConnection` class
+- Added the `Streams` property to the `RTCRtpReceiver` class
+
+### Changed
+
+- Unity 2020.3 support
+- Upgrade libwebrtc [m89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ)
+- Changed the argument type of the `RTCPeerConnection.CreateOffer` method and the `RTCPeerConnection.CreateAnswer` method
+
+### Fixed
+
+- Fixed crash for accessing properties of `RTCDataChannel` instance
+- Fixed crash when using the invalid graphics format to stream video on macOS
+
+## [2.3.3-preview] - 2021-02-26
 
 ### Added
 
@@ -14,7 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fixed a crash bug that occurs when accessing `MediaStreamTrack` properties after disposing of `RTCPeerConnection`
 
-## [2.3.2] - 2021-02-12
+## [2.3.2-preview] - 2021-02-12
 
 ### Changed
 
@@ -27,13 +49,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed `MediaStream.GetVideoStreamTrack` method and `MediaStream.GetVideoStreamTrack` method to return a correct value.
 - Fixed `RTCRtpTransceiver.Receiver` property and `RTCRtpTransceiver.Sender` property to return a correct value.
 
-## [2.3.1] - 2021-01-07
+## [2.3.1-preview] - 2021-01-07
 
 ### Fixed
 
 - Fixed `RTCIceCandidate.candidate` property in order to return a correct SDP formatted string.
 
-## [2.3.0] - 2020-12-28
+## [2.3.0-preview] - 2020-12-28
 
 ### Added 
 
@@ -66,7 +88,7 @@ public RTCDataChannel CreateDataChannel(string label, ref RTCDataChannelInit opt
 public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options = null);
 ```
 
-## [2.2.1] - 2020-11-13
+## [2.2.1-preview] - 2020-11-13
 
 ### Added
 
@@ -80,7 +102,7 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 - Fixed bugs that occur on Linux not installed NVIDIA driver
 - Fixed a bug of the `VideoReceive` sample
 
-## [2.2.0] - 2020-10-26
+## [2.2.0-preview] - 2020-10-26
 
 ### Added
 
@@ -96,26 +118,26 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 - Upgrade NVIDIA Codec SDK 9.1
 - Changed `RTCPeerConnection` behaviour to throw exceptions when pass invalid arguments to `SetLocalDescription`, `SetRemoteDescription` 
 
-## [2.1.3] - 2020-09-28
+## [2.1.3-preview] - 2020-09-28
 
 ### Changed
 
 - Add "minBitrate" parameter to `RTCRtpEncodingParameters` class.
 
-## [2.1.2] - 2020-09-14
+## [2.1.2-preview] - 2020-09-14
 
 ### Changed
 
 - Erase Japanese documentation due to migrating to internal translation system.
 
-## [2.1.1] - 2020-09-11
+## [2.1.1-preview] - 2020-09-11
 
 ### Fixed
 
 - Fixed an issue where the `RTCRtpSender.SetParameters` API did not work properly
 - Removed ZWSP(zero-width-space) in C# code
 
-## [2.1.0] - 2020-08-24
+## [2.1.0-preview] - 2020-08-24
 
 ### Added
 
@@ -128,25 +150,25 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 
 - Fixed a issue which video stream remains with bad quality after a short network degradation
 
-## [2.0.5] - 2020-07-30
+## [2.0.5-preview] - 2020-07-30
 
 ### Fixed
 
 - Upgrade libwebrtc m84 to fix security issue (https://bugs.chromium.org/p/project-zero/issues/detail?id=2034)
 
-## [2.0.4] - 2020-07-10
+## [2.0.4-preview] - 2020-07-10
 
 ### Fixed
 
 - Fix a crash bug when dispose a video track
 
-## [2.0.3] - 2020-06-05
+## [2.0.3-preview] - 2020-06-05
 
 ### Fixed
 
 - Fix the memory leak when using DirectX12
 
-## [2.0.2] - 2020-05-14
+## [2.0.2-preview] - 2020-05-14
 
 ### Fixed
 
@@ -155,13 +177,13 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 - Fix the editor freeze bug when recompiling scripts
 - Fixed documents
 
-## [2.0.1] - 2020-05-01
+## [2.0.1-preview] - 2020-05-01
 
 ### Fixed
 
 - Fixed versioning issue
 
-## [2.0.0] - 2020-04-30
+## [2.0.0-preview] - 2020-04-30
 
 ### Added
 
@@ -170,19 +192,19 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 - Published VideoStreamTrack API
 - Published AudioStreamTrack API
 
-## [1.1.2] - 2020-03-19
+## [1.1.2-preview] - 2020-03-19
 
 ### Fixed
 
 - Fix OpenGL color order
 
-## [1.1.1] - 2020-02-28
+## [1.1.1-preview] - 2020-02-28
 
 ### Fixed
 
 - Fix DLL import error
 
-## [1.1.0] - 2020-02-25
+## [1.1.0-preview] - 2020-02-25
 
 ### Added
 
@@ -195,13 +217,13 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 
 - Changed `Audio.Update` method to public
 
-## [1.0.1] - 2019-09-22
+## [1.0.1-preview] - 2019-09-22
 
 ### Fixed
 
 - Fixed documents
 
-## [1.0.0] - 2019-08-22
+## [1.0.0-preview] - 2019-08-22
 
 ### Added
 
@@ -211,12 +233,12 @@ public RTCDataChannel CreateDataChannel(string label RTCDataChannelInit options 
 
 - Renamed sample folders
 
-## [0.2.0] - 2019-07-30
+## [0.2.0-preview] - 2019-07-30
 
 ### Changed
 
 - Output logs when NVCodec failed to initialize
 
-## [0.1.0] - 2019-07-02
+## [0.1.0-preview] - 2019-07-02
 
 - Initial Release
