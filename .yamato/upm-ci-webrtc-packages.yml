@@ -26,8 +26,8 @@ platforms:
   - name: macos
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode:latest
-    gpu_image: slough-ops/macos-10.14-xcode:latest
+    image: package-ci/mac:latest
+    gpu_image: package-ci/mac:latest
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test_plugin_mac.sh
@@ -35,8 +35,8 @@ platforms:
   - name: ios
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode:latest
-    gpu_image: slough-ops/macos-10.14-xcode:latest
+    image: package-ci/mac:latest
+    gpu_image: package-ci/mac:latest
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_ios.sh
     test_command: BuildScripts~/test_plugin_ios.sh
@@ -134,7 +134,7 @@ test_targets:
         platform: standalone
   - name: macos
     type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode:latest
+    image: package-ci/mac:latest
     flavor: m1.mac
     gfx_types:
       - name: metal
