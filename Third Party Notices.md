@@ -1,7 +1,14 @@
 This package contains third-party software components governed by the license(s) indicated below:
 ---------
 
-# webrtc
+Component Name: webrtc
+
+License Type: BSD
+
+Copyright (c) 2011, The WebRTC project authors all rights reserved.
+
+https://webrtc.googlesource.com/src
+
 ```
 Copyright (c) 2011, The WebRTC project authors. All rights reserved.
 
@@ -32,10 +39,18 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 ```
 
-# abseil-cpp
+---------
+
+Component Name: Abseil
+
+License Type: Apache 2.0
+
+Copyright (c) 2021, The Abseil Authors all rights reserved.
+
+https://github.com/abseil/abseil-cpp
+
 ```
 
                                  Apache License
@@ -243,7 +258,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    
 ```
 
-# base64
+---------
+
+Component Name: base64
+
+License Type: Custom license
+
+Copyright (c) 1999, Bob Withers - bwit@pobox.com
+
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/rtc_base/third_party/base64/
+
 ```
 //*********************************************************************
 //* Base64 - a simple base64 encoder and decoder.
@@ -262,7 +286,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# boringssl
+---------
+
+Component Name: boringssl
+
+License Type: Modified BSD
+
+Copyright (c) 1998-2011 The OpenSSL Project. All rights reserved.
+
+https://boringssl.googlesource.com/boringssl
+
 ```
 BoringSSL is a fork of OpenSSL. As such, large parts of it fall under OpenSSL
 licensing. Files that are completely new have a Google copyright and an ISC
@@ -518,7 +551,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# fft
+---------
+
+Component Name: fft
+
+License Type: Custom license
+
+Copyright(c)1995,97 Mark Olesen
+
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/modules/third_party/fft
+
 ```
 /*
  * Copyright(c)1995,97 Mark Olesen <olesen@me.QueensU.CA>
@@ -548,7 +590,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# fft4g
+---------
+
+Component Name: fft4g
+
+License Type: Custom license
+
+Copyright (c) 1996-2001, Takuya OOURA
+
+http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html
+
 ```
 /*
  * http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html
@@ -561,7 +612,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# fiat
+---------
+
+Component Name: fiat
+
+License Type: MIT
+
+Copyright (c) 2015-2016 the fiat-crypto authors
+
+https://github.com/mit-plv/fiat-crypto
+
 ```
 The MIT License (MIT)
 
@@ -588,7 +648,16 @@ SOFTWARE.
 
 ```
 
-# g711
+---------
+
+Component Name: g711
+
+License Type: Custom license
+
+Copyright (c) 2001 Steve Underwood
+
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/modules/third_party/g711
+
 ```
 /*
  * SpanDSP - a series of DSP components for telephony
@@ -607,7 +676,16 @@ SOFTWARE.
 
 ```
 
-# g722
+---------
+
+Component Name: g722
+
+License Type: Custom license
+
+Copyright (c) 2005 Steve Underwood
+
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/modules/third_party/g722
+
 ```
 /*
  * SpanDSP - a series of DSP components for telephony
@@ -632,7 +710,16 @@ SOFTWARE.
 
 ```
 
-# googletest
+---------
+
+Component Name: googletest
+
+License Type: BSD
+
+Copyright (c) 2008, Google Inc. All rights reserved.
+
+https://github.com/google/googletest.git
+
 ```
 Copyright 2008, Google Inc.
 All rights reserved.
@@ -665,7 +752,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# jsoncpp
+---------
+
+Component Name: jsoncpp
+
+License Type: MIT
+
+Copyright (c) 2007-2010 Baptiste Lepilleur
+
+https://github.com/open-source-parsers/jsoncpp
+
 ```
 The JsonCpp library's source code, including accompanying documentation, 
 tests and demonstration applications, are licensed under the following
@@ -725,7 +821,17 @@ license you like.
 
 ```
 
-# libjpeg_turbo
+---------
+
+Component Name: libjpeg_turbo
+
+License Type: Custom license
+
+Copyright (c) 2009-2021 D. R. Commander. All Rights Reserved.
+Copyright (c) 2015, Viktor Szathmáry. All Rights Reserved.
+
+https://github.com/libjpeg-turbo/libjpeg-turbo/
+
 ```
 libjpeg-turbo Licenses
 ======================
@@ -883,7 +989,16 @@ that were granted to the IJG for code derived from their software.
 
 ```
 
-# libsrtp
+---------
+
+Component Name: libsrtp
+
+License Type: 3-clause BSD
+
+Copyright (c) 2001-2017 Cisco Systems, Inc. All rights reserved.
+
+https://github.com/cisco/libsrtp
+
 ```
 /*
  *  
@@ -923,7 +1038,16 @@ that were granted to the IJG for code derived from their software.
 
 ```
 
-# libvpx
+---------
+
+Component Name: libvpx
+
+License Type: BSD
+
+Copyright (c) 2010, The WebM Project authors. All rights reserved.
+
+http://www.webmproject.org
+
 ```
 Copyright (c) 2010, The WebM Project authors. All rights reserved.
 
@@ -959,7 +1083,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# libyuv
+---------
+
+Component Name: libyuv
+
+License Type: BSD
+
+Copyright 2011 The LibYuv Project Authors. All rights reserved.
+
+http://code.google.com/p/libyuv/
+
 ```
 Copyright 2011 The LibYuv Project Authors. All rights reserved.
 
@@ -993,7 +1126,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# nasm
+---------
+
+Component Name: nasm
+
+License Type: 2-Clause BSD
+
+Copyright 1996-2010 the NASM Authors - All rights reserved.
+
+https://github.com/netwide-assembler/nasm
+
 ```
 NASM is now licensed under the 2-clause BSD license, also known as the
 simplified BSD license.
@@ -1027,7 +1169,16 @@ simplified BSD license.
 
 ```
 
-# opus
+---------
+
+Component Name: opus
+
+License Type: BSD
+
+Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic, Jean-Marc Valin, Timothy B. Terriberry, CSIRO, Gregory Maxwell, Mark Borgerding, Erik de Castro Lopo
+
+https://gitlab.xiph.org/xiph/opus
+
 ```
 Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic,
                     Jean-Marc Valin, Timothy B. Terriberry,
@@ -1076,7 +1227,16 @@ https://datatracker.ietf.org/ipr/1526/
 
 ```
 
-# protobuf
+---------
+
+Component Name: protobuf
+
+License Type: BSD
+
+Copyright 2008 Google Inc. All rights reserved.
+
+https://github.com/google/protobuf
+
 ```
 Copyright 2008 Google Inc.  All rights reserved.
 
@@ -1113,7 +1273,19 @@ support library is itself covered by the above license.
 
 ```
 
-# rnnoise
+---------
+
+Component Name: rnnoise
+
+License Type: 3-Clause BSD 
+
+Copyright (c) 2017, Mozilla
+Copyright (c) 2007-2017, Jean-Marc Valin
+Copyright (c) 2005-2017, Xiph.Org Foundation
+Copyright (c) 2003-2004, Mark Borgerding
+
+https://github.com/xiph/rnnoise
+
 ```
 Copyright (c) 2017, Mozilla
 Copyright (c) 2007-2017, Jean-Marc Valin
@@ -1149,7 +1321,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# sigslot
+---------
+
+Component Name: sigslot
+
+License Type: Custom license
+
+Copyright (c) 2002, Sarah Thompson
+
+http://sigslot.sourceforge.net/
+
 ```
 // sigslot.h: Signal/Slot classes
 //
@@ -1161,7 +1342,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# spl_sqrt_floor
+---------
+
+Component Name: spl_sqrt_floor
+
+License Type: Custom license
+
+Copyright (c) 1996, Wilco Dijkstra
+
+http://www.pertinentdetail.org/sqrt
+
 ```
 /*
  * Written by Wilco Dijkstra, 1996. The following email exchange establishes the
@@ -1193,7 +1383,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
-# usrsctp
+---------
+
+Component Name: usrsctp
+
+License Type: Modified BSD
+
+Copyright (c) 2001, 2002 Cisco Systems, Inc.
+Copyright (c) 2002-12 Randall R. Stewart
+Copyright (c) 2002-12 Michael Tuexen
+
+http://github.com/sctplab/usrsctp
+
 ```
 (Copied from the COPYRIGHT file of
 https://code.google.com/p/sctp-refimpl/source/browse/trunk/COPYRIGHT)
@@ -1228,7 +1429,16 @@ SUCH DAMAGE.
 
 ```
 
-# zlib
+---------
+
+Component Name: zlib
+
+License Type: Custom license
+
+Copyright (c) 1995-2017 Jean-loup Gailly and Mark Adler
+
+http://zlib.net/
+
 ```
 version 1.2.11, January 15th, 2017
 
@@ -1252,7 +1462,16 @@ freely, subject to the following restrictions:
 
 ```
 
-# nvencode, nvdecode
+---------
+
+Component Name: nvencode, nvdecode
+
+License Type: Custom license
+
+Copyright (c) 2010-2020, NVIDIA Corporation. All rights reserved.
+
+https://developer.nvidia.com/nvidia-video-codec-sdk
+
 ```
 NVIDIA VIDEO CODEC SDK LICENSE AGREEMENT (“Agreement”)
 
@@ -1469,7 +1688,16 @@ violation of the foregoing will be null and void.   The terms of this Agreement
 shall be binding upon assignees.
 ```
 
-# Implib.so
+---------
+
+Component Name: Implib.so
+
+License Type: MIT
+
+Copyright (c) 2017-2020 Yury Gribov
+
+https://github.com/yugr/Implib.so
+
 ```
 The MIT License (MIT)
 
