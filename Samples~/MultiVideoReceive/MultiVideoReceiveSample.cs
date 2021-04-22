@@ -14,10 +14,16 @@ class MultiVideoReceiveSample : MonoBehaviour
     [SerializeField] private Button addTracksButton;
     [SerializeField] private Camera cam1;
     [SerializeField] private Camera cam2;
+    [SerializeField] private Camera cam3;
+    [SerializeField] private Camera cam4;
     [SerializeField] private RawImage sourceImage1;
     [SerializeField] private RawImage sourceImage2;
+    [SerializeField] private RawImage sourceImage3;
+    [SerializeField] private RawImage sourceImage4;
     [SerializeField] private RawImage receiveImage1;
     [SerializeField] private RawImage receiveImage2;
+    [SerializeField] private RawImage receiveImage3;
+    [SerializeField] private RawImage receiveImage4;
     [SerializeField] private Transform rotateObject;
 #pragma warning restore 0649
 
@@ -32,7 +38,7 @@ class MultiVideoReceiveSample : MonoBehaviour
     private DelegateOnNegotiationNeeded pc2OnNegotiationNeeded;
     private bool videoUpdateStarted;
     private int videoIndex = 0;
-    private const int MaxVideoIndexLength = 2;
+    private const int MaxVideoIndexLength = 4;
     private const int width = 1280;
     private const int height = 720;
 
@@ -176,7 +182,13 @@ class MultiVideoReceiveSample : MonoBehaviour
         sourceImage1.texture = cam1.targetTexture;
         videoStreamTrackList.Add(cam2.CaptureStreamTrack(width, height, 1000000));
         sourceImage2.texture = cam2.targetTexture;
+        videoStreamTrackList.Add(cam3.CaptureStreamTrack(width, height, 1000000));
+        sourceImage3.texture = cam3.targetTexture;
+        videoStreamTrackList.Add(cam4.CaptureStreamTrack(width, height, 1000000));
+        sourceImage4.texture = cam4.targetTexture;
 
+        receiveStreamList.Add(new MediaStream());
+        receiveStreamList.Add(new MediaStream());
         receiveStreamList.Add(new MediaStream());
         receiveStreamList.Add(new MediaStream());
 
@@ -192,6 +204,20 @@ class MultiVideoReceiveSample : MonoBehaviour
             if (e.Track is VideoStreamTrack track)
             {
                 receiveImage2.texture = track.InitializeReceiver(width, height);
+            }
+        };
+        receiveStreamList[2].OnAddTrack = e =>
+        {
+            if (e.Track is VideoStreamTrack track)
+            {
+                receiveImage3.texture = track.InitializeReceiver(width, height);
+            }
+        };
+        receiveStreamList[3].OnAddTrack = e =>
+        {
+            if (e.Track is VideoStreamTrack track)
+            {
+                receiveImage4.texture = track.InitializeReceiver(width, height);
             }
         };
 
@@ -217,6 +243,8 @@ class MultiVideoReceiveSample : MonoBehaviour
 
         receiveImage1.texture = null;
         receiveImage2.texture = null;
+        receiveImage3.texture = null;
+        receiveImage4.texture = null;
 
         foreach (var track in videoStreamTrackList)
         {
