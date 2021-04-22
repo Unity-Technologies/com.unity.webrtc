@@ -266,7 +266,7 @@ License Type: Custom license
 
 Copyright (c) 1999, Bob Withers - bwit@pobox.com
 
-[Link to component URL]
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/rtc_base/third_party/base64/
 
 ```
 //*********************************************************************
@@ -559,7 +559,7 @@ License Type: Custom license
 
 Copyright(c)1995,97 Mark Olesen
 
-[Link to component URL]
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/modules/third_party/fft
 
 ```
 /*
@@ -656,7 +656,7 @@ License Type: Custom license
 
 Copyright (c) 2001 Steve Underwood
 
-[Link to component URL]
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/modules/third_party/g711
 
 ```
 /*
@@ -684,7 +684,7 @@ License Type: Custom license
 
 Copyright (c) 2005 Steve Underwood
 
-[Link to component URL]
+https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/modules/third_party/g722
 
 ```
 /*
