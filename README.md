@@ -22,10 +22,6 @@ Please see [Install package](Documentation~/install.md).
 
 Please see [Requirements](Documentation~/index.md#requirements).
 
-### Limitations
-
-This package uses GPU hardware acceleration for video encoding on some platforms, so it only runs on graphics cards that support [NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/nvidia-video-codec-sdk).
-
 ### Customize native plugin
 
 Please read this if you have an interest to customize native code in this project.
