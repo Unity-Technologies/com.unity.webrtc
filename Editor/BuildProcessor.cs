@@ -51,6 +51,7 @@ namespace Unity.WebRTC.Editor
                 case BuildTarget.Android:
                     EnsureAndroidSdkVersion();
                     EnsureAndroidArchitecture();
+                    EnsureAndroidInternetPermission();
                     break;
                 case BuildTarget.iOS:
                     EnsureIOSArchitecture();
@@ -84,6 +85,16 @@ namespace Unity.WebRTC.Editor
                 Debug.LogWarning(
                     $"WebRTC apps require a target architecture to be set {RequiredAndroidArchitectures}. " +
                     $"Currently set to {PlayerSettings.Android.targetArchitectures}");
+            }
+        }
+
+        static void EnsureAndroidInternetPermission()
+        {
+            if (!PlayerSettings.Android.forceInternetPermission)
+            {
+                Debug.LogWarning(
+                    $"WebRTC apps require a internet permission on Android devices." +
+                    "Please check the \"Internet Access\" on your Build Settings.");
             }
         }
 
