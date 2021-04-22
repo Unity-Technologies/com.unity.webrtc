@@ -47,22 +47,18 @@ curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-stand
 chmod +x ./utr
 
 # download unity editor
-unity-downloader-cli          \
-  -u ${EDITOR_VERSION}        \
+unity-downloader-cli \
+  -u ${EDITOR_VERSION} \
   ${additional_component_arg} \
-  --wait                      \
+  --wait \
   --published
 
 # run utr
-./utr                                                       \
-  --suite=${suite}                                          \
-  --platform=${platform}                                    \
-  --scripting-backend=${SCRIPTING_BACKEND}                  \
-  --extra-editor-arg="-${EXTRA_EDITOR_ARG}"                 \
-  --testproject=${HOME}/${TEST_PROJECT_DIR}                 \
-  --editor-location=${HOME}/.Editor                         \
-  --artifacts_path=${ARTIFACT_DIR}                          \
-  --architecture=${architecture}
+./utr \
+  --suite=${suite} \
+  --platform=${platform} \
+  --player-load-path=${PLAYER_LOAD_PATH} \
+  --artifacts_path=${ARTIFACT_DIR}
 result=$?
 
 # return exit-code
