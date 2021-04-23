@@ -418,6 +418,11 @@ namespace Unity.WebRTC
 
         public static void ValidateTextureSize(int width, int height)
         {
+            if (GetEncoderType() == EncoderType.Software)
+            {
+                return;
+            }
+
             // Some android crash when smaller than this size
             const int minimumTextureSize = 114;
             if (width < minimumTextureSize || height < minimumTextureSize)
