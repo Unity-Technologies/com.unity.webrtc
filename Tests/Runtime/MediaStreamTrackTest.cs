@@ -71,11 +71,24 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void ConstructorThrowsException()
+        public void ConstructorThrowsExceptionWhenInvalidGraphicsFormat()
         {
             var width = 256;
             var height = 256;
             var format = RenderTextureFormat.R8;
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+
+            Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
+            Object.DestroyImmediate(rt);
+        }
+
+        [Test]
+        public void ConstructThrowsExceptionWhenSmallTexture()
+        {
+            var width = 100;
+            var height = 100;
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
 
