@@ -34,13 +34,11 @@ envsubst ' \
   > ~/remote.sh
 chmod +x ~/remote.sh
 
-# copy package to remote machine
-scp -i ${IDENTITY} -r ${YAMATO_SOURCE_DIR} bokken@${BOKKEN_DEVICE_IP}:~/${PACKAGE_DIR}
-
 # copy shell script to remote machine
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 
-scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/build
+# copy build player
+scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/
 
 # run remote.sh on the remote machine
 ssh -i ${IDENTITY} bokken@${BOKKEN_DEVICE_IP} ~/remote.sh
