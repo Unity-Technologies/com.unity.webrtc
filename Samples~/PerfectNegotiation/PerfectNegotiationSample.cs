@@ -78,8 +78,8 @@ class PerfectNegotiationSample : MonoBehaviour
     private void Update()
     {
         count++;
-        count %= 120;
-        lerp = (float) count / 120;
+        count %= MAX;
+        lerp = (float) count / MAX;
         politeSourceCamera1.backgroundColor = Color.LerpUnclamped(red, magenta, lerp);
         politeSourceCamera2.backgroundColor = Color.LerpUnclamped(magenta, yellow, lerp);
         impoliteSourceCamera1.backgroundColor = Color.LerpUnclamped(blue, cyan, lerp);
@@ -113,6 +113,9 @@ class Peer : IDisposable
     private bool srdAnswerPending;
     private bool sldGetBackStable;
 
+    private const int width = 128;
+    private const int height = 128;
+
     public Peer(
         PerfectNegotiationSample parent,
         bool polite,
@@ -138,7 +141,7 @@ class Peer : IDisposable
                     return;
                 }
 
-                receive.texture = video.InitializeReceiver(100, 100);
+                receive.texture = video.InitializeReceiver(width, height);
             }
         };
 
@@ -153,8 +156,8 @@ class Peer : IDisposable
             this.parent.StartCoroutine(NegotiationProcess());
         };
 
-        sourceVideoTrack1 = source1.CaptureStreamTrack(100, 100, 0);
-        sourceVideoTrack2 = source2.CaptureStreamTrack(100, 100, 0);
+        sourceVideoTrack1 = source1.CaptureStreamTrack(width, height, 0);
+        sourceVideoTrack2 = source2.CaptureStreamTrack(width, height, 0);
     }
 
     private IEnumerator NegotiationProcess()
