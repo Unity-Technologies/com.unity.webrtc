@@ -390,9 +390,6 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     EDITOR_VERSION: {{ editor.version }}
     EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
-    - |
-      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
-      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
     - BuildScripts~/test_package_mac.sh
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
