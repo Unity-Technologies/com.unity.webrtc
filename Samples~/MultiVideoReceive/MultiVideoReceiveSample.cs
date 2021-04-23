@@ -1,53 +1,56 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 class MultiVideoReceiveSample : MonoBehaviour
 {
 #pragma warning disable 0649
+    [SerializeField] private InputField widthInput;
+    [SerializeField] private InputField heightInput;
     [SerializeField] private Button callButton;
     [SerializeField] private Button hangUpButton;
+    [SerializeField] private Button addVideoObjectButton;
     [SerializeField] private Button addTracksButton;
-    [SerializeField] private Camera cam1;
-    [SerializeField] private Camera cam2;
-    [SerializeField] private Camera cam3;
-    [SerializeField] private Camera cam4;
-    [SerializeField] private RawImage sourceImage1;
-    [SerializeField] private RawImage sourceImage2;
-    [SerializeField] private RawImage sourceImage3;
-    [SerializeField] private RawImage sourceImage4;
-    [SerializeField] private RawImage receiveImage1;
-    [SerializeField] private RawImage receiveImage2;
-    [SerializeField] private RawImage receiveImage3;
-    [SerializeField] private RawImage receiveImage4;
+    [SerializeField] private Transform cameraParent;
+    [SerializeField] private Transform sourceImageParent;
+    [SerializeField] private Transform receiveImageParent;
+    [SerializeField] private List<Camera> cameras;
+    [SerializeField] private List<RawImage> sourceImages;
+    [SerializeField] private List<RawImage> receiveImages;
     [SerializeField] private Transform rotateObject;
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
     private List<VideoStreamTrack> videoStreamTrackList;
-    private List<MediaStream> receiveStreamList;
+    private List<RTCRtpSender> sendingSenderList;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
+    private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private DelegateOnNegotiationNeeded pc2OnNegotiationNeeded;
     private bool videoUpdateStarted;
+    private int objectIndex = 0;
     private int videoIndex = 0;
-    private const int MaxVideoIndexLength = 4;
-    private const int width = 1280;
-    private const int height = 720;
+    private int width = 720;
+    private int height = 480;
 
     private void Awake()
     {
         WebRTC.Initialize(WebRTCSettings.EncoderType);
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
-        addTracksButton.onClick.AddListener(AddTransceiver);
+        addVideoObjectButton.onClick.AddListener(AddVideoObject);
+        addTracksButton.onClick.AddListener(AddTracks);
+        widthInput.onValueChanged.AddListener(w => width = int.Parse(w));
+        heightInput.onValueChanged.AddListener(h => height = int.Parse(h));
     }
 
     private void OnDestroy()
@@ -57,8 +60,8 @@ class MultiVideoReceiveSample : MonoBehaviour
 
     private void Start()
     {
-        receiveStreamList = new List<MediaStream>();
         videoStreamTrackList = new List<VideoStreamTrack>();
+        sendingSenderList = new List<RTCRtpSender>();
         callButton.interactable = true;
         hangUpButton.interactable = false;
 
@@ -68,18 +71,14 @@ class MultiVideoReceiveSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            if (e.Track.Kind == TrackKind.Video)
+            if (e.Track is VideoStreamTrack {IsDecoderInitialized: false} track)
             {
-                receiveStreamList[videoIndex % MaxVideoIndexLength].AddTrack(e.Track);
+                receiveImages[videoIndex].texture = track.InitializeReceiver(width, height);
                 videoIndex++;
-            }
-
-            if (videoIndex >= MaxVideoIndexLength)
-            {
-                addTracksButton.interactable = false;
             }
         };
 
+        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
         pc2OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc2)); };
     }
 
@@ -154,16 +153,34 @@ class MultiVideoReceiveSample : MonoBehaviour
         }
     }
 
-    private void AddTransceiver()
+    private void AddVideoObject()
     {
-        _pc2.AddTransceiver(TrackKind.Video);
+        var newCam = new GameObject($"Camera{objectIndex}").AddComponent<Camera>();
+        newCam.backgroundColor = Random.ColorHSV();
+        newCam.transform.SetParent(cameraParent);
+        cameras.Add(newCam);
+        var newSource = new GameObject($"SourceImage{objectIndex}").AddComponent<RawImage>();
+        newSource.transform.SetParent(sourceImageParent);
+        sourceImages.Add(newSource);
+        var newReceive = new GameObject($"ReceiveImage{objectIndex}").AddComponent<RawImage>();
+        newReceive.transform.SetParent(receiveImageParent);
+        receiveImages.Add(newReceive);
+
+        videoStreamTrackList.Add(newCam.CaptureStreamTrack(width, height, 0));
+        newSource.texture = newCam.targetTexture;
+
+        objectIndex++;
+        addTracksButton.interactable = true;
     }
 
     private void Call()
     {
+        widthInput.interactable = false;
+        heightInput.interactable = false;
         callButton.interactable = false;
         hangUpButton.interactable = true;
-        addTracksButton.interactable = true;
+        addVideoObjectButton.interactable = true;
+        addTracksButton.interactable = false;
 
         Debug.Log("GetSelectedSdpSemantics");
         var configuration = GetSelectedSdpSemantics();
@@ -171,60 +188,14 @@ class MultiVideoReceiveSample : MonoBehaviour
         Debug.Log("Created local peer connection object pc1");
         _pc1.OnIceCandidate = pc1OnIceCandidate;
         _pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
+        _pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
+
         _pc2 = new RTCPeerConnection(ref configuration);
         Debug.Log("Created remote peer connection object pc2");
         _pc2.OnIceCandidate = pc2OnIceCandidate;
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;
         _pc2.OnNegotiationNeeded = pc2OnNegotiationNeeded;
-
-        videoStreamTrackList.Add(cam1.CaptureStreamTrack(width, height, 1000000));
-        sourceImage1.texture = cam1.targetTexture;
-        videoStreamTrackList.Add(cam2.CaptureStreamTrack(width, height, 1000000));
-        sourceImage2.texture = cam2.targetTexture;
-        videoStreamTrackList.Add(cam3.CaptureStreamTrack(width, height, 1000000));
-        sourceImage3.texture = cam3.targetTexture;
-        videoStreamTrackList.Add(cam4.CaptureStreamTrack(width, height, 1000000));
-        sourceImage4.texture = cam4.targetTexture;
-
-        receiveStreamList.Add(new MediaStream());
-        receiveStreamList.Add(new MediaStream());
-        receiveStreamList.Add(new MediaStream());
-        receiveStreamList.Add(new MediaStream());
-
-        receiveStreamList[0].OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
-            {
-                receiveImage1.texture = track.InitializeReceiver(width, height);
-            }
-        };
-        receiveStreamList[1].OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
-            {
-                receiveImage2.texture = track.InitializeReceiver(width, height);
-            }
-        };
-        receiveStreamList[2].OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
-            {
-                receiveImage3.texture = track.InitializeReceiver(width, height);
-            }
-        };
-        receiveStreamList[3].OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
-            {
-                receiveImage4.texture = track.InitializeReceiver(width, height);
-            }
-        };
-
-        foreach (var track in videoStreamTrackList)
-        {
-            _pc1.AddTrack(track);
-        }
 
         if (!videoUpdateStarted)
         {
@@ -233,24 +204,35 @@ class MultiVideoReceiveSample : MonoBehaviour
         }
     }
 
+    private void AddTracks()
+    {
+        Debug.Log("Add not added tracks");
+
+        foreach (var track in videoStreamTrackList.Where(x =>
+            !sendingSenderList.Exists(y => y.Track.Id == x.Id)))
+        {
+            var sender = _pc1.AddTrack(track);
+            sendingSenderList.Add(sender);
+        }
+    }
+
     private void HangUp()
     {
-        foreach (var stream in receiveStreamList)
+        foreach (var image in receiveImages.Concat(sourceImages))
         {
-            stream.Dispose();
+            image.texture = null;
+            DestroyImmediate(image.gameObject);
         }
-        receiveStreamList.Clear();
-
-        receiveImage1.texture = null;
-        receiveImage2.texture = null;
-        receiveImage3.texture = null;
-        receiveImage4.texture = null;
+        receiveImages.Clear();
+        sourceImages.Clear();
 
         foreach (var track in videoStreamTrackList)
         {
             track.Dispose();
         }
+
         videoStreamTrackList.Clear();
+        sendingSenderList.Clear();
 
         _pc1.Close();
         _pc2.Close();
@@ -260,8 +242,12 @@ class MultiVideoReceiveSample : MonoBehaviour
         _pc1 = null;
         _pc2 = null;
         videoIndex = 0;
+        objectIndex = 0;
+        widthInput.interactable = true;
+        heightInput.interactable = true;
         callButton.interactable = true;
         hangUpButton.interactable = false;
+        addVideoObjectButton.interactable = false;
         addTracksButton.interactable = false;
     }
 
