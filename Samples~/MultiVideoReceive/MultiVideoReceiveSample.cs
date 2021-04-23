@@ -39,8 +39,8 @@ class MultiVideoReceiveSample : MonoBehaviour
     private bool videoUpdateStarted;
     private int objectIndex = 0;
     private int videoIndex = 0;
-    private int width = 720;
-    private int height = 480;
+    private int width = 128;
+    private int height = 128;
 
     private void Awake()
     {
