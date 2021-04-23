@@ -416,6 +416,16 @@ namespace Unity.WebRTC
             return System.IO.Path.GetFileName(Lib);
         }
 
+        public static void ValidateTextureSize(int width, int height)
+        {
+            // Some android crash when smaller than this size
+            const int minimumTextureSize = 114;
+            if (width < minimumTextureSize || height < minimumTextureSize)
+            {
+                throw new ArgumentException($"Texture size need {minimumTextureSize}, current size width:{width} height:{height}");
+            }
+        }
+
         public static void ValidateGraphicsFormat(GraphicsFormat format)
         {
             // ToDo: Increase the supported formats.
