@@ -50,7 +50,6 @@ publish_libwebrtc_github_release:
     - sudo apt-add-repository https://cli.github.com/packages
     - sudo apt update
     - sudo apt install gh
-    - |
     {% for platform in platforms %}
     - gh release upload $GIT_TAG artifacts/{{ platform.artifact_filename }} --clobber -R Unity-Technologies/com.unity.webrtc
     {% endfor %}
