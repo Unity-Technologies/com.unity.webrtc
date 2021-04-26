@@ -16,11 +16,18 @@ publish_com.unity.webrtc_github_release:
   name: Publish com.unity.webrtc to Github Release
   agent:
     type: Unity::VM
-    image: package-ci/win10:stable
+    image: package-ci/ubuntu:stable
     flavor: b1.large
+  variables:
+    GIT_TAG: Foo
   commands:
-    - npm install github-release-cli@1.3.1 -g
-    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "%GIT_TAG%" -n "%GIT_TAG%" "upm-ci~/packages/com.unity.webrtc-%GIT_TAG%.tgz"
+    - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0
+    - sudo apt-add-repository https://cli.github.com/packages
+    - sudo apt update
+    - sudo apt install gh
+    - |
+      file=`find upm-ci~/packages -name "*.tgz" -print`
+      gh release upload $GIT_TAG $file --clobber -R Unity-Technologies/com.unity.webrtc
   triggers:
     tags:
       only:
@@ -28,16 +35,24 @@ publish_com.unity.webrtc_github_release:
   dependencies:
     - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
 
+
+
 publish_libwebrtc_github_release:
   name: Publish libwebrtc {{ webrtc_version.name }} to Github Release
   agent:
     type: Unity::VM
-    image: package-ci/win10:stable
+    image: package-ci/ubuntu:stable
     flavor: b1.large
+  variables:
+    GIT_TAG: Foo
   commands:
-    - npm install github-release-cli@1.3.1 -g
+    - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0
+    - sudo apt-add-repository https://cli.github.com/packages
+    - sudo apt update
+    - sudo apt install gh
+    - |
     {% for platform in platforms %}
-    - github-release upload -o "Unity-Technologies" -r "com.unity.webrtc" -t "{{ webrtc_version.name }}" -n "{{ webrtc_version.name }}" "artifacts/{{ platform.artifact_filename }}"
+    - gh release upload $GIT_TAG artifacts/{{ platform.artifact_filename }} --clobber -R Unity-Technologies/com.unity.webrtc
     {% endfor %}
   dependencies:
     {% for platform in platforms %}
