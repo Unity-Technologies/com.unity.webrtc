@@ -136,29 +136,29 @@ namespace Unity.WebRTC.RuntimeTest
 
             var pc1CreateOffer = offerPc.CreateOffer();
             yield return pc1CreateOffer;
-            Assert.That(pc1CreateOffer.IsError, Is.False);
+            Assert.That(pc1CreateOffer.IsError, Is.False, () => $"Failed {nameof(pc1CreateOffer)}, error:{pc1CreateOffer.Error.message}");
             var offerDesc = pc1CreateOffer.Desc;
 
             var pc1SetLocalDescription = offerPc.SetLocalDescription(ref offerDesc);
             yield return pc1SetLocalDescription;
-            Assert.That(pc1SetLocalDescription.IsError, Is.False);
+            Assert.That(pc1SetLocalDescription.IsError, Is.False, () => $"Failed {nameof(pc1SetLocalDescription)}, error:{pc1SetLocalDescription.Error.message}");
 
             var pc2SetRemoteDescription = answerPc.SetRemoteDescription(ref offerDesc);
             yield return pc2SetRemoteDescription;
-            Assert.That(pc2SetRemoteDescription.IsError, Is.False);
+            Assert.That(pc2SetRemoteDescription.IsError, Is.False, () => $"Failed {nameof(pc2SetRemoteDescription)}, error:{pc2SetRemoteDescription.Error.message}");
 
             var pc2CreateAnswer = answerPc.CreateAnswer();
             yield return pc2CreateAnswer;
-            Assert.That(pc2CreateAnswer.IsError, Is.False);
+            Assert.That(pc2CreateAnswer.IsError, Is.False, () => $"Failed {nameof(pc2CreateAnswer)}, error:{pc2CreateAnswer.Error.message}");
             var answerDesc = pc2CreateAnswer.Desc;
 
             var pc2SetLocalDescription = answerPc.SetLocalDescription(ref answerDesc);
             yield return pc2SetLocalDescription;
-            Assert.That(pc2SetLocalDescription.IsError, Is.False);
+            Assert.That(pc2SetLocalDescription.IsError, Is.False, () => $"Failed {nameof(pc2SetLocalDescription)}, error:{pc2SetLocalDescription.Error.message}");
 
             var pc1SetRemoteDescription = offerPc.SetRemoteDescription(ref answerDesc);
             yield return pc1SetRemoteDescription;
-            Assert.That(pc1SetRemoteDescription.IsError, Is.False);
+            Assert.That(pc1SetRemoteDescription.IsError, Is.False, () => $"Failed {nameof(pc1SetRemoteDescription)}, error:{pc1SetRemoteDescription.Error.message}");
 
             var waitConnectOfferPc = new WaitUntilWithTimeout(() =>
                 offerPc.IceConnectionState == RTCIceConnectionState.Connected ||
