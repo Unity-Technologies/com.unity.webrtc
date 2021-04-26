@@ -43,9 +43,12 @@ scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/
 # run remote.sh on the remote machine
 ssh -i ${IDENTITY} bokken@${BOKKEN_DEVICE_IP} ~/remote.sh
 result=$?
+
+# copy artifacts from the remote machine
+mkdir -p ${TEST_RESULT_DIR}
+scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results ${TEST_RESULT_DIR}
+
+# return ssh commend results 
 if [ $result -ne 0 ]; then
   exit $result
 fi
-
-mkdir -p ${TEST_RESULT_DIR}
-scp -i ${IDENTITY} -r bokken@${BOKKEN_DEVICE_IP}:~/test-results ${TEST_RESULT_DIR}
