@@ -40,9 +40,13 @@ scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 # copy build player
 scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/
 
+set +e
+
 # run remote.sh on the remote machine
 ssh -i ${IDENTITY} bokken@${BOKKEN_DEVICE_IP} ~/remote.sh
 result=$?
+
+set -e
 
 # copy artifacts from the remote machine
 mkdir -p ${TEST_RESULT_DIR}
