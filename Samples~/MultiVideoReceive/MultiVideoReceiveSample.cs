@@ -71,7 +71,7 @@ class MultiVideoReceiveSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            if (e.Track is VideoStreamTrack {IsDecoderInitialized: false} track)
+            if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
             {
                 receiveImages[videoIndex].texture = track.InitializeReceiver(width, height);
                 videoIndex++;
@@ -223,8 +223,16 @@ class MultiVideoReceiveSample : MonoBehaviour
             image.texture = null;
             DestroyImmediate(image.gameObject);
         }
+
         receiveImages.Clear();
         sourceImages.Clear();
+
+        foreach (var cam in cameras)
+        {
+            DestroyImmediate(cam.gameObject);
+        }
+
+        cameras.Clear();
 
         foreach (var track in videoStreamTrackList)
         {
