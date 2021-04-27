@@ -32,12 +32,15 @@ namespace Unity.WebRTC.RuntimeTest
         public static bool CheckVideoSendRecvCodecSupport(EncoderType encoderType)
         {
             WebRTC.Initialize(encoderType);
-            var capabilitiesSender = RTCRtpSender.GetCapabilities(TrackKind.Video);
-            var capabilitiesReceiver = RTCRtpReceiver.GetCapabilities(TrackKind.Video);
-            var isSupported = capabilitiesSender.codecs.Any(x =>
-            {
-                return !excludeCodecMimeType.Contains(x.mimeType) && capabilitiesReceiver.codecs.Any(y => x.mimeType == y.mimeType);
-            });
+            var capabilitiesSenderCodec = RTCRtpSender.GetCapabilities(TrackKind.Video)
+                .codecs
+                .Select(x => x.mimeType)
+                .Except(excludeCodecMimeType);
+            var capabilitiesReceiverCodec = RTCRtpReceiver.GetCapabilities(TrackKind.Video)
+                .codecs
+                .Select(x => x.mimeType)
+                .Except(excludeCodecMimeType);
+            var isSupported = capabilitiesSenderCodec.Any(x => capabilitiesReceiverCodec.Contains(x));
             WebRTC.Dispose();
             return isSupported;
         }

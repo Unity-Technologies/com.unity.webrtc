@@ -135,7 +135,7 @@ namespace Unity.WebRTC
         public VideoStreamTrack(string label, IntPtr texturePtr, int width, int height, GraphicsFormat format)
             : base(WebRTC.Context.CreateVideoTrack(label))
         {
-            WebRTC.ValidateTextureSize(width, height);
+            WebRTC.ValidateTextureSize(width, height, WebRTC.GetEncoderType(), Application.platform);
             WebRTC.ValidateGraphicsFormat(format);
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());

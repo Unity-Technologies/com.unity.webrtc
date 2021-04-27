@@ -89,7 +89,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             pc2.OnTrack = e =>
             {
-                if (e.Track is VideoStreamTrack {IsDecoderInitialized: false} track)
+                if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
                 {
                     receiveVideoTrack = track;
                     receiveImage = track.InitializeReceiver(width, height);

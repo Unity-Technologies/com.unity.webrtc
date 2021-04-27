@@ -416,9 +416,9 @@ namespace Unity.WebRTC
             return System.IO.Path.GetFileName(Lib);
         }
 
-        public static void ValidateTextureSize(int width, int height)
+        public static void ValidateTextureSize(int width, int height, EncoderType encoderType, RuntimePlatform platform)
         {
-            if (GetEncoderType() == EncoderType.Software)
+            if (encoderType == EncoderType.Software || platform != RuntimePlatform.Android)
             {
                 return;
             }
@@ -427,7 +427,8 @@ namespace Unity.WebRTC
             const int minimumTextureSize = 114;
             if (width < minimumTextureSize || height < minimumTextureSize)
             {
-                throw new ArgumentException($"Texture size need {minimumTextureSize}, current size width:{width} height:{height}");
+                throw new ArgumentException(
+                    $"Texture size need {minimumTextureSize}, current size width:{width} height:{height}");
             }
         }
 

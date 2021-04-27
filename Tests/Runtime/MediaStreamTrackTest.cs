@@ -92,7 +92,7 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
 
-            if (WebRTC.GetEncoderType() == EncoderType.Hardware)
+            if (WebRTC.GetEncoderType() == EncoderType.Hardware && Application.platform == RuntimePlatform.Android)
             {
                 Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
             }
