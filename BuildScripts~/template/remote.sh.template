@@ -58,7 +58,8 @@ unity-downloader-cli \
   --suite=${suite} \
   --platform=${platform} \
   --player-load-path=${PLAYER_LOAD_PATH} \
-  --artifacts_path=${ARTIFACT_DIR}
+  --artifacts_path=${ARTIFACT_DIR} \
+  --player-connection-ip=${BOKKEN_DEVICE_IP}
 result=$?
 
 # return exit-code

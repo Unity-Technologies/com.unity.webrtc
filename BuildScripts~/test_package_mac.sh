@@ -23,6 +23,7 @@ brew install gettext
 
 # render template
 envsubst ' \
+  $BOKKEN_DEVICE_IP \
   $SCRIPTING_BACKEND \
   $EXTRA_EDITOR_ARG \
   $PLAYER_LOAD_PATH \
