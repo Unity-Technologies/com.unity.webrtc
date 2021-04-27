@@ -326,7 +326,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 {% for editor in editors %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.name != "macos" OR param.platform != "standalone" -%}
+{% if target.name != "macos" or param.platform != "standalone" -%}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
