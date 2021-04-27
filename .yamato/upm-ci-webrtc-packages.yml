@@ -342,7 +342,8 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
         - "upm-ci~/test-results/**/*"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% else %}
+
+{% elsif param.platform == "standalone" %}
 
 build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Build {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
@@ -393,6 +394,37 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
         - "upm-ci~/test-results/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
+
+{% else %}
+
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
+  agent:
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
+  variables:
+      TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
+      PACKAGE_DIR: com.unity.webrtc
+      TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
+      TEST_RESULT_DIR: upm-ci~/test-results/
+      TEST_TARGET: {{ target.name }}
+      TEST_PLATFORM: {{ param.platform }}
+      SCRIPTING_BACKEND: {{ param.backend }}  
+      EDITOR_VERSION: {{ editor.version }}
+      EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
+  commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - BuildScripts~/test_package_mac.sh
+  artifacts:
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
+      paths:
+        - "upm-ci~/test-results/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
 {% endif %}
 {% endfor %}
 {% endfor %}

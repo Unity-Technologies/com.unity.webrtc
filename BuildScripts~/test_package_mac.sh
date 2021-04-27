@@ -39,7 +39,10 @@ chmod +x ~/remote.sh
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 
 # copy build player
-scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/
+if [ ${TEST_PLATFORM} = "standalone" ]
+then
+  scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/
+fi
 
 set +e
 
