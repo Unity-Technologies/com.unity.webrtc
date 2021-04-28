@@ -28,7 +28,7 @@ class MultiplePeerConnectionsSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType);
+        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
     }
 
     private void OnDestroy()

@@ -7,11 +7,18 @@ namespace Unity.WebRTC.Samples
     public static class WebRTCSettings
     {
         private static bool s_enableHWCodec = false;
+        private static bool s_limitTextureSize = true;
 
         public static bool EnableHWCodec
         {
             get { return s_enableHWCodec; }
             set { s_enableHWCodec = value; }
+        }
+
+        public static bool LimitTextureSize
+        {
+            get { return s_limitTextureSize; }
+            set { s_limitTextureSize = value; }
         }
 
         public static EncoderType EncoderType
@@ -23,15 +30,22 @@ namespace Unity.WebRTC.Samples
     public class SceneSelectUI : MonoBehaviour
     {
         [SerializeField] private Toggle toggleEnableHWCodec;
+        [SerializeField] private Toggle toggleLimitTextureSize;
 
         void Start()
         {
             toggleEnableHWCodec.isOn = WebRTCSettings.EnableHWCodec;
+            toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
         }
 
         public void OnChangeHWCodec(bool enable)
         {
             WebRTCSettings.EnableHWCodec = enable;
+        }
+
+        public void OnChangeLimitTextureSize(bool enable)
+        {
+            WebRTCSettings.LimitTextureSize = enable;
         }
 
         public void OnPressedPeerConnectionButton()
