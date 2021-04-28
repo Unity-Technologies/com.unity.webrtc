@@ -294,7 +294,7 @@ namespace Unity.WebRTC
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
         internal static Material flipMat;
-
+        private static bool s_limitTextureSize;
 
 #if UNITY_EDITOR
         static public void OnBeforeAssemblyReload()
@@ -303,7 +303,7 @@ namespace Unity.WebRTC
         }
 #endif
 
-        public static void Initialize(EncoderType type = EncoderType.Hardware)
+        public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true)
         {
             // todo(kazuki): Add this event to avoid crash caused by hot-reload.
             // Dispose of all before reloading assembly.
@@ -342,6 +342,8 @@ namespace Unity.WebRTC
             {
                 flipMat = new Material(flipShader);
             }
+
+            s_limitTextureSize = limitTextureSize;
         }
         public static IEnumerator Update()
         {
@@ -416,9 +418,9 @@ namespace Unity.WebRTC
             return System.IO.Path.GetFileName(Lib);
         }
 
-        public static void ValidateTextureSize(int width, int height, EncoderType encoderType, RuntimePlatform platform)
+        public static void ValidateTextureSize(int width, int height, RuntimePlatform platform)
         {
-            if (encoderType == EncoderType.Software || platform != RuntimePlatform.Android)
+            if (!s_limitTextureSize || platform != RuntimePlatform.Android)
             {
                 return;
             }

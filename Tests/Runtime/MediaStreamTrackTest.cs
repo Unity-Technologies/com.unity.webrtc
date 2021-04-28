@@ -84,18 +84,16 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void ConstructThrowsExceptionWhenSmallTextureOnHardwareEncoder()
+        [UnityPlatform(RuntimePlatform.Android)]
+        public void ConstructThrowsExceptionWhenSmallTexture()
         {
-            var width = 100;
-            var height = 100;
+            var width = 50;
+            var height = 50;
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
 
-            if (WebRTC.GetEncoderType() == EncoderType.Hardware && Application.platform == RuntimePlatform.Android)
-            {
-                Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
-            }
+            Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
 
             Object.DestroyImmediate(rt);
         }
