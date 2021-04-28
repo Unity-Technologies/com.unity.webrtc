@@ -36,14 +36,16 @@ namespace Unity.WebRTC.Samples
         {
             toggleEnableHWCodec.isOn = WebRTCSettings.EnableHWCodec;
             toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
+            toggleEnableHWCodec.onValueChanged.AddListener(OnChangeHWCodec);
+            toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
         }
 
-        public void OnChangeHWCodec(bool enable)
+        private void OnChangeHWCodec(bool enable)
         {
             WebRTCSettings.EnableHWCodec = enable;
         }
 
-        public void OnChangeLimitTextureSize(bool enable)
+        private void OnChangeLimitTextureSize(bool enable)
         {
             WebRTCSettings.LimitTextureSize = enable;
         }
