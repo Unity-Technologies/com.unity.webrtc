@@ -38,10 +38,13 @@ chmod +x ~/remote.sh
 # copy shell script to remote machine
 scp -i ${IDENTITY} -r ~/remote.sh bokken@${BOKKEN_DEVICE_IP}:~/remote.sh
 
-# copy build player
 if [ ${TEST_PLATFORM} = "standalone" ]
 then
+  # copy build player to remote machine
   scp -i ${IDENTITY} -r build bokken@${BOKKEN_DEVICE_IP}:~/
+else
+  # copy package to remote machine
+  scp -i ${IDENTITY} -r ${YAMATO_SOURCE_DIR} bokken@${BOKKEN_DEVICE_IP}:~/${PACKAGE_DIR}  
 fi
 
 set +e
