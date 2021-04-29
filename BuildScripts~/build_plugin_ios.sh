@@ -23,6 +23,7 @@ cmake . \
   -B build
 
 xcodebuild -sdk iphonesimulator \
+  -arch "x86_64" \
   -project build/webrtc.xcodeproj \
   -target WebRTCPlugin \
   -configuration Release
