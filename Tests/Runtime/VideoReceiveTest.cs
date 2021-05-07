@@ -6,12 +6,32 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    class VideoReceiveTest
+    //ToDo: decoder is not supported H.264 codec on Windows/Linux.
+    [TestFixture]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedReceiveVideoOnHardware, "Not supported hardware decoder")]
+    class VideoReceiveTestWithHardwareEncoder : VideoReceiveTestWithSoftwareEncoder
     {
+        [OneTimeSetUp]
+        public new void OneTimeInit()
+        {
+            encoderType = EncoderType.Hardware;
+        }
+    }
+
+    class VideoReceiveTestWithSoftwareEncoder
+    {
+        protected EncoderType encoderType;
+
+        [OneTimeSetUp]
+        public void OneTimeInit()
+        {
+            encoderType = EncoderType.Software;
+        }
+
         [SetUp]
         public void SetUp()
         {
-            WebRTC.Initialize(EncoderType.Software);
+            WebRTC.Initialize(encoderType);
         }
 
         [TearDown]
@@ -24,18 +44,22 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         public IEnumerator InitializeReceiver()
         {
+            const int width = 256;
+            const int height = 256;
+
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Video);
-            Assert.NotNull(transceiver);
+            Assert.That(transceiver, Is.Not.Null);
             RTCRtpReceiver receiver = transceiver.Receiver;
-            Assert.NotNull(receiver);
+            Assert.That(receiver, Is.Not.Null);
             MediaStreamTrack track = receiver.Track;
-            Assert.NotNull(track);
+            Assert.That(track, Is.Not.Null);
             Assert.AreEqual(TrackKind.Video, track.Kind);
+            Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
             var videoTrack = track as VideoStreamTrack;
-            Assert.NotNull(videoTrack);
-            var rt = videoTrack.InitializeReceiver(640, 320);
-            Assert.True(videoTrack.IsDecoderInitialized);
+            Assert.That(videoTrack, Is.Not.Null);
+            var rt = videoTrack.InitializeReceiver(width, height);
+            Assert.That(videoTrack.IsDecoderInitialized, Is.True);
             videoTrack.Dispose();
             // wait for disposing video track.
             yield return 0;
@@ -44,48 +68,47 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
-        // todo::Software encoder does not support yet on linux
         [UnityTest]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.Direct3D12,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
-        [UnityPlatform(exclude = new[] {
-            RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.OSXEditor})]
         public IEnumerator VideoReceive()
         {
+            const int width = 256;
+            const int height = 256;
+
             var config = new RTCConfiguration
             {
                 iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}}
             };
             var pc1 = new RTCPeerConnection(ref config);
             var pc2 = new RTCPeerConnection(ref config);
-            var sendStream = new MediaStream();
-            var receiveStream = new MediaStream();
+
             VideoStreamTrack receiveVideoTrack = null;
             Texture receiveImage = null;
-            receiveStream.OnAddTrack = e =>
+
+            pc2.OnTrack = e =>
             {
-                if (e.Track is VideoStreamTrack track)
+                if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
                 {
                     receiveVideoTrack = track;
-                    receiveImage = receiveVideoTrack.InitializeReceiver(640, 320);
+                    receiveImage = track.InitializeReceiver(width, height);
                 }
             };
-            pc2.OnTrack = e => receiveStream.AddTrack(e.Track);
 
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             cam.backgroundColor = Color.red;
-            var sendVideoTrack = cam.CaptureStreamTrack(1280, 720, 1000000);
+            var sendVideoTrack = cam.CaptureStreamTrack(width, height, 1000000);
+
             yield return new WaitForSeconds(0.1f);
 
-            pc1.AddTrack(sendVideoTrack, sendStream);
-            pc2.AddTransceiver(TrackKind.Video);
+            pc1.AddTrack(sendVideoTrack);
 
             yield return SignalingPeers(pc1, pc2);
 
             yield return new WaitUntil(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized);
-            Assert.NotNull(receiveImage);
+            Assert.That(receiveImage, Is.Not.Null);
 
             sendVideoTrack.Update();
             yield return new WaitForSeconds(0.1f);
@@ -94,11 +117,12 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
 
             receiveVideoTrack.Dispose();
-            receiveStream.Dispose();
             sendVideoTrack.Dispose();
-            sendStream.Dispose();
+            yield return 0;
+
             pc2.Dispose();
             pc1.Dispose();
+            Object.DestroyImmediate(camObj);
         }
 
         private static IEnumerator SignalingPeers(RTCPeerConnection offerPc, RTCPeerConnection answerPc)
@@ -108,49 +132,49 @@ namespace Unity.WebRTC.RuntimeTest
 
             var pc1CreateOffer = offerPc.CreateOffer();
             yield return pc1CreateOffer;
-            Assert.False(pc1CreateOffer.IsError);
+            Assert.That(pc1CreateOffer.IsError, Is.False, () => $"Failed {nameof(pc1CreateOffer)}, error:{pc1CreateOffer.Error.message}");
             var offerDesc = pc1CreateOffer.Desc;
 
             var pc1SetLocalDescription = offerPc.SetLocalDescription(ref offerDesc);
             yield return pc1SetLocalDescription;
-            Assert.False(pc1SetLocalDescription.IsError);
+            Assert.That(pc1SetLocalDescription.IsError, Is.False, () => $"Failed {nameof(pc1SetLocalDescription)}, error:{pc1SetLocalDescription.Error.message}");
 
             var pc2SetRemoteDescription = answerPc.SetRemoteDescription(ref offerDesc);
             yield return pc2SetRemoteDescription;
-            Assert.False(pc2SetRemoteDescription.IsError);
+            Assert.That(pc2SetRemoteDescription.IsError, Is.False, () => $"Failed {nameof(pc2SetRemoteDescription)}, error:{pc2SetRemoteDescription.Error.message}");
 
             var pc2CreateAnswer = answerPc.CreateAnswer();
             yield return pc2CreateAnswer;
-            Assert.False(pc2CreateAnswer.IsError);
+            Assert.That(pc2CreateAnswer.IsError, Is.False, () => $"Failed {nameof(pc2CreateAnswer)}, error:{pc2CreateAnswer.Error.message}");
             var answerDesc = pc2CreateAnswer.Desc;
 
             var pc2SetLocalDescription = answerPc.SetLocalDescription(ref answerDesc);
             yield return pc2SetLocalDescription;
-            Assert.False(pc2SetLocalDescription.IsError);
+            Assert.That(pc2SetLocalDescription.IsError, Is.False, () => $"Failed {nameof(pc2SetLocalDescription)}, error:{pc2SetLocalDescription.Error.message}");
 
             var pc1SetRemoteDescription = offerPc.SetRemoteDescription(ref answerDesc);
             yield return pc1SetRemoteDescription;
-            Assert.False(pc1SetRemoteDescription.IsError);
+            Assert.That(pc1SetRemoteDescription.IsError, Is.False, () => $"Failed {nameof(pc1SetRemoteDescription)}, error:{pc1SetRemoteDescription.Error.message}");
 
             var waitConnectOfferPc = new WaitUntilWithTimeout(() =>
                 offerPc.IceConnectionState == RTCIceConnectionState.Connected ||
                 offerPc.IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return waitConnectOfferPc;
-            Assert.True(waitConnectOfferPc.IsCompleted);
+            Assert.That(waitConnectOfferPc.IsCompleted, Is.True);
 
             var waitConnectAnswerPc = new WaitUntilWithTimeout(() =>
                 answerPc.IceConnectionState == RTCIceConnectionState.Connected ||
                 answerPc.IceConnectionState == RTCIceConnectionState.Completed, 5000);
             yield return waitConnectAnswerPc;
-            Assert.True(waitConnectAnswerPc.IsCompleted);
+            Assert.That(waitConnectAnswerPc.IsCompleted, Is.True);
 
             var checkSenders = new WaitUntilWithTimeout(() => offerPc.GetSenders().Any(), 5000);
             yield return checkSenders;
-            Assert.True(checkSenders.IsCompleted);
+            Assert.That(checkSenders.IsCompleted, Is.True);
 
             var checkReceivers = new WaitUntilWithTimeout(() => answerPc.GetReceivers().Any(), 5000);
             yield return checkReceivers;
-            Assert.True(checkReceivers.IsCompleted);
+            Assert.That(checkReceivers.IsCompleted, Is.True);
         }
     }
 }

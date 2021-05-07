@@ -11,8 +11,8 @@ namespace Unity.WebRTC
         internal static List<VideoStreamTrack> tracks = new List<VideoStreamTrack>();
 
         bool m_needFlip = false;
-        UnityEngine.Texture m_sourceTexture;
-        UnityEngine.RenderTexture m_destTexture;
+        Texture m_sourceTexture;
+        RenderTexture m_destTexture;
 
         UnityVideoRenderer m_renderer;
 
@@ -83,7 +83,7 @@ namespace Unity.WebRTC
             //  - it might be better to implement this if possible
             if (m_needFlip)
             {
-                UnityEngine.Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
+                Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
             }
 
             WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_sourceTexture);
@@ -98,7 +98,7 @@ namespace Unity.WebRTC
             //  - it might be better to implement this if possible
             if (m_needFlip)
             {
-                UnityEngine.Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
+                Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
             }
 
             WebRTC.Context.Encode(GetSelfOrThrow());
@@ -110,17 +110,6 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="label"></param>
         /// <param name="source"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public VideoStreamTrack(string label, RenderTexture source)
-            : this(label,
-                source,
-                CreateRenderTexture(source.width, source.height, source.graphicsFormat),
-                source.width,
-                source.height)
-        {
-        }
-
         public VideoStreamTrack(string label, Texture source)
             : this(label,
                 source,
@@ -146,6 +135,7 @@ namespace Unity.WebRTC
         public VideoStreamTrack(string label, IntPtr texturePtr, int width, int height, GraphicsFormat format)
             : base(WebRTC.Context.CreateVideoTrack(label))
         {
+            WebRTC.ValidateTextureSize(width, height, Application.platform);
             WebRTC.ValidateGraphicsFormat(format);
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());
@@ -197,7 +187,7 @@ namespace Unity.WebRTC
 
     public static class CameraExtension
     {
-        public static VideoStreamTrack CaptureStreamTrack(this UnityEngine.Camera cam, int width, int height, int bitrate,
+        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height, int bitrate,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             switch (depth)
@@ -211,7 +201,7 @@ namespace Unity.WebRTC
             }
 
             int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
@@ -219,7 +209,7 @@ namespace Unity.WebRTC
         }
 
 
-        public static MediaStream CaptureStream(this UnityEngine.Camera cam, int width, int height, int bitrate,
+        public static MediaStream CaptureStream(this Camera cam, int width, int height, int bitrate,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream("videostream"));

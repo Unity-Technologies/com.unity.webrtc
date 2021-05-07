@@ -28,7 +28,7 @@ class DataChannelSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType);
+        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
         callButton.onClick.AddListener(() => { StartCoroutine(Call()); });
         hangupButton.onClick.AddListener(() => { Hangup(); });
 

@@ -26,5 +26,23 @@ namespace Unity.WebRTC.RuntimeTest
                 return false;
             return true;
         }
+
+        private static readonly string[] excludeCodecMimeType = {"video/red", "video/ulpfec", "video/rtx"};
+
+        public static bool CheckVideoSendRecvCodecSupport(EncoderType encoderType)
+        {
+            WebRTC.Initialize(encoderType);
+            var capabilitiesSenderCodec = RTCRtpSender.GetCapabilities(TrackKind.Video)
+                .codecs
+                .Select(x => x.mimeType)
+                .Except(excludeCodecMimeType);
+            var capabilitiesReceiverCodec = RTCRtpReceiver.GetCapabilities(TrackKind.Video)
+                .codecs
+                .Select(x => x.mimeType)
+                .Except(excludeCodecMimeType);
+            var isSupported = capabilitiesSenderCodec.Any(x => capabilitiesReceiverCodec.Contains(x));
+            WebRTC.Dispose();
+            return isSupported;
+        }
     }
 }
