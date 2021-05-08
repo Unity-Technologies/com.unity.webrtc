@@ -253,7 +253,7 @@ namespace Unity.WebRTC
             if (error != RTCErrorType.None)
                 throw new ArgumentException(
                         $"create candidate is failed. error type:{error}, " +
-                        $"sdpMid:{candidateInfo.candidate}\n" +
+                        $"candidate:{candidateInfo.candidate}\n" +
                         $"sdpMid:{candidateInfo.sdpMid}\n" +
                         $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
 
