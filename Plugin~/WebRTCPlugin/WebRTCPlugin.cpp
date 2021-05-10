@@ -401,6 +401,16 @@ extern "C"
         track->RemoveSink(sink);
     }
 
+    UNITY_INTERFACE_EXPORT void AudioTrackAddSink(AudioTrackInterface* track, AudioTrackSinkInterface* sink)
+    {
+        track->AddSink(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void AudioTrackRemoveSink(AudioTrackInterface* track, AudioTrackSinkInterface* sink)
+    {
+        track->RemoveSink(sink);
+    }
+
     UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func)
     {
         delegateDebugLog = func;
