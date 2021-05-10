@@ -26,8 +26,8 @@ platforms:
   - name: macos
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode
-    gpu_image: slough-ops/macos-10.14-xcode
+    image: package-ci/mac:latest
+    gpu_image: package-ci/mac:latest
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test_plugin_mac.sh
@@ -35,8 +35,8 @@ platforms:
   - name: ios
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode
-    gpu_image: slough-ops/macos-10.14-xcode
+    image: package-ci/mac:latest
+    gpu_image: package-ci/mac:latest
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_ios.sh
     test_command: BuildScripts~/test_plugin_ios.sh
@@ -134,19 +134,23 @@ test_targets:
         platform: standalone
   - name: macos
     type: Unity::metal::macmini
-    image: slough-ops/macos-10.14-xcode
+    image: package-ci/mac:latest
     flavor: m1.mac
     gfx_types:
       - name: metal
         extra-editor-arg: force-metal
     test_params:
       - backend: mono
+        additional_component_arg: StandaloneSupport-Mono
         platform: editmode
       - backend: mono
+        additional_component_arg: StandaloneSupport-Mono
         platform: playmode
       - backend: mono
+        additional_component_arg: StandaloneSupport-Mono
         platform: standalone
       - backend: il2cpp
+        additional_component_arg: StandaloneSupport-IL2CPP
         platform: standalone
 
 test_targets_android:
@@ -220,7 +224,7 @@ build_{{ package.name }}_{{ editor.version }}_ios:
   name : Build {{ package.packagename }} with {{ editor.version }} for ios device
   agent:
     type: Unity::VM::osx
-    image: mobile/macos-10.13-testing:stable
+    image: package-ci/mac:latest
     flavor: b1.large
   commands:
     - |
@@ -267,7 +271,7 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   name : Build {{ package.packagename }} with {{ editor.version }} for android device {{ target.name }}
   agent:
     type: Unity::VM::osx
-    image: mobile/macos-10.13-testing:stable
+    image: package-ci/mac:latest
     flavor: b1.xlarge
   commands:
     - |
@@ -320,9 +324,9 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 
 {% for target in test_targets %}
 {% for editor in editors %}
-{% if target.name != "macos" -%}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
+{% if target.name != "macos" %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -338,12 +342,61 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
         - "upm-ci~/test-results/**/*"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% endfor %}
-{% endfor %}
-{% else -%}
 
-{% for param in target.test_params %}
-{% for gfx_type in target.gfx_types %}
+{% elsif param.platform == "standalone" %}
+
+build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Build {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
+  agent:
+    type: Unity::VM::osx
+    image: package-ci/mac:latest
+    flavor: m1.mac
+  commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -c Editor -c {{ param.additional_component_arg }} -u {{ editor.version }} --fast -w
+    - curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
+    - ./utr --suite=playmode --platform=StandaloneOSX --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=x64 --artifacts_path=build/logs --scripting-backend={{ param.backend }} --build-only
+  artifacts:
+    players:
+      paths:
+        - "build/players/**"
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
+  agent:
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
+  variables:
+    TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
+    PACKAGE_DIR: com.unity.webrtc
+    PLAYER_LOAD_PATH: build/players
+    TEST_RESULT_DIR: upm-ci~/test-results/
+    TEST_TARGET: {{ target.name }}
+    TEST_PLATFORM: {{ param.platform }}
+    SCRIPTING_BACKEND: {{ param.backend }}  
+    EDITOR_VERSION: {{ editor.version }}
+    EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
+  commands:
+    - BuildScripts~/test_package_mac.sh
+  artifacts:
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
+      paths:
+        - "upm-ci~/test-results/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
+
+{% else %}
+
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -371,9 +424,10 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
         - "upm-ci~/test-results/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
+{% endif %}
 {% endfor %}
 {% endfor %}
-{% endif -%}
 {% endfor %}
 {% endfor %}
 
