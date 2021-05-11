@@ -8,7 +8,7 @@ namespace Unity.WebRTC.RuntimeTest
     {
         public const string UnsupportedHardwareForHardwareCodec = "IgnoreUnsupportedHardwareForHardwareCodec";
         public const string UnsupportedReceiveVideoOnHardware = "IgnoreUnsupportedReceiveVideoOnHardware";
-        public const string Direct3D12 = "IgnoreDirect3D12";
+        public const string UnsupportedPlatformVideoDecoder = "IgnoreUnsupportedPlatformVideoDecoder";
 
         [RuntimeInitializeOnLoadMethod]
         static void OnLoad()
@@ -21,8 +21,10 @@ namespace Unity.WebRTC.RuntimeTest
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedReceiveVideoOnHardware,
                 ignoreReceiveVideoTest);
 
-            ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(Direct3D12,
+#if !UNITY_2020_1_OR_NEWER
+            ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedPlatformVideoDecoder,
                 SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12);
+#endif
         }
     }
 }
