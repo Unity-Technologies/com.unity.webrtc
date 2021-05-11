@@ -968,11 +968,14 @@ namespace Unity.WebRTC
 
         public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
         {
+#if !UNITY_2020_1_OR_NEWER
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12)
             {
                 throw new NotSupportedException(
-                    "CommandBuffer.IssuePluginCustomTextureUpdateV2 method is Direct3D12 is not supported ");
+                    "CommandBuffer.IssuePluginCustomTextureUpdateV2 method is not supported " +
+                    "when using Direct3D12 on Unity2019 or older.");
             }
+#endif
             _command.IssuePluginCustomTextureUpdateV2(callback, texture, rendererId);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
