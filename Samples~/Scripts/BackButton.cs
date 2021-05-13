@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 namespace Unity.WebRTC.Samples
 {
-    public class BackButton : MonoBehaviour
+    internal class BackButton : MonoBehaviour
     {
         [SerializeField]
         GameObject m_BackButton;
