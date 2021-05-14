@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Unity.WebRTC.Samples
 {
-    public static class WebRTCSettings
+    internal static class WebRTCSettings
     {
         private static bool s_enableHWCodec = false;
         private static bool s_limitTextureSize = true;
@@ -27,7 +27,7 @@ namespace Unity.WebRTC.Samples
         }
     }
 
-    public class SceneSelectUI : MonoBehaviour
+    internal class SceneSelectUI : MonoBehaviour
     {
         [SerializeField] private Toggle toggleEnableHWCodec;
         [SerializeField] private Toggle toggleLimitTextureSize;
