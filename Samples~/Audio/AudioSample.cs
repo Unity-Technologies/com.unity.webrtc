@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Unity.WebRTC.Samples;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -43,8 +46,20 @@ namespace Unity.WebRTC
         [SerializeField] private Text textMinFrequency;
         [SerializeField] private Text textMaxFrequency;
 
+        private RTCPeerConnection _pc1, _pc2;
+        private MediaStream videoStream, receiveStream;
+        //private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
+        //private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
+        //private DelegateOnIceCandidate pc1OnIceCandidate;
+        //private DelegateOnIceCandidate pc2OnIceCandidate;
+        private DelegateOnTrack pc2Ontrack;
+        private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
+
+
         private AudioClip m_clipInput;
         private AudioOutput m_audioOutput;
+        private AudioStreamTrack m_audioTrack;
+        private AudioStreamTrack m_receiverTrack;
         int m_head;
         int m_samplingFrequency = 44100;
         int m_lengthSeconds = 1;
@@ -55,6 +70,9 @@ namespace Unity.WebRTC
 
         void Start()
         {
+            WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+            StartCoroutine(WebRTC.Update());
+
             dropdownMicrophoneDevices.options =
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
@@ -65,6 +83,11 @@ namespace Unity.WebRTC
             buttonStart.onClick.AddListener(OnStart);
             buttonCall.onClick.AddListener(OnCall);
             buttonHangup.onClick.AddListener(OnHangUp);
+        }
+
+        void OnDestroy()
+        {
+            WebRTC.Dispose();
         }
 
         void OnStart()
@@ -85,7 +108,38 @@ namespace Unity.WebRTC
 
         void OnCall()
         {
+            var configuration = GetSelectedSdpSemantics();
+            _pc1 = new RTCPeerConnection(ref configuration)
+            {
+                OnIceCandidate = candidate =>
+                {
+//                    Debug.Log("OnIceCandidate 1");
+                    _pc2.AddIceCandidate(candidate);
+                },
+//                OnIceConnectionChange = pc1OnIceConnectionChange,
+                OnNegotiationNeeded = () => StartCoroutine(PeerNegotiationNeeded(_pc1))
+        };
 
+            _pc2 = new RTCPeerConnection(ref configuration)
+            {
+                OnIceCandidate = candidate =>
+                {
+//                    Debug.Log("OnIceCandidate 2");
+                    _pc1.AddIceCandidate(candidate);
+                },
+//                OnIceConnectionChange = pc2OnIceConnectionChange,
+                OnTrack = e =>
+                {
+                    Debug.Log("Track.Kind:" + e.Track.Kind);
+                    m_receiverTrack = e.Track as AudioStreamTrack;
+                }
+            };
+
+            var transceiver = _pc2.AddTransceiver(TrackKind.Audio);
+            transceiver.Direction = RTCRtpTransceiverDirection.RecvOnly;
+
+            m_audioTrack = new AudioStreamTrack("audio", audioSource);
+            _pc1.AddTrack(m_audioTrack);
         }
 
         void OnHangUp()
@@ -106,6 +160,136 @@ namespace Unity.WebRTC
             textChannelCount.text = string.Format($"Channel Count: {m_channelCount}");
             textMinFrequency.text = string.Format($"Minimum frequency: {minFreq}");
             textMaxFrequency.text = string.Format($"Maximum frequency: {maxFreq}");
+        }
+
+        private void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
+        {
+            //Debug.Log($"{GetName(pc)} IceConnectionState: {state}");
+
+            if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
+            {
+                //StartCoroutine(CheckStats(pc));
+            }
+        }
+
+        private static RTCConfiguration GetSelectedSdpSemantics()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+
+            return config;
+        }
+
+
+        IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
+        {
+            var op = pc.CreateOffer();
+            yield return op;
+
+            if (!op.IsError)
+            {
+                if (pc.SignalingState != RTCSignalingState.Stable)
+                {
+                    yield break;
+                }
+
+                yield return StartCoroutine(OnCreateOfferSuccess(pc, op.Desc));
+            }
+            else
+            {
+                var error = op.Error;
+                OnSetSessionDescriptionError(ref error);
+            }
+        }
+
+        private RTCPeerConnection GetOtherPc(RTCPeerConnection pc)
+        {
+            return (pc == _pc1) ? _pc2 : _pc1;
+        }
+
+        private IEnumerator OnCreateOfferSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
+        {
+            Debug.Log("setLocalDescription start");
+            var op = pc.SetLocalDescription(ref desc);
+            yield return op;
+
+            if (!op.IsError)
+            {
+                OnSetLocalSuccess(pc);
+            }
+            else
+            {
+                var error = op.Error;
+                OnSetSessionDescriptionError(ref error);
+            }
+
+            var otherPc = GetOtherPc(pc);
+//            Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
+            var op2 = otherPc.SetRemoteDescription(ref desc);
+            yield return op2;
+            if (!op2.IsError)
+            {
+//                OnSetRemoteSuccess(otherPc);
+            }
+            else
+            {
+                var error = op2.Error;
+                OnSetSessionDescriptionError(ref error);
+            }
+            var op3 = otherPc.CreateAnswer();
+            yield return op3;
+            if (!op3.IsError)
+            {
+                yield return OnCreateAnswerSuccess(otherPc, op3.Desc);
+            }
+            else
+            {
+//                OnCreateSessionDescriptionError(op3.Error);
+            }
+        }
+
+
+        IEnumerator OnCreateAnswerSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
+        {
+            //Debug.Log($"Answer from {GetName(pc)}:\n{desc.sdp}");
+            //Debug.Log($"{GetName(pc)} setLocalDescription start");
+            var op = pc.SetLocalDescription(ref desc);
+            yield return op;
+
+            if (!op.IsError)
+            {
+                OnSetLocalSuccess(pc);
+            }
+            else
+            {
+                var error = op.Error;
+                OnSetSessionDescriptionError(ref error);
+            }
+
+            var otherPc = GetOtherPc(pc);
+//            Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
+
+            var op2 = otherPc.SetRemoteDescription(ref desc);
+            yield return op2;
+            if (!op2.IsError)
+            {
+//                OnSetRemoteSuccess(otherPc);
+            }
+            else
+            {
+                var error = op2.Error;
+                OnSetSessionDescriptionError(ref error);
+            }
+        }
+
+        private void OnSetLocalSuccess(RTCPeerConnection pc)
+        {
+            Debug.Log("SetLocalDescription complete");
+        }
+
+        static void OnSetSessionDescriptionError(ref RTCError error)
+        {
+            Debug.LogError($"Error Detail Type: {error.message}");
         }
 
         void Update()
@@ -136,9 +320,9 @@ namespace Unity.WebRTC
 
 
 
-        private void ProcessAudio(float[] data, int length)
+        private void ProcessAudio(float[] data, int dataLength)
         {
-            m_audioOutput.SetData(data, length);
+            // Audio.Update(data, dataLength, m_channelCount);
         }
     }
 }

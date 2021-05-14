@@ -52,6 +52,10 @@ namespace webrtc
         }
     };
 
+    class AudioSinkAdapter : public AudioTrackSinkInterface
+    {
+    };
+
     class Context : public IVideoEncoderObserver
     {
     public:
@@ -71,13 +75,19 @@ namespace webrtc
         MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
 
         // MediaStreamTrack
-        webrtc::VideoTrackInterface* CreateVideoTrack(
-            const std::string& label);
+        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label);
         void DeleteMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
-        void ProcessAudioData(const float* data, int32 size);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
+
+        void ProcessAudioData(
+            AudioTrackInterface* track,
+            const float* audio_data,
+            int32 sample_rate,
+            int32 bits_per_sample,
+            int32 number_of_channels,
+            int32 number_of_frames);
 
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
@@ -136,7 +146,9 @@ namespace webrtc
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
- 
+
+        //std::unique_ptr<AudioSinkAdapter> sinkAdapter;
+
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
 

@@ -360,8 +360,17 @@ namespace webrtc
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
-        const rtc::scoped_refptr<AudioSourceInterface> source =
-            m_peerConnectionFactory->CreateAudioSource(audioOptions);
+
+        // todo(kazuki)::
+        //const rtc::scoped_refptr<AudioSourceInterface> source =
+        //    m_peerConnectionFactory->CreateAudioSource(audioOptions);
+
+        //sinkAdapter = std::make_unique<AudioSinkAdapter>();
+        //source->AddSink(sinkAdapter.get());
+        const rtc::scoped_refptr<UnityAudioTrackSource> source =
+            UnityAudioTrackSource::Create("audio");
+
+
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
         m_mediaSteamTrackList.push_back(track);
@@ -380,9 +389,30 @@ namespace webrtc
         }
     }
 
-    void Context::ProcessAudioData(const float* data, int32 size)
+    //UnityAudioTrackSource* Context::CreateAudioSource()
+    //{
+    //    
+    //}
+
+    void Context::ProcessAudioData(
+        AudioTrackInterface* track,
+        const float* audio_data,
+        int32 sample_rate,
+        int32 bits_per_sample,
+        int32 number_of_channels,
+        int32 number_of_frames
+        )
     {
-        m_audioDevice->ProcessAudioData(data, size);
+        UnityAudioTrackSource* source = static_cast<UnityAudioTrackSource*>(track->GetSource());
+
+        //DCHECK_EQ(partial_frame_.size(), bytes_per_frame);
+
+        source->OnData(audio_data,
+            bits_per_sample,
+            sample_rate,
+            number_of_channels,
+            number_of_frames);
+        // m_audioDevice->ProcessAudioData(data, size);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

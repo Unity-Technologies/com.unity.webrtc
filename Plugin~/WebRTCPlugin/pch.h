@@ -64,6 +64,7 @@
 #include "common_video/include/bitrate_adjuster.h"
 
 #include "pc/media_stream_observer.h"
+#include "pc/local_audio_source.h"
 
 #pragma endregion
 

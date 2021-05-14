@@ -7,7 +7,117 @@ namespace unity
 namespace webrtc
 {
 
-    namespace webrtc = ::webrtc;
+    using namespace ::webrtc;
+
+    class UnityAudioTrackSource : public webrtc::LocalAudioSource
+    {
+    public:
+        static rtc::scoped_refptr<UnityAudioTrackSource> Create(const std::string& sTrackName)
+        {
+            rtc::scoped_refptr<UnityAudioTrackSource> source(
+                new rtc::RefCountedObject<UnityAudioTrackSource>(sTrackName));
+            return source;
+        }
+
+        static rtc::scoped_refptr<UnityAudioTrackSource> Create(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
+        {
+            rtc::scoped_refptr<UnityAudioTrackSource> source(
+                new rtc::RefCountedObject<UnityAudioTrackSource>(sTrackName, audio_options));
+            return source;
+        }
+
+        //const cricket::AudioOptions& options() const override { return m_Options; }
+
+        void AddSink(webrtc::AudioTrackSinkInterface* sink) override
+        {
+            m_pAudioTrackSinkInterface = sink;
+        }
+        void RemoveSink(webrtc::AudioTrackSinkInterface* sink) override
+        {
+            m_pAudioTrackSinkInterface = 0;
+        }
+
+        void OnData(const void* pAudioData, int nBitPerSample, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
+        {
+            if (m_pAudioTrackSinkInterface)
+            {
+                m_pAudioTrackSinkInterface->OnData(pAudioData, nBitPerSample, nSampleRate, nNumChannels, nNumFrames);
+            }
+        }
+    protected:
+        UnityAudioTrackSource(const std::string& sTrackName) : m_sTrackName(sTrackName), m_pAudioTrackSinkInterface(0)
+        {
+            //CopyConstraintsIntoAudioOptions(constraints, &m_Options);
+        }
+        UnityAudioTrackSource(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
+        : m_sTrackName(sTrackName)
+        , m_pAudioTrackSinkInterface(0)
+        {
+        }
+        ~UnityAudioTrackSource() override {}
+
+    private:
+        std::string m_sTrackName;
+        //cricket::AudioOptions m_Options;
+        webrtc::AudioTrackSinkInterface* m_pAudioTrackSinkInterface;
+    };
+
+    //void WebRTCConductor::AddStreams()
+    //{
+    //    if (m_ActiveStream.find(g_StreamLabel) != m_ActiveStream.end())
+    //    {
+    //        return;  // Already added.
+    //    }
+
+    //    // Create stream
+    //    rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
+    //        m_pPeerConnectionFactory->CreateLocalMediaStream(g_StreamLabel);
+
+    //    // Create Audio Track 1 
+    //    m_ActiveAudioSources[g_AudioLabel1] = MyLocalAudioSource::Create(g_AudioLabel1, m_WebRTCHandler, NULL);
+    //    rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track1(
+    //        m_pPeerConnectionFactory->CreateAudioTrack(g_AudioLabel1, m_ActiveAudioSources[g_AudioLabel1]));
+    //    // Add audio track to stream
+    //    stream->AddTrack(audio_track1);
+
+    //    // Create Audio Track 2
+    //    m_ActiveAudioSources[g_AudioLabel2] = MyLocalAudioSource::Create(g_AudioLabel2, m_WebRTCHandler, NULL);
+    //    rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track2(
+    //        m_pPeerConnectionFactory->CreateAudioTrack(g_AudioLabel2, m_ActiveAudioSources[g_AudioLabel2]));
+    //    // Add audio track to stream
+    //    stream->AddTrack(audio_track2);
+
+    //    // TODO - switch to using AddTrack API on m_pPeerConnection - since AddStream will eventually be deprecated
+
+    //    if (!m_pPeerConnection->AddStream(stream))
+    //    {
+    //        ss << __FUNCTION__ << ": Adding stream to PeerConnection failed";
+    //        m_WebRTCHandler.onLog(IWebRTCHandler::Error, ss.str().c_str());
+    //    }
+    //    typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > MediaStreamPair;
+    //    m_ActiveStream.insert(MediaStreamPair(stream->label(), stream));
+    //}
+
+    //void WebRTCConductor::SendAudioTrackToWebRTCClient(int nTrackNum, short* pLinearAudio, int nSamples, int nSamplingFreqHz, int nChannels)
+    //{
+    //    auto it = m_ActiveAudioSources.find(nTrackNum == 2 ? g_AudioLabel2 : g_AudioLabel1);
+    //    if (it != m_ActiveAudioSources.end())
+    //    {
+    //        int NumberSamplesFor10ms = nSamplingFreqHz / 100; // eg.  80 for 8KHz and 160 for 16kHz
+    //        assert(nSamples % NumberSamplesFor10ms == 0);
+
+    //        for (int i = 0; i < nSamples / NumberSamplesFor10ms; i++)
+    //        {
+    //            it->second->OnData(&pLinearAudio[i * NumberSamplesFor10ms * nChannels],
+    //                sizeof(pLinearAudio[0]) * 8 * nChannels,  // BitsPerSample
+    //                nSamplingFreqHz,  // SampleRate
+    //                nChannels,
+    //                NumberSamplesFor10ms);   // NumFrames
+    //        }
+    //    }
+    //}
+
+
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {

@@ -376,6 +376,12 @@ namespace Unity.WebRTC
                             track.UpdateReceiveTexture();
                         }
                     }
+
+//                    Debug.Log(AudioStreamTrack.tracks.Count);
+                    foreach (var track in AudioStreamTrack.tracks)
+                    {
+                        track.OnData();
+                    }
                 }
             }
         }
@@ -970,7 +976,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern void ProcessAudio(float[] data, int size);
+        public static extern void ProcessAudio(IntPtr track, float[] data, int bitsPerSample, int sampleRate, int channels, int frames);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]

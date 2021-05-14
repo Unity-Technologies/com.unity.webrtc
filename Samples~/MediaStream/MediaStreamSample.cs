@@ -45,7 +45,7 @@ class MediaStreamSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        Audio.Stop();
+//        Audio.Stop();
         WebRTC.Dispose();
     }
 
@@ -259,7 +259,7 @@ class MediaStreamSample : MonoBehaviour
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
-        Audio.Update(data, data.Length);
+//        Audio.Update(data, data.Length);
     }
 
     private void OnSetLocalSuccess(RTCPeerConnection pc)

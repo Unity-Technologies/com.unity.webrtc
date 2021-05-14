@@ -17,14 +17,14 @@ namespace Unity.WebRTC.RuntimeTest
             WebRTC.Dispose();
         }
 
-        [Test]
-        public void Update()
-        {
-            var stream = Audio.CaptureStream();
-            float[] audioData = new float[128];
-            Audio.Update(audioData, 1);
-            Audio.Stop();
-            stream.Dispose();
-        }
+        //[Test]
+        //public void Update()
+        //{
+        //    var stream = Audio.CaptureStream();
+        //    float[] audioData = new float[128];
+        //    Audio.Update(audioData, 1);
+        //    Audio.Stop();
+        //    stream.Dispose();
+        //}
     }
 }
