@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -359,19 +359,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 150123350}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedPeerBandwidthButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &150123350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -578,19 +566,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 189517638}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedPeerConnectionButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &189517638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -935,19 +911,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 300533286}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedPeerPerfectNegotiationButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &300533286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1367,19 +1331,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 595998596}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedDataChannelButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &595998596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1590,19 +1542,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 711766405}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedMungeSDPButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &711766405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1759,19 +1699,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 775769961}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedMediaStreamButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &775769961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1892,19 +1820,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 811312174}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedPeerTrickleIceButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &811312174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2183,19 +2099,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 904471626}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedStatsButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &904471626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2518,6 +2422,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggleEnableHWCodec: {fileID: 1730536247}
   toggleLimitTextureSize: {fileID: 158143828}
+  buttonPeerConnection: {fileID: 189517637}
+  buttonDataChannel: {fileID: 595998595}
+  buttonMediaStream: {fileID: 775769960}
+  buttonMultiPeers: {fileID: 1661926939}
+  buttonMultiVideoRecv: {fileID: 2123867963}
+  buttonMungeSDP: {fileID: 711766404}
+  buttonStats: {fileID: 904471625}
+  buttonChangeCodecs: {fileID: 1781638544}
+  buttonTrickleIce: {fileID: 811312173}
+  buttonVideoReceive: {fileID: 1402485154}
+  buttonBandwidth: {fileID: 150123349}
+  buttonPerfectNegotiation: {fileID: 300533285}
 --- !u!1 &1296462995
 GameObject:
   m_ObjectHideFlags: 0
@@ -2679,19 +2595,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1402485155}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedPeerVideoReceiveButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1402485155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3465,19 +3369,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1661926940}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedMultiPeersButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1661926940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3759,19 +3651,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1781638545}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedPeerChangeCodecsButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1781638545
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4181,7 +4061,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 65202133}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.93666667
+  m_Size: 0.7086667
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4460,19 +4340,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2123867964}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1227338011}
-        m_TargetAssemblyTypeName: Unity.WebRTC.Samples.SceneSelectUI, Unity.WebRTC.Samples
-        m_MethodName: OnPressedMultiVideoRecvButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2123867964
 MonoBehaviour:
   m_ObjectHideFlags: 0
