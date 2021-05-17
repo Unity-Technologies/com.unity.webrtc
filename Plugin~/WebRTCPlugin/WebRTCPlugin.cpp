@@ -246,7 +246,7 @@ extern "C"
     {
 #if !CUDA_PLATFORM
         return false;
-#endif
+#else
         IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
         void* pEncoder = nullptr;
         if (!NvEncoder::CreateEncoder(&pEncoder, device))
@@ -256,6 +256,7 @@ extern "C"
         if (!NvEncoder::DestroyEncoder(pEncoder))
             return false;
         return true;
+#endif
     }
 
     UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
