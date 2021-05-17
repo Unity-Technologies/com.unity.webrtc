@@ -31,6 +31,18 @@ namespace Unity.WebRTC.Samples
     {
         [SerializeField] private Toggle toggleEnableHWCodec;
         [SerializeField] private Toggle toggleLimitTextureSize;
+        [SerializeField] private Button buttonPeerConnection;
+        [SerializeField] private Button buttonDataChannel;
+        [SerializeField] private Button buttonMediaStream;
+        [SerializeField] private Button buttonMultiPeers;
+        [SerializeField] private Button buttonMultiVideoRecv;
+        [SerializeField] private Button buttonMungeSDP;
+        [SerializeField] private Button buttonStats;
+        [SerializeField] private Button buttonChangeCodecs;
+        [SerializeField] private Button buttonTrickleIce;
+        [SerializeField] private Button buttonVideoReceive;
+        [SerializeField] private Button buttonBandwidth;
+        [SerializeField] private Button buttonPerfectNegotiation;
 
         void Start()
         {
@@ -38,6 +50,19 @@ namespace Unity.WebRTC.Samples
             toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
             toggleEnableHWCodec.onValueChanged.AddListener(OnChangeHWCodec);
             toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
+
+            buttonPeerConnection.onClick.AddListener(OnPressedPeerConnectionButton);
+            buttonDataChannel.onClick.AddListener(OnPressedDataChannelButton);
+            buttonMediaStream.onClick.AddListener(OnPressedMediaStreamButton);
+            buttonMultiPeers.onClick.AddListener(OnPressedMultiPeersButton);
+            buttonMultiVideoRecv.onClick.AddListener(OnPressedMultiVideoRecvButton);
+            buttonMungeSDP.onClick.AddListener(OnPressedMungeSDPButton);
+            buttonStats.onClick.AddListener(OnPressedStatsButton);
+            buttonChangeCodecs.onClick.AddListener(OnPressedChangeCodecsButton);
+            buttonTrickleIce.onClick.AddListener(OnPressedTrickleIceButton);
+            buttonVideoReceive.onClick.AddListener(OnPressedVideoReceiveButton);
+            buttonBandwidth.onClick.AddListener(OnPressedBandwidthButton);
+            buttonPerfectNegotiation.onClick.AddListener(OnPressedPerfectNegotiationButton);
         }
 
         private void OnChangeHWCodec(bool enable)
@@ -50,51 +75,51 @@ namespace Unity.WebRTC.Samples
             WebRTCSettings.LimitTextureSize = enable;
         }
 
-        public void OnPressedPeerConnectionButton()
+        private void OnPressedPeerConnectionButton()
         {
             SceneManager.LoadScene("PeerConnection", LoadSceneMode.Single);
         }
-        public void OnPressedDataChannelButton()
+        private void OnPressedDataChannelButton()
         {
             SceneManager.LoadScene("DataChannel", LoadSceneMode.Single);
         }
-        public void OnPressedMediaStreamButton()
+        private void OnPressedMediaStreamButton()
         {
             SceneManager.LoadScene("MediaStream", LoadSceneMode.Single);
         }
-        public void OnPressedMultiPeersButton()
+        private void OnPressedMultiPeersButton()
         {
             SceneManager.LoadScene("MultiplePeerConnections", LoadSceneMode.Single);
         }
-        public void OnPressedMultiVideoRecvButton()
+        private void OnPressedMultiVideoRecvButton()
         {
             SceneManager.LoadScene("MultiVideoReceive", LoadSceneMode.Single);
         }
-        public void OnPressedMungeSDPButton()
+        private void OnPressedMungeSDPButton()
         {
             SceneManager.LoadScene("MungeSDP", LoadSceneMode.Single);
         }
-        public void OnPressedStatsButton()
+        private void OnPressedStatsButton()
         {
             SceneManager.LoadScene("Stats", LoadSceneMode.Single);
         }
-        public void OnPressedPeerChangeCodecsButton()
+        private void OnPressedChangeCodecsButton()
         {
             SceneManager.LoadScene("ChangeCodecs", LoadSceneMode.Single);
         }
-        public void OnPressedPeerTrickleIceButton()
+        private void OnPressedTrickleIceButton()
         {
             SceneManager.LoadScene("TrickleIce", LoadSceneMode.Single);
         }
-        public void OnPressedPeerVideoReceiveButton()
+        private void OnPressedVideoReceiveButton()
         {
             SceneManager.LoadScene("VideoReceive", LoadSceneMode.Single);
         }
-        public void OnPressedPeerBandwidthButton()
+        private void OnPressedBandwidthButton()
         {
             SceneManager.LoadScene("Bandwidth", LoadSceneMode.Single);
         }
-        public void OnPressedPeerPerfectNegotiationButton()
+        private void OnPressedPerfectNegotiationButton()
         {
             SceneManager.LoadScene("PerfectNegotiation", LoadSceneMode.Single);
         }
