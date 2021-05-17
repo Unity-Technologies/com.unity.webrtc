@@ -81,8 +81,11 @@ namespace webrtc
         nvEncInitializeParams.reportSliceOffsets = 0;
         nvEncInitializeParams.enableSubFrameWrite = 0;
         nvEncInitializeParams.encodeConfig = &nvEncConfig;
-        nvEncInitializeParams.maxEncodeWidth = 3840;
-        nvEncInitializeParams.maxEncodeHeight = 2160;
+
+        // Note:: Encoder will not allow dynamic resolution change.
+        // Please set values if you want to support dynamic resolution change.
+        nvEncInitializeParams.maxEncodeWidth = 0;
+        nvEncInitializeParams.maxEncodeHeight = 0;
 #pragma endregion
 #pragma region get preset config and set it
         NV_ENC_PRESET_CONFIG presetConfig = { 0 };
