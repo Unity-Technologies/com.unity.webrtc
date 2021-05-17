@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Unity.WebRTC.NvEnc;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
@@ -423,12 +422,12 @@ namespace Unity.WebRTC
             }
 
             // Check NVCodec capabilities
-            if (encoderType == EncoderType.Hardware && Util.SupportedPlatdorm(platform))
+            if (encoderType == EncoderType.Hardware && NvEnc.SupportedPlatdorm(platform))
             {
-                int minWidth = Util.GetCodecCapabilities(Codec.H264, Caps.NV_ENC_CAPS_WIDTH_MIN);
-                int maxWidth = Util.GetCodecCapabilities(Codec.H264, Caps.NV_ENC_CAPS_WIDTH_MAX);
-                int minHeight = Util.GetCodecCapabilities(Codec.H264, Caps.NV_ENC_CAPS_HEIGHT_MIN);
-                int maxHeight = Util.GetCodecCapabilities(Codec.H264, Caps.NV_ENC_CAPS_HEIGHT_MAX);
+                int minWidth = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_WIDTH_MIN);
+                int maxWidth = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_WIDTH_MAX);
+                int minHeight = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_HEIGHT_MIN);
+                int maxHeight = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_HEIGHT_MAX);
 
                 if (width < minWidth || maxWidth < width ||
                     height < minHeight || maxHeight < height)
