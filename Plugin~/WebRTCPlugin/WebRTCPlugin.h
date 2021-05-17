@@ -108,6 +108,11 @@ namespace webrtc
         Video
     };
 
+    enum class Codec
+    {
+        H264,
+        HEVC
+    };
 
     struct RTCSessionDescription
     {

@@ -57,9 +57,7 @@ namespace webrtc
         openEncodeSessionExParams.deviceType = m_deviceType;
         openEncodeSessionExParams.apiVersion = NVENCAPI_VERSION;
 
-        void* hEncoder = nullptr;
-        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &hEncoder);
-        pEncoderInterface = hEncoder;
+        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &pEncoderInterface);
 
         if(!NV_RESULT(errorCode))
         {
@@ -86,7 +84,7 @@ namespace webrtc
         nvEncInitializeParams.maxEncodeWidth = 3840;
         nvEncInitializeParams.maxEncodeHeight = 2160;
 #pragma endregion
-#pragma region get preset ocnfig and set it
+#pragma region get preset config and set it
         NV_ENC_PRESET_CONFIG presetConfig = { 0 };
         presetConfig.version = NV_ENC_PRESET_CONFIG_VER;
         presetConfig.presetCfg.version = NV_ENC_CONFIG_VER;
@@ -134,6 +132,70 @@ namespace webrtc
             checkf(NV_RESULT(errorCode), StringFormat("Failed to destroy NV encoder interface %d", errorCode).c_str());
             pEncoderInterface = nullptr;
         }
+    }
+
+    bool NvEncoder::CreateEncoder(void** pEncoder, IGraphicsDevice* device)
+    {
+        NV_ENC_DEVICE_TYPE type;
+        switch(device->GetDeviceType())
+        {
+        case GRAPHICS_DEVICE_D3D11:
+        case GRAPHICS_DEVICE_D3D12:
+            type = NV_ENC_DEVICE_TYPE_DIRECTX;
+            break;
+        case GRAPHICS_DEVICE_OPENGL:
+            type = NV_ENC_DEVICE_TYPE_OPENGL;
+            break;
+        case GRAPHICS_DEVICE_VULKAN:
+            type = NV_ENC_DEVICE_TYPE_CUDA;
+            break;
+        }
+
+        //open an encode session
+        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncodeSessionExParams = { 0 };
+        openEncodeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
+        openEncodeSessionExParams.device = device->GetEncodeDevicePtrV();
+        openEncodeSessionExParams.deviceType = type;
+        openEncodeSessionExParams.apiVersion = NVENCAPI_VERSION;
+
+        if (!pNvEncodeAPI)
+            LoadCodec();
+        if(!NV_RESULT(pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, pEncoder)))
+            return false;
+        return true;
+    }
+
+    bool NvEncoder::DestroyEncoder(void* pEncoder)
+    {
+        if (pEncoder != nullptr)
+        {
+            if (!NV_RESULT(pNvEncodeAPI->nvEncDestroyEncoder(pEncoder)))
+                return false;
+        }
+        return true;
+    }
+
+    bool NvEncoder::GetCapabilityValue(void* pEncoder, Codec codec, int32_t capsToQuery, int32_t* value)
+    {
+        if (pEncoder == nullptr)
+            return false;
+
+        GUID guidCodec;
+        switch(codec)
+        {
+            case Codec::H264:
+                guidCodec = NV_ENC_CODEC_H264_GUID;
+                break;
+            case Codec::HEVC:
+                guidCodec = NV_ENC_CODEC_HEVC_GUID;
+                break;
+        }
+
+        NV_ENC_CAPS_PARAM capsParam = { NV_ENC_CAPS_PARAM_VER };
+        capsParam.capsToQuery = static_cast<NV_ENC_CAPS>(capsToQuery);
+        if (!NV_RESULT(pNvEncodeAPI->nvEncGetEncodeCaps(pEncoder, guidCodec, &capsParam, value)))
+            return false;
+        return true;
     }
 
     CodecInitializationResult NvEncoder::LoadCodec()
