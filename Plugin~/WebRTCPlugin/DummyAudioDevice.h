@@ -1,5 +1,6 @@
 #pragma once
 
+#include "WebRTCPlugin.h"
 #include "api/task_queue/default_task_queue_factory.h"
 
 namespace unity
@@ -9,7 +10,40 @@ namespace webrtc
 
     using namespace ::webrtc;
 
-    class UnityAudioTrackSource : public webrtc::LocalAudioSource
+    class AudioTrackSinkAdapter : public webrtc::AudioTrackSinkInterface
+    {
+    public:
+        AudioTrackSinkAdapter(AudioTrackInterface* track, DelegateAudioReceive callback)
+            : _track(track), _callback(callback)
+        {
+        }
+        ~AudioTrackSinkAdapter() override
+        {
+        }
+
+        void OnData(const void* audio_data, int bits_per_sample, int sample_rate, size_t number_of_channels, size_t number_of_frames) override
+        {
+            if(_callback != nullptr)
+            {
+                size_t size = number_of_frames * number_of_channels;
+                //RTC_LOG(LS_INFO) << "size:" << size << "number_of_frames:" << number_of_frames;
+
+                _callback(
+                    _track,
+                    audio_data,
+                    size,
+                    bits_per_sample,
+                    sample_rate,
+                    number_of_channels,
+                    number_of_frames);
+            }
+        }
+    private:
+        AudioTrackInterface* _track;
+        DelegateAudioReceive _callback;
+    };
+
+    class UnityAudioTrackSource : public webrtc::LocalAudioSource, public webrtc::AudioTrackSinkInterface
     {
     public:
         static rtc::scoped_refptr<UnityAudioTrackSource> Create(const std::string& sTrackName)
@@ -26,38 +60,53 @@ namespace webrtc
             return source;
         }
 
-        //const cricket::AudioOptions& options() const override { return m_Options; }
+        //void AddSink(webrtc::AudioTrackSinkInterface* sink) override
+        //{
+        //    m_pAudioTrackSinkInterface = sink;
+        //}
+        //void RemoveSink(webrtc::AudioTrackSinkInterface* sink) override
+        //{
+        //    m_pAudioTrackSinkInterface = 0;
+        //}
 
-        void AddSink(webrtc::AudioTrackSinkInterface* sink) override
+        void OnData(const void* pAudioData, int nBitPerSample, int nSampleRate, size_t nNumChannels, size_t nNumFrames) override
         {
-            m_pAudioTrackSinkInterface = sink;
-        }
-        void RemoveSink(webrtc::AudioTrackSinkInterface* sink) override
-        {
-            m_pAudioTrackSinkInterface = 0;
-        }
+            RTC_LOG(LS_INFO) << "bitPerSample:" << nBitPerSample << "\n"
+                << "sampleRate" << nSampleRate << "\n"
+                << "channels" << nNumChannels << "\n"
+                << "numFrames" << nNumFrames;
 
-        void OnData(const void* pAudioData, int nBitPerSample, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
-        {
-            if (m_pAudioTrackSinkInterface)
-            {
-                m_pAudioTrackSinkInterface->OnData(pAudioData, nBitPerSample, nSampleRate, nNumChannels, nNumFrames);
-            }
+            //if (m_pAudioTrackSinkInterface)
+            //{
+
+            //    //todo(kazuki):: buffering audio
+            //    size_t nNumFrames_ = nSampleRate / 100;
+
+            //    m_pAudioTrackSinkInterface->OnData(pAudioData, nBitPerSample, nSampleRate, nNumChannels, nNumFrames_);
+            //}
         }
     protected:
         UnityAudioTrackSource(const std::string& sTrackName) : m_sTrackName(sTrackName), m_pAudioTrackSinkInterface(0)
         {
+            RTC_LOG(LS_INFO) << "UnityAudioTrackSource:Constructor";
+            AddSink(this);
             //CopyConstraintsIntoAudioOptions(constraints, &m_Options);
         }
         UnityAudioTrackSource(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
         : m_sTrackName(sTrackName)
         , m_pAudioTrackSinkInterface(0)
         {
+            RTC_LOG(LS_INFO) << "UnityAudioTrackSource:Constructor";
+            AddSink(this);
         }
-        ~UnityAudioTrackSource() override {}
+        ~UnityAudioTrackSource() override
+        {
+            RemoveSink(this);
+        }
 
     private:
         std::string m_sTrackName;
+        std::unique_ptr<AudioTrackSinkAdapter> _sink;
         //cricket::AudioOptions m_Options;
         webrtc::AudioTrackSinkInterface* m_pAudioTrackSinkInterface;
     };
@@ -123,6 +172,34 @@ namespace webrtc
     {
     public:
         void ProcessAudioData(const float* data, int32 size);
+        void PullAudioData(const size_t nBitsPerSamples,
+            const size_t nSampleRate,
+            const size_t nChannels,
+            const uint32_t samplesPerSec,
+            void* audioSamples,
+//            size_t& nSamplesOut,
+            int64_t* elapsed_time_ms,
+            int64_t* ntp_time_ms)
+        {
+            // Get 10ms audio and copy result to temporary byte buffer.
+            //render_buffer_.resize(audio_bus->frames() * audio_bus->channels());
+            //constexpr int kBytesPerSample = 2;
+            //static_assert(sizeof(render_buffer_[0]) == kBytesPerSample,
+            //    "kBytesPerSample and FromInterleaved expect 2 bytes.");
+            //int64_t elapsed_time_ms = -1;
+            //int64_t ntp_time_ms = -1;
+            //int16_t* audio_data = render_buffer_.data();
+
+            audio_transport_->PullRenderData(
+                nBitsPerSamples,
+                nSampleRate,
+                nChannels,
+                samplesPerSec,
+                audioSamples,
+//                nSamplesOut,
+                elapsed_time_ms,
+                ntp_time_ms);
+        }
 
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
@@ -132,9 +209,12 @@ namespace webrtc
             return 0;
         }
         // Full-duplex transportation of PCM audio
-        virtual int32 RegisterAudioCallback(webrtc::AudioTransport* audioCallback) override
+        virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
-            deviceBuffer->RegisterAudioCallback(audioCallback);
+            RTC_LOG(LS_INFO) << "RegisterAudioCallback";
+            deviceBuffer->RegisterAudioCallback(transport);
+
+            audio_transport_ = transport;
             return 0;
         }
 
@@ -418,6 +498,8 @@ namespace webrtc
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
+
+        webrtc::AudioTransport* audio_transport_ = nullptr;
     };
 
 } // end namespace webrtc

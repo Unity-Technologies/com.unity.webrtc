@@ -401,16 +401,6 @@ extern "C"
         track->RemoveSink(sink);
     }
 
-    UNITY_INTERFACE_EXPORT void AudioTrackAddSink(AudioTrackInterface* track, AudioTrackSinkInterface* sink)
-    {
-        track->AddSink(sink);
-    }
-
-    UNITY_INTERFACE_EXPORT void AudioTrackRemoveSink(AudioTrackInterface* track, AudioTrackSinkInterface* sink)
-    {
-        track->RemoveSink(sink);
-    }
-
     UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func)
     {
         delegateDebugLog = func;
@@ -1340,8 +1330,28 @@ extern "C"
             sample_rate,
             number_of_channels,
             number_of_frames);
+    }
 
-        //context->ProcessAudioData(data, size);
+    UNITY_INTERFACE_EXPORT void ProcessAudioADM(
+        float* audio_data,
+        int32 size)
+    {
+        ContextManager::GetInstance()->curContext->ProcessAudioData(audio_data, size);
+        ContextManager::GetInstance()->curContext->PullAudioData(audio_data, size);
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(
+        Context* context, AudioTrackInterface* track, DelegateAudioReceive callback)
+    {
+        context->RegisterAudioReceiveCallback(track, callback);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextUnregisterAudioReceiveCallback(
+        Context* context, AudioTrackInterface* track)
+    {
+        context->UnregisterAudioReceiveCallback(track);
     }
 }
 

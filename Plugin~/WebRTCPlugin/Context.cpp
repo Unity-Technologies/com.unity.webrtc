@@ -170,7 +170,9 @@ namespace webrtc
 
         rtc::InitializeSSL();
 
-        m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        //m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+
+        //m_adm = new rtc::RefCountedObject<blink::WebRtcAudioDeviceImpl>();
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
@@ -186,7 +188,7 @@ namespace webrtc
                                 m_workerThread.get(),
                                 m_workerThread.get(),
                                 m_signalingThread.get(),
-                                m_audioDevice,
+                                nullptr,
                                 webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
                                 webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
                                 std::move(videoEncoderFactory),
@@ -365,11 +367,8 @@ namespace webrtc
         //const rtc::scoped_refptr<AudioSourceInterface> source =
         //    m_peerConnectionFactory->CreateAudioSource(audioOptions);
 
-        //sinkAdapter = std::make_unique<AudioSinkAdapter>();
-        //source->AddSink(sinkAdapter.get());
         const rtc::scoped_refptr<UnityAudioTrackSource> source =
             UnityAudioTrackSource::Create("audio");
-
 
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
@@ -389,30 +388,63 @@ namespace webrtc
         }
     }
 
-    //UnityAudioTrackSource* Context::CreateAudioSource()
-    //{
-    //    
-    //}
-
-    void Context::ProcessAudioData(
-        AudioTrackInterface* track,
-        const float* audio_data,
-        int32 sample_rate,
-        int32 bits_per_sample,
-        int32 number_of_channels,
-        int32 number_of_frames
-        )
+    void Context::RegisterAudioReceiveCallback(
+        AudioTrackInterface* track, DelegateAudioReceive callback)
     {
-        UnityAudioTrackSource* source = static_cast<UnityAudioTrackSource*>(track->GetSource());
+        if (m_mapAudioTrackAndSink.find(track) != m_mapAudioTrackAndSink.end())
+        {
+            RTC_LOG(LS_WARNING) << "The callback is already registered.";
+            return;
+        }
 
-        //DCHECK_EQ(partial_frame_.size(), bytes_per_frame);
+        std::unique_ptr<AudioTrackSinkAdapter> sink =
+            std::make_unique<AudioTrackSinkAdapter>(track, callback);
 
-        source->OnData(audio_data,
-            bits_per_sample,
-            sample_rate,
-            number_of_channels,
-            number_of_frames);
-        // m_audioDevice->ProcessAudioData(data, size);
+        track->AddSink(sink.get());
+        m_mapAudioTrackAndSink[track] = std::move(sink);
+    }
+
+    void Context::UnregisterAudioReceiveCallback(
+        AudioTrackInterface* track)
+    {
+        if (m_mapAudioTrackAndSink.find(track) == m_mapAudioTrackAndSink.end())
+            return;
+
+        AudioTrackSinkInterface* sink = m_mapAudioTrackAndSink[track].get();
+        track->RemoveSink(sink);
+        m_mapAudioTrackAndSink.erase(track);
+    }
+
+    void Context::ProcessAudioData(const float* data, int32 size)
+    {
+        if (m_audioDevice == nullptr)
+            return;
+        m_audioDevice->ProcessAudioData(data, size);
+    }
+
+    void Context::PullAudioData(const float* data, int32 size)
+    {
+        if (m_audioDevice == nullptr)
+            return;
+
+        size_t nBytesPerSample = 2;
+        size_t nSampleRate = 44100;
+        size_t nChannels = 1;
+        const int frames_per_10_ms = nSampleRate / 100;
+        int64_t elapsed_time_ms = -1;
+        int64_t ntp_time_ms = -1;
+        int16_t* audio_data = new int16_t[frames_per_10_ms * nChannels];
+
+        m_audioDevice->PullAudioData(
+            nBytesPerSample * 8,
+            nSampleRate,
+            nChannels,
+            frames_per_10_ms,
+            audio_data,
+            &elapsed_time_ms,
+            &ntp_time_ms);
+
+        delete audio_data;
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

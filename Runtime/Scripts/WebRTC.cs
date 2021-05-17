@@ -714,6 +714,10 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeMediaStreamOnAddTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateAudioReceive(
+        IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
+        int bitsPerSample, int sampleRate, int numOfChannels, int numOfFrames);
 
     internal static class NativeMethods
     {
@@ -931,6 +935,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextUnRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
+        public static extern void ContextRegisterAudioReceiveCallback(IntPtr context, IntPtr track, DelegateAudioReceive callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextUnregisterAudioReceiveCallback(IntPtr context, IntPtr track);
+        [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -977,6 +985,8 @@ namespace Unity.WebRTC
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(IntPtr track, float[] data, int bitsPerSample, int sampleRate, int channels, int frames);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ProcessAudioADM(float[] data, int size);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]

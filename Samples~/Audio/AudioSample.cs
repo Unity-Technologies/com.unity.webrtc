@@ -38,6 +38,7 @@ namespace Unity.WebRTC
     public class AudioSample : MonoBehaviour
     {
         [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioSource receiverAudioSource;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
@@ -47,11 +48,7 @@ namespace Unity.WebRTC
         [SerializeField] private Text textMaxFrequency;
 
         private RTCPeerConnection _pc1, _pc2;
-        private MediaStream videoStream, receiveStream;
-        //private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
-        //private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
-        //private DelegateOnIceCandidate pc1OnIceCandidate;
-        //private DelegateOnIceCandidate pc2OnIceCandidate;
+        private MediaStream _receiveStream;
         private DelegateOnTrack pc2Ontrack;
         private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
 
@@ -108,31 +105,20 @@ namespace Unity.WebRTC
 
         void OnCall()
         {
+            _receiveStream = new MediaStream();
+            _receiveStream.OnAddTrack = e => (e.Track as AudioStreamTrack).OnAudioReceived += OnAudioReceived;
+
             var configuration = GetSelectedSdpSemantics();
             _pc1 = new RTCPeerConnection(ref configuration)
             {
-                OnIceCandidate = candidate =>
-                {
-//                    Debug.Log("OnIceCandidate 1");
-                    _pc2.AddIceCandidate(candidate);
-                },
-//                OnIceConnectionChange = pc1OnIceConnectionChange,
+                OnIceCandidate = candidate => _pc2.AddIceCandidate(candidate),
                 OnNegotiationNeeded = () => StartCoroutine(PeerNegotiationNeeded(_pc1))
-        };
+            };
 
             _pc2 = new RTCPeerConnection(ref configuration)
             {
-                OnIceCandidate = candidate =>
-                {
-//                    Debug.Log("OnIceCandidate 2");
-                    _pc1.AddIceCandidate(candidate);
-                },
-//                OnIceConnectionChange = pc2OnIceConnectionChange,
-                OnTrack = e =>
-                {
-                    Debug.Log("Track.Kind:" + e.Track.Kind);
-                    m_receiverTrack = e.Track as AudioStreamTrack;
-                }
+                OnIceCandidate = candidate => _pc1.AddIceCandidate(candidate),
+                OnTrack = e => _receiveStream.AddTrack(e.Track),
             };
 
             var transceiver = _pc2.AddTransceiver(TrackKind.Audio);
@@ -141,6 +127,23 @@ namespace Unity.WebRTC
             m_audioTrack = new AudioStreamTrack("audio", audioSource);
             _pc1.AddTrack(m_audioTrack);
         }
+
+        void OnAudioReceived(float[] data, int bitsPerSample, int sampleRate, int numOfChannels, int numOfFrames)
+        {
+            Debug.Log($"data.Length {data.Length}, " +
+                      $"bitsPerSample {bitsPerSample}, " +
+                      $"sampleRate {sampleRate}, " +
+                      $"numOfChannels {numOfChannels}, " +
+                      $"numOfFrames {numOfFrames}");
+        }
+
+        //private void OnAudioFilterRead(float[] data, int channels)
+        //{
+        //    if (m_audioTrack != null)
+        //    {
+        //        Audio.Update(data, channels);
+        //    }
+        //}
 
         void OnHangUp()
         {

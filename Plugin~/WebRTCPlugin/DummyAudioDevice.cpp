@@ -10,6 +10,8 @@ namespace webrtc
     {
         if (started && isRecording)
         {
+//            RTC_LOG(LS_INFO) << "DummyAudioDevice::ProcessAudioData";
+
             for (int i = 0; i < size; i++)
             {
 #pragma warning (suppress: 4244)

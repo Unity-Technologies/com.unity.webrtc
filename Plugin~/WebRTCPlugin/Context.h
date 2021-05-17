@@ -81,14 +81,11 @@ namespace webrtc
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
 
-        void ProcessAudioData(
-            AudioTrackInterface* track,
-            const float* audio_data,
-            int32 sample_rate,
-            int32 bits_per_sample,
-            int32 number_of_channels,
-            int32 number_of_frames);
-
+        void RegisterAudioReceiveCallback(
+            AudioTrackInterface* track, DelegateAudioReceive callback);
+        void UnregisterAudioReceiveCallback(AudioTrackInterface* track);
+        void ProcessAudioData(const float* data, int32 size);
+        void PullAudioData(const float* data, int32 size);
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
         void DeletePeerConnection(PeerConnectionObject* obj);
@@ -136,6 +133,7 @@ namespace webrtc
         std::unique_ptr<rtc::Thread> m_signalingThread;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
+//        rtc::scoped_refptr <blink::WebRtcAudioDeviceImpl> m_adm;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> m_audioTrack;
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> m_mediaSteamTrackList;
         std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;
@@ -146,6 +144,8 @@ namespace webrtc
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
+
+        std::map<webrtc::AudioTrackInterface*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
 
         //std::unique_ptr<AudioSinkAdapter> sinkAdapter;
 
