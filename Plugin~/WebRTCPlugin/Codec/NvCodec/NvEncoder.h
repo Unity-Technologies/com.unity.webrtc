@@ -9,8 +9,6 @@ namespace unity
 {
 namespace webrtc
 {
-    enum class Codec;
-
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class ITexture2D;
     class IGraphicsDevice;
@@ -48,10 +46,6 @@ namespace webrtc
         static uint32_t GetNumChromaPlanes(NV_ENC_BUFFER_FORMAT);
         static uint32_t GetChromaHeight(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t lumaHeight);
         static uint32_t GetWidthInBytes(const NV_ENC_BUFFER_FORMAT bufferFormat, const uint32_t width);
-
-        static bool CreateEncoder(void** pEncoder, IGraphicsDevice* device);
-        static bool DestroyEncoder(void* pEncoder);
-        static bool GetCapabilityValue(void* pEncoder, Codec guidCodec, int32_t capsToQuery, int32_t* value);
 
         void InitV() override;
         void SetRates(uint32_t bitRate, int64_t frameRate) override;

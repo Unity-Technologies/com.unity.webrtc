@@ -7,10 +7,6 @@
 #include "Codec/EncoderFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
-#if CUDA_PLATFORM
-#include "Codec/NvCodec/NvEncoder.h"
-#endif
-
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
 #endif
@@ -240,23 +236,6 @@ extern "C"
         }
 #endif
         return EncoderFactory::GetHardwareEncoderSupport();
-    }
-
-    UNITY_INTERFACE_EXPORT bool GetCodecCapabilities(Codec codec, int32_t caps, int32_t* value)
-    {
-#if !CUDA_PLATFORM
-        return false;
-#else
-        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
-        void* pEncoder = nullptr;
-        if (!NvEncoder::CreateEncoder(&pEncoder, device))
-            return false;
-        if (!NvEncoder::GetCapabilityValue(pEncoder, codec, caps, value))
-            return false;
-        if (!NvEncoder::DestroyEncoder(pEncoder))
-            return false;
-        return true;
-#endif
     }
 
     UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)

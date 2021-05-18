@@ -422,12 +422,14 @@ namespace Unity.WebRTC
             }
 
             // Check NVCodec capabilities
-            if (encoderType == EncoderType.Hardware && NvEnc.SupportedPlatdorm(platform))
+            // todo(kazuki):: The constant values should be replaced by values that are got from NvCodec API.
+            // Use "nvEncGetEncodeCaps" function which is provided by the NvCodec API.
+            if (encoderType == EncoderType.Hardware && NvEncSupportedPlatdorm(platform))
             {
-                int minWidth = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_WIDTH_MIN);
-                int maxWidth = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_WIDTH_MAX);
-                int minHeight = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_HEIGHT_MIN);
-                int maxHeight = NvEnc.GetCodecCapabilities(NvEnc.Codec.H264, NvEnc.Caps.NV_ENC_CAPS_HEIGHT_MAX);
+                const int minWidth = 145;
+                const int maxWidth = 4096;
+                const int minHeight = 49;
+                const int maxHeight = 4096;
 
                 if (width < minWidth || maxWidth < width ||
                     height < minHeight || maxHeight < height)
@@ -540,6 +542,19 @@ namespace Unity.WebRTC
                 this.ptr = ptr;
                 this.callback = callback;
             }
+        }
+
+        static bool NvEncSupportedPlatdorm(RuntimePlatform platform)
+        {
+            switch (platform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.LinuxPlayer:
+                    return true;
+            }
+            return false;
         }
 
         internal static void Sync(IntPtr ptr, Action callback)
@@ -692,9 +707,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetHardwareEncoderSupport();
-        [DllImport(WebRTC.Lib)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetCodecCapabilities(NvEnc.Codec guid, NvEnc.Caps caps, out int value);
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
         [DllImport(WebRTC.Lib)]
