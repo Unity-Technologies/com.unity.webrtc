@@ -459,9 +459,8 @@ namespace Unity.WebRTC
                 {
                     case GraphicsDeviceType.Direct3D11:
                     case GraphicsDeviceType.Direct3D12:
-                        return GraphicsFormat.B8G8R8A8_SRGB;
                     case GraphicsDeviceType.Vulkan:
-                        return GraphicsFormat.R8G8B8A8_SRGB;
+                        return GraphicsFormat.B8G8R8A8_SRGB;
                     case GraphicsDeviceType.OpenGLCore:
                     case GraphicsDeviceType.OpenGLES2:
                     case GraphicsDeviceType.OpenGLES3:
@@ -476,9 +475,8 @@ namespace Unity.WebRTC
                 {
                     case GraphicsDeviceType.Direct3D11:
                     case GraphicsDeviceType.Direct3D12:
-                        return GraphicsFormat.B8G8R8A8_UNorm;
                     case GraphicsDeviceType.Vulkan:
-                        return GraphicsFormat.R8G8B8A8_UNorm;
+                        return GraphicsFormat.B8G8R8A8_UNorm;
                     case GraphicsDeviceType.OpenGLCore:
                     case GraphicsDeviceType.OpenGLES2:
                     case GraphicsDeviceType.OpenGLES3:
