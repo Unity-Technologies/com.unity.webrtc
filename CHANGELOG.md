@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Fix color space for Vulkan API
+- Fix the color space of the RenderTexture for streaming when using Vulkan API
 - Fix sample scenes
 - Add a short version string to info.plist of ios framework
 
