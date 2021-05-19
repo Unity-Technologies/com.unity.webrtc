@@ -127,6 +127,7 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var track = cam.CaptureStreamTrack(1280, 720, 1000000);
+            Assert.That(track, Is.Not.Null);
             yield return new WaitForSeconds(0.1f);
             track.Dispose();
             // wait for disposing video track.
@@ -134,6 +135,18 @@ namespace Unity.WebRTC.RuntimeTest
 
             Object.DestroyImmediate(camObj);
         }
+
+        [Test]
+        [Category("MediaStreamTrack")]
+        public void CaptureStreamTrackThrowExeption()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            Assert.That(() => cam.CaptureStreamTrack(0, 0, 1000000), Throws.ArgumentException);
+
+            Object.DestroyImmediate(camObj);
+        }
+
 
         [Test]
         [Category("MediaStreamTrack")]
