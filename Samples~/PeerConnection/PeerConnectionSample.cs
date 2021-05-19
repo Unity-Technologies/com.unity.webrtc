@@ -298,6 +298,7 @@ class PeerConnectionSample : MonoBehaviour
         {
             var error = op.Error;
             OnSetSessionDescriptionError(ref error);
+            yield break;
         }
 
         var otherPc = GetOtherPc(pc);
@@ -312,6 +313,7 @@ class PeerConnectionSample : MonoBehaviour
         {
             var error = op2.Error;
             OnSetSessionDescriptionError(ref error);
+            yield break;
         }
 
         Debug.Log($"{GetName(otherPc)} createAnswer start");
@@ -336,9 +338,10 @@ class PeerConnectionSample : MonoBehaviour
         Debug.Log($"{GetName(pc)} SetLocalDescription complete");
     }
 
-    static void OnSetSessionDescriptionError(ref RTCError error)
+    void OnSetSessionDescriptionError(ref RTCError error)
     {
         Debug.LogError($"Error Detail Type: {error.message}");
+        HangUp();
     }
 
     private void OnSetRemoteSuccess(RTCPeerConnection pc)
