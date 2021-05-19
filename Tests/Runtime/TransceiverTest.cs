@@ -111,7 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("RTCRtpTransceiver")]
-        public void TransceiverSetCodecPreferences()
+        public void TransceiverSetVideoCodecPreferences()
         {
             var peer = new RTCPeerConnection();
             var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
@@ -119,5 +119,17 @@ namespace Unity.WebRTC.RuntimeTest
             var error = transceiver.SetCodecPreferences(capabilities.codecs);
             Assert.AreEqual(RTCErrorType.None, error);
         }
+
+        [Test]
+        [Category("RTCRtpTransceiver")]
+        public void TransceiverSetAudioCodecPreferences()
+        {
+            var peer = new RTCPeerConnection();
+            var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Audio);
+            var transceiver = peer.AddTransceiver(TrackKind.Audio);
+            var error = transceiver.SetCodecPreferences(capabilities.codecs);
+            Assert.AreEqual(RTCErrorType.None, error);
+        }
+
     }
 }
