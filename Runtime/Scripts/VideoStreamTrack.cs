@@ -135,7 +135,7 @@ namespace Unity.WebRTC
         public VideoStreamTrack(string label, IntPtr texturePtr, int width, int height, GraphicsFormat format)
             : base(WebRTC.Context.CreateVideoTrack(label))
         {
-            WebRTC.ValidateTextureSize(width, height, Application.platform);
+            WebRTC.ValidateTextureSize(width, height, Application.platform, WebRTC.GetEncoderType());
             WebRTC.ValidateGraphicsFormat(format);
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());
@@ -174,7 +174,8 @@ namespace Unity.WebRTC
                     UnityEngine.Object.DestroyImmediate(m_sourceTexture);
                 }
 
-                tracks.Remove(this);
+                if(tracks.Contains(this))
+                    tracks.Remove(this);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;

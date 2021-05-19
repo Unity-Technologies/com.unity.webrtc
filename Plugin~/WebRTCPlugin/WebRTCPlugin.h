@@ -108,7 +108,6 @@ namespace webrtc
         Video
     };
 
-
     struct RTCSessionDescription
     {
         RTCSdpType type;

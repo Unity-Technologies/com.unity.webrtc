@@ -44,8 +44,8 @@ class PerfectNegotiationSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        politePeer.Dispose();
-        impolitePeer.Dispose();
+        politePeer?.Dispose();
+        impolitePeer?.Dispose();
         WebRTC.Dispose();
     }
 

@@ -57,9 +57,7 @@ namespace webrtc
         openEncodeSessionExParams.deviceType = m_deviceType;
         openEncodeSessionExParams.apiVersion = NVENCAPI_VERSION;
 
-        void* hEncoder = nullptr;
-        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &hEncoder);
-        pEncoderInterface = hEncoder;
+        errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &pEncoderInterface);
 
         if(!NV_RESULT(errorCode))
         {
@@ -83,10 +81,13 @@ namespace webrtc
         nvEncInitializeParams.reportSliceOffsets = 0;
         nvEncInitializeParams.enableSubFrameWrite = 0;
         nvEncInitializeParams.encodeConfig = &nvEncConfig;
-        nvEncInitializeParams.maxEncodeWidth = 3840;
-        nvEncInitializeParams.maxEncodeHeight = 2160;
+
+        // Note:: Encoder will not allow dynamic resolution change.
+        // Please set values if you want to support dynamic resolution change.
+        nvEncInitializeParams.maxEncodeWidth = 0;
+        nvEncInitializeParams.maxEncodeHeight = 0;
 #pragma endregion
-#pragma region get preset ocnfig and set it
+#pragma region get preset config and set it
         NV_ENC_PRESET_CONFIG presetConfig = { 0 };
         presetConfig.version = NV_ENC_PRESET_CONFIG_VER;
         presetConfig.presetCfg.version = NV_ENC_CONFIG_VER;
