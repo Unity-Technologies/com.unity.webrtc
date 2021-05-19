@@ -209,6 +209,9 @@ class MungeSDPSample : MonoBehaviour
         receiveVideoStream = null;
         receiveImage.texture = null;
 
+        offerSdpInput.text = string.Empty;
+        answerSdpInput.text = string.Empty;
+
         pcLocal.Close();
         pcRemote.Close();
         pcLocal.Dispose();

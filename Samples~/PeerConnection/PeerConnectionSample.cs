@@ -56,7 +56,7 @@ class PeerConnectionSample : MonoBehaviour
     private void Start()
     {
         pc1Senders = new List<RTCRtpSender>();
-        callButton.interactable = true;
+        callButton.interactable = false;
         restartButton.interactable = false;
         hangUpButton.interactable = false;
 
