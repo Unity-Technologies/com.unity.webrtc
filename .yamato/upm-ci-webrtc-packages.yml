@@ -196,7 +196,7 @@ test_webrtc_plugin_all_platform:
   name: Test webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
-    {% if platform.name != "android" -%} # todo(kazuki)
+    {% if platform.name != "android" and platform.name != "ios" %} # todo(kazuki)
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
     {% endfor %}
