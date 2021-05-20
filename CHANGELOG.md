@@ -4,6 +4,20 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.0-exp.2] - 2021-05-21
+
+### Fixed
+
+- Fix the color space of the RenderTexture for streaming when using Vulkan API
+- Fix sample scenes
+- Add a short version string to info.plist of ios framework
+
+### Changed
+
+- Add the validation of the streaming texture size on Android
+- Add the validation of the  streaming when using NvCodec 
+- Use the software video decoder when disabling hardware acceleration
+
 ## [2.4.0-exp.1] - 2021-04-23
 
 ### Added
