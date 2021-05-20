@@ -81,15 +81,12 @@ class BandwidthSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            Debug.LogWarning("Receiver OnTrack");
             receiveStream.AddTrack(e.Track);
         };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
 
         receiveStream.OnAddTrack = e =>
         {
-            Debug.LogWarning("receiveStream");
-
             if (e.Track is VideoStreamTrack track)
             {
                 receiveImage.texture = track.InitializeReceiver(width, height);
@@ -150,7 +147,6 @@ class BandwidthSample : MonoBehaviour
 
     IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
     {
-        Debug.Log($"{GetName(pc)} createOffer start");
         var op = pc.CreateOffer();
         yield return op;
 
@@ -210,15 +206,14 @@ class BandwidthSample : MonoBehaviour
         bandwidthSelector.interactable = true;
         statsField.text = string.Empty;
 
-        Debug.Log("GetSelectedSdpSemantics");
         var configuration = GetSelectedSdpSemantics();
         _pc1 = new RTCPeerConnection(ref configuration);
-        Debug.Log("Created local peer connection object pc1");
+
         _pc1.OnIceCandidate = pc1OnIceCandidate;
         _pc1.OnIceConnectionChange = pc1OnIceConnectionChange;
         _pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
         _pc2 = new RTCPeerConnection(ref configuration);
-        Debug.Log("Created remote peer connection object pc2");
+
         _pc2.OnIceCandidate = pc2OnIceCandidate;
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;

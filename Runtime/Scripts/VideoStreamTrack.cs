@@ -201,6 +201,11 @@ namespace Unity.WebRTC
                     throw new InvalidEnumArgumentException(nameof(depth), (int)depth, typeof(RenderTextureDepth));
             }
 
+            if (width == 0 || height == 0)
+            {
+                throw new ArgumentException("width and height are should be greater than zero.");
+            }
+
             int depthValue = (int)depth;
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);

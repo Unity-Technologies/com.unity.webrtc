@@ -55,6 +55,7 @@ class StatsSample : MonoBehaviour
 
     private void Start()
     {
+        dropdown.interactable = false;
         callButton.interactable = true;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(pc1, state); };
@@ -167,6 +168,10 @@ class StatsSample : MonoBehaviour
 
     void Dispose()
     {
+        dropdown.options = new List<Dropdown.OptionData>();
+        dropdown.interactable = false;
+        text.text = string.Empty;
+        text.interactable = false;
         dataChannel.Dispose();
         pc1.Dispose();
         pc2.Dispose();
@@ -310,9 +315,10 @@ class StatsSample : MonoBehaviour
                 }
                 dropdown.ClearOptions();
                 dropdown.AddOptions(options);
+                dropdown.interactable = true;
             }
 
-            if(currentValue != dropdown.value)
+            if (currentValue != dropdown.value)
             {
                 currentValue = dropdown.value;
             }
@@ -321,6 +327,7 @@ class StatsSample : MonoBehaviour
 
             text.text = "Id:" + op1.Value.Stats[id].Id + "\n";
             text.text += "Timestamp:" + op1.Value.Stats[id].Timestamp + "\n";
+            text.interactable = true;
 
             if (!op1.Value.TryGetValue(id, out RTCStats stats))
                 continue;
