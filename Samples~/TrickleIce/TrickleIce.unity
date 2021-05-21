@@ -858,7 +858,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1345352851}
   m_HandleRect: {fileID: 1345352850}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1261,7 +1261,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1627138271}
   m_HandleRect: {fileID: 1627138270}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3522,6 +3522,7 @@ MonoBehaviour:
   candidateParent: {fileID: 1709350895}
   iceTransportOption: {fileID: 973367277}
   candidatePoolSizeSlider: {fileID: 551703105}
+  candidatePoolSizeText: {fileID: 2123737491}
 --- !u!1 &971179770
 GameObject:
   m_ObjectHideFlags: 0
@@ -4337,7 +4338,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1205485771}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.583
+  m_Size: 0.7700285
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4793,8 +4794,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1427176677}
   m_HandleRect: {fileID: 1427176676}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6793,7 +6794,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3831420}
   m_HandleRect: {fileID: 3831419}
   m_Direction: 2
-  m_Value: 0.9999998
+  m_Value: 1
   m_Size: 0.34333333
   m_NumberOfSteps: 0
   m_OnValueChanged:
