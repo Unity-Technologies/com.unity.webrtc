@@ -394,8 +394,8 @@ class ChangeCodecsSample : MonoBehaviour
         RTCOutboundRTPStreamStats outBoundStats = outBoundStatsList.First(stats => stats.kind == "video");
         string codecId = outBoundStats.codecId;
 
-        IEnumerable<RTCCodecStats> codecStatsList = report.Stats.Values.Where(
-            stats => stats.Type == RTCStatsType.Codec).Cast<RTCCodecStats>();
+        List<RTCCodecStats> codecStatsList = report.Stats.Values.Where(
+            stats => stats.Type == RTCStatsType.Codec).Cast<RTCCodecStats>().ToList();
 
         RTCCodecStats codecStats =
             codecStatsList.First(stats => stats.Id == codecId);
