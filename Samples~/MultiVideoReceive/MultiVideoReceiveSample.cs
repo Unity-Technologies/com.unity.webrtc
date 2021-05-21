@@ -58,7 +58,7 @@ class MultiVideoReceiveSample : MonoBehaviour
         });
         heightInput.onValueChanged.AddListener(h =>
         {
-            if (!int.TryParse(h, out width))
+            if (!int.TryParse(h, out height))
                 height = DefaultHeight;
         });
     }
