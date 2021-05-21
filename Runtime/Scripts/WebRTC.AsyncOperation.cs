@@ -40,7 +40,7 @@ namespace Unity.WebRTC
 
             connection.OnStatsDelivered = ptr =>
             {
-                Value = new RTCStatsReport(ptr);
+                Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
                 IsError = false;
                 this.Done();
             };
@@ -52,7 +52,7 @@ namespace Unity.WebRTC
 
             connection.OnStatsDelivered = ptr =>
             {
-                Value = new RTCStatsReport(ptr);
+                Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
                 IsError = false;
                 this.Done();
             };
@@ -63,7 +63,7 @@ namespace Unity.WebRTC
 
             connection.OnStatsDelivered = ptr =>
             {
-                Value = new RTCStatsReport(ptr);
+                Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
                 IsError = false;
                 this.Done();
             };
