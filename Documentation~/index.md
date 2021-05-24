@@ -73,3 +73,10 @@ This package depends on **NVIDIA Video Codec SDK 9.1**. Please check the graphic
 > Please install like command below 
 >
 > ``` sudo apt install -y libc++1 libc++abi1 ```
+
+> [!NOTE]
+> To make the archive for iOS platform to publish App Store, you need to use `lipo` command to eliminate the `x86_64` architecture from the binary in the `webrtc.framework`.
+>
+> ```lipo -remove x86_64 Runtime/Plugins/iOS/webrtc.framework/webrtc -o Runtime/Plugins/iOS/webrtc.framework/webrtc```
+
+

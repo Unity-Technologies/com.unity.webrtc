@@ -3,6 +3,8 @@
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M89/webrtc-ios.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugins/iOS
+export WEBRTC_ARCHIVE_DIR=build/webrtc.xcarchive
+export WEBRTC_SIM_ARCHIVE_DIR=build/webrtc-sim.xcarchive
 
 # Install cmake
 export HOMEBREW_NO_AUTO_UPDATE=1
@@ -22,20 +24,37 @@ cmake . \
   -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES \
   -B build
 
-xcodebuild -sdk iphonesimulator \
-  -arch "x86_64" \
+xcodebuild \
+  -sdk iphonesimulator \
+  -arch 'x86_64' \
   -project build/webrtc.xcodeproj \
-  -target WebRTCPlugin \
+  -target WebRTCLib \
   -configuration Release
 
-mv "$WEBRTC_FRAMEWORK_DIR/webrtc.framework" "$WEBRTC_FRAMEWORK_DIR/webrtc-sim.framework"
-
-xcodebuild -sdk iphoneos \
+xcodebuild archive \
+  -sdk iphonesimulator \
+  -arch 'x86_64' \
+  -scheme WebRTCPlugin \
   -project build/webrtc.xcodeproj \
-  -target WebRTCPlugin \
+  -configuration Release \
+  -archivePath "$WEBRTC_SIM_ARCHIVE_DIR"
+
+xcodebuild \
+  -sdk iphoneos \
+  -project build/webrtc.xcodeproj \
+  -target WebRTCLib \
   -configuration Release
 
-cd "$WEBRTC_FRAMEWORK_DIR"
-lipo -create -o webrtc.framework/webrtc \
-  webrtc.framework/webrtc \
-  webrtc-sim.framework/webrtc
+xcodebuild archive \
+  -sdk iphoneos \
+  -scheme WebRTCPlugin \
+  -project build/webrtc.xcodeproj \
+  -configuration Release \
+  -archivePath "$WEBRTC_ARCHIVE_DIR"
+
+rm -rf "$WEBRTC_FRAMEWORK_DIR/webrtc.framework"
+cp -r "$WEBRTC_ARCHIVE_DIR/Products/@rpath/webrtc.framework" "$WEBRTC_FRAMEWORK_DIR/webrtc.framework"
+
+lipo -create -o "$WEBRTC_FRAMEWORK_DIR/webrtc.framework/webrtc" \
+  "$WEBRTC_ARCHIVE_DIR/Products/@rpath/webrtc.framework/webrtc" \
+  "$WEBRTC_SIM_ARCHIVE_DIR/Products/@rpath/webrtc.framework/webrtc"
