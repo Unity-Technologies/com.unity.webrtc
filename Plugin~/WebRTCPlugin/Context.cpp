@@ -6,6 +6,7 @@
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
 
+#include "AudioTrackSinkAdapter.h"
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
@@ -170,8 +171,12 @@ namespace webrtc
 
         rtc::InitializeSSL();
 
-        //m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
-
+        m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        //rtc::scoped_refptr<webrtc::AudioDeviceModule> adm = m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule> >(
+        //    RTC_FROM_HERE, [&] {
+        //    return AudioDeviceModule::Create(
+        //    AudioDeviceModule::kDummyAudio, webrtc::CreateDefaultTaskQueueFactory().get());
+        //});
         //m_adm = new rtc::RefCountedObject<blink::WebRtcAudioDeviceImpl>();
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
@@ -188,7 +193,7 @@ namespace webrtc
                                 m_workerThread.get(),
                                 m_workerThread.get(),
                                 m_signalingThread.get(),
-                                nullptr,
+                                m_audioDevice,
                                 webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
                                 webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
                                 std::move(videoEncoderFactory),
@@ -363,12 +368,8 @@ namespace webrtc
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
 
-        // todo(kazuki)::
-        //const rtc::scoped_refptr<AudioSourceInterface> source =
-        //    m_peerConnectionFactory->CreateAudioSource(audioOptions);
-
         const rtc::scoped_refptr<UnityAudioTrackSource> source =
-            UnityAudioTrackSource::Create("audio");
+            UnityAudioTrackSource::Create(label, audioOptions);
 
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
@@ -415,18 +416,19 @@ namespace webrtc
         m_mapAudioTrackAndSink.erase(track);
     }
 
-    void Context::ProcessAudioData(const float* data, int32 size)
+    void Context::ProcessAudioData(const float* data, int32_t size)
     {
         if (m_audioDevice == nullptr)
             return;
         m_audioDevice->ProcessAudioData(data, size);
     }
 
-    void Context::PullAudioData(const float* data, int32 size)
+    void Context::PullAudioData(const float* data, int32_t size)
     {
         if (m_audioDevice == nullptr)
             return;
 
+        // todo(kazuki)::set parameter to receive data
         size_t nBytesPerSample = 2;
         size_t nSampleRate = 44100;
         size_t nChannels = 1;
@@ -445,6 +447,11 @@ namespace webrtc
             &ntp_time_ms);
 
         delete audio_data;
+    }
+
+    void Context::ReadAudioData(AudioTrackInterface* track, float* data, int32_t size)
+    {
+        m_mapAudioTrackAndSink[track]->GetData(data, size);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

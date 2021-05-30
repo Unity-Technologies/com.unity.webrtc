@@ -1318,7 +1318,6 @@ extern "C"
     UNITY_INTERFACE_EXPORT void ProcessAudio(
         AudioTrackInterface* track,
         float* audio_data,
-        int32 bits_per_sample,
         int32 sample_rate,
         int32 number_of_channels,
         int32 number_of_frames)
@@ -1326,20 +1325,22 @@ extern "C"
         UnityAudioTrackSource* source = static_cast<UnityAudioTrackSource*>(track->GetSource());
 
         source->OnData(audio_data,
-            bits_per_sample,
             sample_rate,
             number_of_channels,
             number_of_frames);
+
+        // for sender
+        ContextManager::GetInstance()->curContext->ProcessAudioData(nullptr, 0);
+
+        // for receiver
+        ContextManager::GetInstance()->curContext->PullAudioData(nullptr, 0);
     }
 
-    UNITY_INTERFACE_EXPORT void ProcessAudioADM(
-        float* audio_data,
-        int32 size)
+    UNITY_INTERFACE_EXPORT void ContextReadAudioData(
+        Context* context, AudioTrackInterface* track, float* audio_data, int size)
     {
-        ContextManager::GetInstance()->curContext->ProcessAudioData(audio_data, size);
-        ContextManager::GetInstance()->curContext->PullAudioData(audio_data, size);
+        context->ReadAudioData(track, audio_data, size);
     }
-
 
 
     UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(

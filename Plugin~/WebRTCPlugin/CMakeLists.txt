@@ -10,6 +10,8 @@ target_sources(WebRTCLib
     DummyAudioDevice.h
     DummyVideoEncoder.cpp
     DummyVideoEncoder.h
+    AudioTrackSinkAdapter.h
+    AudioTrackSinkAdapter.cpp
     Logger.cpp
     MediaStreamObserver.cpp
     MediaStreamObserver.h

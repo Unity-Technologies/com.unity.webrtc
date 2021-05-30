@@ -1,24 +1,43 @@
+using System.Linq;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Unity.WebRTC.Samples
 {
-    public class AudioSpectrumView : MonoBehaviour
+    class AudioSpectrumView : MonoBehaviour
     {
         [SerializeField] AudioSource target;
+        [SerializeField] LineRenderer line;
+        [SerializeField] RectTransform rectTransform;
+        [SerializeField] float xRatio = 1f;
+        [SerializeField] float yRatio = 10000f;
+        [SerializeField] private float yBase = 2.71828f;
 
-        float[] spectrum = new float[256];
+        const int positionCount = 256;
+        float[] spectrum = new float[positionCount];
+        NativeArray<Vector3> array;
+
+        void Start()
+        {
+            array = new NativeArray<Vector3>(positionCount, Allocator.Persistent);
+            line.positionCount = positionCount;
+        }
+
+        void OnDestroy()
+        {
+            array.Dispose();
+        }
 
         void Update()
         {
             target.GetSpectrumData(spectrum, 0, FFTWindow.Rectangular);
-
-            for (int i = 1; i < spectrum.Length - 1; i++)
+            for(int i = 1; i < array.Length; i++)
             {
-                Debug.DrawLine(new Vector3(i - 1, spectrum[i] + 10, 0), new Vector3(i, spectrum[i + 1] + 10, 0), Color.red);
-                Debug.DrawLine(new Vector3(i - 1, Mathf.Log(spectrum[i - 1]) + 10, 2), new Vector3(i, Mathf.Log(spectrum[i]) + 10, 2), Color.cyan);
-                Debug.DrawLine(new Vector3(Mathf.Log(i - 1), spectrum[i - 1] - 10, 1), new Vector3(Mathf.Log(i), spectrum[i] - 10, 1), Color.green);
-                Debug.DrawLine(new Vector3(Mathf.Log(i - 1), Mathf.Log(spectrum[i - 1]), 3), new Vector3(Mathf.Log(i), Mathf.Log(spectrum[i]), 3), Color.blue);
+                float x = rectTransform.rect.width * i / array.Length * xRatio;
+                float y = rectTransform.rect.height * Mathf.Log(spectrum[i] + 1, yBase) * yRatio;
+                array[i] = new Vector3(x, y, 0);
             }
+            line.SetPositions(array);
         }
     }
 }

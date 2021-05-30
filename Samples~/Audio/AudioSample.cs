@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using Unity.WebRTC.Samples;
 using UnityEngine;
@@ -7,38 +6,10 @@ using UnityEngine.UI;
 
 namespace Unity.WebRTC
 {
-    class AudioOutput
-    {
-        private AudioClip m_clip;
-        private int m_head = 0;
-
-        public AudioClip clip
-        {
-            get {
-                return m_clip; 
-            }
-        }
-
-        public AudioOutput(string name, int lengthSamples, int channels, int frequency)
-        {
-            m_clip = AudioClip.Create(name, lengthSamples, channels, frequency, false);
-        }
-
-        public void SetData(float[] data, int length)
-        {
-            m_clip.SetData(data, m_head);
-            m_head += length;
-            if (m_head >= m_clip.samples)
-            {
-                m_head = 0;
-            }
-        }
-    }
-
     public class AudioSample : MonoBehaviour
     {
-        [SerializeField] private AudioSource audioSource;
-        [SerializeField] private AudioSource receiverAudioSource;
+        [SerializeField] private AudioSource inputAudioSource;
+        [SerializeField] private AudioSource outputAudioSource;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
@@ -48,20 +19,18 @@ namespace Unity.WebRTC
         [SerializeField] private Text textMaxFrequency;
 
         private RTCPeerConnection _pc1, _pc2;
+        private MediaStream _sendStream;
         private MediaStream _receiveStream;
-        private DelegateOnTrack pc2Ontrack;
-        private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-
 
         private AudioClip m_clipInput;
-        private AudioOutput m_audioOutput;
         private AudioStreamTrack m_audioTrack;
+        private AudioStreamTrack m_audioTrack2;
+
         private AudioStreamTrack m_receiverTrack;
-        int m_head;
+        //int m_head;
         int m_samplingFrequency = 44100;
         int m_lengthSeconds = 1;
         int m_channelCount = 1;
-        float[] m_microphoneBuffer = new float[0];
 
         private string m_deviceName = null;
 
@@ -91,12 +60,14 @@ namespace Unity.WebRTC
         {
             m_deviceName = dropdownMicrophoneDevices.captionText.text;
             m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
+            Debug.Log($"clipInput samples:{m_clipInput.samples}, " +
+                      $"m_clipInput.channels:{m_clipInput.channels}," +
+                      $"m_clipInput.frequency:{m_clipInput.frequency}");
             m_channelCount = m_clipInput.channels;
 
-            m_audioOutput = new AudioOutput(
-                "output", m_clipInput.samples, m_clipInput.channels, m_clipInput.frequency);
-            audioSource.clip = m_audioOutput.clip;
-            audioSource.Play();
+            inputAudioSource.loop = true;
+            inputAudioSource.clip = m_clipInput;
+            inputAudioSource.Play();
 
             buttonStart.interactable = false;
             buttonCall.interactable = true;
@@ -105,8 +76,11 @@ namespace Unity.WebRTC
 
         void OnCall()
         {
+            buttonCall.interactable = false;
+
             _receiveStream = new MediaStream();
-            _receiveStream.OnAddTrack = e => (e.Track as AudioStreamTrack).OnAudioReceived += OnAudioReceived;
+            _receiveStream.OnAddTrack += OnAddTrack;
+            _sendStream = new MediaStream();
 
             var configuration = GetSelectedSdpSemantics();
             _pc1 = new RTCPeerConnection(ref configuration)
@@ -124,31 +98,47 @@ namespace Unity.WebRTC
             var transceiver = _pc2.AddTransceiver(TrackKind.Audio);
             transceiver.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
-            m_audioTrack = new AudioStreamTrack("audio", audioSource);
-            _pc1.AddTrack(m_audioTrack);
+            m_audioTrack = new AudioStreamTrack("audio", inputAudioSource);
+//            m_audioTrack2 = new AudioStreamTrack("audio2", inputAudioSource);
+
+            _pc1.AddTrack(m_audioTrack, _sendStream);
+//            _pc1.AddTrack(m_audioTrack2, _sendStream);
         }
 
-        void OnAudioReceived(float[] data, int bitsPerSample, int sampleRate, int numOfChannels, int numOfFrames)
+        void OnAddTrack(MediaStreamTrackEvent e)
         {
-            Debug.Log($"data.Length {data.Length}, " +
-                      $"bitsPerSample {bitsPerSample}, " +
-                      $"sampleRate {sampleRate}, " +
-                      $"numOfChannels {numOfChannels}, " +
-                      $"numOfFrames {numOfFrames}");
+            var track = e.Track as AudioStreamTrack;
+            track.OnAudioReceived += OnAudioReceived;
         }
 
-        //private void OnAudioFilterRead(float[] data, int channels)
-        //{
-        //    if (m_audioTrack != null)
-        //    {
-        //        Audio.Update(data, channels);
-        //    }
-        //}
+        void OnAudioReceived(AudioClip renderer)
+        {
+            //Debug.Log($"track.Id {track.Id}" +
+            //          $"data.Length {data.Length}, " +
+            //          $"bitsPerSample {bitsPerSample}, " +
+            //          $"sampleRate {sampleRate}, " +
+            //          $"numOfChannels {numOfChannels}, " +
+            //          $"numOfFrames {numOfFrames}");
+            // m_audioOutput.SetData(data, numOfFrames);
+
+            outputAudioSource.clip = renderer;
+            outputAudioSource.loop = true;
+            outputAudioSource.Play();
+        }
 
         void OnHangUp()
         {
             Microphone.End(m_deviceName);
             m_clipInput = null;
+
+            m_audioTrack?.Dispose();
+            _receiveStream?.Dispose();
+            _sendStream?.Dispose();
+            _pc1?.Dispose();
+            _pc2?.Dispose();
+                
+            inputAudioSource.Stop();
+            outputAudioSource.Stop();
 
             buttonStart.interactable = true;
             buttonCall.interactable = false;
@@ -295,31 +285,31 @@ namespace Unity.WebRTC
             Debug.LogError($"Error Detail Type: {error.message}");
         }
 
-        void Update()
-        {
-            if (!Microphone.IsRecording(m_deviceName))
-                return;
+        //void Update()
+        //{
+        //    if (!Microphone.IsRecording(m_deviceName))
+        //        return;
 
-            int position = Microphone.GetPosition(m_deviceName);
-            if (position < 0 || m_head == position)
-            {
-                return;
-            }
+        //    int position = Microphone.GetPosition(m_deviceName);
+        //    if (position < 0 || m_head == position)
+        //    {
+        //        return;
+        //    }
 
-            if (m_head > position)
-            {
-                m_head = 0;
-            }
+        //    if (m_head > position)
+        //    {
+        //        m_head = 0;
+        //    }
 
-            if (m_microphoneBuffer.Length != m_samplingFrequency * m_lengthSeconds * m_channelCount)
-            {
-                m_microphoneBuffer = new float[m_samplingFrequency * m_lengthSeconds * m_channelCount];
-            }
-            m_clipInput.GetData(m_microphoneBuffer, m_head);
-            ProcessAudio(m_microphoneBuffer, position - m_head);
+        //    if (m_microphoneBuffer.Length != m_samplingFrequency * m_lengthSeconds * m_channelCount)
+        //    {
+        //        m_microphoneBuffer = new float[m_samplingFrequency * m_lengthSeconds * m_channelCount];
+        //    }
+        //    m_clipInput.GetData(m_microphoneBuffer, m_head);
+        //    ProcessAudio(m_microphoneBuffer, position - m_head);
 
-            m_head = position;
-        }
+        //    m_head = position;
+        //}
 
 
 

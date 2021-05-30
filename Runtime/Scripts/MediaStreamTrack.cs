@@ -85,7 +85,7 @@ namespace Unity.WebRTC
                 return new VideoStreamTrack(ptr);
             }
 
-            return new AudioStreamTrack(ptr, true);
+            return new AudioStreamTrack(ptr);
         }
 
         internal IntPtr GetSelfOrThrow()

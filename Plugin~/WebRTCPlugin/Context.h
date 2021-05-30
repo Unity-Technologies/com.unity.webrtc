@@ -1,5 +1,7 @@
 #pragma once
 #include <mutex>
+
+#include "AudioTrackSinkAdapter.h"
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
@@ -84,8 +86,10 @@ namespace webrtc
         void RegisterAudioReceiveCallback(
             AudioTrackInterface* track, DelegateAudioReceive callback);
         void UnregisterAudioReceiveCallback(AudioTrackInterface* track);
-        void ProcessAudioData(const float* data, int32 size);
-        void PullAudioData(const float* data, int32 size);
+        void ProcessAudioData(const float* data, int32_t size);
+        void PullAudioData(const float* data, int32_t size);
+        void ReadAudioData(AudioTrackInterface* track, float* data, int32_t size);
+
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
         void DeletePeerConnection(PeerConnectionObject* obj);
