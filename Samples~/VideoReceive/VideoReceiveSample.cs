@@ -165,6 +165,7 @@ class VideoReceiveSample : MonoBehaviour
 
     private void Call()
     {
+        useWebCamToggle.interactable = false;
         callButton.interactable = false;
         hangUpButton.interactable = true;
         addTracksButton.interactable = true;
@@ -238,6 +239,7 @@ class VideoReceiveSample : MonoBehaviour
         _pc2 = null;
         sourceImage.texture = null;
         receiveImage.texture = null;
+        useWebCamToggle.interactable = true;
         callButton.interactable = true;
         hangUpButton.interactable = false;
         addTracksButton.interactable = false;

@@ -461,7 +461,9 @@ namespace Unity.WebRTC
         public static void ValidateGraphicsFormat(GraphicsFormat format)
         {
             // can't recognize legacy format
-            if ((int) format == 87 || (int) format == 88)
+            const int LegacyARGB32_sRGB = 87;
+            const int LegacyARGB32_UNorm = 88;
+            if ((int) format == LegacyARGB32_sRGB || (int) format == LegacyARGB32_UNorm)
             {
                 return;
             }
