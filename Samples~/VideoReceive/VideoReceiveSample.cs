@@ -13,6 +13,7 @@ class VideoReceiveSample : MonoBehaviour
     [SerializeField] private Button hangUpButton;
     [SerializeField] private Button addTracksButton;
     [SerializeField] private Button removeTracksButton;
+    [SerializeField] private Toggle useWebCamToggle;
     [SerializeField] private Camera cam;
     [SerializeField] private RawImage sourceImage;
     [SerializeField] private RawImage receiveImage;
@@ -21,7 +22,7 @@ class VideoReceiveSample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
-    private MediaStream videoStream, receiveStream;
+    private VideoStreamTrack videoStreamTrack;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
@@ -29,6 +30,7 @@ class VideoReceiveSample : MonoBehaviour
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private bool videoUpdateStarted;
+    private WebCamTexture webCamTexture;
 
     private void Awake()
     {
@@ -54,7 +56,13 @@ class VideoReceiveSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
-        pc2Ontrack = e => { receiveStream.AddTrack(e.Track); };
+        pc2Ontrack = e =>
+        {
+            if (e.Track is VideoStreamTrack video)
+            {
+                receiveImage.texture = video.InitializeReceiver(1280, 720);
+            }
+        };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
     }
 
@@ -131,10 +139,7 @@ class VideoReceiveSample : MonoBehaviour
 
     private void AddTracks()
     {
-        foreach (var track in videoStream.GetTracks())
-        {
-            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
-        }
+        pc1Senders.Add(_pc1.AddTrack(videoStreamTrack));
 
         if (!videoUpdateStarted)
         {
@@ -178,25 +183,51 @@ class VideoReceiveSample : MonoBehaviour
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;
 
-        videoStream = cam.CaptureStream(1280, 720, 1000000);
-        sourceImage.texture = cam.targetTexture;
 
-        receiveStream = new MediaStream();
-        receiveStream.OnAddTrack = e =>
+        StartCoroutine(CaptureVideoStart());
+    }
+
+    IEnumerator CaptureVideoStart()
+    {
+        if (!useWebCamToggle.isOn)
         {
-            if (e.Track is VideoStreamTrack track)
-            {
-                receiveImage.texture = track.InitializeReceiver(1280, 720);
-            }
-        };
+            videoStreamTrack = cam.CaptureStreamTrack(1280, 720, 1000000);
+            sourceImage.texture = cam.targetTexture;
+            yield break;
+        }
+
+        if (WebCamTexture.devices.Length == 0)
+        {
+            Debug.LogFormat("WebCam device not found");
+            yield break;
+        }
+
+        yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
+        if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
+        {
+            Debug.LogFormat("authorization for using the device is denied");
+            yield break;
+        }
+
+        WebCamDevice userCameraDevice = WebCamTexture.devices[0];
+        webCamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720);
+        webCamTexture.Play();
+        yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
+
+        videoStreamTrack = new VideoStreamTrack("video", webCamTexture);
+        sourceImage.texture = webCamTexture;
     }
 
     private void HangUp()
     {
-        videoStream.Dispose();
-        receiveStream.Dispose();
-        videoStream = null;
-        receiveStream = null;
+        if (webCamTexture != null)
+        {
+            webCamTexture.Stop();
+            webCamTexture = null;
+        }
+
+        videoStreamTrack.Dispose();
+        videoStreamTrack = null;
 
         _pc1.Close();
         _pc2.Close();
@@ -205,6 +236,7 @@ class VideoReceiveSample : MonoBehaviour
         _pc2.Dispose();
         _pc1 = null;
         _pc2 = null;
+        sourceImage.texture = null;
         receiveImage.texture = null;
         callButton.interactable = true;
         hangUpButton.interactable = false;
