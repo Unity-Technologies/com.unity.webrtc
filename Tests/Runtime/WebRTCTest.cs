@@ -33,14 +33,19 @@ namespace Unity.WebRTC.RuntimeTest
             var tx = new Texture2D(10, 10, textureFormat, false);
             Assert.That(tx.format, Is.EqualTo(textureFormat), $"RenderTexture.format:{tx.format} not equal to supportedFormat:{textureFormat}");
             Assert.That(tx.graphicsFormat, Is.EqualTo(graphicsFormat), $"RenderTexture.graphicsFormat:{tx.format} not equal to supportedFormat:{graphicsFormat}");
-
-            var webCam = new WebCamTexture(10, 10);
-            Assert.That(() => WebRTC.ValidateGraphicsFormat(webCam.graphicsFormat), Throws.Nothing);
-
             Object.DestroyImmediate(rt);
             Object.DestroyImmediate(tx);
+        }
+
+#if WEBRTC_TEST_PROJECT
+        [Test]
+        public void WebCamTextureFormat()
+        {
+            var webCam = new WebCamTexture(10, 10);
+            Assert.That(() => WebRTC.ValidateGraphicsFormat(webCam.graphicsFormat), Throws.Nothing);
             Object.DestroyImmediate(webCam);
         }
+#endif
 
         [Test]
         [TestCase(256, 256)]
