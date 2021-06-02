@@ -211,7 +211,7 @@ class VideoReceiveSample : MonoBehaviour
         }
 
         WebCamDevice userCameraDevice = WebCamTexture.devices[0];
-        webCamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720);
+        webCamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720, 30);
         webCamTexture.Play();
         yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
 
