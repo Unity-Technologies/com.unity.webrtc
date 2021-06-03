@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
@@ -14,6 +15,7 @@ class VideoReceiveSample : MonoBehaviour
     [SerializeField] private Button addTracksButton;
     [SerializeField] private Button removeTracksButton;
     [SerializeField] private Toggle useWebCamToggle;
+    [SerializeField] private Dropdown webCamLListDropdown;
     [SerializeField] private Camera cam;
     [SerializeField] private RawImage sourceImage;
     [SerializeField] private RawImage receiveImage;
@@ -39,6 +41,8 @@ class VideoReceiveSample : MonoBehaviour
         hangUpButton.onClick.AddListener(HangUp);
         addTracksButton.onClick.AddListener(AddTracks);
         removeTracksButton.onClick.AddListener(RemoveTracks);
+        useWebCamToggle.onValueChanged.AddListener(SwitchUseWebCam);
+        webCamLListDropdown.options = WebCamTexture.devices.Select(x => new Dropdown.OptionData(x.name)).ToList();
     }
 
     private void OnDestroy()
@@ -163,9 +167,15 @@ class VideoReceiveSample : MonoBehaviour
         removeTracksButton.interactable = false;
     }
 
+    private void SwitchUseWebCam(bool isOn)
+    {
+        webCamLListDropdown.interactable = isOn;
+    }
+
     private void Call()
     {
         useWebCamToggle.interactable = false;
+        webCamLListDropdown.interactable = false;
         callButton.interactable = false;
         hangUpButton.interactable = true;
         addTracksButton.interactable = true;
@@ -210,7 +220,7 @@ class VideoReceiveSample : MonoBehaviour
             yield break;
         }
 
-        WebCamDevice userCameraDevice = WebCamTexture.devices[0];
+        WebCamDevice userCameraDevice = WebCamTexture.devices[webCamLListDropdown.value];
         webCamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720, 30);
         webCamTexture.Play();
         yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
@@ -240,6 +250,7 @@ class VideoReceiveSample : MonoBehaviour
         sourceImage.texture = null;
         receiveImage.texture = null;
         useWebCamToggle.interactable = true;
+        webCamLListDropdown.interactable = useWebCamToggle.isOn;
         callButton.interactable = true;
         hangUpButton.interactable = false;
         addTracksButton.interactable = false;
