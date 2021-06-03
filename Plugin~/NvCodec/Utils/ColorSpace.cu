@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2018 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -14,23 +14,40 @@
 __constant__ float matYuv2Rgb[3][3];
 __constant__ float matRgb2Yuv[3][3];
 
+
 void inline GetConstants(int iMatrix, float &wr, float &wb, int &black, int &white, int &max) {
-    // Default is BT709
-    wr = 0.2126f; wb = 0.0722f;
     black = 16; white = 235;
     max = 255;
-    if (iMatrix == ColorSpaceStandard_BT601) {
+
+    switch (iMatrix)
+    {
+    case ColorSpaceStandard_BT709:
+    default:
+        wr = 0.2126f; wb = 0.0722f;
+        break;
+
+    case ColorSpaceStandard_FCC:
+        wr = 0.30f; wb = 0.11f;
+        break;
+
+    case ColorSpaceStandard_BT470:
+    case ColorSpaceStandard_BT601:
         wr = 0.2990f; wb = 0.1140f;
-    } else if (iMatrix == ColorSpaceStandard_BT2020) {
+        break;
+
+    case ColorSpaceStandard_SMPTE240M:
+        wr = 0.212f; wb = 0.087f;
+        break;
+
+    case ColorSpaceStandard_BT2020:
+    case ColorSpaceStandard_BT2020C:
         wr = 0.2627f; wb = 0.0593f;
         // 10-bit only
         black = 64 << 6; white = 940 << 6;
         max = (1 << 16) - 1;
+        break;
     }
 }
-
-// Full-range BT.709 and BT.2020 are the default matrices used for YUV to RGB conversion for 8-bit and 10/12-bit encoded streams, respectively.
-// If color primaries are encoded/embedded in the bitstream, the client should use those color primaries in the conversion matrices for more accurate color reproduction.
 
 void SetMatYuv2Rgb(int iMatrix) {
     float wr, wb;
