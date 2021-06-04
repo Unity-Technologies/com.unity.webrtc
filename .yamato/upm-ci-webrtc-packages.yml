@@ -298,9 +298,9 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   name: Test {{ package.packagename }} with {{ editor.version }} on android device {{ target.name }}
   agent:
-    type: Unity::mobile::shield
-    image: mobile/android-execution-base:stable
-    flavor: b1.medium
+    type: Unity::mobile::android
+    image: mobile/android-execution-r19:stable
+    flavor: b1.large
   skip_checkout: true
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}
