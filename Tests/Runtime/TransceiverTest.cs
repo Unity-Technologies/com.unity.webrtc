@@ -131,5 +131,20 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(RTCErrorType.None, error);
         }
 
+        [Test]
+        [Category("PeerConnection")]
+        public void SenderGetTrackReturnsNull()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
+            RTCRtpSender sender = transceiver.Sender;
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(sender.Track, Is.Null);
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            Assert.That(peer.GetTransceivers(), Has.All.Not.Null);
+            peer.Dispose();
+        }
     }
 }
