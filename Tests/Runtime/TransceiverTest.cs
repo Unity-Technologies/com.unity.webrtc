@@ -132,18 +132,48 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
-        public void SenderGetTrackReturnsNull()
+        [Category("RTCRtpReceiver")]
+        public void ReceiverGetTrackReturnsVideoTrack()
         {
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Video);
             Assert.That(transceiver, Is.Not.Null);
             Assert.That(transceiver.CurrentDirection, Is.Null);
+
+            // The receiver has a video track
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.That(receiver, Is.Not.Null);
+            Assert.That(receiver.Track, Is.Not.Null);
+            Assert.That(receiver.Track, Is.TypeOf<VideoStreamTrack>());
+
+            // The receiver has no track
             RTCRtpSender sender = transceiver.Sender;
             Assert.That(sender, Is.Not.Null);
             Assert.That(sender.Track, Is.Null);
-            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
-            Assert.That(peer.GetTransceivers(), Has.All.Not.Null);
+
+            peer.Dispose();
+        }
+
+        [Test]
+        [Category("RTCRtpReceiver")]
+        public void ReceiverGetTrackReturnsAudioTrack()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Audio);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
+
+            // The receiver has a audio track
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.That(receiver, Is.Not.Null);
+            Assert.That(receiver.Track, Is.Not.Null);
+            Assert.That(receiver.Track, Is.TypeOf<AudioStreamTrack>());
+
+            // The receiver has no track
+            RTCRtpSender sender = transceiver.Sender;
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(sender.Track, Is.Null);
+
             peer.Dispose();
         }
     }
