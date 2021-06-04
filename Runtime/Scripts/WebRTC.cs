@@ -277,7 +277,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static class WebRTC
     {
@@ -307,7 +307,7 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
@@ -355,7 +355,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public static IEnumerator Update()
@@ -381,7 +381,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static void Dispose()
         {
@@ -399,7 +399,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public static EncoderType GetEncoderType()
@@ -408,7 +408,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
@@ -455,11 +455,19 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="format"></param>
         public static void ValidateGraphicsFormat(GraphicsFormat format)
         {
+            // can't recognize legacy format
+            const int LegacyARGB32_sRGB = 87;
+            const int LegacyARGB32_UNorm = 88;
+            if ((int) format == LegacyARGB32_sRGB || (int) format == LegacyARGB32_UNorm)
+            {
+                return;
+            }
+
             // ToDo: Increase the supported formats.
             GraphicsFormat supportedFormat = GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             if (format != supportedFormat)
@@ -470,7 +478,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -481,7 +489,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -523,6 +531,11 @@ namespace Unity.WebRTC
             throw new ArgumentException($"Graphics device type {type} not supported");
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
         {
             var graphicsFormat = GetSupportedGraphicsFormat(type);
