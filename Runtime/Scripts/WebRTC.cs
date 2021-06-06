@@ -261,6 +261,10 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         public int iceCandidatePoolSize;
+        /// <summary>
+        ///
+        /// </summary>
+        public bool enable_dtls_srtp;
     }
 
     /// <summary>
@@ -1072,5 +1076,3 @@ namespace Unity.WebRTC
         }
     }
 }
-
-
