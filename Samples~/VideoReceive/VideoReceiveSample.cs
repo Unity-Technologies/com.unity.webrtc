@@ -47,6 +47,12 @@ class VideoReceiveSample : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (webCamTexture != null)
+        {
+            webCamTexture.Stop();
+            webCamTexture = null;
+        }
+
         WebRTC.Dispose();
     }
 
