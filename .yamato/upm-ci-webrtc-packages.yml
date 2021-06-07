@@ -305,6 +305,8 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}
   commands:
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
     - |
        # Download standalone UnityTestRunner
        curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output utr.bat
@@ -314,6 +316,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
        # List the connected devices
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       NetSh Advfirewall set allprofiles state off
        ./utr --suite=playmode --platform=android --player-load-path=build/players --artifacts_path=build/test-results
   artifacts:
     logs:
@@ -466,14 +469,15 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
 test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
+    # todo(kazuki): workaround
+    # - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
 {% for target in test_targets_android %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}
 {% endfor %}
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "true" or target.name == "macos" -%}
+{% if target.is_gpu == "true" or target.name == "macos" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif -%}
 {% endfor %}
