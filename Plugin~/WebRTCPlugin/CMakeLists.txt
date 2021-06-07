@@ -175,8 +175,8 @@ elseif(Linux)
       POSITION_INDEPENDENT_CODE ON
   )
 elseif(iOS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -fembed-bitcode")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -fembed-bitcode")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
   set(PROJECT_BINARY_DIR
     "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/iOS"

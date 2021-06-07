@@ -72,6 +72,8 @@ namespace Unity.WebRTC
             get
             {
                 IntPtr ptr = NativeMethods.SenderGetTrack(self);
+                if (ptr == IntPtr.Zero)
+                    return null;
                 return WebRTC.FindOrCreate(ptr, MediaStreamTrack.Create);
             }
         }

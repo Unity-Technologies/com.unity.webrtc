@@ -111,13 +111,70 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("RTCRtpTransceiver")]
-        public void TransceiverSetCodecPreferences()
+        public void TransceiverSetVideoCodecPreferences()
         {
             var peer = new RTCPeerConnection();
             var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
             var transceiver = peer.AddTransceiver(TrackKind.Video);
             var error = transceiver.SetCodecPreferences(capabilities.codecs);
             Assert.AreEqual(RTCErrorType.None, error);
+        }
+
+        [Test]
+        [Category("RTCRtpTransceiver")]
+        public void TransceiverSetAudioCodecPreferences()
+        {
+            var peer = new RTCPeerConnection();
+            var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Audio);
+            var transceiver = peer.AddTransceiver(TrackKind.Audio);
+            var error = transceiver.SetCodecPreferences(capabilities.codecs);
+            Assert.AreEqual(RTCErrorType.None, error);
+        }
+
+        [Test]
+        [Category("RTCRtpReceiver")]
+        public void ReceiverGetTrackReturnsVideoTrack()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
+
+            // The receiver has a video track
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.That(receiver, Is.Not.Null);
+            Assert.That(receiver.Track, Is.Not.Null);
+            Assert.That(receiver.Track, Is.TypeOf<VideoStreamTrack>());
+
+            // The receiver has no track
+            RTCRtpSender sender = transceiver.Sender;
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(sender.Track, Is.Null);
+
+            peer.Dispose();
+        }
+
+        [Test]
+        [Category("RTCRtpReceiver")]
+        public void ReceiverGetTrackReturnsAudioTrack()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Audio);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
+
+            // The receiver has a audio track
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.That(receiver, Is.Not.Null);
+            Assert.That(receiver.Track, Is.Not.Null);
+            Assert.That(receiver.Track, Is.TypeOf<AudioStreamTrack>());
+
+            // The receiver has no track
+            RTCRtpSender sender = transceiver.Sender;
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(sender.Track, Is.Null);
+
+            peer.Dispose();
         }
     }
 }

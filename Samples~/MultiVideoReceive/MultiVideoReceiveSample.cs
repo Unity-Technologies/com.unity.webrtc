@@ -39,8 +39,10 @@ class MultiVideoReceiveSample : MonoBehaviour
     private bool videoUpdateStarted;
     private int objectIndex = 0;
     private int videoIndex = 0;
-    private int width = 128;
-    private int height = 128;
+    private const int DefaultWidth = 128;
+    private const int DefaultHeight = 128;
+    private int width = DefaultWidth;
+    private int height = DefaultHeight;
 
     private void Awake()
     {
@@ -49,8 +51,16 @@ class MultiVideoReceiveSample : MonoBehaviour
         hangUpButton.onClick.AddListener(HangUp);
         addVideoObjectButton.onClick.AddListener(AddVideoObject);
         addTracksButton.onClick.AddListener(AddTracks);
-        widthInput.onValueChanged.AddListener(w => width = int.Parse(w));
-        heightInput.onValueChanged.AddListener(h => height = int.Parse(h));
+        widthInput.onValueChanged.AddListener(w =>
+        {
+            if (!int.TryParse(w, out width))
+                width = DefaultWidth;
+        });
+        heightInput.onValueChanged.AddListener(h =>
+        {
+            if (!int.TryParse(h, out height))
+                height = DefaultHeight;
+        });
     }
 
     private void OnDestroy()
@@ -166,8 +176,17 @@ class MultiVideoReceiveSample : MonoBehaviour
         newReceive.transform.SetParent(receiveImageParent);
         receiveImages.Add(newReceive);
 
-        videoStreamTrackList.Add(newCam.CaptureStreamTrack(width, height, 0));
-        newSource.texture = newCam.targetTexture;
+        try
+        {
+            videoStreamTrackList.Add(newCam.CaptureStreamTrack(width, height, 0));
+            newSource.texture = newCam.targetTexture;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            HangUp();
+            return;
+        }
 
         objectIndex++;
         addTracksButton.interactable = true;

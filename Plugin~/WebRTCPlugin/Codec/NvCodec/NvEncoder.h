@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <thread>
 #include <rtc_base/timestamp_aligner.h>
 
 #include "nvEncodeAPI.h"
@@ -10,7 +9,6 @@ namespace unity
 {
 namespace webrtc
 {
-
     using OutputFrame = NV_ENC_OUTPUT_PTR;
     class ITexture2D;
     class IGraphicsDevice;

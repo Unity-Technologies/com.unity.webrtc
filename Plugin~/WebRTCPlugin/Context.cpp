@@ -174,10 +174,13 @@ namespace webrtc
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this))
-            : webrtc::CreateBuiltinVideoEncoderFactory();
+            std::make_unique<UnityVideoEncoderFactory>(static_cast<IVideoEncoderObserver*>(this)) :
+            webrtc::CreateBuiltinVideoEncoderFactory();
+
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
-            std::make_unique<UnityVideoDecoderFactory>();
+            m_encoderType == UnityEncoderType::UnityEncoderHardware ?
+            std::make_unique<UnityVideoDecoderFactory>() :
+            webrtc::CreateBuiltinVideoDecoderFactory();
 
         m_peerConnectionFactory = CreatePeerConnectionFactory(
                                 m_workerThread.get(),

@@ -276,6 +276,9 @@ namespace Unity.WebRTC
         EncoderInitializationFailed
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static class WebRTC
     {
 #if UNITY_EDITOR_OSX
@@ -303,6 +306,11 @@ namespace Unity.WebRTC
         }
 #endif
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="limitTextureSize"></param>
         public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true)
         {
             // todo(kazuki): Add this event to avoid crash caused by hot-reload.
@@ -345,6 +353,11 @@ namespace Unity.WebRTC
 
             s_limitTextureSize = limitTextureSize;
         }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerator Update()
         {
             while (true)
@@ -367,6 +380,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public static void Dispose()
         {
             if (s_context != null)
@@ -382,60 +398,76 @@ namespace Unity.WebRTC
 #endif
         }
 
-        class CallbackObject
-        {
-            public readonly IntPtr ptr;
-            public readonly Action callback;
-
-            public CallbackObject(IntPtr ptr, Action callback)
-            {
-                this.ptr = ptr;
-                this.callback = callback;
-            }
-        }
-
-        public static void Sync(IntPtr ptr, Action callback)
-        {
-            s_syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
-        }
-
-        static void SendOrPostCallback(object state)
-        {
-            var obj = state as CallbackObject;
-            if (s_context == null || !Table.ContainsKey(obj.ptr)) {
-                return;
-            }
-            obj.callback();
-        }
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
         public static EncoderType GetEncoderType()
         {
             return s_context.GetEncoderType();
         }
 
-        internal static string GetModuleName()
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="platform"></param>
+        /// <param name="encoderType"></param>
+        public static void ValidateTextureSize(int width, int height, RuntimePlatform platform, EncoderType encoderType)
         {
-            return System.IO.Path.GetFileName(Lib);
-        }
-
-        public static void ValidateTextureSize(int width, int height, RuntimePlatform platform)
-        {
-            if (!s_limitTextureSize || platform != RuntimePlatform.Android)
+            if (!s_limitTextureSize)
             {
                 return;
             }
 
-            // Some android crash when smaller than this size
-            const int minimumTextureSize = 114;
-            if (width < minimumTextureSize || height < minimumTextureSize)
+            // Check NVCodec capabilities
+            // todo(kazuki):: The constant values should be replaced by values that are got from NvCodec API.
+            // Use "nvEncGetEncodeCaps" function which is provided by the NvCodec API.
+            if (encoderType == EncoderType.Hardware && NvEncSupportedPlatdorm(platform))
             {
-                throw new ArgumentException(
-                    $"Texture size need {minimumTextureSize}, current size width:{width} height:{height}");
+                const int minWidth = 145;
+                const int maxWidth = 4096;
+                const int minHeight = 49;
+                const int maxHeight = 4096;
+
+                if (width < minWidth || maxWidth < width ||
+                    height < minHeight || maxHeight < height)
+                {
+                    throw new ArgumentException(
+                        $"Texture size is invalid. " +
+                        $"minWidth:{minWidth}, maxWidth:{maxWidth} " +
+                        $"minHeight:{minHeight}, maxHeight:{maxHeight} " +
+                        $"current size width:{width} height:{height}");
+                }
+            }
+
+            if (platform == RuntimePlatform.Android)
+            {
+                // Some android crash when smaller than this size
+                const int minimumTextureSize = 114;
+                if (width < minimumTextureSize || height < minimumTextureSize)
+                {
+                    throw new ArgumentException(
+                        $"Texture size need {minimumTextureSize}, current size width:{width} height:{height}");
+                }
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="format"></param>
         public static void ValidateGraphicsFormat(GraphicsFormat format)
         {
+            // can't recognize legacy format
+            const int LegacyARGB32_sRGB = 87;
+            const int LegacyARGB32_UNorm = 88;
+            if ((int) format == LegacyARGB32_sRGB || (int) format == LegacyARGB32_UNorm)
+            {
+                return;
+            }
+
             // ToDo: Increase the supported formats.
             GraphicsFormat supportedFormat = GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             if (format != supportedFormat)
@@ -445,12 +477,22 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
         {
             var graphicsFormat = GetSupportedGraphicsFormat(type);
             return GraphicsFormatUtility.GetRenderTextureFormat(graphicsFormat);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
         {
             if (QualitySettings.activeColorSpace == ColorSpace.Linear)
@@ -459,9 +501,8 @@ namespace Unity.WebRTC
                 {
                     case GraphicsDeviceType.Direct3D11:
                     case GraphicsDeviceType.Direct3D12:
-                        return GraphicsFormat.B8G8R8A8_SRGB;
                     case GraphicsDeviceType.Vulkan:
-                        return GraphicsFormat.R8G8B8A8_SRGB;
+                        return GraphicsFormat.B8G8R8A8_SRGB;
                     case GraphicsDeviceType.OpenGLCore:
                     case GraphicsDeviceType.OpenGLES2:
                     case GraphicsDeviceType.OpenGLES3:
@@ -476,9 +517,8 @@ namespace Unity.WebRTC
                 {
                     case GraphicsDeviceType.Direct3D11:
                     case GraphicsDeviceType.Direct3D12:
-                        return GraphicsFormat.B8G8R8A8_UNorm;
                     case GraphicsDeviceType.Vulkan:
-                        return GraphicsFormat.R8G8B8A8_UNorm;
+                        return GraphicsFormat.B8G8R8A8_UNorm;
                     case GraphicsDeviceType.OpenGLCore:
                     case GraphicsDeviceType.OpenGLES2:
                     case GraphicsDeviceType.OpenGLES3:
@@ -491,10 +531,60 @@ namespace Unity.WebRTC
             throw new ArgumentException($"Graphics device type {type} not supported");
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
         {
             var graphicsFormat = GetSupportedGraphicsFormat(type);
             return GraphicsFormatUtility.GetTextureFormat(graphicsFormat);
+        }
+
+
+        class CallbackObject
+        {
+            public readonly IntPtr ptr;
+            public readonly Action callback;
+
+            public CallbackObject(IntPtr ptr, Action callback)
+            {
+                this.ptr = ptr;
+                this.callback = callback;
+            }
+        }
+
+        static bool NvEncSupportedPlatdorm(RuntimePlatform platform)
+        {
+            switch (platform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.LinuxPlayer:
+                    return true;
+            }
+            return false;
+        }
+
+        internal static void Sync(IntPtr ptr, Action callback)
+        {
+            s_syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
+        }
+        internal static string GetModuleName()
+        {
+            return System.IO.Path.GetFileName(Lib);
+        }
+
+        static void SendOrPostCallback(object state)
+        {
+            var obj = state as CallbackObject;
+            if (s_context == null || !Table.ContainsKey(obj.ptr))
+            {
+                return;
+            }
+            obj.callback();
         }
 
         internal static IEnumerable<T> Deserialize<T>(IntPtr buf, int length, Func<IntPtr, T> constructor) where T : class
