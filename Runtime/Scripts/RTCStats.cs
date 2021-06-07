@@ -1,3 +1,4 @@
+#if !UNITY_WEBGL
 using System;
 using System.Linq;
 using System.Collections;
@@ -805,3 +806,4 @@ namespace Unity.WebRTC
         }
     }
 }
+#endif

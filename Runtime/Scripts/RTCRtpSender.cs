@@ -1,10 +1,11 @@
+using Newtonsoft.Json;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// 
     /// </summary>
     public class RTCRtpSender : IDisposable
     {
@@ -33,6 +34,9 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+#if UNITY_WEBGL
+                NativeMethods.DeleteSender(self);
+#endif
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
@@ -41,22 +45,27 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
         public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
         {
             WebRTC.Context.GetSenderCapabilities(kind, out IntPtr ptr);
+#if !UNITY_WEBGL
             RTCRtpCapabilitiesInternal capabilitiesInternal =
                 Marshal.PtrToStructure<RTCRtpCapabilitiesInternal>(ptr);
             RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
             Marshal.FreeHGlobal(ptr);
+#else
+            var capabilitiesJson = ptr.AsAnsiStringWithFreeMem();
+            var capabilities = JsonConvert.DeserializeObject<RTCRtpCapabilities>(capabilitiesJson);
+#endif
             return capabilities;
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
@@ -65,7 +74,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         public MediaStreamTrack Track
         {
@@ -79,7 +88,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <returns></returns>
         public RTCRtpSendParameters GetParameters()
@@ -92,7 +101,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -107,7 +116,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>

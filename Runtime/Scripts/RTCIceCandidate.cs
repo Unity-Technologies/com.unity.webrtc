@@ -127,7 +127,7 @@ namespace Unity.WebRTC
             }
         }
 
-        
+
         public static RTCIceTcpCandidateType? ParseRTCIceTcpCandidateType(this string src)
         {
             if (string.IsNullOrEmpty(src))
@@ -146,6 +146,7 @@ namespace Unity.WebRTC
         }
     }
 
+#if !UNITY_WEBGL
     /// <summary>
     /// 
     /// </summary>
@@ -306,4 +307,62 @@ namespace Unity.WebRTC
         [MarshalAs(UnmanagedType.LPStr)]
         public string usernameFragment;
     }
+#else
+    public class RTCIceCandidate : IDisposable
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Candidate;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string SdpMid;
+        /// <summary>
+        /// 
+        /// </summary>
+        public int? SdpMLineIndex;
+
+
+        internal IntPtr self;
+        private bool disposed;
+
+        ~RTCIceCandidate()
+        {
+            this.Dispose();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero)
+            {
+                NativeMethods.DeleteIceCandidate(self);
+                self = IntPtr.Zero;
+            }
+
+            this.disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        public RTCIceCandidate(string candidate, string sdpMid, int sdpMLineIndex, IntPtr? ptr = null)
+        {
+            if(ptr == null)
+            {
+                ptr = NativeMethods.CreateNativeRTCIceCandidate(candidate, sdpMid, sdpMLineIndex);
+            }
+            self = ptr.Value;
+            this.Candidate = candidate;
+            this.SdpMid = sdpMid;
+            this.SdpMLineIndex = sdpMLineIndex;
+        }
+    }
+#endif
 }
