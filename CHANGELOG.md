@@ -4,6 +4,17 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.0-exp.3] - 2021-06-08
+
+### Changed
+
+- Add options of the incoming video in `VideoReceive` sample to test video capture modules on the device
+
+### Fixed
+
+- Fix the validation for the color space of the incoming video
+- Fix the crash when accessing the property `RTCRtpSender.Track`
+
 ## [2.4.0-exp.2] - 2021-05-21
 
 ### Fixed

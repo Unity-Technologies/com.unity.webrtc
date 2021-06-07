@@ -40,7 +40,8 @@ Please read this if you have an interest to customize native code in this projec
 | `2.3.0-preview` | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS platform suppport | Dec 2020 |
 | `2.4.0-exp.1` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Android platform suppport | Apr 2021 |
 | `2.4.0-exp.2` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | | May 2021 |
-| `2.4.0-exp.3` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Audio renderer support - <br>- Apple Silicon support | Jul 2021 |
+| `2.4.0-exp.3` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | | Jun 2021 |
+| `2.4.0-exp.4` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Audio renderer support - <br>- Apple Silicon support | Jul 2021 |
 
 ## Licenses
 
