@@ -31,6 +31,7 @@ platforms:
     image: package-ci/mac:latest
     gpu_image: package-ci/mac:latest
     flavor: m1.mac
+    model:
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test_plugin_mac.sh
     plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
@@ -40,6 +41,7 @@ platforms:
     image: package-ci/mac:latest
     gpu_image: package-ci/mac:latest
     flavor: m1.mac
+    model:
     build_command: BuildScripts~/build_plugin_ios.sh
     test_command: BuildScripts~/test_plugin_ios.sh
     plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
@@ -49,6 +51,7 @@ platforms:
     image: renderstreaming/android-linux-build:latest
     gpu_image: renderstreaming/android-linux-build:latest
     flavor: b1.large
+    model:
     build_command: BuildScripts~/build_plugin_android.sh
     test_command: BuildScripts~/test_plugin_android.sh
     plugin_path: Runtime/Plugins/Android/libwebrtc.aar
@@ -58,6 +61,7 @@ test_targets:
     type: Unity::VM
     image: renderstreaming/win10:v0.3.7-728388
     flavor: b1.large
+    model:
     is_gpu: false
     gfx_types:
       - name: d3d11
@@ -79,6 +83,7 @@ test_targets:
     type: Unity::VM
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
+    model:
     is_gpu: false
     gfx_types:
       - name: glcore
@@ -140,6 +145,7 @@ test_targets:
     type: Unity::metal::macmini
     image: package-ci/mac:latest
     flavor: m1.mac
+    model:
     gfx_types:
       - name: metal
         extra-editor-arg: force-metal
