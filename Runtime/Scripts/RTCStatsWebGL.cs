@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL
+#if UNITY_WEBGL
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -237,7 +237,7 @@ namespace Unity.WebRTC
     public class RTCStats
     {
         public double timestamp;
-        public RTCStatsType type;
+        public RTCStatsType Type;
         public string id;
     }
 

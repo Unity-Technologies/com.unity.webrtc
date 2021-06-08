@@ -376,6 +376,7 @@ namespace Unity.WebRTC
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create(encoderType:type);
+            Debug.Log("s_context create = "+ s_context);
 #if !UNITY_WEBGL
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
@@ -420,6 +421,7 @@ namespace Unity.WebRTC
         /// </summary>
         public static void Dispose()
         {
+            Debug.Log("Dispose");
             if (s_context != null)
             {
                 s_context.Dispose();

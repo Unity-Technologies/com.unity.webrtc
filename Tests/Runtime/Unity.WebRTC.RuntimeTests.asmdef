@@ -1,5 +1,6 @@
 {
     "name": "Unity.WebRTC.RuntimeTests",
+    "rootNamespace": "",
     "references": [
         "Unity.WebRTC",
         "UnityEngine.TestRunner",

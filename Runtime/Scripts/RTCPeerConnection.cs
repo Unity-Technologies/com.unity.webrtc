@@ -596,9 +596,14 @@ namespace Unity.WebRTC
                 throw new ArgumentNullException("");
             }
 
+
+#if !UNITY_WEBGL
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
-            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(
-                GetSelfOrThrow(), track.GetSelfOrThrow(), streamId);
+            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow(), streamId);
+#else
+            var streamPtr = stream == null ? IntPtr.Zero : stream.GetSelfOrThrow();
+            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow(), streamPtr);
+#endif
             return CreateSender(ptr);
         }
 
@@ -660,7 +665,8 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
 #else
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), options.iceRestart, options.offerToReceiveAudio, options.offerToReceiveVideo);
+            // TODO : Handle RTCOfferAnswerOptions rather than booleans
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), options.iceRestart, options.voiceActivityDetection, true);
 #endif
             return m_opSessionDesc;
         }
@@ -668,7 +674,11 @@ namespace Unity.WebRTC
         public RTCSessionDescriptionAsyncOperation CreateOffer()
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
+#if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+#else
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), false, false, true);
+#endif
             return m_opSessionDesc;
         }
 
@@ -692,7 +702,11 @@ namespace Unity.WebRTC
         public RTCSessionDescriptionAsyncOperation CreateAnswer()
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
+#if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+#else
+            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), false);
+#endif
             return m_opSessionDesc;
         }
 
