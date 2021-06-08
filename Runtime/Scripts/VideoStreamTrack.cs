@@ -16,9 +16,9 @@ namespace Unity.WebRTC
 
         UnityVideoRenderer m_renderer;
 
-        private static RenderTexture CreateRenderTexture(int width, int height, GraphicsFormat format)
+        private static RenderTexture CreateRenderTexture(int width, int height)
         {
-            WebRTC.ValidateGraphicsFormat(format);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
             return tex;
@@ -66,8 +66,7 @@ namespace Unity.WebRTC
             m_needFlip = true;
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-            var renderTextureFormat = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height, renderTextureFormat);
+            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
 
             m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
 
@@ -113,7 +112,7 @@ namespace Unity.WebRTC
         public VideoStreamTrack(string label, Texture source)
             : this(label,
                 source,
-                CreateRenderTexture(source.width, source.height, source.graphicsFormat),
+                CreateRenderTexture(source.width, source.height),
                 source.width,
                 source.height)
         {
