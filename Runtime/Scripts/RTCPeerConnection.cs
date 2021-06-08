@@ -617,7 +617,7 @@ namespace Unity.WebRTC
             RTCDataChannelInitInternal _options =
                 options == null ? new RTCDataChannelInitInternal() : (RTCDataChannelInitInternal)options;
 
-            IntPtr ptr = WebRTC.Context.CreateDataChannel(GetSelfOrThrow(), Hash128.Compute(label).ToString(), ref _options);
+            IntPtr ptr = WebRTC.Context.CreateDataChannel(GetSelfOrThrow(), Uri.EscapeUriString(label), ref _options);
             if (ptr == IntPtr.Zero)
                 throw new ArgumentException("RTCDataChannelInit object is incorrect.");
             return new RTCDataChannel(ptr, this);

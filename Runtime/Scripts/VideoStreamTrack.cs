@@ -133,7 +133,7 @@ namespace Unity.WebRTC
         /// <param name="height"></param>
         /// <param name="format"></param>
         public VideoStreamTrack(string label, IntPtr texturePtr, int width, int height, GraphicsFormat format)
-            : base(WebRTC.Context.CreateVideoTrack(Hash128.Compute(label).ToString()))
+            : base(WebRTC.Context.CreateVideoTrack(Uri.EscapeUriString(label)))
         {
             WebRTC.ValidateTextureSize(width, height, Application.platform, WebRTC.GetEncoderType());
             WebRTC.ValidateGraphicsFormat(format);

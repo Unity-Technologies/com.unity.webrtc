@@ -5,7 +5,7 @@ namespace Unity.WebRTC
 {
     public class AudioStreamTrack : MediaStreamTrack
     {
-        public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(Hash128.Compute(label).ToString()))
+        public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(Uri.EscapeUriString(label)))
         {
         }
 
@@ -22,8 +22,8 @@ namespace Unity.WebRTC
         {
             started = true;
 
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream(Hash128.Compute(streamlabel).ToString()));
-            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(Hash128.Compute(label).ToString()));
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream(Uri.EscapeUriString(streamlabel)));
+            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(Uri.EscapeUriString(label)));
             stream.AddTrack(track);
             return stream;
         }
