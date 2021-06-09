@@ -93,8 +93,9 @@ namespace Unity.WebRTC
 
             m_needFlip = true;
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
 #if !UNITY_WEBGL
-            var renderTextureFormat = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
             m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
             m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);

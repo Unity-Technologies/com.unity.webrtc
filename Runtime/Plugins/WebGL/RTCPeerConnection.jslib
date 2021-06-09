@@ -299,7 +299,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionClose', peer.label);
     peer.close();
   },
-    
+
   PeerConnectionRestartIce: function (peerPtr) {
 
   },
@@ -367,12 +367,10 @@ var UnityWebRTCPeerConnection = {
       return false;
     }
   },
-    
-  PeerConnectionCreateOffer: function (peerPtr, iceRestart) {
+
+  PeerConnectionCreateOffer: function (peerPtr, iceRestart, offerToReceiveAudio, offerToReceiveVideo) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateOffer', 'peer')) return;
     var peer = UWManaged[peerPtr];
-    var offerToReceiveAudio = false;
-    var offerToReceiveVideo = false;
     var options = {
       iceRestart: !!iceRestart,
       offerToReceiveAudio: !!offerToReceiveAudio,
