@@ -300,6 +300,10 @@ var UnityWebRTCPeerConnection = {
     peer.close();
   },
 
+  PeerConnectionRestartIce: function (peerPtr) {
+
+  },
+
   PeerConnectionAddTrack: function (peerPtr, trackPtr, streamPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionAddTrack', 'peer')) return;
     if (!uwcom_existsCheck(trackPtr, 'PeerConnectionAddTrack', 'track')) return;

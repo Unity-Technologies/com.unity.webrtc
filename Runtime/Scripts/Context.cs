@@ -166,7 +166,7 @@ namespace Unity.WebRTC
             return NativeMethods.ContextCreateMediaStream(self, label);
         }
 #else
-        public IntPtr CreateMediaStream()
+        public IntPtr CreateMediaStream(string label="")
         {
             return NativeMethods.ContextCreateMediaStream(self);
         }
@@ -224,6 +224,11 @@ namespace Unity.WebRTC
             return NativeMethods.ContextCreateVideoTrack(self, label);
         }
 #else
+        public IntPtr CreateVideoTrack(string label)
+        {
+            return IntPtr.Zero; // NativeMethods.ContextCreateVideoTrack(self, label);
+        }
+
         public IntPtr CreateVideoTrack(IntPtr srcTexturePtr, IntPtr dstTexturePtr, int width, int height)
         {
             return NativeMethods.ContextCreateVideoTrack(self, srcTexturePtr, dstTexturePtr, width, height);

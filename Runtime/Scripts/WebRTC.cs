@@ -376,7 +376,6 @@ namespace Unity.WebRTC
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create(encoderType:type);
-            Debug.Log("s_context create = "+ s_context);
 #if !UNITY_WEBGL
             NativeMethods.SetCurrentContext(s_context.self);
             s_syncContext = SynchronizationContext.Current;
@@ -815,6 +814,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func);
 #else
+        public static void RegisterDebugLog(Action<string> func) { }
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DebugLogLevel logLevel, DelegateDebugLog func);
 #endif
@@ -1103,6 +1103,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
 #else
+        public static IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label)
+        {
+            return ContextCreateMediaStream(ctx);
+        }
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateMediaStream(IntPtr ctx);
 #endif
@@ -1217,6 +1221,29 @@ namespace Unity.WebRTC
         public static extern IntPtr StatsMemberGetDoubleArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length);
+#else
+        public static IntPtr StatsGetJson(IntPtr stats) { return default; }
+        public static IntPtr StatsGetId(IntPtr stats){ return default; }
+        public static RTCStatsType StatsGetType(IntPtr stats){ return default; }
+        public static long StatsGetTimestamp(IntPtr stats){ return default; }
+        public static IntPtr StatsGetMembers(IntPtr stats, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetName(IntPtr member){ return default; }
+        public static StatsMemberType StatsMemberGetType(IntPtr member){ return default; }
+        public static bool StatsMemberIsDefined(IntPtr member){ return default; }
+        public static bool StatsMemberGetBool(IntPtr member){ return default; }
+        public static int StatsMemberGetInt(IntPtr member){ return default; }
+        public static uint StatsMemberGetUnsignedInt(IntPtr member){ return default; }
+        public static long StatsMemberGetLong(IntPtr member){ return default; }
+        public static ulong StatsMemberGetUnsignedLong(IntPtr member){ return default; }
+        public static double StatsMemberGetDouble(IntPtr member){ return default; }
+        public static IntPtr StatsMemberGetString(IntPtr member){ return default; }
+        public static IntPtr StatsMemberGetBoolArray(IntPtr member, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetIntArray(IntPtr member, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetUnsignedIntArray(IntPtr member, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetLongArray(IntPtr member, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetUnsignedLongArray(IntPtr member, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetDoubleArray(IntPtr member, out ulong length){ length = default; return default; }
+        public static IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length){ length = default; return default; }
 #endif
 
 #if UNITY_WEBGL
