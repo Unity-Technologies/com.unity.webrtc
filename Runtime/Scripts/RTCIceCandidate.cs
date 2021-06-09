@@ -127,7 +127,7 @@ namespace Unity.WebRTC
             }
         }
 
-        
+
         public static RTCIceTcpCandidateType? ParseRTCIceTcpCandidateType(this string src)
         {
             if (string.IsNullOrEmpty(src))
@@ -146,6 +146,7 @@ namespace Unity.WebRTC
         }
     }
 
+//#if !UNITY_WEBGL
     /// <summary>
     /// 
     /// </summary>
@@ -154,15 +155,30 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public string Candidate => NativeMethods.IceCandidateGetSdp(self);
+        public string Candidate
+#if !UNITY_WEBGL
+             => NativeMethods.IceCandidateGetSdp(self);
+#else
+            ;
+#endif
         /// <summary>
         /// 
         /// </summary>
-        public string SdpMid => NativeMethods.IceCandidateGetSdpMid(self);
+        public string SdpMid
+#if !UNITY_WEBGL
+            => NativeMethods.IceCandidateGetSdpMid(self);
+#else
+            ;
+#endif
         /// <summary>
         /// 
         /// </summary>
-        public int? SdpMLineIndex => NativeMethods.IceCandidateGetSdpLineIndex(self);
+        public int? SdpMLineIndex
+#if !UNITY_WEBGL
+            => NativeMethods.IceCandidateGetSdpLineIndex(self);
+#else
+            ;
+#endif
         /// <summary>
         /// 
         /// </summary>
@@ -242,14 +258,23 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         /// <param name="candidateInfo"></param>
+#if !UNITY_WEBGL
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
+#else
+        public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null, IntPtr iceCandidatePtr = default)
+#endif
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
             if(candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
                 throw new ArgumentException("sdpMid and sdpMLineIndex are both null");
 
             RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
-            RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
+            RTCErrorType error =
+#if !UNITY_WEBGL
+                NativeMethods.CreateIceCandidate(ref option, out self);
+#else
+                RTCErrorType.InternalError;
+#endif
             if (error != RTCErrorType.None)
                 throw new ArgumentException(
                         $"create candidate is failed. error type:{error}, " +
@@ -257,7 +282,9 @@ namespace Unity.WebRTC
                         $"sdpMid:{candidateInfo.sdpMid}\n" +
                         $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
 
+#if !UNITY_WEBGL
             NativeMethods.IceCandidateGetCandidate(self, out _candidate);
+#endif
         }
     }
 

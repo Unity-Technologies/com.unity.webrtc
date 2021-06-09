@@ -95,7 +95,7 @@ var UnityWebRTCDataChannel = {
     if (!uwcom_existsCheck(dataChannelPtr, 'DataChannelRegisterOnOpen', 'dataChannel')) return;
     uwevt_DCOnOpen = DataChannelNativeOnOpen;
   },
-
+    
   DataChannelRegisterOnClose: function (dataChannelPtr, DataChannelNativeOnClose) {
     if (!uwcom_existsCheck(dataChannelPtr, 'DataChannelRegisterOnClose', 'dataChannel')) return;
     uwevt_DCOnClose = DataChannelNativeOnClose;

@@ -103,7 +103,11 @@ var UnityWebRTCContext = {
     if (!uwcom_existsCheck(streamPtr, 'ContextDeleteMediaStream', 'stream')) return;
     _DeleteMediaStream(streamPtr);
   },
-
+    
+  ContextRegisterMediaStreamObserver: function (contextPtr, streamPtr) {
+    
+  },
+    
   MediaStreamRegisterOnAddTrack: function (contextPtr, streamPtr, MediaStreamOnAddTrack) {
     if (!uwcom_existsCheck(contextPtr, 'MediaStreamRegisterOnAddTrack', 'context')) return;
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamRegisterOnAddTrack', 'stream')) return;

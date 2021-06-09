@@ -299,6 +299,10 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionClose', peer.label);
     peer.close();
   },
+    
+  PeerConnectionRestartIce: function (peerPtr) {
+
+  },
 
   PeerConnectionAddTrack: function (peerPtr, trackPtr, streamPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionAddTrack', 'peer')) return;
@@ -363,7 +367,7 @@ var UnityWebRTCPeerConnection = {
       return false;
     }
   },
-
+    
   PeerConnectionCreateOffer: function (peerPtr, iceRestart) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateOffer', 'peer')) return;
     var peer = UWManaged[peerPtr];

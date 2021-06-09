@@ -21,7 +21,11 @@ namespace Unity.WebRTC
         {
             started = true;
 
+#if !UNITY_WEBGL
             var stream = new MediaStream(WebRTC.Context.CreateMediaStream(streamlabel));
+#else
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream());
+#endif
             var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(label));
             stream.AddTrack(track);
             return stream;

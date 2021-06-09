@@ -1,5 +1,6 @@
 {
     "name": "Unity.WebRTC",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [
         "Android",
@@ -7,6 +8,7 @@
         "iOS",
         "LinuxStandalone64",
         "macOSStandalone",
+        "WebGL",
         "WindowsStandalone64"
     ],
     "excludePlatforms": [],

@@ -46,6 +46,20 @@ namespace Unity.WebRTC
             };
         }
 
+#if UNITY_WEBGL
+        internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, MediaStreamTrack track)
+        {
+            NativeMethods.PeerConnectionTrackGetStats(connection.GetSelfOrThrow(), track.GetSelfOrThrow());
+
+            connection.OnStatsDelivered = ptr =>
+            {
+                Value = new RTCStatsReport(ptr);
+                IsError = false;
+                this.Done();
+            };
+        }
+#endif
+
         internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpSender sender)
         {
             NativeMethods.PeerConnectionSenderGetStats(connection.GetSelfOrThrow(), sender.self);
