@@ -349,8 +349,7 @@ namespace Unity.WebRTC
             if (Application.platform == RuntimePlatform.WindowsEditor ||
                 Application.platform == RuntimePlatform.WindowsPlayer ||
                 Application.platform == RuntimePlatform.OSXEditor ||
-                Application.platform == RuntimePlatform.OSXPlayer ||
-                Application.platform != RuntimePlatform.WebGLPlayer)
+                Application.platform == RuntimePlatform.OSXPlayer)
             {
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
                     SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
