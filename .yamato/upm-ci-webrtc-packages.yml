@@ -177,9 +177,6 @@ build_webrtc_plugin_{{ platform.name }}:
     type: {{ platform.type }}
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
-{% if platform.model %}
-    model: {{ platform.model }}
-{% endif %}    
   commands:
     - {{ platform.build_command }}
   artifacts:
@@ -346,7 +343,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
-{% if target.model %}
+{% if target.is_gpu == "true" and target.model %}
     model: {{ target.model }}
 {% endif %}    
   commands:
@@ -468,7 +465,7 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "false" -%}
+{% if target.is_gpu == "false" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif -%}
 {% endfor %}
