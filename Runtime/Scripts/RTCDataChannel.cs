@@ -106,8 +106,19 @@ namespace Unity.WebRTC
             }
         }
 
+#if UNITY_WEBGL
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public DelegateOnTextMessage OnTextMessage
+        {
+            get { return onTextMessage; }
+            set { onTextMessage = value; }
+        }
+#endif
+
+        /// <summary>
+        ///
         /// </summary>
         public DelegateOnOpen OnOpen
         {
