@@ -17,6 +17,20 @@ namespace Unity.WebRTC.RuntimeTest
 
         public bool IsTestFinished { get; private set; }
 
+        public void CreatePeersAndChannels()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[]
+            {
+                new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
+            };
+
+            peers[0] = new RTCPeerConnection(ref config);
+            peers[1] = new RTCPeerConnection(ref config);
+            dataChannels[peers[0]] = new List<RTCDataChannel>();
+            dataChannels[peers[1]] = new List<RTCDataChannel>();
+        }
+
         public void SetStream(MediaStream stream)
         {
             m_stream = stream;
@@ -66,16 +80,10 @@ namespace Unity.WebRTC.RuntimeTest
 
         IEnumerator Start()
         {
-            RTCConfiguration config = default;
-            config.iceServers = new[]
+            if (peers.All(x => x == null))
             {
-                    new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
-                };
-
-            peers[0] = new RTCPeerConnection(ref config);
-            peers[1] = new RTCPeerConnection(ref config);
-            dataChannels[peers[0]] = new List<RTCDataChannel>();
-            dataChannels[peers[1]] = new List<RTCDataChannel>();
+                CreatePeersAndChannels();
+            }
 
             RTCDataChannel channel = peers[0].CreateDataChannel("data");
             dataChannels[peers[0]].Add(channel);
@@ -83,21 +91,21 @@ namespace Unity.WebRTC.RuntimeTest
             peers[0].OnIceCandidate = candidate =>
             {
                 Assert.That(candidate, Is.Not.Null);
-                Assert.That(candidate, Is.Not.Null);
+                Assert.That(candidate.Candidate, Is.Not.Null);
                 peers[1].AddIceCandidate(candidate);
             };
             peers[1].OnIceCandidate = candidate =>
             {
-                Assert.NotNull(candidate);
-                Assert.NotNull(candidate.Candidate);
+                Assert.That(candidate, Is.Not.Null);
+                Assert.That(candidate.Candidate, Is.Not.Null);
                 peers[0].AddIceCandidate(candidate);
             };
             peers[1].OnTrack = e =>
             {
-                Assert.NotNull(e);
-                Assert.NotNull(e.Track);
-                Assert.NotNull(e.Receiver);
-                Assert.NotNull(e.Transceiver);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.Track, Is.Not.Null);
+                Assert.That(e.Receiver, Is.Not.Null);
+                Assert.That(e.Transceiver, Is.Not.Null);
                 peers[1].AddTrack(e.Track);
             };
             peers[0].OnDataChannel = e =>

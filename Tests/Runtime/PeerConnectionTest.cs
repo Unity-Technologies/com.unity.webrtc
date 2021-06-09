@@ -891,7 +891,36 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.Dispose();
         }
 
-        private IEnumerator SignalingOffer(RTCPeerConnection @from, RTCPeerConnection to)
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator InvalidLabelButNoError()
+        {
+            // label include space
+            var audioTrack = new AudioStreamTrack("audio track");
+            // gameobject name include space (gameobject name use for track label in CaptureStream method)
+            var cam = new GameObject("main camera object").AddComponent<Camera>();
+            var videoTrack = cam.CaptureStreamTrack(1280, 720, 0);
+
+            var stream = new MediaStream();
+            stream.AddTrack(audioTrack);
+            stream.AddTrack(videoTrack);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.CreatePeersAndChannels();
+            test.component.CreateDataChannel(0, "test channel");
+            test.component.SetStream(stream);
+            yield return test;
+
+            test.component.Dispose();
+            audioTrack.Dispose();
+            videoTrack.Dispose();
+            yield return 0;
+            stream.Dispose();
+            Object.DestroyImmediate(cam.gameObject);
+        }
+
+        private static IEnumerator SignalingOffer(RTCPeerConnection @from, RTCPeerConnection to)
         {
             var op1 = @from.CreateOffer();
             yield return op1;
