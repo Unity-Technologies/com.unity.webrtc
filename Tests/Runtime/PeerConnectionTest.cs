@@ -907,8 +907,6 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.CreatePeersAndChannels();
-            test.component.CreateDataChannel(0, "test channel");
             test.component.SetStream(stream);
             yield return test;
 

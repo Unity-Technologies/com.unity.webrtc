@@ -17,20 +17,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         public bool IsTestFinished { get; private set; }
 
-        public void CreatePeersAndChannels()
-        {
-            RTCConfiguration config = default;
-            config.iceServers = new[]
-            {
-                new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
-            };
-
-            peers[0] = new RTCPeerConnection(ref config);
-            peers[1] = new RTCPeerConnection(ref config);
-            dataChannels[peers[0]] = new List<RTCDataChannel>();
-            dataChannels[peers[1]] = new List<RTCDataChannel>();
-        }
-
         public void SetStream(MediaStream stream)
         {
             m_stream = stream;
@@ -80,10 +66,16 @@ namespace Unity.WebRTC.RuntimeTest
 
         IEnumerator Start()
         {
-            if (peers.All(x => x == null))
+            RTCConfiguration config = default;
+            config.iceServers = new[]
             {
-                CreatePeersAndChannels();
-            }
+                new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
+            };
+
+            peers[0] = new RTCPeerConnection(ref config);
+            peers[1] = new RTCPeerConnection(ref config);
+            dataChannels[peers[0]] = new List<RTCDataChannel>();
+            dataChannels[peers[1]] = new List<RTCDataChannel>();
 
             RTCDataChannel channel = peers[0].CreateDataChannel("data");
             dataChannels[peers[0]].Add(channel);
