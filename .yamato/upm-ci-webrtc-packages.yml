@@ -177,6 +177,9 @@ build_webrtc_plugin_{{ platform.name }}:
     type: {{ platform.type }}
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
+{% if platform.model %}
+    model: {{ platform.model }}
+{% endif %}    
   commands:
     - {{ platform.build_command }}
   artifacts:
