@@ -570,8 +570,8 @@ push_plugin:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_nogpu
 
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
@@ -593,8 +593,8 @@ publish_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_nogpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
+#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_nogpu
 
 publish_dry_run_{{ package.name }}:
   name: Publish Dry Run {{ package.packagename }}
