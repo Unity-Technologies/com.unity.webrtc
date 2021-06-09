@@ -31,6 +31,11 @@ namespace Unity.WebRTC.RuntimeTest
 
         public static bool CheckVideoSendRecvCodecSupport(EncoderType encoderType)
         {
+            // hardware encoder is not supported 
+            if (encoderType == EncoderType.Hardware &&
+                !NativeMethods.GetHardwareEncoderSupport())
+                return false;                
+
             WebRTC.Initialize(encoderType);
             var capabilitiesSenderCodec = RTCRtpSender.GetCapabilities(TrackKind.Video)
                 .codecs

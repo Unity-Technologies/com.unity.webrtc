@@ -11,6 +11,7 @@ platforms:
     image: renderstreaming/win10:v0.3.7-728388
     gpu_image: renderstreaming/win10:v0.3.7-728285
     flavor: b1.large
+    model: rtx2080
     build_command: BuildScripts~/build_plugin_win.cmd
     test_command: BuildScripts~/test_plugin_win.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
@@ -20,6 +21,7 @@ platforms:
     image: renderstreaming/ubuntu-18.04:latest
     gpu_image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
+    model: rtx2080
     build_command: BuildScripts~/build_plugin_linux.sh
     test_command: BuildScripts~/test_plugin_linux.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
@@ -96,6 +98,7 @@ test_targets:
     type: Unity::VM::GPU
     image: renderstreaming/win10:v0.3.7-728285
     flavor: b1.large
+    model: rtx2080
     is_gpu: true
     gfx_types:
       - name: d3d11
@@ -117,6 +120,7 @@ test_targets:
     type: Unity::VM::GPU
     image: renderstreaming/ubuntu-18.04:latest
     flavor: b1.large
+    model: rtx2080
     is_gpu: true
     gfx_types:
       - name: glcore
@@ -188,6 +192,9 @@ test_webrtc_plugin_{{ platform.name }}:
     type: {{ platform.gpu_type }}
     image: {{ platform.gpu_image }}
     flavor: {{ platform.flavor }}
+{% if platform.model %}
+    model: {{ platform.model }}
+{% endif %}    
   commands:
     - {{ platform.test_command }}
 {% endfor %}
@@ -336,6 +343,9 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
+{% if target.is_gpu == "true" and target.model %}
+    model: {{ target.model }}
+{% endif %}    
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }} --extra-editor-arg {{ gfx_type.extra-editor-arg }}
@@ -442,11 +452,7 @@ trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_gpu
 {% if editor.version == "2020.3" -%}
   triggers:
-    branches:
-      only:
-      - "/.*/"
-      except:
-      - "master"
+    expression: pull_request.target eq "develop"
 {% endif -%}
 
 test_{{ package.name }}_{{ editor.version }}_nogpu:
@@ -459,7 +465,7 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "false" -%}
+{% if target.is_gpu == "false" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif -%}
 {% endfor %}
