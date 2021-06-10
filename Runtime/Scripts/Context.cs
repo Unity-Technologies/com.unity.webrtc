@@ -150,7 +150,7 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, ref options);
 #else
-            var optionsJson = JsonConvert.SerializeObject(options);
+            var optionsJson = JsonUtility.ToJson(options);
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, optionsJson);
 #endif
         }
@@ -186,7 +186,7 @@ namespace Unity.WebRTC
         {
             NativeMethods.ContextRegisterMediaStreamObserver(self, stream.GetSelfOrThrow());
         }
-        
+
         public void MediaStreamRegisterOnAddTrack(MediaStream stream, DelegateNativeMediaStreamOnAddTrack callback)
         {
             NativeMethods.MediaStreamRegisterOnAddTrack(self, stream.GetSelfOrThrow(), callback);
