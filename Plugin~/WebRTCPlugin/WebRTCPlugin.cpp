@@ -391,6 +391,36 @@ extern "C"
         track->RemoveSink(sink);
     }
 
+    UNITY_INTERFACE_EXPORT void AudioFrameObserverRegisterOnFrameReady(Context* context, UnityAudioFrameObserver* observer, DelegateAudioFrameObserverOnFrameReady callback)
+    {
+        context->GetAudioFrameObserver(observer->GetId())->RegisterOnFrameReady(callback);
+    }
+
+    UNITY_INTERFACE_EXPORT UnityAudioFrameObserver* CreateAudioFrameObserver(Context* context)
+    {
+        return context->CreateAudioFrameObserver();
+    }
+
+    UNITY_INTERFACE_EXPORT uint32_t GetAudioFrameObserverId(UnityAudioFrameObserver* sink)
+    {
+        return sink->GetId();
+    }
+
+    UNITY_INTERFACE_EXPORT void DeletetAudioFrameObserver(Context* context, UnityAudioFrameObserver* sink)
+    {
+        context->DeleteAudioFrameObserver(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void AudioTrackAddSink(AudioTrackInterface* track, UnityAudioFrameObserver* sink)
+    {
+        track->AddSink(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void AudioTrackRemoveSink(AudioTrackInterface* track, UnityAudioFrameObserver* sink)
+    {
+        track->RemoveSink(sink);
+    }
+
     UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func)
     {
         delegateDebugLog = func;

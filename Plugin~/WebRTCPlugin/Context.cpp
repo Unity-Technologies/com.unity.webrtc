@@ -461,6 +461,28 @@ namespace webrtc
         renderer = nullptr;
     }
 
+    uint32_t Context::s_audioFrameObserverId = 0;
+    uint32_t Context::GenerateAudioFrameObserverId() { return s_audioFrameObserverId++; }
+
+    UnityAudioFrameObserver* Context::CreateAudioFrameObserver()
+    {
+        auto audioFrameObserverId = GenerateAudioFrameObserverId();
+        auto observer = std::make_unique<UnityAudioFrameObserver>(audioFrameObserverId);
+        m_mapAudioFrameObserver[audioFrameObserverId] = std::move(observer);
+        return m_mapAudioFrameObserver[audioFrameObserverId].get();
+    }
+
+    UnityAudioFrameObserver* Context::GetAudioFrameObserver(uint32_t id)
+    {
+        return m_mapAudioFrameObserver[id].get();
+    }
+
+    void Context::DeleteAudioFrameObserver(UnityAudioFrameObserver* observer)
+    {
+        m_mapAudioFrameObserver.erase(observer->GetId());
+        observer = nullptr;
+    }
+
     void Context::GetRtpSenderCapabilities(
         cricket::MediaType kind, RtpCapabilities* capabilities) const
     {

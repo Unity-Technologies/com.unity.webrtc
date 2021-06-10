@@ -565,6 +565,8 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeMediaStreamOnAddTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateNativeAudioFrameObserverOnFrameReady(IntPtr track, in AudioFrame frame);
 
     internal static class NativeMethods
     {
@@ -816,6 +818,18 @@ namespace Unity.WebRTC
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(float[] data, int size);
+        [DllImport(WebRTC.Lib)]
+        public static extern void AudioFrameObserverRegisterOnFrameReady(IntPtr context, IntPtr observer, DelegateNativeAudioFrameObserverOnFrameReady callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr CreateAudioFrameObserver(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern uint GetAudioFrameObserverId(IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void DeleteAudioFrameObserver(IntPtr context, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void AudioTrackAddSink(IntPtr track, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void AudioTrackRemoveSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]

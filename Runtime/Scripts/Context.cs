@@ -236,5 +236,20 @@ namespace Unity.WebRTC
             textureUpdateFunction = textureUpdateFunction == IntPtr.Zero ? GetUpdateTextureFunc() : textureUpdateFunction;
             VideoDecoderMethods.UpdateRendererTexture(textureUpdateFunction, texture, rendererId);
         }
+
+        public void AudioFrameObserverRegisterOnFrameReady(IntPtr observer, DelegateNativeAudioFrameObserverOnFrameReady callback)
+        {
+            NativeMethods.AudioFrameObserverRegisterOnFrameReady(self, observer, callback);
+        }
+
+        public IntPtr CreateAudioFrameObserver()
+        {
+            return NativeMethods.CreateAudioFrameObserver(self);
+        }
+
+        public void DeleteAudioFrameObserver(IntPtr sink)
+        {
+            NativeMethods.DeleteAudioFrameObserver(self, sink);
+        }
     }
 }

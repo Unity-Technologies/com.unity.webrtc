@@ -36,7 +36,9 @@ target_sources(WebRTCLib
     WebRTCConstants.h
     WebRTCMacros.h
     WebRTCPlugin.h
-)
+    "UnityAudioFrameObserver.cpp"
+    "UnityAudioFrameObserver.h"
+    )
 
 if(iOS OR macOS)
   target_sources(WebRTCLib
