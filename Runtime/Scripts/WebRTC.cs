@@ -817,10 +817,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DebugLogLevel logLevel, DelegateDebugLog func);
 #endif
-#if !UNITY_WEBGL
-        [DllImport(WebRTC.Lib)]
-        public static extern void RegisterRenderingWebRTCPlugin();
-#endif
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreate(int uid, EncoderType encoderType);
         [DllImport(WebRTC.Lib)]
