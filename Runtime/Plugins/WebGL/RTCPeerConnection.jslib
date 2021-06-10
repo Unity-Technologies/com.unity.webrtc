@@ -372,7 +372,7 @@ var UnityWebRTCPeerConnection = {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateOffer', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var options = {
-      iceRestart: !!iceRestart,
+      iceRestart: !!iceRestart
     };
     peer.createOffer(options).then(function (offer) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionCreateOffer', peer.label + ':' + JSON.stringify(options) + ':' + offer.type);

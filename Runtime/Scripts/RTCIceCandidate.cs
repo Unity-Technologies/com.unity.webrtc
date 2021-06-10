@@ -255,35 +255,38 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="candidateInfo"></param>
 #if !UNITY_WEBGL
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
 #else
-        public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null, IntPtr iceCandidatePtr = default)
+        public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null, IntPtr? iceCandidatePtr = null)
 #endif
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
             if(candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
                 throw new ArgumentException("sdpMid and sdpMLineIndex are both null");
 
-            RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
-            RTCErrorType error =
+            RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal) candidateInfo;
 #if !UNITY_WEBGL
-                NativeMethods.CreateIceCandidate(ref option, out self);
-#else
-                RTCErrorType.InternalError;
-#endif
+            RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
             if (error != RTCErrorType.None)
                 throw new ArgumentException(
                         $"create candidate is failed. error type:{error}, " +
                         $"candidate:{candidateInfo.candidate}\n" +
                         $"sdpMid:{candidateInfo.sdpMid}\n" +
                         $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
-
-#if !UNITY_WEBGL
             NativeMethods.IceCandidateGetCandidate(self, out _candidate);
+#else
+            if (iceCandidatePtr == null)
+            {
+                iceCandidatePtr = NativeMethods.CreateNativeRTCIceCandidate(candidateInfo.candidate, candidateInfo.sdpMid, candidateInfo.sdpMLineIndex ?? 0);
+            }
+            self = iceCandidatePtr.Value;
+            this.Candidate = candidateInfo.candidate;
+            this.SdpMid = candidateInfo.sdpMid;
+            this.SdpMLineIndex = candidateInfo.sdpMLineIndex;
 #endif
         }
     }

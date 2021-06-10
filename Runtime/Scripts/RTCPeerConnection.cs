@@ -332,20 +332,17 @@ namespace Unity.WebRTC
 #else
         static void PCOnIceCandidate(IntPtr ptr, IntPtr iceCandidatePtr, string sdp, string sdpMid, int sdpMlineIndex)
         {
-            WebRTC.Sync(ptr, () =>
+            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
             {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                var options = new RTCIceCandidateInit
                 {
-                    var options = new RTCIceCandidateInit
-                    {
-                        candidate = sdp,
-                        sdpMid = sdpMid,
-                        sdpMLineIndex = sdpMlineIndex
-                    };
-                    var candidate = new RTCIceCandidate(options);
-                    connection.OnIceCandidate?.Invoke(candidate);
-                }
-            });
+                    candidate = sdp,
+                    sdpMid = sdpMid,
+                    sdpMLineIndex = sdpMlineIndex
+                };
+                var candidate = new RTCIceCandidate(options, iceCandidatePtr);
+                connection.OnIceCandidate?.Invoke(candidate);
+            }
         }
 #endif
 
