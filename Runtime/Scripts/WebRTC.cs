@@ -874,7 +874,7 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
 #else
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateOffer(IntPtr ptr, bool iceRestart, bool offerToReceiveAudio, bool offerToReceiveVideo);
+        public static extern void PeerConnectionCreateOffer(IntPtr ptr, bool iceRestart, bool voiceActivation);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionCreateAnswer(IntPtr ptr, bool iceRestart);
 #endif

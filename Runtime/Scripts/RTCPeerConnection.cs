@@ -675,7 +675,7 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
 #else
             // TODO : Handle RTCOfferAnswerOptions rather than booleans
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), options.iceRestart, options.voiceActivityDetection, true);
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), options.iceRestart, options.voiceActivityDetection);
 #endif
             return m_opSessionDesc;
         }
@@ -686,7 +686,7 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
 #else
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), false, false, true);
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), RTCOfferAnswerOptions.Default.iceRestart, RTCOfferAnswerOptions.Default.voiceActivityDetection);
 #endif
             return m_opSessionDesc;
         }
@@ -714,7 +714,7 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
 #else
-            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), false);
+            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), RTCOfferAnswerOptions.Default.iceRestart);
 #endif
             return m_opSessionDesc;
         }

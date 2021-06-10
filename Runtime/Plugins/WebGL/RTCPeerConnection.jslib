@@ -368,13 +368,11 @@ var UnityWebRTCPeerConnection = {
     }
   },
 
-  PeerConnectionCreateOffer: function (peerPtr, iceRestart, offerToReceiveAudio, offerToReceiveVideo) {
+  PeerConnectionCreateOffer: function (peerPtr, iceRestart, voiceActivityDetection) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateOffer', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var options = {
       iceRestart: !!iceRestart,
-      offerToReceiveAudio: !!offerToReceiveAudio,
-      offerToReceiveVideo: !!offerToReceiveVideo
     };
     peer.createOffer(options).then(function (offer) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionCreateOffer', peer.label + ':' + JSON.stringify(options) + ':' + offer.type);
