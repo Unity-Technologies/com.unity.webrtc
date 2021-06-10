@@ -9,6 +9,10 @@ var UnityWebRTCRtpReceiver = {
     var receiver = UWManaged[receiverPtr];
     uwcom_addManageObj(receiver.track);
     return receiver.track.managePtr;
+  },
+  
+  ReceiverGetStreams: function(receiverPtr, length){
+    
   }
 };
 mergeInto(LibraryManager.library, UnityWebRTCRtpReceiver);
