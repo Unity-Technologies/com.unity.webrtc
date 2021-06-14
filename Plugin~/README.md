@@ -15,6 +15,8 @@ On windows, [chocolatey](https://chocolatey.org/) is used to install.
 choco install cuda --version=10.1
 
 # Install Windows SDK
+# WARNING: If you have versions of Windows SDK earlier than Version 1809,
+# compiling the plugin will fail. Make sure to uninstall earlier versions.
 choco install -y vcredist2010 vcredist2013 vcredist140 windows-sdk-10-version-1809-all
 
 # Install Vulkan
