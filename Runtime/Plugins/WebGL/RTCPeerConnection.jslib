@@ -50,6 +50,15 @@ var UnityWebRTCPeerConnection = {
     peer.ondatachannel = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'ondatachannel', this.label + ':' + evt.channel.label);
       var channel = evt.channel;
+      channel.onmessage = (function(evt) {
+        if (typeof evt.data === "string") {
+          var msgPtr = uwcom_strToPtr(evt.data);
+          Module.dynCall_vii(uwevt_DCOnTextMessage, channel.managePtr, msgPtr);
+        } else {
+          var msgPtr = uwcom_arrayToReturnPtr(evt.data, Uint8Array);
+          Module.dynCall_vii(uwevt_DCOnBinaryMessage, channel.managePtr, msgPtr);
+        }
+      });      
       uwcom_addManageObj(channel);
       Module.dynCall_vii(uwevt_PCOnDataChannel, this.managePtr, channel.managePtr);
     };
