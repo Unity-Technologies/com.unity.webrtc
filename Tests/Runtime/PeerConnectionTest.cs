@@ -239,7 +239,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void GetTransceivers()
         {
             var peer = new RTCPeerConnection();
-            var track = new AudioStreamTrack("audio");
+            var track = new AudioStreamTrack();
 
             var sender = peer.AddTrack(track);
             Assert.That(peer.GetTransceivers().ToList(), Has.Count.EqualTo(1));
@@ -258,7 +258,7 @@ namespace Unity.WebRTC.RuntimeTest
             var config = GetDefaultConfiguration();
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
-            var audioTrack = new AudioStreamTrack("audio");
+            var audioTrack = new AudioStreamTrack();
 
             var transceiver1 = peer1.AddTransceiver(TrackKind.Audio);
             transceiver1.Direction = RTCRtpTransceiverDirection.RecvOnly;
@@ -460,7 +460,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             var stream = new MediaStream();
-            var track = new AudioStreamTrack("audio");
+            var track = new AudioStreamTrack();
             var sender = peer.AddTrack(track, stream);
 
             var op = peer.CreateOffer();
@@ -493,7 +493,7 @@ namespace Unity.WebRTC.RuntimeTest
             var peer2 = new RTCPeerConnection(ref config);
 
             var stream = new MediaStream();
-            var track = new AudioStreamTrack("audio");
+            var track = new AudioStreamTrack();
             var sender = peer1.AddTrack(track, stream);
 
             var op1 = peer1.CreateOffer();
@@ -862,8 +862,8 @@ namespace Unity.WebRTC.RuntimeTest
             peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream("audiostream"));
-            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack("audio"));
+            var stream = new MediaStream();
+            var track = new AudioStreamTrack();
             stream.AddTrack(track);
             RTCRtpSender sender = peer1.AddTrack(track, stream);
 
