@@ -69,6 +69,10 @@ namespace Unity.WebRTC
 
         public AudioStreamTrack(AudioSource source) : this()
         {
+            if (source == null)
+                throw new ArgumentNullException("AudioSource argument is null");
+            if (source.clip == null)
+                throw new ArgumentException("AudioClip must to be attached on AudioSource");
             Source = source;
             _sampleRate = Source.clip.frequency;
             _channels = Source.clip.channels;
