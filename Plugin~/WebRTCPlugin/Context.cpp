@@ -172,12 +172,6 @@ namespace webrtc
         rtc::InitializeSSL();
 
         m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
-        //rtc::scoped_refptr<webrtc::AudioDeviceModule> adm = m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule> >(
-        //    RTC_FROM_HERE, [&] {
-        //    return AudioDeviceModule::Create(
-        //    AudioDeviceModule::kDummyAudio, webrtc::CreateDefaultTaskQueueFactory().get());
-        //});
-        //m_adm = new rtc::RefCountedObject<blink::WebRtcAudioDeviceImpl>();
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?

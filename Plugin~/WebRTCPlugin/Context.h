@@ -54,10 +54,6 @@ namespace webrtc
         }
     };
 
-    class AudioSinkAdapter : public AudioTrackSinkInterface
-    {
-    };
-
     class Context : public IVideoEncoderObserver
     {
     public:
@@ -137,7 +133,6 @@ namespace webrtc
         std::unique_ptr<rtc::Thread> m_signalingThread;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
-//        rtc::scoped_refptr <blink::WebRtcAudioDeviceImpl> m_adm;
         rtc::scoped_refptr<webrtc::AudioTrackInterface> m_audioTrack;
         std::list<rtc::scoped_refptr<webrtc::MediaStreamTrackInterface>> m_mediaSteamTrackList;
         std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;
@@ -150,8 +145,6 @@ namespace webrtc
         std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
 
         std::map<webrtc::AudioTrackInterface*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
-
-        //std::unique_ptr<AudioSinkAdapter> sinkAdapter;
 
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;

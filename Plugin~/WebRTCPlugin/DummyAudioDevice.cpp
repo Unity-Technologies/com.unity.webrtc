@@ -10,6 +10,7 @@ namespace webrtc
     {
         if (started && isRecording)
         {
+            // set dummy data
             std::memset(convertedAudioData.data(), 0, size);            
 
             //opus supports up to 48khz sample rate, enforce 48khz here for quality
