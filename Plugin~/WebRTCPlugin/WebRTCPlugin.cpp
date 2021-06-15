@@ -4,6 +4,7 @@
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
 #include "Context.h"
+#include "UnityAudioTrackSource.h"
 #include "Codec/EncoderFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 

@@ -10,6 +10,7 @@
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
+#include "UnityAudioTrackSource.h"
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"

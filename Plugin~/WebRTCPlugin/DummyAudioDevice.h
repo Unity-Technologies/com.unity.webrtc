@@ -9,89 +9,7 @@ namespace unity
 {
 namespace webrtc
 {
-
     using namespace ::webrtc;
-
-    class UnityAudioTrackSource : public webrtc::LocalAudioSource
-    {
-    public:
-        static rtc::scoped_refptr<UnityAudioTrackSource> Create(const std::string& sTrackName)
-        {
-            rtc::scoped_refptr<UnityAudioTrackSource> source(
-                new rtc::RefCountedObject<UnityAudioTrackSource>(sTrackName));
-            return source;
-        }
-
-        static rtc::scoped_refptr<UnityAudioTrackSource> Create(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
-        {
-            rtc::scoped_refptr<UnityAudioTrackSource> source(
-                new rtc::RefCountedObject<UnityAudioTrackSource>(sTrackName, audio_options));
-            return source;
-        }
-
-        void AddSink(webrtc::AudioTrackSinkInterface* sink) override
-        {
-            m_pAudioTrackSinkInterface = sink;
-        }
-        void RemoveSink(webrtc::AudioTrackSinkInterface* sink) override
-        {
-            m_pAudioTrackSinkInterface = nullptr;
-        }
-
-        void OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
-        {
-            RTC_LOG(LS_INFO) << "bitPerSample:"
-                << "sampleRate" << nSampleRate << "\n"
-                << "channels" << nNumChannels << "\n"
-                << "numFrames" << nNumFrames;
-
-            if (m_pAudioTrackSinkInterface)
-            {
-                std::vector<int16_t> convertedAudioData;
-                for (int i = 0; i < nNumFrames; i++)
-                {
-                    convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
-                }
-
-                //todo(kazuki):: buffering audio
-                // eg.  80 for 8KHz and 160 for 16kHz
-                size_t nNumFramesFor10ms = nSampleRate / 100;
-                //RTC_DCHECK(nNumFrames % nNumFramesFor10ms == 0);
-                size_t size = nNumFrames / nNumFramesFor10ms;
-                size_t nBitPerSample = sizeof(int16_t) * 8;
-                for (int i = 0; i < size; i++)
-                {
-                    m_pAudioTrackSinkInterface->OnData(
-                        &convertedAudioData.data()[i * nNumFramesFor10ms * nNumChannels],
-                        nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
-                }
-            }
-        }
-    protected:
-        UnityAudioTrackSource(const std::string& sTrackName) : m_sTrackName(sTrackName), m_pAudioTrackSinkInterface(0)
-        {
-            //RTC_LOG(LS_INFO) << "UnityAudioTrackSource:Constructor";
-            //AddSink(this);
-            //CopyConstraintsIntoAudioOptions(constraints, &m_Options);
-        }
-        UnityAudioTrackSource(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
-        : m_sTrackName(sTrackName)
-        , m_pAudioTrackSinkInterface(0)
-        {
-            //RTC_LOG(LS_INFO) << "UnityAudioTrackSource:Constructor";
-            //AddSink(this);
-        }
-        ~UnityAudioTrackSource() override
-        {
-            //RemoveSink(this);
-        }
-
-    private:
-        std::string m_sTrackName;
-        //std::unique_ptr<AudioTrackSinkAdapter> _sink;
-        //cricket::AudioOptions m_Options;
-        webrtc::AudioTrackSinkInterface* m_pAudioTrackSinkInterface;
-    };
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
@@ -136,7 +54,6 @@ namespace webrtc
         // Full-duplex transportation of PCM audio
         virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
-            RTC_LOG(LS_INFO) << "RegisterAudioCallback" << transport;
             deviceBuffer->RegisterAudioCallback(transport);
 
             audio_transport_ = transport;
