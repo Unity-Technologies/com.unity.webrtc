@@ -73,6 +73,18 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("Context")]
+        public void CreateAndDeleteAudioTrack()
+        {
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var context = Context.Create(
+                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var track = context.CreateAudioTrack("audio");
+            context.DeleteMediaStreamTrack(track);
+            context.Dispose();
+        }
+
+        [Test]
+        [Category("Context")]
         public void CreateAndDeleteVideoTrack()
         {
             var value = NativeMethods.GetHardwareEncoderSupport();

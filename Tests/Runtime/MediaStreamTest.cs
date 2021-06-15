@@ -34,6 +34,17 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("MediaStream")]
+        public void EqualId()
+        {
+            var guid = Guid.NewGuid().ToString();
+            var stream = new MediaStream(WebRTC.Context.CreateMediaStream(guid));
+            Assert.That(stream, Is.Not.Null);
+            Assert.That(stream.Id, Is.EqualTo(guid));
+            stream.Dispose();
+        }
+
+        [Test]
+        [Category("MediaStream")]
         public void AccessAfterDisposed()
         {
             var stream = new MediaStream();

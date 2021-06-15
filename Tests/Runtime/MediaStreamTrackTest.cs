@@ -38,6 +38,26 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void EqualIdWithAudioTrack()
+        {
+            var guid = Guid.NewGuid().ToString();
+            var track = new MediaStreamTrack(WebRTC.Context.CreateAudioTrack(guid));
+            Assert.That(track, Is.Not.Null);
+            Assert.That(track.Id, Is.EqualTo(guid));
+            track.Dispose();
+        }
+
+        [Test]
+        public void EqualIdWithVideoTrack()
+        {
+            var guid = Guid.NewGuid().ToString();
+            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack(guid));
+            Assert.That(track, Is.Not.Null);
+            Assert.That(track.Id, Is.EqualTo(guid));
+            track.Dispose();
+        }
+
+        [Test]
         public void AccessAfterDisposed()
         {
             var width = 256;
