@@ -31,7 +31,7 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = new VideoStreamTrack("video", rt);
+            var track = new VideoStreamTrack(rt);
             Assert.That(track, Is.Not.Null);
             track.Dispose();
             Object.DestroyImmediate(rt);
@@ -45,7 +45,7 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = new VideoStreamTrack("video", rt);
+            var track = new VideoStreamTrack(rt);
             Assert.That(track, Is.Not.Null);
             track.Dispose();
             Assert.That(() => { var id = track.Id; }, Throws.TypeOf<InvalidOperationException>());
@@ -61,7 +61,7 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
 
-            Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
+            Assert.That(() => { new VideoStreamTrack(rt); }, Throws.TypeOf<ArgumentException>());
             Object.DestroyImmediate(rt);
         }
 
@@ -75,7 +75,7 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
 
-            Assert.That(() => { new VideoStreamTrack("video", rt); }, Throws.TypeOf<ArgumentException>());
+            Assert.That(() => { new VideoStreamTrack(rt); }, Throws.TypeOf<ArgumentException>());
 
             Object.DestroyImmediate(rt);
         }
@@ -92,7 +92,7 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = new VideoStreamTrack("video", rt);
+            var track = new VideoStreamTrack(rt);
             Assert.NotNull(track);
 
             // wait for the end of the initialization for encoder on the render thread.
@@ -153,7 +153,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void AddAndRemoveAudioStreamTrack()
         {
             var stream = new MediaStream();
-            var track = new AudioStreamTrack("audio");
+            var track = new AudioStreamTrack();
             Assert.AreEqual(TrackKind.Audio, track.Kind);
             Assert.AreEqual(0, stream.GetAudioTracks().Count());
             Assert.True(stream.AddTrack(track));
@@ -174,7 +174,7 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
-            var track = new VideoStreamTrack("video", rt);
+            var track = new VideoStreamTrack(rt);
 
             track.Dispose();
             Object.DestroyImmediate(rt);
@@ -191,11 +191,11 @@ namespace Unity.WebRTC.RuntimeTest
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
             var rt1 = new UnityEngine.RenderTexture(width, height, 0, format);
             rt1.Create();
-            var track1 = new VideoStreamTrack("video1", rt1);
+            var track1 = new VideoStreamTrack(rt1);
 
             var rt2 = new UnityEngine.RenderTexture(width, height, 0, format);
             rt2.Create();
-            var track2 = new VideoStreamTrack("video2", rt2);
+            var track2 = new VideoStreamTrack(rt2);
 
             // wait for initialization encoder on render thread.
             yield return new WaitForSeconds(0.1f);
