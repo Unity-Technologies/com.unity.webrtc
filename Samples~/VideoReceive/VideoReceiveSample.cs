@@ -231,7 +231,7 @@ class VideoReceiveSample : MonoBehaviour
         webCamTexture.Play();
         yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
 
-        videoStreamTrack = new VideoStreamTrack("video", webCamTexture);
+        videoStreamTrack = new VideoStreamTrack(webCamTexture);
         sourceImage.texture = webCamTexture;
     }
 

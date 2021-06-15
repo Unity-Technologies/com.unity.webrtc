@@ -4,11 +4,11 @@ namespace Unity.WebRTC
 {
     public class AudioStreamTrack : MediaStreamTrack
     {
-        public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(label))
+        public AudioStreamTrack() : this(WebRTC.Context.CreateAudioTrack(Guid.NewGuid().ToString()))
         {
         }
 
-        public AudioStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
+        internal AudioStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
         }
     }
@@ -17,16 +17,13 @@ namespace Unity.WebRTC
     {
         private static bool started;
 
-        public static MediaStream CaptureStream(string streamlabel = "audiostream", string label="audio")
+        public static MediaStream CaptureStream()
         {
             started = true;
 
-#if !UNITY_WEBGL
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream(streamlabel));
-#else
-            var stream = new MediaStream(WebRTC.Context.CreateMediaStream());
-#endif
-            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(label));
+            var stream = new MediaStream();
+            var track = new AudioStreamTrack();
+
             stream.AddTrack(track);
             return stream;
         }
