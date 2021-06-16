@@ -23,6 +23,7 @@ namespace webrtc
 
     private:
         std::string m_sTrackName;
+        std::vector<int16_t> convertedAudioData;
         ::webrtc::AudioTrackSinkInterface* m_pAudioTrackSinkInterface;
     };
 } // end namespace webrtc

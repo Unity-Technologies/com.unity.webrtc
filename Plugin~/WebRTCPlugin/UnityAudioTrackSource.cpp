@@ -37,23 +37,26 @@ void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, siz
     if (!m_pAudioTrackSinkInterface)
         return;
 
-    std::vector<int16_t> convertedAudioData;
-    for (int i = 0; i < nNumFrames; i++)
+    for (size_t i = 0; i < nNumFrames; i++)
     {
         convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
     }
 
-    //todo(kazuki):: buffering audio
     // eg.  80 for 8KHz and 160 for 16kHz
     size_t nNumFramesFor10ms = nSampleRate / 100;
-    size_t size = nNumFrames / nNumFramesFor10ms;
+    size_t size = convertedAudioData.size() / (nNumFramesFor10ms * nNumChannels);
     size_t nBitPerSample = sizeof(int16_t) * 8;
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         m_pAudioTrackSinkInterface->OnData(
             &convertedAudioData.data()[i * nNumFramesFor10ms * nNumChannels],
             nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
     }
+
+    // pop processed buffer, remained buffer will be processed the next time.
+    convertedAudioData.erase(
+        convertedAudioData.begin(),
+        convertedAudioData.begin() + nNumFramesFor10ms * nNumChannels * size);
 }
 
 UnityAudioTrackSource::UnityAudioTrackSource(const std::string& sTrackName)

@@ -82,7 +82,6 @@ namespace Unity.WebRTC
             _audioSourceRead.onAudioRead += OnAudioRead;
             _sampleRate = Source.clip.frequency;
             _channels = Source.clip.channels;
-            _sampleBuffer = new float[1024]; // Its length must be a power of 2.
         }
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
