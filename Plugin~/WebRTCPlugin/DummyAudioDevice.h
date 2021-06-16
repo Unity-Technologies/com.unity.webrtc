@@ -17,37 +17,6 @@ namespace webrtc
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
-        void ProcessAudioData(const float* data, int32 size, const size_t nChannels);
-        void PullAudioData(const size_t nBitsPerSamples,
-            const size_t nSampleRate,
-            const size_t nChannels,
-            const uint32_t samplesPerSec,
-            void* audioSamples,
-            int64_t* elapsed_time_ms,
-            int64_t* ntp_time_ms)
-        {
-            // Get 10ms audio and copy result to temporary byte buffer.
-            //render_buffer_.resize(audio_bus->frames() * audio_bus->channels());
-            //constexpr int kBytesPerSample = 2;
-            //static_assert(sizeof(render_buffer_[0]) == kBytesPerSample,
-            //    "kBytesPerSample and FromInterleaved expect 2 bytes.");
-            //int64_t elapsed_time_ms = -1;
-            //int64_t ntp_time_ms = -1;
-            //int16_t* audio_data = render_buffer_.data();
-
-            audio_transport_->PullRenderData(
-                nBitsPerSamples,
-                nSampleRate,
-                nChannels,
-                samplesPerSec,
-                audioSamples,
-//                nSamplesOut,
-                elapsed_time_ms,
-                ntp_time_ms);
-        }
-
-        bool RecThreadProcess();
-
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
         virtual int32 ActiveAudioLayer(AudioLayer* audioLayer) const override
@@ -142,21 +111,9 @@ namespace webrtc
         }
         virtual int32 InitRecording() override
         {
-            RTC_LOG(LS_INFO) << "InitRecording";
-
             isRecording = true;
-            _recordingFramesIn10MS = static_cast<size_t>(kRecordingFixedSampleRate / 100);
             deviceBuffer->SetRecordingSampleRate(kRecordingFixedSampleRate);
             deviceBuffer->SetRecordingChannels(kRecordingNumChannels);
-
-
-            //RTC_LOG(LS_INFO) << "StartRecording";
-            _ptrThreadRec = rtc::Thread::Create();
-            _ptrThreadRec->Start();
-            _ptrThreadRec->PostTask(RTC_FROM_HERE, [&] {
-                while (RecThreadProcess()) {
-                }
-            });
 
             return 0;
         }
@@ -181,24 +138,10 @@ namespace webrtc
 
         virtual int32 StartRecording() override
         {
-            //RTC_LOG(LS_INFO) << "StartRecording";
-            //_ptrThreadRec = rtc::Thread::Create();
-            //_ptrThreadRec->Invoke<void>(RTC_FROM_HERE, [&]{
-            //    while (RecThreadProcess()) {
-            //    }
-            //});
-
-            //_ptrThreadRec = new rtc::PlatformThread((rtc::ThreadRunFunction)ThreadRun,
-            //    nullptr,
-            //    "webrtc_audio_module_capture_thread",
-            //        rtc::ThreadPriority::kRealtimePriority);
-
             return 0;
         }
         virtual int32 StopRecording() override
         {
-            if (_ptrThreadRec && !_ptrThreadRec->empty())
-                _ptrThreadRec->Stop();
             return 0;
         }
         virtual bool Recording() const override
@@ -372,10 +315,6 @@ namespace webrtc
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
-
-        size_t _recordingFramesIn10MS;
-        std::unique_ptr<rtc::Thread> _ptrThreadRec;
-        int64_t _lastCallRecordMillis = 0;
 
         webrtc::AudioTransport* audio_transport_ = nullptr;
     };

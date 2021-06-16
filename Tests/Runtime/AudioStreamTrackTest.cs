@@ -20,16 +20,6 @@ namespace Unity.WebRTC.RuntimeTest
             WebRTC.Dispose();
         }
 
-        //[Test]
-        //public void Update()
-        //{
-        //    var stream = Audio.CaptureStream();
-        //    float[] audioData = new float[128];
-        //    Audio.Update(audioData, 1);
-        //    Audio.Stop();
-        //    stream.Dispose();
-        //}
-
         [UnityTest]
         public IEnumerator AudioStreamTrackInstantiateOnce()
         {
@@ -62,33 +52,6 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitWhile(() => source.isPlaying);
             track.Dispose();
             Object.DestroyImmediate(obj);
-        }
-
-    }
-
-    class AudioStreamClipTest
-    {
-        [SetUp]
-        public void SetUp()
-        {
-            var value = TestHelper.HardwareCodecSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
-        }
-
-        [UnityTest]
-        public IEnumerator Constructor()
-        {
-            //const int position = 0;
-            //const int samplerate = 44100;
-            ////const float frequency = 440;
-            //var clip = new AudioStreamTrack.AudioStreamRenderer("audio", samplerate, 1, samplerate);
-            yield return new WaitForSeconds(0.3f);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
         }
     }
 }

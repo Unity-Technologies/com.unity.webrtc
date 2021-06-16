@@ -708,10 +708,6 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeMediaStreamOnAddTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateAudioReceive(
-        IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
-        int bitsPerSample, int sampleRate, int numOfChannels, int numOfFrames);
 
     internal static class NativeMethods
     {
