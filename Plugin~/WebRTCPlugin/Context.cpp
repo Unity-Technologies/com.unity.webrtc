@@ -6,7 +6,6 @@
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
 
-#include "AudioTrackSinkAdapter.h"
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
@@ -382,64 +381,6 @@ namespace webrtc
         {
             m_mediaSteamTrackList.erase(result);
         }
-    }
-
-    void Context::RegisterAudioReceiveCallback(
-        AudioTrackInterface* track, DelegateAudioReceive callback)
-    {
-        if (m_mapAudioTrackAndSink.find(track) != m_mapAudioTrackAndSink.end())
-        {
-            RTC_LOG(LS_WARNING) << "The callback is already registered.";
-            return;
-        }
-
-        std::unique_ptr<AudioTrackSinkAdapter> sink =
-            std::make_unique<AudioTrackSinkAdapter>(track, callback);
-
-        track->AddSink(sink.get());
-        m_mapAudioTrackAndSink[track] = std::move(sink);
-    }
-
-    void Context::UnregisterAudioReceiveCallback(
-        AudioTrackInterface* track)
-    {
-        if (m_mapAudioTrackAndSink.find(track) == m_mapAudioTrackAndSink.end())
-            return;
-
-        AudioTrackSinkInterface* sink = m_mapAudioTrackAndSink[track].get();
-        track->RemoveSink(sink);
-        m_mapAudioTrackAndSink.erase(track);
-    }
-
-    void Context::PullAudioData(const float* data, int32_t size)
-    {
-        if (m_audioDevice == nullptr)
-            return;
-
-        // todo(kazuki)::set parameter to receive data
-        size_t nBytesPerSample = 2;
-        size_t nSampleRate = 44100;
-        size_t nChannels = 1;
-        const int frames_per_10_ms = nSampleRate / 100;
-        int64_t elapsed_time_ms = -1;
-        int64_t ntp_time_ms = -1;
-        int16_t* audio_data = new int16_t[frames_per_10_ms * nChannels];
-
-        m_audioDevice->PullAudioData(
-            nBytesPerSample * 8,
-            nSampleRate,
-            nChannels,
-            frames_per_10_ms,
-            audio_data,
-            &elapsed_time_ms,
-            &ntp_time_ms);
-
-        delete audio_data;
-    }
-
-    void Context::ReadAudioData(AudioTrackInterface* track, float* data, int32_t size)
-    {
-        m_mapAudioTrackAndSink[track]->GetData(data, size);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

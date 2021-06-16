@@ -1331,23 +1331,5 @@ extern "C"
             number_of_channels,
             number_of_frames);
     }
-
-    UNITY_INTERFACE_EXPORT void ContextReadAudioData(
-        Context* context, AudioTrackInterface* track, float* audio_data, int size)
-    {
-        context->ReadAudioData(track, audio_data, size);
-    }
-
-    UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(
-        Context* context, AudioTrackInterface* track, DelegateAudioReceive callback)
-    {
-        context->RegisterAudioReceiveCallback(track, callback);
-    }
-
-    UNITY_INTERFACE_EXPORT void ContextUnregisterAudioReceiveCallback(
-        Context* context, AudioTrackInterface* track)
-    {
-        context->UnregisterAudioReceiveCallback(track);
-    }
 }
 
