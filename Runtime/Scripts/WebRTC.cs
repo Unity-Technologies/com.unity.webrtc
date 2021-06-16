@@ -376,11 +376,6 @@ namespace Unity.WebRTC
                             track.UpdateReceiveTexture();
                         }
                     }
-
-                    foreach (var track in AudioStreamTrack.tracks)
-                    {
-                        track.OnData();
-                    }
                 }
             }
         }
