@@ -5,7 +5,6 @@ namespace unity
 {
 namespace webrtc
 {
-
     AudioTrackSinkAdapter::AudioTrackSinkAdapter(
         webrtc::AudioTrackInterface* track, DelegateAudioReceive callback)
         : _track(track)
@@ -25,7 +24,7 @@ namespace webrtc
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        size_t size = number_of_channels * number_of_frames;
+        const size_t size = number_of_channels * number_of_frames;
         const int16_t* data = static_cast<const int16_t*>(audio_data);
         const float_t INVERSE = 1.0 / SHRT_MAX;
 
@@ -38,14 +37,9 @@ namespace webrtc
 
             max = std::max(max, data[i]);
         }
-        //RTC_LOG(LS_INFO) << max;
-
 
         if (_callback != nullptr)
         {
-            size_t size = number_of_frames * number_of_channels;
-            //RTC_LOG(LS_INFO) << "size:" << size << "number_of_frames:" << number_of_frames;
-
             _callback(
                 _track,
                 audio_data,
@@ -56,5 +50,5 @@ namespace webrtc
                 number_of_frames);
         }
     }
-}
-}
+} // end namespace webrtc
+} // end namespace unity

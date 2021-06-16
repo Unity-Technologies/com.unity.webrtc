@@ -9,7 +9,6 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-
     class AudioTrackSinkAdapter : public webrtc::AudioTrackSinkInterface
     {
     public:
@@ -18,7 +17,12 @@ namespace webrtc
 
         void GetData(float_t* audio_data, int32_t size);
 
-        void OnData(const void* audio_data, int bits_per_sample, int sample_rate, size_t number_of_channels, size_t number_of_frames) override;
+        void OnData(
+            const void* audio_data,
+            int bits_per_sample,
+            int sample_rate,
+            size_t number_of_channels,
+            size_t number_of_frames) override;
     private:
         std::mutex m_mutex;
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> m_frameBuffer;
@@ -26,6 +30,5 @@ namespace webrtc
         AudioTrackInterface* _track;
         DelegateAudioReceive _callback;
     };
-
-}
-}
+} // end namespace webrtc
+} // end namespace unity

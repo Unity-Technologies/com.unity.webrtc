@@ -23,7 +23,6 @@ namespace webrtc
             const size_t nChannels,
             const uint32_t samplesPerSec,
             void* audioSamples,
-//            size_t& nSamplesOut,
             int64_t* elapsed_time_ms,
             int64_t* ntp_time_ms)
         {
