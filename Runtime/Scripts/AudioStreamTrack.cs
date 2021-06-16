@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
@@ -59,7 +60,8 @@ namespace Unity.WebRTC
 
         readonly int _sampleRate = 0;
         readonly int _channels = 0;
-        readonly float[] _sampleBuffer = null; 
+        readonly float[] _sampleBuffer = null;
+        readonly AudioSourceRead _audioSourceRead;
 
         private AudioStreamRenderer _mStreamRenderer;
 
@@ -74,6 +76,10 @@ namespace Unity.WebRTC
             if (source.clip == null)
                 throw new ArgumentException("AudioClip must to be attached on AudioSource");
             Source = source;
+
+            _audioSourceRead = source.gameObject.AddComponent<AudioSourceRead>();
+            _audioSourceRead.hideFlags = HideFlags.HideInHierarchy;
+            _audioSourceRead.onAudioRead += OnAudioRead;
             _sampleRate = Source.clip.frequency;
             _channels = Source.clip.channels;
             _sampleBuffer = new float[1024]; // Its length must be a power of 2.
@@ -95,6 +101,8 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 tracks.Remove(this);
+                if(_audioSourceRead != null)
+                    Object.Destroy(_audioSourceRead);
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
@@ -116,7 +124,7 @@ namespace Unity.WebRTC
             //NativeMethods.ProcessAudio(self, _sampleBuffer, _sampleRate, _channels, _sampleBuffer.Length);
         }
 
-        public void OnAudioRead(float[] data, int channels)
+        internal void OnAudioRead(float[] data, int channels)
         {
             NativeMethods.ProcessAudio(self, data, _sampleRate, channels, data.Length);
         }

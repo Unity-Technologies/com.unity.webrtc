@@ -34,30 +34,25 @@ void UnityAudioTrackSource::RemoveSink(::webrtc::AudioTrackSinkInterface* sink)
 
 void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
 {
-    //RTC_LOG(LS_INFO) << "bitPerSample:"
-    //    << "sampleRate" << nSampleRate << "\n"
-    //    << "channels" << nNumChannels << "\n"
-    //    << "numFrames" << nNumFrames;
+    if (!m_pAudioTrackSinkInterface)
+        return;
 
-    if (m_pAudioTrackSinkInterface)
+    std::vector<int16_t> convertedAudioData;
+    for (int i = 0; i < nNumFrames; i++)
     {
-        std::vector<int16_t> convertedAudioData;
-        for (int i = 0; i < nNumFrames; i++)
-        {
-            convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
-        }
+        convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
+    }
 
-        //todo(kazuki):: buffering audio
-        // eg.  80 for 8KHz and 160 for 16kHz
-        size_t nNumFramesFor10ms = nSampleRate / 100;
-        size_t size = nNumFrames / nNumFramesFor10ms;
-        size_t nBitPerSample = sizeof(int16_t) * 8;
-        for (int i = 0; i < size; i++)
-        {
-            m_pAudioTrackSinkInterface->OnData(
-                &convertedAudioData.data()[i * nNumFramesFor10ms * nNumChannels],
-                nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
-        }
+    //todo(kazuki):: buffering audio
+    // eg.  80 for 8KHz and 160 for 16kHz
+    size_t nNumFramesFor10ms = nSampleRate / 100;
+    size_t size = nNumFrames / nNumFramesFor10ms;
+    size_t nBitPerSample = sizeof(int16_t) * 8;
+    for (int i = 0; i < size; i++)
+    {
+        m_pAudioTrackSinkInterface->OnData(
+            &convertedAudioData.data()[i * nNumFramesFor10ms * nNumChannels],
+            nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
     }
 }
 
