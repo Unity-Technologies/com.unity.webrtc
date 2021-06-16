@@ -20,27 +20,24 @@ namespace Unity.WebRTC.RuntimeTest
             WebRTC.Dispose();
         }
 
-        [UnityTest]
-        public IEnumerator AudioStreamTrackInstantiateOnce()
+        [Test]
+        public void AudioStreamTrackInstantiateOnce()
         {
             var track = new AudioStreamTrack();
-            yield return 0;
             track.Dispose();
         }
 
-        [UnityTest]
-        public IEnumerator AudioStreamTrackInstantiateMultiple()
+        [Test]
+        public void AudioStreamTrackInstantiateMultiple()
         {
             var track1 = new AudioStreamTrack();
             var track2 = new AudioStreamTrack();
-            yield return 0;
             track1.Dispose();
             track2.Dispose();
         }
 
-        [UnityTest]
-        [Timeout(100)]
-        public IEnumerator AudioStreamTrackPlayAudio()
+        [Test]
+        public void AudioStreamTrackPlayAudio()
         {
             GameObject obj = new GameObject("audio");
             AudioSource source = obj.AddComponent<AudioSource>();
@@ -49,7 +46,6 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new AudioStreamTrack(source);
             source.Play();
 
-            yield return new WaitWhile(() => source.isPlaying);
             track.Dispose();
             Object.DestroyImmediate(obj);
         }
