@@ -142,7 +142,10 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
             };
-            MediaStream audioStream = null;
+            var audioTrack = new AudioStreamTrack();
+            var audioStream = new MediaStream();
+            audioStream.AddTrack(audioTrack);
+
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.SetStream(audioStream);
             yield return test;
