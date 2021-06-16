@@ -33,7 +33,9 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         public IEnumerator ConstructAudioStreamTrack()
         {
-            new AudioStreamTrack();
+            var track = new AudioStreamTrack();
+            yield return 0;
+            track.Dispose();
         }
     }
 

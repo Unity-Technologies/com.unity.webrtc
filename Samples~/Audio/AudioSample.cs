@@ -98,11 +98,9 @@ namespace Unity.WebRTC
             var transceiver = _pc2.AddTransceiver(TrackKind.Audio);
             transceiver.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
-            m_audioTrack = new AudioStreamTrack("audio", inputAudioSource);
-//            m_audioTrack2 = new AudioStreamTrack("audio2", inputAudioSource);
+            m_audioTrack = new AudioStreamTrack(inputAudioSource);
 
             _pc1.AddTrack(m_audioTrack, _sendStream);
-//            _pc1.AddTrack(m_audioTrack2, _sendStream);
         }
 
         void OnAddTrack(MediaStreamTrackEvent e)

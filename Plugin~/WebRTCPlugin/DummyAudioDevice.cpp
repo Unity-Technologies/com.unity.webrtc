@@ -24,7 +24,7 @@ namespace webrtc
             {
                 deviceBuffer->SetRecordedBuffer(convertedAudioData.data(), _recordingFramesIn10MS);
                 deviceBuffer->DeliverRecordedData();
-                //convertedAudioData.erase(convertedAudioData.begin(), convertedAudioData.begin() + _recordingFramesIn10MS);
+                convertedAudioData.erase(convertedAudioData.begin(), convertedAudioData.begin() + _recordingFramesIn10MS);
             }
         }
     }
@@ -49,7 +49,6 @@ namespace webrtc
         //        }
             _lastCallRecordMillis = currentTime;
             //mutex_.Unlock();
-            ProcessAudioData(nullptr, 0, 2);
             //deviceBuffer->DeliverRecordedData();
             //mutex_.Lock();
         }

@@ -59,7 +59,6 @@ namespace webrtc
         // Full-duplex transportation of PCM audio
         virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
-            RTC_LOG(LS_INFO) << "RegisterAudioCallback";
             deviceBuffer->RegisterAudioCallback(transport);
 
             audio_transport_ = transport;
@@ -199,7 +198,7 @@ namespace webrtc
         }
         virtual int32 StopRecording() override
         {
-            if (!_ptrThreadRec->empty())
+            if (_ptrThreadRec && !_ptrThreadRec->empty())
                 _ptrThreadRec->Stop();
             return 0;
         }
