@@ -59,7 +59,7 @@ namespace Unity.WebRTC
 
         readonly int _sampleRate = 0;
         readonly int _channels = 0;
-        readonly float[] _microphoneBuffer = new float[1440]; // 480 * 3 = 1440
+        readonly float[] _sampleBuffer = null; 
 
         private AudioStreamRenderer _mStreamRenderer;
 
@@ -76,6 +76,7 @@ namespace Unity.WebRTC
             Source = source;
             _sampleRate = Source.clip.frequency;
             _channels = Source.clip.channels;
+            _sampleBuffer = new float[1024]; // Its length must be a power of 2.
         }
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
@@ -107,12 +108,17 @@ namespace Unity.WebRTC
         // Called each every frame from WebRTC.Update
         internal void OnData()
         {
-            if (Source == null || !Source.isPlaying)
-                return;
+            //if (Source == null || !Source.isPlaying)
+            //    return;
 
-            Source.GetOutputData(_microphoneBuffer, _channels);
+            //Source.GetOutputData(_sampleBuffer, _channels);
 
-            NativeMethods.ProcessAudio(self, _microphoneBuffer, _sampleRate, _channels, _microphoneBuffer.Length);
+            //NativeMethods.ProcessAudio(self, _sampleBuffer, _sampleRate, _channels, _sampleBuffer.Length);
+        }
+
+        public void OnAudioRead(float[] data, int channels)
+        {
+            NativeMethods.ProcessAudio(self, data, _sampleRate, channels, data.Length);
         }
 
         /// <summary>

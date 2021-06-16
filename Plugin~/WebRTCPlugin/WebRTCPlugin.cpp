@@ -1325,16 +1325,21 @@ extern "C"
     {
         UnityAudioTrackSource* source = static_cast<UnityAudioTrackSource*>(track->GetSource());
 
+        RTC_LOG(LS_INFO)
+            << "sample_rate: " << sample_rate
+            << "number_of_channels: " << number_of_channels
+            << "number_of_frames: " << number_of_frames;
+
         source->OnData(audio_data,
             sample_rate,
             number_of_channels,
             number_of_frames);
 
-        // for sender
-        ContextManager::GetInstance()->curContext->ProcessAudioData(nullptr, 0);
+        //// for sender
+        //ContextManager::GetInstance()->curContext->ProcessAudioData(nullptr, 0);
 
-        // for receiver
-        ContextManager::GetInstance()->curContext->PullAudioData(nullptr, 0);
+        //// for receiver
+        //ContextManager::GetInstance()->curContext->PullAudioData(nullptr, 0);
     }
 
     UNITY_INTERFACE_EXPORT void ContextReadAudioData(

@@ -5,7 +5,7 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    class AudioTest
+    class AudioStreamTrackTest
     {
         [SetUp]
         public void SetUp()
@@ -29,6 +29,12 @@ namespace Unity.WebRTC.RuntimeTest
         //    Audio.Stop();
         //    stream.Dispose();
         //}
+
+        [UnityTest]
+        public IEnumerator ConstructAudioStreamTrack()
+        {
+            new AudioStreamTrack();
+        }
     }
 
     class AudioStreamClipTest

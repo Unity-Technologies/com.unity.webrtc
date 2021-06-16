@@ -180,7 +180,7 @@ class MediaStreamSample : MonoBehaviour
         _pc2.OnTrack = pc2Ontrack;
 
         _pc1.CreateDataChannel("data");
-        audioStream = Audio.CaptureStream();
+//        audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720, 1000000);
         RtImage.texture = cam.targetTexture;
     }

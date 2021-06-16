@@ -415,7 +415,7 @@ namespace webrtc
     {
         if (m_audioDevice == nullptr)
             return;
-        m_audioDevice->ProcessAudioData(data, size);
+        m_audioDevice->ProcessAudioData(data, size, 2);
     }
 
     void Context::PullAudioData(const float* data, int32_t size)
