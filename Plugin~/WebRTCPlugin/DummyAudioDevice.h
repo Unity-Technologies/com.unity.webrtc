@@ -7,12 +7,56 @@ namespace unity
 namespace webrtc
 {
 
-    namespace webrtc = ::webrtc;
+    using namespace ::webrtc;
+
+    const int kRecordingFixedSampleRate = 44100;
+    const size_t kRecordingNumChannels = 2;
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
         void ProcessAudioData(const float* data, int32 size);
+        void PullAudioData(const size_t nBitsPerSamples,
+            const size_t nSampleRate,
+            const size_t nChannels,
+            const uint32_t samplesPerSec,
+            void* audioSamples,
+            int64_t* elapsed_time_ms,
+            int64_t* ntp_time_ms)
+        {
+
+            audio_transport_->PullRenderData(
+                nBitsPerSamples,
+                nSampleRate,
+                nChannels,
+                samplesPerSec,
+                audioSamples,
+                //                nSamplesOut,
+                elapsed_time_ms,
+                ntp_time_ms);
+        }
+
+        int32_t NeedMorePlayData(
+            const size_t nSamples,
+            const size_t nBytesPerSample,
+            const size_t nChannels,
+            const uint32_t samplesPerSec,
+            void* audioSamples,
+            size_t& nSamplesOut,
+            int64_t* elapsed_time_ms,
+            int64_t* ntp_time_ms) const
+        {
+            return audio_transport_->NeedMorePlayData(nSamples,
+                nBytesPerSample,
+                nChannels,
+                samplesPerSec,
+                audioSamples,
+                nSamplesOut,
+                elapsed_time_ms,
+                ntp_time_ms);
+        }
+
+        bool RecThreadProcess();
 
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
@@ -25,6 +69,7 @@ namespace webrtc
         virtual int32 RegisterAudioCallback(webrtc::AudioTransport* audioCallback) override
         {
             deviceBuffer->RegisterAudioCallback(audioCallback);
+            audio_transport_ = audioCallback;
             return 0;
         }
 
@@ -308,6 +353,8 @@ namespace webrtc
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
+
+        webrtc::AudioTransport* audio_transport_ = nullptr;
     };
 
 } // end namespace webrtc

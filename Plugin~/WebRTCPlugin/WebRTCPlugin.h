@@ -172,7 +172,8 @@ namespace webrtc
         std::uint32_t sample_count_;
     };
 
-    using DelegateAudioFrameObserverOnFrameReady = void(*)(const AudioFrame&);
+    class UnityAudioFrameObserver;
+    using DelegateAudioFrameObserverOnFrameReady = void(*)(UnityAudioFrameObserver*, const AudioFrame&);
     
 } // end namespace webrtc
 } // end namespace unity

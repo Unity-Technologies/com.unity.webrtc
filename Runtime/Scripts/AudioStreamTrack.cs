@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -159,7 +160,7 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeAudioFrameObserverOnFrameReady))]
         static void AudioFrameObserverOnFrameReady(IntPtr ptr, in AudioFrame frame)
         {
-
+            Debug.Log("Invoke audio frame observer callback");
             if (WebRTC.Table[ptr] is UnityAudioFrameObserver observer)
             {
                 observer._onFrameReady?.Invoke(frame);
