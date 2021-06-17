@@ -79,7 +79,7 @@ namespace webrtc
 #pragma region open an encode session
     uint32_t Context::s_encoderId = 0;
     uint32_t Context::GenerateUniqueId() { return s_encoderId++; }
-#pragma endregion 
+#pragma endregion
 
     bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -117,6 +117,8 @@ namespace webrtc
         }
         int iceTransportPolicy = configJson["iceTransportPolicy"].asInt();
         if(iceTransportPolicy != 0) config.type = static_cast<PeerConnectionInterface::IceTransportsType>(iceTransportPolicy);
+        Json::Value enableDtlsSrtp = configJson["enableDtlsSrtp"];
+        if (enableDtlsSrtp != 0) config.enable_dtls_srtp = enableDtlsSrtp.asBool();
         config.ice_candidate_pool_size = configJson["iceCandidatePoolSize"].asInt();
         config.bundle_policy = static_cast<PeerConnectionInterface::BundlePolicy>(configJson["bundlePolicy"].asInt());
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
