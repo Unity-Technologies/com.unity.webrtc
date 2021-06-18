@@ -9,6 +9,7 @@
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
+#include "UnityAudioTrackSource.h"
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
@@ -362,8 +363,10 @@ namespace webrtc
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
-        const rtc::scoped_refptr<AudioSourceInterface> source =
-            m_peerConnectionFactory->CreateAudioSource(audioOptions);
+
+        const rtc::scoped_refptr<UnityAudioTrackSource> source =
+            UnityAudioTrackSource::Create(label, audioOptions);
+
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
         m_mediaSteamTrackList.push_back(track);
@@ -380,11 +383,6 @@ namespace webrtc
         {
             m_mediaSteamTrackList.erase(result);
         }
-    }
-
-    void Context::ProcessAudioData(const float* data, int32 size)
-    {
-        m_audioDevice->ProcessAudioData(data, size);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

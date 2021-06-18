@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using System.Text;
 using Unity.WebRTC.Samples;
 
-[RequireComponent(typeof(AudioListener))]
 class MediaStreamSample : MonoBehaviour
 {
 #pragma warning disable 0649
@@ -21,7 +20,7 @@ class MediaStreamSample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders, pc2Senders;
-    private MediaStream audioStream, videoStream;
+    private MediaStream videoStream;
     private RTCDataChannel remoteDataChannel;
     private Coroutine sdpCheck;
     private string msg;
@@ -45,7 +44,6 @@ class MediaStreamSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        Audio.Stop();
         WebRTC.Dispose();
     }
 
@@ -127,10 +125,6 @@ class MediaStreamSample : MonoBehaviour
 
     private void AddTracks()
     {
-        foreach (var track in audioStream.GetTracks())
-        {
-            pc1Senders.Add (_pc1.AddTrack(track, audioStream));
-        }
         foreach(var track in videoStream.GetTracks())
         {
             pc1Senders.Add(_pc1.AddTrack(track, videoStream));
@@ -180,7 +174,6 @@ class MediaStreamSample : MonoBehaviour
         _pc2.OnTrack = pc2Ontrack;
 
         _pc1.CreateDataChannel("data");
-        audioStream = Audio.CaptureStream();
         videoStream = cam.CaptureStream(1280, 720, 1000000);
         RtImage.texture = cam.targetTexture;
     }
@@ -255,11 +248,6 @@ class MediaStreamSample : MonoBehaviour
         {
             OnCreateSessionDescriptionError(op3.Error);
         }
-    }
-
-    private void OnAudioFilterRead(float[] data, int channels)
-    {
-        Audio.Update(data, data.Length);
     }
 
     private void OnSetLocalSuccess(RTCPeerConnection pc)
