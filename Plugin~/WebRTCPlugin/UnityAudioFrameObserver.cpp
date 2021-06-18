@@ -25,9 +25,7 @@ UnityAudioFrameObserver::~UnityAudioFrameObserver()
 void UnityAudioFrameObserver::RegisterOnFrameReady(
     DelegateAudioFrameObserverOnFrameReady callback) noexcept {
   std::lock_guard<std::mutex> lock(m_mutex);
-  DebugLog("RegisterOnFrameReady, Id:%d", m_id);
   on_frame_ready_ = callback;
-  DebugLog("RegisterOnFrameReady Finish, Id:%d", m_id);
 }
 
 uint32_t UnityAudioFrameObserver::GetId() const
@@ -41,7 +39,6 @@ void UnityAudioFrameObserver::OnData(const void* audio_data,
                                 int sample_rate,
                                 size_t number_of_channels,
                                 size_t number_of_frames) {
-  DebugLog("AudioFrameObserver Ondata: sample rate %d, channels %d, samples %d", sample_rate, number_of_channels, number_of_frames);
   std::lock_guard<std::mutex> lock(m_mutex);
   if (!on_frame_ready_) {
     return;

@@ -1,6 +1,10 @@
 #pragma once
 
+#include <chrono>
+#include <thread>
+
 #include "api/task_queue/default_task_queue_factory.h"
+
 
 namespace unity
 {
@@ -12,51 +16,50 @@ namespace webrtc
     const int kRecordingFixedSampleRate = 44100;
     const size_t kRecordingNumChannels = 2;
 
+    const size_t nBytesPerSample = 2;
+    const size_t nSampleRate = 44100;
+    const int nChunkSampleCount = nSampleRate / 100;
+    const size_t nChannels = 2;
+
+    // libwebrtc uses 10ms frames.
+    const unsigned frameLengthMs = 1000 * nChunkSampleCount / nSampleRate;
+    const unsigned pollSamples = 5;
+    const unsigned pollInterval = 5 * frameLengthMs;
+    const unsigned channels = 2;
+
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
         void ProcessAudioData(const float* data, int32 size);
-        void PullAudioData(const size_t nBitsPerSamples,
-            const size_t nSampleRate,
-            const size_t nChannels,
-            const uint32_t samplesPerSec,
-            void* audioSamples,
-            int64_t* elapsed_time_ms,
-            int64_t* ntp_time_ms)
+        void pollAudioData()
         {
+            while (isPlaying)
+            {
+                pollFromSource();
 
-            audio_transport_->PullRenderData(
-                nBitsPerSamples,
-                nSampleRate,
-                nChannels,
-                samplesPerSec,
-                audioSamples,
-                //                nSamplesOut,
-                elapsed_time_ms,
-                ntp_time_ms);
+                auto now = std::chrono::high_resolution_clock::now();
+                auto delayUntilNextPolling = m_pollingTime + std::chrono::microseconds(pollInterval) - now;
+                if (delayUntilNextPolling < std::chrono::seconds(0)) {
+                    delayUntilNextPolling = std::chrono::seconds(0);
+                }
+                m_pollingTime = now + delayUntilNextPolling;
+                std::this_thread::sleep_for(delayUntilNextPolling);
+            }
+
         }
 
-        int32_t NeedMorePlayData(
-            const size_t nSamples,
-            const size_t nBytesPerSample,
-            const size_t nChannels,
-            const uint32_t samplesPerSec,
-            void* audioSamples,
-            size_t& nSamplesOut,
-            int64_t* elapsed_time_ms,
-            int64_t* ntp_time_ms) const
+        void pollFromSource()
         {
-            return audio_transport_->NeedMorePlayData(nSamples,
-                nBytesPerSample,
-                nChannels,
-                samplesPerSec,
-                audioSamples,
-                nSamplesOut,
-                elapsed_time_ms,
-                ntp_time_ms);
-        }
+            if (!audio_transport_)
+                return;
 
-        bool RecThreadProcess();
+            for (unsigned i = 0; i < pollSamples; i++) {
+                int64_t elapsedTime = -1;
+                int64_t ntpTime = -1;
+                int16_t* audio_data = new int16_t[nChunkSampleCount * nChannels];
+                audio_transport_->PullRenderData(nBytesPerSample * 8, nSampleRate, channels, nChunkSampleCount, audio_data, &elapsedTime, &ntpTime);
+            }
+        }
 
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
@@ -143,7 +146,7 @@ namespace webrtc
         }
         virtual bool PlayoutIsInitialized() const override
         {
-            return false;
+            return true;
         }
         virtual int32 RecordingIsAvailable(bool* available) override
         {
@@ -164,15 +167,25 @@ namespace webrtc
         // Audio transport control
         virtual int32 StartPlayout() override
         {
+            if (isPlaying)
+                return 0;
+
+            isPlaying = true;
+            _ptrThreadPlay = rtc::Thread::Create();
+            _ptrThreadPlay->Start();
+            _ptrThreadPlay->PostTask(RTC_FROM_HERE, [&] {
+                pollAudioData();
+                });
             return 0;
         }
         virtual int32 StopPlayout() override
         {
+            isPlaying = false;
             return 0;
         }
         virtual bool Playing() const override
         {
-            return false;
+            return isPlaying;
         }
         virtual int32 StartRecording() override
         {
@@ -352,7 +365,11 @@ namespace webrtc
         std::unique_ptr<webrtc::AudioDeviceBuffer> deviceBuffer;
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
+        std::atomic<bool> isPlaying{ false };
         std::vector<int16> convertedAudioData;
+
+        std::unique_ptr<rtc::Thread> _ptrThreadPlay;
+        std::chrono::time_point<std::chrono::steady_clock> m_pollingTime;
 
         webrtc::AudioTransport* audio_transport_ = nullptr;
     };

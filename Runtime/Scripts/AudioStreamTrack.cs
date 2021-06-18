@@ -69,7 +69,7 @@ namespace Unity.WebRTC
         }
     }
 
-    public ref struct AudioFrame
+    public struct AudioFrame
     {
         /// <summary>
         /// Buffer of audio samples for all channels.
@@ -158,13 +158,15 @@ namespace Unity.WebRTC
 
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeAudioFrameObserverOnFrameReady))]
-        static void AudioFrameObserverOnFrameReady(IntPtr ptr, in AudioFrame frame)
+        static void AudioFrameObserverOnFrameReady(IntPtr ptr, AudioFrame frame)
         {
-            Debug.Log("Invoke audio frame observer callback");
-            if (WebRTC.Table[ptr] is UnityAudioFrameObserver observer)
+            WebRTC.Sync(ptr, () =>
             {
-                observer._onFrameReady?.Invoke(frame);
-            }
+                if (WebRTC.Table[ptr] is UnityAudioFrameObserver observer)
+                {
+                    observer._onFrameReady?.Invoke(frame);
+                }
+            });
         }
     }
 }

@@ -566,7 +566,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeAudioFrameObserverOnFrameReady(IntPtr observer, in AudioFrame frame);
+    internal delegate void DelegateNativeAudioFrameObserverOnFrameReady(IntPtr observer, AudioFrame frame);
 
     internal static class NativeMethods
     {
