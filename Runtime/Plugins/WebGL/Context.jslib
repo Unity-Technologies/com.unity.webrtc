@@ -134,7 +134,7 @@ var UnityWebRTCContext = {
 
   ContextCreateAudioTrack: function (contextPtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextCreateAudioTrack', 'context')) return;
-    return CreateAudioTrack();
+    return _CreateAudioTrack();
   },
 
   ContextCreateVideoTrack: function (contextPtr, srcTexturePtr, dstTexturePtr, width, height) {
