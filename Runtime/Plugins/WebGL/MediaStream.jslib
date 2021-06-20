@@ -30,7 +30,8 @@ var UnityWebRTCMediaStream = {
     
     navigator.mediaDevices.getUserMedia(options).then(function(stream2){
       stream2.getTracks().forEach(function(track){
-        MediaStreamAddTrack(stream.managePtr, track.managePtr);
+        uwcom_addManageObj(track);
+        _MediaStreamAddTrack(stream.managePtr, track.managePtr);
       })
     }).catch(function(err) {
       console.error(err);
