@@ -12,7 +12,7 @@ var UnityWebRTCMediaStream = {
         return;
       }
       if (!uwcom_existsCheck(evt.track.managePtr, 'stream.onremovetrack', 'track')) return;
-      Module.dynCall_vii(uwevt_MSOnRemoveTrack, this.memberPtr, evt.track.managePtr);
+      Module.dynCall_vii(uwevt_MSOnRemoveTrack, this.managePtr, evt.track.managePtr);
     };
 
     uwcom_addManageObj(stream);
@@ -20,6 +20,23 @@ var UnityWebRTCMediaStream = {
     return stream.managePtr;
   },
 
+  MediaStreamAddUserMedia: function (streamPtr, constraints){
+    if (!uwcom_existsCheck(streamPtr, 'MediaStreamAddUserMedia', 'stream')) return;
+    uwcom_debugLog('log', 'MediaStream.jslib', 'AddUserMedia', streamPtr);
+    
+    var stream = UWManaged[streamPtr];
+    var optionsJson = Pointer_stringify(constraints);
+    var options = JSON.parse(optionsJson);
+    
+    navigator.mediaDevices.getUserMedia(options).then(function(stream2){
+      stream2.getTracks().forEach(function(track){
+        MediaStreamAddTrack(stream.managePtr, track.managePtr);
+      })
+    }).catch(function(err) {
+      console.error(err);
+    });
+  },
+  
   DeleteMediaStream: function(streamPtr) {
     var stream = UWManaged[streamPtr];
     stream.getTracks().forEach(function(track) {

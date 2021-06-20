@@ -1104,6 +1104,9 @@ namespace Unity.WebRTC
         }
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateMediaStream(IntPtr ctx);
+
+        [DllImport(WebRTC.Lib)]
+        public static extern void MediaStreamAddUserMedia(IntPtr streamPtr, string constraints);
 #endif
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteMediaStream(IntPtr ctx, IntPtr stream);
