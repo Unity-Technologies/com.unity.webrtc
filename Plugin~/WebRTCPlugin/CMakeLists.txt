@@ -33,6 +33,8 @@ target_sources(WebRTCLib
     UnityVideoRenderer.h
     UnityVideoTrackSource.cpp
     UnityVideoTrackSource.h
+    UnityAudioTrackSource.cpp
+    UnityAudioTrackSource.h
     WebRTCConstants.h
     WebRTCMacros.h
     WebRTCPlugin.h

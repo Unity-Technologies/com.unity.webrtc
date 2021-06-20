@@ -133,21 +133,6 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(camObj);
         }
 
-        [Test]
-        public void AddAndRemoveAudioStream()
-        {
-            var audioStream = Audio.CaptureStream();
-            Assert.That(audioStream.GetAudioTracks(), Has.Count.EqualTo(1));
-            Assert.That(audioStream.GetVideoTracks(), Has.Count.EqualTo(0));
-            Assert.That(audioStream.GetTracks().ToList(),
-                Has.Count.EqualTo(1).And.All.InstanceOf<AudioStreamTrack>());
-            foreach (var track in audioStream.GetTracks())
-            {
-                track.Dispose();
-            }
-            audioStream.Dispose();
-        }
-
         [UnityTest]
         [Timeout(5000)]
         public IEnumerator AddAndRemoveAudioMediaTrack()
@@ -157,7 +142,10 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}
             };
-            var audioStream = Audio.CaptureStream();
+            var audioTrack = new AudioStreamTrack();
+            var audioStream = new MediaStream();
+            audioStream.AddTrack(audioTrack);
+
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.SetStream(audioStream);
             yield return test;

@@ -4,6 +4,7 @@
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
 #include "Context.h"
+#include "UnityAudioTrackSource.h"
 #include "Codec/EncoderFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
@@ -1315,12 +1316,20 @@ extern "C"
         ContextManager::GetInstance()->curContext = context;
     }
 
-    UNITY_INTERFACE_EXPORT void ProcessAudio(float* data, int32 size)
+    UNITY_INTERFACE_EXPORT void ProcessAudio(
+        AudioTrackInterface* track,
+        float* audio_data,
+        int32 sample_rate,
+        int32 number_of_channels,
+        int32 number_of_frames)
     {
-        if (ContextManager::GetInstance()->curContext)
-        {
-            ContextManager::GetInstance()->curContext->ProcessAudioData(data, size);
-        }
+        UnityAudioTrackSource* source =
+            static_cast<UnityAudioTrackSource*>(track->GetSource());
+
+        source->OnData(audio_data,
+            sample_rate,
+            number_of_channels,
+            number_of_frames);
     }
 }
 

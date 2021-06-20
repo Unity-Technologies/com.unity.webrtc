@@ -9,6 +9,7 @@
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
+#include "UnityAudioTrackSource.h"
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoDecoderFactory.h"
 #include "UnityVideoTrackSource.h"
@@ -79,7 +80,7 @@ namespace webrtc
 #pragma region open an encode session
     uint32_t Context::s_encoderId = 0;
     uint32_t Context::GenerateUniqueId() { return s_encoderId++; }
-#pragma endregion 
+#pragma endregion
 
     bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -117,6 +118,8 @@ namespace webrtc
         }
         int iceTransportPolicy = configJson["iceTransportPolicy"].asInt();
         if(iceTransportPolicy != 0) config.type = static_cast<PeerConnectionInterface::IceTransportsType>(iceTransportPolicy);
+        Json::Value enableDtlsSrtp = configJson["enableDtlsSrtp"];
+        if (enableDtlsSrtp != 0) config.enable_dtls_srtp = enableDtlsSrtp.asBool();
         config.ice_candidate_pool_size = configJson["iceCandidatePoolSize"].asInt();
         config.bundle_policy = static_cast<PeerConnectionInterface::BundlePolicy>(configJson["bundlePolicy"].asInt());
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
@@ -360,8 +363,10 @@ namespace webrtc
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
-        const rtc::scoped_refptr<AudioSourceInterface> source =
-            m_peerConnectionFactory->CreateAudioSource(audioOptions);
+
+        const rtc::scoped_refptr<UnityAudioTrackSource> source =
+            UnityAudioTrackSource::Create(label, audioOptions);
+
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
         m_mediaSteamTrackList.push_back(track);
@@ -378,11 +383,6 @@ namespace webrtc
         {
             m_mediaSteamTrackList.erase(result);
         }
-    }
-
-    void Context::ProcessAudioData(const float* data, int32 size)
-    {
-        m_audioDevice->ProcessAudioData(data, size);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

@@ -79,15 +79,7 @@ namespace Unity.WebRTC
 
         private void StopTrack(MediaStreamTrack track)
         {
-
-            if (track.Kind == TrackKind.Video)
-            {
-                WebRTC.Context.StopMediaStreamTrack(track.GetSelfOrThrow());
-            }
-            else
-            {
-                Audio.Stop();
-            }
+            WebRTC.Context.StopMediaStreamTrack(track.GetSelfOrThrow());
         }
 
         public IEnumerable<VideoStreamTrack> GetVideoTracks()

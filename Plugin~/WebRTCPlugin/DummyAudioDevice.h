@@ -1,19 +1,22 @@
 #pragma once
 
+#include <mutex>
+
+#include "WebRTCPlugin.h"
 #include "api/task_queue/default_task_queue_factory.h"
 
 namespace unity
 {
 namespace webrtc
 {
+    using namespace ::webrtc;
 
-    namespace webrtc = ::webrtc;
+    const int kRecordingFixedSampleRate = 44100;
+    const size_t kRecordingNumChannels = 2;
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
-        void ProcessAudioData(const float* data, int32 size);
-
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
         virtual int32 ActiveAudioLayer(AudioLayer* audioLayer) const override
@@ -22,9 +25,11 @@ namespace webrtc
             return 0;
         }
         // Full-duplex transportation of PCM audio
-        virtual int32 RegisterAudioCallback(webrtc::AudioTransport* audioCallback) override
+        virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
-            deviceBuffer->RegisterAudioCallback(audioCallback);
+            deviceBuffer->RegisterAudioCallback(transport);
+
+            audio_transport_ = transport;
             return 0;
         }
 
@@ -107,8 +112,9 @@ namespace webrtc
         virtual int32 InitRecording() override
         {
             isRecording = true;
-            deviceBuffer->SetRecordingSampleRate(48000);
-            deviceBuffer->SetRecordingChannels(2);
+            deviceBuffer->SetRecordingSampleRate(kRecordingFixedSampleRate);
+            deviceBuffer->SetRecordingChannels(kRecordingNumChannels);
+
             return 0;
         }
         virtual bool RecordingIsInitialized() const override
@@ -129,6 +135,7 @@ namespace webrtc
         {
             return false;
         }
+
         virtual int32 StartRecording() override
         {
             return 0;
@@ -308,6 +315,8 @@ namespace webrtc
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
+
+        webrtc::AudioTransport* audio_transport_ = nullptr;
     };
 
 } // end namespace webrtc

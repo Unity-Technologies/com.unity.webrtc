@@ -271,6 +271,10 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public int iceCandidatePoolSize;
+        /// <summary>
+        ///
+        /// </summary>
+        public bool enableDtlsSrtp;
     }
 
     /// <summary>
@@ -1169,7 +1173,7 @@ namespace Unity.WebRTC
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
 #endif
         [DllImport(WebRTC.Lib)]
-        public static extern void ProcessAudio(float[] data, int size);
+        public static extern void ProcessAudio(IntPtr track, float[] data, int sampleRate, int channels, int frames);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
 #if !UNITY_WEBGL
@@ -1333,5 +1337,3 @@ namespace Unity.WebRTC
 #endif
     }
 }
-
-

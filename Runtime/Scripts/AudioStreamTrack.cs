@@ -1,47 +1,83 @@
 using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
     {
+
+        internal static List<AudioStreamTrack> tracks = new List<AudioStreamTrack>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AudioSource Source { get; private set; }
+
+        readonly int _sampleRate;
+        readonly AudioSourceRead _audioSourceRead;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public AudioStreamTrack() : this(WebRTC.Context.CreateAudioTrack(Guid.NewGuid().ToString()))
         {
         }
 
-        internal AudioStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        public AudioStreamTrack(AudioSource source) : this()
         {
-        }
-    }
+            if (source == null)
+                throw new ArgumentNullException("AudioSource argument is null");
+            if (source.clip == null)
+                throw new ArgumentException("AudioClip must to be attached on AudioSource");
+            Source = source;
 
-    public static class Audio
-    {
-        private static bool started;
-
-        public static MediaStream CaptureStream()
-        {
-            started = true;
-
-            var stream = new MediaStream();
-            var track = new AudioStreamTrack();
-
-            stream.AddTrack(track);
-            return stream;
+            _audioSourceRead = source.gameObject.AddComponent<AudioSourceRead>();
+            _audioSourceRead.hideFlags = HideFlags.HideInHierarchy;
+            _audioSourceRead.onAudioRead += OnAudioRead;
+            _sampleRate = Source.clip.frequency;
         }
 
-        public static void Update(float[] audioData, int channels)
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
         {
-            if (started)
+            if (this.disposed)
             {
-                NativeMethods.ProcessAudio(audioData, audioData.Length);
+                return;
             }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                tracks.Remove(this);
+                if(_audioSourceRead != null)
+                    Object.Destroy(_audioSourceRead);
+                WebRTC.Context.DeleteMediaStreamTrack(self);
+                WebRTC.Table.Remove(self);
+                self = IntPtr.Zero;
+            }
+
+            this.disposed = true;
+            GC.SuppressFinalize(this);
         }
 
-        public static void Stop()
+        internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
-            if (started)
-            {
-                started = false;
-            }
+            tracks.Add(this);
+        }
+
+        internal void OnAudioRead(float[] data, int channels)
+        {
+            NativeMethods.ProcessAudio(self, data, _sampleRate, channels, data.Length);
         }
     }
 }
