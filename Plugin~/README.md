@@ -114,7 +114,7 @@ To build plugin, you need to execute command in the `BuildScripts~` folder.
 
 When you run the build, `webrtc.dll` will be placed in `Packages\com.unity.webrtc\Runtime\Plugins\x86_64`. You should then be able to verify the following settings in the Unity Inspector window.
 
-**WARNING:** If "Load on startup" is not ticked, your editor will crash when running your project. ([#444](https://github.com/Unity-Technologies/com.unity.webrtc/issues/444))
+**WARNING:** If "Load on startup" is not ticked, your editor will crash when running your project. This may become unticked after you make a change to the plugin. ([#444](https://github.com/Unity-Technologies/com.unity.webrtc/issues/444))
 
 <img src="../Documentation~/images/inspector_webrtc_plugin.png" width=400 align=center>
 
