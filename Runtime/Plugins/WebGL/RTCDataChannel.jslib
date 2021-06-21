@@ -6,15 +6,15 @@ var UnityWebRTCDataChannel = {
     var optionsJson = Pointer_stringify(optionsJsonPtr);
     var options = JSON.parse(optionsJson);
     var dataChannel = peer.createDataChannel(label, options);
-    // dataChannel.onmessage = function (evt) {
-    //   if (typeof evt.data === 'string') {
-    //     var msgPtr = uwcom_strToPtr(evt.data);
-    //     Module.dynCall_vii(uwevt_DCOnTextMessage, this.managePtr, msgPtr);
-    //   } else {
-    //     var msgPtr = uwcom_arrayToReturnPtr(evt.data, Uint8Array);
-    //     Module.dynCall_vii(uwevt_DCOnBinaryMessage, this.managePtr, msgPtr);
-    //   }
-    // };
+    dataChannel.onmessage = function (evt) {
+      if (typeof evt.data === 'string') {
+        var msgPtr = uwcom_strToPtr(evt.data);
+        Module.dynCall_vii(uwevt_DCOnTextMessage, this.managePtr, msgPtr);
+      } else {
+        var msgPtr = uwcom_arrayToReturnPtr(evt.data, Uint8Array);
+        Module.dynCall_vii(uwevt_DCOnBinaryMessage, this.managePtr, msgPtr);
+      }
+    };
     dataChannel.onopen = function (evt) {
       Module.dynCall_vi(uwevt_DCOnOpen, this.managePtr);
     };

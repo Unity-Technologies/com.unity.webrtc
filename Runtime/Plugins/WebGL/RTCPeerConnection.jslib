@@ -58,7 +58,13 @@ var UnityWebRTCPeerConnection = {
           var msgPtr = uwcom_arrayToReturnPtr(evt.data, Uint8Array);
           Module.dynCall_vii(uwevt_DCOnBinaryMessage, channel.managePtr, msgPtr);
         }
-      });      
+      });
+      channel.onopen = function (evt) {
+        Module.dynCall_vi(uwevt_DCOnOpen, this.managePtr);
+      };
+      channel.onclose = function (evt) {
+        Module.dynCall_vi(uwevt_DCOnClose, this.managePtr);
+      };
       uwcom_addManageObj(channel);
       Module.dynCall_vii(uwevt_PCOnDataChannel, this.managePtr, channel.managePtr);
     };
