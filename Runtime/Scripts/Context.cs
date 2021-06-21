@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
@@ -150,7 +151,16 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, ref options);
 #else
-            var optionsJson = JsonUtility.ToJson(options);
+            //TODO: Fix serialization for OptionalFields
+            JObject jObject = new JObject();
+            if (options.ordered.hasValue) jObject.Add("ordered", options.ordered.value);
+            if (options.maxRetransmits.hasValue) jObject.Add("maxRetransmits", options.maxRetransmits.value);
+            if (options.maxRetransmitTime.hasValue) jObject.Add("maxPacketLifeTime", options.maxRetransmitTime.value);
+            if (options.negotiated.hasValue) jObject.Add("negotiated", options.negotiated.value);
+            if (options.id.hasValue) jObject.Add("id", options.id.value);
+            if (!string.IsNullOrEmpty(options.protocol)) jObject.Add("protocol", options.protocol);
+
+            var optionsJson = jObject.ToString(Formatting.None);
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, optionsJson);
 #endif
         }
