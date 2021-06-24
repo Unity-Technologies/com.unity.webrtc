@@ -32,7 +32,7 @@ class UnityAudioFrameObserver : public webrtc::AudioTrackSinkInterface {
   uint32_t m_id;
   std::mutex m_mutex;
   DelegateAudioFrameObserverOnFrameReady on_frame_ready_ RTC_GUARDED_BY(m_mutex) = nullptr;
-  
+
 };
 
 }

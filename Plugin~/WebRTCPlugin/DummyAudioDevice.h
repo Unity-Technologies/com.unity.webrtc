@@ -13,53 +13,22 @@ namespace webrtc
 
     using namespace ::webrtc;
 
-    const int kRecordingFixedSampleRate = 44100;
-    const size_t kRecordingNumChannels = 2;
-
-    const size_t nBytesPerSample = 2;
-    const size_t nSampleRate = 44100;
-    const int nChunkSampleCount = nSampleRate / 100;
-    const size_t nChannels = 2;
 
     // libwebrtc uses 10ms frames.
-    const unsigned frameLengthMs = 1000 * nChunkSampleCount / nSampleRate;
-    const unsigned pollSamples = 5;
-    const unsigned pollInterval = 5 * frameLengthMs;
+    const unsigned samplingRate = 48000;
+    const unsigned frameLengthMs = 10;
+    const unsigned samplesPerFrame = samplingRate * frameLengthMs / 1000;
+    const unsigned pollInterval = frameLengthMs;
     const unsigned channels = 2;
+    const unsigned bytesPerSample = 2;
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
         void ProcessAudioData(const float* data, int32 size);
-        void pollAudioData()
-        {
-            while (isPlaying)
-            {
-                pollFromSource();
+        void pollAudioData();
+        void pollFromSource();
 
-                auto now = std::chrono::high_resolution_clock::now();
-                auto delayUntilNextPolling = m_pollingTime + std::chrono::microseconds(pollInterval) - now;
-                if (delayUntilNextPolling < std::chrono::seconds(0)) {
-                    delayUntilNextPolling = std::chrono::seconds(0);
-                }
-                m_pollingTime = now + delayUntilNextPolling;
-                std::this_thread::sleep_for(delayUntilNextPolling);
-            }
-
-        }
-
-        void pollFromSource()
-        {
-            if (!audio_transport_)
-                return;
-
-            for (unsigned i = 0; i < pollSamples; i++) {
-                int64_t elapsedTime = -1;
-                int64_t ntpTime = -1;
-                int16_t* audio_data = new int16_t[nChunkSampleCount * nChannels];
-                audio_transport_->PullRenderData(nBytesPerSample * 8, nSampleRate, channels, nChunkSampleCount, audio_data, &elapsedTime, &ntpTime);
-            }
-        }
 
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
@@ -369,7 +338,6 @@ namespace webrtc
         std::vector<int16> convertedAudioData;
 
         std::unique_ptr<rtc::Thread> _ptrThreadPlay;
-        std::chrono::time_point<std::chrono::steady_clock> m_pollingTime;
 
         webrtc::AudioTransport* audio_transport_ = nullptr;
     };
