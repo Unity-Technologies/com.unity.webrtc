@@ -36,6 +36,29 @@ namespace Unity.WebRTC
         {
             m_observer.OnFrameReady = onFrameReady;
         }
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                if (IsObserverInitialized)
+                {
+                    m_observer.Dispose();
+                }
+
+                WebRTC.Context.DeleteMediaStreamTrack(self);
+                WebRTC.Table.Remove(self);
+                self = IntPtr.Zero;
+            }
+
+            this.disposed = true;
+            GC.SuppressFinalize(this);
+        }
     }
 
     public static class Audio
