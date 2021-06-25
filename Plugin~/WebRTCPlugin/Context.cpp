@@ -424,8 +424,8 @@ namespace webrtc
                 config, std::move(dependencies));
         if (obj->connection == nullptr)
             return nullptr;
-        // // disable peer connection audio playout, and use webRTC NullAudioPoller to poll audio data from audio transport 
-        // obj->connection->SetAudioPlayout(false);
+        // disable peer connection audio playout, and use webRTC NullAudioPoller to poll audio data from audio transport 
+        obj->connection->SetAudioPlayout(false);
         const PeerConnectionObject* ptr = obj.get();
         m_mapClients[ptr] = std::move(obj);
         return m_mapClients[ptr].get();

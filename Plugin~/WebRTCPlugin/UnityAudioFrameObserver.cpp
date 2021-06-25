@@ -59,7 +59,6 @@ void UnityAudioFrameObserver::OnData(const void* audio_data,
   // size_t number_of_bytes = number_of_channels * number_of_frames * (bits_per_sample / 8);
   // stream.write(audio_data_char, number_of_bytes);
   // stream.flush();
-
   on_frame_ready_(this, frame);
 }
 

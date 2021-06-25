@@ -406,7 +406,7 @@ extern "C"
         return sink->GetId();
     }
 
-    UNITY_INTERFACE_EXPORT void DeletetAudioFrameObserver(Context* context, UnityAudioFrameObserver* sink)
+    UNITY_INTERFACE_EXPORT void DeleteAudioFrameObserver(Context* context, UnityAudioFrameObserver* sink)
     {
         context->DeleteAudioFrameObserver(sink);
     }

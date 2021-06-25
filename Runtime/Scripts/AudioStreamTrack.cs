@@ -1,19 +1,23 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Unity.WebRTC
 {
     public class AudioStreamTrack : MediaStreamTrack
     {
-
+        internal static List<AudioStreamTrack> tracks = new List<AudioStreamTrack>();
         UnityAudioFrameObserver m_observer;
 
         public AudioStreamTrack(string label) : base(WebRTC.Context.CreateAudioTrack(label))
         {
+            tracks.Add(this);
         }
 
         public AudioStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
+            tracks.Add(this);
         }
 
         public bool IsObserverInitialized
@@ -51,6 +55,7 @@ namespace Unity.WebRTC
                     m_observer.Dispose();
                 }
 
+                tracks.Remove(this);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
@@ -92,7 +97,8 @@ namespace Unity.WebRTC
         }
     }
 
-    public struct AudioFrame
+    [StructLayout(LayoutKind.Sequential)]
+    public ref struct AudioFrame
     {
         /// <summary>
         /// Buffer of audio samples for all channels.
@@ -181,15 +187,12 @@ namespace Unity.WebRTC
 
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeAudioFrameObserverOnFrameReady))]
-        static void AudioFrameObserverOnFrameReady(IntPtr ptr, AudioFrame frame)
+        static void AudioFrameObserverOnFrameReady(IntPtr ptr, in AudioFrame frame)
         {
-            WebRTC.Sync(ptr, () =>
+            if (WebRTC.Table[ptr] is UnityAudioFrameObserver observer)
             {
-                if (WebRTC.Table[ptr] is UnityAudioFrameObserver observer)
-                {
-                    observer._onFrameReady?.Invoke(frame);
-                }
-            });
+                observer._onFrameReady?.Invoke(frame);
+            }
         }
     }
 }
