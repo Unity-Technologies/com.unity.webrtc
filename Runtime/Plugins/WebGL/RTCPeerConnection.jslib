@@ -92,6 +92,34 @@ var UnityWebRTCPeerConnection = {
         };
         Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
       } else if (track.kind === 'video') {
+
+        // BUG: MediaStream is not registered in Unity this way,
+        // TODO: Create HTMLVideoElement when created the receiver in unity
+        var streamPtr = _CreateMediaStream();
+        var stream = UWManaged[streamPtr];
+        stream.addTrack(track);
+        var video = document.createElement('video');
+        video.id = 'video_' + track.managePtr.toString();
+        video.muted = true;
+        //video.style.display = 'none';
+        video.srcObject = stream;
+        //document.body.appendChild(video);
+        video.style.width = '300px';
+        video.style.height = '200px';
+        video.style.position = 'absolute';
+        video.style.left = video.style.top = 0;
+        uwcom_remoteVideoTracks[track.managePtr] = {
+          track: track,
+          video: video,
+          playing: false
+        };
+        video.onplaying = function(){
+          uwcom_remoteVideoTracks[track.managePtr].playing = true;
+        }
+        video.play();
+        Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
+        
+        
         // TODO already exists check 
         // var video = document.createElement('video');
         // video.id = 'video_' + track.managePtr.toString();
@@ -99,7 +127,7 @@ var UnityWebRTCPeerConnection = {
         // video.style.display = 'none';
         // video.onloadedmetadata = function (evt) {
         //   // TODO Realtime resize
-          Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
+        //  Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
         // };
         // video.srcObject = evt.streams[0];
         // document.body.appendChild(video);
