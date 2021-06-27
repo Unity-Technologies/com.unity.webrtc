@@ -58,6 +58,7 @@ var UnityWebRTCMediaStream = {
 
   MediaStreamGetVideoTracks: function (streamPtr) {
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamGetVideoTracks', 'stream')) return;
+    var stream = UWManaged[streamPtr];
     var tracks = stream.getVideoTracks();
     var ptrs = [];
     tracks.forEach(function (track) {
@@ -70,6 +71,7 @@ var UnityWebRTCMediaStream = {
 
   MediaStreamGetAudioTracks: function (streamPtr) {
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamGetAudioTracks', 'stream')) return;
+    var stream = UWManaged[streamPtr];
     var tracks = stream.getAudioTracks();
     var ptrs = [];
     tracks.forEach(function (track) {

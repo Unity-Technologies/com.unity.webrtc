@@ -19,7 +19,7 @@ var UnityWebRTCPeerConnection = {
         uwcom_addManageObj(cnd);
         var candidatePtr = uwcom_strToPtr(cnd.candidate);
         var sdpMidPtr = uwcom_strToPtr(cnd.sdpMid);
-        Module.dynCall_viiiii(uwevt_PCOnIceCandidate, this.managePtr, cnd.managePtr, candidatePtr, sdpMidPtr, cnd.sdpMLineIndex);
+        Module.dynCall_viiiii(uwevt_PCOnIceCandidate, peer.managePtr, cnd.managePtr, candidatePtr, sdpMidPtr, cnd.sdpMLineIndex);
       }
     };
     peer.oniceconnectionstatechange = function (evt) {
@@ -28,12 +28,12 @@ var UnityWebRTCPeerConnection = {
       if (idx === -1) {
         console.error('unknown iceConnectionState: "' + this.iceConnectionState + '"');
       }
-      Module.dynCall_vii(uwevt_PCOnIceConnectionChange, this.managePtr, idx);
+      Module.dynCall_vii(uwevt_PCOnIceConnectionChange, peer.managePtr, idx);
     };
     peer.onconnectionstatechange = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onconnectionstatechange', this.label + ':' +this.connectionState);
       var idx = UWRTCPeerConnectionState.indexOf(this.connectionState);
-      Module.dynCall_vii(uwevt_PCOnConnectionStateChange, this.managePtr, idx);
+      Module.dynCall_vii(uwevt_PCOnConnectionStateChange, peer.managePtr, idx);
     };
     peer.onicegatheringstatechange = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onicegatheringstatechange', this.label + ':' +this.iceGatheringState);
@@ -41,11 +41,11 @@ var UnityWebRTCPeerConnection = {
       if (idx === -1) {
         console.error('unknown iceGatheringState: "' + this.iceGatheringState + '"');
       }
-      Module.dynCall_vii(uwevt_PCOnIceGatheringChange, this.managePtr, idx);
+      Module.dynCall_vii(uwevt_PCOnIceGatheringChange, peer.managePtr, idx);
     };
     peer.onnegotiationneeded = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onnegotiationneeded', this.label);
-      Module.dynCall_vi(uwevt_PCOnNegotiationNeeded, this.managePtr);
+      Module.dynCall_vi(uwevt_PCOnNegotiationNeeded, peer.managePtr);
     };
     peer.ondatachannel = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'ondatachannel', this.label + ':' + evt.channel.label);
@@ -60,13 +60,13 @@ var UnityWebRTCPeerConnection = {
         }
       });
       channel.onopen = function (evt) {
-        Module.dynCall_vi(uwevt_DCOnOpen, this.managePtr);
+        Module.dynCall_vi(uwevt_DCOnOpen, peer.managePtr);
       };
       channel.onclose = function (evt) {
-        Module.dynCall_vi(uwevt_DCOnClose, this.managePtr);
+        Module.dynCall_vi(uwevt_DCOnClose, peer.managePtr);
       };
       uwcom_addManageObj(channel);
-      Module.dynCall_vii(uwevt_PCOnDataChannel, this.managePtr, channel.managePtr);
+      Module.dynCall_vii(uwevt_PCOnDataChannel, peer.managePtr, channel.managePtr);
     };
     peer.ontrack = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'ontrack', this.label + ':' + evt.track.kind);

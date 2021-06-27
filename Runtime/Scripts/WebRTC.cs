@@ -643,6 +643,16 @@ namespace Unity.WebRTC
             return list;
         }
 
+        internal static IEnumerable<T> Deserialize<T>(IntPtr[] array, Func<IntPtr, T> constructor) where T : class
+        {
+            var list = new List<T>();
+            foreach (var ptr in array)
+            {
+                list.Add(FindOrCreate(ptr, constructor));
+            }
+            return list;
+        }
+
         internal static T FindOrCreate<T>(IntPtr ptr, Func<IntPtr, T> constructor) where T : class
         {
             if (Context.table.ContainsKey(ptr))
