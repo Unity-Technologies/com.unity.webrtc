@@ -3,7 +3,7 @@ var UnityWebRTCVideoRenderer = {
   },
 
   CreateNativeTexture: function() {
-    console.log('nativeTexture');
+    //console.log('nativeTexture');
     var texPtr = 0;
     for(var texPtr = 0; texPtr < GL.textures.length; texPtr++) {
       if(GL.textures[texPtr] === undefined)
@@ -12,7 +12,7 @@ var UnityWebRTCVideoRenderer = {
     var tex = GLctx.createTexture();
     tex.name = texPtr;
     GL.textures[texPtr] = tex;
-    console.log('nativeTexture' + texPtr);
+    //console.log('nativeTexture' + texPtr);
     return texPtr;
   },
 
@@ -26,8 +26,9 @@ var UnityWebRTCVideoRenderer = {
 
   UpdateRendererTexture: function (trackPtr, renderTexturePtr, needFlip) {
     // console.log('UpdateRendererTexture');
-    // if (!uwcom_existsCheck(trackPtr, 'UpdateRendererTexture', 'track')) return;
-    console.log('UpdateRendererTexture', renderTexturePtr);
+    if (!uwcom_existsCheck(trackPtr, 'UpdateRendererTexture', 'track')) return;
+    if (!uwcom_remoteVideoTracks[trackPtr].playing) return;
+    //console.log('UpdateRendererTexture', renderTexturePtr);
     var video = uwcom_remoteVideoTracks[trackPtr].video;
     var tex = GL.textures[renderTexturePtr];
     GLctx.bindTexture(GLctx.TEXTURE_2D, tex);

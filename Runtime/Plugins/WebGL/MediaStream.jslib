@@ -103,9 +103,13 @@ var UnityWebRTCMediaStream = {
       video.style.left = video.style.top = 0;
       uwcom_remoteVideoTracks[track.managePtr] = {
         track: track,
-        video: video
+        video: video,
+        playing: false
       };
-      video.play(); 
+      video.onplaying = function(){
+        uwcom_remoteVideoTracks[track.managePtr].playing = true;
+      }
+      video.play();
       Module.dynCall_vii(uwevt_MSOnAddTrack, stream.managePtr, track.managePtr);
       return true;
     } catch (err) {
