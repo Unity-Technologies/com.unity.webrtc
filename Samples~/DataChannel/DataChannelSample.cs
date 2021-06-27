@@ -22,6 +22,9 @@ class DataChannelSample : MonoBehaviour
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnMessage onDataChannelMessage;
+#if UNITY_WEBGL
+    private DelegateOnTextMessage onDataChannelTextMessage;
+#endif
     private DelegateOnOpen onDataChannelOpen;
     private DelegateOnClose onDataChannelClose;
     private DelegateOnDataChannel onDataChannel;
@@ -52,8 +55,14 @@ class DataChannelSample : MonoBehaviour
         {
             remoteDataChannel = channel;
             remoteDataChannel.OnMessage = onDataChannelMessage;
+#if UNITY_WEBGL
+            remoteDataChannel.OnTextMessage = onDataChannelTextMessage;
+#endif
         };
         onDataChannelMessage = bytes => { textReceive.text = System.Text.Encoding.UTF8.GetString(bytes); };
+#if UNITY_WEBGL
+        onDataChannelTextMessage = text => {textReceive.text = text;};
+#endif
         onDataChannelOpen = () =>
         {
             sendButton.interactable = true;
