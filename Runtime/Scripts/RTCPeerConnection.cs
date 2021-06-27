@@ -173,10 +173,12 @@ namespace Unity.WebRTC
 #else
             IntPtr pointers = NativeMethods.PeerConnectionGetReceivers(GetSelfOrThrow());
             var arr = NativeMethods.ptrToIntPtrArray(pointers);
-            RTCRtpReceiver[] receivers = new RTCRtpReceiver[arr.Length];
-            for (var i = 0; i < arr.Length; i++)
-                receivers[i] = new RTCRtpReceiver(arr[i], this);
-            return receivers;
+            return WebRTC.Deserialize(arr, ptr => new RTCRtpReceiver(ptr, this));
+
+            // RTCRtpReceiver[] receivers = new RTCRtpReceiver[arr.Length];
+            // for (var i = 0; i < arr.Length; i++)
+            //     receivers[i] = new RTCRtpReceiver(arr[i], this);
+            // return receivers;
 #endif
         }
 
@@ -199,10 +201,11 @@ namespace Unity.WebRTC
 #else
             IntPtr pointers = NativeMethods.PeerConnectionGetSenders(GetSelfOrThrow());
             var arr = NativeMethods.ptrToIntPtrArray(pointers);
-            RTCRtpSender[] senders = new RTCRtpSender[arr.Length];
-            for (var i = 0; i < arr.Length; i++)
-                senders[i] = new RTCRtpSender(arr[i], this);
-            return senders;
+            return WebRTC.Deserialize(arr, ptr => new RTCRtpSender(ptr, this));
+            // RTCRtpSender[] senders = new RTCRtpSender[arr.Length];
+            // for (var i = 0; i < arr.Length; i++)
+            //     senders[i] = new RTCRtpSender(arr[i], this);
+            // return senders;
 #endif
         }
 
@@ -225,10 +228,11 @@ namespace Unity.WebRTC
 #else
             IntPtr pointers = NativeMethods.PeerConnectionGetTransceivers(GetSelfOrThrow());
             var arr = NativeMethods.ptrToIntPtrArray(pointers);
-            RTCRtpTransceiver[] transceivers = new RTCRtpTransceiver[arr.Length];
-            for (var i = 0; i < arr.Length; i++)
-                transceivers[i] = new RTCRtpTransceiver(arr[i], this);
-            return transceivers;
+            return WebRTC.Deserialize(arr, ptr => new RTCRtpTransceiver(ptr, this));
+            // RTCRtpTransceiver[] transceivers = new RTCRtpTransceiver[arr.Length];
+            // for (var i = 0; i < arr.Length; i++)
+            //     transceivers[i] = new RTCRtpTransceiver(arr[i], this);
+            // return transceivers;
 #endif
         }
 
