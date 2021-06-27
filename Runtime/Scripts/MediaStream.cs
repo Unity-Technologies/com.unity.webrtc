@@ -90,8 +90,7 @@ namespace Unity.WebRTC
 #else
             var ptr = NativeMethods.MediaStreamGetVideoTracks(GetSelfOrThrow());
             var buf = NativeMethods.ptrToIntPtrArray(ptr);
-            var videoTracks = buf.Select(p => new VideoStreamTrack(p));
-            return videoTracks;
+            return WebRTC.Deserialize(buf, p => new VideoStreamTrack(p));
 #endif
         }
 
@@ -103,8 +102,7 @@ namespace Unity.WebRTC
 #else
             var ptr = NativeMethods.MediaStreamGetAudioTracks(GetSelfOrThrow());
             var buf = NativeMethods.ptrToIntPtrArray(ptr);
-            var audioTracks = buf.Select(p => new AudioStreamTrack(p));
-            return audioTracks;
+            return WebRTC.Deserialize(buf, p => new AudioStreamTrack(p));
 #endif
         }
 
