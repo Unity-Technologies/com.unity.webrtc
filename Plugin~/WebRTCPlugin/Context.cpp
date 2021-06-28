@@ -6,6 +6,7 @@
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
 
+#include "AudioTrackSinkAdapter.h"
 #include "DummyVideoEncoder.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
@@ -80,7 +81,7 @@ namespace webrtc
 #pragma region open an encode session
     uint32_t Context::s_encoderId = 0;
     uint32_t Context::GenerateUniqueId() { return s_encoderId++; }
-#pragma endregion
+#pragma endregion 
 
     bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -397,6 +398,39 @@ namespace webrtc
         {
             m_mediaSteamTrackList.erase(result);
         }
+    }
+
+    void Context::RegisterAudioReceiveCallback(
+        AudioTrackInterface* track, DelegateAudioReceive callback)
+    {
+        if (m_mapAudioTrackAndSink.find(track) != m_mapAudioTrackAndSink.end())
+        {
+            RTC_LOG(LS_WARNING) << "The callback is already registered.";
+            return;
+        }
+
+        std::unique_ptr<AudioTrackSinkAdapter> sink =
+            std::make_unique<AudioTrackSinkAdapter>(track, callback);
+
+        track->AddSink(sink.get());
+        m_mapAudioTrackAndSink[track] = std::move(sink);
+    }
+
+    void Context::UnregisterAudioReceiveCallback(
+        AudioTrackInterface* track)
+    {
+        if (m_mapAudioTrackAndSink.find(track) == m_mapAudioTrackAndSink.end())
+            return;
+
+        AudioTrackSinkInterface* sink = m_mapAudioTrackAndSink[track].get();
+        track->RemoveSink(sink);
+        m_mapAudioTrackAndSink.erase(track);
+    }
+
+
+    void Context::ReadAudioData(AudioTrackInterface* track, float* data, int32_t size)
+    {
+        m_mapAudioTrackAndSink[track]->GetData(data, size);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
