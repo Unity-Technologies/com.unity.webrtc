@@ -747,7 +747,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateAudioReceive(
         IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
-        int bitsPerSample, int sampleRate, int numOfChannels, int numOfFrames);
+        int sampleRate, int numOfChannels, int numOfFrames);
 
     internal static class NativeMethods
     {
@@ -1015,8 +1015,6 @@ namespace Unity.WebRTC
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void ProcessAudio(IntPtr track, float[] data, int sampleRate, int channels, int frames);
-        [DllImport(WebRTC.Lib)]
-        public static extern void ContextReadAudioData(IntPtr context, IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] float[] data, int size);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]

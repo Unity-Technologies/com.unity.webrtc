@@ -30,6 +30,8 @@ namespace webrtc
         // Full-duplex transportation of PCM audio
         virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
+            std::lock_guard<std::mutex> lock(m_mutex);
+
             deviceBuffer->RegisterAudioCallback(transport);
 
             audio_transport_ = transport;
@@ -329,6 +331,7 @@ namespace webrtc
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
         std::vector<int16> convertedAudioData;
+        std::mutex m_mutex;
 
         size_t _recordingFramesIn10MS;
         std::unique_ptr<rtc::Thread> _ptrThreadRec;

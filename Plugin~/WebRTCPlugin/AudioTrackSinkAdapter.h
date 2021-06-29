@@ -15,8 +15,6 @@ namespace webrtc
         AudioTrackSinkAdapter(AudioTrackInterface* track, DelegateAudioReceive callback);
         ~AudioTrackSinkAdapter() override {};
 
-        void GetData(float_t* audio_data, int32_t size);
-
         void OnData(
             const void* audio_data,
             int bits_per_sample,
@@ -24,9 +22,7 @@ namespace webrtc
             size_t number_of_channels,
             size_t number_of_frames) override;
     private:
-        std::mutex m_mutex;
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> m_frameBuffer;
-        std::vector<float_t> _data;
         AudioTrackInterface* _track;
         DelegateAudioReceive _callback;
     };

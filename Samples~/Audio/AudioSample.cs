@@ -10,6 +10,7 @@ namespace Unity.WebRTC
     {
         [SerializeField] private AudioSource inputAudioSource;
         [SerializeField] private AudioSource outputAudioSource;
+        [SerializeField] private Toggle toggleEnableMicrophone;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
@@ -17,6 +18,7 @@ namespace Unity.WebRTC
         [SerializeField] private Text textChannelCount;
         [SerializeField] private Text textMinFrequency;
         [SerializeField] private Text textMaxFrequency;
+        [SerializeField] private AudioClip audioclipStereoSample;
 
         private RTCPeerConnection _pc1, _pc2;
         private MediaStream _sendStream;
@@ -24,11 +26,8 @@ namespace Unity.WebRTC
 
         private AudioClip m_clipInput;
         private AudioStreamTrack m_audioTrack;
-        private AudioStreamTrack m_audioTrack2;
 
-        private AudioStreamTrack m_receiverTrack;
-        //int m_head;
-        int m_samplingFrequency = 44100;
+        int m_samplingFrequency = 48000;
         int m_lengthSeconds = 1;
         int m_channelCount = 1;
 
@@ -39,6 +38,9 @@ namespace Unity.WebRTC
             WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
 
+            toggleEnableMicrophone.isOn = false;
+            toggleEnableMicrophone.onValueChanged.AddListener(OnEnableMicrophone);
+            dropdownMicrophoneDevices.interactable = false;
             dropdownMicrophoneDevices.options =
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
@@ -58,11 +60,15 @@ namespace Unity.WebRTC
 
         void OnStart()
         {
-            m_deviceName = dropdownMicrophoneDevices.captionText.text;
-            m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
-            Debug.Log($"clipInput samples:{m_clipInput.samples}, " +
-                      $"m_clipInput.channels:{m_clipInput.channels}," +
-                      $"m_clipInput.frequency:{m_clipInput.frequency}");
+            if (toggleEnableMicrophone.isOn)
+            {
+                m_deviceName = dropdownMicrophoneDevices.captionText.text;
+                m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
+            }
+            else
+            {
+                m_clipInput = audioclipStereoSample;
+            }
             m_channelCount = m_clipInput.channels;
 
             inputAudioSource.loop = true;
@@ -72,6 +78,11 @@ namespace Unity.WebRTC
             buttonStart.interactable = false;
             buttonCall.interactable = true;
             buttonHangup.interactable = true;
+        }
+
+        void OnEnableMicrophone(bool enable)
+        {
+            dropdownMicrophoneDevices.interactable = enable;
         }
 
         void OnCall()
@@ -111,14 +122,6 @@ namespace Unity.WebRTC
 
         void OnAudioReceived(AudioClip renderer)
         {
-            //Debug.Log($"track.Id {track.Id}" +
-            //          $"data.Length {data.Length}, " +
-            //          $"bitsPerSample {bitsPerSample}, " +
-            //          $"sampleRate {sampleRate}, " +
-            //          $"numOfChannels {numOfChannels}, " +
-            //          $"numOfFrames {numOfFrames}");
-            // m_audioOutput.SetData(data, numOfFrames);
-
             outputAudioSource.clip = renderer;
             outputAudioSource.loop = true;
             outputAudioSource.Play();
@@ -151,16 +154,6 @@ namespace Unity.WebRTC
             textChannelCount.text = string.Format($"Channel Count: {m_channelCount}");
             textMinFrequency.text = string.Format($"Minimum frequency: {minFreq}");
             textMaxFrequency.text = string.Format($"Maximum frequency: {maxFreq}");
-        }
-
-        private void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
-        {
-            //Debug.Log($"{GetName(pc)} IceConnectionState: {state}");
-
-            if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
-            {
-                //StartCoroutine(CheckStats(pc));
-            }
         }
 
         private static RTCConfiguration GetSelectedSdpSemantics()
@@ -200,7 +193,6 @@ namespace Unity.WebRTC
 
         private IEnumerator OnCreateOfferSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
         {
-            Debug.Log("setLocalDescription start");
             var op = pc.SetLocalDescription(ref desc);
             yield return op;
 
@@ -215,14 +207,9 @@ namespace Unity.WebRTC
             }
 
             var otherPc = GetOtherPc(pc);
-//            Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
             var op2 = otherPc.SetRemoteDescription(ref desc);
             yield return op2;
-            if (!op2.IsError)
-            {
-//                OnSetRemoteSuccess(otherPc);
-            }
-            else
+            if (op2.IsError)
             {
                 var error = op2.Error;
                 OnSetSessionDescriptionError(ref error);
@@ -233,17 +220,11 @@ namespace Unity.WebRTC
             {
                 yield return OnCreateAnswerSuccess(otherPc, op3.Desc);
             }
-            else
-            {
-//                OnCreateSessionDescriptionError(op3.Error);
-            }
         }
 
 
         IEnumerator OnCreateAnswerSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
         {
-            //Debug.Log($"Answer from {GetName(pc)}:\n{desc.sdp}");
-            //Debug.Log($"{GetName(pc)} setLocalDescription start");
             var op = pc.SetLocalDescription(ref desc);
             yield return op;
 
@@ -258,15 +239,9 @@ namespace Unity.WebRTC
             }
 
             var otherPc = GetOtherPc(pc);
-//            Debug.Log($"{GetName(otherPc)} setRemoteDescription start");
-
             var op2 = otherPc.SetRemoteDescription(ref desc);
             yield return op2;
-            if (!op2.IsError)
-            {
-//                OnSetRemoteSuccess(otherPc);
-            }
-            else
+            if (op2.IsError)
             {
                 var error = op2.Error;
                 OnSetSessionDescriptionError(ref error);
@@ -281,39 +256,6 @@ namespace Unity.WebRTC
         static void OnSetSessionDescriptionError(ref RTCError error)
         {
             Debug.LogError($"Error Detail Type: {error.message}");
-        }
-
-        //void Update()
-        //{
-        //    if (!Microphone.IsRecording(m_deviceName))
-        //        return;
-
-        //    int position = Microphone.GetPosition(m_deviceName);
-        //    if (position < 0 || m_head == position)
-        //    {
-        //        return;
-        //    }
-
-        //    if (m_head > position)
-        //    {
-        //        m_head = 0;
-        //    }
-
-        //    if (m_microphoneBuffer.Length != m_samplingFrequency * m_lengthSeconds * m_channelCount)
-        //    {
-        //        m_microphoneBuffer = new float[m_samplingFrequency * m_lengthSeconds * m_channelCount];
-        //    }
-        //    m_clipInput.GetData(m_microphoneBuffer, m_head);
-        //    ProcessAudio(m_microphoneBuffer, position - m_head);
-
-        //    m_head = position;
-        //}
-
-
-
-        private void ProcessAudio(float[] data, int dataLength)
-        {
-            // Audio.Update(data, dataLength, m_channelCount);
         }
     }
 }

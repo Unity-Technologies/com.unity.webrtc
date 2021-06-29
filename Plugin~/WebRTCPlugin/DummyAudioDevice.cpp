@@ -9,37 +9,40 @@ namespace webrtc
 
     bool DummyAudioDevice::RecThreadProcess()
     {
-        if (!isRecording) {
-            return false;
-        }
-
         int64_t currentTime = rtc::TimeMillis();
-        //mutex_.Lock();
 
-        if (_lastCallRecordMillis == 0 || currentTime - _lastCallRecordMillis >= 10) {
-            _lastCallRecordMillis = currentTime;
-            //mutex_.Unlock();
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
 
-            const int kBytesPerSample = 2;
-            const int kChannels = 2;
+            if (audio_transport_ == nullptr) {
+                return false;
+            }
 
-            const int kSamplingRate = 48000;
+            if (!isRecording) {
+                return false;
+            }
 
-            // Webrtc uses 10ms frames.
-            const int kFrameLengthMs = 10;
-            const int kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
+            if (_lastCallRecordMillis == 0 || currentTime - _lastCallRecordMillis >= 10) {
+                _lastCallRecordMillis = currentTime;
 
-            int64_t elapsed_time_ms = -1;
-            int64_t ntp_time_ms = -1;
-            char data[kBytesPerSample * kChannels * kSamplesPerFrame];
+                const int kBytesPerSample = 2;
+                const int kChannels = 2;
 
-            audio_transport_->PullRenderData(kBytesPerSample * 8, kSamplingRate,
-                kChannels, kSamplesPerFrame, data,
-                &elapsed_time_ms, &ntp_time_ms);
-            //mutex_.Lock();
+                const int kSamplingRate = 48000;
+
+                // Webrtc uses 10ms frames.
+                const int kFrameLengthMs = 10;
+                const int kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
+
+                int64_t elapsed_time_ms = -1;
+                int64_t ntp_time_ms = -1;
+                char data[kBytesPerSample * kChannels * kSamplesPerFrame];
+
+                audio_transport_->PullRenderData(kBytesPerSample * 8, kSamplingRate,
+                    kChannels, kSamplesPerFrame, data,
+                    &elapsed_time_ms, &ntp_time_ms);
+            }
         }
-
-        //mutex_.Unlock();
 
         int64_t deltaTimeMillis = rtc::TimeMillis() - currentTime;
         if (deltaTimeMillis < 10) {

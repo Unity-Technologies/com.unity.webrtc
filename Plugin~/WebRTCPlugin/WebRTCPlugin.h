@@ -26,7 +26,6 @@ namespace webrtc
         void(*)(webrtc::AudioTrackInterface* track,
             const void* audio_data,
             int size,
-            int bits_per_sample,
             int sample_rate,
             int number_of_channels,
             int number_of_frames);

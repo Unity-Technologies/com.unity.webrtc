@@ -427,12 +427,6 @@ namespace webrtc
         m_mapAudioTrackAndSink.erase(track);
     }
 
-
-    void Context::ReadAudioData(AudioTrackInterface* track, float* data, int32_t size)
-    {
-        m_mapAudioTrackAndSink[track]->GetData(data, size);
-    }
-
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
     {
         m_listStatsReport.push_back(report);

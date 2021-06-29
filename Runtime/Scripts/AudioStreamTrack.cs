@@ -22,6 +22,7 @@ namespace Unity.WebRTC
             private int m_frequency;
             private int m_sampleRate;
             private int m_position = 0;
+            private int m_channel = 0;
             private AudioStreamTrack m_track;
 
             public AudioClip clip
@@ -37,26 +38,46 @@ namespace Unity.WebRTC
                 m_frequency = frequency;
                 m_sampleRate = sampleRate;
                 m_track = track;
+                m_channel = channels;
 
                 // note:: OnSendAudio and OnAudioSetPosition callback is called before complete the constructor.
-                m_clip = AudioClip.Create(track.Id, m_sampleRate, channels, m_frequency, true, OnAudioRead, OnAudioSetPosition);
+                // PCMRenderCallback is not worked 
+                //m_clip = AudioClip.Create(track.Id, m_sampleRate, channels, m_frequency, true, OnAudioRead, OnAudioSetPosition);
+                m_clip = AudioClip.Create(track.Id, m_sampleRate, channels, m_frequency, false);
             }
 
-            void OnAudioRead(float[] data)
+            internal void SetData(float[] data)
             {
-                // todo(kazuki):: change position
-                WebRTC.Context.AudioTrackReadAudioData(m_track.self, data);
-                m_position = data.Length;
+                int length = data.Length / m_channel;
+
+                if (m_position + length > m_clip.samples)
+                {
+
+                    int remain = m_position + length - m_clip.samples;
+                    length = m_clip.samples - m_position;
+                    float[] _data = new float[length * m_channel];
+                    Buffer.BlockCopy(data, 0, _data, 0, length * m_channel);
+                    float[] _data2 = new float[remain * m_channel];
+                    Buffer.BlockCopy(data, length * m_channel, _data2, 0, remain * m_channel);
+                    SetData(_data);
+
+                    data = _data2;
+                    length = remain;
+                    m_position = 0;
+                }
+                m_clip.SetData(data, m_position);
+                m_position += length;
+
+                if (m_position == m_clip.samples)
+                {
+                    m_position = 0;
+                }
             }
 
-            void OnAudioSetPosition(int newPosition)
-            {
-                m_position = newPosition;
-            }
+
         }
 
         internal static List<AudioStreamTrack> tracks = new List<AudioStreamTrack>();
-
 
         public event OnAudioReceived OnAudioReceived;
 
@@ -65,11 +86,9 @@ namespace Unity.WebRTC
         public AudioClip Renderer { get; private set; }
 
         readonly int _sampleRate = 0;
-        readonly int _channels = 0;
-        readonly float[] _sampleBuffer = null;
         readonly AudioSourceRead _audioSourceRead;
 
-        private AudioStreamRenderer _mStreamRenderer;
+        private AudioStreamRenderer _streamRenderer;
 
         public AudioStreamTrack() : this(WebRTC.Context.CreateAudioTrack(Guid.NewGuid().ToString()))
         {
@@ -91,7 +110,6 @@ namespace Unity.WebRTC
             _audioSourceRead.hideFlags = HideFlags.HideInHierarchy;
             _audioSourceRead.onAudioRead += OnSendAudio;
             _sampleRate = Source.clip.frequency;
-            _channels = Source.clip.channels;
         }
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
@@ -138,26 +156,27 @@ namespace Unity.WebRTC
         /// <param name="sampleRate">default=48000</param>
         /// <param name="channels">default=1</param>
         /// <param name="numOfFrames">default=480</param>
-        internal void OnAudioReceivedInternal(float[] audioData, int bitsPerSample, int sampleRate, int channels, int numOfFrames)
+        internal void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
         {
             if (Renderer == null)
             {
-                _mStreamRenderer = new AudioStreamRenderer(this, sampleRate, channels,sampleRate);
-                Renderer = _mStreamRenderer.clip;
+                _streamRenderer = new AudioStreamRenderer(this, sampleRate, channels,sampleRate);
+                Renderer = _streamRenderer.clip;
 
                 OnAudioReceived?.Invoke(Renderer);
             }
+            _streamRenderer.SetData(audioData);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateAudioReceive))]
         static void OnAudioReceive(
-            IntPtr ptrTrack, float[] audioData, int size, int bitsPerSample, int sampleRate, int numOfChannels, int numOfFrames)
+            IntPtr ptrTrack, float[] audioData, int size, int sampleRate, int numOfChannels, int numOfFrames)
         {
             WebRTC.Sync(ptrTrack, () =>
             {
                 if (WebRTC.Table[ptrTrack] is AudioStreamTrack track)
                 {
-                    track.OnAudioReceivedInternal(audioData, bitsPerSample, sampleRate, numOfChannels, numOfFrames);
+                    track.OnAudioReceivedInternal(audioData, sampleRate, numOfChannels, numOfFrames);
                 }
             });
         }

@@ -82,8 +82,6 @@ namespace webrtc
         void RegisterAudioReceiveCallback(
             AudioTrackInterface* track, DelegateAudioReceive callback);
         void UnregisterAudioReceiveCallback(AudioTrackInterface* track);
-        //void PullAudioData(const float* data, int32_t size);
-        void ReadAudioData(AudioTrackInterface* track, float* data, int32_t size);
 
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);

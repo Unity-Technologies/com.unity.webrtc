@@ -10,8 +10,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] LineRenderer line;
         [SerializeField] RectTransform rectTransform;
         [SerializeField] float xRatio = 1f;
-        [SerializeField] float yRatio = 10000f;
-        [SerializeField] private float yBase = 2.71828f;
+        [SerializeField] float yRatio = 1f;
 
         const int positionCount = 256;
         float[] spectrum = new float[positionCount];
@@ -34,7 +33,7 @@ namespace Unity.WebRTC.Samples
             for(int i = 1; i < array.Length; i++)
             {
                 float x = rectTransform.rect.width * i / array.Length * xRatio;
-                float y = rectTransform.rect.height * Mathf.Log(spectrum[i] + 1, yBase) * yRatio;
+                float y = rectTransform.rect.height * Mathf.Log(spectrum[i] + 1) * yRatio;
                 array[i] = new Vector3(x, y, 0);
             }
             line.SetPositions(array);
