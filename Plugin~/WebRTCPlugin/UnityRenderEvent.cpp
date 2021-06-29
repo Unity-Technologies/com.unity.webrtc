@@ -330,18 +330,31 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
     if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
     {
         auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
-        
+
         auto renderer = s_context->GetVideoRenderer(params->userData);
         if (renderer == nullptr)
         {
             // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
             return;
         }
+        renderer->usedByRenderThread = true;
         {
             ScopedProfiler profiler(*s_MarkerDecode);
             renderer->ConvertVideoFrameToTextureAndWriteToBuffer(params->width, params->height, ConvertTextureFormat(params->format));
         }
         params->texData = renderer->tempBuffer.data();
+    }
+    if (event == kUnityRenderingExtEventUpdateTextureEndV2)
+    {
+        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
+
+        auto renderer = s_context->GetVideoRenderer(params->userData);
+        if (renderer == nullptr)
+        {
+            // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
+            return;
+        }
+        renderer->usedByRenderThread = false;
     }
 }
 

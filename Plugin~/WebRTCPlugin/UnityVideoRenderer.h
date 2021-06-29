@@ -20,6 +20,7 @@ namespace webrtc {
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> GetFrameBuffer();
         void SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer);
         std::vector<uint8_t> tempBuffer;
+        bool usedByRenderThread;
 
         void ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format);
 

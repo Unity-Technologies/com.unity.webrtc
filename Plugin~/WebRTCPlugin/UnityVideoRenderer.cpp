@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "UnityVideoRenderer.h"
+#include <thread>
+#include <chrono>
 
 namespace unity {
 namespace webrtc {
@@ -11,6 +13,10 @@ UnityVideoRenderer::UnityVideoRenderer(uint32_t id) : m_id(id)
 
 UnityVideoRenderer::~UnityVideoRenderer()
 {
+    while(usedByRenderThread)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     DebugLog("Destory UnityVideoRenderer Id:%d", m_id);
     {
         std::unique_lock<std::mutex> lock(m_mutex);
