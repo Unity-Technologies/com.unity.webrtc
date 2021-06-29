@@ -16,6 +16,22 @@ namespace Unity.WebRTC
     /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public event OnAudioReceived OnAudioReceived;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AudioSource Source { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AudioClip Renderer { get; private set; }
+
+
         internal class AudioStreamRenderer
         {
             private AudioClip m_clip;
@@ -41,8 +57,6 @@ namespace Unity.WebRTC
                 m_channel = channels;
 
                 // note:: OnSendAudio and OnAudioSetPosition callback is called before complete the constructor.
-                // PCMRenderCallback is not worked 
-                //m_clip = AudioClip.Create(track.Id, m_sampleRate, channels, m_frequency, true, OnAudioRead, OnAudioSetPosition);
                 m_clip = AudioClip.Create(track.Id, m_sampleRate, channels, m_frequency, false);
             }
 
@@ -52,7 +66,6 @@ namespace Unity.WebRTC
 
                 if (m_position + length > m_clip.samples)
                 {
-
                     int remain = m_position + length - m_clip.samples;
                     length = m_clip.samples - m_position;
                     float[] _data = new float[length * m_channel];
@@ -73,23 +86,18 @@ namespace Unity.WebRTC
                     m_position = 0;
                 }
             }
-
-
         }
 
         internal static List<AudioStreamTrack> tracks = new List<AudioStreamTrack>();
-
-        public event OnAudioReceived OnAudioReceived;
-
-        public AudioSource Source { get; private set; }
-
-        public AudioClip Renderer { get; private set; }
 
         readonly int _sampleRate = 0;
         readonly AudioSourceRead _audioSourceRead;
 
         private AudioStreamRenderer _streamRenderer;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AudioStreamTrack() : this(WebRTC.Context.CreateAudioTrack(Guid.NewGuid().ToString()))
         {
         }
