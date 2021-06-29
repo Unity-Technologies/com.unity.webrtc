@@ -7,7 +7,7 @@ namespace unity
 namespace webrtc
 {
 
-    bool DummyAudioDevice::RecThreadProcess()
+    bool DummyAudioDevice::PlayoutThreadProcess()
     {
         int64_t currentTime = rtc::TimeMillis();
 
