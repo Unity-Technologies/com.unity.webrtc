@@ -1895,7 +1895,7 @@ MonoBehaviour:
   textChannelCount: {fileID: 1891872139}
   textMinFrequency: {fileID: 607497268}
   textMaxFrequency: {fileID: 1233102119}
-  audioclipStereoSample: {fileID: 8300000, guid: 660809d226827ec4f9873717c8a1277f,
+  audioclipStereoSample: {fileID: 8300000, guid: 90d9c085a4875424398f64e8cb82d9bd,
     type: 3}
 --- !u!1 &989765905
 GameObject:
