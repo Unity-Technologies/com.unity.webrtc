@@ -17,9 +17,6 @@ namespace webrtc
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
-
-        bool RecThreadProcess();
-
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
         virtual int32 ActiveAudioLayer(AudioLayer* audioLayer) const override
@@ -125,8 +122,7 @@ namespace webrtc
             _ptrThreadRec = rtc::Thread::Create();
             _ptrThreadRec->Start();
             _ptrThreadRec->PostTask(RTC_FROM_HERE, [&] {
-                while (RecThreadProcess()) {
-                }
+                while (RecThreadProcess()) {}
             });
 
             return 0;
@@ -327,6 +323,8 @@ namespace webrtc
         }
 #endif
     private:
+        bool RecThreadProcess();
+
         std::unique_ptr<webrtc::AudioDeviceBuffer> deviceBuffer;
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};

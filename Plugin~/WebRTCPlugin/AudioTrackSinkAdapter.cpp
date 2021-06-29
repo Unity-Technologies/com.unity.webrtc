@@ -39,11 +39,11 @@ namespace webrtc
         const int16_t* data = static_cast<const int16_t*>(audio_data);
         const float_t INVERSE = 1.0 / SHRT_MAX;
 
-        std::vector<float_t> _converted_data;
+        std::vector<float_t> _converted_data(size);
 
         for (size_t i = 0; i < size; i++)
         {
-            _converted_data.push_back(data[i] * INVERSE);
+            _converted_data[i] = data[i] * INVERSE;
         }
 
         _callback(
