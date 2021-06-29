@@ -12,18 +12,18 @@ namespace webrtc
         int64_t currentTime = rtc::TimeMillis();
 
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard<std::mutex> lock(mutex_);
 
             if (audio_transport_ == nullptr) {
                 return false;
             }
 
-            if (!isRecording) {
+            if (!playing_) {
                 return false;
             }
 
-            if (_lastCallRecordMillis == 0 || currentTime - _lastCallRecordMillis >= 10) {
-                _lastCallRecordMillis = currentTime;
+            if (lastCallRecordMillis_ == 0 || currentTime - lastCallRecordMillis_ >= 10) {
+                lastCallRecordMillis_ = currentTime;
 
                 const int kBytesPerSample = 2;
                 const int kChannels = 2;

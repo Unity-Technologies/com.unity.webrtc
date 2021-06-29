@@ -27,7 +27,7 @@ namespace webrtc
         // Full-duplex transportation of PCM audio
         virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard<std::mutex> lock(mutex_);
 
             audio_transport_ = transport;
             return 0;
@@ -36,18 +36,18 @@ namespace webrtc
         // Main initialization and termination
         virtual int32 Init() override
         {
-            started = true;
+            initialized_ = true;
             return 0;
         }
         virtual int32 Terminate() override
         {
-            started = false;
-            isRecording = false;
+            initialized_ = false;
+            playing_ = false;
             return 0;
         }
         virtual bool Initialized() const override
         {
-            return started;
+            return initialized_;
         }
 
         // Device enumeration
@@ -109,32 +109,33 @@ namespace webrtc
         }
         virtual int32 InitRecording() override
         {
-            isRecording = true;
-            _ptrThreadRec = rtc::Thread::Create();
-            _ptrThreadRec->Start();
-            _ptrThreadRec->PostTask(RTC_FROM_HERE, [&] {
-                while (RecThreadProcess()) {}
-            });
-
             return 0;
         }
         virtual bool RecordingIsInitialized() const override
         {
-            return isRecording;
+            return false;
         }
 
         // Audio transport control
         virtual int32 StartPlayout() override
         {
+            playing_ = true;
+            playoutAudioThread_ = rtc::Thread::Create();
+            playoutAudioThread_->Start();
+            playoutAudioThread_->PostTask(RTC_FROM_HERE, [&] {
+                while (PlayoutThreadProcess()) {}
+                });
             return 0;
         }
         virtual int32 StopPlayout() override
         {
+            if (playoutAudioThread_ && !playoutAudioThread_->empty())
+                playoutAudioThread_->Stop();
             return 0;
         }
         virtual bool Playing() const override
         {
-            return false;
+            return playing_;
         }
 
         virtual int32 StartRecording() override
@@ -143,13 +144,11 @@ namespace webrtc
         }
         virtual int32 StopRecording() override
         {
-            if (_ptrThreadRec && !_ptrThreadRec->empty())
-                _ptrThreadRec->Stop();
             return 0;
         }
         virtual bool Recording() const override
         {
-            return isRecording;
+            return false;
         }
 
         // Audio mixer initialization
@@ -314,14 +313,13 @@ namespace webrtc
         }
 #endif
     private:
-        bool RecThreadProcess();
+        bool PlayoutThreadProcess();
 
-        std::atomic<bool> started {false};
-        std::atomic<bool> isRecording {false};
-        std::mutex m_mutex;
-
-        std::unique_ptr<rtc::Thread> _ptrThreadRec;
-        int64_t _lastCallRecordMillis = 0;
+        std::atomic<bool> initialized_ {false};
+        std::atomic<bool> playing_ {false};
+        std::mutex mutex_;
+        std::unique_ptr<rtc::Thread> playoutAudioThread_;
+        int64_t lastCallRecordMillis_ = 0;
 
         webrtc::AudioTransport* audio_transport_ = nullptr;
     };
