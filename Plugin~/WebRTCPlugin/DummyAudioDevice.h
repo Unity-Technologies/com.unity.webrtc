@@ -29,8 +29,6 @@ namespace webrtc
         {
             std::lock_guard<std::mutex> lock(m_mutex);
 
-            deviceBuffer->RegisterAudioCallback(transport);
-
             audio_transport_ = transport;
             return 0;
         }
@@ -38,13 +36,11 @@ namespace webrtc
         // Main initialization and termination
         virtual int32 Init() override
         {
-            deviceBuffer = std::make_unique<webrtc::AudioDeviceBuffer>(webrtc::CreateDefaultTaskQueueFactory().get());
             started = true;
             return 0;
         }
         virtual int32 Terminate() override
         {
-            deviceBuffer.reset();
             started = false;
             isRecording = false;
             return 0;
@@ -114,11 +110,6 @@ namespace webrtc
         virtual int32 InitRecording() override
         {
             isRecording = true;
-            _recordingFramesIn10MS = static_cast<size_t>(kRecordingFixedSampleRate / 100);
-            deviceBuffer->SetRecordingSampleRate(kRecordingFixedSampleRate);
-            deviceBuffer->SetRecordingChannels(kRecordingNumChannels);
-
-
             _ptrThreadRec = rtc::Thread::Create();
             _ptrThreadRec->Start();
             _ptrThreadRec->PostTask(RTC_FROM_HERE, [&] {
@@ -325,13 +316,10 @@ namespace webrtc
     private:
         bool RecThreadProcess();
 
-        std::unique_ptr<webrtc::AudioDeviceBuffer> deviceBuffer;
         std::atomic<bool> started {false};
         std::atomic<bool> isRecording {false};
-        std::vector<int16> convertedAudioData;
         std::mutex m_mutex;
 
-        size_t _recordingFramesIn10MS;
         std::unique_ptr<rtc::Thread> _ptrThreadRec;
         int64_t _lastCallRecordMillis = 0;
 
