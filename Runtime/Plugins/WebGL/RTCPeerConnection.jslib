@@ -8,6 +8,13 @@ var UnityWebRTCPeerConnection = {
 
     //debugger;
     conf = conf || {};
+    
+    var iceIdx = 0;
+    for(var iceIdx = 0; iceIdx < conf.iceServers.length; iceIdx++) {
+        var idx = conf.iceServers[iceIdx].credentialType;
+        conf.iceServers[iceIdx].credentialType = UWRTCIceCredentialType[idx];
+    }
+    
     var peer = new RTCPeerConnection(conf);
     peer.label = label;
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'CreatePeerConnection', 'create peer: ' + peer.label);
