@@ -229,6 +229,8 @@ namespace webrtc
             root["iceServers"].append(jsonIceServer);
         }
         root["iceTransportPolicy"] = _config.type;
+        if(_config.enable_dtls_srtp.has_value())
+            root["enableDtlsSrtp"] = _config.enable_dtls_srtp.value();
         root["iceCandidatePoolSize"] = _config.ice_candidate_pool_size;
         root["bundlePolicy"] = _config.bundle_policy;
 
