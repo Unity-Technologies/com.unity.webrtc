@@ -29,7 +29,10 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public AudioClip Renderer { get; private set; }
+        public AudioClip Renderer
+        {
+            get { return _streamRenderer.clip; }
+        }
 
 
         internal class AudioStreamRenderer
@@ -171,12 +174,11 @@ namespace Unity.WebRTC
         /// <param name="numOfFrames">default=480</param>
         internal void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
         {
-            if (Renderer == null)
+            if (_streamRenderer == null)
             {
                 _streamRenderer = new AudioStreamRenderer(this.Id, sampleRate, channels);
-                Renderer = _streamRenderer.clip;
 
-                OnAudioReceived?.Invoke(Renderer);
+                OnAudioReceived?.Invoke(_streamRenderer.clip);
             }
             _streamRenderer.SetData(audioData);
         }
