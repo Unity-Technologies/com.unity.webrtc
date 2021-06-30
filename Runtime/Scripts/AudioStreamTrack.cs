@@ -35,11 +35,9 @@ namespace Unity.WebRTC
         internal class AudioStreamRenderer
         {
             private AudioClip m_clip;
-            private int m_frequency;
             private int m_sampleRate;
             private int m_position = 0;
             private int m_channel = 0;
-            private AudioStreamTrack m_track;
 
             public AudioClip clip
             {
@@ -49,15 +47,19 @@ namespace Unity.WebRTC
                 }
             }
 
-            public AudioStreamRenderer(AudioStreamTrack track, int sampleRate, int channels, int frequency)
+            public AudioStreamRenderer(string name, int sampleRate, int channels)
             {
-                m_frequency = frequency;
                 m_sampleRate = sampleRate;
-                m_track = track;
                 m_channel = channels;
+                int lengthSamples = m_sampleRate;  // sample length for a second
 
                 // note:: OnSendAudio and OnAudioSetPosition callback is called before complete the constructor.
-                m_clip = AudioClip.Create(track.Id, m_sampleRate, channels, m_frequency, false);
+                m_clip = AudioClip.Create(name, lengthSamples, channels, m_sampleRate, false);
+            }
+
+            ~AudioStreamRenderer()
+            {
+                Object.Destroy(m_clip);
             }
 
             internal void SetData(float[] data)
@@ -68,15 +70,18 @@ namespace Unity.WebRTC
                 {
                     int remain = m_position + length - m_clip.samples;
                     length = m_clip.samples - m_position;
+
+                    // Split two arrays from original data
                     float[] _data = new float[length * m_channel];
                     Buffer.BlockCopy(data, 0, _data, 0, length * m_channel);
                     float[] _data2 = new float[remain * m_channel];
                     Buffer.BlockCopy(data, length * m_channel, _data2, 0, remain * m_channel);
+
+                    // push the split array to the audio buffer
                     SetData(_data);
 
                     data = _data2;
                     length = remain;
-                    m_position = 0;
                 }
                 m_clip.SetData(data, m_position);
                 m_position += length;
@@ -168,7 +173,7 @@ namespace Unity.WebRTC
         {
             if (Renderer == null)
             {
-                _streamRenderer = new AudioStreamRenderer(this, sampleRate, channels,sampleRate);
+                _streamRenderer = new AudioStreamRenderer(this.Id, sampleRate, channels);
                 Renderer = _streamRenderer.clip;
 
                 OnAudioReceived?.Invoke(Renderer);
