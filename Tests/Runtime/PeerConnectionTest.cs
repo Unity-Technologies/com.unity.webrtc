@@ -25,6 +25,8 @@ namespace Unity.WebRTC.RuntimeTest
                 }
             };
             config.iceTransportPolicy = RTCIceTransportPolicy.All;
+            config.iceCandidatePoolSize = 0;
+            config.bundlePolicy = RTCBundlePolicy.BundlePolicyBalanced;
             return config;
         }
 

@@ -1,9 +1,9 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalInt
     {
@@ -19,8 +19,28 @@ namespace Unity.WebRTC
         {
             return new OptionalInt { hasValue = a.HasValue, value = a.GetValueOrDefault() };
         }
+
+        public static OptionalInt FromEnum<T>(T? a) where T : struct
+        {
+            Type type = typeof(T);
+            if (!type.IsEnum)
+                throw new ArgumentException();
+
+            return new OptionalInt {hasValue = a.HasValue, value = Convert.ToInt32(a.GetValueOrDefault()) };
+        }
+
+        public T? AsEnum<T>() where T : struct
+        {
+            if(!hasValue)
+                return null;
+            Type type = typeof(T);
+            if (!type.IsEnum)
+                return null;
+            return (T)Enum.ToObject(typeof(T), value);
+        }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalUlong
     {
@@ -38,6 +58,7 @@ namespace Unity.WebRTC
         }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalUshort
     {
@@ -55,6 +76,7 @@ namespace Unity.WebRTC
         }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalShort
     {
@@ -72,6 +94,7 @@ namespace Unity.WebRTC
         }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalUint
     {
@@ -89,6 +112,7 @@ namespace Unity.WebRTC
         }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalDouble
     {
@@ -106,6 +130,7 @@ namespace Unity.WebRTC
         }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalBool
     {
@@ -124,6 +149,7 @@ namespace Unity.WebRTC
         }
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     internal struct MarshallingArray<T> where T : struct
     {
