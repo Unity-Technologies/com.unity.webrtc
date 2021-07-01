@@ -70,14 +70,14 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
-        class TestValue
+        internal class TestValue
         {
             public int width;
             public int height;
             public int count;
         }
 
-        static TestValue[] testValues = new TestValue[]
+        internal static TestValue[] testValues = new TestValue[]
         {
             new TestValue{width = 256, height = 256, count = 1},
             new TestValue{width = 256, height = 256, count = 2},
@@ -87,7 +87,7 @@ namespace Unity.WebRTC.RuntimeTest
             new TestValue{width = 1280, height = 720, count = 3},
         };
 
-        static int[] range = Enumerable.Range(0, 6).ToArray();
+        internal static int[] range = Enumerable.Range(0, 6).ToArray();
 
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
