@@ -35,7 +35,7 @@ namespace Unity.WebRTC
         }
 
 
-        internal class AudioStreamRenderer
+        internal class AudioStreamRenderer : IDisposable
         {
             private AudioClip m_clip;
             private int m_sampleRate;
@@ -60,9 +60,11 @@ namespace Unity.WebRTC
                 m_clip = AudioClip.Create(name, lengthSamples, channels, m_sampleRate, false);
             }
 
-            ~AudioStreamRenderer()
+            public void Dispose()
             {
-                Object.Destroy(m_clip);
+                if(m_clip != null)
+                    Object.Destroy(m_clip);
+                m_clip = null;
             }
 
             internal void SetData(float[] data)
@@ -149,6 +151,7 @@ namespace Unity.WebRTC
                 tracks.Remove(this);
                 if(_audioSourceRead != null)
                     Object.Destroy(_audioSourceRead);
+                _streamRenderer.Dispose();
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
