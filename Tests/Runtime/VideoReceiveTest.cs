@@ -85,17 +85,14 @@ namespace Unity.WebRTC.RuntimeTest
             new TestValue{width = 1280, height = 720, count = 1},
             new TestValue{width = 1280, height = 720, count = 2},
             new TestValue{width = 1280, height = 720, count = 3},
-            new TestValue{width = 1920, height = 1080, count = 1},
-            new TestValue{width = 1920, height = 1080, count = 2},
-            new TestValue{width = 1920, height = 1080, count = 3}
         };
 
-        static int[] range = Enumerable.Range(0, 9).ToArray();
+        static int[] range = Enumerable.Range(0, 6).ToArray();
 
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest]
-        [Timeout(5000)]
+        [Timeout(10000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
@@ -139,19 +136,14 @@ namespace Unity.WebRTC.RuntimeTest
 
         public VideoStreamTrack SendVideoTrack { get; private set; }
         public VideoStreamTrack RecvVideoTrack { get; private set; }
-        public Texture SendTexture => sourceImage.texture;
-        public Texture RecvTexture => receiveImage.texture;
+        public Texture SendTexture { get; private set; }
+        public Texture RecvTexture { get; private set; }
 
         RTCPeerConnection offerPc;
         RTCPeerConnection answerPc;
         RTCRtpSender sender;
         GameObject camObj;
         Camera cam;
-        GameObject sourceObj;
-        RawImage sourceImage;
-        GameObject receiveObj;
-        RawImage receiveImage;
-
         int width;
         int height;
 
@@ -159,11 +151,6 @@ namespace Unity.WebRTC.RuntimeTest
         {
             camObj = new GameObject("Camera");
             cam = camObj.AddComponent<Camera>();
-
-            sourceObj = new GameObject("Source");
-            sourceImage = sourceObj.AddComponent<RawImage>();
-            receiveObj = new GameObject("Receive");
-            receiveImage = receiveObj.AddComponent<RawImage>();
 
             IsTestFinished = true;
         }
@@ -188,14 +175,14 @@ namespace Unity.WebRTC.RuntimeTest
                 if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
                 {
                     RecvVideoTrack = track;
-                    receiveImage.texture = track.InitializeReceiver(width, height);
+                    RecvTexture = track.InitializeReceiver(width, height);
                 }
             };
         }
         public void CreateVideoStreamTrack()
         {
             SendVideoTrack = cam.CaptureStreamTrack(width, height, 1000000);
-            sourceImage.texture = cam.targetTexture;
+            SendTexture = cam.targetTexture;
         }
 
         public void AddTrack()
@@ -224,21 +211,15 @@ namespace Unity.WebRTC.RuntimeTest
             answerPc?.Dispose();
             offerPc = null;
             answerPc = null;
-            sourceImage.texture = null;
-            receiveImage.texture = null;
+            SendTexture = null;
+            RecvTexture = null;
         }
 
         void OnDestroy()
         {
             Clear();
-            DestroyImmediate(sourceObj);
-            sourceObj = null;
-            DestroyImmediate(receiveObj);
-            receiveObj = null;
             DestroyImmediate(camObj);
             camObj = null;
-            sourceImage = null;
-            receiveImage = null;
         }
 
         public IEnumerator Signaling()
