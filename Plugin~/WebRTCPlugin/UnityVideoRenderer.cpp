@@ -7,7 +7,6 @@ namespace webrtc {
 UnityVideoRenderer::UnityVideoRenderer(uint32_t id) : m_id(id)
 {
     DebugLog("Create UnityVideoRenderer Id:%d", id);
-    m_renderLock = std::unique_lock<std::mutex>(m_mutex, std::defer_lock);
 }
 
 UnityVideoRenderer::~UnityVideoRenderer()
@@ -33,24 +32,6 @@ void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame &frame)
 uint32_t UnityVideoRenderer::GetId()
 {
     return m_id;
-}
-
-bool UnityVideoRenderer::RenderTryLock()
-{
-    if (m_renderLock.owns_lock())
-    {
-        return false;
-    }
-
-    return m_renderLock.try_lock();
-}
-
-void UnityVideoRenderer::RenderUnLock()
-{
-    if (m_renderLock.owns_lock())
-    {
-        m_renderLock.unlock();
-    }
 }
 
 rtc::scoped_refptr<webrtc::VideoFrameBuffer> UnityVideoRenderer::GetFrameBuffer()

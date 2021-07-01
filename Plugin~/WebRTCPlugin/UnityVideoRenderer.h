@@ -17,8 +17,6 @@ namespace webrtc {
         void OnFrame(const webrtc::VideoFrame &frame) override;
 
         uint32_t GetId();
-        bool RenderTryLock();
-        void RenderUnLock();
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> GetFrameBuffer();
         void SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer);
 
@@ -31,7 +29,6 @@ namespace webrtc {
         uint32_t m_id;
         std::mutex m_mutex;
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> m_frameBuffer;
-        std::unique_lock<std::mutex> m_renderLock;
     };
 
 } // end namespace webrtc
