@@ -159,20 +159,12 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        internal void OnSendAudio(float[] data, int channels)
+        private void OnSendAudio(float[] data, int channels)
         {
             NativeMethods.ProcessAudio(self, data, _sampleRate, channels, data.Length);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="audioData"></param>
-        /// <param name="bitsPerSample">default=16</param>
-        /// <param name="sampleRate">default=48000</param>
-        /// <param name="channels">default=1</param>
-        /// <param name="numOfFrames">default=480</param>
-        internal void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
+        private void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
         {
             if (_streamRenderer == null)
             {

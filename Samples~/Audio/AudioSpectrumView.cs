@@ -8,12 +8,14 @@ namespace Unity.WebRTC.Samples
     {
         [SerializeField] AudioSource target;
         [SerializeField] LineRenderer line;
+        [SerializeField] Color[] lineColors;
         [SerializeField] RectTransform rectTransform;
         [SerializeField] float xRatio = 1f;
         [SerializeField] float yRatio = 1f;
 
         const int positionCount = 256;
-        float[] spectrum = new float[positionCount];
+        float[] spectrum = new float[2048];
+
         NativeArray<Vector3> array;
         List<LineRenderer> lines = new List<LineRenderer>();
 
@@ -43,6 +45,8 @@ namespace Unity.WebRTC.Samples
                 var line_ = GameObject.Instantiate(line, line.transform.parent);
                 line_.gameObject.SetActive(true);
                 line_.positionCount = positionCount;
+                line_.startColor = lineColors[i];
+                line_.endColor = lineColors[i];
                 lines.Add(line_);
             }
         }
