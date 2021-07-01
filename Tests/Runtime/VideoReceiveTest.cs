@@ -123,7 +123,7 @@ namespace Unity.WebRTC.RuntimeTest
             for (int i = 0; i < value.count; i++)
             {
                 yield return VideoReceive();
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(1);
             }
 
             Object.DestroyImmediate(test.gameObject);
@@ -206,10 +206,10 @@ namespace Unity.WebRTC.RuntimeTest
             SendVideoTrack = null;
 
             offerPc?.Close();
-            answerPc?.Close();
             offerPc?.Dispose();
-            answerPc?.Dispose();
             offerPc = null;
+            answerPc?.Close();
+            answerPc?.Dispose();
             answerPc = null;
             SendTexture = null;
             RecvTexture = null;
