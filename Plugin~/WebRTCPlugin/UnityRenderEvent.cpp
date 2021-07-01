@@ -337,10 +337,13 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
             // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
             return;
         }
-        renderer->usedByRenderThread = true;
         {
             ScopedProfiler profiler(*s_MarkerDecode);
             renderer->ConvertVideoFrameToTextureAndWriteToBuffer(params->width, params->height, ConvertTextureFormat(params->format));
+        }
+        if (!renderer->RenderTryLock())
+        {
+            return;
         }
         params->texData = renderer->tempBuffer.data();
     }
@@ -354,7 +357,7 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
             // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
             return;
         }
-        renderer->usedByRenderThread = false;
+        renderer->RenderUnLock();
     }
 }
 

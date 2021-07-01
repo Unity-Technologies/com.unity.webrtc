@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "UnityVideoRenderer.h"
-#include <thread>
-#include <chrono>
 
 namespace unity {
 namespace webrtc {
@@ -9,14 +7,11 @@ namespace webrtc {
 UnityVideoRenderer::UnityVideoRenderer(uint32_t id) : m_id(id)
 {
     DebugLog("Create UnityVideoRenderer Id:%d", id);
+    m_renderLock = std::unique_lock<std::mutex>(m_mutex, std::defer_lock);
 }
 
 UnityVideoRenderer::~UnityVideoRenderer()
 {
-    while(usedByRenderThread)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
     DebugLog("Destory UnityVideoRenderer Id:%d", m_id);
     {
         std::unique_lock<std::mutex> lock(m_mutex);
@@ -38,6 +33,24 @@ void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame &frame)
 uint32_t UnityVideoRenderer::GetId()
 {
     return m_id;
+}
+
+bool UnityVideoRenderer::RenderTryLock()
+{
+    if (m_renderLock.owns_lock())
+    {
+        return false;
+    }
+
+    return m_renderLock.try_lock();
+}
+
+void UnityVideoRenderer::RenderUnLock()
+{
+    if (m_renderLock.owns_lock())
+    {
+        m_renderLock.unlock();
+    }
 }
 
 rtc::scoped_refptr<webrtc::VideoFrameBuffer> UnityVideoRenderer::GetFrameBuffer()
