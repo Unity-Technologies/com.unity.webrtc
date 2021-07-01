@@ -54,7 +54,11 @@ namespace Unity.WebRTC.Samples
         void Update()
         {
             if (target.clip == null)
+            {
+                if(lines.Count > 0)
+                    ResetLines(0);
                 return;
+            }
             int channelCount = target.clip.channels;
             if (channelCount != lines.Count)
             {

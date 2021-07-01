@@ -151,7 +151,7 @@ namespace Unity.WebRTC
                 tracks.Remove(this);
                 if(_audioSourceRead != null)
                     Object.Destroy(_audioSourceRead);
-                _streamRenderer.Dispose();
+                _streamRenderer?.Dispose();
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);

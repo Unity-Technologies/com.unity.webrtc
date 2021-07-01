@@ -58,6 +58,7 @@ namespace Unity.WebRTC.RuntimeTest
                 float[] data = new float[2048];
                 renderer.SetData(data);
             }
+            renderer.Dispose();
         }
     }
 }
