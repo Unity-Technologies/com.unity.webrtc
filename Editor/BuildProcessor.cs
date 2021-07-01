@@ -28,8 +28,11 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
+#if UNITY_2021
+        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel22;
+#else
         public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
-
+#endif
         /// <summary>
         ///
         /// </summary>
