@@ -394,7 +394,8 @@ namespace Unity.WebRTC
         {
             IntPtr ptr = NativeMethods.PeerConnectionGetConfiguration(GetSelfOrThrow());
             string str = ptr.AsAnsiStringWithFreeMem();
-            return JsonUtility.FromJson<RTCConfiguration>(str);
+            var conf = JsonUtility.FromJson<RTCConfigurationInternal>(str);
+            return new RTCConfiguration(ref conf);
         }
 
         /// <summary>
@@ -430,7 +431,9 @@ namespace Unity.WebRTC
         /// <seealso cref="GetConfiguration()"/>
         public RTCErrorType SetConfiguration(ref RTCConfiguration configuration)
         {
-            return NativeMethods.PeerConnectionSetConfiguration(GetSelfOrThrow(), JsonUtility.ToJson(configuration));
+            var conf_ = configuration.Cast();
+            string str = JsonUtility.ToJson(conf_);
+            return NativeMethods.PeerConnectionSetConfiguration(GetSelfOrThrow(), str);
         }
 
         /// <summary>
@@ -457,7 +460,8 @@ namespace Unity.WebRTC
         /// <seealso cref="RTCPeerConnection()"/>
         public RTCPeerConnection(ref RTCConfiguration configuration)
         {
-            string configStr = JsonUtility.ToJson(configuration);
+            var conf_ = configuration.Cast();
+            string configStr = JsonUtility.ToJson(conf_);
             self = WebRTC.Context.CreatePeerConnection(configStr);
             if (self == IntPtr.Zero)
             {

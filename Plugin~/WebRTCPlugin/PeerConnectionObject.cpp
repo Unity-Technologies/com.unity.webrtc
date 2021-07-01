@@ -228,9 +228,21 @@ namespace webrtc
             }
             root["iceServers"].append(jsonIceServer);
         }
-        root["iceTransportPolicy"] = _config.type;
-        root["iceCandidatePoolSize"] = _config.ice_candidate_pool_size;
-        root["bundlePolicy"] = _config.bundle_policy;
+        root["iceTransportPolicy"] = Json::Value(Json::objectValue);
+        root["iceTransportPolicy"]["hasValue"] = true;
+        root["iceTransportPolicy"]["value"] = _config.type;
+
+        root["enableDtlsSrtp"] = Json::Value(Json::objectValue);
+        root["enableDtlsSrtp"]["hasValue"] = _config.enable_dtls_srtp.has_value();
+        root["enableDtlsSrtp"]["value"] = _config.enable_dtls_srtp.value_or(false);
+
+        root["iceCandidatePoolSize"] = Json::Value(Json::objectValue);
+        root["iceCandidatePoolSize"]["hasValue"] = true;
+        root["iceCandidatePoolSize"]["value"] = _config.ice_candidate_pool_size;
+            
+        root["bundlePolicy"] = Json::Value(Json::objectValue);
+        root["bundlePolicy"]["hasValue"] = true;
+        root["bundlePolicy"]["value"] = _config.bundle_policy;
 
         Json::StreamWriterBuilder builder;
         return Json::writeString(builder, root);
