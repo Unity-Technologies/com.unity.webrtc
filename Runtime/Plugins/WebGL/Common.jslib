@@ -13,6 +13,9 @@ var UnityWebRTCCommon = {
       obj.managePtr = uwcom_managePtr;
       UWManaged[obj.managePtr] = obj;
     }
+    else if(!UWManaged[obj.managePtr]){
+      UWManaged[obj.managePtr] = obj;
+    }
   },
   $uwcom_strToPtr: function (str) {
     var len = lengthBytesUTF8(str) + 1;
@@ -109,7 +112,7 @@ var UnityWebRTCCommon = {
   $uwcom_existsCheck: function (ptr, funcName, typeName) {
     var obj = UWManaged[ptr];
     if (obj) return true;
-    console.error('[jslib] ' + funcName + ': Unmanaged ' + typeName);
+    console.error("[jslib] " + funcName + ": Unmanaged " + typeName + ". Ptr: " + ptr);
     return false;
   },
   $uwcom_getIdx: function (enum_, val) {
