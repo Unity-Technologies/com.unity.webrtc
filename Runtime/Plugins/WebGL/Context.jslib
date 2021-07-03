@@ -47,7 +47,7 @@ var UnityWebRTCContext = {
   },
 
   ContextDeletePeerConnection: function (contextPtr, peerPtr) {
-    if (!uwcom_existsCheck(contextPtr, 'ContextDeletePeerConnection', 'context')) return;
+    //if (!uwcom_existsCheck(contextPtr, 'ContextDeletePeerConnection', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'ContextDeletePeerConnection', 'peer')) return;
     var peer = UWManaged[peerPtr];
     if (peer.readyState !== 'closed' || peer.signalingState !== 'closed')
@@ -88,7 +88,7 @@ var UnityWebRTCContext = {
   },
 
   ContextDeleteDataChannel: function (contextPtr, dataChannelPtr) {
-    if (!uwcom_existsCheck(contextPtr, 'ContextDeleteDataChannel', 'context')) return;
+    //if (!uwcom_existsCheck(contextPtr, 'ContextDeleteDataChannel', 'context')) return;
     if (!uwcom_existsCheck(dataChannelPtr, 'ContextDeleteDataChannel', 'dataChannel')) return;
     delete UWManaged[dataChannelPtr];
   },
@@ -99,7 +99,7 @@ var UnityWebRTCContext = {
   },
 
   ContextDeleteMediaStream: function (contextPtr, streamPtr) {
-    if (!uwcom_existsCheck(contextPtr, 'ContextDeleteMediaStream', 'context')) return;
+    //if (!uwcom_existsCheck(contextPtr, 'ContextDeleteMediaStream', 'context')) return;
     if (!uwcom_existsCheck(streamPtr, 'ContextDeleteMediaStream', 'stream')) return;
     _DeleteMediaStream(streamPtr);
   },
@@ -163,7 +163,7 @@ var UnityWebRTCContext = {
   // },
 
   ContextDeleteStatsReport: function (contextPtr, reportPtr) {
-    if (!uwcom_existsCheck(contextPtr, 'ContextDeleteStatsReport', 'context')) return;
+    //if (!uwcom_existsCheck(contextPtr, 'ContextDeleteStatsReport', 'context')) return;
     if (!uwcom_existsCheck(reportPtr, 'ContextDeleteStatsReport', 'report')) return;
     delete UWManaged[reportPtr];
   },
