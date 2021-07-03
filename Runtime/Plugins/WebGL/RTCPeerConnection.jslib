@@ -107,8 +107,7 @@ var UnityWebRTCPeerConnection = {
 
         // BUG: MediaStream is not registered in Unity this way,
         // TODO: Create HTMLVideoElement when created the receiver in unity
-        var streamPtr = _CreateMediaStream();
-        var stream = UWManaged[streamPtr];
+        var stream = new MediaStream();
         stream.addTrack(track);
         var video = document.createElement('video');
         video.id = 'video_' + track.managePtr.toString();
