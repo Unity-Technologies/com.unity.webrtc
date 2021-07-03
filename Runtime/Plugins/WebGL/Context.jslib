@@ -149,7 +149,7 @@ var UnityWebRTCContext = {
     track.stop();
   },
 
-  ContextDeleteMediaStreamTrack: function (trackPtr) {
+  ContextDeleteMediaStreamTrack: function (contextPtr, trackPtr) {
     if (!uwcom_existsCheck(trackPtr, 'ContextDeleteMediaStreamTrack', 'track')) return;
     delete UWManaged[trackPtr];
   },
