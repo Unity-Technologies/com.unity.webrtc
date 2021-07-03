@@ -8,12 +8,17 @@ var UnityWebRTCPeerConnection = {
 
     //debugger;
     conf = conf || {};
-    
+
     var iceIdx = 0;
-    for(var iceIdx = 0; iceIdx < conf.iceServers.length; iceIdx++) {
-        var idx = conf.iceServers[iceIdx].credentialType;
-        conf.iceServers[iceIdx].credentialType = UWRTCIceCredentialType[idx];
+    for (var iceIdx = 0; iceIdx < conf.iceServers.length; iceIdx++) {
+      var idx = conf.iceServers[iceIdx].credentialType;
+      conf.iceServers[iceIdx].credentialType = UWRTCIceCredentialType[idx];
     }
+
+    if (conf.iceTransportPolicy) conf.iceTransportPolicy = conf.iceTransportPolicy.value;
+    if (conf.iceCandidatePoolSize) conf.iceCandidatePoolSize = conf.iceCandidatePoolSize.value;
+    if (conf.bundlePolicy) conf.bundlePolicy = conf.bundlePolicy.value;
+    if (conf.enableDtlsSrtp) conf.enableDtlsSrtp = conf.enableDtlsSrtp.value;
     
     var peer = new RTCPeerConnection(conf);
     peer.label = label;
