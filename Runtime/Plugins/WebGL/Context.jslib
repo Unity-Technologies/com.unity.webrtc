@@ -151,6 +151,20 @@ var UnityWebRTCContext = {
 
   ContextDeleteMediaStreamTrack: function (contextPtr, trackPtr) {
     if (!uwcom_existsCheck(trackPtr, 'ContextDeleteMediaStreamTrack', 'track')) return;
+    var track = UWManaged[trackPtr];
+
+    // Not sure how js garbage collection works, remove/disable/stop all attributes inside the track object?
+    if(track.kind === "video"){
+      if(uwcom_localVideoTracks[trackPtr]){
+        delete uwcom_localVideoTracks[trackPtr];
+      }
+
+      if(uwcom_remoteVideoTracks[trackPtr]){
+        uwcom_remoteVideoTracks[trackPtr].video.remove();
+        uwcom_remoteVideoTracks[trackPtr].track.stop();
+        delete uwcom_remoteVideoTracks[trackPtr];
+      }
+    }
     delete UWManaged[trackPtr];
   },
 
