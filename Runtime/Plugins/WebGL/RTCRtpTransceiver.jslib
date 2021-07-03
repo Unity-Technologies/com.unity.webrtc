@@ -1,4 +1,9 @@
 var UnityWebRTCRtpTransceiver = {
+  DeleteTransceiver: function (transceiverPtr){
+    if (!uwcom_existsCheck(transceiverPtr, 'DeleteTransceiver', 'transceiver')) return;
+    delete UWManaged[transceiverPtr];
+  },
+  
   TransceiverGetDirection: function (transceiverPtr) {
     if (!uwcom_existsCheck(transceiverPtr, 'TransceiverGetDirection', 'transceiver')) return;
     var transceiver = UWManaged[transceiverPtr];

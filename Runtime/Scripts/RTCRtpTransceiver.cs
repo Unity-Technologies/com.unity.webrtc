@@ -29,6 +29,11 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+
+#if UNITY_WEBGL
+                NativeMethods.DeleteTransceiver(self);
+#endif
+
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }

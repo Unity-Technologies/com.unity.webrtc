@@ -1313,6 +1313,8 @@ namespace Unity.WebRTC
         public static extern IntPtr DeleteReceiver(IntPtr receiverPtr);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DeleteSender(IntPtr senderPtr);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr DeleteTransceiver(IntPtr transceiverPtr);
 
         [DllImport(WebRTC.Lib)]
         public static extern void RenderLocalVideotrack(IntPtr trackPtr);
