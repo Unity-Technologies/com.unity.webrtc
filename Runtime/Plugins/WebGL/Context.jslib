@@ -105,7 +105,18 @@ var UnityWebRTCContext = {
   },
 
   ContextRegisterMediaStreamObserver: function (contextPtr, streamPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'MediaStreamRegisterOnAddTrack', 'context')) return;
+    if (!uwcom_existsCheck(streamPtr, 'MediaStreamRegisterOnAddTrack', 'stream')) return;
     
+    var stream = UWManaged[streamPtr];
+    stream.onaddtrack = (function(evt) {
+      uwcom_addManageObj(evt.track);
+      Module.dynCall_vii(uwevt_MSOnAddTrack, stream.managePtr, evt.track.managePtr);
+    });
+    stream.onremovetrack = (function(evt) {
+      if (!uwcom_existsCheck(evt.track.managePtr, "stream.onremovetrack", "track")) return;
+      Module.dynCall_vii(uwevt_MSOnRemoveTrack, stream.managePtr, evt.track.managePtr);
+    });
   },
     
   ContextUnRegisterMediaStreamObserver: function (contextPtr, streamPtr) {
