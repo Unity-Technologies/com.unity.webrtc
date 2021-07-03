@@ -25,6 +25,8 @@ namespace Unity.WebRTC.RuntimeTest
                 }
             };
             config.iceTransportPolicy = RTCIceTransportPolicy.All;
+            config.iceCandidatePoolSize = 0;
+            config.bundlePolicy = RTCBundlePolicy.BundlePolicyBalanced;
             return config;
         }
 
@@ -79,15 +81,18 @@ namespace Unity.WebRTC.RuntimeTest
             var peer = new RTCPeerConnection(ref config);
 
             var config2 = peer.GetConfiguration();
-            Assert.NotNull(config.iceServers);
-            Assert.NotNull(config2.iceServers);
-            Assert.AreEqual(config.iceServers.Length, config2.iceServers.Length);
-            Assert.AreEqual(config.iceServers[0].username, config2.iceServers[0].username);
-            Assert.AreEqual(config.iceServers[0].credential, config2.iceServers[0].credential);
-            Assert.AreEqual(config.iceServers[0].urls, config2.iceServers[0].urls);
-            Assert.AreEqual(config.iceTransportPolicy, config2.iceTransportPolicy);
-            Assert.AreEqual(config.iceCandidatePoolSize, config2.iceCandidatePoolSize);
-            Assert.AreEqual(config.bundlePolicy, config2.bundlePolicy);
+            Assert.That(config.iceServers, Is.Not.Null);
+            Assert.That(config2.iceServers, Is.Not.Null);
+            Assert.That(config.iceServers.Length, Is.EqualTo(config2.iceServers.Length));
+            Assert.That(config.iceServers[0].username, Is.EqualTo(config2.iceServers[0].username));
+            Assert.That(config.iceServers[0].credential, Is.EqualTo(config2.iceServers[0].credential));
+            Assert.That(config.iceServers[0].urls, Is.EqualTo(config2.iceServers[0].urls));
+            Assert.That(config.iceTransportPolicy, Is.EqualTo(RTCIceTransportPolicy.All));
+            Assert.That(config.iceTransportPolicy, Is.EqualTo(config2.iceTransportPolicy));
+            Assert.That(config.enableDtlsSrtp, Is.Null);
+            Assert.That(config.enableDtlsSrtp, Is.EqualTo(config2.enableDtlsSrtp));
+            Assert.That(config.iceCandidatePoolSize, Is.EqualTo(config2.iceCandidatePoolSize));
+            Assert.That(config.bundlePolicy, Is.EqualTo(config2.bundlePolicy));
 
             peer.Close();
             peer.Dispose();

@@ -116,12 +116,26 @@ namespace webrtc
             }
             config.servers.push_back(iceServer);
         }
-        int iceTransportPolicy = configJson["iceTransportPolicy"].asInt();
-        if(iceTransportPolicy != 0) config.type = static_cast<PeerConnectionInterface::IceTransportsType>(iceTransportPolicy);
+        Json::Value iceTransportPolicy = configJson["iceTransportPolicy"];
+        if(iceTransportPolicy["hasValue"].asBool())
+        {
+            config.type = static_cast<PeerConnectionInterface::IceTransportsType>(iceTransportPolicy["value"].asInt());
+        }
         Json::Value enableDtlsSrtp = configJson["enableDtlsSrtp"];
-        if (enableDtlsSrtp != 0) config.enable_dtls_srtp = enableDtlsSrtp.asBool();
-        config.ice_candidate_pool_size = configJson["iceCandidatePoolSize"].asInt();
-        config.bundle_policy = static_cast<PeerConnectionInterface::BundlePolicy>(configJson["bundlePolicy"].asInt());
+        if (enableDtlsSrtp["hasValue"].asBool())
+        {
+            config.enable_dtls_srtp = enableDtlsSrtp["value"].asBool();
+        }
+        Json::Value iceCandidatePoolSize = configJson["iceCandidatePoolSize"];
+        if (iceCandidatePoolSize["hasValue"].asBool())
+        {
+            config.ice_candidate_pool_size = iceCandidatePoolSize["value"].asInt();
+        }
+        Json::Value bundlePolicy = configJson["bundlePolicy"];
+        if (bundlePolicy["hasValue"].asBool())
+        {
+            config.bundle_policy = static_cast<PeerConnectionInterface::BundlePolicy>(bundlePolicy["value"].asInt());
+        }
         config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
         config.enable_implicit_rollback = true;
         return true;

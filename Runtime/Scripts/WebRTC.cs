@@ -262,19 +262,51 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public RTCIceTransportPolicy iceTransportPolicy;
+        public RTCIceTransportPolicy? iceTransportPolicy;
         /// <summary>
         /// 
         /// </summary>
-        public RTCBundlePolicy bundlePolicy;
+        public RTCBundlePolicy? bundlePolicy;
         /// <summary>
         /// 
         /// </summary>
-        public int iceCandidatePoolSize;
+        public int? iceCandidatePoolSize;
         /// <summary>
         ///
         /// </summary>
-        public bool enableDtlsSrtp;
+        public bool? enableDtlsSrtp;
+
+        internal RTCConfiguration(ref RTCConfigurationInternal v)
+        {
+            iceServers = v.iceServers;
+            iceTransportPolicy = v.iceTransportPolicy.AsEnum<RTCIceTransportPolicy>();
+            bundlePolicy = v.bundlePolicy.AsEnum<RTCBundlePolicy>();
+            iceCandidatePoolSize = v.iceCandidatePoolSize;
+            enableDtlsSrtp = v.enableDtlsSrtp;
+        }
+
+        internal RTCConfigurationInternal Cast()
+        {
+            RTCConfigurationInternal instance = new RTCConfigurationInternal
+            {
+                iceServers = this.iceServers,
+                iceTransportPolicy = OptionalInt.FromEnum(this.iceTransportPolicy),
+                bundlePolicy = OptionalInt.FromEnum(this.bundlePolicy),
+                iceCandidatePoolSize = this.iceCandidatePoolSize,
+                enableDtlsSrtp = this.enableDtlsSrtp
+            };
+            return instance;
+        }
+    }
+
+    [Serializable]
+    struct RTCConfigurationInternal
+    {
+        public RTCIceServer[] iceServers;
+        public OptionalInt iceTransportPolicy;
+        public OptionalInt bundlePolicy;
+        public OptionalInt iceCandidatePoolSize;
+        public OptionalBool enableDtlsSrtp;
     }
 
     /// <summary>
