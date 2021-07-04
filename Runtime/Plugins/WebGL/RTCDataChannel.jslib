@@ -5,6 +5,13 @@ var UnityWebRTCDataChannel = {
     var label = Pointer_stringify(labelPtr);
     var optionsJson = Pointer_stringify(optionsJsonPtr);
     var options = JSON.parse(optionsJson);
+    
+    options.ordered = options.ordered.value;
+    options.maxRetransmits = options.maxRetransmits.value;
+    options.maxRetransmitTime = options.maxRetransmitTime.value;
+    options.negotiated = options.negotiated.value;
+    options.id = options.id.value;
+    
     var dataChannel = peer.createDataChannel(label, options);
     dataChannel.onmessage = function (evt) {
       if (typeof evt.data === 'string') {
