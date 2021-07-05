@@ -833,6 +833,10 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeMediaStreamOnAddTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateAudioReceive(
+        IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
+        int sampleRate, int numOfChannels, int numOfFrames);
 
     internal static class NativeMethods
     {
@@ -1160,6 +1164,10 @@ namespace Unity.WebRTC
         public static extern void ContextRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextUnRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextRegisterAudioReceiveCallback(IntPtr context, IntPtr track, DelegateAudioReceive callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextUnregisterAudioReceiveCallback(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]

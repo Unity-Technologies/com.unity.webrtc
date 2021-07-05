@@ -1,6 +1,7 @@
 #pragma once
 #include <mutex>
 
+#include "AudioTrackSinkAdapter.h"
 #include "DummyAudioDevice.h"
 #include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
@@ -78,6 +79,10 @@ namespace webrtc
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
 
+        void RegisterAudioReceiveCallback(
+            AudioTrackInterface* track, DelegateAudioReceive callback);
+        void UnregisterAudioReceiveCallback(AudioTrackInterface* track);
+
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
         void DeletePeerConnection(PeerConnectionObject* obj);
@@ -135,6 +140,8 @@ namespace webrtc
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
+
+        std::map<webrtc::AudioTrackInterface*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
 
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
         std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
