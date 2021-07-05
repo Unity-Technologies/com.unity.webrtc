@@ -179,6 +179,14 @@ var UnityWebRTCContext = {
     delete UWManaged[trackPtr];
   },
 
+  ContextRegisterAudioReceiveCallback: function (contextPtr, trackPtr, AudioTrackOnReceive){
+    
+  },
+
+  ContextUnregisterAudioReceiveCallback: function (contextPtr, trackPtr){
+    
+  },
+  
   // CreateVideoRenderer: function(contextPtr) {
 
   // },

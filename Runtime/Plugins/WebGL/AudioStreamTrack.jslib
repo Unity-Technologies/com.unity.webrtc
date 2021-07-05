@@ -1,10 +1,10 @@
 var UnityWebRTCAudioStreamTrack = {
   CreateAudioTrack: function () {
-    // TODO
     if (!uwcom_audioContext) {
-      uwcom_audioContext = new AudioContext();
+      uwcom_audioContext = new AudioContext;
     }
-    var audioTrack = {};
+    var dest = uwcom_audioContext.createMediaStreamDestination();
+    var audioTrack = dest.stream.getAudioTracks()[0];
     uwcom_addManageObj(audioTrack);
     return audioTrack.managePtr;
   },
