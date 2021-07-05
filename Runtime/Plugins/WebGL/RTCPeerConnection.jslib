@@ -155,12 +155,12 @@ var UnityWebRTCPeerConnection = {
       var idx = conf.iceServers[iceIdx].credentialType;
       conf.iceServers[iceIdx].credentialType = UWRTCIceCredentialType[idx];
     }
-    if (conf.iceTransportPolicy) conf.iceTransportPolicy = conf.iceTransportPolicy.value;
+    
+    if (conf.iceTransportPolicy) conf.iceTransportPolicy = UWRTCIceTransportPolicy[conf.iceTransportPolicy.value];
     if (conf.iceCandidatePoolSize) conf.iceCandidatePoolSize = conf.iceCandidatePoolSize.value;
-    if (conf.bundlePolicy) conf.bundlePolicy = conf.bundlePolicy.value;
+    if (conf.bundlePolicy) conf.bundlePolicy = UWRTCBundlePolicy[conf.bundlePolicy.value];
     if (conf.enableDtlsSrtp) conf.enableDtlsSrtp = conf.enableDtlsSrtp.value;
-
-
+    
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'CreatePeerConnectionWithConfig', JSON.stringify(conf));
     var ptr = _CreatePeerConnection(conf);
     return ptr;
