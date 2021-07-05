@@ -1331,5 +1331,18 @@ extern "C"
             number_of_channels,
             number_of_frames);
     }
+
+
+    UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(
+        Context* context, AudioTrackInterface* track, DelegateAudioReceive callback)
+    {
+        context->RegisterAudioReceiveCallback(track, callback);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextUnregisterAudioReceiveCallback(
+        Context* context, AudioTrackInterface* track)
+    {
+        context->UnregisterAudioReceiveCallback(track);
+    }
 }
 

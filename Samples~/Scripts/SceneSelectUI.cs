@@ -34,6 +34,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonPeerConnection;
         [SerializeField] private Button buttonDataChannel;
         [SerializeField] private Button buttonMediaStream;
+        [SerializeField] private Button buttonAudio;
         [SerializeField] private Button buttonMultiPeers;
         [SerializeField] private Button buttonMultiVideoRecv;
         [SerializeField] private Button buttonMungeSDP;
@@ -54,6 +55,7 @@ namespace Unity.WebRTC.Samples
             buttonPeerConnection.onClick.AddListener(OnPressedPeerConnectionButton);
             buttonDataChannel.onClick.AddListener(OnPressedDataChannelButton);
             buttonMediaStream.onClick.AddListener(OnPressedMediaStreamButton);
+            buttonAudio.onClick.AddListener(OnPressedAudioButton);
             buttonMultiPeers.onClick.AddListener(OnPressedMultiPeersButton);
             buttonMultiVideoRecv.onClick.AddListener(OnPressedMultiVideoRecvButton);
             buttonMungeSDP.onClick.AddListener(OnPressedMungeSDPButton);
@@ -87,6 +89,12 @@ namespace Unity.WebRTC.Samples
         {
             SceneManager.LoadScene("MediaStream", LoadSceneMode.Single);
         }
+
+        private void OnPressedAudioButton()
+        {
+            SceneManager.LoadScene("Audio", LoadSceneMode.Single);
+        }
+        
         private void OnPressedMultiPeersButton()
         {
             SceneManager.LoadScene("MultiplePeerConnections", LoadSceneMode.Single);
