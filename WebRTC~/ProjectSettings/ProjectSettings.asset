@@ -342,7 +342,7 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: for test WebCamTexture
   locationUsageDescription: 
-  microphoneUsageDescription: 
+  microphoneUsageDescription: for test Microphone
   switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144

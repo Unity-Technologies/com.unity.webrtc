@@ -1,7 +1,5 @@
-using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -45,9 +43,22 @@ namespace Unity.WebRTC.RuntimeTest
 
             var track = new AudioStreamTrack(source);
             source.Play();
-
             track.Dispose();
             Object.DestroyImmediate(obj);
+        }
+
+        [Test]
+        public void AudioStreamRenderer()
+        {
+            var renderer = new AudioStreamTrack.AudioStreamRenderer("test", 48000, 2);
+            Assert.That(renderer.clip, Is.Not.Null);
+
+            for (int i = 0; i < 300; i++)
+            {
+                float[] data = new float[2048];
+                renderer.SetData(data);
+            }
+            renderer.Dispose();
         }
     }
 }
