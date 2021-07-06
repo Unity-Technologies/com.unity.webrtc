@@ -27,7 +27,7 @@ var UnityWebRTCVideoRenderer = {
   UpdateRendererTexture: function (trackPtr, renderTexturePtr, needFlip) {
     // console.log('UpdateRendererTexture');
     if (!uwcom_existsCheck(trackPtr, 'UpdateRendererTexture', 'track')) return;
-    if (!uwcom_remoteVideoTracks[trackPtr].playing) return;
+    if (!uwcom_remoteVideoTracks[trackPtr]) return;
     //console.log('UpdateRendererTexture', renderTexturePtr);
     var video = uwcom_remoteVideoTracks[trackPtr].video;
     var tex = GL.textures[renderTexturePtr];

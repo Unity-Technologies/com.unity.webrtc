@@ -79,63 +79,39 @@ var UnityWebRTCPeerConnection = {
       uwcom_addManageObj(receiver);
       uwcom_addManageObj(transceiver);
       uwcom_addManageObj(track);
-      if (track.kind === 'audio') {
-        var audio = new Audio();
-        // TODO already exists check 
-        audio.id = 'audio_' + track.managePtr.toString();
-        audio.style.display = 'none';
-        audio.srcObject = evt.streams[0];
-        document.body.appendChild(audio);
+      
+      var stream = new MediaStream();
+      stream.addTrack(track);
+      if (track.kind === "audio") {
+        var audio = document.createElement('audio');
+        audio.id = "audio_remote_" + track.managePtr.toString();
+        audio.style.display = "none";
+        audio.srcObject = stream;
+        //document.body.appendChild(audio);
         audio.play();
         uwcom_remoteAudioTracks[track.managePtr] = {
           track: track,
-          audio: new Audio()
+          audio: audio
         };
         Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
-      } else if (track.kind === 'video') {
-
-        // BUG: MediaStream is not registered in Unity this way,
-        // TODO: Create HTMLVideoElement when created the receiver in unity
-        var stream = new MediaStream();
-        stream.addTrack(track);
-        var video = document.createElement('video');
-        video.id = 'video_' + track.managePtr.toString();
+      } else if (track.kind === "video") {
+        var video = document.createElement("video");
+        video.id = "video_receive_" + track.managePtr.toString();
+        document.body.appendChild(video);
         video.muted = true;
-        //video.style.display = 'none';
         video.srcObject = stream;
-        //document.body.appendChild(video);
-        video.style.width = '300px';
-        video.style.height = '200px';
-        video.style.position = 'absolute';
+        video.style.width = "300px";
+        video.style.height = "200px";
+        video.style.position = "absolute";
         video.style.left = video.style.top = 0;
         uwcom_remoteVideoTracks[track.managePtr] = {
           track: track,
-          video: video,
-          playing: false
+          video: video
         };
-        video.onplaying = function(){
-          uwcom_remoteVideoTracks[track.managePtr].playing = true;
-        }
         video.play();
-        Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
-        
-        
-        // TODO already exists check 
-        // var video = document.createElement('video');
-        // video.id = 'video_' + track.managePtr.toString();
-        // video.muted = true;
-        // video.style.display = 'none';
-        // video.onloadedmetadata = function (evt) {
-        //   // TODO Realtime resize
-        //  Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
-        // };
-        // video.srcObject = evt.streams[0];
-        // document.body.appendChild(video);
-        // uwcom_remoteVideoTracks[track.managePtr] = {
-        //   track: track,
-        //   video: video
-        // };
-        // video.play(); 
+        video.onloadedmetadata = function(evt){
+          Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
+        }
       }
     };
     uwcom_addManageObj(peer);
@@ -366,6 +342,7 @@ var UnityWebRTCPeerConnection = {
     peer.close();
   },
 
+  //TODO
   PeerConnectionRestartIce: function (peerPtr) {
 
   },
@@ -384,7 +361,27 @@ var UnityWebRTCPeerConnection = {
       stream = UWManaged[streamPtr];
     }
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionAddTrack', peer.label + ':' + track.kind);
-    var sender = peer.addTrack(track);//, stream);
+
+    // TODO: Only add video element for local webcam display
+    if(track.kind == "video"){
+      var video = document.createElement("video");
+      video.id = "video_send_" + track.managePtr.toString();
+      document.body.appendChild(video);
+      video.muted = true;
+      video.srcObject = stream;
+      video.style.width = "300px";
+      video.style.height = "200px";
+      video.style.position = "absolute";
+      video.style.left = video.style.top = 0;
+      uwcom_remoteVideoTracks[track.managePtr] = {
+        track: track,
+        video: video
+      };
+      video.play();
+    }
+    
+    
+    var sender = peer.addTrack(track);
     uwcom_addManageObj(sender);
     return sender.managePtr;
   },
