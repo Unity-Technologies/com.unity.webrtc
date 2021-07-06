@@ -125,7 +125,7 @@ elseif(macOS)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
   set(PROJECT_BINARY_DIR
-    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
+    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/macOS")
 
   target_compile_definitions(WebRTCLib
     PUBLIC

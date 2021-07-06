@@ -30,26 +30,47 @@ patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-for target_cpu in "x64"
+for is_debug in "true" "false"
 do
-  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
-  for is_debug in "true" "false"
+  for target_cpu in "x64" "arm64"
   do
+
     # generate ninja files
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} target_os=\"mac\" target_cpu=\"${target_cpu}\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false"
+      --args="is_debug=${is_debug} \
+      target_os=\"mac\"  \
+      target_cpu=\"${target_cpu}\" \
+      rtc_include_tests=false \
+      rtc_build_examples=false \
+      rtc_use_h264=false \
+      symbol_level=0 \
+      enable_iterator_debugging=false \
+      is_component_build=false \
+      use_rtti=true \
+      rtc_use_x11=false \
+      libcxx_abi_unstable=false"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
 
-    filename="libwebrtc.a"
-    if [ $is_debug = "true" ]; then
-      filename="libwebrtcd.a"
-    fi
-
-    # cppy static library
-    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
+    # copy static library
+    mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
   done
+
+  filename="libwebrtc.a"
+  if [ $is_debug = "true" ]; then
+    filename="libwebrtcd.a"
+  fi
+
+  # make universal binary
+  lipo -create -output \
+  "$ARTIFACTS_DIR/lib/${filename}" \
+  "$ARTIFACTS_DIR/lib/arm64/libwebrtc.a" \
+  "$ARTIFACTS_DIR/lib/x64/libwebrtc.a"
+
+  rm -r "$ARTIFACTS_DIR/lib/arm64"
+  rm -r "$ARTIFACTS_DIR/lib/x64"
 done
 
 # fix error when generate license
