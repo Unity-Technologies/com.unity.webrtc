@@ -252,7 +252,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public string label;
+        /// public string label;
 #endif
 
         /// <summary>
