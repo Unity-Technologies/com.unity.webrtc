@@ -33,7 +33,7 @@ platforms:
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test_plugin_mac.sh
-    plugin_path: Runtime/Plugins/x86_64/webrtc.bundle/**
+    plugin_path: Runtime/Plugins/macOS/webrtc.bundle/**
   - name: ios
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini

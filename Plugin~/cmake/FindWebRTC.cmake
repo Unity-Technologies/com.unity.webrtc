@@ -20,8 +20,8 @@ set(WEBRTC_LIBRARY_DIR
 )
 
 # There is only `x64` on Windows, macOS, and Linux
-# iOS uses universal binary contains `x64` and `arm64`
-if(Windows OR macOS OR Linux)
+# iOS and macOS use universal binary contains `x64` and `arm64`
+if(Windows OR Linux)
   set(SYSTEM_PROCESSOR x64)
   set(WEBRTC_LIBRARY_DIR ${WEBRTC_LIBRARY_DIR}/${SYSTEM_PROCESSOR})
 endif()
