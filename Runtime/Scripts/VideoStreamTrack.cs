@@ -11,6 +11,7 @@ namespace Unity.WebRTC
     {
         internal static Dictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new Dictionary<IntPtr, WeakReference<VideoStreamTrack>>();
+        internal static object s_lockTracks = new object();
 
         bool m_needFlip = false;
         Texture m_sourceTexture;
@@ -137,7 +138,11 @@ namespace Unity.WebRTC
             WebRTC.ValidateGraphicsFormat(format);
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());
-            s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
+
+            lock (s_lockTracks)
+            {
+                s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
+            }
         }
 
         /// <summary>
@@ -146,7 +151,10 @@ namespace Unity.WebRTC
         /// <param name="sourceTrack"></param>
         internal VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
-            s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
+            lock (s_lockTracks)
+            {
+                s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
+            }
         }
 
         ~VideoStreamTrack()
@@ -177,8 +185,13 @@ namespace Unity.WebRTC
                     UnityEngine.Object.DestroyImmediate(m_sourceTexture);
                 }
 
-                if(s_tracks.ContainsKey(self))
-                    s_tracks.Remove(self);
+                if (s_tracks.ContainsKey(self))
+                {
+                    lock (s_lockTracks)
+                    {
+                        s_tracks.Remove(self);
+                    }
+                }
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
