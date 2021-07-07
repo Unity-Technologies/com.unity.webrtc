@@ -61,10 +61,12 @@ var UnityWebRTCPeerConnection = {
         }
       });
       channel.onopen = function (evt) {
-        Module.dynCall_vi(uwevt_DCOnOpen, peer.managePtr);
+        if (!uwcom_existsCheck(channel.managePtr, "onopen", "dataChannel")) return;
+        Module.dynCall_vi(uwevt_DCOnOpen, channel.managePtr);
       };
       channel.onclose = function (evt) {
-        Module.dynCall_vi(uwevt_DCOnClose, peer.managePtr);
+        if (!uwcom_existsCheck(channel.managePtr, "onclose", "dataChannel")) return;
+        Module.dynCall_vi(uwevt_DCOnClose, channel.managePtr);
       };
       uwcom_addManageObj(channel);
       Module.dynCall_vii(uwevt_PCOnDataChannel, peer.managePtr, channel.managePtr);

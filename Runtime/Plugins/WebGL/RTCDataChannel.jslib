@@ -23,9 +23,11 @@ var UnityWebRTCDataChannel = {
       }
     };
     dataChannel.onopen = function (evt) {
+      if (!uwcom_existsCheck(this.managePtr, "onopen", "dataChannel")) return;
       Module.dynCall_vi(uwevt_DCOnOpen, this.managePtr);
     };
     dataChannel.onclose = function (evt) {
+      if (!uwcom_existsCheck(this.managePtr, "onclose", "dataChannel")) return;
       Module.dynCall_vi(uwevt_DCOnClose, this.managePtr);
     };
     uwcom_addManageObj(dataChannel);
