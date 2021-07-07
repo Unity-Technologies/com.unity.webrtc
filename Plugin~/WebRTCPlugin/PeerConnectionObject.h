@@ -20,6 +20,7 @@ namespace webrtc
     using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
+    using DelegateOnRemoveTrack = void(*)(PeerConnectionObject*, webrtc::RtpReceiverInterface*);
 
     class PeerConnectionObject
         : public webrtc::CreateSessionDescriptionObserver
@@ -57,6 +58,7 @@ namespace webrtc
         void RegisterOnDataChannel(DelegateOnDataChannel callback) { onDataChannel = callback; }
         void RegisterOnRenegotiationNeeded(DelegateOnRenegotiationNeeded callback) { onRenegotiationNeeded = callback; }
         void RegisterOnTrack(DelegateOnTrack callback) { onTrack = callback; }
+        void RegisterOnRemoveTrack(DelegateOnRemoveTrack callback) { onRemoveTrack = callback; }
 
         //webrtc::CreateSessionDescriptionObserver
         // This callback transfers the ownership of the |desc|.
@@ -103,6 +105,8 @@ namespace webrtc
         // https://w3c.github.io/webrtc-pc/#set-description
         void OnTrack(rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) override;
 
+        void OnRemoveTrack(rtc::scoped_refptr<RtpReceiverInterface> receiver) override;
+
         friend class DataChannelObject;
 
         DelegateCreateSDSuccess onCreateSDSuccess = nullptr;
@@ -115,6 +119,7 @@ namespace webrtc
         DelegateOnDataChannel onDataChannel = nullptr;
         DelegateOnRenegotiationNeeded onRenegotiationNeeded = nullptr;
         DelegateOnTrack onTrack = nullptr;
+        DelegateOnRemoveTrack onRemoveTrack = nullptr;
         rtc::scoped_refptr<webrtc::PeerConnectionInterface> connection = nullptr;
     private:
         Context& context;
