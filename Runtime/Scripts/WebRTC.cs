@@ -1049,6 +1049,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string IceCandidateGetSdpMid(IntPtr candidate);
+#else
+        [DllImport(WebRTC.Lib)]
+        public static extern string IceCandidateGetCandidate(IntPtr candidate);
+
 #endif
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);

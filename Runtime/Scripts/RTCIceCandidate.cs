@@ -114,8 +114,10 @@ namespace Unity.WebRTC
         {
             switch (src)
             {
+                case "host":
                 case "local":
                     return RTCIceCandidateType.Host;
+                case "srflx":
                 case "stun":
                     return RTCIceCandidateType.Srflx;
                 case "prflx":
@@ -279,14 +281,19 @@ namespace Unity.WebRTC
                         $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
             NativeMethods.IceCandidateGetCandidate(self, out _candidate);
 #else
+
             if (iceCandidatePtr == null)
             {
-                iceCandidatePtr = NativeMethods.CreateNativeRTCIceCandidate(candidateInfo.candidate, candidateInfo.sdpMid, candidateInfo.sdpMLineIndex ?? 0);
+                iceCandidatePtr = NativeMethods.CreateNativeRTCIceCandidate(option.candidate, option.sdpMid, option.sdpMLineIndex);
             }
+
             self = iceCandidatePtr.Value;
             this.Candidate = candidateInfo.candidate;
             this.SdpMid = candidateInfo.sdpMid;
             this.SdpMLineIndex = candidateInfo.sdpMLineIndex;
+
+            string json = NativeMethods.IceCandidateGetCandidate(self);
+            _candidate = JsonUtility.FromJson<CandidateInternal>(json);
 #endif
         }
     }
