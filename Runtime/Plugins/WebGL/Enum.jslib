@@ -36,21 +36,22 @@ var UnityWebRTCEnum = {
     'complete'
   ],
   $UWRTCPeerConnectionState: [
-    'closed',
-    'failed',
-    'disconnected',
     'new',
     'connecting',
-    'connected'
+    'connected',
+    'disconnected',
+    'failed',
+    'closed'
   ],
   $UWRTCIceConnectionState: [
-    'closed',
-    'failed',
-    'disconnected',
     'new',
     'checking',
+    'connected',
     'completed',
-    'connected'
+    'failed',
+    'disconnected',
+    'closed',
+    'max'
   ],
   $UWRTCSdpType: [
     'offer',
@@ -125,10 +126,10 @@ var UnityWebRTCEnum = {
     'data-channel-failure',
     'dtls-failure',
     'fingerprint-failure',
-    'sctp-failure',
-    'sdp-syntax-error',
+    'hardware-encoder-error',
     'hardware-encoder-not-available',
-    'hardware-encoder-error'
+    'sdp-syntax-error',
+    'sctp-failure'
   ],
   // Media Capture and Streams
   $UWMediaStreamTrackState: [
