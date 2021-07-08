@@ -177,7 +177,7 @@ namespace webrtc
     }
 #pragma warning(pop)
 
-    Context::Context(int uid, UnityEncoderType encoderType)
+    Context::Context(int uid, UnityEncoderType encoderType, bool forTest)
         : m_uid(uid)
         , m_encoderType(encoderType)
     {
@@ -197,7 +197,7 @@ namespace webrtc
 
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<UnityVideoDecoderFactory>() :
+            std::make_unique<UnityVideoDecoderFactory>(forTest) :
             webrtc::CreateBuiltinVideoDecoderFactory();
 
         m_peerConnectionFactory = CreatePeerConnectionFactory(
