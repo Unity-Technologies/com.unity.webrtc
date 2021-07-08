@@ -779,6 +779,11 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 0);
+
+            var source = camObj.AddComponent<AudioSource>();
+            source.clip = AudioClip.Create("test", 480, 2, 48000, false);
+            videoStream.AddTrack(new AudioStreamTrack(source));
+
             yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
