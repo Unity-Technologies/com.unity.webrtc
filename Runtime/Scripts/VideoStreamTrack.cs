@@ -157,11 +157,6 @@ namespace Unity.WebRTC
             }
         }
 
-        ~VideoStreamTrack()
-        {
-            this.Dispose();
-        }
-
         public override void Dispose()
         {
             if (this.disposed)
