@@ -776,52 +776,51 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         public IEnumerator GetStatsReturnsReport()
         {
-            var camObj = new GameObject("Camera");
-            var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 0);
+            var stream = new MediaStream();
 
-            var source = camObj.AddComponent<AudioSource>();
+            var go = new GameObject("Test");
+            var cam = go.AddComponent<Camera>();
+            stream.AddTrack(cam.CaptureStreamTrack(1280, 720, 0));
+
+            var source = go.AddComponent<AudioSource>();
             source.clip = AudioClip.Create("test", 480, 2, 48000, false);
-            videoStream.AddTrack(new AudioStreamTrack(source));
+            stream.AddTrack(new AudioStreamTrack(source));
 
             yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.SetStream(videoStream);
+            test.component.SetStream(stream);
             yield return test;
             test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetPeerStats(0);
             yield return op;
-            Assert.True(op.IsDone);
-            Assert.IsNotEmpty(op.Value.Stats);
-            Assert.IsNotEmpty(op.Value.Stats.Keys);
-            Assert.IsNotEmpty(op.Value.Stats.Values);
-            Assert.Greater(op.Value.Stats.Count, 0);
+            Assert.That(op.IsDone, Is.True);
+            Assert.That(op.Value.Stats, Is.Not.Empty);
+            Assert.That(op.Value.Stats.Keys, Is.Not.Empty);
+            Assert.That(op.Value.Stats.Values, Is.Not.Empty);
+            Assert.That(op.Value.Stats.Count, Is.GreaterThan(0));
 
             foreach (RTCStats stats in op.Value.Stats.Values)
             {
-                Assert.NotNull(stats);
-                Assert.Greater(stats.Timestamp, 0);
-                Assert.IsNotEmpty(stats.Id);
+                Assert.That(stats, Is.Not.Null);
+                Assert.That(stats.Timestamp, Is.GreaterThan(0));
+                Assert.That(stats.Id, Is.Not.Empty);
                 foreach (var pair in stats.Dict)
                 {
-                    Assert.IsNotEmpty(pair.Key);
+                    Assert.That(pair.Key, Is.Not.Empty);
                 }
                 StatsCheck.Test(stats);
             }
             op.Value.Dispose();
 
             test.component.Dispose();
-            foreach (var track in videoStream.GetTracks())
+            foreach (var track in stream.GetTracks())
             {
                 track.Dispose();
             }
-            // wait for disposing video track.
-            yield return 0;
-
-            videoStream.Dispose();
-            Object.DestroyImmediate(camObj);
+            stream.Dispose();
+            Object.DestroyImmediate(go);
         }
 
         [UnityTest]
