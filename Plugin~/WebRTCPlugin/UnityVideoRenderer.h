@@ -19,8 +19,10 @@ namespace webrtc {
         uint32_t GetId();
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> GetFrameBuffer();
         void SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer);
-        std::vector<uint8_t> tempBuffer;
 
+        // used in UnityRenderingExtEventUpdateTexture 
+        std::vector<uint8_t> tempBuffer;
+        // called on RenderThread
         void ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format);
 
     private:

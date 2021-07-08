@@ -504,14 +504,14 @@ namespace webrtc
     UnityVideoRenderer* Context::CreateVideoRenderer()
     {
         auto rendererId = GenerateRendererId();
-        auto renderer = std::make_unique<UnityVideoRenderer>(rendererId);
-        m_mapVideoRenderer[rendererId] = std::move(renderer);
+        auto renderer = std::make_shared<UnityVideoRenderer>(rendererId);
+        m_mapVideoRenderer[rendererId] = renderer;
         return m_mapVideoRenderer[rendererId].get();
     }
 
-    UnityVideoRenderer* Context::GetVideoRenderer(uint32_t id)
+    std::shared_ptr<UnityVideoRenderer> Context::GetVideoRenderer(uint32_t id)
     {
-        return m_mapVideoRenderer[id].get();
+        return m_mapVideoRenderer[id];
     }
 
     void Context::DeleteVideoRenderer(UnityVideoRenderer* renderer)

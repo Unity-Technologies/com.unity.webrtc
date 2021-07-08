@@ -1846,6 +1846,7 @@ MonoBehaviour:
   useWebCamToggle: {fileID: 260222989}
   webCamLListDropdown: {fileID: 652734888}
   cam: {fileID: 934963288}
+  streamSize: {x: 1280, y: 720}
   sourceImage: {fileID: 1839397354}
   receiveImage: {fileID: 2123783124}
   rotateObject: {fileID: 1823897046}

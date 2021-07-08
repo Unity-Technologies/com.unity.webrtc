@@ -17,6 +17,7 @@ class VideoReceiveSample : MonoBehaviour
     [SerializeField] private Toggle useWebCamToggle;
     [SerializeField] private Dropdown webCamLListDropdown;
     [SerializeField] private Camera cam;
+    [SerializeField] private Vector2Int streamSize = new Vector2Int(1280, 720);
     [SerializeField] private RawImage sourceImage;
     [SerializeField] private RawImage receiveImage;
     [SerializeField] private Transform rotateObject;
@@ -68,12 +69,13 @@ class VideoReceiveSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            if (e.Track is VideoStreamTrack video)
+            if (e.Track is VideoStreamTrack video && !video.IsDecoderInitialized)
             {
-                receiveImage.texture = video.InitializeReceiver(1280, 720);
+                receiveImage.texture = video.InitializeReceiver(streamSize.x, streamSize.y);
             }
         };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
+        StartCoroutine(WebRTC.Update());
     }
 
     private void Update()
@@ -87,7 +89,7 @@ class VideoReceiveSample : MonoBehaviour
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+        config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
         return config;
     }
@@ -150,13 +152,6 @@ class VideoReceiveSample : MonoBehaviour
     private void AddTracks()
     {
         pc1Senders.Add(_pc1.AddTrack(videoStreamTrack));
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
-        }
-
         addTracksButton.interactable = false;
         removeTracksButton.interactable = true;
     }
@@ -208,7 +203,7 @@ class VideoReceiveSample : MonoBehaviour
     {
         if (!useWebCamToggle.isOn)
         {
-            videoStreamTrack = cam.CaptureStreamTrack(1280, 720, 1000000);
+            videoStreamTrack = cam.CaptureStreamTrack(streamSize.x, streamSize.y, 1000000);
             sourceImage.texture = cam.targetTexture;
             yield break;
         }
@@ -227,7 +222,7 @@ class VideoReceiveSample : MonoBehaviour
         }
 
         WebCamDevice userCameraDevice = WebCamTexture.devices[webCamLListDropdown.value];
-        webCamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720, 30);
+        webCamTexture = new WebCamTexture(userCameraDevice.name, streamSize.x, streamSize.y, 30);
         webCamTexture.Play();
         yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
 

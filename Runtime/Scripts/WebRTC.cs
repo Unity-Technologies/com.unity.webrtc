@@ -407,15 +407,20 @@ namespace Unity.WebRTC
                 // Wait until all frame rendering is done
                 yield return new WaitForEndOfFrame();
                 {
-                    foreach(var track in VideoStreamTrack.tracks)
+                    lock (VideoStreamTrack.s_lockTracks)
                     {
-                        if (track.IsEncoderInitialized)
+                        foreach (var reference in VideoStreamTrack.s_tracks.Values)
                         {
-                            track.Update();
-                        }
-                        else if (track.IsDecoderInitialized)
-                        {
-                            track.UpdateReceiveTexture();
+                            if (!reference.TryGetTarget(out var track))
+                                continue;
+                            if (track.IsEncoderInitialized)
+                            {
+                                track.Update();
+                            }
+                            else if (track.IsDecoderInitialized)
+                            {
+                                track.UpdateReceiveTexture();
+                            }
                         }
                     }
                 }
@@ -739,6 +744,8 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnTrack(IntPtr ptr, IntPtr transceiver);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateNativeOnRemoveTrack(IntPtr ptr, IntPtr receiver);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnDataChannel(IntPtr ptr, IntPtr ptrChannel);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnMessage(IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] bytes, int size);
@@ -901,6 +908,8 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionRegisterOnRenegotiationNeeded(IntPtr ptr, DelegateNativeOnNegotiationNeeded callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnTrack(IntPtr ptr, DelegateNativeOnTrack callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern void PeerConnectionRegisterOnRemoveTrack(IntPtr ptr, DelegateNativeOnRemoveTrack callback);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);

@@ -10,7 +10,7 @@ namespace Unity.WebRTC.RuntimeTest
         public const string UnsupportedReceiveVideoOnHardware = "IgnoreUnsupportedReceiveVideoOnHardware";
         public const string UnsupportedPlatformVideoDecoder = "IgnoreUnsupportedPlatformVideoDecoder";
 
-        [RuntimeInitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnLoad()
         {
             var ignoreHardwareEncoderTest = !NativeMethods.GetHardwareEncoderSupport();

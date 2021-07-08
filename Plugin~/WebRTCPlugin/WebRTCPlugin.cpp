@@ -969,6 +969,11 @@ extern "C"
         obj->RegisterOnTrack(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnRemoveTrack(PeerConnectionObject* obj, DelegateOnRemoveTrack callback)
+    {
+        obj->RegisterOnRemoveTrack(callback);
+    }
+
     UNITY_INTERFACE_EXPORT bool TransceiverGetCurrentDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection* direction)
     {
         if (transceiver->current_direction().has_value())
