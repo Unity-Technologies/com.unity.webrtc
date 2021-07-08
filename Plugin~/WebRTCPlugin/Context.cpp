@@ -2,6 +2,30 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
+#define WEBRTC_USE_BUILTIN_ISAC_FLOAT 1
+
+#include <api/audio_codecs/builtin_audio_decoder_factory.h>
+#include <api/audio_codecs/builtin_audio_encoder_factory.h>
+#include <api/audio_codecs/opus/audio_encoder_multi_channel_opus.h>
+#include <api/audio_codecs/opus/audio_decoder_multi_channel_opus.h>
+#include <api/audio_codecs/L16/audio_decoder_L16.h>
+#include <api/audio_codecs/L16/audio_encoder_L16.h>
+#include <api/audio_codecs/audio_decoder_factory_template.h>
+#include <api/audio_codecs/audio_encoder_factory_template.h>
+#include <api/audio_codecs/g711/audio_decoder_g711.h>
+#include <api/audio_codecs/g711/audio_encoder_g711.h>
+#include <api/audio_codecs/g722/audio_decoder_g722.h>
+#include <api/audio_codecs/g722/audio_encoder_g722.h>
+#include <api/audio_codecs/ilbc/audio_decoder_ilbc.h>
+#include <api/audio_codecs/ilbc/audio_encoder_ilbc.h>
+#include <api/audio_codecs/isac/audio_decoder_isac.h>
+#include <api/audio_codecs/isac/audio_encoder_isac.h>
+#include <api/audio_codecs/opus/audio_decoder_multi_channel_opus.h>
+#include <api/audio_codecs/opus/audio_decoder_opus.h>
+#include <api/audio_codecs/opus/audio_encoder_multi_channel_opus.h>
+#include <api/audio_codecs/opus/audio_encoder_opus.h>
+
+
 #if defined(UNITY_WIN) || defined(UNITY_LINUX)
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
@@ -177,6 +201,62 @@ namespace webrtc
     }
 #pragma warning(pop)
 
+    template <typename T>
+    struct StereoSupportDecoder {
+        using Config = typename T::Config;
+        static absl::optional<Config> SdpToConfig(
+            const webrtc::SdpAudioFormat& audio_format) {
+            return T::SdpToConfig(audio_format);
+        }
+        static void AppendSupportedDecoders(
+            std::vector<webrtc::AudioCodecSpec>* specs) {
+            std::vector<webrtc::AudioCodecSpec> new_specs;
+            T::AppendSupportedDecoders(&new_specs);
+
+            RTC_DCHECK_EQ(new_specs.size(), 1);
+
+            auto spec = new_specs[0];
+            if (spec.format.num_channels == 2 &&
+                spec.format.parameters.find("stereo") == spec.format.parameters.end())
+            {
+                spec.format.parameters.emplace("stereo", "1");
+                spec.info.num_channels = 2;
+            }
+            specs->push_back(spec);
+        }
+        static std::unique_ptr<webrtc::AudioDecoder> MakeAudioDecoder(
+            const Config& config,
+            absl::optional<webrtc::AudioCodecPairId> codec_pair_id) {
+            return T::MakeAudioDecoder(config, codec_pair_id);
+        }
+    };
+
+    rtc::scoped_refptr<webrtc::AudioDecoderFactory>
+        CreateAudioDecoderFactory() {
+        return webrtc::CreateAudioDecoderFactory<
+            StereoSupportDecoder<webrtc::AudioDecoderOpus>,
+            webrtc::AudioDecoderMultiChannelOpus,
+            webrtc::AudioDecoderIlbc,
+            webrtc::AudioDecoderIsac,
+            webrtc::AudioDecoderG722,
+            webrtc::AudioDecoderG711,
+            webrtc::AudioDecoderL16
+        >();
+    }
+
+    rtc::scoped_refptr<webrtc::AudioEncoderFactory>
+        CreateAudioEncoderFactory() {
+        return webrtc::CreateAudioEncoderFactory<
+            webrtc::AudioEncoderOpus,
+            webrtc::AudioEncoderMultiChannelOpus,
+            webrtc::AudioEncoderIlbc,
+            webrtc::AudioEncoderIsac,
+            webrtc::AudioEncoderG722,
+            webrtc::AudioEncoderG711,
+            webrtc::AudioEncoderL16
+        >();
+    }
+
     Context::Context(int uid, UnityEncoderType encoderType, bool forTest)
         : m_uid(uid)
         , m_encoderType(encoderType)
@@ -200,13 +280,21 @@ namespace webrtc
             std::make_unique<UnityVideoDecoderFactory>(forTest) :
             webrtc::CreateBuiltinVideoDecoderFactory();
 
+        auto audioEncoderFactory = CreateAudioEncoderFactory();
+        //auto audioEncoderFactory = webrtc::CreateBuiltinAudioEncoderFactory();
+        //auto audioEncoderFactory = webrtc::CreateAudioEncoderFactory<AudioEncoderMultiChannelOpus>();
+        auto audioDecoderFactory = CreateAudioDecoderFactory();
+        //auto audioDecoderFactory = webrtc::CreateBuiltinAudioDecoderFactory();
+        
+        //auto audioDecoderFactory = webrtc::CreateAudioDecoderFactory<AudioDecoderMultiChannelOpus>();
+
         m_peerConnectionFactory = CreatePeerConnectionFactory(
                                 m_workerThread.get(),
                                 m_workerThread.get(),
                                 m_signalingThread.get(),
                                 m_audioDevice,
-                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                audioEncoderFactory,
+                                audioDecoderFactory,
                                 std::move(videoEncoderFactory),
                                 std::move(videoDecoderFactory),
                                 nullptr,

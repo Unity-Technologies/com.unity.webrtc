@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.WebRTC.Samples;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace Unity.WebRTC
         [SerializeField] private AudioSource outputAudioSource;
         [SerializeField] private Toggle toggleEnableMicrophone;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
+        [SerializeField] private Dropdown dropdownAudioCodecs;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
         [SerializeField] private Button buttonHangup;
@@ -26,6 +28,7 @@ namespace Unity.WebRTC
 
         private AudioClip m_clipInput;
         private AudioStreamTrack m_audioTrack;
+        private List<RTCRtpCodecCapability> availableCodecs = new List<RTCRtpCodecCapability>();
 
         int m_samplingFrequency = 48000;
         int m_lengthSeconds = 1;
@@ -44,6 +47,19 @@ namespace Unity.WebRTC
             dropdownMicrophoneDevices.options =
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
+
+            dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
+            var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
+
+            var excludeCodecTypes = new[] { "audio/CN", "audio/telephone-event" };
+            foreach (var codec in codecs)
+            {
+                if (excludeCodecTypes.Count(type => codec.mimeType.Contains(type)) > 0)
+                    continue;
+                availableCodecs.Add(codec);
+            }
+            dropdownAudioCodecs.AddOptions(availableCodecs.Select(codec =>
+                new Dropdown.OptionData(string.Format($"{codec.mimeType} {codec.clockRate} {codec.sdpFmtpLine.Replace(";", " ")}"))).ToList());
 
             // Update UI
             OnDeviceChanged(dropdownMicrophoneDevices.value);
@@ -70,6 +86,8 @@ namespace Unity.WebRTC
                 m_clipInput = audioclipStereoSample;
             }
             m_channelCount = m_clipInput.channels;
+
+
 
             inputAudioSource.loop = true;
             inputAudioSource.clip = m_clipInput;
@@ -106,12 +124,25 @@ namespace Unity.WebRTC
                 OnTrack = e => _receiveStream.AddTrack(e.Track),
             };
 
-            var transceiver = _pc2.AddTransceiver(TrackKind.Audio);
-            transceiver.Direction = RTCRtpTransceiverDirection.RecvOnly;
+            var transceiver2 = _pc2.AddTransceiver(TrackKind.Audio);
+            transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
             m_audioTrack = new AudioStreamTrack(inputAudioSource);
 
             _pc1.AddTrack(m_audioTrack, _sendStream);
+
+            var transceiver1 = _pc1.GetTransceivers().First();
+            if (dropdownAudioCodecs.value == 0)
+            {
+                var error = transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
+                Debug.Log(error);
+            }
+            else
+            {
+                var codec = availableCodecs[dropdownAudioCodecs.value - 1];
+                var error = transceiver1.SetCodecPreferences(new[] { codec });
+                Debug.Log(error);
+            }
         }
 
         void OnAddTrack(MediaStreamTrackEvent e)
