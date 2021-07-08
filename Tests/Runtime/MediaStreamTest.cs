@@ -14,7 +14,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void SetUp()
         {
             var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
-            WebRTC.Initialize(type: type, forTest:true);
+            WebRTC.Initialize(type: type, limitTextureSize:true, forTest:true);
         }
 
         [TearDown]

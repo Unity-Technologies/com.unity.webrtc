@@ -347,7 +347,13 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
-        public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true, bool forTest = false)
+        public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true)
+        {
+            Initialize(type, limitTextureSize, false);
+        }
+
+
+        internal static void Initialize(EncoderType type, bool limitTextureSize, bool forTest)
         {
             // todo(kazuki): Add this event to avoid crash caused by hot-reload.
             // Dispose of all before reloading assembly.
