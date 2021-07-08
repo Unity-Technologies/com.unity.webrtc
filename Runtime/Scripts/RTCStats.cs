@@ -623,12 +623,31 @@ namespace Unity.WebRTC
     {
         public string trackIdentifier { get { return GetString("trackIdentifier"); } }
         public string kind { get { return GetString("kind"); } }
-        public uint width { get { return GetUnsignedInt("width"); } }
-        public uint height { get { return GetUnsignedInt("height"); } }
-        public uint frames { get { return GetUnsignedInt("frames"); } }
-        public uint framesPerSecond { get { return GetUnsignedInt("framesPerSecond"); } }
 
         internal RTCMediaSourceStats(IntPtr ptr) : base(ptr)
+        {
+        }
+    }
+
+    public class RTCAudioSourceStats : RTCMediaSourceStats
+    {
+        public double audioLevel { get { return GetDouble("audioLevel"); } }
+        public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
+        public double totalSamplesDuration { get { return GetDouble("totalSamplesDuration"); } }
+
+        internal RTCAudioSourceStats(IntPtr ptr) : base(ptr)
+        {
+        }
+    }
+
+    public class RTCVideoSourceStats : RTCMediaSourceStats
+    {
+        public ulong width { get { return GetUnsignedLong("width"); } }
+        public ulong height { get { return GetUnsignedLong("height"); } }
+        public ulong frames { get { return GetUnsignedLong("frames"); } }
+        public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
+
+        internal RTCVideoSourceStats(IntPtr ptr) : base(ptr)
         {
         }
     }
@@ -715,7 +734,18 @@ namespace Unity.WebRTC
                 { RTCStatsType.OutboundRtp, ptr => new RTCOutboundRTPStreamStats(ptr) },
                 { RTCStatsType.RemoteInboundRtp, ptr => new RTCRemoteInboundRtpStreamStats(ptr) },
                 { RTCStatsType.RemoteOutboundRtp, ptr => new RTCRemoteOutboundRtpStreamStats(ptr) },
-                { RTCStatsType.MediaSource, ptr => new RTCMediaSourceStats(ptr) },
+                {
+                    RTCStatsType.MediaSource, ptr =>
+                    {
+                        var @base = new RTCMediaSourceStats(ptr);
+                        if (@base.kind == "audio")
+                        {
+                            return new RTCAudioSourceStats(ptr);
+                        }
+
+                        return new RTCVideoSourceStats(ptr);
+                    }
+                },
                 { RTCStatsType.Csrc, ptr => new RTCCodecStats(ptr) },
                 { RTCStatsType.PeerConnection, ptr => new RTCPeerConnectionStats(ptr) },
                 { RTCStatsType.DataChannel, ptr => new RTCDataChannelStats(ptr) },

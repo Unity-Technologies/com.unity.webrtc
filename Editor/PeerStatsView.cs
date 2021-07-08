@@ -378,21 +378,25 @@ namespace Unity.WebRTC.Editor
                     new Label($"{nameof(mediaSourceStats.trackIdentifier)}: {mediaSourceStats.trackIdentifier}"));
                 container.Add(new Label($"{nameof(mediaSourceStats.kind)}: {mediaSourceStats.kind}"));
 
-                if (mediaSourceStats.kind == "video")
+                if (mediaSourceStats is RTCVideoSourceStats videoSourceStats)
                 {
-                    container.Add(new Label($"{nameof(mediaSourceStats.width)}: {mediaSourceStats.width}"));
-                    container.Add(new Label($"{nameof(mediaSourceStats.height)}: {mediaSourceStats.height}"));
-                    container.Add(new Label($"{nameof(mediaSourceStats.frames)}: {mediaSourceStats.frames}"));
+                    container.Add(new Label($"{nameof(videoSourceStats.width)}: {videoSourceStats.width}"));
+                    container.Add(new Label($"{nameof(videoSourceStats.height)}: {videoSourceStats.height}"));
+                    container.Add(new Label($"{nameof(videoSourceStats.frames)}: {videoSourceStats.frames}"));
                     container.Add(
-                        new Label($"{nameof(mediaSourceStats.framesPerSecond)}: {mediaSourceStats.framesPerSecond}"));
-                    sourceGraph.AddInput(mediaSourceStats);
+                        new Label($"{nameof(videoSourceStats.framesPerSecond)}: {videoSourceStats.framesPerSecond}"));
+                    sourceGraph.AddInput(videoSourceStats);
                     graphView.visible = true;
                 }
-                else
-                {
-                    graphView.visible = false;
-                }
 
+                if (mediaSourceStats is RTCAudioSourceStats audioSourceStats)
+                {
+                    container.Add(new Label($"{nameof(audioSourceStats.audioLevel)}: {audioSourceStats.audioLevel}"));
+                    container.Add(new Label($"{nameof(audioSourceStats.totalAudioEnergy)}: {audioSourceStats.totalAudioEnergy}"));
+                    container.Add(new Label($"{nameof(audioSourceStats.totalSamplesDuration)}: {audioSourceStats.totalSamplesDuration}"));
+                    sourceGraph.AddInput(audioSourceStats);
+                    graphView.visible = true;
+                }
             };
 
             root.Add(graphView);
