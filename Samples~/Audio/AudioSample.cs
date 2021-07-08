@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,14 @@ namespace Unity.WebRTC
         [SerializeField] private AudioSource inputAudioSource;
         [SerializeField] private AudioSource outputAudioSource;
         [SerializeField] private Toggle toggleEnableMicrophone;
+        [SerializeField] private Dropdown dropdownAudioClips;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Dropdown dropdownAudioCodecs;
+        [SerializeField] private Dropdown dropdpwnSpeakerMode;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
         [SerializeField] private Button buttonHangup;
-        [SerializeField] private Text textChannelCount;
-        [SerializeField] private Text textMinFrequency;
-        [SerializeField] private Text textMaxFrequency;
-        [SerializeField] private AudioClip audioclipStereoSample;
+        [SerializeField] private AudioClip[] audioclipList;
 
         private RTCPeerConnection _pc1, _pc2;
         private MediaStream _sendStream;
@@ -32,7 +32,6 @@ namespace Unity.WebRTC
 
         int m_samplingFrequency = 48000;
         int m_lengthSeconds = 1;
-        int m_channelCount = 1;
 
         private string m_deviceName = null;
 
@@ -43,10 +42,18 @@ namespace Unity.WebRTC
 
             toggleEnableMicrophone.isOn = false;
             toggleEnableMicrophone.onValueChanged.AddListener(OnEnableMicrophone);
+            dropdownAudioClips.interactable = true;
+            dropdownAudioClips.options =
+                audioclipList.Select(clip => new Dropdown.OptionData(clip.name)).ToList();
             dropdownMicrophoneDevices.interactable = false;
             dropdownMicrophoneDevices.options =
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
+            var audioConf = AudioSettings.GetConfiguration();
+            dropdpwnSpeakerMode.options =
+                Enum.GetNames(typeof(AudioSpeakerMode)).Select(mode => new Dropdown.OptionData(mode)).ToList();
+            dropdpwnSpeakerMode.value = (int)audioConf.speakerMode;
+            dropdpwnSpeakerMode.onValueChanged.AddListener(OnSpeakerModeChanged);
 
             dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
             var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
@@ -83,12 +90,9 @@ namespace Unity.WebRTC
             }
             else
             {
-                m_clipInput = audioclipStereoSample;
+                var clipIndex = dropdownAudioClips.value;
+                m_clipInput = audioclipList[clipIndex];
             }
-            m_channelCount = m_clipInput.channels;
-
-
-
             inputAudioSource.loop = true;
             inputAudioSource.clip = m_clipInput;
             inputAudioSource.Play();
@@ -96,11 +100,13 @@ namespace Unity.WebRTC
             buttonStart.interactable = false;
             buttonCall.interactable = true;
             buttonHangup.interactable = true;
+            dropdpwnSpeakerMode.interactable = false;
         }
 
         void OnEnableMicrophone(bool enable)
         {
             dropdownMicrophoneDevices.interactable = enable;
+            dropdownAudioClips.interactable = !enable;
         }
 
         void OnCall()
@@ -175,16 +181,24 @@ namespace Unity.WebRTC
             buttonStart.interactable = true;
             buttonCall.interactable = false;
             buttonHangup.interactable = false;
+            dropdpwnSpeakerMode.interactable = true;
         }
 
         void OnDeviceChanged(int value)
         {
             m_deviceName = dropdownMicrophoneDevices.options[value].text;
             Microphone.GetDeviceCaps(m_deviceName, out int minFreq, out int maxFreq);
+        }
 
-            textChannelCount.text = string.Format($"Channel Count: {m_channelCount}");
-            textMinFrequency.text = string.Format($"Minimum frequency: {minFreq}");
-            textMaxFrequency.text = string.Format($"Maximum frequency: {maxFreq}");
+        void OnSpeakerModeChanged(int value)
+        {
+            var audioConf = AudioSettings.GetConfiguration();
+            audioConf.speakerMode = (AudioSpeakerMode)value;
+            Debug.Log(audioConf.speakerMode);
+            if (!AudioSettings.Reset(audioConf))
+            {
+                Debug.LogError("Failed changing Audio Settings");
+            }
         }
 
         private static RTCConfiguration GetSelectedSdpSemantics()
