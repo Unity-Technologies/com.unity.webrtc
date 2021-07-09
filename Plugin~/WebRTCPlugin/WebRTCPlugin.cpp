@@ -1022,7 +1022,10 @@ extern "C"
             _codecs[i].num_channels = ConvertOptional(codecs[i].channels);
             _codecs[i].parameters = ConvertSdp(codecs[i].sdpFmtpLine);
         }
-        return transceiver->SetCodecPreferences(_codecs).type();
+        auto error = transceiver->SetCodecPreferences(_codecs);
+        if (error.type() != RTCErrorType::NONE)
+            RTC_LOG(LS_ERROR) << error.message();
+        return error.type();
     }
 
     UNITY_INTERFACE_EXPORT RtpReceiverInterface* TransceiverGetReceiver(RtpTransceiverInterface* transceiver)

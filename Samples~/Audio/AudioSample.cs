@@ -145,12 +145,19 @@ namespace Unity.WebRTC
             var transceiver1 = _pc1.GetTransceivers().First();
             if (dropdownAudioCodecs.value == 0)
             {
-                transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
+                var error = transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
+                if(error != RTCErrorType.None)
+                    Debug.LogError(error);
             }
             else
             {
                 var codec = availableCodecs[dropdownAudioCodecs.value - 1];
-                transceiver1.SetCodecPreferences(new[] { codec });
+                //Debug.Log(codec.channels);
+                //codec.channels = 1;
+                var error = transceiver1.SetCodecPreferences(new[] { codec });
+                if (error != RTCErrorType.None)
+                    Debug.LogError(error);
+
             }
         }
 

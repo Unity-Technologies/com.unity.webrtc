@@ -31,10 +31,12 @@ struct StereoSupportDecoder {
         RTC_DCHECK_EQ(new_specs.size(), 1);
 
         auto spec = new_specs[0];
-        if (spec.format.num_channels == 2 &&
-            spec.format.parameters.find("stereo") == spec.format.parameters.end())
+        if (spec.format.num_channels == 2)
         {
-            spec.format.parameters.emplace("stereo", "1");
+            if (spec.format.parameters.find("stereo") == spec.format.parameters.end())
+                spec.format.parameters.emplace("stereo", "1");
+            if (spec.format.parameters.find("sprop-stereo") == spec.format.parameters.end())
+                spec.format.parameters.emplace("sprop-stereo", "1");
             spec.info.num_channels = 2;
         }
         specs->push_back(spec);
