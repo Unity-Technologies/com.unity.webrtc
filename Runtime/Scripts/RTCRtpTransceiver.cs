@@ -112,7 +112,7 @@ namespace Unity.WebRTC
             instance.Dispose();
             return error;
 #else
-            string json = JsonConvert.SerializeObject(codecs);
+            string json = JsonConvert.SerializeObject(codecs, Formatting.None, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
             NativeMethods.TransceiverSetCodecPreferences(self, json);
 
             //TODO

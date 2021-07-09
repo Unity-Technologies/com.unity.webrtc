@@ -211,7 +211,9 @@ var UnityWebRTCContext = {
 
   $UWContextGetCapabilities: function (senderReceiver, kindIdx) {
     var kind = UWMediaStreamTrackKind[kindIdx];
-    var capabilities = senderReceiver.getCapabilities(kind);
+    var capabilities = {codecs:[], headerExtensions: []};
+    const supportsSetCodecPreferences = window.RTCRtpTransceiver && 'setCodecPreferences' in window.RTCRtpTransceiver.prototype;
+    if(supportsSetCodecPreferences) capabilities = senderReceiver.getCapabilities(kind);
     var capabilitiesJson = JSON.stringify(capabilities);
     var capabilitiesJsonPtr = uwcom_strToPtr(capabilitiesJson);
     return capabilitiesJsonPtr;

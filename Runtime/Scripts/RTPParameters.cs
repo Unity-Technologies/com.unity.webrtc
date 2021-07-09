@@ -435,30 +435,30 @@ namespace Unity.WebRTC
         /// </summary>
         public class RTCRtpCodecCapability
         {
-            public int channels;
+            public int? channels;
             public int clockRate;
             public string mimeType;
-            public string sdpFmtpLine;
+            public string? sdpFmtpLine;
 
-            internal RTCRtpCodecCapability(ref RTCRtpCodecCapabilityInternal v)
-            {
-                mimeType = v.mimeType;
-                clockRate = v.clockRate;
-                channels = v.channels;
-                sdpFmtpLine = v.sdpFmtpLine;
-            }
-
-            internal RTCRtpCodecCapabilityInternal Cast()
-            {
-                RTCRtpCodecCapabilityInternal instance = new RTCRtpCodecCapabilityInternal
-                {
-                    channels = this.channels,
-                    clockRate = this.clockRate,
-                    mimeType = this.mimeType,
-                    sdpFmtpLine = this.sdpFmtpLine
-                };
-                return instance;
-            }
+            // internal RTCRtpCodecCapability(ref RTCRtpCodecCapabilityInternal v)
+            // {
+            //     mimeType = v.mimeType;
+            //     clockRate = v.clockRate;
+            //     channels = v.channels;
+            //     sdpFmtpLine = v.sdpFmtpLine;
+            // }
+            //
+            // internal RTCRtpCodecCapabilityInternal Cast()
+            // {
+            //     RTCRtpCodecCapabilityInternal instance = new RTCRtpCodecCapabilityInternal
+            //     {
+            //         channels = this.channels,
+            //         clockRate = this.clockRate,
+            //         mimeType = this.mimeType,
+            //         sdpFmtpLine = this.sdpFmtpLine
+            //     };
+            //     return instance;
+            // }
         }
 
         /// <summary>
@@ -479,8 +479,8 @@ namespace Unity.WebRTC
         /// </summary>
         public class RTCRtpCapabilities
         {
-            public readonly RTCRtpCodecCapability[] codecs;
-            public readonly RTCRtpHeaderExtensionCapability[] headerExtensions;
+            public RTCRtpCodecCapability[] codecs;
+            public RTCRtpHeaderExtensionCapability[] headerExtensions;
 
             // internal RTCRtpCapabilities(RTCRtpCapabilitiesInternal capabilities)
             // {
