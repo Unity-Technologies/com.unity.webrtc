@@ -1,6 +1,8 @@
 using Newtonsoft.Json;
 using System;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -45,23 +47,23 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
         public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
         {
-            WebRTC.Context.GetSenderCapabilities(kind, out IntPtr ptr);
+
 #if !UNITY_WEBGL
+            WebRTC.Context.GetSenderCapabilities(kind, out IntPtr ptr);
             RTCRtpCapabilitiesInternal capabilitiesInternal =
                 Marshal.PtrToStructure<RTCRtpCapabilitiesInternal>(ptr);
             RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
             Marshal.FreeHGlobal(ptr);
-#else
-            var capabilitiesJson = ptr.AsAnsiStringWithFreeMem();
-            var capabilities = JsonConvert.DeserializeObject<RTCRtpCapabilities>(capabilitiesJson);
-#endif
             return capabilities;
+#else
+            return WebRTC.Context.GetSenderCapabilities(kind);
+#endif
         }
 
         /// <summary>
@@ -93,30 +95,47 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpSendParameters GetParameters()
         {
+#if !UNITY_WEBGL
             NativeMethods.SenderGetParameters(self, out var ptr);
             RTCRtpSendParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
             RTCRtpSendParameters parameters = new RTCRtpSendParameters(ref parametersInternal);
             Marshal.FreeHGlobal(ptr);
             return parameters;
+#else
+            string json = NativeMethods.SenderGetParameters(self);
+
+            Debug.Log("Get parameters");
+            Debug.Log(json);
+
+            return JsonConvert.DeserializeObject<RTCRtpSendParameters>(json);
+#endif
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
         public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
         {
+#if !UNITY_WEBGL
             parameters.CreateInstance(out RTCRtpSendParametersInternal instance);
             IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(instance));
             Marshal.StructureToPtr(instance, ptr, false);
             RTCErrorType error = NativeMethods.SenderSetParameters(self, ptr);
             Marshal.FreeCoTaskMem(ptr);
             return error;
+#else
+            string json = JsonConvert.SerializeObject(parameters, Formatting.None, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+            Debug.Log("Set parameters");
+            Debug.Log(json);
+            NativeMethods.SenderSetParameters(self, json);
+            return RTCErrorType.None;
+#endif
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>
