@@ -19,6 +19,8 @@ namespace Unity.WebRTC
         [SerializeField] private Dropdown dropdownSpeakerMode;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
+        [SerializeField] private Button buttonPause;
+        [SerializeField] private Button buttonResume;
         [SerializeField] private Button buttonHangup;
         [SerializeField] private AudioClip[] audioclipList;
 
@@ -73,6 +75,8 @@ namespace Unity.WebRTC
 
             buttonStart.onClick.AddListener(OnStart);
             buttonCall.onClick.AddListener(OnCall);
+            buttonPause.onClick.AddListener(OnPause);
+            buttonResume.onClick.AddListener(OnResume);
             buttonHangup.onClick.AddListener(OnHangUp);
         }
 
@@ -112,6 +116,7 @@ namespace Unity.WebRTC
         void OnCall()
         {
             buttonCall.interactable = false;
+            buttonPause.interactable = true;
 
             _receiveStream = new MediaStream();
             _receiveStream.OnAddTrack += OnAddTrack;
@@ -149,6 +154,26 @@ namespace Unity.WebRTC
             }
         }
 
+        void OnPause()
+        {
+            var transceiver1 = _pc1.GetTransceivers().First();
+            var track = transceiver1.Sender.Track;
+            track.Enabled = false;
+
+            buttonResume.gameObject.SetActive(true);
+            buttonPause.gameObject.SetActive(false);
+        }
+
+        void OnResume()
+        {
+            var transceiver1 = _pc1.GetTransceivers().First();
+            var track = transceiver1.Sender.Track;
+            track.Enabled = true;
+
+            buttonResume.gameObject.SetActive(false);
+            buttonPause.gameObject.SetActive(true);
+        }
+
         void OnAddTrack(MediaStreamTrackEvent e)
         {
             var track = e.Track as AudioStreamTrack;
@@ -179,6 +204,11 @@ namespace Unity.WebRTC
             buttonStart.interactable = true;
             buttonCall.interactable = false;
             buttonHangup.interactable = false;
+            buttonPause.interactable = false;
+
+            buttonResume.gameObject.SetActive(false);
+            buttonPause.gameObject.SetActive(true);
+
             dropdownSpeakerMode.interactable = true;
         }
 
