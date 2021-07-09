@@ -99,7 +99,7 @@ var UnityWebRTCPeerConnection = {
       } else if (track.kind === "video") {
         var video = document.createElement("video");
         video.id = "video_receive_" + track.managePtr.toString();
-        document.body.appendChild(video);
+        //document.body.appendChild(video);
         video.muted = true;
         video.srcObject = stream;
         video.style.width = "300px";
@@ -368,7 +368,7 @@ var UnityWebRTCPeerConnection = {
     if(track.kind == "video"){
       var video = document.createElement("video");
       video.id = "video_send_" + track.managePtr.toString();
-      document.body.appendChild(video);
+      //document.body.appendChild(video);
       video.muted = true;
       video.srcObject = stream;
       video.style.width = "300px";
