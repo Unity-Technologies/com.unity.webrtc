@@ -3612,7 +3612,7 @@ MonoBehaviour:
   dropdownAudioClips: {fileID: 1102474322}
   dropdownMicrophoneDevices: {fileID: 319738650}
   dropdownAudioCodecs: {fileID: 2058848602}
-  dropdpwnSpeakerMode: {fileID: 671964786}
+  dropdownSpeakerMode: {fileID: 671964786}
   buttonStart: {fileID: 1290512353}
   buttonCall: {fileID: 2066401219}
   buttonHangup: {fileID: 1344461799}

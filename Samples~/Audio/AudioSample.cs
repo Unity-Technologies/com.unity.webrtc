@@ -16,7 +16,7 @@ namespace Unity.WebRTC
         [SerializeField] private Dropdown dropdownAudioClips;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Dropdown dropdownAudioCodecs;
-        [SerializeField] private Dropdown dropdpwnSpeakerMode;
+        [SerializeField] private Dropdown dropdownSpeakerMode;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
         [SerializeField] private Button buttonHangup;
@@ -50,10 +50,10 @@ namespace Unity.WebRTC
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
             var audioConf = AudioSettings.GetConfiguration();
-            dropdpwnSpeakerMode.options =
+            dropdownSpeakerMode.options =
                 Enum.GetNames(typeof(AudioSpeakerMode)).Select(mode => new Dropdown.OptionData(mode)).ToList();
-            dropdpwnSpeakerMode.value = (int)audioConf.speakerMode;
-            dropdpwnSpeakerMode.onValueChanged.AddListener(OnSpeakerModeChanged);
+            dropdownSpeakerMode.value = (int)audioConf.speakerMode;
+            dropdownSpeakerMode.onValueChanged.AddListener(OnSpeakerModeChanged);
 
             dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
             var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
@@ -100,7 +100,7 @@ namespace Unity.WebRTC
             buttonStart.interactable = false;
             buttonCall.interactable = true;
             buttonHangup.interactable = true;
-            dropdpwnSpeakerMode.interactable = false;
+            dropdownSpeakerMode.interactable = false;
         }
 
         void OnEnableMicrophone(bool enable)
@@ -140,14 +140,12 @@ namespace Unity.WebRTC
             var transceiver1 = _pc1.GetTransceivers().First();
             if (dropdownAudioCodecs.value == 0)
             {
-                var error = transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
-                Debug.Log(error);
+                transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
             }
             else
             {
                 var codec = availableCodecs[dropdownAudioCodecs.value - 1];
-                var error = transceiver1.SetCodecPreferences(new[] { codec });
-                Debug.Log(error);
+                transceiver1.SetCodecPreferences(new[] { codec });
             }
         }
 
@@ -181,7 +179,7 @@ namespace Unity.WebRTC
             buttonStart.interactable = true;
             buttonCall.interactable = false;
             buttonHangup.interactable = false;
-            dropdpwnSpeakerMode.interactable = true;
+            dropdownSpeakerMode.interactable = true;
         }
 
         void OnDeviceChanged(int value)
