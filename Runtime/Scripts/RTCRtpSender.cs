@@ -103,10 +103,6 @@ namespace Unity.WebRTC
             return parameters;
 #else
             string json = NativeMethods.SenderGetParameters(self);
-
-            Debug.Log("Get parameters");
-            Debug.Log(json);
-
             return JsonConvert.DeserializeObject<RTCRtpSendParameters>(json);
 #endif
         }
@@ -127,9 +123,9 @@ namespace Unity.WebRTC
             return error;
 #else
             string json = JsonConvert.SerializeObject(parameters, Formatting.None, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
-            Debug.Log("Set parameters");
-            Debug.Log(json);
             NativeMethods.SenderSetParameters(self, json);
+
+            //TODO
             return RTCErrorType.None;
 #endif
         }
