@@ -96,16 +96,15 @@ var UnityWebRTCCommon = {
         if (stat.state === -1) return false;
       }
     }
+    stat.type = UWRTCStatsType.indexOf(stat.type);
+    return true;
   },
   $uwcom_statsSerialize: function (stats) {
-    var statsTypes = [];
     var statsJsons = [];
-    stats.forEach(function (stat) {
-      statsTypes.push(stat.type);
-      if (uwcom_fixStatEnumValue(stat))
-        statsJsons.push(JSON.stringify());
-    });
-    var statsDataJson = JSON.stringify([statsTypes, statsJsons]);
+    stats.forEach((function(stat) {
+      if (uwcom_fixStatEnumValue(stat)) statsJsons.push(stat);
+    }));
+    var statsDataJson = JSON.stringify(statsJsons);
     var statsDataJsonPtr = uwcom_strToPtr(statsDataJson);
     return statsDataJsonPtr;
   },
@@ -165,7 +164,9 @@ var UnityWebRTCCommon = {
   },
 
   StatsReportGetStatsList: function (reportPtr) {
-
+    if (!uwcom_existsCheck(reportPtr, "StatsReportGetStatsList", "report")) return;
+    var report = UWManaged[reportPtr];
+    return uwcom_statsSerialize(report);
   },
   StatsGetJson: function (statsPtr) {
 
