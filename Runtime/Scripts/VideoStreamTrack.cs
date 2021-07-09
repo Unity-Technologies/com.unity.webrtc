@@ -100,14 +100,12 @@ namespace Unity.WebRTC
             m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
             m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
 #else
-            Debug.Log("InitializeReceiver");
             //m_destTexture = CreateRenderTexture(width, height, renderTextureFormat);
             var texPtr = NativeMethods.CreateNativeTexture();
             var tex = Texture2D.CreateExternalTexture(width, height, TextureFormat.RGBA32, false, false, texPtr);
             tex.UpdateExternalTexture(texPtr);
             m_destTexture = tex;
             IsRemote = true;
-            Debug.Log($"IsRemote:{IsRemote}");
 #endif
 
 

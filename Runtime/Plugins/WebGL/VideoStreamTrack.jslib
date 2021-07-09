@@ -37,7 +37,7 @@ var UnityWebRTCVideoStreamTrack = {
     //uwcom_addManageObj(stream);
     uwcom_addManageObj(track);
     uwcom_localVideoTracks[track.managePtr] = localVideoData;
-    console.log('localVideoData', track.managePtr);
+    //console.log('localVideoData', track.managePtr);
     return track.managePtr;
   },
 

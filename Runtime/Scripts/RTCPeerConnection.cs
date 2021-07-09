@@ -448,7 +448,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnTrack))]
         static void PCOnTrack(IntPtr ptr, IntPtr transceiver)
         {
-            Debug.Log("PCOnTrack");
 #if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
@@ -460,7 +459,6 @@ namespace Unity.WebRTC
 #else
             if (WebRTC.Table[ptr] is RTCPeerConnection connection)
             {
-                Debug.Log($"connection.OnTrack:{connection.OnTrack}:{transceiver}");
                 connection.OnTrack?.Invoke(new RTCTrackEvent(transceiver, connection));
             }
 #endif
