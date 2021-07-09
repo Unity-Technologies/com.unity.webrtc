@@ -29,12 +29,8 @@ var UnityWebRTCIceCandidate = {
     ret.tcpType = candidate.tcpType;
     ret.type = candidate.type;
     ret.usernameFragment = candidate.usernameFragment;
-    // TODO: Use uwcom_strToPtr()
     var json = JSON.stringify(ret);
-    var bufferSize = lengthBytesUTF8(json) + 1;
-    var buffer = _malloc(bufferSize);
-    stringToUTF8(json, buffer, bufferSize);
-    return buffer;
+    return uwcom_strToPtr(json);
   }, 
   
   DeleteIceCandidate: function (candidatePtr) {
