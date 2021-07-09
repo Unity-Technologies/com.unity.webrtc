@@ -51,17 +51,18 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
         {
-            WebRTC.Context.GetReceiverCapabilities(kind, out IntPtr ptr);
+
 #if !UNITY_WEBGL
+            WebRTC.Context.GetReceiverCapabilities(kind, out IntPtr ptr);
             RTCRtpCapabilitiesInternal capabilitiesInternal =
                 Marshal.PtrToStructure<RTCRtpCapabilitiesInternal>(ptr);
             RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
             Marshal.FreeHGlobal(ptr);
-#else
-            var capabilitiesJson = ptr.AsAnsiStringWithFreeMem();
-            var capabilities = JsonConvert.DeserializeObject<RTCRtpCapabilities>(capabilitiesJson);
-#endif
             return capabilities;
+#else
+            return WebRTC.Context.GetReceiverCapabilities(kind);
+#endif
+
         }
 
         public RTCStatsReportAsyncOperation GetStats()

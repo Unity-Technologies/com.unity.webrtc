@@ -284,25 +284,33 @@ namespace Unity.WebRTC
         }
 #endif
 
+#if !UNITY_WEBGL
         public void GetSenderCapabilities(TrackKind kind, out IntPtr capabilities)
         {
-#if !UNITY_WEBGL
             NativeMethods.ContextGetSenderCapabilities(self, kind, out capabilities);
-#else
-            var ptr = NativeMethods.ContextGetSenderCapabilities(self, kind);
-            capabilities = ptr;
-#endif
         }
+#else
+        public RTCRtpCapabilities GetSenderCapabilities(TrackKind kind)
+        {
+            string json = NativeMethods.ContextGetSenderCapabilities(self, kind);
 
+            return JsonConvert.DeserializeObject<RTCRtpCapabilities>(json);
+        }
+#endif
+
+#if !UNITY_WEBGL
         public void GetReceiverCapabilities(TrackKind kind, out IntPtr capabilities)
         {
-#if !UNITY_WEBGL
             NativeMethods.ContextGetReceiverCapabilities(self, kind, out capabilities);
-#else
-            var ptr = NativeMethods.ContextGetReceiverCapabilities(self, kind);
-            capabilities = ptr;
-#endif
         }
+#else
+        public RTCRtpCapabilities GetReceiverCapabilities(TrackKind kind)
+        {
+            string json = NativeMethods.ContextGetReceiverCapabilities(self, kind);
+
+            return JsonConvert.DeserializeObject<RTCRtpCapabilities>(json);
+        }
+#endif
 
 
 #if !UNITY_WEBGL
