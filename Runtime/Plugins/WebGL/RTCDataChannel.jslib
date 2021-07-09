@@ -6,11 +6,17 @@ var UnityWebRTCDataChannel = {
     var optionsJson = Pointer_stringify(optionsJsonPtr);
     var options = JSON.parse(optionsJson);
     
-    options.ordered = options.ordered.value;
-    options.maxRetransmits = options.maxRetransmits.value;
-    options.maxRetransmitTime = options.maxRetransmitTime.value;
-    options.negotiated = options.negotiated.value;
-    options.id = options.id.value;
+    // Firefox doesn't like null values, so remove them.
+    if(options.ordered.hasValue) options.ordered = options.ordered.value;
+    else delete options.ordered;
+    if(options.maxRetransmits.hasValue) options.maxRetransmits = options.maxRetransmits.value;
+    else delete options.maxRetransmits;
+    if(options.maxRetransmitTime.hasValue) options.maxRetransmitTime = options.maxRetransmitTime.value;
+    else delete options.maxRetransmitTime;
+    if(options.negotiated.hasValue) options.negotiated = options.negotiated.value;
+    else delete options.negotiated;
+    if(options.id.hasValue) options.id = options.id.value;
+    else delete options.id;
     
     var dataChannel = peer.createDataChannel(label, options);
     dataChannel.onmessage = function (evt) {
