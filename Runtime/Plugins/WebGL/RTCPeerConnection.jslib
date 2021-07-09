@@ -430,7 +430,7 @@ var UnityWebRTCPeerConnection = {
       // Possible solution: Put icecandidates on a queue if the description is not set, and handle the queue when the description is set.
       setTimeout(function(){
         peer.addIceCandidate(candidate)
-          .then(function(){console.log("Added ice")})
+          .then(function(){})
           .catch(function(){console.error(err.message, peerPtr)});
       }, 1000);
       
