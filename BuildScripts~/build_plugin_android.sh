@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M89/webrtc-android.zip
+export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M92/webrtc-android.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 export PLUGIN_DIR=$(pwd)/Runtime/Plugins/Android
 export ARCH_ABI=arm64-v8a

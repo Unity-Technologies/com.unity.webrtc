@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M89/webrtc-ios.zip
+export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M92/webrtc-ios.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugins/iOS
 export WEBRTC_ARCHIVE_DIR=build/webrtc.xcarchive
