@@ -408,13 +408,13 @@ namespace Unity.WebRTC
         public bool isRemote { get { return GetBool("isRemote"); } }
         public string networkType { get { return GetString("networkType"); } }
         public string ip { get { return GetString("ip"); } }
+        public string address { get { return GetString("address"); } }
         public int port { get { return GetInt("port"); } }
         public string protocol { get { return GetString("protocol"); } }
         public string relayProtocol { get { return GetString("relayProtocol"); } }
         public string candidateType { get { return GetString("candidateType"); } }
         public int priority { get { return GetInt("priority"); } }
         public string url { get { return GetString("url"); } }
-        public bool deleted { get { return GetBool("deleted"); } }
 
         internal RTCIceCandidateStats(IntPtr ptr) : base(ptr)
         {

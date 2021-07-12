@@ -70,12 +70,12 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.IsNotEmpty(candidateStats.protocol);
                     Assert.IsNotEmpty(candidateStats.candidateType);
                     Ignore.Pass(candidateStats.ip);
+                    Ignore.Pass(candidateStats.address);
                     Assert.IsNotEmpty(candidateStats.transportId);
                     Ignore.Pass(candidateStats.url);
                     Ignore.Pass(candidateStats.relayProtocol);
                     Ignore.Pass(candidateStats.networkType);
                     Ignore.Pass(candidateStats.priority);
-                    Ignore.Pass(candidateStats.deleted);
                     Ignore.Pass(candidateStats.isRemote);
                     Ignore.Pass(candidateStats.port);
                     break;
