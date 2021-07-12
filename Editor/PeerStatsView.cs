@@ -897,13 +897,13 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidateStats.isRemote)}: {candidateStats.isRemote}"));
                 container.Add(new Label($"{nameof(candidateStats.networkType)}: {candidateStats.networkType}"));
                 container.Add(new Label($"{nameof(candidateStats.ip)}: {candidateStats.ip}"));
+                container.Add(new Label($"{nameof(candidateStats.address)}: {candidateStats.address}"));
                 container.Add(new Label($"{nameof(candidateStats.port)}: {candidateStats.port}"));
                 container.Add(new Label($"{nameof(candidateStats.protocol)}: {candidateStats.protocol}"));
                 container.Add(new Label($"{nameof(candidateStats.relayProtocol)}: {candidateStats.relayProtocol}"));
                 container.Add(new Label($"{nameof(candidateStats.candidateType)}: {candidateStats.candidateType}"));
                 container.Add(new Label($"{nameof(candidateStats.priority)}: {candidateStats.priority}"));
                 container.Add(new Label($"{nameof(candidateStats.url)}: {candidateStats.url}"));
-                container.Add(new Label($"{nameof(candidateStats.deleted)}: {candidateStats.deleted}"));
             };
             return root;
         }
@@ -935,13 +935,13 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidateStats.isRemote)}: {candidateStats.isRemote}"));
                 container.Add(new Label($"{nameof(candidateStats.networkType)}: {candidateStats.networkType}"));
                 container.Add(new Label($"{nameof(candidateStats.ip)}: {candidateStats.ip}"));
+                container.Add(new Label($"{nameof(candidateStats.address)}: {candidateStats.address}"));
                 container.Add(new Label($"{nameof(candidateStats.port)}: {candidateStats.port}"));
                 container.Add(new Label($"{nameof(candidateStats.protocol)}: {candidateStats.protocol}"));
                 container.Add(new Label($"{nameof(candidateStats.relayProtocol)}: {candidateStats.relayProtocol}"));
                 container.Add(new Label($"{nameof(candidateStats.candidateType)}: {candidateStats.candidateType}"));
                 container.Add(new Label($"{nameof(candidateStats.priority)}: {candidateStats.priority}"));
                 container.Add(new Label($"{nameof(candidateStats.url)}: {candidateStats.url}"));
-                container.Add(new Label($"{nameof(candidateStats.deleted)}: {candidateStats.deleted}"));
             };
             return root;
         }
