@@ -2,6 +2,9 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
+#include "UnityAudioEncoderFactory.h"
+#include "UnityAudioDecoderFactory.h"
+
 #if defined(UNITY_WIN) || defined(UNITY_LINUX)
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
@@ -200,13 +203,16 @@ namespace webrtc
             std::make_unique<UnityVideoDecoderFactory>(forTest) :
             webrtc::CreateBuiltinVideoDecoderFactory();
 
+        rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
+        rtc::scoped_refptr<AudioDecoderFactory>  audioDecoderFactory = CreateAudioDecoderFactory();
+
         m_peerConnectionFactory = CreatePeerConnectionFactory(
                                 m_workerThread.get(),
                                 m_workerThread.get(),
                                 m_signalingThread.get(),
                                 m_audioDevice,
-                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                audioEncoderFactory,
+                                audioDecoderFactory,
                                 std::move(videoEncoderFactory),
                                 std::move(videoDecoderFactory),
                                 nullptr,

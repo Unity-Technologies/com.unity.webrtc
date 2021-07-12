@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.WebRTC.Samples;
 using UnityEngine;
@@ -11,14 +13,16 @@ namespace Unity.WebRTC
         [SerializeField] private AudioSource inputAudioSource;
         [SerializeField] private AudioSource outputAudioSource;
         [SerializeField] private Toggle toggleEnableMicrophone;
+        [SerializeField] private Dropdown dropdownAudioClips;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
+        [SerializeField] private Dropdown dropdownAudioCodecs;
+        [SerializeField] private Dropdown dropdownSpeakerMode;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
+        [SerializeField] private Button buttonPause;
+        [SerializeField] private Button buttonResume;
         [SerializeField] private Button buttonHangup;
-        [SerializeField] private Text textChannelCount;
-        [SerializeField] private Text textMinFrequency;
-        [SerializeField] private Text textMaxFrequency;
-        [SerializeField] private AudioClip audioclipStereoSample;
+        [SerializeField] private AudioClip[] audioclipList;
 
         private RTCPeerConnection _pc1, _pc2;
         private MediaStream _sendStream;
@@ -26,10 +30,10 @@ namespace Unity.WebRTC
 
         private AudioClip m_clipInput;
         private AudioStreamTrack m_audioTrack;
+        private List<RTCRtpCodecCapability> availableCodecs = new List<RTCRtpCodecCapability>();
 
         int m_samplingFrequency = 48000;
         int m_lengthSeconds = 1;
-        int m_channelCount = 1;
 
         private string m_deviceName = null;
 
@@ -40,16 +44,39 @@ namespace Unity.WebRTC
 
             toggleEnableMicrophone.isOn = false;
             toggleEnableMicrophone.onValueChanged.AddListener(OnEnableMicrophone);
+            dropdownAudioClips.interactable = true;
+            dropdownAudioClips.options =
+                audioclipList.Select(clip => new Dropdown.OptionData(clip.name)).ToList();
             dropdownMicrophoneDevices.interactable = false;
             dropdownMicrophoneDevices.options =
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
+            var audioConf = AudioSettings.GetConfiguration();
+            dropdownSpeakerMode.options =
+                Enum.GetNames(typeof(AudioSpeakerMode)).Select(mode => new Dropdown.OptionData(mode)).ToList();
+            dropdownSpeakerMode.value = (int)audioConf.speakerMode;
+            dropdownSpeakerMode.onValueChanged.AddListener(OnSpeakerModeChanged);
+
+            dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
+            var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
+
+            var excludeCodecTypes = new[] { "audio/CN", "audio/telephone-event" };
+            foreach (var codec in codecs)
+            {
+                if (excludeCodecTypes.Count(type => codec.mimeType.Contains(type)) > 0)
+                    continue;
+                availableCodecs.Add(codec);
+            }
+            dropdownAudioCodecs.AddOptions(availableCodecs.Select(codec =>
+                new Dropdown.OptionData(string.Format($"{codec.mimeType} {codec.clockRate} {codec.sdpFmtpLine.Replace(";", " ")}"))).ToList());
 
             // Update UI
             OnDeviceChanged(dropdownMicrophoneDevices.value);
 
             buttonStart.onClick.AddListener(OnStart);
             buttonCall.onClick.AddListener(OnCall);
+            buttonPause.onClick.AddListener(OnPause);
+            buttonResume.onClick.AddListener(OnResume);
             buttonHangup.onClick.AddListener(OnHangUp);
         }
 
@@ -67,10 +94,9 @@ namespace Unity.WebRTC
             }
             else
             {
-                m_clipInput = audioclipStereoSample;
+                var clipIndex = dropdownAudioClips.value;
+                m_clipInput = audioclipList[clipIndex];
             }
-            m_channelCount = m_clipInput.channels;
-
             inputAudioSource.loop = true;
             inputAudioSource.clip = m_clipInput;
             inputAudioSource.Play();
@@ -78,16 +104,19 @@ namespace Unity.WebRTC
             buttonStart.interactable = false;
             buttonCall.interactable = true;
             buttonHangup.interactable = true;
+            dropdownSpeakerMode.interactable = false;
         }
 
         void OnEnableMicrophone(bool enable)
         {
             dropdownMicrophoneDevices.interactable = enable;
+            dropdownAudioClips.interactable = !enable;
         }
 
         void OnCall()
         {
             buttonCall.interactable = false;
+            buttonPause.interactable = true;
 
             _receiveStream = new MediaStream();
             _receiveStream.OnAddTrack += OnAddTrack;
@@ -106,12 +135,50 @@ namespace Unity.WebRTC
                 OnTrack = e => _receiveStream.AddTrack(e.Track),
             };
 
-            var transceiver = _pc2.AddTransceiver(TrackKind.Audio);
-            transceiver.Direction = RTCRtpTransceiverDirection.RecvOnly;
+            var transceiver2 = _pc2.AddTransceiver(TrackKind.Audio);
+            transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
             m_audioTrack = new AudioStreamTrack(inputAudioSource);
 
             _pc1.AddTrack(m_audioTrack, _sendStream);
+
+            var transceiver1 = _pc1.GetTransceivers().First();
+            if (dropdownAudioCodecs.value == 0)
+            {
+                var error = transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
+                if(error != RTCErrorType.None)
+                    Debug.LogError(error);
+            }
+            else
+            {
+                var codec = availableCodecs[dropdownAudioCodecs.value - 1];
+                //Debug.Log(codec.channels);
+                //codec.channels = 1;
+                var error = transceiver1.SetCodecPreferences(new[] { codec });
+                if (error != RTCErrorType.None)
+                    Debug.LogError(error);
+
+            }
+        }
+
+        void OnPause()
+        {
+            var transceiver1 = _pc1.GetTransceivers().First();
+            var track = transceiver1.Sender.Track;
+            track.Enabled = false;
+
+            buttonResume.gameObject.SetActive(true);
+            buttonPause.gameObject.SetActive(false);
+        }
+
+        void OnResume()
+        {
+            var transceiver1 = _pc1.GetTransceivers().First();
+            var track = transceiver1.Sender.Track;
+            track.Enabled = true;
+
+            buttonResume.gameObject.SetActive(false);
+            buttonPause.gameObject.SetActive(true);
         }
 
         void OnAddTrack(MediaStreamTrackEvent e)
@@ -144,16 +211,29 @@ namespace Unity.WebRTC
             buttonStart.interactable = true;
             buttonCall.interactable = false;
             buttonHangup.interactable = false;
+            buttonPause.interactable = false;
+
+            buttonResume.gameObject.SetActive(false);
+            buttonPause.gameObject.SetActive(true);
+
+            dropdownSpeakerMode.interactable = true;
         }
 
         void OnDeviceChanged(int value)
         {
             m_deviceName = dropdownMicrophoneDevices.options[value].text;
             Microphone.GetDeviceCaps(m_deviceName, out int minFreq, out int maxFreq);
+        }
 
-            textChannelCount.text = string.Format($"Channel Count: {m_channelCount}");
-            textMinFrequency.text = string.Format($"Minimum frequency: {minFreq}");
-            textMaxFrequency.text = string.Format($"Maximum frequency: {maxFreq}");
+        void OnSpeakerModeChanged(int value)
+        {
+            var audioConf = AudioSettings.GetConfiguration();
+            audioConf.speakerMode = (AudioSpeakerMode)value;
+            Debug.Log(audioConf.speakerMode);
+            if (!AudioSettings.Reset(audioConf))
+            {
+                Debug.LogError("Failed changing Audio Settings");
+            }
         }
 
         private static RTCConfiguration GetSelectedSdpSemantics()
