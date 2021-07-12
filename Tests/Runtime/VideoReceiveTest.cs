@@ -117,6 +117,10 @@ namespace Unity.WebRTC.RuntimeTest
 
                 yield return new WaitForSeconds(0.1f);
 
+                test.component.RemoveTrack();
+
+                yield return test.component.Signaling();
+
                 test.component.Clear();
             }
 
@@ -177,6 +181,12 @@ namespace Unity.WebRTC.RuntimeTest
                     RecvVideoTrack = track;
                     RecvTexture = track.InitializeReceiver(width, height);
                 }
+
+                var stream = e.Streams.First();
+                stream.OnRemoveTrack = ev =>
+                {
+                    Debug.Log($"OnRemoveTrack {ev.Track.Id}");
+                };
             };
         }
         public void CreateVideoStreamTrack()
