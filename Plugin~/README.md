@@ -109,6 +109,9 @@ To build plugin, you need to execute command in the `BuildScripts~` folder.
 - [BuildScripts~/build_plugin_ios.sh](../BuildScripts~/build_plugin_ios.sh)
 - [BuildScripts~/build_plugin_linux.sh](../BuildScripts~/build_plugin_linux.sh)
 - [BuildScripts~/build_plugin_win.cmd](../BuildScripts~/build_plugin_win.cmd)
+    - Note: If you encounter `LNK1120`, `LNK2001` or `LNK2019` errors while running this build script, it's possible that you may need to open `Plugin~/build64/webrtc.sln` and build from within Visual Studio 2019 instead. You can also use it for development. ([#441](https://github.com/Unity-Technologies/com.unity.webrtc/issues/441))
+
+Alternatively, after the script has been run, a project ready for your IDE or other build tools is ready for you to use/build with (the name of the folder differs based on the target platform, check the script for more details).
 
 ## Debug
 
