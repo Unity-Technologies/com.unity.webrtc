@@ -177,7 +177,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="nativeSlice"></param>
         /// <param name="channels"></param>
-        public void SetData(NativeSlice<float> nativeSlice, int channels, int sampleRate)
+        public void SetData(ref NativeSlice<float> nativeSlice, int channels, int sampleRate)
         {
             unsafe
             {
