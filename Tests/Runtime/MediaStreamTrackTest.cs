@@ -41,7 +41,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void EqualIdWithAudioTrack()
         {
             var guid = Guid.NewGuid().ToString();
-            var track = new MediaStreamTrack(WebRTC.Context.CreateAudioTrack(guid));
+            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(guid));
             Assert.That(track, Is.Not.Null);
             Assert.That(track.Id, Is.EqualTo(guid));
             track.Dispose();
@@ -51,7 +51,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void EqualIdWithVideoTrack()
         {
             var guid = Guid.NewGuid().ToString();
-            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack(guid));
+            var track = new VideoStreamTrack(WebRTC.Context.CreateVideoTrack(guid));
             Assert.That(track, Is.Not.Null);
             Assert.That(track.Id, Is.EqualTo(guid));
             track.Dispose();

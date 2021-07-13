@@ -175,8 +175,7 @@ namespace Unity.WebRTC
                     UnityEngine.Object.DestroyImmediate(m_sourceTexture);
                 }
 
-                if(!s_tracks.TryRemove(self, out var value))
-                    Debug.LogError("Invalid Operation");
+                s_tracks.TryRemove(self, out var value);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
