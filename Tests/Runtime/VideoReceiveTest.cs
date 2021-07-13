@@ -92,7 +92,7 @@ namespace Unity.WebRTC.RuntimeTest
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest]
-        [Timeout(10000)]
+        [Timeout(30000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
