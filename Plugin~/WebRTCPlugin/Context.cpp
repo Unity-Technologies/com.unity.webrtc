@@ -356,12 +356,10 @@ namespace webrtc
     void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
     {
         m_mapMediaStreamObserver[stream] = std::make_shared<MediaStreamObserver>(stream);
-        stream->RegisterObserver(m_mapMediaStreamObserver[stream].get());
     }
 
     void Context::UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
     {
-        stream->UnregisterObserver(m_mapMediaStreamObserver[stream].get());
         m_mapMediaStreamObserver.erase(stream);
     }
 
