@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Unity.WebRTC.RuntimeTest
@@ -55,8 +56,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             for (int i = 0; i < 300; i++)
             {
-                NativeArray<float> nativeArray = new NativeArray<float>(2048, Allocator.Temp);
-                renderer.SetData(ref nativeArray);
+                float[] data = new float[2048];
+                renderer.SetData(data);
             }
             renderer.Dispose();
         }

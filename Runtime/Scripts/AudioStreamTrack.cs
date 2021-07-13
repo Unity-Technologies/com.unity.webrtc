@@ -129,7 +129,6 @@ namespace Unity.WebRTC
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
-            tracks.Add(this);
             WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
         }
 
@@ -145,7 +144,6 @@ namespace Unity.WebRTC
 
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                tracks.Remove(this);
                 if(_audioSourceRead != null)
                     Object.Destroy(_audioSourceRead);
                 _streamRenderer?.Dispose();
