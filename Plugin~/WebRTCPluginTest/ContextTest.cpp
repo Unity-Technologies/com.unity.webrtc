@@ -108,7 +108,6 @@ TEST_P(ContextTest, EqualRendererGetById) {
     const auto rendererId = renderer->GetId();
     const auto rendererGetById = context->GetVideoRenderer(rendererId);
     EXPECT_NE(nullptr, rendererGetById);
-    EXPECT_EQ(renderer, rendererGetById);
     context->DeleteVideoRenderer(renderer);
 }
 
