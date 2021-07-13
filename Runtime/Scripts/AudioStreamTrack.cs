@@ -157,6 +157,12 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nativeArray"></param>
+        /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
         public void SetData(ref NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
         {
             unsafe
