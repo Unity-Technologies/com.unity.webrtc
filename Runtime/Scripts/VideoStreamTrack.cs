@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -9,9 +9,8 @@ namespace Unity.WebRTC
 {
     public class VideoStreamTrack : MediaStreamTrack
     {
-        internal static Dictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
-            new Dictionary<IntPtr, WeakReference<VideoStreamTrack>>();
-        internal static object s_lockTracks = new object();
+        internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
+            new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
 
         bool m_needFlip = false;
         Texture m_sourceTexture;
@@ -139,10 +138,8 @@ namespace Unity.WebRTC
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());
 
-            lock (s_lockTracks)
-            {
-                s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
-            }
+            if(!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
+                throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -151,10 +148,8 @@ namespace Unity.WebRTC
         /// <param name="sourceTrack"></param>
         internal VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
-            lock (s_lockTracks)
-            {
-                s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
-            }
+            if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
+                throw new InvalidOperationException();
         }
 
         public override void Dispose()
@@ -180,13 +175,8 @@ namespace Unity.WebRTC
                     UnityEngine.Object.DestroyImmediate(m_sourceTexture);
                 }
 
-                if (s_tracks.ContainsKey(self))
-                {
-                    lock (s_lockTracks)
-                    {
-                        s_tracks.Remove(self);
-                    }
-                }
+                if(!s_tracks.TryRemove(self, out var value))
+                    Debug.LogError("Invalid Operation");
                 WebRTC.Context.DeleteMediaStreamTrack(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;

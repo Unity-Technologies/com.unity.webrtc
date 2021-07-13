@@ -7,8 +7,6 @@ namespace Unity.WebRTC
     {
         protected IntPtr self;
         protected bool disposed;
-        private bool enabled;
-        private TrackState readyState;
 
         /// <summary>
         ///
@@ -56,20 +54,7 @@ namespace Unity.WebRTC
 
         public virtual void Dispose()
         {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
-            {
-                WebRTC.Context.DeleteMediaStreamTrack(self);
-                WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
-            }
-
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            throw new NotImplementedException("Must to implements on the inherited class");
         }
 
         //Disassociate track from its source(video or audio), not for destroying the track

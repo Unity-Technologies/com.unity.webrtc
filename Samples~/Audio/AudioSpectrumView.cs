@@ -78,6 +78,7 @@ namespace Unity.WebRTC.Samples
             {
                 if(lines.Count > 0)
                     ResetLines(0);
+                clip = null;
                 return;
             }
 

@@ -55,8 +55,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             for (int i = 0; i < 300; i++)
             {
-                float[] data = new float[2048];
-                renderer.SetData(data);
+                NativeArray<float> nativeArray = new NativeArray<float>(2048, Allocator.Temp);
+                renderer.SetData(ref nativeArray);
             }
             renderer.Dispose();
         }

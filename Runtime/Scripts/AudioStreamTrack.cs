@@ -1,5 +1,6 @@
 using System;
-using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -98,9 +99,6 @@ namespace Unity.WebRTC
             }
         }
 
-        internal static List<AudioStreamTrack> tracks = new List<AudioStreamTrack>();
-
-        readonly int _sampleRate = 0;
         readonly AudioSourceRead _audioSourceRead;
 
         private AudioStreamRenderer _streamRenderer;
@@ -126,8 +124,7 @@ namespace Unity.WebRTC
 
             _audioSourceRead = source.gameObject.AddComponent<AudioSourceRead>();
             _audioSourceRead.hideFlags = HideFlags.HideInHierarchy;
-            _audioSourceRead.onAudioRead += OnSendAudio;
-            _sampleRate = Source.clip.frequency;
+            _audioSourceRead.onAudioRead += SetData;
         }
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
@@ -162,9 +159,40 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
-        private void OnSendAudio(float[] data, int channels)
+        public void SetData(ref NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
         {
-            NativeMethods.ProcessAudio(self, data, _sampleRate, channels, data.Length);
+            unsafe
+            {
+                void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
+                NativeMethods.ProcessAudio(self, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nativeSlice"></param>
+        /// <param name="channels"></param>
+        public void SetData(NativeSlice<float> nativeSlice, int channels, int sampleRate)
+        {
+            unsafe
+            {
+                void* ptr = nativeSlice.GetUnsafeReadOnlyPtr();
+                NativeMethods.ProcessAudio(self, (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="channels"></param>
+        public void SetData(float[] array, int channels, int sampleRate)
+        {
+            NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
+            var readonlyNativeArray = nativeArray.AsReadOnly();
+            SetData(ref readonlyNativeArray, channels, sampleRate);
+            nativeArray.Dispose();
         }
 
         private void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
