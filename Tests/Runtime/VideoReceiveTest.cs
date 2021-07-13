@@ -112,7 +112,7 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return test.component.Signaling();
 
                 var receiveVideoTrack = test.component.RecvVideoTrack;
-                yield return new WaitUntil(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized);
+                yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized, 5000);
                 Assert.That(test.component.RecvTexture, Is.Not.Null);
 
                 yield return new WaitForSeconds(0.1f);
@@ -120,6 +120,8 @@ namespace Unity.WebRTC.RuntimeTest
                 test.component.RemoveTrack();
 
                 yield return test.component.Signaling();
+
+                yield return new WaitUntilWithTimeout(() => test.component.IsCalledOnRemoveTrack, 5000);
 
                 test.component.Clear();
             }
@@ -142,6 +144,7 @@ namespace Unity.WebRTC.RuntimeTest
         public VideoStreamTrack RecvVideoTrack { get; private set; }
         public Texture SendTexture { get; private set; }
         public Texture RecvTexture { get; private set; }
+        public bool IsCalledOnRemoveTrack { get; private set; }
 
         RTCPeerConnection offerPc;
         RTCPeerConnection answerPc;
@@ -185,7 +188,7 @@ namespace Unity.WebRTC.RuntimeTest
                 var stream = e.Streams.First();
                 stream.OnRemoveTrack = ev =>
                 {
-                    Debug.Log($"OnRemoveTrack {ev.Track.Id}");
+                    IsCalledOnRemoveTrack = true;
                 };
             };
         }
@@ -202,6 +205,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         public void RemoveTrack()
         {
+            IsCalledOnRemoveTrack = false;
             offerPc.RemoveTrack(sender);
         }
 
