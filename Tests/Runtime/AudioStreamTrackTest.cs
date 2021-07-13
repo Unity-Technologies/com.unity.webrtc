@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Unity.Collections;
 using UnityEngine;
 
 namespace Unity.WebRTC.RuntimeTest
