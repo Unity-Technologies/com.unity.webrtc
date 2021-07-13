@@ -191,7 +191,12 @@ namespace webrtc
 
         rtc::InitializeSSL();
 
-        m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        m_workerThread->Invoke<void>(
+            RTC_FROM_HERE,
+            [this]()
+            {
+                m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+            });
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
@@ -225,6 +230,12 @@ namespace webrtc
             std::lock_guard<std::mutex> lock(mutex);
 
             m_peerConnectionFactory = nullptr;
+            m_workerThread->Invoke<void>(
+                RTC_FROM_HERE,
+                [this]()
+                {
+                    m_audioDevice = nullptr;
+                });
             m_audioTrack = nullptr;
 
             m_mapIdAndEncoder.clear();
