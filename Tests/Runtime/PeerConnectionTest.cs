@@ -896,7 +896,6 @@ namespace Unity.WebRTC.RuntimeTest
                 MediaStream receiveStream = e.Streams.First();
                 receiveStream.OnRemoveTrack = ev =>
                 {
-                    Debug.Log($"OnRemoveTrack {ev.Track.Id}");
                     isInvokeOnRemoveTrack = true;
                 };
             };
