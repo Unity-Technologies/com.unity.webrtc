@@ -821,6 +821,7 @@ namespace Unity.WebRTC.RuntimeTest
             }
             stream.Dispose();
             Object.DestroyImmediate(go);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
