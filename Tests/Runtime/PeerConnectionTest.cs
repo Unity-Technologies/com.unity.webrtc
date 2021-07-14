@@ -874,9 +874,17 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
             var stream = new MediaStream();
-            var track = new AudioStreamTrack();
-            stream.AddTrack(track);
-            RTCRtpSender sender = peer1.AddTrack(track, stream);
+
+            var audioTrack = new AudioStreamTrack();
+            stream.AddTrack(audioTrack);
+
+            var cam = new GameObject("cam").AddComponent<Camera>();
+            var videoTrack = cam.CaptureStreamTrack(1280, 720, 0);
+            stream.AddTrack(videoTrack);
+            yield return 0;
+
+            RTCRtpSender sender1 = peer1.AddTrack(audioTrack, stream);
+            RTCRtpSender sender2 = peer1.AddTrack(videoTrack, stream);
 
             bool isInvokeNegotiationNeeded1 = false;
             peer1.OnNegotiationNeeded = () => isInvokeNegotiationNeeded1 = true;
@@ -886,27 +894,46 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 Assert.That(e.Streams, Has.Count.EqualTo(1));
                 MediaStream receiveStream = e.Streams.First();
-                receiveStream.OnRemoveTrack = ev => isInvokeOnRemoveTrack = true;
+                receiveStream.OnRemoveTrack = ev =>
+                {
+                    isInvokeOnRemoveTrack = true;
+                };
             };
 
             yield return SignalingOffer(peer1, peer2);
 
-            peer1.RemoveTrack(sender);
+            peer1.RemoveTrack(sender1);
 
             var op9 = new WaitUntilWithTimeout(() => isInvokeNegotiationNeeded1, 5000);
             yield return op9;
             Assert.That(op9.IsCompleted, Is.True);
+            isInvokeNegotiationNeeded1 = false;
 
             yield return SignalingOffer(peer1, peer2);
 
             var op10 = new WaitUntilWithTimeout(() => isInvokeOnRemoveTrack, 5000);
             yield return op10;
             Assert.That(op10.IsCompleted, Is.True);
+            isInvokeOnRemoveTrack = false;
+
+            peer1.RemoveTrack(sender2);
+
+            var op11 = new WaitUntilWithTimeout(() => isInvokeNegotiationNeeded1, 5000);
+            yield return op11;
+            Assert.That(op11.IsCompleted, Is.True);
+
+            yield return SignalingOffer(peer1, peer2);
+
+            var op12 = new WaitUntilWithTimeout(() => isInvokeOnRemoveTrack, 5000);
+            yield return op12;
+            Assert.That(op12.IsCompleted, Is.True);
 
             stream.Dispose();
-            track.Dispose();
+            audioTrack.Dispose();
+            videoTrack.Dispose();
             peer1.Dispose();
             peer2.Dispose();
+            Object.DestroyImmediate(cam.gameObject);
         }
 
         private IEnumerator SignalingOffer(RTCPeerConnection @from, RTCPeerConnection to)
