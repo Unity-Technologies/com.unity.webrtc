@@ -93,7 +93,7 @@ namespace Unity.WebRTC.RuntimeTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         // ToDo: Investigating longer execution time
         [UnityTest]
-        [Timeout(30000)]
+        [Timeout(10000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
         [Ignore("sometimes happen Unhandled error message about NullRef on PcOnRemoveTrack")]
