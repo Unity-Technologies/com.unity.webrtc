@@ -642,12 +642,10 @@ namespace Unity.WebRTC
 
     public class RTCVideoSourceStats : RTCMediaSourceStats
     {
-        public uint width { get { return GetUnsignedInt("width"); } }
-        public uint height { get { return GetUnsignedInt("height"); } }
-        public uint frames { get { return GetUnsignedInt("frames"); } }
-        // RFC define double but chromium define uint32_t
-        // https://source.chromium.org/chromium/chromium/src/+/main:third_party/webrtc/api/stats/rtcstats_objects.h;l=645;bpv=0;bpt=1
-        public uint framesPerSecond { get { return GetUnsignedInt("framesPerSecond"); } }
+        public ulong width { get { return GetUnsignedLong("width"); } }
+        public ulong height { get { return GetUnsignedLong("height"); } }
+        public ulong frames { get { return GetUnsignedLong("frames"); } }
+        public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
 
         internal RTCVideoSourceStats(IntPtr ptr) : base(ptr)
         {
