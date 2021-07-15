@@ -140,6 +140,7 @@ test_targets:
     type: Unity::metal::macmini
     image: package-ci/mac:latest
     flavor: m1.mac
+    architecture: x64
     gfx_types:
       - name: metal
         extra-editor-arg: force-metal
@@ -160,6 +161,7 @@ test_targets:
     type: Unity::metal::devkit
     image: package-ci/mac:latest
     flavor: m1.mac
+    architecture: ARM64
     gfx_types:
       - name: metal
         extra-editor-arg: force-metal
@@ -392,7 +394,7 @@ build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name
     - unity-downloader-cli -c Editor -c {{ param.additional_component_arg }} -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=StandaloneOSX --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=x64 --artifacts_path=build/logs --scripting-backend={{ param.backend }} --build-only
+    - ./utr --suite=playmode --platform=StandaloneOSX --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture={{ target.architecture }} --artifacts_path=build/logs --scripting-backend={{ param.backend }} --build-only
   artifacts:
     players:
       paths:
