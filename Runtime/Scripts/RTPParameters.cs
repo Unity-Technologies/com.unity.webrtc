@@ -302,26 +302,6 @@ namespace Unity.WebRTC
             public bool adaptivePtime;
             public string? networkPriority;
             public string? priority;
-
-            // internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)
-            // {
-            //     active = parameter.active;
-            //     maxBitrate = parameter.maxBitrate;
-            //     minBitrate = parameter.minBitrate;
-            //     maxFramerate = parameter.maxFramerate;
-            //     scaleResolutionDownBy = parameter.scaleResolutionDownBy;
-            //     rid = parameter.rid;
-            // }
-            //
-            // internal void CopyInternal(ref RTCRtpEncodingParametersInternal instance)
-            // {
-            //     instance.active = active;
-            //     instance.maxBitrate = maxBitrate;
-            //     instance.minBitrate = minBitrate;
-            //     instance.maxFramerate = maxFramerate;
-            //     instance.scaleResolutionDownBy = scaleResolutionDownBy;
-            //     instance.rid = rid;
-            // }
         }
 
         public class RTCRtpCodecParameters
@@ -331,16 +311,6 @@ namespace Unity.WebRTC
             public long? clockRate;
             public short? channels;
             public string sdpFmtpLine;
-            // internal RTCRtpCodecParameters(ref RTCRtpCodecParametersInternal src)
-            // {
-            //     payloadType = src.payloadType;
-            //     if (src.mimeType != IntPtr.Zero)
-            //         mimeType = src.mimeType.AsAnsiStringWithFreeMem();
-            //     clockRate = src.clockRate;
-            //     channels = src.channels;
-            //     if (src.sdpFmtpLine != IntPtr.Zero)
-            //         sdpFmtpLine = src.sdpFmtpLine.AsAnsiStringWithFreeMem();
-            // }
         };
 
         public class RTCRtpHeaderExtensionParameters
@@ -348,25 +318,12 @@ namespace Unity.WebRTC
             public string uri;
             public ushort id;
             public bool encrypted;
-            // internal RTCRtpHeaderExtensionParameters(ref RTCRtpHeaderExtensionParametersInternal src)
-            // {
-            //     if (src.uri != IntPtr.Zero)
-            //         uri = src.uri.AsAnsiStringWithFreeMem();
-            //     id = src.id;
-            //     encrypted = src.encrypted;
-            // }
         }
 
         public class RTCRtcpParameters
         {
             public string cname;
             public bool reducedSize;
-            // internal RTCRtcpParameters(ref RTCRtcpParametersInternal src)
-            // {
-            //     if (src.cname != IntPtr.Zero)
-            //         cname = src.cname.AsAnsiStringWithFreeMem();
-            //     reducedSize = src.reducedSize;
-            // }
         }
 
         /// <summary>
@@ -377,15 +334,6 @@ namespace Unity.WebRTC
             public RTCRtpHeaderExtensionParameters[] headerExtensions;
             public RTCRtcpParameters rtcp;
             public RTCRtpCodecParameters[] codecs;
-
-            // internal RTCRtpParameters(ref RTCRtpSendParametersInternal src)
-            // {
-            //     headerExtensions = Array.ConvertAll(src.headerExtensions.ToArray(),
-            //         v => new RTCRtpHeaderExtensionParameters(ref v));
-            //     rtcp = new RTCRtcpParameters(ref src.rtcp);
-            //     codecs = Array.ConvertAll(src.codecs.ToArray(),
-            //         v => new RTCRtpCodecParameters(ref v));
-            // }
         }
 
         /// <summary>
@@ -395,27 +343,6 @@ namespace Unity.WebRTC
         {
             public RTCRtpEncodingParameters[] encodings;
             public string transactionId;
-
-            // internal RTCRtpSendParameters(ref RTCRtpSendParametersInternal src)
-            //     : base(ref src)
-            // {
-            //     this.encodings = Array.ConvertAll(src.encodings.ToArray(),
-            //         v => new RTCRtpEncodingParameters(ref v));
-            //     transactionId = src.transactionId.AsAnsiStringWithFreeMem();
-            // }
-            //
-            // internal void CreateInstance(out RTCRtpSendParametersInternal instance)
-            // {
-            //     instance = default;
-            //     RTCRtpEncodingParametersInternal[] encodings =
-            //         new RTCRtpEncodingParametersInternal[this.encodings.Length];
-            //     for(int i = 0; i < this.encodings.Length; i++)
-            //     {
-            //         this.encodings[i].CopyInternal(ref encodings[i]);
-            //     }
-            //     instance.encodings = encodings;
-            //     instance.transactionId = Marshal.StringToCoTaskMemAnsi(transactionId);
-            // }
         }
 
         /// <summary>
@@ -439,26 +366,6 @@ namespace Unity.WebRTC
             public int clockRate;
             public string mimeType;
             public string? sdpFmtpLine;
-
-            // internal RTCRtpCodecCapability(ref RTCRtpCodecCapabilityInternal v)
-            // {
-            //     mimeType = v.mimeType;
-            //     clockRate = v.clockRate;
-            //     channels = v.channels;
-            //     sdpFmtpLine = v.sdpFmtpLine;
-            // }
-            //
-            // internal RTCRtpCodecCapabilityInternal Cast()
-            // {
-            //     RTCRtpCodecCapabilityInternal instance = new RTCRtpCodecCapabilityInternal
-            //     {
-            //         channels = this.channels,
-            //         clockRate = this.clockRate,
-            //         mimeType = this.mimeType,
-            //         sdpFmtpLine = this.sdpFmtpLine
-            //     };
-            //     return instance;
-            // }
         }
 
         /// <summary>
@@ -467,11 +374,6 @@ namespace Unity.WebRTC
         public class RTCRtpHeaderExtensionCapability
         {
             public string uri;
-
-            // internal RTCRtpHeaderExtensionCapability(ref RTCRtpHeaderExtensionCapabilityInternal v)
-            // {
-            //     uri = v.uri.AsAnsiStringWithFreeMem();
-            // }
         }
 
         /// <summary>
@@ -481,12 +383,6 @@ namespace Unity.WebRTC
         {
             public RTCRtpCodecCapability[] codecs;
             public RTCRtpHeaderExtensionCapability[] headerExtensions;
-
-            // internal RTCRtpCapabilities(RTCRtpCapabilitiesInternal capabilities)
-            // {
-            //     codecs = Array.ConvertAll(capabilities.codecs.ToArray(), v => new RTCRtpCodecCapability(ref v));
-            //     headerExtensions = Array.ConvertAll(capabilities.extensionHeaders.ToArray(), v => new RTCRtpHeaderExtensionCapability(ref v));
-            // }
         }
 
         internal struct RTCRtpCodecCapabilityInternal
