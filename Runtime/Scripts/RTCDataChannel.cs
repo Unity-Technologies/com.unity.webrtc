@@ -194,7 +194,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
         static void DataChannelNativeOnMessage(IntPtr ptr, byte[] msg, int len)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCDataChannel channel)
@@ -202,12 +201,6 @@ namespace Unity.WebRTC
                     channel.onMessage?.Invoke(msg);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCDataChannel channel)
-            {
-                channel.onMessage?.Invoke(msg);
-            }
-#endif
         }
 
 #if UNITY_WEBGL
@@ -225,7 +218,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnOpen))]
         static void DataChannelNativeOnOpen(IntPtr ptr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCDataChannel channel)
@@ -233,18 +225,11 @@ namespace Unity.WebRTC
                     channel.onOpen?.Invoke();
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCDataChannel channel)
-            {
-                channel.onOpen?.Invoke();
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnClose))]
         static void DataChannelNativeOnClose(IntPtr ptr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCDataChannel channel)
@@ -252,12 +237,6 @@ namespace Unity.WebRTC
                     channel.onClose?.Invoke();
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCDataChannel channel)
-            {
-                channel.onClose?.Invoke();
-            }
-#endif
         }
 
         internal RTCDataChannel(IntPtr ptr, RTCPeerConnection peerConnection)

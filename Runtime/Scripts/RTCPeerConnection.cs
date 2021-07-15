@@ -341,7 +341,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceConnectionChange))]
         static void PCOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -349,18 +348,11 @@ namespace Unity.WebRTC
                     connection.OnIceConnectionChange?.Invoke(state);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnIceConnectionChange?.Invoke(state);
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnConnectionStateChange))]
         static void PCOnConnectionStateChange(IntPtr ptr, RTCPeerConnectionState state)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -368,18 +360,11 @@ namespace Unity.WebRTC
                     connection.OnConnectionStateChange?.Invoke(state);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnConnectionStateChange?.Invoke(state);
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceGatheringChange))]
         static void PCOnIceGatheringChange(IntPtr ptr, RTCIceGatheringState state)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -387,18 +372,11 @@ namespace Unity.WebRTC
                     connection.OnIceGatheringStateChange?.Invoke(state);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnIceGatheringStateChange?.Invoke(state);
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnNegotiationNeeded))]
         static void PCOnNegotiationNeeded(IntPtr ptr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -406,18 +384,11 @@ namespace Unity.WebRTC
                     connection.OnNegotiationNeeded?.Invoke();
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnNegotiationNeeded?.Invoke();
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnDataChannel))]
         static void PCOnDataChannel(IntPtr ptr, IntPtr ptrChannel)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -425,18 +396,11 @@ namespace Unity.WebRTC
                     connection.OnDataChannel?.Invoke(new RTCDataChannel(ptrChannel, connection));
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnDataChannel?.Invoke(new RTCDataChannel(ptrChannel, connection));
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnTrack))]
         static void PCOnTrack(IntPtr ptr, IntPtr transceiver)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -446,18 +410,12 @@ namespace Unity.WebRTC
                     connection.cacheTracks.Add(e.Track);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnTrack?.Invoke(new RTCTrackEvent(transceiver, connection));
-            }
-#endif
+
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnRemoveTrack))]
         static void PCOnRemoveTrack(IntPtr ptr, IntPtr receiverPtr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -467,14 +425,6 @@ namespace Unity.WebRTC
                     connection.cacheTracks.Remove(receiver.Track);
                 }
             });
-#else
-             if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                    {
-                        var receiver = WebRTC.FindOrCreate(
-                            receiverPtr, ptr => new RTCRtpReceiver(ptr, connection));
-                        connection.cacheTracks.Remove(receiver.Track);
-                    }
-#endif
         }
 
         /// <summary>
@@ -758,7 +708,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDSuccess))]
         static void OnSuccessCreateSessionDesc(IntPtr ptr, RTCSdpType type, string sdp)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -767,19 +716,11 @@ namespace Unity.WebRTC
                     connection.m_opSessionDesc.Done();
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.m_opSessionDesc.Desc = new RTCSessionDescription { sdp = sdp, type = type };
-                connection.m_opSessionDesc.Done();
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDFailure))]
         static void OnFailureCreateSessionDesc(IntPtr ptr, RTCErrorType type, string message)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -789,14 +730,6 @@ namespace Unity.WebRTC
                     connection.m_opSessionDesc.Done();
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.m_opSessionDesc.IsError = true;
-                connection.m_opSessionDesc.Error = new RTCError { errorType = type, message = message };
-                connection.m_opSessionDesc.Done();
-            }
-#endif
         }
 
         /// <summary>
@@ -1078,7 +1011,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
         static void OnSetSessionDescSuccess(IntPtr ptr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -1086,18 +1018,12 @@ namespace Unity.WebRTC
                     connection.OnSetSessionDescriptionSuccess();
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnSetSessionDescriptionSuccess();
-            }
-#endif
+
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
         static void OnSetSessionDescFailure(IntPtr ptr, RTCErrorType type, string message)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -1106,19 +1032,11 @@ namespace Unity.WebRTC
                     connection.OnSetSessionDescriptionFailure(error);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                RTCError error = new RTCError { errorType = type, message = message };
-                connection.OnSetSessionDescriptionFailure(error);
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
         static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr report)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
@@ -1126,12 +1044,6 @@ namespace Unity.WebRTC
                     connection.OnStatsDelivered(report);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                connection.OnStatsDelivered(report);
-            }
-#endif
         }
     }
 }

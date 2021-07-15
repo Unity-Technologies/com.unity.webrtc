@@ -654,11 +654,16 @@ namespace Unity.WebRTC
             }
             return false;
         }
-        
+
         internal static void Sync(IntPtr ptr, Action callback)
         {
+#if !UNITY_WEBGL
             s_syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
-        }                
+#else
+            callback();
+#endif
+        }
+
         internal static string GetModuleName()
         {
             return System.IO.Path.GetFileName(Lib);

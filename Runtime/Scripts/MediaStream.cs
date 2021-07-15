@@ -154,7 +154,6 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
         static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr trackPtr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
@@ -164,20 +163,11 @@ namespace Unity.WebRTC
                     stream.cacheTracks.Add(e.Track);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is MediaStream stream)
-            {
-                var e = new MediaStreamTrackEvent(trackPtr);
-                stream.onAddTrack?.Invoke(e);
-                stream.cacheTracks.Add(e.Track);
-            }
-#endif
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
         static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr trackPtr)
         {
-#if !UNITY_WEBGL
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
@@ -187,14 +177,6 @@ namespace Unity.WebRTC
                     stream.cacheTracks.Remove(e.Track);
                 }
             });
-#else
-            if (WebRTC.Table[ptr] is MediaStream stream)
-            {
-                var e = new MediaStreamTrackEvent(trackPtr);
-                stream.onRemoveTrack?.Invoke(e);
-                stream.cacheTracks.Remove(e.Track);
-            }
-#endif
         }
     }
 }
