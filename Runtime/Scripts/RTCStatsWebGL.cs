@@ -158,8 +158,8 @@ namespace Unity.WebRTC
         Csrc,
         PeerConnection,
         DataChannel,
-        Stream,             // obsolete?
-        Track,              // obsolete?
+        Stream,
+        Track,
         Transceiver,
         Sender,
         Receiver,
@@ -212,14 +212,6 @@ namespace Unity.WebRTC
         Closed
     };
 
-    //public enum RTCDataChannelState
-    //{
-    //    Connecting,
-    //    Open,
-    //    Closing,
-    //    Closed
-    //};
-
     public enum RTCPriorityType
     {
         VeryLow,
@@ -244,17 +236,10 @@ namespace Unity.WebRTC
         Failed
     };
 
-    //public enum RTCIceCandidateType
-    //{
-    //    Host,
-    //    Srflx,
-    //    Prflx,
-    //    Relay
-    //};
-
     [Serializable]
     public class RTCStats
     {
+        // All 6 fields are displayed/shown in StatsSample, not very nice
         public double timestamp;
         public RTCStatsType type;
         public string id;
