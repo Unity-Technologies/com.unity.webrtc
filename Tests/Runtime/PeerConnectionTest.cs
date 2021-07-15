@@ -875,6 +875,7 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
             var stream = new MediaStream();
+            MediaStream receiveStream = null;
             var track = new AudioStreamTrack();
             stream.AddTrack(track);
             RTCRtpSender sender = peer1.AddTrack(track, stream);
@@ -886,7 +887,7 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.OnTrack = e =>
             {
                 Assert.That(e.Streams, Has.Count.EqualTo(1));
-                MediaStream receiveStream = e.Streams.First();
+                receiveStream = e.Streams.First();
                 receiveStream.OnRemoveTrack = ev => isInvokeOnRemoveTrack = true;
             };
 
@@ -905,6 +906,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(op10.IsCompleted, Is.True);
 
             stream.Dispose();
+            receiveStream.Dispose();
             track.Dispose();
             peer1.Dispose();
             peer2.Dispose();
