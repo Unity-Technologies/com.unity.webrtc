@@ -412,7 +412,7 @@ extern "C"
         delegateSetResolution = func;
     }
 
-    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType)
+    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType, bool forTest)
     {
         auto ctx = ContextManager::GetInstance()->GetContext(uid);
         if (ctx != nullptr)
@@ -420,7 +420,7 @@ extern "C"
             DebugLog("Already created context with ID %d", uid);
             return ctx;
         }
-        ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType);
+        ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType, forTest);
         return ctx;
     }
 
@@ -969,6 +969,11 @@ extern "C"
         obj->RegisterOnTrack(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnRemoveTrack(PeerConnectionObject* obj, DelegateOnRemoveTrack callback)
+    {
+        obj->RegisterOnRemoveTrack(callback);
+    }
+
     UNITY_INTERFACE_EXPORT bool TransceiverGetCurrentDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection* direction)
     {
         if (transceiver->current_direction().has_value())
@@ -1022,7 +1027,10 @@ extern "C"
             _codecs[i].num_channels = ConvertOptional(codecs[i].channels);
             _codecs[i].parameters = ConvertSdp(codecs[i].sdpFmtpLine);
         }
-        return transceiver->SetCodecPreferences(_codecs).type();
+        auto error = transceiver->SetCodecPreferences(_codecs);
+        if (error.type() != RTCErrorType::NONE)
+            RTC_LOG(LS_ERROR) << error.message();
+        return error.type();
     }
 
     UNITY_INTERFACE_EXPORT RtpReceiverInterface* TransceiverGetReceiver(RtpTransceiverInterface* transceiver)

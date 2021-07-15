@@ -2,6 +2,9 @@
 #include "WebRTCPlugin.h"
 #include "Context.h"
 
+#include "UnityAudioEncoderFactory.h"
+#include "UnityAudioDecoderFactory.h"
+
 #if defined(UNITY_WIN) || defined(UNITY_LINUX)
 #include "Codec/NvCodec/NvEncoder.h"
 #endif
@@ -33,14 +36,14 @@ namespace webrtc
         return nullptr;
     }
 
-    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType)
+    Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType, bool forTest)
     {
         auto it = s_instance.m_contexts.find(uid);
         if (it != s_instance.m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
-        auto ctx = new Context(uid, encoderType);
+        auto ctx = new Context(uid, encoderType, forTest);
         s_instance.m_contexts[uid].reset(ctx);
         return ctx;
     }
@@ -177,7 +180,7 @@ namespace webrtc
     }
 #pragma warning(pop)
 
-    Context::Context(int uid, UnityEncoderType encoderType)
+    Context::Context(int uid, UnityEncoderType encoderType, bool forTest)
         : m_uid(uid)
         , m_encoderType(encoderType)
     {
@@ -188,7 +191,12 @@ namespace webrtc
 
         rtc::InitializeSSL();
 
-        m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+        m_workerThread->Invoke<void>(
+            RTC_FROM_HERE,
+            [this]()
+            {
+                m_audioDevice = new rtc::RefCountedObject<DummyAudioDevice>();
+            });
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
@@ -197,16 +205,19 @@ namespace webrtc
 
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
             m_encoderType == UnityEncoderType::UnityEncoderHardware ?
-            std::make_unique<UnityVideoDecoderFactory>() :
+            std::make_unique<UnityVideoDecoderFactory>(forTest) :
             webrtc::CreateBuiltinVideoDecoderFactory();
+
+        rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
+        rtc::scoped_refptr<AudioDecoderFactory>  audioDecoderFactory = CreateAudioDecoderFactory();
 
         m_peerConnectionFactory = CreatePeerConnectionFactory(
                                 m_workerThread.get(),
                                 m_workerThread.get(),
                                 m_signalingThread.get(),
                                 m_audioDevice,
-                                webrtc::CreateAudioEncoderFactory<webrtc::AudioEncoderOpus>(),
-                                webrtc::CreateAudioDecoderFactory<webrtc::AudioDecoderOpus>(),
+                                audioEncoderFactory,
+                                audioDecoderFactory,
                                 std::move(videoEncoderFactory),
                                 std::move(videoDecoderFactory),
                                 nullptr,
@@ -219,6 +230,12 @@ namespace webrtc
             std::lock_guard<std::mutex> lock(mutex);
 
             m_peerConnectionFactory = nullptr;
+            m_workerThread->Invoke<void>(
+                RTC_FROM_HERE,
+                [this]()
+                {
+                    m_audioDevice = nullptr;
+                });
             m_audioTrack = nullptr;
 
             m_mapIdAndEncoder.clear();
@@ -339,12 +356,10 @@ namespace webrtc
     void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
     {
         m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream);
-        stream->RegisterObserver(m_mapMediaStreamObserver[stream].get());
     }
 
     void Context::UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
     {
-        stream->UnregisterObserver(m_mapMediaStreamObserver[stream].get());
         m_mapMediaStreamObserver.erase(stream);
     }
 
@@ -504,14 +519,14 @@ namespace webrtc
     UnityVideoRenderer* Context::CreateVideoRenderer()
     {
         auto rendererId = GenerateRendererId();
-        auto renderer = std::make_unique<UnityVideoRenderer>(rendererId);
-        m_mapVideoRenderer[rendererId] = std::move(renderer);
+        auto renderer = std::make_shared<UnityVideoRenderer>(rendererId);
+        m_mapVideoRenderer[rendererId] = renderer;
         return m_mapVideoRenderer[rendererId].get();
     }
 
-    UnityVideoRenderer* Context::GetVideoRenderer(uint32_t id)
+    std::shared_ptr<UnityVideoRenderer> Context::GetVideoRenderer(uint32_t id)
     {
-        return m_mapVideoRenderer[id].get();
+        return m_mapVideoRenderer[id];
     }
 
     void Context::DeleteVideoRenderer(UnityVideoRenderer* renderer)

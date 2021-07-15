@@ -234,14 +234,23 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.MediaSource:
                     var mediaSourceStats = stats as RTCMediaSourceStats;
                     Assert.NotNull(mediaSourceStats);
-                    Assert.AreEqual(6, mediaSourceStats.Dict.Count);
                     Assert.IsNotEmpty(mediaSourceStats.trackIdentifier);
                     Assert.IsNotEmpty(mediaSourceStats.kind);
-                    Ignore.Pass(mediaSourceStats.width);
-                    Ignore.Pass(mediaSourceStats.height);
-                    Ignore.Pass(mediaSourceStats.frames);
-                    Ignore.Pass(mediaSourceStats.framesPerSecond);
-
+                    if (mediaSourceStats is RTCVideoSourceStats videoSourceStats)
+                    {
+                        Assert.AreEqual(6, videoSourceStats.Dict.Count);
+                        Ignore.Pass(videoSourceStats.width);
+                        Ignore.Pass(videoSourceStats.height);
+                        Ignore.Pass(videoSourceStats.frames);
+                        Ignore.Pass(videoSourceStats.framesPerSecond);
+                    }
+                    if (mediaSourceStats is RTCAudioSourceStats audioSourceStats)
+                    {
+                        Assert.AreEqual(5, audioSourceStats.Dict.Count);
+                        Ignore.Pass(audioSourceStats.audioLevel);
+                        Ignore.Pass(audioSourceStats.totalAudioEnergy);
+                        Ignore.Pass(audioSourceStats.totalSamplesDuration);
+                    }
                     break;
                 case RTCStatsType.Track:
                     var mediaStreamTrackStats = stats as RTCMediaStreamTrackStats;

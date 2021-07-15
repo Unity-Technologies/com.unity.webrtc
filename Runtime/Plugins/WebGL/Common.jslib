@@ -150,6 +150,7 @@ var UnityWebRTCCommon = {
   $uwevt_DCOnClose: null,
   $uwevt_OnSetSessionDescSuccess: null,
   $uwevt_OnSetSessionDescFailure: null,
+  $uwevt_OnRemoveTrack: null,
   $uwevt_OnSuccessCreateSessionDesc: null,
   $uwevt_OnFailureCreateSessionDesc: null,
   $uwevt_OnStatsDeliveredCallback: null,
@@ -199,6 +200,7 @@ autoAddDeps(UnityWebRTCCommon, '$uwevt_DCOnOpen');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_DCOnClose');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnSetSessionDescSuccess');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnSetSessionDescFailure');
+autoAddDeps(UnityWebRTCCommon, '$uwevt_OnRemoveTrack');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnSuccessCreateSessionDesc');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnFailureCreateSessionDesc');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnStatsDeliveredCallback');
