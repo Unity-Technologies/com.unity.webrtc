@@ -347,7 +347,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
-        public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true)
+        public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true, bool enableNativeLog = false)
         {
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
@@ -383,7 +383,7 @@ namespace Unity.WebRTC
                 }
             }
 
-            NativeMethods.RegisterDebugLog(DebugLog);
+            NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
@@ -438,7 +438,7 @@ namespace Unity.WebRTC
                 s_context = null;
             }
             s_syncContext = null;
-            NativeMethods.RegisterDebugLog(null);
+            NativeMethods.RegisterDebugLog(null, false);
 
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
@@ -787,7 +787,7 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
-        public static extern void RegisterDebugLog(DelegateDebugLog func);
+        public static extern void RegisterDebugLog(DelegateDebugLog func, [MarshalAs(UnmanagedType.U1)] bool enableNativeLog);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreate(int uid, EncoderType encoderType, [MarshalAs(UnmanagedType.U1)] bool forTest);
         [DllImport(WebRTC.Lib)]
