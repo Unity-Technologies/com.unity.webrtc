@@ -633,8 +633,8 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
 #else
-            // TODO : Handle RTCOfferAnswerOptions rather than booleans
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), options.iceRestart, options.voiceActivityDetection);
+            string offer = JsonUtility.ToJson(options);
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), offer);
 #endif
             return m_opSessionDesc;
         }
@@ -645,7 +645,8 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
 #else
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), RTCOfferAnswerOptions.Default.iceRestart, RTCOfferAnswerOptions.Default.voiceActivityDetection);
+            string offer = JsonUtility.ToJson(RTCOfferAnswerOptions.Default);
+            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), offer);
 #endif
             return m_opSessionDesc;
         }
@@ -662,7 +663,8 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
 #else
-            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), options.iceRestart);
+            string answer = JsonUtility.ToJson(options);
+            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), answer);
 #endif
             return m_opSessionDesc;
         }
@@ -673,7 +675,8 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
 #else
-            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), RTCOfferAnswerOptions.Default.iceRestart);
+            string answer = JsonUtility.ToJson(RTCOfferAnswerOptions.Default);
+            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), answer);
 #endif
             return m_opSessionDesc;
         }

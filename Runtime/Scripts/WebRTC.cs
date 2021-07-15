@@ -944,9 +944,9 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
 #else
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateOffer(IntPtr ptr, bool iceRestart, bool voiceActivation);
+        public static extern void PeerConnectionCreateOffer(IntPtr ptr, string options);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, bool iceRestart);
+        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, string options);
 #endif
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackCreateSD(IntPtr ptr, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure);

@@ -445,12 +445,11 @@ var UnityWebRTCPeerConnection = {
       return true;
   },
 
-  PeerConnectionCreateOffer: function (peerPtr, iceRestart, voiceActivityDetection) {
+  PeerConnectionCreateOffer: function (peerPtr, optionsPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateOffer', 'peer')) return;
     var peer = UWManaged[peerPtr];
-    var options = {
-      iceRestart: !!iceRestart
-    };
+    var options = Pointer_stringify(optionsPtr);
+    var options = JSON.parse(options);
     peer.createOffer(options).then(function (offer) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionCreateOffer', peer.label + ':' + JSON.stringify(options) + ':' + offer.type);
       uwcom_addManageObj(offer);
@@ -464,12 +463,11 @@ var UnityWebRTCPeerConnection = {
     });
   },
 
-  PeerConnectionCreateAnswer: function (peerPtr, iceRestart) {
+  PeerConnectionCreateAnswer: function (peerPtr, optionsPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateAnswer', 'peer')) return;
     var peer = UWManaged[peerPtr];
-    var options = {
-      iceRestart: !!iceRestart
-    };
+    var options = Pointer_stringify(optionsPtr);
+    var options = JSON.parse(options);
     peer.createAnswer(options).then(function (answer) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionCreateAnswer', peer.label + ':' + JSON.stringify(options) + ':' + answer.type);
       uwcom_addManageObj(answer);
