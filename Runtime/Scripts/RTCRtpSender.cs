@@ -123,9 +123,9 @@ namespace Unity.WebRTC
             return error;
 #else
             string json = JsonConvert.SerializeObject(parameters, Formatting.None, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
-            NativeMethods.SenderSetParameters(self, json);
 
-            //TODO
+            //TODO Get correct RTCErrorType from jslib.
+            NativeMethods.SenderSetParameters(self, json);
             return RTCErrorType.None;
 #endif
         }

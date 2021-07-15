@@ -28,7 +28,7 @@ var UnityWebRTCRtpSender = {
     var parametersJson = Pointer_stringify(parametersJsonPtr);
     var parameters = JSON.parse(parametersJson);
     sender.setParameters(parameters).then(function () {
-      // TODO 非同期
+      // TODO Send correct RTCErrorType.
     });
   },
 
