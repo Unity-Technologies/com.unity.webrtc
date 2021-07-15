@@ -20,6 +20,15 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
+        }
+
         ~RTCRtpReceiver()
         {
             this.Dispose();
@@ -64,7 +73,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                IntPtr ptr = NativeMethods.ReceiverGetTrack(self);
+                IntPtr ptr = NativeMethods.ReceiverGetTrack(GetSelfOrThrow());
                 if (ptr == IntPtr.Zero)
                     return null;
                 return WebRTC.FindOrCreate(ptr, MediaStreamTrack.Create);
@@ -75,7 +84,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                IntPtr ptrStreams = NativeMethods.ReceiverGetStreams(self, out ulong length);
+                IntPtr ptrStreams = NativeMethods.ReceiverGetStreams(GetSelfOrThrow(), out ulong length);
                 return WebRTC.Deserialize(ptrStreams, (int)length, ptr => new MediaStream(ptr));
             }
         }

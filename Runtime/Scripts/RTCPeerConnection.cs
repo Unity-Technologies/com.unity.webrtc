@@ -100,7 +100,6 @@ namespace Unity.WebRTC
                 // Dispose of MediaStreamTrack when disposing of RTCRtpReceiver.
                 // On the other hand, do not dispose a track when disposing of RTCRtpSender.
                 transceiver.Receiver?.Track?.Dispose();
-
                 transceiver.Receiver?.Dispose();
                 transceiver.Sender?.Dispose();
                 transceiver.Dispose();
@@ -549,9 +548,8 @@ namespace Unity.WebRTC
         /// <seealso cref="AddTrack"/>
         public void RemoveTrack(RTCRtpSender sender)
         {
-            NativeMethods.PeerConnectionRemoveTrack(
-                GetSelfOrThrow(), sender.self);
             cacheTracks.Remove(sender.Track);
+            NativeMethods.PeerConnectionRemoveTrack(GetSelfOrThrow(), sender.self);
         }
 
         /// <summary>
