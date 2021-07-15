@@ -7,7 +7,7 @@ namespace Unity.WebRTC
     /// </summary>
     /// <param name="data"></param>
     /// <param name="channels"></param>
-    delegate void AudioReadEventHandler(float[] data, int channels);
+    delegate void AudioReadEventHandler(float[] data, int channels, int sampleRate);
 
     /// <summary>
     /// 
@@ -17,9 +17,16 @@ namespace Unity.WebRTC
     {
         public event AudioReadEventHandler onAudioRead;
 
+        private int sampleRate;
+
+        void OnEnable()
+        {
+            sampleRate = GetComponent<AudioSource>().clip.frequency;
+        }
+
         void OnAudioFilterRead(float[] data, int channels)
         {
-            onAudioRead?.Invoke(data, channels);
+            onAudioRead?.Invoke(data, channels, sampleRate);
         }
     }
 }

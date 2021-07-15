@@ -316,9 +316,6 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
-            float[] data = new float[2048];
-            NativeMethods.ProcessAudio(track, data,48000, 2, data.Length);
-
             NativeMethods.ContextDeleteMediaStreamTrack(context, track);
             NativeMethods.PeerConnectionRemoveTrack(peer, sender);
             NativeMethods.ContextDeleteMediaStream(context, stream);

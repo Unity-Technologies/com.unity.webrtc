@@ -407,20 +407,17 @@ namespace Unity.WebRTC
                 // Wait until all frame rendering is done
                 yield return new WaitForEndOfFrame();
                 {
-                    lock (VideoStreamTrack.s_lockTracks)
+                    foreach (var reference in VideoStreamTrack.s_tracks.Values)
                     {
-                        foreach (var reference in VideoStreamTrack.s_tracks.Values)
+                        if (!reference.TryGetTarget(out var track))
+                            continue;
+                        if (track.IsEncoderInitialized)
                         {
-                            if (!reference.TryGetTarget(out var track))
-                                continue;
-                            if (track.IsEncoderInitialized)
-                            {
-                                track.Update();
-                            }
-                            else if (track.IsDecoderInitialized)
-                            {
-                                track.UpdateReceiveTexture();
-                            }
+                            track.Update();
+                        }
+                        else if (track.IsDecoderInitialized)
+                        {
+                            track.UpdateReceiveTexture();
                         }
                     }
                 }
@@ -1029,7 +1026,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern void ProcessAudio(IntPtr track, float[] data, int sampleRate, int channels, int frames);
+        public static extern void ProcessAudio(IntPtr track, IntPtr array, int sampleRate, int channels, int frames);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);
         [DllImport(WebRTC.Lib)]
