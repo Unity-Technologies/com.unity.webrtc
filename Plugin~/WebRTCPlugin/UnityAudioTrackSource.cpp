@@ -23,50 +23,54 @@ rtc::scoped_refptr<UnityAudioTrackSource> UnityAudioTrackSource::Create(
     return source;
 }
 
-void UnityAudioTrackSource::AddSink(::webrtc::AudioTrackSinkInterface* sink)
+void UnityAudioTrackSource::AddSink(AudioTrackSinkInterface* sink)
 {
-    m_pAudioTrackSinkInterface = sink;
+    _arrSink.push_back(sink);
 }
-void UnityAudioTrackSource::RemoveSink(::webrtc::AudioTrackSinkInterface* sink)
+void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
 {
-    m_pAudioTrackSinkInterface = nullptr;
+    auto i= std::find(_arrSink.begin(), _arrSink.end(), sink);
+    if (i != _arrSink.end())
+        _arrSink.erase(i);
 }
 
 void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
 {
-    if (!m_pAudioTrackSinkInterface)
+    if (_arrSink.empty())
         return;
 
     for (size_t i = 0; i < nNumFrames; i++)
     {
-        convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
+        _convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
     }
 
     // eg.  80 for 8KHz and 160 for 16kHz
     size_t nNumFramesFor10ms = nSampleRate / 100;
-    size_t size = convertedAudioData.size() / (nNumFramesFor10ms * nNumChannels);
+    size_t size = _convertedAudioData.size() / (nNumFramesFor10ms * nNumChannels);
     size_t nBitPerSample = sizeof(int16_t) * 8;
-    for (size_t i = 0; i < size; i++)
+
+    for(auto sink : _arrSink)
     {
-        m_pAudioTrackSinkInterface->OnData(
-            &convertedAudioData.data()[i * nNumFramesFor10ms * nNumChannels],
-            nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
+        for (size_t i = 0; i < size; i++)
+        {
+            sink->OnData(
+                &_convertedAudioData.data()[i * nNumFramesFor10ms * nNumChannels],
+                nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
+        }
     }
 
     // pop processed buffer, remained buffer will be processed the next time.
-    convertedAudioData.erase(
-        convertedAudioData.begin(),
-        convertedAudioData.begin() + nNumFramesFor10ms * nNumChannels * size);
+    _convertedAudioData.erase(
+        _convertedAudioData.begin(),
+        _convertedAudioData.begin() + nNumFramesFor10ms * nNumChannels * size);
 }
 
 UnityAudioTrackSource::UnityAudioTrackSource(const std::string& sTrackName)
-    : m_sTrackName(sTrackName)
-    , m_pAudioTrackSinkInterface(nullptr)
+    : _sTrackName(sTrackName)
 {
 }
 UnityAudioTrackSource::UnityAudioTrackSource(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
-    : m_sTrackName(sTrackName)
-    , m_pAudioTrackSinkInterface(nullptr)
+    : _sTrackName(sTrackName)
 {
 }
 

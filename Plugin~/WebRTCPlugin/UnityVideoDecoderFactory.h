@@ -12,9 +12,10 @@ namespace webrtc
     public:
         std::vector<webrtc::SdpVideoFormat> GetSupportedFormats() const override;
         std::unique_ptr<webrtc::VideoDecoder> CreateVideoDecoder(const webrtc::SdpVideoFormat& format) override;
-        UnityVideoDecoderFactory();
+        UnityVideoDecoderFactory(bool forTest);
     private:
         const std::unique_ptr<VideoDecoderFactory> internal_decoder_factory_;
+        bool forTest_;
     };
 }
 }

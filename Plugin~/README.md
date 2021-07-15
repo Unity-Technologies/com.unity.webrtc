@@ -109,6 +109,17 @@ To build plugin, you need to execute command in the `BuildScripts~` folder.
 - [BuildScripts~/build_plugin_ios.sh](../BuildScripts~/build_plugin_ios.sh)
 - [BuildScripts~/build_plugin_linux.sh](../BuildScripts~/build_plugin_linux.sh)
 - [BuildScripts~/build_plugin_win.cmd](../BuildScripts~/build_plugin_win.cmd)
+    - Note: If you encounter `LNK1120`, `LNK2001` or `LNK2019` errors while running this build script, it's possible that you may need to open `Plugin~/build64/webrtc.sln` and build from within Visual Studio 2019 instead. You can also use it for development. ([#441](https://github.com/Unity-Technologies/com.unity.webrtc/issues/441))
+
+Alternatively, after the script has been run, a project ready for your IDE or other build tools is ready for you to use/build with (the name of the folder differs based on the target platform, check the script for more details).
+
+### Deploying the Plugin
+
+When you run the build, `webrtc.dll` will be placed in `Packages\com.unity.webrtc\Runtime\Plugins\x86_64`. You should then be able to verify the following settings in the Unity Inspector window.
+
+**WARNING:** If "Load on startup" is not ticked, your editor will crash when running your project. This may become unticked after you make a change to the plugin. ([#444](https://github.com/Unity-Technologies/com.unity.webrtc/issues/444))
+
+<img src="../Documentation~/images/inspector_webrtc_plugin.png" width=400 align=center>
 
 ## Debug
 
@@ -117,9 +128,3 @@ The `WebRTC` project properties must be adjusted to match your environment in or
 Set the Unity.exe path under `Command` and the project path under `Command Arguments`. Once set, during debugging the Unity Editor will run and breakpoints will be enabled.  
 
 <img src="../Documentation~/images/command_config_vs2017.png" width=600 align=center>
-
-### Deploying the Plugin
-
-When you run the build, `webrtc.dll` will be placed in `Packages\com.unity.webrtc\Runtime\Plugins\x86_64`. You should then be able to verify the following settings in the Unity Inspector window. 
-
-<img src="../Documentation~/images/inspector_webrtc_plugin.png" width=400 align=center>

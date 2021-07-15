@@ -115,6 +115,9 @@
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
+// audio codec isac
+#define WEBRTC_USE_BUILTIN_ISAC_FLOAT 1
+
 namespace unity
 {
 namespace webrtc

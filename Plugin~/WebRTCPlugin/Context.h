@@ -26,7 +26,7 @@ namespace webrtc
         static ContextManager* GetInstance() { return &s_instance; }
      
         Context* GetContext(int uid) const;
-        Context* CreateContext(int uid, UnityEncoderType encoderType);
+        Context* CreateContext(int uid, UnityEncoderType encoderType, bool forTest);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
         bool Exists(Context* context);
@@ -58,7 +58,7 @@ namespace webrtc
     {
     public:
         
-        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware);
+        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware, bool forTest = false);
         ~Context();
 
         // Utility
@@ -101,7 +101,7 @@ namespace webrtc
 
         // Renderer
         UnityVideoRenderer* CreateVideoRenderer();
-        UnityVideoRenderer* GetVideoRenderer(uint32_t id);
+        std::shared_ptr<UnityVideoRenderer> GetVideoRenderer(uint32_t id);
         void DeleteVideoRenderer(UnityVideoRenderer* renderer);
 
         // RtpSender
@@ -139,7 +139,7 @@ namespace webrtc
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
-        std::map<const uint32_t, std::unique_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
+        std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
 
         std::map<webrtc::AudioTrackInterface*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
 
