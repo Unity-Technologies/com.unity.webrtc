@@ -228,11 +228,11 @@ elseif(Android)
       EGL
   )
   target_compile_options(WebRTCLib
-    PUBLIC
+    PUBLIC 
       -fno-lto -fno-rtti
   )
 
-  # Linker excludes unused symbols from the shared library
+  # Linker excludes unused symbols from the shared library 
   # when linking the archive file (libwebrtc.a).
   file(READ "${CMAKE_SOURCE_DIR}/tools/android/jni_symbols.txt" JNI_SYMBOLS)
   string(REPLACE "\n" ";" JNI_SYMBOLS ${JNI_SYMBOLS})

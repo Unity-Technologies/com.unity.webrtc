@@ -495,7 +495,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT void PeerConnectionRestartIce(PeerConnectionObject* obj)
     {
         obj->connection->RestartIce();
-    }
+    } 
 
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionAddTrack(
         PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId, RtpSenderInterface** sender)
