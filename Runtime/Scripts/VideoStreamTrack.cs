@@ -35,24 +35,17 @@ namespace Unity.WebRTC
             return tex;
         }
 
-
-#if !UNITY_WEBGL
         internal VideoStreamTrack(Texture source, RenderTexture dest, int width, int height)
+#if !UNITY_WEBGL
             : this(dest.GetNativeTexturePtr(), width, height, source.graphicsFormat)
-        {
-            m_needFlip = true;
-            m_sourceTexture = source;
-            m_destTexture = dest;
-        }
 #else
-        internal VideoStreamTrack(Texture source, RenderTexture dest, int width,int height)
             : this(source.GetNativeTexturePtr(), dest.GetNativeTexturePtr(), width, height)
+#endif
         {
             m_needFlip = true;
             m_sourceTexture = source;
             m_destTexture = dest;
         }
-#endif
 
         /// <summary>
         /// note:
@@ -192,7 +185,6 @@ namespace Unity.WebRTC
                 s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
             }
         }
-
 #else
         /// <summary>
         /// Creates a new VideoStream object.
@@ -324,9 +316,7 @@ namespace Unity.WebRTC
         {
             self = ptr;
             this.track = track;
-#if !UNITY_WEBGL
             NativeMethods.VideoTrackAddOrUpdateSink(track.GetSelfOrThrow(), self);
-#endif
             WebRTC.Table.Add(self, this);
         }
 
@@ -345,12 +335,10 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero)
             {
                 IntPtr trackPtr = track.GetSelfOrThrow();
-#if !UNITY_WEBGL
                 if (trackPtr != IntPtr.Zero)
                 {
                     NativeMethods.VideoTrackRemoveSink(trackPtr, self);
                 }
-#endif
 
                 WebRTC.Context.DeleteVideoRenderer(self);
                 WebRTC.Table.Remove(self);

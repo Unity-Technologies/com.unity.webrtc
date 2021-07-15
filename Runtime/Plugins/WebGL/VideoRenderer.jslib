@@ -42,6 +42,14 @@ var UnityWebRTCVideoRenderer = {
     GLctx.texParameteri(GLctx.TEXTURE_2D, GLctx.TEXTURE_WRAP_S, GLctx.CLAMP_TO_EDGE);
     GLctx.texParameteri(GLctx.TEXTURE_2D, GLctx.TEXTURE_WRAP_T, GLctx.CLAMP_TO_EDGE);
     GLctx.bindTexture(GLctx.TEXTURE_2D, null);
+  },
+
+  VideoTrackAddOrUpdateSink: function(trackPtr, sinkPtr){
+
+  },
+
+  VideoTrackRemoveSink: function(trackPtr, sinkPtr){
+
   }
 };
 mergeInto(LibraryManager.library, UnityWebRTCVideoRenderer);
