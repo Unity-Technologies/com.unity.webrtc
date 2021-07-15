@@ -174,6 +174,7 @@ namespace Unity.WebRTC.RuntimeTest
                 track.Dispose();
             }
             audioStream.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
@@ -201,6 +202,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
@@ -245,6 +247,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
@@ -287,6 +290,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
@@ -329,6 +333,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         // todo::(kazuki) Test execution timed out on linux standalone
@@ -389,6 +394,7 @@ namespace Unity.WebRTC.RuntimeTest
             videoStream.Dispose();
             Object.DestroyImmediate(camObj);
             Object.DestroyImmediate(rt);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
@@ -417,6 +423,7 @@ namespace Unity.WebRTC.RuntimeTest
             }
 
             stream.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -107,6 +108,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => channel.Send(message1), Throws.TypeOf<InvalidOperationException>());
             Assert.That(() => channel.Send(message2), Throws.TypeOf<InvalidOperationException>());
             test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]

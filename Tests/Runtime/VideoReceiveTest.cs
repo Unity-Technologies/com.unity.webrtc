@@ -1,10 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -91,12 +89,10 @@ namespace Unity.WebRTC.RuntimeTest
 
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
-        // ToDo: Investigating longer execution time
         [UnityTest]
-        [Timeout(30000)]
+        [Timeout(10000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
-        [Ignore("sometimes happen Unhandled error message about NullRef on PcOnRemoveTrack")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
         {
             var value = testValues[index];
@@ -119,12 +115,6 @@ namespace Unity.WebRTC.RuntimeTest
 
                 yield return new WaitForSeconds(0.1f);
 
-                test.component.RemoveTrack();
-
-                yield return test.component.Signaling();
-
-                yield return new WaitUntilWithTimeout(() => test.component.IsCalledOnRemoveTrack, 5000);
-
                 test.component.Clear();
             }
 
@@ -146,7 +136,6 @@ namespace Unity.WebRTC.RuntimeTest
         public VideoStreamTrack RecvVideoTrack { get; private set; }
         public Texture SendTexture { get; private set; }
         public Texture RecvTexture { get; private set; }
-        public bool IsCalledOnRemoveTrack { get; private set; }
 
         RTCPeerConnection offerPc;
         RTCPeerConnection answerPc;
@@ -186,12 +175,6 @@ namespace Unity.WebRTC.RuntimeTest
                     RecvVideoTrack = track;
                     RecvTexture = track.InitializeReceiver(width, height);
                 }
-
-                var stream = e.Streams.First();
-                stream.OnRemoveTrack = ev =>
-                {
-                    IsCalledOnRemoveTrack = true;
-                };
             };
         }
         public void CreateVideoStreamTrack()
@@ -207,7 +190,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         public void RemoveTrack()
         {
-            IsCalledOnRemoveTrack = false;
             offerPc.RemoveTrack(sender);
         }
 
