@@ -179,7 +179,7 @@ namespace Unity.WebRTC
     /// </summary>
     public struct RTCOfferAnswerOptions
     {
-       public static RTCOfferAnswerOptions Default =
+        public static RTCOfferAnswerOptions Default =
             new RTCOfferAnswerOptions {iceRestart = false, voiceActivityDetection = true};
 
         /// <summary>
@@ -378,18 +378,6 @@ namespace Unity.WebRTC
         /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
         public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true)
-        {
-            Initialize(type, limitTextureSize, false);
-        }
-
-
-        internal static void Initialize(EncoderType type, bool limitTextureSize, bool forTest)
-        {
-            Initialize(type, limitTextureSize, false);
-        }
-
-
-        internal static void Initialize(EncoderType type, bool limitTextureSize, bool forTest)
         {
             Initialize(type, limitTextureSize, false);
         }
