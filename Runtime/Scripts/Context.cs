@@ -161,17 +161,11 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
-#if !UNITY_WEBGL
+
         public IntPtr CreateMediaStream(string label)
         {
             return NativeMethods.ContextCreateMediaStream(self, label);
         }
-#else
-        public IntPtr CreateMediaStream(string label="")
-        {
-            return NativeMethods.ContextCreateMediaStream(self);
-        }
-#endif
 
         public void DeleteMediaStream(MediaStream stream)
         {

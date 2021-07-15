@@ -8,14 +8,6 @@ namespace Unity.WebRTC
     public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
     public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
 
-#if UNITY_WEBGL
-    public class MediaStreamConstraints
-    {
-        public bool audio = true;
-        public bool video = true;
-    }
-#endif
-
     public class MediaStream : IDisposable
     {
         private DelegateOnAddTrack onAddTrack;
@@ -26,6 +18,12 @@ namespace Unity.WebRTC
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
 
 #if UNITY_WEBGL
+        public class MediaStreamConstraints
+        {
+            public bool audio = true;
+            public bool video = true;
+        }
+
         public void AddUserMedia(MediaStreamConstraints constraints)
         {
             NativeMethods.MediaStreamAddUserMedia(self, JsonUtility.ToJson(constraints));
@@ -33,7 +31,7 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string Id =>
             NativeMethods.MediaStreamGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
@@ -123,15 +121,9 @@ namespace Unity.WebRTC
             return NativeMethods.MediaStreamRemoveTrack(GetSelfOrThrow(), track.GetSelfOrThrow());
         }
 
-#if !UNITY_WEBGL
         public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
         {
         }
-#else
-        public MediaStream() : this(WebRTC.Context.CreateMediaStream())
-        {
-        }
-#endif
 
         internal IntPtr GetSelfOrThrow()
         {

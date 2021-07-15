@@ -305,6 +305,9 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceCandidate))]
 #if !UNITY_WEBGL
         static void PCOnIceCandidate(IntPtr ptr, string sdp, string sdpMid, int sdpMlineIndex)
+#else
+        static void PCOnIceCandidate(IntPtr ptr, IntPtr iceCandidatePtr, string sdp, string sdpMid, int sdpMlineIndex)
+#endif
         {
             WebRTC.Sync(ptr, () =>
             {
@@ -316,27 +319,15 @@ namespace Unity.WebRTC
                         sdpMid = sdpMid,
                         sdpMLineIndex = sdpMlineIndex
                     };
+#if !UNITY_WEBGL
                     var candidate = new RTCIceCandidate(options);
+#else
+                    var candidate = new RTCIceCandidate(options, iceCandidatePtr);
+#endif
                     connection.OnIceCandidate?.Invoke(candidate);
                 }
             });
         }
-#else
-        static void PCOnIceCandidate(IntPtr ptr, IntPtr iceCandidatePtr, string sdp, string sdpMid, int sdpMlineIndex)
-        {
-            if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-            {
-                var options = new RTCIceCandidateInit
-                {
-                    candidate = sdp,
-                    sdpMid = sdpMid,
-                    sdpMLineIndex = sdpMlineIndex
-                };
-                var candidate = new RTCIceCandidate(options, iceCandidatePtr);
-                connection.OnIceCandidate?.Invoke(candidate);
-            }
-        }
-#endif
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceConnectionChange))]
         static void PCOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state)

@@ -31,7 +31,23 @@ var UnityWebRTCIceCandidate = {
     ret.usernameFragment = candidate.usernameFragment;
     var json = JSON.stringify(ret);
     return uwcom_strToPtr(json);
-  }, 
+  },
+
+  IceCandidateGetSdp: function(candidatePtr){
+    if (!uwcom_existsCheck(candidatePtr, "IceCandidateGetSdp", "iceCandidate")) return;
+    candidate = UWManaged[candidatePtr];
+    return uwcom_strToPtr(candidate.candidate);
+  },
+
+  IceCandidateGetSdpMid: function(candidatePtr){
+    if (!uwcom_existsCheck(candidatePtr, "IceCandidateGetSdpMid", "iceCandidate")) return;
+    return uwcom_strToPtr(candidate.sdpMid);
+  },
+
+  IceCandidateGetSdpLineIndex: function(candidatePtr){
+    if (!uwcom_existsCheck(candidatePtr, "IceCandidateGetSdpMid", "iceCandidate")) return;
+    return candidate.sdpMLineIndex;
+  },
   
   DeleteIceCandidate: function (candidatePtr) {
     if (!uwcom_existsCheck(candidatePtr, 'DeleteIceCandidate', 'iceCandidate')) return;

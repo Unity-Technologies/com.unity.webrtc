@@ -93,7 +93,7 @@ var UnityWebRTCContext = {
     delete UWManaged[dataChannelPtr];
   },
 
-  ContextCreateMediaStream: function (contextPtr) {
+  ContextCreateMediaStream: function (contextPtr, label) {
     if (!uwcom_existsCheck(contextPtr, 'ContextCreateMediaStream', 'context')) return;
     return _CreateMediaStream();
   },

@@ -1072,7 +1072,14 @@ namespace Unity.WebRTC
 #else
         [DllImport(WebRTC.Lib)]
         public static extern string IceCandidateGetCandidate(IntPtr candidate);
-
+        [DllImport(WebRTC.Lib)]
+        public static extern int IceCandidateGetSdpLineIndex(IntPtr candidate);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string IceCandidateGetSdp(IntPtr candidate);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string IceCandidateGetSdpMid(IntPtr candidate);
 #endif
         [DllImport(WebRTC.Lib)]
         public static extern RTCPeerConnectionState PeerConnectionState(IntPtr ptr);
@@ -1191,17 +1198,10 @@ namespace Unity.WebRTC
         public static extern void DataChannelRegisterOnOpen(IntPtr ptr, DelegateNativeOnOpen callback);
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
-#if !UNITY_WEBGL
+
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
-#else
-        public static IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label)
-        {
-            return ContextCreateMediaStream(ctx);
-        }
-        [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateMediaStream(IntPtr ctx);
-
+#if UNITY_WEBGL
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamAddUserMedia(IntPtr streamPtr, string constraints);
 #endif

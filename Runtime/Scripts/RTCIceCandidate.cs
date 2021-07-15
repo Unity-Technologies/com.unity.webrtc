@@ -158,30 +158,18 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public string Candidate
-#if !UNITY_WEBGL
-             => NativeMethods.IceCandidateGetSdp(self);
-#else
-            ;
-#endif
+        public string Candidate => NativeMethods.IceCandidateGetSdp(self);
+
         /// <summary>
         /// 
         /// </summary>
-        public string SdpMid
-#if !UNITY_WEBGL
-            => NativeMethods.IceCandidateGetSdpMid(self);
-#else
-            ;
-#endif
+        public string SdpMid => NativeMethods.IceCandidateGetSdpMid(self);
+
         /// <summary>
         /// 
         /// </summary>
-        public int? SdpMLineIndex
-#if !UNITY_WEBGL
-            => NativeMethods.IceCandidateGetSdpLineIndex(self);
-#else
-            ;
-#endif
+        public int? SdpMLineIndex => NativeMethods.IceCandidateGetSdpLineIndex(self);
+
         /// <summary>
         /// 
         /// </summary>
@@ -289,10 +277,6 @@ namespace Unity.WebRTC
             }
 
             self = iceCandidatePtr.Value;
-            this.Candidate = candidateInfo.candidate;
-            this.SdpMid = candidateInfo.sdpMid;
-            this.SdpMLineIndex = candidateInfo.sdpMLineIndex;
-
             string json = NativeMethods.IceCandidateGetCandidate(self);
             _candidate = JsonUtility.FromJson<CandidateInternal>(json);
 #endif

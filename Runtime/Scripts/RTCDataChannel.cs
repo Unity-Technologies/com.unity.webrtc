@@ -207,11 +207,14 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
         static void DataChannelNativeOnTextMessage(IntPtr ptr, IntPtr msgPtr)
         {
-            if (WebRTC.Table[ptr] is RTCDataChannel channel)
+            WebRTC.Sync(ptr, () =>
             {
-                var msg = msgPtr.AsAnsiStringWithFreeMem();
-                channel.onTextMessage?.Invoke(msg);
-            }
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    var msg = msgPtr.AsAnsiStringWithFreeMem();
+                    channel.onTextMessage?.Invoke(msg);
+                }
+            });
         }
 #endif
 
