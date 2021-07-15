@@ -3,6 +3,7 @@
 #include "PeerConnectionObject.h"
 #include "MediaStreamObserver.h"
 #include "SetSessionDescriptionObserver.h"
+#include "UnityLogStream.h"
 #include "Context.h"
 #include "Codec/EncoderFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
@@ -401,9 +402,17 @@ extern "C"
         track->RemoveSink(sink);
     }
 
-    UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func)
+    UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func, bool enableNativeLog)
     {
         delegateDebugLog = func;
+        if (func != nullptr && enableNativeLog)
+        {
+            UnityLogStream::AddLogStream(func);
+        } else if (func == nullptr)
+        {
+            UnityLogStream::RemoveLogStream();
+        }
+
     }
 
     UNITY_INTERFACE_EXPORT void RegisterSetResolution(DelegateSetResolution func)
@@ -473,7 +482,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT void PeerConnectionRestartIce(PeerConnectionObject* obj)
     {
         obj->connection->RestartIce();
-    } 
+    }
 
     UNITY_INTERFACE_EXPORT RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId)
     {
