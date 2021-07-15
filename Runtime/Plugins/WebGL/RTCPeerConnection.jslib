@@ -336,6 +336,13 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionRegisterOnTrack', peer.label);
     uwevt_PCOnTrack = PCOnTrack;
   },
+  
+  PeerConnectionRegisterOnRemoveTrack: function (peerPtr, PCOnRemoveTrack){
+    if (!uwcom_existsCheck(peerPtr, 'PeerConnectionRegisterOnRemoveTrack', 'peer')) return;
+    var peer = UWManaged[peerPtr];
+    uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionRegisterOnRemoveTrack', peer.label);
+    uwevt_PCOnRemoveTrack = PCOnRemoveTrack;
+  },
 
   PeerConnectionClose: function (peerPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionClose', 'peer')) return;

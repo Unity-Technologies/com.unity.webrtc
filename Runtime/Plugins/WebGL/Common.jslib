@@ -142,6 +142,7 @@ var UnityWebRTCCommon = {
   $uwevt_PCOnNegotiationNeeded: null,
   $uwevt_PCOnDataChannel: null,
   $uwevt_PCOnTrack: null,
+  $uwevt_PCOnRemoveTrack: null,
   $uwevt_MSOnAddTrack: null,
   $uwevt_MSOnRemoveTrack: null,
   $uwevt_DCOnTextMessage: null,
@@ -150,7 +151,6 @@ var UnityWebRTCCommon = {
   $uwevt_DCOnClose: null,
   $uwevt_OnSetSessionDescSuccess: null,
   $uwevt_OnSetSessionDescFailure: null,
-  $uwevt_OnRemoveTrack: null,
   $uwevt_OnSuccessCreateSessionDesc: null,
   $uwevt_OnFailureCreateSessionDesc: null,
   $uwevt_OnStatsDeliveredCallback: null,
@@ -192,6 +192,7 @@ autoAddDeps(UnityWebRTCCommon, '$uwevt_PCOnIceGatheringChange');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_PCOnNegotiationNeeded');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_PCOnDataChannel');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_PCOnTrack');
+autoAddDeps(UnityWebRTCCommon, '$uwevt_PCOnRemoveTrack');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_MSOnAddTrack');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_MSOnRemoveTrack');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_DCOnTextMessage');
@@ -200,7 +201,6 @@ autoAddDeps(UnityWebRTCCommon, '$uwevt_DCOnOpen');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_DCOnClose');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnSetSessionDescSuccess');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnSetSessionDescFailure');
-autoAddDeps(UnityWebRTCCommon, '$uwevt_OnRemoveTrack');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnSuccessCreateSessionDesc');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnFailureCreateSessionDesc');
 autoAddDeps(UnityWebRTCCommon, '$uwevt_OnStatsDeliveredCallback');

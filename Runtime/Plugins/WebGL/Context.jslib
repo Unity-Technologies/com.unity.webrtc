@@ -81,11 +81,6 @@ var UnityWebRTCContext = {
     uwevt_OnSetSessionDescFailure = OnSetSessionDescFailure;
   },
 
-  PeerConnectionRegisterOnRemoveTrack: function (peerPtr, OnRemoveTrack){
-    if (!uwcom_existsCheck(peerPtr, 'PeerConnectionRegisterOnRemoveTrack', 'peer')) return;
-    uwevt_OnRemoveTrack = OnRemoveTrack;
-  },
-
   ContextCreateDataChannel: function (contextPtr, peerPtr, labelPtr, optionsJsonPtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextCreateDataChannel', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'ContextCreateDataChannel', 'peer')) return;
