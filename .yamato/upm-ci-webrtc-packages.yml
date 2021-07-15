@@ -156,7 +156,7 @@ test_targets:
       - backend: il2cpp
         additional_component_arg: StandaloneSupport-IL2CPP
         platform: standalone
-  - name: macos
+  - name: macos-m1
     type: Unity::metal::devkit
     image: package-ci/mac:latest
     flavor: m1.mac
@@ -356,7 +356,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 {% for editor in editors %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.name != "macos" %}
+{% if target.name != "macos" and target.name != "macos-m1" %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -502,7 +502,7 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "true" or target.name == "macos" %}
+{% if target.is_gpu == "true" or target.name == "macos" or target.name == "macos-m1" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif -%}
 {% endfor %}
@@ -512,7 +512,7 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% endfor %}
 
 {% for platform in platforms %}
-{% if platform.name != "macos" -%}
+{% if platform.name != "macos" %}
 {% for editor in editors %}
 codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
