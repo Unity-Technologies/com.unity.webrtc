@@ -1378,7 +1378,7 @@ namespace Unity.WebRTC
         public static extern IntPtr DeleteTransceiver(IntPtr transceiverPtr);
 
         [DllImport(WebRTC.Lib)]
-        public static extern void RenderLocalVideotrack(IntPtr trackPtr);
+        public static extern void RenderLocalVideotrack(IntPtr trackPtr, bool needFlip);
         [DllImport(WebRTC.Lib)]
         public static extern void UpdateRendererTexture(IntPtr trackPtr, IntPtr renderTexturePtr, bool needFlip);
         [DllImport(WebRTC.Lib)]
