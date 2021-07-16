@@ -106,7 +106,7 @@ var UnityWebRTCVideoStreamTrack = {
   },
 
   RenderLocalVideotrack__deps: ['$readPixelsAsync', '$clientWaitAsync'],
-  RenderLocalVideotrack: function (trackPtr) {
+  RenderLocalVideotrack: function (trackPtr, needFlip) {
     var data = uwcom_localVideoTracks[trackPtr];
     // console.log('RenderLocalVideotrack', trackPtr, data);
     if (!data) return;
@@ -139,7 +139,15 @@ var UnityWebRTCVideoStreamTrack = {
 
       imgData.data.set(buffer);
       ctx.putImageData(imgData, 0, 0);
-
+      
+      // For now: Flip every time, since we want the correct image transfered over WebRTC
+      ctx.globalCompositeOperation = 'copy';
+      ctx.scale(1,-1);
+      ctx.translate(0, -imgData.height);
+      ctx.drawImage(cnv,0,0);
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.globalCompositeOperation = 'source-over';
+      
       GLctx.bindTexture(GLctx.TEXTURE_2D, dstTexture);
       GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.RGBA, GLctx.RGBA, GLctx.UNSIGNED_BYTE, cnv);
       //GLctx.texSubImage2D(GLctx.TEXTURE_2D, 0, 0, 0, GLctx.RGBA, GLctx.UNSIGNED_BYTE, cnv);
