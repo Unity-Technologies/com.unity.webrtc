@@ -42,15 +42,19 @@ namespace Unity.WebRTC
             WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
 
+#if !UNITY_WEBGL
             toggleEnableMicrophone.isOn = false;
             toggleEnableMicrophone.onValueChanged.AddListener(OnEnableMicrophone);
+#endif
             dropdownAudioClips.interactable = true;
             dropdownAudioClips.options =
                 audioclipList.Select(clip => new Dropdown.OptionData(clip.name)).ToList();
+#if !UNITY_WEBGL
             dropdownMicrophoneDevices.interactable = false;
             dropdownMicrophoneDevices.options =
                 Microphone.devices.Select(name => new Dropdown.OptionData(name)).ToList();
             dropdownMicrophoneDevices.onValueChanged.AddListener(OnDeviceChanged);
+#endif
             var audioConf = AudioSettings.GetConfiguration();
             dropdownSpeakerMode.options =
                 Enum.GetNames(typeof(AudioSpeakerMode)).Select(mode => new Dropdown.OptionData(mode)).ToList();
@@ -89,8 +93,10 @@ namespace Unity.WebRTC
         {
             if (toggleEnableMicrophone.isOn)
             {
+#if !UNITY_WEBGL
                 m_deviceName = dropdownMicrophoneDevices.captionText.text;
                 m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
+#endif
             }
             else
             {
@@ -196,7 +202,9 @@ namespace Unity.WebRTC
 
         void OnHangUp()
         {
+#if !UNITY_WEBGL
             Microphone.End(m_deviceName);
+#endif            
             m_clipInput = null;
 
             m_audioTrack?.Dispose();
@@ -222,7 +230,9 @@ namespace Unity.WebRTC
         void OnDeviceChanged(int value)
         {
             m_deviceName = dropdownMicrophoneDevices.options[value].text;
+#if !UNITY_WEBGL 
             Microphone.GetDeviceCaps(m_deviceName, out int minFreq, out int maxFreq);
+#endif
         }
 
         void OnSpeakerModeChanged(int value)
