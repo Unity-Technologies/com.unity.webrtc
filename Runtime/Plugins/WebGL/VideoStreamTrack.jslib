@@ -41,6 +41,7 @@ var UnityWebRTCVideoStreamTrack = {
     return track.managePtr;
   },
 
+  // Not finished, don't delete.
   $readPixelsAsync: function (data) {
     var w = data.width;
     var h = data.height;
@@ -87,6 +88,7 @@ var UnityWebRTCVideoStreamTrack = {
     });
   },
 
+  // Not finished, don't delete.
   $clientWaitAsync: function (sync, flags, interval_ms) {
     return new Promise(function (resolve, reject) {
       var check = function() {
@@ -157,7 +159,6 @@ var UnityWebRTCVideoStreamTrack = {
       GLctx.bindTexture(GLctx.TEXTURE_2D, null);
     }
   },
-
-
+  
 };
 mergeInto(LibraryManager.library, UnityWebRTCVideoStreamTrack);

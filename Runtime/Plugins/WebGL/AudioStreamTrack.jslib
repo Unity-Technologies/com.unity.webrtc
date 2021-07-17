@@ -1,4 +1,6 @@
 var UnityWebRTCAudioStreamTrack = {
+  
+  // To be implemented
   CreateAudioTrack: function () {
     if (!uwcom_audioContext) {
       uwcom_audioContext = new AudioContext;

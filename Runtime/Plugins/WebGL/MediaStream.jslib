@@ -28,14 +28,16 @@ var UnityWebRTCMediaStream = {
     var optionsJson = Pointer_stringify(constraints);
     var options = JSON.parse(optionsJson);
     
-    navigator.mediaDevices.getUserMedia(options).then(function(stream2){
-      stream2.getTracks().forEach(function(track){
-        uwcom_addManageObj(track);
-        _MediaStreamAddTrack(stream.managePtr, track.managePtr);
+    navigator.mediaDevices.getUserMedia(options)
+      .then(function(usermedia){
+        usermedia.getTracks().forEach(function(track){
+          uwcom_addManageObj(track);
+          _MediaStreamAddTrack(stream.managePtr, track.managePtr);
+        })
       })
-    }).catch(function(err) {
-      console.error(err);
-    });
+      .catch(function(err) {
+        console.error(err);
+      });
   },
   
   DeleteMediaStream: function(streamPtr) {

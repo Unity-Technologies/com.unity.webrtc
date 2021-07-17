@@ -15,9 +15,8 @@ var UnityWebRTCVideoRenderer = {
     //console.log('nativeTexture' + texPtr);
     return texPtr;
   },
-
+  
   GetVideoRendererId: function (sinkPtr) {
-
   },
 
   DeleteVideoRenderer: function (contextPtr, sinkPtr) {
@@ -47,6 +46,7 @@ var UnityWebRTCVideoRenderer = {
     GLctx.bindTexture(GLctx.TEXTURE_2D, null);
   },
 
+  // Not used in WebGL, but is here to make the NativeMethods more maintainable. 
   VideoTrackAddOrUpdateSink: function(trackPtr, sinkPtr){
 
   },
