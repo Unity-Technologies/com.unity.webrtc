@@ -18,6 +18,7 @@ namespace Unity.WebRTC
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
 
 #if UNITY_WEBGL
+        // TODO Use MediaTrackConstraints instead of booleans
         public class MediaStreamConstraints
         {
             public bool audio = true;
