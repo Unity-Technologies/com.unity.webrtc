@@ -44,10 +44,6 @@ namespace webrtc
             }
         }
 
-        int64_t deltaTimeMillis = rtc::TimeMillis() - currentTime;
-        if (deltaTimeMillis < 10) {
-            SleepMs(10 - deltaTimeMillis);
-        }
         return true;
     }
 
