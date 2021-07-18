@@ -55,6 +55,7 @@ namespace Unity.WebRTC
             private int m_bufferLength;
             private int m_bufferPosition;
             private int m_bufferResetCycle;
+            private int m_bufferingFrame;
 
             public AudioStreamRenderer(string name, int sampleRate, int channels)
             {
@@ -65,6 +66,7 @@ namespace Unity.WebRTC
                 m_bufferLength = sampleRate * channels;
                 m_buffer = new float[m_bufferLength];
                 m_bufferResetCycle = m_bufferLength * 5;  // reset buffer every 5 seconds
+                m_bufferingFrame = m_sampleRate / 1000;  // set initial buffering frames
 
                 // note:: OnSendAudio and OnAudioSetPosition callback is called before complete the constructor.
                 m_clip = AudioClip.Create(name, lengthSamples, channels, m_sampleRate, true, OnReadBuffer);
@@ -74,7 +76,14 @@ namespace Unity.WebRTC
             {
                 int dataLength = data.Length;
 
-                if (m_bufferPosition > m_position + dataLength)
+                if (m_bufferingFrame > 0)
+                {
+                    m_bufferingFrame -= 1;
+
+                    // Sounds silent while buffering
+                    Array.Clear(data, 0, data.Length);
+                }
+                else if (m_bufferPosition > m_position + dataLength)
                 {
                     int srcOffset = m_position % m_bufferLength;
                     int destOffset = 0;
@@ -111,6 +120,9 @@ namespace Unity.WebRTC
                 }
                 else
                 {
+                    // Set waiting frames for buffering
+                    m_bufferingFrame += m_sampleRate / 1000; // if 48Khz, then 48 frames
+
                     // Sounds silent while buffering
                     Array.Clear(data, 0, data.Length);
                 }
