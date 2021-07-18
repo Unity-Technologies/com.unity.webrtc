@@ -51,14 +51,69 @@ namespace Unity.WebRTC
                 }
             }
 
+            private float[] m_buffer;
+            private int m_bufferLength;
+            private int m_bufferPosition;
+            private int m_bufferResetCycle;
+
             public AudioStreamRenderer(string name, int sampleRate, int channels)
             {
                 m_sampleRate = sampleRate;
                 m_channel = channels;
                 int lengthSamples = m_sampleRate;  // sample length for a second
 
+                m_bufferLength = sampleRate * channels;
+                m_buffer = new float[m_bufferLength];
+                m_bufferResetCycle = m_bufferLength * 5;  // reset buffer every 5 seconds
+
                 // note:: OnSendAudio and OnAudioSetPosition callback is called before complete the constructor.
-                m_clip = AudioClip.Create(name, lengthSamples, channels, m_sampleRate, false);
+                m_clip = AudioClip.Create(name, lengthSamples, channels, m_sampleRate, true, OnReadBuffer);
+            }
+
+            internal void OnReadBuffer(float[] data)
+            {
+                int dataLength = data.Length;
+
+                if (m_bufferPosition > m_position + dataLength)
+                {
+                    int srcOffset = m_position % m_bufferLength;
+                    int destOffset = 0;
+                    int count = data.Length;
+
+                    if (srcOffset + dataLength > m_bufferLength)
+                    {
+                        count = m_bufferLength - srcOffset;
+
+                        Array.Copy(m_buffer, srcOffset, data, destOffset, count);
+
+                        srcOffset = 0;
+                        destOffset += count;
+                        count = dataLength - count;
+                    }
+
+                    Array.Copy(m_buffer, srcOffset, data, destOffset, count);
+
+                    m_position += dataLength;
+
+                    if (m_position == m_bufferResetCycle)
+                    {
+                        int endPosition = m_bufferPosition;
+                        int startPosition = endPosition - m_position;
+                        int remainLength = endPosition - startPosition;
+
+                        float[] temp = new float[remainLength];
+                        Array.Copy(m_buffer, startPosition, temp, 0, remainLength);
+                        Array.Copy(temp, m_buffer, remainLength);
+
+                        m_position = 0;
+                        m_bufferPosition = remainLength;
+                    }
+                }
+                else
+                {
+                    // Sounds silent while buffering
+                    Array.Clear(data, 0, data.Length);
+                }
             }
 
             public void Dispose()
@@ -70,32 +125,26 @@ namespace Unity.WebRTC
 
             internal void SetData(float[] data)
             {
-                int length = data.Length / m_channel;
+                int dataLength = data.Length;
+                int srcOffset = 0;
+                int destOffset = m_bufferPosition % m_bufferLength;
+                int count = data.Length;
 
-                if (m_position + length > m_clip.samples)
+                if (destOffset + dataLength > m_bufferLength)
                 {
-                    int remain = m_position + length - m_clip.samples;
-                    length = m_clip.samples - m_position;
+                    count = m_bufferLength - destOffset;
 
-                    // Split two arrays from original data
-                    float[] _data = new float[length * m_channel];
-                    Buffer.BlockCopy(data, 0, _data, 0, length * m_channel);
-                    float[] _data2 = new float[remain * m_channel];
-                    Buffer.BlockCopy(data, length * m_channel, _data2, 0, remain * m_channel);
+                    Array.Copy(data, srcOffset, m_buffer, destOffset, count);
 
-                    // push the split array to the audio buffer
-                    SetData(_data);
+                    srcOffset += count;
+                    destOffset = 0;
 
-                    data = _data2;
-                    length = remain;
+                    count = dataLength - count;
                 }
-                m_clip.SetData(data, m_position);
-                m_position += length;
 
-                if (m_position == m_clip.samples)
-                {
-                    m_position = 0;
-                }
+                Array.Copy(data, srcOffset, m_buffer, destOffset, count);
+
+                m_bufferPosition += dataLength;
             }
         }
 
