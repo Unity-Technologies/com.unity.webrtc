@@ -416,7 +416,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     PACKAGE_DIR: com.unity.webrtc
     PLAYER_LOAD_PATH: build/players
     TEST_RESULT_DIR: upm-ci~/test-results/
-    TEST_TARGET: {{ target.name }}
+    TEST_TARGET: macos
     TEST_PLATFORM: {{ param.platform }}
     TEST_ARCHITECTURE : {{ target.architecture }}
     SCRIPTING_BACKEND: {{ param.backend }}  

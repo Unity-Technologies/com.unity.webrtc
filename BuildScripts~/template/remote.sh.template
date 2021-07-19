@@ -55,7 +55,7 @@ chmod +x ./utr
 if [ ${TEST_TARGET} = "macos" ] && [ ${architecture} = "arm64" ]
 then
   # install rosetta 2
-   softwareupdate --install-rosetta --agree-to-license
+  softwareupdate --install-rosetta --agree-to-license
 fi
 
 if [ ${TEST_PLATFORM} = "standalone" ]
