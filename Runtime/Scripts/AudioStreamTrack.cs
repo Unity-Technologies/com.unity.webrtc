@@ -120,7 +120,7 @@ namespace Unity.WebRTC
         /// <param name="mute">
         /// Whether you want the source to not be hearable in game.
         /// </param>
-        public AudioStreamTrack(AudioSource source, bool mute = true) : this()
+        public AudioStreamTrack(AudioSource source, bool mute = false) : this()
         {
             if (source == null)
                 throw new ArgumentNullException("AudioSource argument is null");
