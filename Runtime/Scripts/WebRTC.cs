@@ -336,7 +336,7 @@ namespace Unity.WebRTC
         private static bool s_limitTextureSize;
 
 #if UNITY_EDITOR
-        static public void OnBeforeAssemblyReload()
+        public static void OnBeforeAssemblyReload()
         {
             Dispose();
         }
@@ -349,6 +349,9 @@ namespace Unity.WebRTC
         /// <param name="limitTextureSize"></param>
         public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true)
         {
+            if (s_context != null)
+                throw new InvalidOperationException("Already initialized WebRTC.");
+
             Initialize(type, limitTextureSize, false);
         }
 
