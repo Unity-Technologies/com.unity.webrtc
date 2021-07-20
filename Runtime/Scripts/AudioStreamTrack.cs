@@ -157,6 +157,7 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+#if UNITY_2020_1_OR_NEWER
         /// <summary>
         /// 
         /// </summary>
@@ -164,6 +165,22 @@ namespace Unity.WebRTC
         /// <param name="channels"></param>
         /// <param name="sampleRate"></param>
         public void SetData(ref NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
+        {
+            unsafe
+            {
+                void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
+                NativeMethods.ProcessAudio(self, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+            }
+        }
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nativeArray"></param>
+        /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
+        public void SetData(ref NativeArray<float> nativeArray, int channels, int sampleRate)
         {
             unsafe
             {
@@ -194,8 +211,7 @@ namespace Unity.WebRTC
         public void SetData(float[] array, int channels, int sampleRate)
         {
             NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
-            var readonlyNativeArray = nativeArray.AsReadOnly();
-            SetData(ref readonlyNativeArray, channels, sampleRate);
+            SetData(ref nativeArray, channels, sampleRate);
             nativeArray.Dispose();
         }
 
