@@ -4,6 +4,18 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.0-exp.4] - 2021-07-30
+
+### Added
+
+- M1 mac architecture native support
+- Audio stream rendering support
+- Add two scenes (`Audio` and `MultiAudioReceive`) into the package sample
+
+### Changed
+
+- Add the audio waveform graph to `MultiplePeerConnections` scene in the sample
+
 ## [2.4.0-exp.3] - 2021-06-08
 
 ### Changed
