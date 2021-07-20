@@ -118,6 +118,9 @@ namespace Unity.WebRTC
             }
             inputAudioSource.loop = true;
             inputAudioSource.clip = m_clipInput;
+
+            // set the latency to “0” samples before the audio starts to play.
+            while (!(Microphone.GetPosition(m_deviceName) > 0)) {}
             inputAudioSource.Play();
 
             buttonStart.interactable = false;
