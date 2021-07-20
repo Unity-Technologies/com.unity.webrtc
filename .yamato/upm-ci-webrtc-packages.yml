@@ -140,6 +140,28 @@ test_targets:
     type: Unity::metal::macmini
     image: package-ci/mac:latest
     flavor: m1.mac
+    architecture: x64
+    gfx_types:
+      - name: metal
+        extra-editor-arg: force-metal
+    test_params:
+      - backend: mono
+        additional_component_arg: StandaloneSupport-Mono
+        platform: editmode
+      - backend: mono
+        additional_component_arg: StandaloneSupport-Mono
+        platform: playmode
+      - backend: mono
+        additional_component_arg: StandaloneSupport-Mono
+        platform: standalone
+      - backend: il2cpp
+        additional_component_arg: StandaloneSupport-IL2CPP
+        platform: standalone
+  - name: macos-m1
+    type: Unity::metal::devkit
+    image: package-ci/mac:latest
+    flavor: m1.mac
+    architecture: arm64
     gfx_types:
       - name: metal
         extra-editor-arg: force-metal
@@ -203,7 +225,7 @@ test_webrtc_plugin_all_platform:
   name: Test webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
-    {% if platform.name != "android" and platform.name != "ios" %} # todo(kazuki)
+    {% if platform.name != "android" and platform.name != "ios" %} # todo(kazuki) native plugin test is not supported on iOS and android 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
     {% endfor %}
@@ -241,7 +263,7 @@ build_{{ package.name }}_{{ editor.version }}_ios:
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --build-only
+    - ./utr --suite=playmode --platform=iOS --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=arm64 --artifacts_path=build/logs --build-only
   artifacts:
     players:
       paths:
@@ -291,7 +313,7 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=ARM64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
+    - ./utr --suite=playmode --platform=Android --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=arm64 --artifacts_path=build/logs --scripting-backend=il2cpp --build-only
   artifacts:
     players:
       paths:
@@ -336,7 +358,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 {% for editor in editors %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.name != "macos" %}
+{% if target.name != "macos" and target.name != "macos-m1" %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -372,7 +394,7 @@ build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name
     - unity-downloader-cli -c Editor -c {{ param.additional_component_arg }} -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
     - chmod +x ./utr
-    - ./utr --suite=playmode --platform=StandaloneOSX --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture=x64 --artifacts_path=build/logs --scripting-backend={{ param.backend }} --build-only
+    - ./utr --suite=playmode --platform=StandaloneOSX --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --architecture={{ target.architecture }} --artifacts_path=build/logs --scripting-backend={{ param.backend }} --build-only
   artifacts:
     players:
       paths:
@@ -394,8 +416,9 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     PACKAGE_DIR: com.unity.webrtc
     PLAYER_LOAD_PATH: build/players
     TEST_RESULT_DIR: upm-ci~/test-results/
-    TEST_TARGET: {{ target.name }}
+    TEST_TARGET: macos
     TEST_PLATFORM: {{ param.platform }}
+    TEST_ARCHITECTURE : {{ target.architecture }}
     SCRIPTING_BACKEND: {{ param.backend }}  
     EDITOR_VERSION: {{ editor.version }}
     EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
@@ -421,9 +444,10 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       PACKAGE_DIR: com.unity.webrtc
       TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
       TEST_RESULT_DIR: upm-ci~/test-results/
-      TEST_TARGET: {{ target.name }}
+      TEST_TARGET: macos
       TEST_PLATFORM: {{ param.platform }}
-      SCRIPTING_BACKEND: {{ param.backend }}  
+      TEST_ARCHITECTURE : {{ target.architecture }}
+      SCRIPTING_BACKEND: {{ param.backend }}
       EDITOR_VERSION: {{ editor.version }}
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
@@ -482,7 +506,13 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "true" or target.name == "macos" %}
+{% if target.is_gpu == "true" or target.name == "macos"%}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
+{% endif -%}
+# todo(kazuki) : 
+# editor/playmode test are not conducted on m1 mac 
+# XCode command line tools has not installed on m1 mac device (Standalone test don't need to install them)
+{% if target.name == "macos-m1" and param.platform == "standalone" %} 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif -%}
 {% endfor %}
@@ -492,7 +522,7 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% endfor %}
 
 {% for platform in platforms %}
-{% if platform.name != "macos" -%}
+{% if platform.name != "macos" %}
 {% for editor in editors %}
 codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
   name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}

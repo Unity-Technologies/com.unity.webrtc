@@ -776,6 +776,9 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         public IEnumerator GetStatsReturnsReport()
         {
+            if (SystemInfo.processorType == "Apple M1")
+                Assert.Ignore("todo:: This test will hang up on Apple M1");
+
             var stream = new MediaStream();
 
             var go = new GameObject("Test");
