@@ -21,6 +21,12 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void InitializeTwiceThrowException()
+        {
+            Assert.That(() => WebRTC.Initialize(), Throws.InvalidOperationException);
+        }
+
+        [Test]
         public void GraphicsFormat()
         {
             var graphicsFormat = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
