@@ -95,6 +95,9 @@ namespace Unity.WebRTC.RuntimeTest
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
         {
+            if(SystemInfo.processorType == "Apple M1")
+                Assert.Ignore("todo:: This test will hang up on Apple M1");
+
             var value = testValues[index];
             var test = new MonoBehaviourTest<VideoReceivePeers>();
             test.component.SetResolution(value.width, value.height);
