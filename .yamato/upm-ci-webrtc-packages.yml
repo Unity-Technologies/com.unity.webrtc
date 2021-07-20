@@ -225,7 +225,7 @@ test_webrtc_plugin_all_platform:
   name: Test webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
-    {% if platform.name != "android" and platform.name != "ios" %} # todo(kazuki)
+    {% if platform.name != "android" and platform.name != "ios" %} # todo(kazuki) native plugin test is not supported on iOS and android 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
     {% endfor %}
@@ -433,7 +433,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 
 {% else %}
 
-{% if target.name != "macos-m1" %} # todo(kazuki): XCode command line tools has not installed on m1 mac device 
+{% if target.name != "macos-m1" %} # todo(kazuki): XCode command line tools has not installed on m1 mac device (Standalone test don't need to install them)
 
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
@@ -509,7 +509,10 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "true" or target.name == "macos" or target.name == "macos-m1" %}
+{% if target.is_gpu == "true" or target.name == "macos"%}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
+{% endif -%}
+{% if target.name == "macos-m1" and param.platform == "standalone" %} # todo(kazuki) : editor/playmode test are not conducted on m1 mac 
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif -%}
 {% endfor %}
