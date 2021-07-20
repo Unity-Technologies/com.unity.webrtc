@@ -32,6 +32,7 @@ namespace Unity.WebRTC.Samples
         private List<RTCRtpSender> pc1Senders;
         private VideoStreamTrack videoStreamTrack;
         private AudioStreamTrack audioStreamTrack;
+        private MediaStream receiveAudioStream, receiveVideoStream;
         private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
         private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
         private DelegateOnIceCandidate pc1OnIceCandidate;
@@ -76,21 +77,15 @@ namespace Unity.WebRTC.Samples
             pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
             pc2Ontrack = e =>
             {
-                var stream = e.Streams.First();
-
                 if (e.Track is VideoStreamTrack video && !video.IsDecoderInitialized)
                 {
                     receiveImage.texture = video.InitializeReceiver(streamSize.x, streamSize.y);
-                    stream.OnRemoveTrack += ev =>
+                    receiveVideoStream = e.Streams.First();
+                    receiveVideoStream.OnRemoveTrack = ev =>
                     {
-                        if (video.Id == ev.Track.Id)
-                        {
-                            Debug.Log($"on remove video track {ev.Track}");
-                            receiveImage.texture = null;
-                            ev.Track.Dispose();
-                        }
+                        receiveImage.texture = null;
+                        ev.Track.Dispose();
                     };
-
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)
@@ -101,15 +96,12 @@ namespace Unity.WebRTC.Samples
                         receiveAudio.loop = true;
                         receiveAudio.Play();
                     };
-                    stream.OnRemoveTrack += ev =>
+                    receiveAudioStream = e.Streams.First();
+                    receiveAudioStream.OnRemoveTrack = ev =>
                     {
-                        if (audioTrack.Id == ev.Track.Id)
-                        {
-                            Debug.Log($"on remove audio track {ev.Track}");
-                            receiveAudio.Stop();
-                            receiveAudio.clip = null;
-                            ev.Track.Dispose();
-                        }
+                        receiveAudio.Stop();
+                        receiveAudio.clip = null;
+                        ev.Track.Dispose();
                     };
                 }
             };
@@ -304,6 +296,11 @@ namespace Unity.WebRTC.Samples
                 webCamTexture.Stop();
                 webCamTexture = null;
             }
+
+            receiveAudioStream.Dispose();
+            receiveAudioStream = null;
+            receiveVideoStream.Dispose();
+            receiveVideoStream = null;
 
             videoStreamTrack.Dispose();
             videoStreamTrack = null;
