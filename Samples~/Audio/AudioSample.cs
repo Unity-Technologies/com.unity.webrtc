@@ -24,6 +24,7 @@ namespace Unity.WebRTC
         [SerializeField] private Button buttonResume;
         [SerializeField] private Button buttonHangup;
         [SerializeField] private AudioClip[] audioclipList;
+        [SerializeField] private Text textBandwidth;
 
         private RTCPeerConnection _pc1, _pc2;
         private MediaStream _sendStream;
@@ -52,6 +53,7 @@ namespace Unity.WebRTC
         {
             WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
+            StartCoroutine(LoopStatsCoroutine());
 
             toggleEnableMicrophone.isOn = false;
             toggleEnableMicrophone.onValueChanged.AddListener(OnEnableMicrophone);
@@ -170,8 +172,6 @@ namespace Unity.WebRTC
             else
             {
                 var codec = availableCodecs[dropdownAudioCodecs.value - 1];
-                //Debug.Log(codec.channels);
-                //codec.channels = 1;
                 var error = transceiver1.SetCodecPreferences(new[] { codec });
                 if (error != RTCErrorType.None)
                     Debug.LogError(error);
@@ -291,7 +291,6 @@ namespace Unity.WebRTC
             return config;
         }
 
-
         IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
         {
             var op = pc.CreateOffer();
@@ -383,6 +382,67 @@ namespace Unity.WebRTC
         static void OnSetSessionDescriptionError(ref RTCError error)
         {
             Debug.LogError($"Error Detail Type: {error.message}");
+        }
+
+        private IEnumerator LoopStatsCoroutine()
+        {
+            while (true)
+            {
+                yield return StartCoroutine(UpdateStatsCoroutine());
+                yield return new WaitForSeconds(1f);
+            }
+        }
+
+        private IEnumerator UpdateStatsCoroutine()
+        {
+            RTCRtpSender sender = _pc1?.GetSenders().First();
+            if (sender == null)
+                yield break;
+            RTCStatsReportAsyncOperation op = sender.GetStats();
+            yield return op;
+            if (op.IsError)
+            {
+                Debug.LogErrorFormat("RTCRtpSender.GetStats() is failed {0}", op.Error.errorType);
+            }
+            else
+            {
+                UpdateStatsPacketSize(op.Value);
+            }
+        }
+
+        private RTCStatsReport lastResult = null;
+        private void UpdateStatsPacketSize(RTCStatsReport res)
+        {
+            foreach (RTCStats stats in res.Stats.Values)
+            {
+                if (!(stats is RTCOutboundRTPStreamStats report))
+                {
+                    continue;
+                }
+
+                if (report.isRemote)
+                    return;
+
+                long now = report.Timestamp;
+                ulong bytes = report.bytesSent;
+
+                if (lastResult != null)
+                {
+                    if (!lastResult.TryGetValue(report.Id, out RTCStats last))
+                        continue;
+
+                    var lastStats = last as RTCOutboundRTPStreamStats;
+                    var duration = (double)(now - lastStats.Timestamp) / 1000000;
+                    ulong bitrate = (ulong)(8 * (bytes - lastStats.bytesSent) / duration);
+                    textBandwidth.text = (bitrate / 1000.0f).ToString("f2");
+                    //if (autoScroll.isOn)
+                    //{
+                    //    statsField.MoveTextEnd(false);
+                    //}
+                }
+
+            }
+            lastResult = res;
         }
     }
 }
