@@ -17,6 +17,7 @@ namespace Unity.WebRTC
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Dropdown dropdownAudioCodecs;
         [SerializeField] private Dropdown dropdownSpeakerMode;
+        [SerializeField] private Dropdown dropdownBandwidth;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
         [SerializeField] private Button buttonPause;
@@ -36,6 +37,16 @@ namespace Unity.WebRTC
         int m_lengthSeconds = 1;
 
         private string m_deviceName = null;
+
+        private Dictionary<string, ulong?> bandwidthOptions = new Dictionary<string, ulong?>()
+        {
+            { "undefined", null },
+            { "160",  160 },
+            { "80", 80 },
+            { "40", 40 },
+            { "20",  20 },
+            { "10",  10 },
+        };
 
         void Start()
         {
@@ -69,6 +80,12 @@ namespace Unity.WebRTC
             }
             dropdownAudioCodecs.AddOptions(availableCodecs.Select(codec =>
                 new Dropdown.OptionData(string.Format($"{codec.mimeType} {codec.clockRate} {codec.sdpFmtpLine.Replace(";", " ")}"))).ToList());
+
+            dropdownBandwidth.options = bandwidthOptions
+                .Select(pair => new Dropdown.OptionData { text = pair.Key })
+                .ToList();
+            dropdownBandwidth.onValueChanged.AddListener(OnBandwidthChanged);
+            dropdownBandwidth.interactable = false;
 
             // Update UI
             OnDeviceChanged(dropdownMicrophoneDevices.value);
@@ -117,6 +134,7 @@ namespace Unity.WebRTC
         {
             buttonCall.interactable = false;
             buttonPause.interactable = true;
+            dropdownBandwidth.interactable = true;
 
             _receiveStream = new MediaStream();
             _receiveStream.OnAddTrack += OnAddTrack;
@@ -217,12 +235,41 @@ namespace Unity.WebRTC
             buttonPause.gameObject.SetActive(true);
 
             dropdownSpeakerMode.interactable = true;
+            dropdownBandwidth.interactable = false;
+
         }
 
         void OnDeviceChanged(int value)
         {
             m_deviceName = dropdownMicrophoneDevices.options[value].text;
             Microphone.GetDeviceCaps(m_deviceName, out int minFreq, out int maxFreq);
+        }
+
+        private void OnBandwidthChanged(int index)
+        {
+            if (_pc1 == null || _pc2 == null)
+                return;
+            ulong? bandwidth = bandwidthOptions.Values.ElementAt(index);
+            RTCRtpSender sender = _pc1.GetSenders().First();
+            RTCRtpSendParameters parameters = sender.GetParameters();
+            if (bandwidth == null)
+            {
+                parameters.encodings[0].maxBitrate = null;
+                parameters.encodings[0].minBitrate = null;
+            }
+            else
+            {
+                parameters.encodings[0].maxBitrate = bandwidth * 1000;
+                parameters.encodings[0].minBitrate = bandwidth * 1000;
+            }
+
+            RTCErrorType error = sender.SetParameters(parameters);
+            if (error != RTCErrorType.None)
+            {
+                Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+            }
+
+            Debug.Log("SetParameters:" + bandwidth);
         }
 
         void OnSpeakerModeChanged(int value)
