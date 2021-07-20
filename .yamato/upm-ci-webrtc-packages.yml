@@ -433,6 +433,8 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 
 {% else %}
 
+{% if target.name != "macos-m1" %} # todo(kazuki): XCode command line tools has not installed on m1 mac device 
+
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -446,7 +448,8 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       TEST_RESULT_DIR: upm-ci~/test-results/
       TEST_TARGET: macos
       TEST_PLATFORM: {{ param.platform }}
-      SCRIPTING_BACKEND: {{ param.backend }}  
+      TEST_ARCHITECTURE : {{ target.architecture }}
+      SCRIPTING_BACKEND: {{ param.backend }}
       EDITOR_VERSION: {{ editor.version }}
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
   commands:
@@ -461,6 +464,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
+{% endif %} # macos-m1
 {% endif %}
 {% endfor %}
 {% endfor %}
