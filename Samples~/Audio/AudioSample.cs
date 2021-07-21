@@ -17,6 +17,7 @@ namespace Unity.WebRTC
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Dropdown dropdownAudioCodecs;
         [SerializeField] private Dropdown dropdownSpeakerMode;
+        [SerializeField] private Dropdown dropdownDSPBufferSize;
         [SerializeField] private Dropdown dropdownBandwidth;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
@@ -49,7 +50,14 @@ namespace Unity.WebRTC
             { "10",  10 },
         };
 
-        void Start()
+        private Dictionary<string, int> dspBufferSizeOptions = new Dictionary<string, int>()
+        {
+            { "Best Latency",  256 },
+            { "Good Latency", 512 },
+            { "Best Performance", 1024 },
+        };
+
+    void Start()
         {
             WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
@@ -69,6 +77,13 @@ namespace Unity.WebRTC
                 Enum.GetNames(typeof(AudioSpeakerMode)).Select(mode => new Dropdown.OptionData(mode)).ToList();
             dropdownSpeakerMode.value = (int)audioConf.speakerMode;
             dropdownSpeakerMode.onValueChanged.AddListener(OnSpeakerModeChanged);
+
+            dropdownDSPBufferSize.options =
+                dspBufferSizeOptions.Select(clip => new Dropdown.OptionData(clip.Key)).ToList();
+            dropdownDSPBufferSize.onValueChanged.AddListener(OnDSPBufferSizeChanged);
+
+            // best latency is default
+            OnDSPBufferSizeChanged(dropdownDSPBufferSize.value);
 
             dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
             var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
@@ -222,7 +237,9 @@ namespace Unity.WebRTC
             _sendStream?.Dispose();
             _pc1?.Dispose();
             _pc2?.Dispose();
-                
+            _pc1 = null;
+            _pc2 = null;
+
             inputAudioSource.Stop();
             outputAudioSource.Stop();
 
@@ -277,6 +294,16 @@ namespace Unity.WebRTC
             var audioConf = AudioSettings.GetConfiguration();
             audioConf.speakerMode = (AudioSpeakerMode)value;
             Debug.Log(audioConf.speakerMode);
+            if (!AudioSettings.Reset(audioConf))
+            {
+                Debug.LogError("Failed changing Audio Settings");
+            }
+        }
+
+        void OnDSPBufferSizeChanged(int value)
+        {
+            var audioConf = AudioSettings.GetConfiguration();
+            audioConf.dspBufferSize = dspBufferSizeOptions.Values.ToArray()[value];
             if (!AudioSettings.Reset(audioConf))
             {
                 Debug.LogError("Failed changing Audio Settings");
