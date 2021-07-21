@@ -252,7 +252,9 @@ namespace Unity.WebRTC.Samples
             var deviceName = Microphone.devices[micListDropdown.value];
             Microphone.GetDeviceCaps(deviceName, out int minFreq, out int maxFreq);
             var micClip = Microphone.Start(deviceName, true, 1, 48000);
-            while (!(Microphone.GetPosition(deviceName) > 0)) { }
+
+            // set the latency to “0” samples before the audio starts to play.
+            while (!(Microphone.GetPosition(deviceName) > 0)) {}
 
             sourceAudio.clip = micClip;
             sourceAudio.loop = true;
