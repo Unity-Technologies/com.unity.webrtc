@@ -120,8 +120,6 @@ namespace Unity.WebRTC
             }
             inputAudioSource.loop = true;
             inputAudioSource.clip = m_clipInput;
-
-            
             inputAudioSource.Play();
 
             buttonStart.interactable = false;
