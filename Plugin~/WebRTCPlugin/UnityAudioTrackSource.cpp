@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "UnityAudioTrackSource.h"
 
-#include <mutex>
-
 namespace unity
 {
 namespace webrtc
@@ -25,10 +23,15 @@ rtc::scoped_refptr<UnityAudioTrackSource> UnityAudioTrackSource::Create(
 
 void UnityAudioTrackSource::AddSink(AudioTrackSinkInterface* sink)
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     _arrSink.push_back(sink);
 }
+
 void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     auto i= std::find(_arrSink.begin(), _arrSink.end(), sink);
     if (i != _arrSink.end())
         _arrSink.erase(i);
@@ -36,6 +39,8 @@ void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
 
 void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_arrSink.empty())
         return;
 
