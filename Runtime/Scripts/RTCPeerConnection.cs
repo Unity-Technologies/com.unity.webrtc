@@ -383,7 +383,7 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     var receiver = WebRTC.FindOrCreate(
-                        receiverPtr, ptr => new RTCRtpReceiver(ptr, connection));
+                        receiverPtr, _ptr => new RTCRtpReceiver(_ptr, connection));
                     connection.cacheTracks.Remove(receiver.Track);
                 }
             });
