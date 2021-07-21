@@ -45,7 +45,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         public RTCStatsReportAsyncOperation GetReceiverStats(int indexPeer, int indexReceiver)
         {
-            return GetReceivers(indexPeer).ElementAt(indexReceiver).GetStats();
+            return GetPeerReceivers(indexPeer).ElementAt(indexReceiver).GetStats();
         }
 
         public IEnumerable<RTCRtpSender> GetPeerSenders(int indexPeer)
@@ -53,7 +53,7 @@ namespace Unity.WebRTC.RuntimeTest
             return peers[indexPeer].GetSenders();
         }
 
-        public IEnumerable<RTCRtpReceiver> GetReceivers(int indexPeer)
+        public IEnumerable<RTCRtpReceiver> GetPeerReceivers(int indexPeer)
         {
             return peers[indexPeer].GetReceivers();
         }
@@ -87,16 +87,16 @@ namespace Unity.WebRTC.RuntimeTest
             };
             peers[1].OnIceCandidate = candidate =>
             {
-                Assert.NotNull(candidate);
-                Assert.NotNull(candidate.Candidate);
+                Assert.That(candidate, Is.Not.Null);
+                Assert.That(candidate.Candidate, Is.Not.Null);
                 peers[0].AddIceCandidate(candidate);
             };
             peers[1].OnTrack = e =>
             {
-                Assert.NotNull(e);
-                Assert.NotNull(e.Track);
-                Assert.NotNull(e.Receiver);
-                Assert.NotNull(e.Transceiver);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.Track, Is.Not.Null);
+                Assert.That(e.Receiver, Is.Not.Null);
+                Assert.That(e.Transceiver, Is.Not.Null);
                 peers[1].AddTrack(e.Track);
             };
             peers[0].OnDataChannel = e =>
@@ -161,7 +161,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             if (m_stream != null)
             {
-                var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any(), 5000);
+                var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any() && GetPeerReceivers(1).Any(), 5000);
                 yield return op9;
                 Assert.That(op9.IsCompleted, Is.True);
             }

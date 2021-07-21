@@ -413,7 +413,7 @@ namespace Unity.WebRTC.RuntimeTest
             test.component.SetStream(stream);
             yield return test;
 
-            foreach (var receiver in test.component.GetReceivers(1))
+            foreach (var receiver in test.component.GetPeerReceivers(1))
             {
                 Assert.That(receiver.Streams, Has.Count.EqualTo(1));
             }
