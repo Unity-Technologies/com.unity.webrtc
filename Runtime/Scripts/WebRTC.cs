@@ -614,6 +614,10 @@ namespace Unity.WebRTC
             }
             return false;
         }
+        internal static void DestroyOnMainThread(UnityEngine.Object obj)
+        {
+            s_syncContext.Post(DestroyImmediate, obj);
+        }
 
         internal static void Sync(IntPtr ptr, Action callback)
         {
@@ -633,6 +637,13 @@ namespace Unity.WebRTC
             }
             obj.callback();
         }
+
+        static void DestroyImmediate(object state)
+        {
+            var obj = state as UnityEngine.Object;
+            UnityEngine.Object.DestroyImmediate(obj);
+        }
+
 
         internal static IEnumerable<T> Deserialize<T>(IntPtr buf, int length, Func<IntPtr, T> constructor) where T : class
         {
