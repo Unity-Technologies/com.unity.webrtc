@@ -110,6 +110,8 @@ namespace Unity.WebRTC
             {
                 m_deviceName = dropdownMicrophoneDevices.captionText.text;
                 m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
+                // set the latency to “0” samples before the audio starts to play.
+                while (!(Microphone.GetPosition(m_deviceName) > 0)) {}
             }
             else
             {

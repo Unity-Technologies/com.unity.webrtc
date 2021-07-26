@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 using namespace ::webrtc;
 
 namespace unity
@@ -27,6 +29,7 @@ namespace webrtc
         std::string _sTrackName;
         std::vector<int16_t> _convertedAudioData;
         std::vector <AudioTrackSinkInterface*> _arrSink;
+        std::mutex _mutex;
     };
 } // end namespace webrtc
 } // end namespace unity
