@@ -64,7 +64,9 @@ namespace Unity.WebRTC
             public void Dispose()
             {
                 if(m_clip != null)
-                    Object.Destroy(m_clip);
+                {
+                    WebRTC.DestroyOnMainThread(m_clip);
+                }
                 m_clip = null;
             }
 
@@ -145,7 +147,11 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 if(_audioSourceRead != null)
-                    Object.Destroy(_audioSourceRead);
+                {
+                    // Unity API must be called from main thread.
+                    _audioSourceRead.onAudioRead -= SetData;
+                    WebRTC.DestroyOnMainThread(_audioSourceRead);
+                }
                 _streamRenderer?.Dispose();
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
                 WebRTC.Context.DeleteMediaStreamTrack(self);
@@ -169,7 +175,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                NativeMethods.ProcessAudio(self, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+                NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
         }
 #endif
@@ -185,7 +191,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                NativeMethods.ProcessAudio(self, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+                NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
         }
 
@@ -199,7 +205,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeSlice.GetUnsafeReadOnlyPtr();
-                NativeMethods.ProcessAudio(self, (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
+                NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
             }
         }
 

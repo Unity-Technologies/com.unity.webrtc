@@ -166,13 +166,17 @@ namespace Unity.WebRTC
                     WebRTC.Context.FinalizeEncoder(self);
                     if (RenderTexture.active == m_destTexture)
                         RenderTexture.active = null;
-                    UnityEngine.Object.DestroyImmediate(m_destTexture);
+
+                    // Unity API must be called from main thread.
+                    WebRTC.DestroyOnMainThread(m_destTexture);
                 }
 
                 if (IsDecoderInitialized)
                 {
                     m_renderer.Dispose();
-                    UnityEngine.Object.DestroyImmediate(m_sourceTexture);
+
+                    // Unity API must be called from main thread.
+                    WebRTC.DestroyOnMainThread(m_destTexture);
                 }
 
                 s_tracks.TryRemove(self, out var value);
