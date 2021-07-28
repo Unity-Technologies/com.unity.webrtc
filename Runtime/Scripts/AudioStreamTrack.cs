@@ -193,7 +193,8 @@ namespace Unity.WebRTC
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
                 NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
-            OnAudioReceive(self, nativeArray.ToArray(), nativeArray.Length, sampleRate, channels, sampleRate);
+            //OnAudioReceive(self, nativeArray.ToArray(), nativeArray.Length, sampleRate, channels, sampleRate);
+            OnAudioReceivedInternal(nativeArray.ToArray(), sampleRate, channels, sampleRate);
         }
 
         /// <summary>
