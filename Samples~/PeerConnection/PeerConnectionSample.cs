@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +25,13 @@ class PeerConnectionSample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
-    private MediaStream videoStream, receiveStream;
+    private VideoStreamTrack videoStreamTrack;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private bool videoUpdateStarted;
 
     private const int width = 1280;
     private const int height = 720;
@@ -45,11 +43,12 @@ class PeerConnectionSample : MonoBehaviour
         callButton.onClick.AddListener(Call);
         restartButton.onClick.AddListener(RestartIce);
         hangUpButton.onClick.AddListener(HangUp);
-        receiveStream = new MediaStream();
     }
 
     private void OnDestroy()
     {
+        videoStreamTrack?.Dispose();
+        videoStreamTrack = null;
         WebRTC.Dispose();
     }
 
@@ -66,18 +65,15 @@ class PeerConnectionSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            receiveStream.AddTrack(e.Track);
-        };
-        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
-
-        receiveStream.OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
+            if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
             {
                 receiveImage.texture = track.InitializeReceiver(width, height);
                 receiveImage.color = Color.white;
             }
         };
+        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
+
+        StartCoroutine(WebRTC.Update());
     }
 
     private void OnStart()
@@ -85,9 +81,9 @@ class PeerConnectionSample : MonoBehaviour
         startButton.interactable = false;
         callButton.interactable = true;
 
-        if (videoStream == null)
+        if (videoStreamTrack == null)
         {
-            videoStream = cam.CaptureStream(width, height, 1000000);
+            videoStreamTrack = cam.CaptureStreamTrack(width, height, 0);
         }
 
         sourceImage.texture = cam.targetTexture;
@@ -192,37 +188,6 @@ class PeerConnectionSample : MonoBehaviour
         }
     }
 
-    private void AddTracks()
-    {
-        foreach (var track in videoStream.GetTracks())
-        {
-            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
-        }
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
-        }
-    }
-
-    private void RemoveTracks()
-    {
-        foreach (var sender in pc1Senders)
-        {
-            _pc1.RemoveTrack(sender);
-        }
-
-        pc1Senders.Clear();
-
-        MediaStreamTrack[] tracks = receiveStream.GetTracks().ToArray();
-        foreach (var track in tracks)
-        {
-            receiveStream.RemoveTrack(track);
-            track.Dispose();
-        }
-    }
-
     private void Call()
     {
         callButton.interactable = false;
@@ -239,7 +204,7 @@ class PeerConnectionSample : MonoBehaviour
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;
 
-        AddTracks();
+        pc1Senders.Add(_pc1.AddTrack(videoStreamTrack));
     }
 
     private void RestartIce()
@@ -251,10 +216,12 @@ class PeerConnectionSample : MonoBehaviour
 
     private void HangUp()
     {
-        RemoveTracks();
+        foreach (var sender in pc1Senders)
+        {
+            _pc1.RemoveTrack(sender);
+        }
+        pc1Senders.Clear();
 
-        _pc1.Close();
-        _pc2.Close();
         _pc1.Dispose();
         _pc2.Dispose();
         _pc1 = null;
@@ -264,6 +231,7 @@ class PeerConnectionSample : MonoBehaviour
         restartButton.interactable = false;
         hangUpButton.interactable = false;
 
+        receiveImage.texture = null;
         receiveImage.color = Color.black;
     }
 
