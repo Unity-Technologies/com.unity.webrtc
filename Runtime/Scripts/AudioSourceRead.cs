@@ -38,12 +38,11 @@ namespace Unity.WebRTC
 
         void Update()
         {
-            Debug.Log("source.timeSamples:" + source.timeSamples);
-
-            if (source.timeSamples == prevTimeSamples)
+            var timeSamples= source.timeSamples;
+            if (timeSamples == prevTimeSamples)
                 return;
 
-            if (source.timeSamples < prevTimeSamples)
+            if (timeSamples < prevTimeSamples)
             {
                 var length = clip.samples - prevTimeSamples;
                 var data = new float[length * channels];
@@ -52,15 +51,15 @@ namespace Unity.WebRTC
                 prevTimeSamples = 0;
             }
 
-            if (source.timeSamples == prevTimeSamples)
+            if (timeSamples == prevTimeSamples)
                 return;
 
             {
-                var length = source.timeSamples - prevTimeSamples;
+                var length = timeSamples - prevTimeSamples;
                 var data = new float[length * channels];
                 clip.GetData(data, prevTimeSamples);
                 onAudioRead?.Invoke(data, channels, sampleRate);
-                prevTimeSamples = source.timeSamples;
+                prevTimeSamples = timeSamples;
             }
     }
         // void OnAudioFilterRead(float[] data, int channels)
