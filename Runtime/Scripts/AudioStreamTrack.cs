@@ -7,28 +7,28 @@ using Object = UnityEngine.Object;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="renderer"></param>
     public delegate void OnAudioReceived(AudioClip renderer);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event OnAudioReceived OnAudioReceived;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public AudioSource Source { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public AudioClip Renderer
         {
@@ -106,14 +106,14 @@ namespace Unity.WebRTC
         private AudioStreamRenderer _streamRenderer;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public AudioStreamTrack() : this(WebRTC.Context.CreateAudioTrack(Guid.NewGuid().ToString()))
         {
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="source"></param>
         public AudioStreamTrack(AudioSource source) : this()
@@ -131,11 +131,11 @@ namespace Unity.WebRTC
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
-            WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
+            //WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -165,7 +165,7 @@ namespace Unity.WebRTC
 
 #if UNITY_2020_1_OR_NEWER
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="nativeArray"></param>
         /// <param name="channels"></param>
@@ -181,7 +181,7 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="nativeArray"></param>
         /// <param name="channels"></param>
@@ -193,10 +193,11 @@ namespace Unity.WebRTC
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
                 NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
+            OnAudioReceive(self, nativeArray.ToArray(), nativeArray.Length, sampleRate, channels, sampleRate);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="nativeSlice"></param>
         /// <param name="channels"></param>
@@ -210,7 +211,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="array"></param>
         /// <param name="channels"></param>
