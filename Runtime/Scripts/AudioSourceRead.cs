@@ -42,6 +42,16 @@ namespace Unity.WebRTC
             nativeArray.Dispose();
         }
 
+        void OnAudioRead(int current, int prev)
+        {
+            var length = current - prev;
+            var data = new float[length * channels];
+            clip.GetData(data, prev);
+            NativeArray<float>.Copy(data, 0, nativeArray, prev, length);
+            var slice = new NativeSlice<float>(nativeArray, prev, length);
+            onAudioRead?.Invoke(ref slice, channels, sampleRate);
+        }
+
         void Update()
         {
             var timeSamples= source.timeSamples;
@@ -50,27 +60,14 @@ namespace Unity.WebRTC
 
             if (timeSamples < prevTimeSamples)
             {
-                var length = clip.samples - prevTimeSamples;
-                var data = new float[length * channels];
-                clip.GetData(data, prevTimeSamples);
-                NativeArray<float>.Copy(data, 0, nativeArray, prevTimeSamples, length);
-                var slice = new NativeSlice<float>(nativeArray, prevTimeSamples, length);
-                onAudioRead?.Invoke(ref slice, channels, sampleRate);
+                OnAudioRead(clip.samples, prevTimeSamples);
                 prevTimeSamples = 0;
             }
-
             if (timeSamples == prevTimeSamples)
                 return;
-
-            {
-                var length = timeSamples - prevTimeSamples;
-                var data = new float[length * channels];
-                clip.GetData(data, prevTimeSamples);
-                NativeArray<float>.Copy(data, 0, nativeArray, prevTimeSamples, length);
-                var slice = new NativeSlice<float>(nativeArray, prevTimeSamples, length);
-                onAudioRead?.Invoke(ref slice, channels, sampleRate);
-                prevTimeSamples = timeSamples;
-            }
+            
+            OnAudioRead(timeSamples, prevTimeSamples);
+            prevTimeSamples = timeSamples;
         }
     }
 }
