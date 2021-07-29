@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Unity.Collections;
 
 namespace Unity.WebRTC
 {
@@ -7,7 +9,7 @@ namespace Unity.WebRTC
     /// </summary>
     /// <param name="data"></param>
     /// <param name="channels"></param>
-    delegate void AudioReadEventHandler(float[] data, int channels, int sampleRate);
+    delegate void AudioReadEventHandler(ref NativeSlice<float> data, int channels, int sampleRate);
 
     /// <summary>
     ///
@@ -20,6 +22,7 @@ namespace Unity.WebRTC
         private int sampleRate;
         private int channels;
         private int prevTimeSamples;
+        private NativeArray<float> nativeArray;
 
         private AudioClip clip;
         private AudioSource source;
@@ -30,10 +33,13 @@ namespace Unity.WebRTC
             clip = source.clip;
             channels = clip.channels;
             sampleRate = clip.frequency;
+            nativeArray = new NativeArray<float>(
+                clip.channels * clip.samples, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+        }
 
-            Debug.Log("channels:" + channels);
-            Debug.Log("sampleRate:" + sampleRate);
-
+        private void OnDestroy()
+        {
+            nativeArray.Dispose();
         }
 
         void Update()
@@ -47,7 +53,9 @@ namespace Unity.WebRTC
                 var length = clip.samples - prevTimeSamples;
                 var data = new float[length * channels];
                 clip.GetData(data, prevTimeSamples);
-                onAudioRead?.Invoke(data, channels, sampleRate);
+                NativeArray<float>.Copy(data, 0, nativeArray, prevTimeSamples, length);
+                var slice = new NativeSlice<float>(nativeArray, prevTimeSamples, length);
+                onAudioRead?.Invoke(ref slice, channels, sampleRate);
                 prevTimeSamples = 0;
             }
 
@@ -58,13 +66,11 @@ namespace Unity.WebRTC
                 var length = timeSamples - prevTimeSamples;
                 var data = new float[length * channels];
                 clip.GetData(data, prevTimeSamples);
-                onAudioRead?.Invoke(data, channels, sampleRate);
+                NativeArray<float>.Copy(data, 0, nativeArray, prevTimeSamples, length);
+                var slice = new NativeSlice<float>(nativeArray, prevTimeSamples, length);
+                onAudioRead?.Invoke(ref slice, channels, sampleRate);
                 prevTimeSamples = timeSamples;
             }
-    }
-        // void OnAudioFilterRead(float[] data, int channels)
-        // {
-        //     onAudioRead?.Invoke(data, channels, sampleRate);
-        // }
+        }
     }
 }
