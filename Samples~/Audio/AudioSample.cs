@@ -141,6 +141,7 @@ namespace Unity.WebRTC
             buttonCall.interactable = true;
             buttonHangup.interactable = true;
             dropdownSpeakerMode.interactable = false;
+            dropdownDSPBufferSize.interactable = false;
         }
 
         void OnEnableMicrophone(bool enable)
@@ -156,7 +157,7 @@ namespace Unity.WebRTC
             dropdownBandwidth.interactable = true;
 
             _receiveStream = new MediaStream();
-//            _receiveStream.OnAddTrack += OnAddTrack;
+            _receiveStream.OnAddTrack += OnAddTrack;
             _sendStream = new MediaStream();
 
             var configuration = GetSelectedSdpSemantics();
@@ -176,7 +177,6 @@ namespace Unity.WebRTC
             transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
             m_audioTrack = new AudioStreamTrack(inputAudioSource);
-            m_audioTrack.OnAudioReceived += OnAudioReceived;
             _pc1.AddTrack(m_audioTrack, _sendStream);
 
             var transceiver1 = _pc1.GetTransceivers().First();
@@ -254,6 +254,7 @@ namespace Unity.WebRTC
             buttonPause.gameObject.SetActive(true);
 
             dropdownSpeakerMode.interactable = true;
+            dropdownDSPBufferSize.interactable = true;
             dropdownBandwidth.interactable = false;
 
         }

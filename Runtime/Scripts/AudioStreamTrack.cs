@@ -2,7 +2,6 @@ using System;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
@@ -131,7 +130,7 @@ namespace Unity.WebRTC
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
-            //WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
+            WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
         }
 
         /// <summary>
@@ -207,8 +206,6 @@ namespace Unity.WebRTC
                 void* ptr = nativeSlice.GetUnsafeReadOnlyPtr();
                 NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
             }
-            //OnAudioReceive(self, nativeArray.ToArray(), nativeArray.Length, sampleRate, channels, sampleRate);
-            OnAudioReceivedInternal(nativeSlice.ToArray(), sampleRate, channels, sampleRate);
         }
 
         /// <summary>
