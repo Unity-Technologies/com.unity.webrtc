@@ -47,8 +47,8 @@ namespace Unity.WebRTC
             var length = current - prev;
             var data = new float[length * channels];
             clip.GetData(data, prev);
-            NativeArray<float>.Copy(data, 0, nativeArray, prev, length);
-            var slice = new NativeSlice<float>(nativeArray, prev, length);
+            NativeArray<float>.Copy(data, 0, nativeArray, prev, data.Length);
+            var slice = new NativeSlice<float>(nativeArray, prev, data.Length);
             onAudioRead?.Invoke(ref slice, channels, sampleRate);
         }
 
