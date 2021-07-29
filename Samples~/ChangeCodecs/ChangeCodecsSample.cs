@@ -25,14 +25,13 @@ class ChangeCodecsSample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
-    private MediaStream videoStream, receiveStream;
+    private VideoStreamTrack videoStreamTrack;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private bool videoUpdateStarted;
 
     private readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
     private RTCRtpCodecCapability[] availableCodecs;
@@ -46,7 +45,7 @@ class ChangeCodecsSample : MonoBehaviour
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
-        receiveStream = new MediaStream();
+        StartCoroutine(WebRTC.Update());
     }
 
     private void OnDestroy()
@@ -67,18 +66,13 @@ class ChangeCodecsSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            receiveStream.AddTrack(e.Track);
-        };
-        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
-
-        receiveStream.OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
+            if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
             {
                 receiveImage.texture = track.InitializeReceiver(width, height);
                 receiveImage.color = Color.white;
             }
         };
+        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
     }
 
     private void OnStart()
@@ -167,16 +161,7 @@ class ChangeCodecsSample : MonoBehaviour
 
     private void AddTracks()
     {
-        foreach (var track in videoStream.GetTracks())
-        {
-            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
-        }
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
-        }
+        pc1Senders.Add(_pc1.AddTrack(videoStreamTrack));
 
         RTCRtpCodecCapability[] codecs = null;
         if (codecSelector.value == 0)
@@ -196,22 +181,6 @@ class ChangeCodecsSample : MonoBehaviour
         }
     }
 
-    private void RemoveTracks()
-    {
-        foreach (var sender in pc1Senders)
-        {
-            _pc1.RemoveTrack(sender);
-        }
-        pc1Senders.Clear();
-
-        MediaStreamTrack[] tracks = receiveStream.GetTracks().ToArray();
-        foreach (var track in tracks)
-        {
-            receiveStream.RemoveTrack(track);
-            track.Dispose();
-        }
-    }
-
     private void Call()
     {
         callButton.interactable = false;
@@ -228,9 +197,9 @@ class ChangeCodecsSample : MonoBehaviour
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;
 
-        if (videoStream == null)
+        if (videoStreamTrack == null)
         {
-            videoStream = cam.CaptureStream(width, height, 1000000);
+            videoStreamTrack = cam.CaptureStreamTrack(width, height, 0);
         }
         sourceImage.texture = cam.targetTexture;
         sourceImage.color = Color.white;
@@ -240,7 +209,14 @@ class ChangeCodecsSample : MonoBehaviour
 
     private void HangUp()
     {
-        RemoveTracks();
+        foreach (var sender in pc1Senders)
+        {
+            _pc1.RemoveTrack(sender);
+        }
+        pc1Senders.Clear();
+
+        videoStreamTrack.Dispose();
+        videoStreamTrack = null;
 
         _pc1.Close();
         _pc2.Close();
