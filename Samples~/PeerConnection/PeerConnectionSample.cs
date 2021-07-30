@@ -25,7 +25,7 @@ class PeerConnectionSample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
-    private VideoStreamTrack videoStreamTrack;
+    private MediaStream videoStream, receiveStream;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
@@ -43,12 +43,15 @@ class PeerConnectionSample : MonoBehaviour
         callButton.onClick.AddListener(Call);
         restartButton.onClick.AddListener(RestartIce);
         hangUpButton.onClick.AddListener(HangUp);
+        receiveStream = new MediaStream();
     }
 
     private void OnDestroy()
     {
-        videoStreamTrack?.Dispose();
-        videoStreamTrack = null;
+        receiveStream?.Dispose();
+        receiveStream = null;
+        videoStream?.Dispose();
+        videoStream = null;
         WebRTC.Dispose();
     }
 
@@ -63,7 +66,10 @@ class PeerConnectionSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
-        pc2Ontrack = e =>
+        pc2Ontrack = e => { receiveStream.AddTrack(e.Track); };
+        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
+
+        receiveStream.OnAddTrack = e =>
         {
             if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
             {
@@ -71,7 +77,14 @@ class PeerConnectionSample : MonoBehaviour
                 receiveImage.color = Color.white;
             }
         };
-        pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
+        receiveStream.OnRemoveTrack = e =>
+        {
+            if (e.Track is VideoStreamTrack track)
+            {
+                track.Dispose();
+                receiveImage.color = Color.black;
+            }
+        };
 
         StartCoroutine(WebRTC.Update());
     }
@@ -81,9 +94,9 @@ class PeerConnectionSample : MonoBehaviour
         startButton.interactable = false;
         callButton.interactable = true;
 
-        if (videoStreamTrack == null)
+        if (videoStream == null)
         {
-            videoStreamTrack = cam.CaptureStreamTrack(width, height, 0);
+            videoStream = cam.CaptureStream(width, height, 0);
         }
 
         sourceImage.texture = cam.targetTexture;
@@ -204,7 +217,10 @@ class PeerConnectionSample : MonoBehaviour
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
         _pc2.OnTrack = pc2Ontrack;
 
-        pc1Senders.Add(_pc1.AddTrack(videoStreamTrack));
+        foreach (var track in videoStream.GetTracks())
+        {
+            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
+        }
     }
 
     private void RestartIce()
@@ -221,6 +237,11 @@ class PeerConnectionSample : MonoBehaviour
             _pc1.RemoveTrack(sender);
         }
         pc1Senders.Clear();
+
+        foreach (var track in receiveStream.GetTracks())
+        {
+            receiveStream.RemoveTrack(track);
+        }
 
         _pc1.Dispose();
         _pc2.Dispose();
