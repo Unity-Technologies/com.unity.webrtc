@@ -68,9 +68,9 @@ namespace webrtc
         template <typename T>
         rtc::scoped_refptr<T> GetRefPtr(T* ptr) { return *static_cast<rtc::scoped_refptr<T>*>((void*)(&m_mapRefPtr.find(ptr))); }
         template <typename T>
-        void AddRefPtr(rtc::scoped_refptr<T>& refptr) { m_mapRefPtr.try_emplace(refptr.get(), refptr); }
+        void AddRefPtr(rtc::scoped_refptr<T>& refptr) { m_mapRefPtr.emplace(refptr.get(), refptr); }
         template <typename T>
-        void AddRefPtr(T* ptr) { m_mapRefPtr.try_emplace(ptr, ptr); }
+        void AddRefPtr(T* ptr) { m_mapRefPtr.emplace(ptr, ptr); }
         template <typename T>
         void RemoveRefPtr(rtc::scoped_refptr<T>& refptr) { m_mapRefPtr.erase(refptr.get()); }
         template <typename T>

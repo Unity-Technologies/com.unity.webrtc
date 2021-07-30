@@ -351,7 +351,7 @@ namespace webrtc
     {
         rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
             m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        m_mapRefPtr.try_emplace(stream.get(), stream);
+        m_mapRefPtr.emplace(stream.get(), stream);
 
         //m_mapLocalMediaStream[streamId] = stream.release();
         return stream.get();
@@ -416,7 +416,7 @@ namespace webrtc
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
         //m_mediaSteamTrackList.push_back(track);
-        m_mapRefPtr.try_emplace(track.get(), track);
+        m_mapRefPtr.emplace(track.get(), track);
         return track;
     }
 
