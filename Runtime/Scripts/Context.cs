@@ -166,6 +166,10 @@ namespace Unity.WebRTC
             NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream.GetSelfOrThrow(), callback);
         }
 
+        public void MediaStreamObserverRemoveCachedTrack(MediaStream stream, string trackId)
+        {
+            NativeMethods.MediaStreamObserverRemoveCachedTrack(self, stream.GetSelfOrThrow(), trackId);
+        }
 
         public void AudioTrackRegisterAudioReceiveCallback(IntPtr track, DelegateAudioReceive callback)
         {

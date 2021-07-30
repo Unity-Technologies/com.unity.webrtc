@@ -334,6 +334,11 @@ extern "C"
         context->GetObserver(stream)->RegisterOnRemoveTrack(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void MediaStreamObserverRemoveCachedTrack(Context* context, MediaStreamInterface* stream, const char* trackId)
+    {
+        context->GetObserver(stream)->RemoveCachedTrack(trackId);
+    }
+
     UNITY_INTERFACE_EXPORT VideoTrackInterface** MediaStreamGetVideoTracks(MediaStreamInterface* stream, size_t* length)
     {
         return ConvertPtrArrayFromRefPtrArray<VideoTrackInterface>(stream->GetVideoTracks(), length);

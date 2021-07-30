@@ -12,6 +12,7 @@ namespace webrtc
         explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream);
         void RegisterOnAddTrack(DelegateMediaStreamOnAddTrack callback);
         void RegisterOnRemoveTrack(DelegateMediaStreamOnRemoveTrack callback);
+        void RemoveCachedTrack(const char* trackId);
     private:
         void OnVideoTrackAdded(webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream);
         void OnAudioTrackAdded(webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream);
@@ -20,6 +21,9 @@ namespace webrtc
 
         std::list<DelegateMediaStreamOnAddTrack> m_listOnAddTrack;
         std::list<DelegateMediaStreamOnRemoveTrack> m_listOnRemoveTrack;
+
+        std::vector<rtc::scoped_refptr<webrtc::AudioTrackInterface>> m_cachedAudioTrackList;
+        std::vector<rtc::scoped_refptr<webrtc::VideoTrackInterface>> m_cachedVideoTrackList;
     };
 
 } // end namespace webrtc

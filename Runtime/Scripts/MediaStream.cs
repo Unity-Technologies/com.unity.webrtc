@@ -139,8 +139,10 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
                     var e = new MediaStreamTrackEvent(trackPtr);
+                    var trackId = e.Track.Id;
                     stream.onRemoveTrack?.Invoke(e);
                     stream.cacheTracks.Remove(e.Track);
+                    WebRTC.Context.MediaStreamObserverRemoveCachedTrack(stream, trackId);
                 }
             });
         }

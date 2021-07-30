@@ -1013,6 +1013,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamRegisterOnRemoveTrack(IntPtr context, IntPtr stream, DelegateNativeMediaStreamOnRemoveTrack callback);
         [DllImport(WebRTC.Lib)]
+        public static extern void MediaStreamObserverRemoveCachedTrack(IntPtr context, IntPtr stream, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string trackId);
+        [DllImport(WebRTC.Lib)]
         public static extern TrackKind MediaStreamTrackGetKind(IntPtr track);
         [DllImport(WebRTC.Lib)]
         public static extern TrackState MediaStreamTrackGetReadyState(IntPtr track);
