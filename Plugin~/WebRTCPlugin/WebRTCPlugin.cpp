@@ -986,7 +986,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void TransceiverStop(RtpTransceiverInterface* transceiver)
     {
-        transceiver->Stop();
+        transceiver->StopStandard();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverDirection TransceiverGetDirection(RtpTransceiverInterface* transceiver)

@@ -239,9 +239,17 @@ namespace webrtc
             m_audioTrack = nullptr;
 
             m_mapIdAndEncoder.clear();
-            m_mediaSteamTrackList.clear();
+            //m_mediaSteamTrackList.clear();
             m_mapClients.clear();
-            m_mapLocalMediaStream.clear();
+
+            RTC_LOG(LS_INFO) << "scoped_refptr size:" << m_mapRefPtr.size();
+            for (auto pair : m_mapRefPtr)
+            {
+                RTC_LOG(LS_INFO) << "scoped_refptr :" << pair.first << " " << pair.second;
+            }
+
+            m_mapRefPtr.clear();
+            //m_mapLocalMediaStream.clear();
             m_mapMediaStreamObserver.clear();
             m_mapSetSessionDescriptionObserver.clear();
             m_mapVideoEncoderParameter.clear();
@@ -257,10 +265,13 @@ namespace webrtc
 
     UnityVideoTrackSource* Context::GetVideoSource(const MediaStreamTrackInterface* track)
     {
-        const auto result = std::find_if(
-            m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
-            [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
-        if (result == m_mediaSteamTrackList.end())
+        //const auto result = std::find_if(
+        //    m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
+        //    [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
+        //if (result == m_mediaSteamTrackList.end())
+        //    return nullptr;
+
+        if (m_mapRefPtr.find(track) == m_mapRefPtr.end())
             return nullptr;
 
         const VideoTrackInterface* videoTrack = static_cast<const VideoTrackInterface*>(track);
@@ -340,22 +351,25 @@ namespace webrtc
     {
         rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
             m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        m_mapLocalMediaStream[streamId] = stream.release();
-        return m_mapLocalMediaStream[streamId];
+        m_mapRefPtr.try_emplace(stream.get(), stream);
+
+        //m_mapLocalMediaStream[streamId] = stream.release();
+        return stream.get();
     }
 
     void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
     {
-        if (m_mapLocalMediaStream.find(stream->id()) != m_mapLocalMediaStream.end())
-        {
-            m_mapLocalMediaStream.erase(stream->id());
-            stream->Release();
-        }
+        m_mapRefPtr.erase(stream);
+        //if (m_mapLocalMediaStream.find(stream->id()) != m_mapLocalMediaStream.end())
+        //{
+        //    m_mapLocalMediaStream.erase(stream->id());
+        //    stream->Release();
+        //}
     }
 
     void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
     {
-        m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream);
+        m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream, this);
     }
 
     void Context::UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
@@ -377,7 +391,9 @@ namespace webrtc
 
         const rtc::scoped_refptr<VideoTrackInterface> track =
             m_peerConnectionFactory->CreateVideoTrack(label, source);
-        m_mediaSteamTrackList.push_back(track);
+
+        //m_mediaSteamTrackList.push_back(track);
+        m_mapRefPtr.emplace(track.get(), track);
         return track;
     }
 
@@ -399,20 +415,21 @@ namespace webrtc
 
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
-        m_mediaSteamTrackList.push_back(track);
-
+        //m_mediaSteamTrackList.push_back(track);
+        m_mapRefPtr.try_emplace(track.get(), track);
         return track;
     }
 
     void Context::DeleteMediaStreamTrack(MediaStreamTrackInterface* track)
     {
-        const auto result = std::find_if(
-            m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
-            [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
-        if(result != m_mediaSteamTrackList.end())
-        {
-            m_mediaSteamTrackList.erase(result);
-        }
+        //const auto result = std::find_if(
+        //    m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
+        //    [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
+        //if(result != m_mediaSteamTrackList.end())
+        //{
+        //    m_mediaSteamTrackList.erase(result);
+        //}
+        m_mapRefPtr.erase(track);
     }
 
     void Context::RegisterAudioReceiveCallback(
