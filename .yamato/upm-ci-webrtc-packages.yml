@@ -278,7 +278,7 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
     type: Unity::mobile::iPhone
-    image: mobile/macos-10.13-testing:stable
+    image: mobile/ios-debug:latest
     flavor: b1.medium
   skip_checkout: true
   dependencies:
