@@ -27,7 +27,7 @@ This version of the package is compatible with the following versions of the Uni
 - **Linux**
 - **macOS** (**Apple Slicon** is not supported yet)
 - **iOS**
-- **Android**
+- **Android** (**ARM64** only. **ARMv7** is not supported)
 
 > [!NOTE]
 > **WebGL** platform is not supported.
@@ -75,8 +75,12 @@ This package depends on **NVIDIA Video Codec SDK 9.1**. Please check the graphic
 > ``` sudo apt install -y libc++1 libc++abi1 ```
 
 > [!NOTE]
-> To make the archive for iOS platform to publish App Store, you need to use `lipo` command to eliminate the `x86_64` architecture from the binary in the `webrtc.framework`.
+> To make the archive for **iOS platform** to publish App Store, you need to use `lipo` command to eliminate the `x86_64` architecture from the binary in the `webrtc.framework`.
 >
 > ```lipo -remove x86_64 Runtime/Plugins/iOS/webrtc.framework/webrtc -o Runtime/Plugins/iOS/webrtc.framework/webrtc```
 
-
+> [!NOTE]
+> To build the apk file for **Android platform**, you need to configure player settings below.
+> - **Scripting backend** - IL2CPP
+> - **Target Architectures** - ARM64 (Do disable ARMv7)
+>
