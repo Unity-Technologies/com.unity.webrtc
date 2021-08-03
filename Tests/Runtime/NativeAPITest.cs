@@ -128,7 +128,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var context = NativeMethods.ContextCreate(0, encoderType, true);
             var connection = NativeMethods.ContextCreatePeerConnection(context);
-            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(context, connection, out ulong length);
+            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(connection, out ulong length);
             Assert.AreEqual(0, length);
             NativeMethods.ContextDeletePeerConnection(context, connection);
             NativeMethods.ContextDestroy(0);
