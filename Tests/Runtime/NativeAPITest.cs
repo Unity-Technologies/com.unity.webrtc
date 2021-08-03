@@ -128,7 +128,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var context = NativeMethods.ContextCreate(0, encoderType, true);
             var connection = NativeMethods.ContextCreatePeerConnection(context);
-            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(connection, out ulong length);
+            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(context, connection, out ulong length);
             Assert.AreEqual(0, length);
             NativeMethods.ContextDeletePeerConnection(context, connection);
             NativeMethods.ContextDestroy(0);
@@ -152,7 +152,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var context = NativeMethods.ContextCreate(0, encoderType, true);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDestroy(0);
         }
 
@@ -173,7 +173,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.MediaStreamRegisterOnRemoveTrack(context, stream, MediaStreamOnRemoveTrack);
 
             NativeMethods.ContextUnRegisterMediaStreamObserver(context, stream);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDestroy(0);
         }
 
@@ -185,7 +185,7 @@ namespace Unity.WebRTC.RuntimeTest
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
             var track = NativeMethods.ContextCreateVideoTrack(context, "video");
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
@@ -205,9 +205,9 @@ namespace Unity.WebRTC.RuntimeTest
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
             var track2 = NativeMethods.SenderGetTrack(sender);
             Assert.AreEqual(track, track2);
-            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
+            NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
@@ -234,9 +234,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreNotEqual(IntPtr.Zero, parameters.encodings);
             Assert.AreNotEqual(IntPtr.Zero, parameters.transactionId);
 
-            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
+            NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
         }
@@ -267,8 +267,8 @@ namespace Unity.WebRTC.RuntimeTest
             #endif
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
@@ -300,8 +300,8 @@ namespace Unity.WebRTC.RuntimeTest
             #endif
 
             NativeMethods.MediaStreamRemoveTrack(stream, track);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDestroy(0);
         }
 
@@ -316,9 +316,9 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
-            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, track);
+            Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
         }
@@ -344,7 +344,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
             NativeMethods.VideoTrackRemoveSink(track, renderer);
             NativeMethods.DeleteVideoRenderer(context, renderer);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
@@ -418,9 +418,9 @@ namespace Unity.WebRTC.RuntimeTest
             VideoEncoderMethods.FinalizeEncoder(callback, track);
             yield return new WaitForSeconds(1.0f);
 
-            NativeMethods.PeerConnectionRemoveTrack(peer, sender);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
-            NativeMethods.ContextDeleteMediaStream(context, stream);
+            Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
+            NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
@@ -477,7 +477,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             NativeMethods.VideoTrackRemoveSink(track, renderer);
             NativeMethods.DeleteVideoRenderer(context, renderer);
-            NativeMethods.ContextDeleteMediaStreamTrack(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
             UnityEngine.Object.DestroyImmediate(receiveTexture);

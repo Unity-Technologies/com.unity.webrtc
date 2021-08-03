@@ -3,11 +3,8 @@ using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
-    public class MediaStreamTrack : IDisposable
+    public class MediaStreamTrack : RefCounterObject
     {
-        protected IntPtr self;
-        protected bool disposed;
-
         /// <summary>
         ///
         /// </summary>
@@ -41,9 +38,8 @@ namespace Unity.WebRTC
         public string Id =>
             NativeMethods.MediaStreamTrackGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
-        internal MediaStreamTrack(IntPtr ptr)
+        internal MediaStreamTrack(IntPtr ptr) : base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
         }
 
@@ -52,9 +48,18 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
-            throw new NotImplementedException("Must to implements on the inherited class");
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Table.Remove(self);
+            }
+            base.Dispose();
         }
 
         //Disassociate track from its source(video or audio), not for destroying the track

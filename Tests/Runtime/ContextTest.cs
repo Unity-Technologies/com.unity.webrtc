@@ -79,7 +79,7 @@ namespace Unity.WebRTC.RuntimeTest
             var context = Context.Create(
                 encoderType: value ? EncoderType.Hardware : EncoderType.Software);
             var track = context.CreateAudioTrack("audio");
-            context.DeleteMediaStreamTrack(track);
+            context.DeleteRefPtr(track);
             context.Dispose();
         }
 
@@ -96,7 +96,7 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
             var track = context.CreateVideoTrack("video");
-            context.DeleteMediaStreamTrack(track);
+            context.DeleteRefPtr(track);
             context.Dispose();
             UnityEngine.Object.DestroyImmediate(rt);
         }

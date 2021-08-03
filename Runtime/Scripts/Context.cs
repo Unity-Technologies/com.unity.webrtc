@@ -67,6 +67,11 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+        public void DeleteRefPtr(IntPtr ptr)
+        {
+            NativeMethods.ContextDeleteRefPtr(self, ptr);
+        }
+
         public EncoderType GetEncoderType()
         {
             return NativeMethods.ContextGetEncoderType(self);
@@ -94,7 +99,7 @@ namespace Unity.WebRTC
             RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
                 self, ptr, ref desc, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType =  errorType, message = message};
+            return new RTCError { errorType = errorType, message = message };
         }
 
         public RTCError PeerConnectionSetLocalDescription(IntPtr ptr)
@@ -103,7 +108,7 @@ namespace Unity.WebRTC
             RTCErrorType errorType =
                 NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError {errorType = errorType, message = message};
+            return new RTCError { errorType = errorType, message = message };
         }
 
         public RTCError PeerConnectionSetRemoteDescription(
@@ -113,7 +118,7 @@ namespace Unity.WebRTC
             RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
                 self, ptr, ref desc, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType =  errorType, message = message};
+            return new RTCError { errorType = errorType, message = message };
         }
 
         public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
@@ -139,11 +144,6 @@ namespace Unity.WebRTC
         public IntPtr CreateMediaStream(string label)
         {
             return NativeMethods.ContextCreateMediaStream(self, label);
-        }
-
-        public void DeleteMediaStream(MediaStream stream)
-        {
-            NativeMethods.ContextDeleteMediaStream(self, stream.GetSelfOrThrow());
         }
 
         public void RegisterMediaStreamObserver(MediaStream stream)
@@ -202,10 +202,6 @@ namespace Unity.WebRTC
             NativeMethods.ContextStopMediaStreamTrack(self, track);
         }
 
-        public void DeleteMediaStreamTrack(IntPtr track)
-        {
-            NativeMethods.ContextDeleteMediaStreamTrack(self, track);
-        }
 
         public IntPtr CreateVideoRenderer()
         {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -180,13 +179,8 @@ namespace Unity.WebRTC
                 }
 
                 s_tracks.TryRemove(self, out var value);
-                WebRTC.Context.DeleteMediaStreamTrack(self);
-                WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
     }
 

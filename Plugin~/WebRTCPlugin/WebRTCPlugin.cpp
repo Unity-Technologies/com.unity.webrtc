@@ -261,11 +261,6 @@ extern "C"
         return context->CreateMediaStream(streamId);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStream(Context* context, MediaStreamInterface* stream)
-    {
-        context->DeleteMediaStream(stream);
-    }
-
     UNITY_INTERFACE_EXPORT void ContextRegisterMediaStreamObserver(Context* context, MediaStreamInterface* stream)
     {
         context->RegisterMediaStreamObserver(stream);
@@ -281,19 +276,19 @@ extern "C"
         return context->CreateVideoTrack(label);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
-    {
-        context->DeleteMediaStreamTrack(track);
-    }
-
     UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
     {
         context->StopMediaStreamTrack(track);
     }
 
-    UNITY_INTERFACE_EXPORT::webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
     {
         return context->CreateAudioTrack(label);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextDeleteRefPtr(Context* context, rtc::RefCountInterface* ptr)
+    {
+        context->RemoveRefPtr(ptr);
     }
 
     UNITY_INTERFACE_EXPORT bool MediaStreamAddTrack(MediaStreamInterface* stream, MediaStreamTrackInterface* track)

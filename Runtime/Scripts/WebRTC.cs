@@ -654,6 +654,8 @@ namespace Unity.WebRTC
             var list = new List<T>();
             foreach (var ptr in array)
             {
+                if (ptr == IntPtr.Zero)
+                    UnityEngine.Debug.LogError("IntPtr is zero");
                 list.Add(FindOrCreate(ptr, constructor));
             }
             return list;
@@ -811,11 +813,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextStopMediaStreamTrack(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextDeleteMediaStreamTrack(IntPtr context, IntPtr track);
-        [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteStatsReport(IntPtr context, IntPtr report);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextSetVideoEncoderParameter(IntPtr context, IntPtr track, int width, int height, GraphicsFormat format, IntPtr texturePtr);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextDeleteRefPtr(IntPtr context, IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern CodecInitializationResult GetInitializationResult(IntPtr context, IntPtr track);
         [DllImport(WebRTC.Lib)]
@@ -984,8 +986,6 @@ namespace Unity.WebRTC
         public static extern void DataChannelRegisterOnClose(IntPtr ptr, DelegateNativeOnClose callback);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateMediaStream(IntPtr ctx, [MarshalAs(UnmanagedType.LPStr, SizeConst = 256)] string label);
-        [DllImport(WebRTC.Lib)]
-        public static extern void ContextDeleteMediaStream(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]

@@ -2,7 +2,6 @@ using System;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
@@ -154,13 +153,8 @@ namespace Unity.WebRTC
                 }
                 _streamRenderer?.Dispose();
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
-                WebRTC.Context.DeleteMediaStreamTrack(self);
-                WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
 #if UNITY_2020_1_OR_NEWER

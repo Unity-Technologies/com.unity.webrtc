@@ -236,7 +236,6 @@ namespace webrtc
                 {
                     m_audioDevice = nullptr;
                 });
-            m_audioTrack = nullptr;
 
             m_mapIdAndEncoder.clear();
             //m_mediaSteamTrackList.clear();
@@ -249,7 +248,6 @@ namespace webrtc
             }
 
             m_mapRefPtr.clear();
-            //m_mapLocalMediaStream.clear();
             m_mapMediaStreamObserver.clear();
             m_mapSetSessionDescriptionObserver.clear();
             m_mapVideoEncoderParameter.clear();
@@ -357,16 +355,6 @@ namespace webrtc
         return stream.get();
     }
 
-    void Context::DeleteMediaStream(webrtc::MediaStreamInterface* stream)
-    {
-        m_mapRefPtr.erase(stream);
-        //if (m_mapLocalMediaStream.find(stream->id()) != m_mapLocalMediaStream.end())
-        //{
-        //    m_mapLocalMediaStream.erase(stream->id());
-        //    stream->Release();
-        //}
-    }
-
     void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
     {
         m_mapMediaStreamObserver[stream] = std::make_unique<MediaStreamObserver>(stream, this);
@@ -420,17 +408,6 @@ namespace webrtc
         return track;
     }
 
-    void Context::DeleteMediaStreamTrack(MediaStreamTrackInterface* track)
-    {
-        //const auto result = std::find_if(
-        //    m_mediaSteamTrackList.begin(), m_mediaSteamTrackList.end(),
-        //    [track](rtc::scoped_refptr<MediaStreamTrackInterface> x) { return x.get() == track; });
-        //if(result != m_mediaSteamTrackList.end())
-        //{
-        //    m_mediaSteamTrackList.erase(result);
-        //}
-        m_mapRefPtr.erase(track);
-    }
 
     void Context::RegisterAudioReceiveCallback(
         AudioTrackInterface* track, DelegateAudioReceive callback)

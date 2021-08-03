@@ -86,6 +86,8 @@ namespace webrtc
 
     void PeerConnectionObject::OnTrack(rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver)
     {
+        context.AddRefPtr(transceiver);
+        context.AddRefPtr(transceiver->receiver());
         context.AddRefPtr(transceiver->receiver()->track());
 
         if (onTrack != nullptr)
