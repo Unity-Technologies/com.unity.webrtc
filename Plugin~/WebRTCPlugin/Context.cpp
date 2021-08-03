@@ -265,6 +265,12 @@ namespace webrtc
 
     UnityVideoTrackSource* Context::GetVideoSource(const MediaStreamTrackInterface* track)
     {
+        if (m_mapRefPtr.find(track) == m_mapRefPtr.end())
+        {
+            RTC_LOG(LS_INFO) << "track is not found";
+            return nullptr;
+        }
+
         const VideoTrackInterface* videoTrack = static_cast<const VideoTrackInterface*>(track);
         webrtc::VideoTrackSourceInterface* _source = videoTrack->GetSource();
         if (m_mapRefPtr.find(_source) == m_mapRefPtr.end())
