@@ -71,7 +71,7 @@ namespace webrtc
             return m_mapRefPtr.find(ptr) != m_mapRefPtr.end();
         }
         template <typename T>
-        void AddRefPtr(rtc::scoped_refptr<T>& refptr) {
+        void AddRefPtr(rtc::scoped_refptr<T> refptr) {
 //            std::lock_guard<std::mutex> lock(mutex);
             m_mapRefPtr.emplace(refptr.get(), refptr); }
         template <typename T>
@@ -116,7 +116,7 @@ namespace webrtc
     
         // DataChannel
         DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options);
-        void AddDataChannel(std::unique_ptr<DataChannelObject>& channel);
+        void AddDataChannel(std::unique_ptr<DataChannelObject> channel);
         void DeleteDataChannel(DataChannelObject* obj);
 
         // Renderer

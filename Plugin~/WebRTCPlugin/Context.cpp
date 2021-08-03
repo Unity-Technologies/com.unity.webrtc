@@ -469,7 +469,7 @@ namespace webrtc
         return ptr;
     }
 
-    void Context::AddDataChannel(std::unique_ptr<DataChannelObject>& channel) {
+    void Context::AddDataChannel(std::unique_ptr<DataChannelObject> channel) {
         const auto ptr = channel.get();
         m_mapDataChannels[ptr] = std::move(channel);
     }
