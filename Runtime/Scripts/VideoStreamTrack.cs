@@ -42,6 +42,7 @@ namespace Unity.WebRTC
         {
             get
             {
+                Debug.Log("IsEncoderInitialized");
                 return WebRTC.Context.GetInitializationResult(GetSelfOrThrow()) == CodecInitializationResult.Success;
             }
         }

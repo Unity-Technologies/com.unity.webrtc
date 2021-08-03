@@ -7,15 +7,12 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    public class RTCRtpReceiver : IDisposable
+    public class RTCRtpReceiver : RefCounterObject
     {
-        internal IntPtr self;
         private RTCPeerConnection peer;
-        private bool disposed;
 
-        internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer)
+        internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
             this.peer = peer;
         }
@@ -34,7 +31,7 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (this.disposed)
             {
@@ -43,10 +40,8 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
         /// <summary>
