@@ -212,6 +212,11 @@ namespace Unity.WebRTC
             return NativeMethods.GetUpdateTextureFunc(self);
         }
 
+        public IntPtr CreateVideoTrackSource()
+        {
+            return NativeMethods.ContextCreateVideoTrackSource(self);
+        }
+
         public IntPtr CreateAudioTrackSource()
         {
             return NativeMethods.ContextCreateAudioTrackSource(self);
@@ -222,9 +227,9 @@ namespace Unity.WebRTC
             return NativeMethods.ContextCreateAudioTrack(self, label, trackSource);
         }
 
-        public IntPtr CreateVideoTrack(string label)
+        public IntPtr CreateVideoTrack(string label, IntPtr source)
         {
-            return NativeMethods.ContextCreateVideoTrack(self, label);
+            return NativeMethods.ContextCreateVideoTrack(self, label, source);
         }
 
         public void StopMediaStreamTrack(IntPtr track)

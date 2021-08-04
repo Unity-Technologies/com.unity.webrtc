@@ -86,10 +86,10 @@ namespace webrtc
         webrtc::AudioSourceInterface* CreateAudioSource();
 
         // Video Source
-        //CreateAudioSource();
+        webrtc::VideoTrackSourceInterface* CreateVideoSource();
 
         // MediaStreamTrack
-        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label);
+        webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, webrtc::VideoTrackSourceInterface* source);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);

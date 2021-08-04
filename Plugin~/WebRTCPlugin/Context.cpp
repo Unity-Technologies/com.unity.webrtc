@@ -367,17 +367,22 @@ namespace webrtc
         return m_mapMediaStreamObserver[stream].get();
     }
 
-    webrtc::VideoTrackInterface* Context::CreateVideoTrack(
-        const std::string& label)
+    VideoTrackSourceInterface* Context::CreateVideoSource()
     {
-        const rtc::scoped_refptr<UnityVideoTrackSource> source =
+        rtc::scoped_refptr<UnityVideoTrackSource> source =
             new rtc::RefCountedObject<UnityVideoTrackSource>(false, nullptr);
 
+        AddRefPtr(source);
+        return source;
+    }
+
+    webrtc::VideoTrackInterface* Context::CreateVideoTrack(
+        const std::string& label, VideoTrackSourceInterface* source)
+    {
         const rtc::scoped_refptr<VideoTrackInterface> track =
             m_peerConnectionFactory->CreateVideoTrack(label, source);
 
         AddRefPtr(track);
-        AddRefPtr(source);
 
         return track;
     }

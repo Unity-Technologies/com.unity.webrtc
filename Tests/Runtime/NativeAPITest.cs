@@ -184,8 +184,10 @@ namespace Unity.WebRTC.RuntimeTest
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
@@ -201,13 +203,15 @@ namespace Unity.WebRTC.RuntimeTest
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
             var track2 = NativeMethods.SenderGetTrack(sender);
             Assert.AreEqual(track, track2);
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
@@ -224,7 +228,8 @@ namespace Unity.WebRTC.RuntimeTest
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             NativeMethods.SenderGetParameters(sender, out var ptr);
@@ -237,6 +242,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
         }
@@ -251,7 +257,8 @@ namespace Unity.WebRTC.RuntimeTest
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             NativeMethods.MediaStreamAddTrack(stream, track);
 
             IntPtr buf = NativeMethods.MediaStreamGetVideoTracks(stream, out ulong length);
@@ -269,6 +276,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
@@ -303,6 +311,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.MediaStreamRemoveTrack(stream, track);
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDestroy(0);
         }
 
@@ -319,6 +328,7 @@ namespace Unity.WebRTC.RuntimeTest
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
@@ -341,12 +351,14 @@ namespace Unity.WebRTC.RuntimeTest
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             var renderer = NativeMethods.CreateVideoRenderer(context);
             NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
             NativeMethods.VideoTrackRemoveSink(track, renderer);
             NativeMethods.DeleteVideoRenderer(context, renderer);
             NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
@@ -400,7 +412,8 @@ namespace Unity.WebRTC.RuntimeTest
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             var callback = NativeMethods.GetRenderEventFunc(context);
@@ -423,6 +436,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDeletePeerConnection(context, peer);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
@@ -455,7 +469,8 @@ namespace Unity.WebRTC.RuntimeTest
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
             var receiveTexture = CreateRenderTexture(width, height);
-            var track = NativeMethods.ContextCreateVideoTrack(context, "video");
+            var source = NativeMethods.ContextCreateVideoTrackSource(context);
+            var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             var renderer = NativeMethods.CreateVideoRenderer(context);
             var rendererId = NativeMethods.GetVideoRendererId(renderer);
             NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
@@ -480,6 +495,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.VideoTrackRemoveSink(track, renderer);
             NativeMethods.DeleteVideoRenderer(context, renderer);
             NativeMethods.ContextDeleteRefPtr(context, track);
+            NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
             UnityEngine.Object.DestroyImmediate(receiveTexture);

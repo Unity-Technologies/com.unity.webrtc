@@ -271,15 +271,22 @@ extern "C"
         context->UnRegisterMediaStreamObserver(stream);
     }
 
-    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(
+        Context* context, const char* label, webrtc::VideoTrackSourceInterface* source)
     {
-        return context->CreateVideoTrack(label);
+        return context->CreateVideoTrack(label, source);
     }
 
     UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
     {
         context->StopMediaStreamTrack(track);
     }
+
+    UNITY_INTERFACE_EXPORT webrtc::VideoTrackSourceInterface* ContextCreateVideoTrackSource(Context* context)
+    {
+        return context->CreateVideoSource();
+    }
+
     UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface* ContextCreateAudioTrackSource(Context* context)
     {
         return context->CreateAudioSource();
