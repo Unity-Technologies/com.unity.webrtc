@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
-    public class MediaStreamTrack : RefCounterObject
+    public class MediaStreamTrack : RefCountedObject
     {
         /// <summary>
         ///

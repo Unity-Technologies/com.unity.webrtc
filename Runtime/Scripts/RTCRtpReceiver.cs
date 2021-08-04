@@ -7,7 +7,7 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    public class RTCRtpReceiver : RefCounterObject
+    public class RTCRtpReceiver : RefCountedObject
     {
         private RTCPeerConnection peer;
 

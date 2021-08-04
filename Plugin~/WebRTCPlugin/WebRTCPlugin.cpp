@@ -280,15 +280,19 @@ extern "C"
     {
         context->StopMediaStreamTrack(track);
     }
-
-    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface* ContextCreateAudioTrackSource(Context* context)
     {
-        return context->CreateAudioTrack(label);
+        return context->CreateAudioSource();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(
+        Context* context, const char* label, webrtc::AudioSourceInterface* source)
+    {
+        return context->CreateAudioTrack(label, source);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteRefPtr(Context* context, rtc::RefCountInterface* ptr)
     {
-        RTC_LOG(LS_INFO) << "ContextDeleteRefPtr";
         context->RemoveRefPtr(ptr);
     }
 

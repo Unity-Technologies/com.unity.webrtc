@@ -2,13 +2,13 @@ using System;
 
 namespace Unity.WebRTC
 {
-    public class RefCounterObject : IDisposable
+    public class RefCountedObject : IDisposable
     {
         internal IntPtr self;
 
         protected bool disposed;
 
-        internal RefCounterObject(IntPtr ptr)
+        internal RefCountedObject(IntPtr ptr)
         {
             self = ptr;
         }

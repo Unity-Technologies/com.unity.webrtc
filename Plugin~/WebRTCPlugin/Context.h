@@ -66,26 +66,15 @@ namespace webrtc
         CodecInitializationResult GetInitializationResult(webrtc::MediaStreamTrackInterface* track);
 
         template <typename T>
-        bool ExistsRefPtr(T* ptr) {
-//            std::lock_guard<std::mutex> lock(mutex);
-            return m_mapRefPtr.find(ptr) != m_mapRefPtr.end();
-        }
+        bool ExistsRefPtr(T* ptr) {  return m_mapRefPtr.find(ptr) != m_mapRefPtr.end(); }
         template <typename T>
-        void AddRefPtr(rtc::scoped_refptr<T> refptr) {
-//            std::lock_guard<std::mutex> lock(mutex);
-            m_mapRefPtr.emplace(refptr.get(), refptr); }
+        void AddRefPtr(rtc::scoped_refptr<T> refptr) { m_mapRefPtr.emplace(refptr.get(), refptr); }
         template <typename T>
-        void AddRefPtr(T* ptr) {
-//            std::lock_guard<std::mutex> lock(mutex);
-            m_mapRefPtr.emplace(ptr, ptr); }
+        void AddRefPtr(T* ptr) { m_mapRefPtr.emplace(ptr, ptr); }
         template <typename T>
-        void RemoveRefPtr(rtc::scoped_refptr<T>& refptr) {
-//                        std::lock_guard<std::mutex> lock(mutex);
-            m_mapRefPtr.erase(refptr.get()); }
+        void RemoveRefPtr(rtc::scoped_refptr<T>& refptr) { m_mapRefPtr.erase(refptr.get()); }
         template <typename T>
-        void RemoveRefPtr(T* ptr) {
-//                        std::lock_guard<std::mutex> lock(mutex);
-            m_mapRefPtr.erase(ptr); }
+        void RemoveRefPtr(T* ptr) { m_mapRefPtr.erase(ptr); }
 
         // MediaStream
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& streamId);
@@ -93,9 +82,15 @@ namespace webrtc
         void UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream);
         MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
 
+        // Audio Source
+        webrtc::AudioSourceInterface* CreateAudioSource();
+
+        // Video Source
+        //CreateAudioSource();
+
         // MediaStreamTrack
         webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label);
-        webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label);
+        webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
 

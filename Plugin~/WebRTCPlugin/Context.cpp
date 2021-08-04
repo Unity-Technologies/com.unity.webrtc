@@ -258,7 +258,7 @@ namespace webrtc
 
     UnityVideoTrackSource* Context::GetVideoSource(const MediaStreamTrackInterface* track)
     {
-        if (ExistsRefPtr(track))
+        if (!ExistsRefPtr(track))
         {
             RTC_LOG(LS_INFO) << "track is not found";
             return nullptr;
@@ -267,7 +267,7 @@ namespace webrtc
         const VideoTrackInterface* videoTrack = static_cast<const VideoTrackInterface*>(track);
         webrtc::VideoTrackSourceInterface* source = videoTrack->GetSource();
 
-        if (ExistsRefPtr(source))
+        if (!ExistsRefPtr(source))
         {
             RTC_LOG(LS_INFO) << "source is not found";
             return nullptr;
@@ -387,7 +387,7 @@ namespace webrtc
         // todo:(kazuki)
     }
 
-    AudioTrackInterface* Context::CreateAudioTrack(const std::string& label)
+    webrtc::AudioSourceInterface* Context::CreateAudioSource()
     {
         //avoid optimization specially for voice
         cricket::AudioOptions audioOptions;
@@ -396,13 +396,19 @@ namespace webrtc
         audioOptions.highpass_filter = false;
 
         const rtc::scoped_refptr<UnityAudioTrackSource> source =
-            UnityAudioTrackSource::Create(label, audioOptions);
+            UnityAudioTrackSource::Create(audioOptions);
 
+        AddRefPtr(source);
+
+        return source;
+    }
+
+    AudioTrackInterface* Context::CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source)
+    {
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
 
         AddRefPtr(track);
-        AddRefPtr(source);
 
         return track;
     }

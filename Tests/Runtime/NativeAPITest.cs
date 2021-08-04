@@ -280,7 +280,8 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var context = NativeMethods.ContextCreate(0, encoderType, true);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
-            var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
+            var source = NativeMethods.ContextCreateAudioTrackSource(context);
+            var track = NativeMethods.ContextCreateAudioTrack(context, "audio", source);
             NativeMethods.MediaStreamAddTrack(stream, track);
 
             var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, out ulong trackSize);
@@ -313,7 +314,8 @@ namespace Unity.WebRTC.RuntimeTest
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
             Assert.IsNotEmpty(streamId);
-            var track = NativeMethods.ContextCreateAudioTrack(context, "audio");
+            var source = NativeMethods.ContextCreateAudioTrackSource(context);
+            var track = NativeMethods.ContextCreateAudioTrack(context, "audio", source);
             var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
 
             NativeMethods.ContextDeleteRefPtr(context, track);

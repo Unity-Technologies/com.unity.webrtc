@@ -2,7 +2,7 @@ using System;
 
 namespace Unity.WebRTC
 {
-    public class RTCRtpTransceiver : RefCounterObject
+    public class RTCRtpTransceiver : RefCountedObject
     {
         private RTCPeerConnection peer;
 

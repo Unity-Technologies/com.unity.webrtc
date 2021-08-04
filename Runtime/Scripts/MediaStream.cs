@@ -7,7 +7,7 @@ namespace Unity.WebRTC
     public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
     public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
 
-    public class MediaStream : RefCounterObject
+    public class MediaStream : RefCountedObject
     {
         private DelegateOnAddTrack onAddTrack;
         private DelegateOnRemoveTrack onRemoveTrack;

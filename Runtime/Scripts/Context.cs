@@ -212,9 +212,14 @@ namespace Unity.WebRTC
             return NativeMethods.GetUpdateTextureFunc(self);
         }
 
-        public IntPtr CreateAudioTrack(string label)
+        public IntPtr CreateAudioTrackSource()
         {
-            return NativeMethods.ContextCreateAudioTrack(self, label);
+            return NativeMethods.ContextCreateAudioTrackSource(self);
+        }
+
+        public IntPtr CreateAudioTrack(string label, IntPtr trackSource)
+        {
+            return NativeMethods.ContextCreateAudioTrack(self, label, trackSource);
         }
 
         public IntPtr CreateVideoTrack(string label)
