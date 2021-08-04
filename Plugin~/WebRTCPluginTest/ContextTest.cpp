@@ -40,6 +40,8 @@ TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
+    context->RemoveRefPtr(track);
+    context->RemoveRefPtr(source);
 }
 
 TEST_P(ContextTest, CreateAndDeleteMediaStream) {
@@ -56,12 +58,14 @@ TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
     EXPECT_NE(nullptr, track);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
     context->RemoveRefPtr(track);
+    context->RemoveRefPtr(source);
 }
 
 TEST_P(ContextTest, CreateAndDeleteAudioTrack) {
     const auto source = context->CreateAudioSource();
     const auto track = context->CreateAudioTrack("audio", source);
     context->RemoveRefPtr(track);
+    context->RemoveRefPtr(source);
 }
 
 TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
@@ -73,6 +77,7 @@ TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
     stream->RemoveTrack(audiotrack);
     context->RemoveRefPtr(stream);
     context->RemoveRefPtr(track);
+    context->RemoveRefPtr(source);
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
@@ -85,6 +90,7 @@ TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
     stream->RemoveTrack(videoTrack);
     context->RemoveRefPtr(stream);
     context->RemoveRefPtr(track);
+    context->RemoveRefPtr(source);
 }
 
 TEST_P(ContextTest, CreateAndDeletePeerConnection) {
@@ -126,6 +132,8 @@ TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
     track->RemoveSink(renderer);
     context->DeleteVideoRenderer(renderer);
+    context->RemoveRefPtr(track);
+    context->RemoveRefPtr(source);
 }
 
 INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
