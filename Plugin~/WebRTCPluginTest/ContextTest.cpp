@@ -128,49 +128,6 @@ TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     context->DeleteVideoRenderer(renderer);
 }
 
-class RefCountTest : public rtc::RefCountInterface
-{
-public:
-    RefCountTest()
-    {
-        RTC_LOG(LS_INFO) << "constructor";
-    }
-
-protected:
-    ~RefCountTest() override
-    {
-        RTC_LOG(LS_INFO) << "destructor";
-    }
-};
-
-TEST_P(ContextTest, Test) {
-
-    RTC_LOG(LS_INFO) << "ContextTest::0";
-    {
-        rtc::scoped_refptr<RefCountTest> hoge3;
-        rtc::scoped_refptr<rtc::RefCountInterface> hoge2;
-        rtc::scoped_refptr<RefCountTest> hoge(new rtc::RefCountedObject<RefCountTest>());
-        hoge2 = hoge;
-        auto ptr = static_cast<rtc::scoped_refptr<RefCountTest>*>((void*)&hoge2);
-        hoge3 = *ptr;
-    }
-    RTC_LOG(LS_INFO) << "ContextTest::1";
-}
-
-TEST_P(ContextTest, Test2) {
-
-    RTC_LOG(LS_INFO) << "ContextTest::0";
-    std::vector<rtc::scoped_refptr<rtc::RefCountInterface>> vec;
-    {
-        rtc::scoped_refptr<RefCountTest> hoge(new rtc::RefCountedObject<RefCountTest>());
-        vec.push_back(hoge.get());
-    }
-    RTC_LOG(LS_INFO) << "ContextTest::1";
-    vec.clear();
-    RTC_LOG(LS_INFO) << "ContextTest::2";
-}
-
-
 INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc

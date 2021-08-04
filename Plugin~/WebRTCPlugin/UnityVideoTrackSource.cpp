@@ -19,14 +19,12 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     encoder_(nullptr)
 {
 //  DETACH_FROM_THREAD(thread_checker_);
-    RTC_LOG(LS_INFO) << "UnityVideoTrackSource constructor";
 }
 
 UnityVideoTrackSource::~UnityVideoTrackSource()
 {
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        RTC_LOG(LS_INFO) << "UnityVideoTrackSource destructor";
     }
 }
 

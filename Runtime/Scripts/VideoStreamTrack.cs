@@ -229,6 +229,7 @@ namespace Unity.WebRTC
     {
         public VideoTrackSource() : base(WebRTC.Context.CreateVideoTrackSource())
         {
+            WebRTC.Table.Add(self, this);
         }
 
         ~VideoTrackSource()

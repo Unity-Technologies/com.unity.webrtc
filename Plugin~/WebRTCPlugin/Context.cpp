@@ -383,7 +383,6 @@ namespace webrtc
             m_peerConnectionFactory->CreateVideoTrack(label, source);
 
         AddRefPtr(track);
-
         return track;
     }
 
@@ -404,7 +403,6 @@ namespace webrtc
             UnityAudioTrackSource::Create(audioOptions);
 
         AddRefPtr(source);
-
         return source;
     }
 
@@ -414,7 +412,6 @@ namespace webrtc
             m_peerConnectionFactory->CreateAudioTrack(label, source);
 
         AddRefPtr(track);
-
         return track;
     }
 

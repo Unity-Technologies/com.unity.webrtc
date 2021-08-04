@@ -384,7 +384,8 @@ namespace Unity.WebRTC
                 {
                     var receiver = WebRTC.FindOrCreate(
                         receiverPtr, _ptr => new RTCRtpReceiver(_ptr, connection));
-                    connection.cacheTracks.Remove(receiver.Track);
+                    if(receiver != null)
+                        connection.cacheTracks.Remove(receiver.Track);
                 }
             });
         }

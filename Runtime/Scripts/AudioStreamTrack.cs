@@ -137,7 +137,6 @@ namespace Unity.WebRTC
             _source = source;
         }
 
-
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
             WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
@@ -254,6 +253,7 @@ namespace Unity.WebRTC
     {
         public AudioTrackSource() : base(WebRTC.Context.CreateAudioTrackSource())
         {
+            WebRTC.Table.Add(self, this);
         }
 
         ~AudioTrackSource()
