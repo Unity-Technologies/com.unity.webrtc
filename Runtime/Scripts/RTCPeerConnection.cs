@@ -83,8 +83,6 @@ namespace Unity.WebRTC
             {
                 Close();
                 DisposeAllTransceivers();
-                //Debug.Log("RTCPeerConnection::Dispose");
-                //WebRTC.Context.DeletePeerConnection(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }

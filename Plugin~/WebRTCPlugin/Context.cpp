@@ -236,18 +236,11 @@ namespace webrtc
                 {
                     m_audioDevice = nullptr;
                 });
-            //m_audioTrack = nullptr;
-
             m_mapIdAndEncoder.clear();
-            //m_mediaSteamTrackList.clear();
             m_mapClients.clear();
 
-            //RTC_DCHECK_EQ(m_mapRefPtr.size(), 0);
-
-            for (auto pair : m_mapRefPtr)
-            {
-                RTC_LOG(LS_INFO) << "scoped_refptr :" << pair.first << " " << pair.second;
-            }
+            // check count of refptr to avoid to forget disposing
+            RTC_DCHECK_EQ(m_mapRefPtr.size(), 0);
 
             m_mapRefPtr.clear();
             m_mapMediaStreamObserver.clear();
@@ -265,22 +258,21 @@ namespace webrtc
 
     UnityVideoTrackSource* Context::GetVideoSource(const MediaStreamTrackInterface* track)
     {
-        if (m_mapRefPtr.find(track) == m_mapRefPtr.end())
+        if (ExistsRefPtr(track))
         {
             RTC_LOG(LS_INFO) << "track is not found";
             return nullptr;
         }
 
         const VideoTrackInterface* videoTrack = static_cast<const VideoTrackInterface*>(track);
-        webrtc::VideoTrackSourceInterface* _source = videoTrack->GetSource();
-        if (m_mapRefPtr.find(_source) == m_mapRefPtr.end())
+        webrtc::VideoTrackSourceInterface* source = videoTrack->GetSource();
+
+        if (ExistsRefPtr(source))
         {
             RTC_LOG(LS_INFO) << "source is not found";
             return nullptr;
         }
-
-        UnityVideoTrackSource* source = static_cast<UnityVideoTrackSource*>(_source);
-        return source;
+        return static_cast<UnityVideoTrackSource*>(source);
     }
 
     bool Context::InitializeEncoder(IEncoder* encoder, MediaStreamTrackInterface* track)
@@ -301,7 +293,6 @@ namespace webrtc
 
     bool Context::FinalizeEncoder(IEncoder* encoder)
     {
-        RTC_LOG(LS_INFO) << "Context::FinalizeEncoder";
         m_mapIdAndEncoder.erase(encoder->Id());
         return true;
     }
@@ -346,8 +337,6 @@ namespace webrtc
 
     CodecInitializationResult Context::GetInitializationResult(MediaStreamTrackInterface* track)
     {
-        //std::lock_guard<std::mutex> lock(mutex);
-
         UnityVideoTrackSource* source = GetVideoSource(track);
         if (source != nullptr)
             return source->GetCodecInitializationResult();
@@ -358,10 +347,8 @@ namespace webrtc
     {
         rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
             m_peerConnectionFactory->CreateLocalMediaStream(streamId);
-        m_mapRefPtr.emplace(stream.get(), stream);
-
-        //m_mapLocalMediaStream[streamId] = stream.release();
-        return stream.get();
+        AddRefPtr(stream);
+        return stream;
     }
 
     void Context::RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream)
@@ -389,9 +376,9 @@ namespace webrtc
         const rtc::scoped_refptr<VideoTrackInterface> track =
             m_peerConnectionFactory->CreateVideoTrack(label, source);
 
-        //m_mediaSteamTrackList.push_back(track);
-        m_mapRefPtr.emplace(track.get(), track);
-        m_mapRefPtr.emplace(source.get(), source);
+        AddRefPtr(track);
+        AddRefPtr(source);
+
         return track;
     }
 
@@ -413,8 +400,10 @@ namespace webrtc
 
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
-        //m_mediaSteamTrackList.push_back(track);
-        m_mapRefPtr.emplace(track.get(), track);
+
+        AddRefPtr(track);
+        AddRefPtr(source);
+
         return track;
     }
 
