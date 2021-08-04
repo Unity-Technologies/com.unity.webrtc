@@ -72,9 +72,17 @@ namespace webrtc
         template <typename T>
         void AddRefPtr(T* ptr) { m_mapRefPtr.emplace(ptr, ptr); }
         template <typename T>
-        void RemoveRefPtr(rtc::scoped_refptr<T>& refptr) { m_mapRefPtr.erase(refptr.get()); }
+        void RemoveRefPtr(rtc::scoped_refptr<T>& refptr)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            m_mapRefPtr.erase(refptr.get());
+        }
         template <typename T>
-        void RemoveRefPtr(T* ptr) { m_mapRefPtr.erase(ptr); }
+        void RemoveRefPtr(T* ptr)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            m_mapRefPtr.erase(ptr);
+        }
 
         // MediaStream
         webrtc::MediaStreamInterface* CreateMediaStream(const std::string& streamId);
