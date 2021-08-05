@@ -67,6 +67,12 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+        public void AddRefPtr(IntPtr ptr)
+        {
+            NativeMethods.ContextAddRefPtr(self, ptr);
+        }
+
+
         public void DeleteRefPtr(IntPtr ptr)
         {
             NativeMethods.ContextDeleteRefPtr(self, ptr);

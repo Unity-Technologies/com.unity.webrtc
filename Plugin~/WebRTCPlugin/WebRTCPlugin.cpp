@@ -298,6 +298,11 @@ extern "C"
         return context->CreateAudioTrack(label, source);
     }
 
+    UNITY_INTERFACE_EXPORT void ContextAddRefPtr(Context* context, rtc::RefCountInterface* ptr)
+    {
+        context->AddRefPtr(ptr);
+    }
+
     UNITY_INTERFACE_EXPORT void ContextDeleteRefPtr(Context* context, rtc::RefCountInterface* ptr)
     {
         context->RemoveRefPtr(ptr);
@@ -494,10 +499,8 @@ extern "C"
         auto result = obj->connection->AddTransceiver(track);
         if (!result.ok())
             return nullptr;
-        rtc::scoped_refptr<RtpTransceiverInterface> transceiver = result.value();
-        context->AddRefPtr(transceiver);
 
-        return transceiver;
+        return result.value();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(
@@ -506,10 +509,8 @@ extern "C"
         auto result = obj->connection->AddTransceiver(track, *init);
         if (!result.ok())
             return nullptr;
-        rtc::scoped_refptr<RtpTransceiverInterface> transceiver = result.value();
-        context->AddRefPtr(transceiver);
 
-        return transceiver;
+        return result.value();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithType(
@@ -518,10 +519,8 @@ extern "C"
         auto result = obj->connection->AddTransceiver(type);
         if (!result.ok())
             return nullptr;
-        rtc::scoped_refptr<RtpTransceiverInterface> transceiver = result.value();
-        context->AddRefPtr(transceiver);
 
-        return transceiver;
+        return result.value();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(
@@ -530,10 +529,8 @@ extern "C"
         auto result = obj->connection->AddTransceiver(type, *init);
         if (!result.ok())
             return nullptr;
-        rtc::scoped_refptr<RtpTransceiverInterface> transceiver = result.value();
-        context->AddRefPtr(transceiver);
 
-        return transceiver;
+        return result.value();
     }
 
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionRemoveTrack(PeerConnectionObject* obj, RtpSenderInterface* sender)
@@ -794,30 +791,18 @@ extern "C"
     UNITY_INTERFACE_EXPORT RtpReceiverInterface** PeerConnectionGetReceivers(Context* context, PeerConnectionObject* obj, size_t* length)
     {
         auto receivers = obj->connection->GetReceivers();
-        for (auto receiver : receivers)
-        {
-            context->AddRefPtr(receiver);
-        }
         return ConvertPtrArrayFromRefPtrArray<RtpReceiverInterface>(receivers, length);
     }
 
     UNITY_INTERFACE_EXPORT RtpSenderInterface** PeerConnectionGetSenders(Context* context, PeerConnectionObject* obj, size_t* length)
     {
         auto senders = obj->connection->GetSenders();
-        for (auto sender : senders)
-        {
-            context->AddRefPtr(sender);
-        }
         return ConvertPtrArrayFromRefPtrArray<RtpSenderInterface>(senders, length);
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface** PeerConnectionGetTransceivers(Context* context, PeerConnectionObject* obj, size_t* length)
     {
         auto transceivers = obj->connection->GetTransceivers();
-        for (auto transceiver : transceivers)
-        {
-            context->AddRefPtr(transceiver);
-        }
         return ConvertPtrArrayFromRefPtrArray<RtpTransceiverInterface>(transceivers, length);
     }
 

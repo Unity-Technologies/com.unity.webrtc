@@ -25,7 +25,7 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (this.disposed)
             {

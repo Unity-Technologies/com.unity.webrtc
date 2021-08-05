@@ -11,6 +11,7 @@ namespace Unity.WebRTC
         internal RefCountedObject(IntPtr ptr)
         {
             self = ptr;
+            WebRTC.Context.AddRefPtr(self);
         }
 
         public virtual void Dispose()
