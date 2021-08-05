@@ -16,9 +16,16 @@ namespace Unity.WebRTC.RuntimeTest
 
         public bool IsTestFinished { get; private set; }
 
+        bool negotiating = false;
+
         public void SetStream(MediaStream stream)
         {
             m_stream = stream;
+        }
+
+        public void AddTransceiver(int indexPeer, MediaStreamTrack track)
+        {
+            peers[indexPeer].AddTransceiver(track);
         }
 
         public RTCDataChannel CreateDataChannel(int indexPeer, string label, RTCDataChannelInit option = null)
@@ -58,12 +65,18 @@ namespace Unity.WebRTC.RuntimeTest
             return peers[indexPeer].GetReceivers();
         }
 
+        public IEnumerable<RTCRtpTransceiver> GetPeerTransceivers(int indexPeer)
+        {
+            return peers[indexPeer].GetTransceivers();
+        }
+
+
         public Coroutine CoroutineUpdate()
         {
             return StartCoroutine(WebRTC.Update());
         }
 
-        IEnumerator Start()
+        void Awake()
         {
             RTCConfiguration config = default;
             config.iceServers = new[]
@@ -75,9 +88,6 @@ namespace Unity.WebRTC.RuntimeTest
             peers[1] = new RTCPeerConnection(ref config);
             dataChannels[peers[0]] = new List<RTCDataChannel>();
             dataChannels[peers[1]] = new List<RTCDataChannel>();
-
-            RTCDataChannel channel = peers[0].CreateDataChannel("data");
-            dataChannels[peers[0]].Add(channel);
 
             peers[0].OnIceCandidate = candidate =>
             {
@@ -97,7 +107,7 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.That(e.Track, Is.Not.Null);
                 Assert.That(e.Receiver, Is.Not.Null);
                 Assert.That(e.Transceiver, Is.Not.Null);
-                peers[1].AddTrack(e.Track);
+                //peers[1].AddTrack(e.Track);
             };
             peers[0].OnDataChannel = e =>
             {
@@ -106,58 +116,84 @@ namespace Unity.WebRTC.RuntimeTest
             };
             peers[1].OnDataChannel = e =>
             {
-                if(peers[1].ConnectionState == RTCPeerConnectionState.Connected)
+                if (peers[1].ConnectionState == RTCPeerConnectionState.Connected)
                     dataChannels[peers[1]].Add(e);
             };
-
-            if (m_stream != null)
+            peers[0].OnNegotiationNeeded = () =>
             {
-                foreach (var track in m_stream.GetTracks())
-                {
-                    peers[0].AddTrack(track, m_stream);
-                }
-            }
+//                Debug.Log("OnNegotiationNeeded ");
+                IsTestFinished = false;
+                StartCoroutine(Negotiate(peers[0], peers[1]));
+            };
 
-            // Because some platform can't accept H264 codec for receive.
-            foreach (var transceiver in peers[0].GetTransceivers())
+            peers[1].OnNegotiationNeeded = () =>
             {
-                transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
-            }
+//                Debug.Log("OnNegotiationNeeded ");
+                IsTestFinished = false;
+                StartCoroutine(Negotiate(peers[1], peers[0]));
+            };
+        }
 
-            var op1 = peers[0].CreateOffer();
+        IEnumerator Start()
+        {
+
+            //RTCDataChannel channel = peers[0].CreateDataChannel("data");
+            //dataChannels[peers[0]].Add(channel);
+
+            //if (m_stream != null)
+            //{
+            //    foreach (var track in m_stream.GetTracks())
+            //    {
+            //        peers[0].AddTrack(track, m_stream);
+            //    }
+            //}
+
+            //// Because some platform can't accept H264 codec for receive.
+            //foreach (var transceiver in peers[0].GetTransceivers())
+            //{
+            //    transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
+            //}
+
+            //yield return StartCoroutine(Negotiate(peers[0], peers[1]));
+            yield return new WaitUntil(() => NegotiationCompleted());
+        }
+
+        IEnumerator Negotiate(RTCPeerConnection peer1, RTCPeerConnection peer2)
+        {
+            if (negotiating)
+            {
+                Debug.LogError("Negotiating");
+                yield break;
+            }
+            negotiating = true;
+            var op1 = peer1.CreateOffer();
             yield return op1;
             Assert.That(op1.IsError, Is.False, op1.Error.message);
             var desc = op1.Desc;
-            var op2 = peers[0].SetLocalDescription(ref desc);
+            var op2 = peer1.SetLocalDescription(ref desc);
             yield return op2;
             Assert.That(op2.IsError, Is.False, op2.Error.message);
 
-            var op3 = peers[1].SetRemoteDescription(ref desc);
+            var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
             Assert.That(op3.IsError, Is.False, op3.Error.message);
-            var op4 = peers[1].CreateAnswer();
+            var op4 = peer2.CreateAnswer();
             yield return op4;
             Assert.That(op4.IsError, Is.False, op4.Error.message);
             desc = op4.Desc;
-            var op5 = peers[1].SetLocalDescription(ref desc);
+            var op5 = peer2.SetLocalDescription(ref desc);
             yield return op5;
             Assert.That(op5.IsError, Is.False, op5.Error.message);
 
-            var op6 = peers[0].SetRemoteDescription(ref desc);
+            var op6 = peer1.SetRemoteDescription(ref desc);
             yield return op6;
             Assert.That(op6.IsError, Is.False, op6.Error.message);
 
             var op7 = new WaitUntilWithTimeout(() =>
-                peers[0].IceConnectionState == RTCIceConnectionState.Connected ||
-                peers[0].IceConnectionState == RTCIceConnectionState.Completed, 5000);
+                peers[0].SignalingState == RTCSignalingState.Stable &&
+                peers[1].SignalingState == RTCSignalingState.Stable, 5000);
             yield return op7;
             Assert.That(op7.IsCompleted, Is.True);
-
-            var op8 = new WaitUntilWithTimeout(() =>
-                peers[1].IceConnectionState == RTCIceConnectionState.Connected ||
-                peers[1].IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op8;
-            Assert.That(op8.IsCompleted, Is.True);
 
             if (m_stream != null)
             {
@@ -166,6 +202,13 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.That(op9.IsCompleted, Is.True);
             }
             IsTestFinished = true;
+            negotiating = false;
+        }
+
+        public bool NegotiationCompleted()
+        {
+            return !negotiating &&
+                peers[0].SignalingState == RTCSignalingState.Stable && peers[1].SignalingState == RTCSignalingState.Stable;
         }
 
         public void Dispose()

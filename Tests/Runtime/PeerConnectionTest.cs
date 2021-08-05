@@ -291,11 +291,63 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(transceiver1.CurrentDirection, RTCRtpTransceiverDirection.RecvOnly);
             Assert.AreEqual(transceiver2.CurrentDirection, RTCRtpTransceiverDirection.SendOnly);
 
+            //Assert.That(transceiver2.Stop(), Is.EqualTo(RTCErrorType.None));
+            //Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            // todo(kazuki):: Transceiver.CurrentDirection of Sender is not changed to "Stopped" even if waiting
+            // yield return new WaitUntil(() => transceiver2.CurrentDirection == RTCRtpTransceiverDirection.Stopped);
+            // Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            // todo(kazuki):: Transceiver.CurrentDirection of Receiver is not changed to "Stopped" even if waiting
+            // yield return new WaitUntil(() => transceiver1.Direction == RTCRtpTransceiverDirection.Stopped);
+            // Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
             audioTrack.Dispose();
             peer1.Close();
             peer2.Close();
             peer1.Dispose();
             peer2.Dispose();
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator TransceiverStop()
+        {
+            if (SystemInfo.processorType == "Apple M1")
+                Assert.Ignore("todo:: This test will hang up on Apple M1");
+
+            //var stream = new MediaStream();
+
+            var go = new GameObject("Test");
+            var cam = go.AddComponent<Camera>();
+            //stream.AddTrack(cam.CaptureStreamTrack(1280, 720, 0));
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
+            //test.component.SetStream(stream);
+            yield return test;
+            test.component.CoroutineUpdate();
+
+            var senderTransceivers = test.component.GetPeerTransceivers(0);
+            Assert.That(senderTransceivers.Count(), Is.EqualTo(1));
+            var transceiver1 = senderTransceivers.First();
+
+            var receiverTransceivers = test.component.GetPeerTransceivers(1);
+            Assert.That(receiverTransceivers.Count(), Is.EqualTo(1));
+            var transceiver2 = receiverTransceivers.First();
+
+            Assert.That(transceiver1.Stop(), Is.EqualTo(RTCErrorType.None));
+            Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            yield return 0;
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+
+            Assert.That(transceiver1.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+            Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            //stream.Dispose();
+            Object.DestroyImmediate(go);
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
