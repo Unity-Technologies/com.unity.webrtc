@@ -309,41 +309,37 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.Dispose();
         }
 
+
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator TransceiverStop()
+        public IEnumerator TransceiverReturnsSender()
         {
-            if (SystemInfo.processorType == "Apple M1")
-                Assert.Ignore("todo:: This test will hang up on Apple M1");
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
 
-            var go = new GameObject("Test");
-            var cam = go.AddComponent<Camera>();
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
 
-            var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
-            yield return test;
-            test.component.CoroutineUpdate();
+            AudioStreamTrack track1 = new AudioStreamTrack();
+            peer1.AddTrack(track1);
 
-            var senderTransceivers = test.component.GetPeerTransceivers(0);
-            Assert.That(senderTransceivers.Count(), Is.EqualTo(1));
-            var transceiver1 = senderTransceivers.First();
+            yield return SignalingOffer(peer1, peer2);
 
-            var receiverTransceivers = test.component.GetPeerTransceivers(1);
-            Assert.That(receiverTransceivers.Count(), Is.EqualTo(1));
-            var transceiver2 = receiverTransceivers.First();
+            Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
+            RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
+            Assert.That(sender1, Is.Not.Null);
 
-            Assert.That(transceiver1.Stop(), Is.EqualTo(RTCErrorType.None));
-            Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+            AudioStreamTrack track2 = new AudioStreamTrack();
+            RTCRtpSender sender2 = peer2.AddTrack(track2);
+            Assert.That(sender2, Is.Not.Null);
+            Assert.That(sender1, Is.EqualTo(sender2));
 
-            yield return 0;
-            yield return new WaitUntil(() => test.component.NegotiationCompleted());
-
-            Assert.That(transceiver1.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-            Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-
-            //stream.Dispose();
-            Object.DestroyImmediate(go);
-            Object.DestroyImmediate(test.gameObject);
+            track1.Dispose();
+            track2.Dispose();
+            peer1.Dispose();
+            peer2.Dispose();
         }
 
         [UnityTest]
@@ -719,38 +715,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => track1.Id, Throws.TypeOf<InvalidOperationException>());
             track.Dispose();
             track1.Dispose();
-        }
-
-        [UnityTest]
-        [Timeout(5000)]
-        public IEnumerator TransceiverReturnsSender()
-        {
-            RTCConfiguration config = default;
-            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
-            var peer1 = new RTCPeerConnection(ref config);
-            var peer2 = new RTCPeerConnection(ref config);
-
-            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
-            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
-
-            AudioStreamTrack track1 = new AudioStreamTrack();
-            peer1.AddTrack(track1);
-
-            yield return SignalingOffer(peer1, peer2);
-
-            Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
-            RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
-            Assert.That(sender1, Is.Not.Null);
-
-            AudioStreamTrack track2 = new AudioStreamTrack();
-            RTCRtpSender sender2 = peer2.AddTrack(track2);
-            Assert.That(sender2, Is.Not.Null);
-            Assert.That(sender1, Is.EqualTo(sender2));
-
-            track1.Dispose();
-            track2.Dispose();
-            peer1.Dispose();
-            peer2.Dispose();
         }
 
         [UnityTest]
