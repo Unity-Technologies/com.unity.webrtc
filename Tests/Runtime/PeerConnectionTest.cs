@@ -343,43 +343,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
-        [Timeout(5000)]
-        public IEnumerator TransceiverStop()
-        {
-            if (SystemInfo.processorType == "Apple M1")
-                Assert.Ignore("todo:: This test will hang up on Apple M1");
-
-            var go = new GameObject("Test");
-            var cam = go.AddComponent<Camera>();
-
-            var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
-            yield return test;
-            test.component.CoroutineUpdate();
-
-            var senderTransceivers = test.component.GetPeerTransceivers(0);
-            Assert.That(senderTransceivers.Count(), Is.EqualTo(1));
-            var transceiver1 = senderTransceivers.First();
-
-            var receiverTransceivers = test.component.GetPeerTransceivers(1);
-            Assert.That(receiverTransceivers.Count(), Is.EqualTo(1));
-            var transceiver2 = receiverTransceivers.First();
-
-            Assert.That(transceiver1.Stop(), Is.EqualTo(RTCErrorType.None));
-            Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-
-            yield return 0;
-            yield return new WaitUntil(() => test.component.NegotiationCompleted());
-
-            Assert.That(transceiver1.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-            Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-
-            //stream.Dispose();
-            Object.DestroyImmediate(go);
-            Object.DestroyImmediate(test.gameObject);
-        }
-
-        [UnityTest]
         [Timeout(1000)]
         [Category("PeerConnection")]
         public IEnumerator CreateOffer()
