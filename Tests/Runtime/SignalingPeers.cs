@@ -9,7 +9,6 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class SignalingPeers : MonoBehaviour, IMonoBehaviourTest
     {
-        private MediaStream m_stream;
         RTCPeerConnection[] peers = new RTCPeerConnection[2];
         Dictionary<RTCPeerConnection, List<RTCDataChannel>> dataChannels
             = new Dictionary<RTCPeerConnection, List<RTCDataChannel>>();
@@ -18,14 +17,27 @@ namespace Unity.WebRTC.RuntimeTest
 
         bool negotiating = false;
 
-        public void SetStream(MediaStream stream)
+        public void AddStream(int indexPeer, MediaStream stream)
         {
-            m_stream = stream;
+            foreach (var track in stream.GetTracks())
+            {
+                peers[0].AddTrack(track, stream);
+            }
         }
 
         public void AddTransceiver(int indexPeer, MediaStreamTrack track)
         {
             peers[indexPeer].AddTransceiver(track);
+        }
+
+        public RTCRtpSender AddTrack(int indexPeer, MediaStreamTrack track)
+        {
+            return peers[indexPeer].AddTrack(track);
+        }
+
+        public RTCErrorType RemoveTrack(int indexPeer, RTCRtpSender sender)
+        {
+            return peers[indexPeer].RemoveTrack(sender);
         }
 
         public RTCDataChannel CreateDataChannel(int indexPeer, string label, RTCDataChannelInit option = null)
@@ -121,14 +133,12 @@ namespace Unity.WebRTC.RuntimeTest
             };
             peers[0].OnNegotiationNeeded = () =>
             {
-//                Debug.Log("OnNegotiationNeeded ");
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[0], peers[1]));
             };
 
             peers[1].OnNegotiationNeeded = () =>
             {
-//                Debug.Log("OnNegotiationNeeded ");
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[1], peers[0]));
             };
@@ -195,12 +205,6 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op7;
             Assert.That(op7.IsCompleted, Is.True);
 
-            if (m_stream != null)
-            {
-                var op9 = new WaitUntilWithTimeout(() => GetPeerSenders(0).Any() && GetPeerReceivers(1).Any(), 5000);
-                yield return op9;
-                Assert.That(op9.IsCompleted, Is.True);
-            }
             IsTestFinished = true;
             negotiating = false;
         }

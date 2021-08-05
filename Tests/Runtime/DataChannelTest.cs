@@ -94,8 +94,8 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator SendThrowsExceptionAfterClose()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
-            yield return test;
             RTCDataChannel channel = test.component.CreateDataChannel(0, "test");
+            yield return test;
             byte[] message1 = { 1, 2, 3 };
             string message2 = "123";
 

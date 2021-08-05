@@ -316,15 +316,11 @@ namespace Unity.WebRTC.RuntimeTest
             if (SystemInfo.processorType == "Apple M1")
                 Assert.Ignore("todo:: This test will hang up on Apple M1");
 
-            //var stream = new MediaStream();
-
             var go = new GameObject("Test");
             var cam = go.AddComponent<Camera>();
-            //stream.AddTrack(cam.CaptureStreamTrack(1280, 720, 0));
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
-            //test.component.SetStream(stream);
             yield return test;
             test.component.CoroutineUpdate();
 
@@ -844,7 +840,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.SetStream(stream);
+            test.component.AddStream(0, stream);
             yield return test;
             test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
