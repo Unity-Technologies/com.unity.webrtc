@@ -40,6 +40,16 @@ namespace Unity.WebRTC.RuntimeTest
             return peers[indexPeer].RemoveTrack(sender);
         }
 
+        public RTCRtpSender AddTrack(int indexPeer, MediaStreamTrack track)
+        {
+            return peers[indexPeer].AddTrack(track);
+        }
+
+        public RTCErrorType RemoveTrack(int indexPeer, RTCRtpSender sender)
+        {
+            return peers[indexPeer].RemoveTrack(sender);
+        }
+
         public RTCDataChannel CreateDataChannel(int indexPeer, string label, RTCDataChannelInit option = null)
         {
             RTCDataChannel channel =  peers[indexPeer].CreateDataChannel(label, option);
