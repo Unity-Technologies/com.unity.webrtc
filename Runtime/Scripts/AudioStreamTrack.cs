@@ -31,7 +31,7 @@ namespace Unity.WebRTC
         /// </summary>
         public AudioClip Renderer
         {
-            get { return _streamRenderer.clip; }
+            get { return _streamRenderer?.clip; }
         }
 
 
@@ -100,11 +100,18 @@ namespace Unity.WebRTC
             }
         }
 
+        
+        /// <summary>
+        /// The channel count of streaming receiving audio is changing at the first few frames.
+        /// So This count is for ignoring the unstable audio frames
+        /// </summary>
+        const int FrameCountReceiveDataForIgnoring = 5;
+
         readonly AudioSourceRead _audioSourceRead;
+        AudioStreamRenderer _streamRenderer;
+        AudioTrackSource _source;
 
-        private AudioStreamRenderer _streamRenderer;
-        private AudioTrackSource _source;
-
+        int frameCountReceiveData = 0; 
 
         /// <summary>
         ///
@@ -227,13 +234,15 @@ namespace Unity.WebRTC
 
         private void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
         {
-            if (_streamRenderer == null)
+            if (_streamRenderer == null && frameCountReceiveData > FrameCountReceiveDataForIgnoring)
             {
                 _streamRenderer = new AudioStreamRenderer(this.Id, sampleRate, channels);
 
                 OnAudioReceived?.Invoke(_streamRenderer.clip);
             }
-            _streamRenderer.SetData(audioData);
+            _streamRenderer?.SetData(audioData);
+
+            frameCountReceiveData++;
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateAudioReceive))]

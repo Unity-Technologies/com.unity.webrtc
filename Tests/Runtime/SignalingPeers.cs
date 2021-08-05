@@ -156,25 +156,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         IEnumerator Start()
         {
-
-            //RTCDataChannel channel = peers[0].CreateDataChannel("data");
-            //dataChannels[peers[0]].Add(channel);
-
-            //if (m_stream != null)
-            //{
-            //    foreach (var track in m_stream.GetTracks())
-            //    {
-            //        peers[0].AddTrack(track, m_stream);
-            //    }
-            //}
-
-            //// Because some platform can't accept H264 codec for receive.
-            //foreach (var transceiver in peers[0].GetTransceivers())
-            //{
-            //    transceiver.Direction = RTCRtpTransceiverDirection.SendOnly;
-            //}
-
-            //yield return StartCoroutine(Negotiate(peers[0], peers[1]));
             yield return new WaitUntil(() => NegotiationCompleted());
         }
 

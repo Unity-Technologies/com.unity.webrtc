@@ -11,6 +11,7 @@ namespace Unity.WebRTC.Samples
     class MultiAudioReceiveSample : MonoBehaviour
     {
 #pragma warning disable 0649
+        [SerializeField] private Dropdown dropdownAudioclip;
         [SerializeField] private Button callButton;
         [SerializeField] private Button hangUpButton;
         [SerializeField] private Button addAudioObjectButton;
@@ -55,6 +56,7 @@ namespace Unity.WebRTC.Samples
             sendingSenderList = new List<RTCRtpSender>();
             callButton.interactable = true;
             hangUpButton.interactable = false;
+            dropdownAudioclip.options = sourceAudioClips.Select(clip => new Dropdown.OptionData(clip.name)).ToList();
 
             pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
             pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
@@ -112,7 +114,7 @@ namespace Unity.WebRTC.Samples
             var newSource = Instantiate(audioObjectPrefab, sourceObjectParent, false);
             newSource.name = $"SourceAudioObject{objectIndex}";
             newSource.loop = true;
-            newSource.clip = sourceAudioClips[Random.Range(0, sourceAudioClips.Count)];
+            newSource.clip = sourceAudioClips[dropdownAudioclip.value];
             newSource.Play();
 
             sourceObjectList.Add(newSource);

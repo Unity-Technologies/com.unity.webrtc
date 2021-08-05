@@ -536,8 +536,10 @@ namespace Unity.WebRTC
             }
 
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
-            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(
-                GetSelfOrThrow(), track.GetSelfOrThrow(), streamId);
+            RTCErrorType error = NativeMethods.PeerConnectionAddTrack(
+                GetSelfOrThrow(), track.GetSelfOrThrow(), streamId, out var ptr);
+            if (error != RTCErrorType.None)
+                throw new InvalidOperationException($"error occurred :{error}");
             cacheTracks.Add(track);
             return CreateSender(ptr);
         }
