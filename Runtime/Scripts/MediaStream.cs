@@ -7,13 +7,11 @@ namespace Unity.WebRTC
     public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
     public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
 
-    public class MediaStream : IDisposable
+    public class MediaStream : RefCountedObject
     {
         private DelegateOnAddTrack onAddTrack;
         private DelegateOnRemoveTrack onRemoveTrack;
 
-        private IntPtr self;
-        private bool disposed;
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
 
         /// <summary>
@@ -27,7 +25,7 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (this.disposed)
             {
@@ -36,12 +34,9 @@ namespace Unity.WebRTC
             if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Context.UnRegisterMediaStreamObserver(this);
-                WebRTC.Context.DeleteMediaStream(this);
                 WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
         public DelegateOnAddTrack OnAddTrack
@@ -108,9 +103,8 @@ namespace Unity.WebRTC
             return self;
         }
 
-        internal MediaStream(IntPtr ptr)
+        internal MediaStream(IntPtr ptr) :base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
             WebRTC.Context.RegisterMediaStreamObserver(this);
             WebRTC.Context.MediaStreamRegisterOnAddTrack(this, MediaStreamOnAddTrack);

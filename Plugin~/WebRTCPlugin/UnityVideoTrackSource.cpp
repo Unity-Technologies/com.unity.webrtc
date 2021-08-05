@@ -52,6 +52,15 @@ absl::optional<bool> UnityVideoTrackSource::needs_denoising() const
     return needs_denoising_;
 }
 
+CodecInitializationResult UnityVideoTrackSource::GetCodecInitializationResult() const
+{
+    if (encoder_ == nullptr)
+    {
+        return CodecInitializationResult::NotInitialized;
+    }
+    return encoder_->GetCodecInitializationResult();
+}
+
 void UnityVideoTrackSource::SetEncoder(IEncoder* encoder)
 {
     encoder_ = encoder;

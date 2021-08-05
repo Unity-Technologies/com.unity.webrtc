@@ -269,6 +269,12 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     const VideoStreamRenderEventID event =
         static_cast<VideoStreamRenderEventID>(eventID);
 
+    if (!s_context->ExistsRefPtr(track))
+    {
+        RTC_LOG(LS_INFO) << "OnRenderEvent:: track is not found";
+        return;
+    }
+
     switch(event)
     {
         case VideoStreamRenderEventID::Initialize:

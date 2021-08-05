@@ -106,6 +106,7 @@ if(Windows)
       Msdmo
       Dmoguids
       wmcodecdspuuid
+      Strmiids
   )
   target_include_directories(WebRTCLib
     PUBLIC

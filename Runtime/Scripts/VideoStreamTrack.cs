@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -17,6 +16,7 @@ namespace Unity.WebRTC
         RenderTexture m_destTexture;
 
         UnityVideoRenderer m_renderer;
+        VideoTrackSource _source;
 
         private static RenderTexture CreateRenderTexture(int width, int height)
         {
@@ -131,21 +131,20 @@ namespace Unity.WebRTC
         /// <param name="height"></param>
         /// <param name="format"></param>
         public VideoStreamTrack(IntPtr texturePtr, int width, int height, GraphicsFormat format)
-            : base(WebRTC.Context.CreateVideoTrack(Guid.NewGuid().ToString()))
+            : this(Guid.NewGuid().ToString(), new VideoTrackSource())
         {
             WebRTC.ValidateTextureSize(width, height, Application.platform, WebRTC.GetEncoderType());
             WebRTC.ValidateGraphicsFormat(format);
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());
-
-            if(!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
-                throw new InvalidOperationException();
         }
 
-        /// <summary>
-        /// Creates from MediaStreamTrack object
-        /// </summary>
-        /// <param name="sourceTrack"></param>
+        internal VideoStreamTrack(string label, VideoTrackSource source)
+            : this(WebRTC.Context.CreateVideoTrack(label, source.self))
+        {
+            _source = source;
+        }
+
         internal VideoStreamTrack(IntPtr sourceTrack) : base(sourceTrack)
         {
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
@@ -179,14 +178,11 @@ namespace Unity.WebRTC
                     WebRTC.DestroyOnMainThread(m_destTexture);
                 }
 
-                s_tracks.TryRemove(self, out var value);
-                WebRTC.Context.DeleteMediaStreamTrack(self);
-                WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
-            }
+                _source?.Dispose();
 
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+                s_tracks.TryRemove(self, out var value);
+            }
+            base.Dispose();
         }
     }
 
@@ -226,6 +222,33 @@ namespace Unity.WebRTC
             var track = cam.CaptureStreamTrack(width, height, bitrate, depth);
             stream.AddTrack(track);
             return stream;
+        }
+    }
+
+    internal class VideoTrackSource : RefCountedObject
+    {
+        public VideoTrackSource() : base(WebRTC.Context.CreateVideoTrackSource())
+        {
+            WebRTC.Table.Add(self, this);
+        }
+
+        ~VideoTrackSource()
+        {
+            this.Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Table.Remove(self);
+            }
+            base.Dispose();
         }
     }
 
