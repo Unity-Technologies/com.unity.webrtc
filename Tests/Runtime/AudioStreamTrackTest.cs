@@ -36,6 +36,7 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
+        [Ignore("AudioManager is disabled when batch mode on CI")]
         [UnityTest]
         [Timeout(5000)]
         public IEnumerator AddMultiAudioTrack()
