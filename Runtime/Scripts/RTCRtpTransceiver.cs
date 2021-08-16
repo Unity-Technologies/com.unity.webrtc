@@ -105,9 +105,9 @@ namespace Unity.WebRTC
             return error;
         }
 
-        public void Stop()
+        public RTCErrorType Stop()
         {
-            NativeMethods.TransceiverStop(GetSelfOrThrow());
+            return NativeMethods.TransceiverStop(self);
         }
     }
 }

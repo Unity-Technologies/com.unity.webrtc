@@ -291,9 +291,53 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(transceiver1.CurrentDirection, RTCRtpTransceiverDirection.RecvOnly);
             Assert.AreEqual(transceiver2.CurrentDirection, RTCRtpTransceiverDirection.SendOnly);
 
+            //Assert.That(transceiver2.Stop(), Is.EqualTo(RTCErrorType.None));
+            //Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            // todo(kazuki):: Transceiver.CurrentDirection of Sender is not changed to "Stopped" even if waiting
+            // yield return new WaitUntil(() => transceiver2.CurrentDirection == RTCRtpTransceiverDirection.Stopped);
+            // Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            // todo(kazuki):: Transceiver.CurrentDirection of Receiver is not changed to "Stopped" even if waiting
+            // yield return new WaitUntil(() => transceiver1.Direction == RTCRtpTransceiverDirection.Stopped);
+            // Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
             audioTrack.Dispose();
             peer1.Close();
             peer2.Close();
+            peer1.Dispose();
+            peer2.Dispose();
+        }
+
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator TransceiverReturnsSender()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
+
+            AudioStreamTrack track1 = new AudioStreamTrack();
+            peer1.AddTrack(track1);
+
+            yield return SignalingOffer(peer1, peer2);
+
+            Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
+            RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
+            Assert.That(sender1, Is.Not.Null);
+
+            AudioStreamTrack track2 = new AudioStreamTrack();
+            RTCRtpSender sender2 = peer2.AddTrack(track2);
+            Assert.That(sender2, Is.Not.Null);
+            Assert.That(sender1, Is.EqualTo(sender2));
+
+            track1.Dispose();
+            track2.Dispose();
             peer1.Dispose();
             peer2.Dispose();
         }
@@ -675,38 +719,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator TransceiverReturnsSender()
-        {
-            RTCConfiguration config = default;
-            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
-            var peer1 = new RTCPeerConnection(ref config);
-            var peer2 = new RTCPeerConnection(ref config);
-
-            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
-            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
-
-            AudioStreamTrack track1 = new AudioStreamTrack();
-            peer1.AddTrack(track1);
-
-            yield return SignalingOffer(peer1, peer2);
-
-            Assert.That(peer2.GetTransceivers().Count(), Is.EqualTo(1));
-            RTCRtpSender sender1 = peer2.GetTransceivers().First().Sender;
-            Assert.That(sender1, Is.Not.Null);
-
-            AudioStreamTrack track2 = new AudioStreamTrack();
-            RTCRtpSender sender2 = peer2.AddTrack(track2);
-            Assert.That(sender2, Is.Not.Null);
-            Assert.That(sender1, Is.EqualTo(sender2));
-
-            track1.Dispose();
-            track2.Dispose();
-            peer1.Dispose();
-            peer2.Dispose();
-        }
-
-        [UnityTest]
-        [Timeout(5000)]
         public IEnumerator PeerConnectionStateChange()
         {
             RTCConfiguration config = default;
@@ -792,7 +804,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.SetStream(stream);
+            test.component.AddStream(0, stream);
             yield return test;
             test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);

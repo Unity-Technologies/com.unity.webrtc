@@ -1020,9 +1020,10 @@ extern "C"
         return false;
     }
 
-    UNITY_INTERFACE_EXPORT void TransceiverStop(RtpTransceiverInterface* transceiver)
+    UNITY_INTERFACE_EXPORT RTCErrorType TransceiverStop(RtpTransceiverInterface* transceiver)
     {
-        transceiver->StopStandard();
+        auto error = transceiver->StopStandard();
+        return error.type();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverDirection TransceiverGetDirection(RtpTransceiverInterface* transceiver)

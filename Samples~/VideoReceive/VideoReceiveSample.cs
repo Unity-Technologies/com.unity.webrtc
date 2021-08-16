@@ -190,9 +190,14 @@ namespace Unity.WebRTC.Samples
 
         private void RemoveTracks()
         {
-            foreach (var sender in pc1Senders)
+            var transceivers = _pc1.GetTransceivers();
+            foreach (var transceiver in transceivers)
             {
-                _pc1.RemoveTrack(sender);
+                if(transceiver.Sender != null)
+                {
+                    transceiver.Stop();
+                    _pc1.RemoveTrack(transceiver.Sender);
+                }
             }
 
             pc1Senders.Clear();

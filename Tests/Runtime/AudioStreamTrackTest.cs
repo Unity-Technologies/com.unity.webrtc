@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Collections;
+using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -8,14 +10,28 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = TestHelper.HardwareCodecSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
+            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
         public void TearDown()
         {
             WebRTC.Dispose();
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator AddAndRemoveAudioTrack()
+        {
+            var audioTrack = new AudioStreamTrack();
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var sender = test.component.AddTrack(0, audioTrack);
+            yield return test;
+            Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [Test]

@@ -665,7 +665,9 @@ namespace Unity.WebRTC
         {
             if (Context.table.ContainsKey(ptr))
             {
-                return Context.table[ptr] as T;
+                if(Context.table[ptr] is T value)
+                    return value;
+                throw new InvalidCastException($"{ptr} is not {typeof(T).Name}");
             }
             else
             {
@@ -934,7 +936,7 @@ namespace Unity.WebRTC
         public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool TransceiverStop(IntPtr transceiver);
+        public static extern RTCErrorType TransceiverStop(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
         public static extern RTCRtpTransceiverDirection TransceiverGetDirection(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
