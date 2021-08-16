@@ -488,9 +488,15 @@ extern "C"
         obj->connection->RestartIce();
     } 
 
-    UNITY_INTERFACE_EXPORT RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId)
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionAddTrack(
+        PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId, RtpSenderInterface** sender)
     {
-        return obj->connection->AddTrack(rtc::scoped_refptr <MediaStreamTrackInterface>(track), { streamId }).value().get();
+        auto result = obj->connection->AddTrack(rtc::scoped_refptr <MediaStreamTrackInterface>(track), { streamId });
+        if (result.ok())
+        {
+            *sender = result.value();
+        }
+        return result.error().type();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiver(

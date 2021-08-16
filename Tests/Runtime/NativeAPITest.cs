@@ -205,7 +205,9 @@ namespace Unity.WebRTC.RuntimeTest
             var renderTexture = CreateRenderTexture(width, height);
             var source = NativeMethods.ContextCreateVideoTrackSource(context);
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
-            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
+            Assert.That(error, Is.EqualTo(RTCErrorType.None));
+
             var track2 = NativeMethods.SenderGetTrack(sender);
             Assert.AreEqual(track, track2);
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
@@ -230,7 +232,8 @@ namespace Unity.WebRTC.RuntimeTest
             var renderTexture = CreateRenderTexture(width, height);
             var source = NativeMethods.ContextCreateVideoTrackSource(context);
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
-            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
+            Assert.That(error, Is.EqualTo(RTCErrorType.None));
 
             NativeMethods.SenderGetParameters(sender, out var ptr);
             var parameters = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
@@ -325,7 +328,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.IsNotEmpty(streamId);
             var source = NativeMethods.ContextCreateAudioTrackSource(context);
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio", source);
-            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
+            Assert.That(error, Is.EqualTo(RTCErrorType.None));
 
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, source);
@@ -414,7 +418,8 @@ namespace Unity.WebRTC.RuntimeTest
             var renderTexture = CreateRenderTexture(width, height);
             var source = NativeMethods.ContextCreateVideoTrackSource(context);
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
-            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, streamId);
+            var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
+            Assert.That(error, Is.EqualTo(RTCErrorType.None));
 
             var callback = NativeMethods.GetRenderEventFunc(context);
             Assert.AreEqual(CodecInitializationResult.NotInitialized, NativeMethods.GetInitializationResult(context, track));
