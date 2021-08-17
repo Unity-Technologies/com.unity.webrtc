@@ -306,21 +306,19 @@ namespace Unity.WebRTC.Samples
                 webCamTexture = null;
             }
 
-            receiveAudioStream.Dispose();
+            receiveAudioStream?.Dispose();
             receiveAudioStream = null;
-            receiveVideoStream.Dispose();
+            receiveVideoStream?.Dispose();
             receiveVideoStream = null;
 
-            videoStreamTrack.Dispose();
+            videoStreamTrack?.Dispose();
             videoStreamTrack = null;
-            audioStreamTrack.Dispose();
+            audioStreamTrack?.Dispose();
             audioStreamTrack = null;
 
-            _pc1.Close();
-            _pc2.Close();
             Debug.Log("Close local/remote peer connection");
-            _pc1.Dispose();
-            _pc2.Dispose();
+            _pc1?.Dispose();
+            _pc2?.Dispose();
             _pc1 = null;
             _pc2 = null;
             sourceImage.texture = null;
