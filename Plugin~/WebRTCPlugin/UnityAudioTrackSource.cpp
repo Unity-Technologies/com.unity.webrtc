@@ -1,34 +1,37 @@
 #include "pch.h"
 #include "UnityAudioTrackSource.h"
 
-#include <mutex>
-
 namespace unity
 {
 namespace webrtc
 {
 
-rtc::scoped_refptr<UnityAudioTrackSource> UnityAudioTrackSource::Create(const std::string& sTrackName)
+rtc::scoped_refptr<UnityAudioTrackSource> UnityAudioTrackSource::Create()
 {
     rtc::scoped_refptr<UnityAudioTrackSource> source(
-        new rtc::RefCountedObject<UnityAudioTrackSource>(sTrackName));
+        new rtc::RefCountedObject<UnityAudioTrackSource>());
     return source;
 }
 
 rtc::scoped_refptr<UnityAudioTrackSource> UnityAudioTrackSource::Create(
-    const std::string& sTrackName, const cricket::AudioOptions& audio_options)
+    const cricket::AudioOptions& audio_options)
 {
     rtc::scoped_refptr<UnityAudioTrackSource> source(
-        new rtc::RefCountedObject<UnityAudioTrackSource>(sTrackName, audio_options));
+        new rtc::RefCountedObject<UnityAudioTrackSource>(audio_options));
     return source;
 }
 
 void UnityAudioTrackSource::AddSink(AudioTrackSinkInterface* sink)
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     _arrSink.push_back(sink);
 }
+
 void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     auto i= std::find(_arrSink.begin(), _arrSink.end(), sink);
     if (i != _arrSink.end())
         _arrSink.erase(i);
@@ -36,6 +39,8 @@ void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
 
 void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_arrSink.empty())
         return;
 
@@ -65,12 +70,10 @@ void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, siz
         _convertedAudioData.begin() + nNumFramesFor10ms * nNumChannels * size);
 }
 
-UnityAudioTrackSource::UnityAudioTrackSource(const std::string& sTrackName)
-    : _sTrackName(sTrackName)
+UnityAudioTrackSource::UnityAudioTrackSource()
 {
 }
-UnityAudioTrackSource::UnityAudioTrackSource(const std::string& sTrackName, const cricket::AudioOptions& audio_options)
-    : _sTrackName(sTrackName)
+UnityAudioTrackSource::UnityAudioTrackSource(const cricket::AudioOptions& audio_options)
 {
 }
 

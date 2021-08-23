@@ -191,7 +191,8 @@ var UnityWebRTCPeerConnection = {
     return idx;
   },
 
-  PeerConnectionGetReceivers: function (peerPtr) {
+  PeerConnectionGetReceivers: function (contextPtr, peerPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'PeerConnectionGetReceivers', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionGetReceivers', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var receivers = peer.getReceivers();
@@ -205,7 +206,8 @@ var UnityWebRTCPeerConnection = {
     return ptr;
   },
 
-  PeerConnectionGetSenders: function (peerPtr) {
+  PeerConnectionGetSenders: function (contextPtr, peerPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'PeerConnectionGetSenders', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionGetSenders', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var senders = peer.getSenders();
@@ -219,7 +221,8 @@ var UnityWebRTCPeerConnection = {
     return ptr;
   },
 
-  PeerConnectionGetTransceivers: function (peerPtr) {
+  PeerConnectionGetTransceivers: function (contextPtr, peerPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'PeerConnectionGetTransceivers', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionGetTransceivers', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var transceivers = peer.getTransceivers();

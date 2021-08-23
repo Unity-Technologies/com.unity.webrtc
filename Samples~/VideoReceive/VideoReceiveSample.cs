@@ -32,6 +32,7 @@ namespace Unity.WebRTC.Samples
         private List<RTCRtpSender> pc1Senders;
         private VideoStreamTrack videoStreamTrack;
         private AudioStreamTrack audioStreamTrack;
+        private MediaStream receiveAudioStream, receiveVideoStream;
         private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
         private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
         private DelegateOnIceCandidate pc1OnIceCandidate;
@@ -81,6 +82,12 @@ namespace Unity.WebRTC.Samples
                 if (e.Track is VideoStreamTrack video && !video.IsDecoderInitialized)
                 {
                     receiveImage.texture = video.InitializeReceiver(streamSize.x, streamSize.y);
+                    receiveVideoStream = e.Streams.First();
+                    receiveVideoStream.OnRemoveTrack = ev =>
+                    {
+                        receiveImage.texture = null;
+                        ev.Track.Dispose();
+                    };
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)
@@ -90,6 +97,13 @@ namespace Unity.WebRTC.Samples
                         receiveAudio.clip = clip;
                         receiveAudio.loop = true;
                         receiveAudio.Play();
+                    };
+                    receiveAudioStream = e.Streams.First();
+                    receiveAudioStream.OnRemoveTrack = ev =>
+                    {
+                        receiveAudio.Stop();
+                        receiveAudio.clip = null;
+                        ev.Track.Dispose();
                     };
                 }
             };
@@ -178,9 +192,14 @@ namespace Unity.WebRTC.Samples
 
         private void RemoveTracks()
         {
-            foreach (var sender in pc1Senders)
+            var transceivers = _pc1.GetTransceivers();
+            foreach (var transceiver in transceivers)
             {
-                _pc1.RemoveTrack(sender);
+                if(transceiver.Sender != null)
+                {
+                    transceiver.Stop();
+                    _pc1.RemoveTrack(transceiver.Sender);
+                }
             }
 
             pc1Senders.Clear();
@@ -240,6 +259,10 @@ namespace Unity.WebRTC.Samples
             var deviceName = Microphone.devices[micListDropdown.value];
             Microphone.GetDeviceCaps(deviceName, out int minFreq, out int maxFreq);
             var micClip = Microphone.Start(deviceName, true, 1, 48000);
+
+            // set the latency to “0” samples before the audio starts to play.
+            while (!(Microphone.GetPosition(deviceName) > 0)) {}
+
             sourceAudio.clip = micClip;
             sourceAudio.loop = true;
             sourceAudio.Play();
@@ -286,16 +309,19 @@ namespace Unity.WebRTC.Samples
                 webCamTexture = null;
             }
 
-            videoStreamTrack.Dispose();
+            receiveAudioStream?.Dispose();
+            receiveAudioStream = null;
+            receiveVideoStream?.Dispose();
+            receiveVideoStream = null;
+
+            videoStreamTrack?.Dispose();
             videoStreamTrack = null;
-            audioStreamTrack.Dispose();
+            audioStreamTrack?.Dispose();
             audioStreamTrack = null;
 
-            _pc1.Close();
-            _pc2.Close();
             Debug.Log("Close local/remote peer connection");
-            _pc1.Dispose();
-            _pc2.Dispose();
+            _pc1?.Dispose();
+            _pc2?.Dispose();
             _pc1 = null;
             _pc2 = null;
             sourceImage.texture = null;

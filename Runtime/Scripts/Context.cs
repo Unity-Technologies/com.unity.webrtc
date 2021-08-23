@@ -69,6 +69,17 @@ namespace Unity.WebRTC
             GC.SuppressFinalize(this);
         }
 
+        public void AddRefPtr(IntPtr ptr)
+        {
+            NativeMethods.ContextAddRefPtr(self, ptr);
+        }
+
+
+        public void DeleteRefPtr(IntPtr ptr)
+        {
+            NativeMethods.ContextDeleteRefPtr(self, ptr);
+        }
+
         public EncoderType GetEncoderType()
         {
             return NativeMethods.ContextGetEncoderType(self);
@@ -97,7 +108,7 @@ namespace Unity.WebRTC
             RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
                 self, ptr, ref desc, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType =  errorType, message = message};
+            return new RTCError { errorType = errorType, message = message};
 #else
             RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
                 self, ptr, desc.type, desc.sdp);
@@ -116,7 +127,7 @@ namespace Unity.WebRTC
             RTCErrorType errorType = RTCErrorType.InternalError; // TODO
 #endif
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError {errorType = errorType, message = message};
+            return new RTCError { errorType = errorType, message = message };
         }
 
         public RTCError PeerConnectionSetRemoteDescription(
@@ -127,7 +138,7 @@ namespace Unity.WebRTC
             RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
                 self, ptr, ref desc, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType =  errorType, message = message};
+            return new RTCError { errorType = errorType, message = message};
 #else
             RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
                 self, ptr, desc.type, desc.sdp);
@@ -146,6 +157,46 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
         }
 
+        public IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track)
+        {
+            return NativeMethods.PeerConnectionAddTransceiver(self, pc, track);
+        }
+
+        public IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind)
+        {
+            return NativeMethods.PeerConnectionAddTransceiverWithType(self, pc, kind);
+        }
+
+        public IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length)
+        {
+#if !UNITY_WEBGL
+            return NativeMethods.PeerConnectionGetReceivers(self, ptr, out length);
+#else
+            length = 0;
+            return NativeMethods.PeerConnectionGetReceivers(self, ptr);
+#endif
+        }
+
+        public IntPtr PeerConnectionGetSenders(IntPtr ptr, out ulong length)
+        {
+#if !UNITY_WEBGL
+            return NativeMethods.PeerConnectionGetSenders(self, ptr, out length);
+#else
+            length = 0;
+            return NativeMethods.PeerConnectionGetSenders(self, ptr);
+#endif
+        }
+
+        public IntPtr PeerConnectionGetTransceivers(IntPtr ptr, out ulong length)
+        {
+#if !UNITY_WEBGL
+            return NativeMethods.PeerConnectionGetTransceivers(self, ptr, out length);
+#else
+            length = 0;
+            return NativeMethods.PeerConnectionGetTransceivers(self, ptr);
+#endif
+        }
+
         public IntPtr CreateDataChannel(IntPtr ptr, string label, ref RTCDataChannelInitInternal options)
         {
 #if !UNITY_WEBGL
@@ -161,15 +212,9 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
-
         public IntPtr CreateMediaStream(string label)
         {
             return NativeMethods.ContextCreateMediaStream(self, label);
-        }
-
-        public void DeleteMediaStream(MediaStream stream)
-        {
-            NativeMethods.ContextDeleteMediaStream(self, stream.GetSelfOrThrow());
         }
 
         public void RegisterMediaStreamObserver(MediaStream stream)
@@ -215,19 +260,24 @@ namespace Unity.WebRTC
         }
 #endif
 
-        public IntPtr CreateAudioTrack(string label)
+        public IntPtr CreateVideoTrackSource()
         {
-#if !UNITY_WEBGL
-            return NativeMethods.ContextCreateAudioTrack(self, label);
-#else
-            return NativeMethods.ContextCreateAudioTrack(self);
-#endif
+            return NativeMethods.ContextCreateVideoTrackSource(self);
         }
 
-#if !UNITY_WEBGL
-        public IntPtr CreateVideoTrack(string label)
+        public IntPtr CreateAudioTrackSource()
         {
-            return NativeMethods.ContextCreateVideoTrack(self, label);
+            return NativeMethods.ContextCreateAudioTrackSource(self);
+        }
+
+        public IntPtr CreateAudioTrack(string label, IntPtr trackSource)
+        {
+            return NativeMethods.ContextCreateAudioTrack(self, label, trackSource);
+        }
+#if !UNITY_WEBGL
+        public IntPtr CreateVideoTrack(string label, IntPtr source)
+        {
+            return NativeMethods.ContextCreateVideoTrack(self, label, source);
         }
 #else
         public IntPtr CreateVideoTrack(string label)
@@ -246,10 +296,6 @@ namespace Unity.WebRTC
             NativeMethods.ContextStopMediaStreamTrack(self, track);
         }
 
-        public void DeleteMediaStreamTrack(IntPtr track)
-        {
-            NativeMethods.ContextDeleteMediaStreamTrack(self, track);
-        }
 
         public IntPtr CreateVideoRenderer()
         {
@@ -287,7 +333,6 @@ namespace Unity.WebRTC
         public RTCRtpCapabilities GetSenderCapabilities(TrackKind kind)
         {
             string json = NativeMethods.ContextGetSenderCapabilities(self, kind);
-
             return JsonConvert.DeserializeObject<RTCRtpCapabilities>(json);
         }
 #endif
@@ -301,7 +346,6 @@ namespace Unity.WebRTC
         public RTCRtpCapabilities GetReceiverCapabilities(TrackKind kind)
         {
             string json = NativeMethods.ContextGetReceiverCapabilities(self, kind);
-
             return JsonConvert.DeserializeObject<RTCRtpCapabilities>(json);
         }
 #endif

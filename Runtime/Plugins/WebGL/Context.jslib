@@ -29,7 +29,28 @@ var UnityWebRTCContext = {
       delete UWManaged[contextPtr];
     });
   },
-
+  
+  
+  // TODO
+  ContextAddRefPtr: function (ptr){
+    
+  },
+  
+  // TODO
+  ContextDeleteRefPtr: function(ptr){
+    
+  },
+  
+  // TODO
+  ContextCreateAudioTrackSource: function(trackPtr){
+    
+  },
+  
+  // TODO
+  ContextCreateVideoTrackSource: function(trackPtr){
+    
+  },
+  
   ContextGetEncoderType: function (contextPtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextGetEncoderType', 'context')) return;
     var encodeTypeIdx = UWEncoderType.indexOf(context.encodeType);

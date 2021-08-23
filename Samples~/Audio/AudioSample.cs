@@ -17,12 +17,15 @@ namespace Unity.WebRTC
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Dropdown dropdownAudioCodecs;
         [SerializeField] private Dropdown dropdownSpeakerMode;
+        [SerializeField] private Dropdown dropdownDSPBufferSize;
+        [SerializeField] private Dropdown dropdownBandwidth;
         [SerializeField] private Button buttonStart;
         [SerializeField] private Button buttonCall;
         [SerializeField] private Button buttonPause;
         [SerializeField] private Button buttonResume;
         [SerializeField] private Button buttonHangup;
         [SerializeField] private AudioClip[] audioclipList;
+        [SerializeField] private Text textBandwidth;
 
         private RTCPeerConnection _pc1, _pc2;
         private MediaStream _sendStream;
@@ -37,10 +40,28 @@ namespace Unity.WebRTC
 
         private string m_deviceName = null;
 
-        void Start()
+        private Dictionary<string, ulong?> bandwidthOptions = new Dictionary<string, ulong?>()
+        {
+            { "undefined", null },
+            { "160",  160 },
+            { "80", 80 },
+            { "40", 40 },
+            { "20",  20 },
+            { "10",  10 },
+        };
+
+        private Dictionary<string, int> dspBufferSizeOptions = new Dictionary<string, int>()
+        {
+            { "Best Latency",  256 },
+            { "Good Latency", 512 },
+            { "Best Performance", 1024 },
+        };
+
+    void Start()
         {
             WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
+            StartCoroutine(LoopStatsCoroutine());
 
 #if !UNITY_WEBGL
             toggleEnableMicrophone.isOn = false;
@@ -61,6 +82,13 @@ namespace Unity.WebRTC
             dropdownSpeakerMode.value = (int)audioConf.speakerMode;
             dropdownSpeakerMode.onValueChanged.AddListener(OnSpeakerModeChanged);
 
+            dropdownDSPBufferSize.options =
+                dspBufferSizeOptions.Select(clip => new Dropdown.OptionData(clip.Key)).ToList();
+            dropdownDSPBufferSize.onValueChanged.AddListener(OnDSPBufferSizeChanged);
+
+            // best latency is default
+            OnDSPBufferSizeChanged(dropdownDSPBufferSize.value);
+
             dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
             var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
 
@@ -73,6 +101,12 @@ namespace Unity.WebRTC
             }
             dropdownAudioCodecs.AddOptions(availableCodecs.Select(codec =>
                 new Dropdown.OptionData(string.Format($"{codec.mimeType} {codec.clockRate} {codec.sdpFmtpLine.Replace(";", " ")}"))).ToList());
+
+            dropdownBandwidth.options = bandwidthOptions
+                .Select(pair => new Dropdown.OptionData { text = pair.Key })
+                .ToList();
+            dropdownBandwidth.onValueChanged.AddListener(OnBandwidthChanged);
+            dropdownBandwidth.interactable = false;
 
             // Update UI
             OnDeviceChanged(dropdownMicrophoneDevices.value);
@@ -96,6 +130,8 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
                 m_deviceName = dropdownMicrophoneDevices.captionText.text;
                 m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
+                // set the latency to “0” samples before the audio starts to play.
+                while (!(Microphone.GetPosition(m_deviceName) > 0)) {}
 #endif
             }
             else
@@ -111,6 +147,7 @@ namespace Unity.WebRTC
             buttonCall.interactable = true;
             buttonHangup.interactable = true;
             dropdownSpeakerMode.interactable = false;
+            dropdownDSPBufferSize.interactable = false;
         }
 
         void OnEnableMicrophone(bool enable)
@@ -123,6 +160,7 @@ namespace Unity.WebRTC
         {
             buttonCall.interactable = false;
             buttonPause.interactable = true;
+            dropdownBandwidth.interactable = true;
 
             _receiveStream = new MediaStream();
             _receiveStream.OnAddTrack += OnAddTrack;
@@ -145,7 +183,6 @@ namespace Unity.WebRTC
             transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
             m_audioTrack = new AudioStreamTrack(inputAudioSource);
-
             _pc1.AddTrack(m_audioTrack, _sendStream);
 
             var transceiver1 = _pc1.GetTransceivers().First();
@@ -158,8 +195,6 @@ namespace Unity.WebRTC
             else
             {
                 var codec = availableCodecs[dropdownAudioCodecs.value - 1];
-                //Debug.Log(codec.channels);
-                //codec.channels = 1;
                 var error = transceiver1.SetCodecPreferences(new[] { codec });
                 if (error != RTCErrorType.None)
                     Debug.LogError(error);
@@ -212,7 +247,9 @@ namespace Unity.WebRTC
             _sendStream?.Dispose();
             _pc1?.Dispose();
             _pc2?.Dispose();
-                
+            _pc1 = null;
+            _pc2 = null;
+
             inputAudioSource.Stop();
             outputAudioSource.Stop();
 
@@ -225,6 +262,9 @@ namespace Unity.WebRTC
             buttonPause.gameObject.SetActive(true);
 
             dropdownSpeakerMode.interactable = true;
+            dropdownDSPBufferSize.interactable = true;
+            dropdownBandwidth.interactable = false;
+
         }
 
         void OnDeviceChanged(int value)
@@ -233,6 +273,33 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL 
             Microphone.GetDeviceCaps(m_deviceName, out int minFreq, out int maxFreq);
 #endif
+        }
+
+        private void OnBandwidthChanged(int index)
+        {
+            if (_pc1 == null || _pc2 == null)
+                return;
+            ulong? bandwidth = bandwidthOptions.Values.ElementAt(index);
+            RTCRtpSender sender = _pc1.GetSenders().First();
+            RTCRtpSendParameters parameters = sender.GetParameters();
+            if (bandwidth == null)
+            {
+                parameters.encodings[0].maxBitrate = null;
+                parameters.encodings[0].minBitrate = null;
+            }
+            else
+            {
+                parameters.encodings[0].maxBitrate = bandwidth * 1000;
+                parameters.encodings[0].minBitrate = bandwidth * 1000;
+            }
+
+            RTCErrorType error = sender.SetParameters(parameters);
+            if (error != RTCErrorType.None)
+            {
+                Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+            }
+
+            Debug.Log("SetParameters:" + bandwidth);
         }
 
         void OnSpeakerModeChanged(int value)
@@ -246,6 +313,16 @@ namespace Unity.WebRTC
             }
         }
 
+        void OnDSPBufferSizeChanged(int value)
+        {
+            var audioConf = AudioSettings.GetConfiguration();
+            audioConf.dspBufferSize = dspBufferSizeOptions.Values.ToArray()[value];
+            if (!AudioSettings.Reset(audioConf))
+            {
+                Debug.LogError("Failed changing Audio Settings");
+            }
+        }
+
         private static RTCConfiguration GetSelectedSdpSemantics()
         {
             RTCConfiguration config = default;
@@ -253,7 +330,6 @@ namespace Unity.WebRTC
 
             return config;
         }
-
 
         IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
         {
@@ -346,6 +422,67 @@ namespace Unity.WebRTC
         static void OnSetSessionDescriptionError(ref RTCError error)
         {
             Debug.LogError($"Error Detail Type: {error.message}");
+        }
+
+        private IEnumerator LoopStatsCoroutine()
+        {
+            while (true)
+            {
+                yield return StartCoroutine(UpdateStatsCoroutine());
+                yield return new WaitForSeconds(1f);
+            }
+        }
+
+        private IEnumerator UpdateStatsCoroutine()
+        {
+            RTCRtpSender sender = _pc1?.GetSenders().First();
+            if (sender == null)
+                yield break;
+            RTCStatsReportAsyncOperation op = sender.GetStats();
+            yield return op;
+            if (op.IsError)
+            {
+                Debug.LogErrorFormat("RTCRtpSender.GetStats() is failed {0}", op.Error.errorType);
+            }
+            else
+            {
+                UpdateStatsPacketSize(op.Value);
+            }
+        }
+
+        private RTCStatsReport lastResult = null;
+        private void UpdateStatsPacketSize(RTCStatsReport res)
+        {
+            foreach (RTCStats stats in res.Stats.Values)
+            {
+                if (!(stats is RTCOutboundRTPStreamStats report))
+                {
+                    continue;
+                }
+
+                if (report.isRemote)
+                    return;
+
+                long now = report.Timestamp;
+                ulong bytes = report.bytesSent;
+
+                if (lastResult != null)
+                {
+                    if (!lastResult.TryGetValue(report.Id, out RTCStats last))
+                        continue;
+
+                    var lastStats = last as RTCOutboundRTPStreamStats;
+                    var duration = (double)(now - lastStats.Timestamp) / 1000000;
+                    ulong bitrate = (ulong)(8 * (bytes - lastStats.bytesSent) / duration);
+                    textBandwidth.text = (bitrate / 1000.0f).ToString("f2");
+                    //if (autoScroll.isOn)
+                    //{
+                    //    statsField.MoveTextEnd(false);
+                    //}
+                }
+
+            }
+            lastResult = res;
         }
     }
 }

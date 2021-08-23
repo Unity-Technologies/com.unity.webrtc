@@ -109,6 +109,7 @@ if(Windows)
       Dmoguids
       wmcodecdspuuid
       WebRTCLib
+      Strmiids
   )
   target_include_directories(WebRTCLibTest
     PRIVATE

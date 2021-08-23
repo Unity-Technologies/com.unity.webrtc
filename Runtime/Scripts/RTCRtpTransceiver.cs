@@ -4,15 +4,12 @@ using Newtonsoft.Json;
 
 namespace Unity.WebRTC
 {
-    public class RTCRtpTransceiver
+    public class RTCRtpTransceiver : RefCountedObject
     {
-        internal IntPtr self;
         private RTCPeerConnection peer;
-        private bool disposed;
 
-        internal RTCRtpTransceiver(IntPtr ptr, RTCPeerConnection peer)
+        internal RTCRtpTransceiver(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
             this.peer = peer;
         }
@@ -22,7 +19,7 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (this.disposed)
             {
@@ -36,10 +33,17 @@ namespace Unity.WebRTC
 #endif
 
                 WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
+        }
+
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
         }
 
         /// <summary>
@@ -48,8 +52,8 @@ namespace Unity.WebRTC
         /// </summary>
         public RTCRtpTransceiverDirection Direction
         {
-            get { return NativeMethods.TransceiverGetDirection(self); }
-            set { NativeMethods.TransceiverSetDirection(self, value); }
+            get { return NativeMethods.TransceiverGetDirection(GetSelfOrThrow()); }
+            set { NativeMethods.TransceiverSetDirection(GetSelfOrThrow(), value); }
         }
 
         /// <summary>
@@ -63,14 +67,14 @@ namespace Unity.WebRTC
             {
 #if !UNITY_WEBGL
                 var direction = RTCRtpTransceiverDirection.RecvOnly;
-                if (NativeMethods.TransceiverGetCurrentDirection(self, ref direction))
+                if (NativeMethods.TransceiverGetCurrentDirection(GetSelfOrThrow(), ref direction))
                 {
                     return direction;
                 }
 
                 return null;
 #else
-                return NativeMethods.TransceiverGetDirection(self);
+                return NativeMethods.TransceiverGetDirection(GetSelfOrThrow());
 #endif
             }
         }
@@ -82,7 +86,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                IntPtr receiverPtr = NativeMethods.TransceiverGetReceiver(self);
+                IntPtr receiverPtr = NativeMethods.TransceiverGetReceiver(GetSelfOrThrow());
                 return WebRTC.FindOrCreate(receiverPtr, ptr => new RTCRtpReceiver(ptr, peer));
             }
         }
@@ -94,7 +98,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                IntPtr senderPtr = NativeMethods.TransceiverGetSender(self);
+                IntPtr senderPtr = NativeMethods.TransceiverGetSender(GetSelfOrThrow());
                 return WebRTC.FindOrCreate(senderPtr, ptr => new RTCRtpSender(ptr, peer));
             }
         }
@@ -104,7 +108,7 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             RTCRtpCodecCapabilityInternal[] array = Array.ConvertAll(codecs, v => v.Cast());
             MarshallingArray<RTCRtpCodecCapabilityInternal> instance = array;
-            RTCErrorType error = NativeMethods.TransceiverSetCodecPreferences(self, instance.ptr, instance.length);
+            RTCErrorType error = NativeMethods.TransceiverSetCodecPreferences(GetSelfOrThrow(), instance.ptr, instance.length);
             foreach (var v in array)
             {
                 v.Dispose();
@@ -120,9 +124,9 @@ namespace Unity.WebRTC
 #endif
         }
 
-        public void Stop()
+        public RTCErrorType Stop()
         {
-            NativeMethods.TransceiverStop(self);
+            return NativeMethods.TransceiverStop(self);
         }
     }
 }

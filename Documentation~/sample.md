@@ -38,3 +38,9 @@ Open `Menu` scene and press `Play` button, as you can see the menu for sample sc
 It is easy to try all samples on mobile devices if only you put sample scenes into `Scenes in Build` in Build Settings Window. `Menu` scene should be loaded as a first one so you need to rearrange scenes.
 
 ![Build Settings](images/sample_buildsettings.png)
+
+> [!NOTE]
+> If building app for iOS, you need to add description for `CameraUsageDescription` and `MicrophoneUsageDescription` on PlayerSettings.
+> `VideoReceive` sample use Camera and Microphone. (If not add description, build is failed.)
+
+![Camera&Microphone Usage Description in PlayerSettings](images/playersetting_camera_microphone_usagedescription_for_ios.png)

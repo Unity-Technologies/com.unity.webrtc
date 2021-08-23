@@ -2,6 +2,7 @@ using System;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -10,8 +11,8 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = TestHelper.HardwareCodecSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
+            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
@@ -93,8 +94,8 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator SendThrowsExceptionAfterClose()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
-            yield return test;
             RTCDataChannel channel = test.component.CreateDataChannel(0, "test");
+            yield return test;
             byte[] message1 = { 1, 2, 3 };
             string message2 = "123";
 
@@ -107,6 +108,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => channel.Send(message1), Throws.TypeOf<InvalidOperationException>());
             Assert.That(() => channel.Send(message2), Throws.TypeOf<InvalidOperationException>());
             test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
