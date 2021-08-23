@@ -27,6 +27,9 @@ C:/Windows/Temp/VulkanSDK.exe /S
 # Install CMake 3.18.0
 choco install cmake -y --version 3.18.0
 
+# Install 7zip (used to extract Google's webrtc library after download)
+choco install 7zip
+
 # Setting up environment variables
 setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
 setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
