@@ -1,4 +1,8 @@
+using UnityEngine;
+using UnityEngine.TestTools;
 using NUnit.Framework;
+using System.Collections;
+using System.Linq;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -7,8 +11,8 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = TestHelper.HardwareCodecSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
+            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
@@ -175,6 +179,45 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(sender.Track, Is.Null);
 
             peer.Dispose();
+        }
+
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator TransceiverStop()
+        {
+            if (SystemInfo.processorType == "Apple M1")
+                Assert.Ignore("todo:: This test will hang up on Apple M1");
+
+            var go = new GameObject("Test");
+            var cam = go.AddComponent<Camera>();
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
+            yield return test;
+            test.component.CoroutineUpdate();
+
+            var senderTransceivers = test.component.GetPeerTransceivers(0);
+            Assert.That(senderTransceivers.Count(), Is.EqualTo(1));
+            var transceiver1 = senderTransceivers.First();
+
+            var receiverTransceivers = test.component.GetPeerTransceivers(1);
+            Assert.That(receiverTransceivers.Count(), Is.EqualTo(1));
+            var transceiver2 = receiverTransceivers.First();
+
+            Assert.That(transceiver1.Stop(), Is.EqualTo(RTCErrorType.None));
+
+            // wait for OnNegotiationNeeded callback in SignalingPeers class
+            yield return 0;
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+
+            Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+            Assert.That(transceiver1.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+            Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+            Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            Object.DestroyImmediate(go);
+            Object.DestroyImmediate(test.gameObject);
         }
     }
 }

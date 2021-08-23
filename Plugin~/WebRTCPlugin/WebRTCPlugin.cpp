@@ -261,11 +261,6 @@ extern "C"
         return context->CreateMediaStream(streamId);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStream(Context* context, MediaStreamInterface* stream)
-    {
-        context->DeleteMediaStream(stream);
-    }
-
     UNITY_INTERFACE_EXPORT void ContextRegisterMediaStreamObserver(Context* context, MediaStreamInterface* stream)
     {
         context->RegisterMediaStreamObserver(stream);
@@ -276,14 +271,10 @@ extern "C"
         context->UnRegisterMediaStreamObserver(stream);
     }
 
-    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ContextCreateVideoTrack(
+        Context* context, const char* label, webrtc::VideoTrackSourceInterface* source)
     {
-        return context->CreateVideoTrack(label);
-    }
-
-    UNITY_INTERFACE_EXPORT void ContextDeleteMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
-    {
-        context->DeleteMediaStreamTrack(track);
+        return context->CreateVideoTrack(label, source);
     }
 
     UNITY_INTERFACE_EXPORT void ContextStopMediaStreamTrack(Context* context, ::webrtc::MediaStreamTrackInterface* track)
@@ -291,9 +282,30 @@ extern "C"
         context->StopMediaStreamTrack(track);
     }
 
-    UNITY_INTERFACE_EXPORT::webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(Context* context, const char* label)
+    UNITY_INTERFACE_EXPORT webrtc::VideoTrackSourceInterface* ContextCreateVideoTrackSource(Context* context)
     {
-        return context->CreateAudioTrack(label);
+        return context->CreateVideoSource();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface* ContextCreateAudioTrackSource(Context* context)
+    {
+        return context->CreateAudioSource();
+    }
+
+    UNITY_INTERFACE_EXPORT webrtc::MediaStreamTrackInterface* ContextCreateAudioTrack(
+        Context* context, const char* label, webrtc::AudioSourceInterface* source)
+    {
+        return context->CreateAudioTrack(label, source);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextAddRefPtr(Context* context, rtc::RefCountInterface* ptr)
+    {
+        context->AddRefPtr(ptr);
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextDeleteRefPtr(Context* context, rtc::RefCountInterface* ptr)
+    {
+        context->RemoveRefPtr(ptr);
     }
 
     UNITY_INTERFACE_EXPORT bool MediaStreamAddTrack(MediaStreamInterface* stream, MediaStreamTrackInterface* track)
@@ -476,34 +488,61 @@ extern "C"
         obj->connection->RestartIce();
     } 
 
-    UNITY_INTERFACE_EXPORT RtpSenderInterface* PeerConnectionAddTrack(PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId)
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionAddTrack(
+        PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId, RtpSenderInterface** sender)
     {
-        return obj->connection->AddTrack(rtc::scoped_refptr <MediaStreamTrackInterface>(track), { streamId }).value().get();
+        auto result = obj->connection->AddTrack(rtc::scoped_refptr <MediaStreamTrackInterface>(track), { streamId });
+        if (result.ok())
+        {
+            *sender = result.value();
+        }
+        return result.error().type();
     }
 
-    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiver(PeerConnectionObject* obj, MediaStreamTrackInterface* track)
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiver(
+        Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track)
     {
-        return obj->connection->AddTransceiver(track).value().get();
+        auto result = obj->connection->AddTransceiver(track);
+        if (!result.ok())
+            return nullptr;
+
+        return result.value();
     }
 
-    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(PeerConnectionObject* obj, MediaStreamTrackInterface* track, RtpTransceiverInit* init)
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(
+        Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track, RtpTransceiverInit* init)
     {
-        return obj->connection->AddTransceiver(track, *init).value().get();
+        auto result = obj->connection->AddTransceiver(track, *init);
+        if (!result.ok())
+            return nullptr;
+
+        return result.value();
     }
 
-    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithType(PeerConnectionObject* obj, cricket::MediaType type)
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithType(
+        Context* context, PeerConnectionObject* obj, cricket::MediaType type)
     {
-        return obj->connection->AddTransceiver(type).value().get();
+        auto result = obj->connection->AddTransceiver(type);
+        if (!result.ok())
+            return nullptr;
+
+        return result.value();
     }
 
-    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(PeerConnectionObject* obj, cricket::MediaType type, RtpTransceiverInit* init)
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(
+        Context* context, PeerConnectionObject* obj, cricket::MediaType type, RtpTransceiverInit* init)
     {
-        return obj->connection->AddTransceiver(type, *init).value().get();
+        auto result = obj->connection->AddTransceiver(type, *init);
+        if (!result.ok())
+            return nullptr;
+
+        return result.value();
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionRemoveTrack(PeerConnectionObject* obj, RtpSenderInterface* sender)
+    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionRemoveTrack(PeerConnectionObject* obj, RtpSenderInterface* sender)
     {
-        obj->connection->RemoveTrack(sender);
+        webrtc::RTCError error = obj->connection->RemoveTrackNew(sender);
+        return error.type();
     }
 
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetConfiguration(PeerConnectionObject* obj, const char* conf)
@@ -755,19 +794,22 @@ extern "C"
         return obj->GetSessionDescription(obj->connection->current_remote_description(), *desc);
     }
 
-    UNITY_INTERFACE_EXPORT RtpReceiverInterface** PeerConnectionGetReceivers(PeerConnectionObject* obj, size_t* length)
+    UNITY_INTERFACE_EXPORT RtpReceiverInterface** PeerConnectionGetReceivers(Context* context, PeerConnectionObject* obj, size_t* length)
     {
-        return ConvertPtrArrayFromRefPtrArray<RtpReceiverInterface>(obj->connection->GetReceivers(), length);
+        auto receivers = obj->connection->GetReceivers();
+        return ConvertPtrArrayFromRefPtrArray<RtpReceiverInterface>(receivers, length);
     }
 
-    UNITY_INTERFACE_EXPORT RtpSenderInterface** PeerConnectionGetSenders(PeerConnectionObject* obj, size_t* length)
+    UNITY_INTERFACE_EXPORT RtpSenderInterface** PeerConnectionGetSenders(Context* context, PeerConnectionObject* obj, size_t* length)
     {
-        return ConvertPtrArrayFromRefPtrArray<RtpSenderInterface>(obj->connection->GetSenders(), length);
+        auto senders = obj->connection->GetSenders();
+        return ConvertPtrArrayFromRefPtrArray<RtpSenderInterface>(senders, length);
     }
 
-    UNITY_INTERFACE_EXPORT RtpTransceiverInterface** PeerConnectionGetTransceivers(PeerConnectionObject* obj, size_t* length)
+    UNITY_INTERFACE_EXPORT RtpTransceiverInterface** PeerConnectionGetTransceivers(Context* context, PeerConnectionObject* obj, size_t* length)
     {
-        return ConvertPtrArrayFromRefPtrArray<RtpTransceiverInterface>(obj->connection->GetTransceivers(), length);
+        auto transceivers = obj->connection->GetTransceivers();
+        return ConvertPtrArrayFromRefPtrArray<RtpTransceiverInterface>(transceivers, length);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionCreateOffer(PeerConnectionObject* obj, const RTCOfferAnswerOptions* options)
@@ -984,9 +1026,10 @@ extern "C"
         return false;
     }
 
-    UNITY_INTERFACE_EXPORT void TransceiverStop(RtpTransceiverInterface* transceiver)
+    UNITY_INTERFACE_EXPORT RTCErrorType TransceiverStop(RtpTransceiverInterface* transceiver)
     {
-        transceiver->Stop();
+        auto error = transceiver->StopStandard();
+        return error.type();
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverDirection TransceiverGetDirection(RtpTransceiverInterface* transceiver)

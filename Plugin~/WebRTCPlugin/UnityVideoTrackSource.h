@@ -52,15 +52,7 @@ class UnityVideoTrackSource :
     void SetEncoder(IEncoder* encoder);
 
     // todo(kazuki)::
-    CodecInitializationResult GetCodecInitializationResult() const
-    {
-        if (encoder_ == nullptr)
-        {
-            return CodecInitializationResult::NotInitialized;
-        }
-        return encoder_->GetCodecInitializationResult();
-    }
-
+    CodecInitializationResult GetCodecInitializationResult() const;
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
 

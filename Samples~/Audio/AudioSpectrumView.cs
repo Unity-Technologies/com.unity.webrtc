@@ -19,7 +19,7 @@ namespace Unity.WebRTC.Samples
         float[] spectrum = new float[2048];
         private AudioClip clip;
 
-        NativeArray<Vector3> array;
+        Vector3[] array;
         List<LineRenderer> lines = new List<LineRenderer>();
 
         private Dictionary<AudioSpeakerMode, int> SpeakerModeToChannel = new Dictionary<AudioSpeakerMode, int>()
@@ -34,7 +34,7 @@ namespace Unity.WebRTC.Samples
 
         void Start()
         {
-            array = new NativeArray<Vector3>(positionCount, Allocator.Persistent);
+            array = new Vector3[positionCount];
 
             // This line object is used as a template.
             if(line.gameObject.activeInHierarchy)
@@ -47,11 +47,6 @@ namespace Unity.WebRTC.Samples
         {
             // reset lines;
             clip = null;
-        }
-
-        void OnDestroy()
-        {
-            array.Dispose();
         }
 
         void ResetLines(int channelCount)
@@ -78,6 +73,7 @@ namespace Unity.WebRTC.Samples
             {
                 if(lines.Count > 0)
                     ResetLines(0);
+                clip = null;
                 return;
             }
 

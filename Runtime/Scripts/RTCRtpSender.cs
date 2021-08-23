@@ -7,18 +7,14 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    public class RTCRtpSender : IDisposable
+    public class RTCRtpSender : RefCountedObject
     {
-        internal IntPtr self;
         private RTCPeerConnection peer;
-        private bool disposed;
 
-
-        internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer)
+        internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
             this.peer = peer;
         }
@@ -28,7 +24,16 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public virtual void Dispose()
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
+        }
+
+        public override void Dispose()
         {
             if (this.disposed)
             {
@@ -40,10 +45,8 @@ namespace Unity.WebRTC
                 NativeMethods.DeleteSender(self);
 #endif
                 WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
@@ -76,13 +79,13 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public MediaStreamTrack Track
         {
             get
             {
-                IntPtr ptr = NativeMethods.SenderGetTrack(self);
+                IntPtr ptr = NativeMethods.SenderGetTrack(GetSelfOrThrow());
                 if (ptr == IntPtr.Zero)
                     return null;
                 return WebRTC.FindOrCreate(ptr, MediaStreamTrack.Create);
@@ -90,13 +93,14 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCRtpSendParameters GetParameters()
         {
+
 #if !UNITY_WEBGL
-            NativeMethods.SenderGetParameters(self, out var ptr);
+            NativeMethods.SenderGetParameters(GetSelfOrThrow(), out var ptr);
             RTCRtpSendParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
             RTCRtpSendParameters parameters = new RTCRtpSendParameters(ref parametersInternal);
             Marshal.FreeHGlobal(ptr);
@@ -118,7 +122,7 @@ namespace Unity.WebRTC
             parameters.CreateInstance(out RTCRtpSendParametersInternal instance);
             IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(instance));
             Marshal.StructureToPtr(instance, ptr, false);
-            RTCErrorType error = NativeMethods.SenderSetParameters(self, ptr);
+            RTCErrorType error = NativeMethods.SenderSetParameters(GetSelfOrThrow(), ptr);
             Marshal.FreeCoTaskMem(ptr);
             return error;
 #else
@@ -138,7 +142,7 @@ namespace Unity.WebRTC
         public bool ReplaceTrack(MediaStreamTrack track)
         {
             IntPtr trackPtr = track?.GetSelfOrThrow() ?? IntPtr.Zero;
-            return NativeMethods.SenderReplaceTrack(self, trackPtr);
+            return NativeMethods.SenderReplaceTrack(GetSelfOrThrow(), trackPtr);
         }
     }
 }

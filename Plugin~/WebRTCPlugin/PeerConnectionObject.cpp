@@ -56,7 +56,7 @@ namespace webrtc
     void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
         auto obj = std::make_unique<DataChannelObject>(channel, *this);
         const auto ptr = obj.get();
-        context.AddDataChannel(obj);
+        context.AddDataChannel(std::move(obj));
         if (onDataChannel != nullptr) {
             onDataChannel(this, ptr);
         }
@@ -86,6 +86,10 @@ namespace webrtc
 
     void PeerConnectionObject::OnTrack(rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver)
     {
+        context.AddRefPtr(transceiver);
+        context.AddRefPtr(transceiver->receiver());
+        context.AddRefPtr(transceiver->receiver()->track());
+
         if (onTrack != nullptr)
         {
             onTrack(this, transceiver.get());

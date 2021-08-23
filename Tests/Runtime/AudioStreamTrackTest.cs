@@ -1,5 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -8,8 +12,8 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = TestHelper.HardwareCodecSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
+            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
@@ -17,6 +21,73 @@ namespace Unity.WebRTC.RuntimeTest
         {
             WebRTC.Dispose();
         }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator AddAndRemoveAudioTrack()
+        {
+            var audioTrack = new AudioStreamTrack();
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var sender = test.component.AddTrack(0, audioTrack);
+            yield return test;
+            Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
+        }
+
+        [Ignore("AudioManager is disabled when batch mode on CI")]
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator AddMultiAudioTrack()
+        {
+            GameObject obj = new GameObject("audio");
+            AudioSource source = obj.AddComponent<AudioSource>();
+
+            int channels = 2;
+            source.clip = AudioClip.Create("test", 48000, channels, 48000, false);
+            source.Play();
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.gameObject.AddComponent<AudioListener>();
+
+            // first track
+            var track1 = new AudioStreamTrack(source);
+            var sender1 = test.component.AddTrack(0, track1);
+            yield return test;
+            var receivers = test.component.GetPeerReceivers(1);
+            Assert.That(receivers.Count(), Is.EqualTo(1));
+
+            var receiver = receivers.First();
+            var audioTrack = receiver.Track as AudioStreamTrack;
+            Assert.That(audioTrack, Is.Not.Null);
+
+            yield return new WaitUntil(() => audioTrack.Renderer != null);
+            Assert.That(audioTrack.Renderer, Is.Not.Null);
+            Assert.That(audioTrack.Renderer.channels, Is.EqualTo(channels));
+
+
+            // second track
+            var track2 = new AudioStreamTrack(source);
+            var sender2 = test.component.AddTrack(0, track2);
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+            yield return new WaitUntil(() => test.component.GetPeerReceivers(1).Count() == 2);
+            receivers = test.component.GetPeerReceivers(1);
+            Assert.That(receivers.Count(), Is.EqualTo(2));
+
+            receiver = receivers.Last();
+            audioTrack = receiver.Track as AudioStreamTrack;
+            Assert.That(audioTrack, Is.Not.Null);
+
+            yield return new WaitUntil(() => audioTrack.Renderer != null);
+            Assert.That(audioTrack.Renderer, Is.Not.Null);
+            Assert.That(audioTrack.Renderer.channels, Is.EqualTo(channels));
+
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
+            Object.DestroyImmediate(obj);
+        }
+
 
         [Test]
         public void AudioStreamTrackInstantiateOnce()

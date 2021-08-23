@@ -1,37 +1,37 @@
 using System;
-using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="renderer"></param>
     public delegate void OnAudioReceived(AudioClip renderer);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event OnAudioReceived OnAudioReceived;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public AudioSource Source { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public AudioClip Renderer
         {
-            get { return _streamRenderer.clip; }
+            get { return _streamRenderer?.clip; }
         }
 
 
@@ -62,8 +62,10 @@ namespace Unity.WebRTC
 
             public void Dispose()
             {
-                if(m_clip != null)
-                    Object.Destroy(m_clip);
+                if (m_clip != null)
+                {
+                    WebRTC.DestroyOnMainThread(m_clip);
+                }
                 m_clip = null;
             }
 
@@ -98,22 +100,29 @@ namespace Unity.WebRTC
             }
         }
 
-        internal static List<AudioStreamTrack> tracks = new List<AudioStreamTrack>();
+        
+        /// <summary>
+        /// The channel count of streaming receiving audio is changing at the first few frames.
+        /// So This count is for ignoring the unstable audio frames
+        /// </summary>
+        const int MaxFrameCountReceiveDataForIgnoring = 5;
 
-        readonly int _sampleRate = 0;
         readonly AudioSourceRead _audioSourceRead;
+        AudioStreamRenderer _streamRenderer;
+        AudioTrackSource _source;
 
-        private AudioStreamRenderer _streamRenderer;
+        int frameCountReceiveDataForIgnoring = 0; 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        public AudioStreamTrack() : this(WebRTC.Context.CreateAudioTrack(Guid.NewGuid().ToString()))
+        public AudioStreamTrack()
+            : this(Guid.NewGuid().ToString(), new AudioTrackSource())
         {
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="source"></param>
         public AudioStreamTrack(AudioSource source) : this()
@@ -126,18 +135,22 @@ namespace Unity.WebRTC
 
             _audioSourceRead = source.gameObject.AddComponent<AudioSourceRead>();
             _audioSourceRead.hideFlags = HideFlags.HideInHierarchy;
-            _audioSourceRead.onAudioRead += OnSendAudio;
-            _sampleRate = Source.clip.frequency;
+            _audioSourceRead.onAudioRead += SetData;
+        }
+
+        internal AudioStreamTrack(string label, AudioTrackSource source)
+            : this(WebRTC.Context.CreateAudioTrack(label, source.self))
+        {
+            _source = source;
         }
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
-            tracks.Add(this);
             WebRTC.Context.AudioTrackRegisterAudioReceiveCallback(self, OnAudioReceive);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -148,34 +161,91 @@ namespace Unity.WebRTC
 
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                tracks.Remove(this);
-                if(_audioSourceRead != null)
-                    Object.Destroy(_audioSourceRead);
+                if (_audioSourceRead != null)
+                {
+                    // Unity API must be called from main thread.
+                    _audioSourceRead.onAudioRead -= SetData;
+                    WebRTC.DestroyOnMainThread(_audioSourceRead);
+                }
                 _streamRenderer?.Dispose();
+                _source?.Dispose();
                 WebRTC.Context.AudioTrackUnregisterAudioReceiveCallback(self);
-                WebRTC.Context.DeleteMediaStreamTrack(self);
-                WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
-        private void OnSendAudio(float[] data, int channels)
+#if UNITY_2020_1_OR_NEWER
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="nativeArray"></param>
+        /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
+        public void SetData(ref NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
         {
-            NativeMethods.ProcessAudio(self, data, _sampleRate, channels, data.Length);
+            unsafe
+            {
+                void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
+                NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+            }
+        }
+#endif
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="nativeArray"></param>
+        /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
+        public void SetData(ref NativeArray<float> nativeArray, int channels, int sampleRate)
+        {
+            unsafe
+            {
+                void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
+                NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="nativeSlice"></param>
+        /// <param name="channels"></param>
+        public void SetData(ref NativeSlice<float> nativeSlice, int channels, int sampleRate)
+        {
+            unsafe
+            {
+                void* ptr = nativeSlice.GetUnsafeReadOnlyPtr();
+                NativeMethods.ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="channels"></param>
+        public void SetData(float[] array, int channels, int sampleRate)
+        {
+            NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
+            SetData(ref nativeArray, channels, sampleRate);
+            nativeArray.Dispose();
         }
 
         private void OnAudioReceivedInternal(float[] audioData, int sampleRate, int channels, int numOfFrames)
         {
             if (_streamRenderer == null)
             {
+                if(frameCountReceiveDataForIgnoring < MaxFrameCountReceiveDataForIgnoring)
+                {
+                    frameCountReceiveDataForIgnoring++;
+                    return;
+                }
                 _streamRenderer = new AudioStreamRenderer(this.Id, sampleRate, channels);
 
                 OnAudioReceived?.Invoke(_streamRenderer.clip);
             }
-            _streamRenderer.SetData(audioData);
+            _streamRenderer?.SetData(audioData);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateAudioReceive))]
@@ -189,6 +259,32 @@ namespace Unity.WebRTC
                     track.OnAudioReceivedInternal(audioData, sampleRate, numOfChannels, numOfFrames);
                 }
             });
+        }
+    }
+    internal class AudioTrackSource : RefCountedObject
+    {
+        public AudioTrackSource() : base(WebRTC.Context.CreateAudioTrackSource())
+        {
+            WebRTC.Table.Add(self, this);
+        }
+
+        ~AudioTrackSource()
+        {
+            this.Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            {
+                WebRTC.Table.Remove(self);
+            }
+            base.Dispose();
         }
     }
 }

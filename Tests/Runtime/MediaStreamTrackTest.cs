@@ -13,8 +13,8 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var value = TestHelper.HardwareCodecSupport();
-            WebRTC.Initialize(value ? EncoderType.Hardware : EncoderType.Software);
+            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
+            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
@@ -41,20 +41,24 @@ namespace Unity.WebRTC.RuntimeTest
         public void EqualIdWithAudioTrack()
         {
             var guid = Guid.NewGuid().ToString();
-            var track = new MediaStreamTrack(WebRTC.Context.CreateAudioTrack(guid));
+            var source = new AudioTrackSource();
+            var track = new AudioStreamTrack(WebRTC.Context.CreateAudioTrack(guid, source.self));
             Assert.That(track, Is.Not.Null);
             Assert.That(track.Id, Is.EqualTo(guid));
             track.Dispose();
+            source.Dispose();
         }
 
         [Test]
         public void EqualIdWithVideoTrack()
         {
             var guid = Guid.NewGuid().ToString();
-            var track = new MediaStreamTrack(WebRTC.Context.CreateVideoTrack(guid));
+            var source = new VideoTrackSource();
+            var track = new VideoStreamTrack(WebRTC.Context.CreateVideoTrack(guid, source.self));
             Assert.That(track, Is.Not.Null);
             Assert.That(track.Id, Is.EqualTo(guid));
             track.Dispose();
+            source.Dispose();
         }
 
         [Test]
