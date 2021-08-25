@@ -45,9 +45,6 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         public IEnumerator InitializeReceiver()
         {
-            const int width = 256;
-            const int height = 256;
-
             var peer = new RTCPeerConnection();
             var transceiver = peer.AddTransceiver(TrackKind.Video);
             Assert.That(transceiver, Is.Not.Null);
@@ -59,14 +56,13 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
             var videoTrack = track as VideoStreamTrack;
             Assert.That(videoTrack, Is.Not.Null);
-            var rt = videoTrack.InitializeReceiver(width, height);
+            videoTrack.InitializeReceiver();
             Assert.That(videoTrack.IsDecoderInitialized, Is.True);
             videoTrack.Dispose();
             // wait for disposing video track.
             yield return 0;
 
             peer.Dispose();
-            Object.DestroyImmediate(rt);
         }
 
         internal class TestValue
@@ -115,6 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
 
                 var receiveVideoTrack = test.component.RecvVideoTrack;
                 yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized, 5000);
+                yield return new WaitUntilWithTimeout(() => test.component.RecvTexture != null, 5000);
                 Assert.That(test.component.RecvTexture, Is.Not.Null);
 
                 yield return new WaitForSeconds(0.1f);
@@ -177,7 +174,8 @@ namespace Unity.WebRTC.RuntimeTest
                 if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
                 {
                     RecvVideoTrack = track;
-                    RecvTexture = track.InitializeReceiver(width, height);
+                    track.InitializeReceiver();
+                    track.OnVideoReceived += tex => RecvTexture = tex;
                 }
             };
         }
