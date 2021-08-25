@@ -82,6 +82,11 @@ namespace Unity.WebRTC
 
         internal void UpdateReceiveTexture()
         {
+            if (m_sourceTexture == null || m_destTexture == null)
+            {
+                return;
+            }
+
             // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
             // note: streamed video is flipped vertical if no action was taken:
             //  - duplicate RenderTexture from its source texture
