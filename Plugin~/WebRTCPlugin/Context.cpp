@@ -517,10 +517,10 @@ namespace webrtc
     uint32_t Context::s_rendererId = 0;
     uint32_t Context::GenerateRendererId() { return s_rendererId++; }
 
-    UnityVideoRenderer* Context::CreateVideoRenderer()
+    UnityVideoRenderer* Context::CreateVideoRenderer(DelegateVideoFrameResize callback)
     {
         auto rendererId = GenerateRendererId();
-        auto renderer = std::make_shared<UnityVideoRenderer>(rendererId);
+        auto renderer = std::make_shared<UnityVideoRenderer>(rendererId, callback);
         m_mapVideoRenderer[rendererId] = renderer;
         return m_mapVideoRenderer[rendererId].get();
     }
