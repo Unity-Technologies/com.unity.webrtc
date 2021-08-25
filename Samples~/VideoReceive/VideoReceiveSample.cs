@@ -79,7 +79,11 @@ namespace Unity.WebRTC.Samples
             {
                 if (e.Track is VideoStreamTrack video && !video.IsDecoderInitialized)
                 {
-                    receiveImage.texture = video.InitializeReceiver(streamSize.x, streamSize.y);
+                    video.InitializeReceiver();
+                    video.OnVideoReceived += tex =>
+                    {
+                        receiveImage.texture = tex;
+                    };
                     receiveVideoStream = e.Streams.First();
                     receiveVideoStream.OnRemoveTrack = ev =>
                     {

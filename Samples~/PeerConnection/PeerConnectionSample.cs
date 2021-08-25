@@ -79,10 +79,14 @@ class PeerConnectionSample : MonoBehaviour
 
         receiveStream.OnAddTrack = e =>
         {
-            if (e.Track is VideoStreamTrack track)
+            if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
             {
-                receiveImage.texture = track.InitializeReceiver(width, height);
-                receiveImage.color = Color.white;
+                track.InitializeReceiver();
+                track.OnVideoReceived += tex =>
+                {
+                    receiveImage.texture = tex;
+                    receiveImage.color = Color.white;
+                };
             }
         };
     }

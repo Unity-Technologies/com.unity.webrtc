@@ -83,8 +83,12 @@ class MultiVideoReceiveSample : MonoBehaviour
         {
             if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
             {
-                receiveImages[videoIndex].texture = track.InitializeReceiver(width, height);
-                videoIndex++;
+                track.InitializeReceiver();
+                track.OnVideoReceived += tex =>
+                {
+                    receiveImages[videoIndex].texture = tex;
+                    videoIndex++;
+                };
             }
         };
 

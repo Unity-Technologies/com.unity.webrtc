@@ -90,7 +90,11 @@ namespace Unity.WebRTC.Samples
             {
                 if (e.Track is VideoStreamTrack videoTrack && !videoTrack.IsDecoderInitialized)
                 {
-                    receiveImage1.texture = videoTrack.InitializeReceiver(streamingSize.x, streamingSize.y);
+                    videoTrack.InitializeReceiver();
+                    videoTrack.OnVideoReceived += tex =>
+                    {
+                        receiveImage1.texture = tex;
+                    };
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)
@@ -113,7 +117,11 @@ namespace Unity.WebRTC.Samples
             {
                 if (e.Track is VideoStreamTrack videoTrack && !videoTrack.IsDecoderInitialized)
                 {
-                    receiveImage2.texture = videoTrack.InitializeReceiver(streamingSize.x, streamingSize.y);
+                    videoTrack.InitializeReceiver();
+                    videoTrack.OnVideoReceived += tex =>
+                    {
+                        receiveImage2.texture = tex;
+                    };
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)
