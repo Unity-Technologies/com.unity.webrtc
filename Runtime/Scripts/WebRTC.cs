@@ -816,6 +816,8 @@ namespace Unity.WebRTC
     internal delegate void DelegateAudioReceive(
         IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
         int sampleRate, int numOfChannels, int numOfFrames);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateVideoFrameResize(IntPtr renderer, int width, int height);
 
     internal static class NativeMethods
     {
@@ -1077,7 +1079,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void MediaStreamTrackSetEnabled(IntPtr track, [MarshalAs(UnmanagedType.U1)] bool enabled);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr CreateVideoRenderer(IntPtr context);
+        public static extern IntPtr CreateVideoRenderer(IntPtr context, DelegateVideoFrameResize callback);
         [DllImport(WebRTC.Lib)]
         public static extern uint GetVideoRendererId(IntPtr sink);
         [DllImport(WebRTC.Lib)]

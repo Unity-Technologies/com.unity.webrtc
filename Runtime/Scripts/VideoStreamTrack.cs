@@ -6,6 +6,12 @@ using UnityEngine.Experimental.Rendering;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="renderer"></param>
+    public delegate void OnVideoReceived(Texture renderer);
+
     public class VideoStreamTrack : MediaStreamTrack
     {
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
@@ -60,19 +66,18 @@ namespace Unity.WebRTC
         /// </summary>
         public Texture Texture => m_destTexture;
 
-        public Texture InitializeReceiver(int width, int height)
+        /// <summary>
+        ///
+        /// </summary>
+        public event OnVideoReceived OnVideoReceived;
+
+        public void InitializeReceiver()
         {
             if (IsDecoderInitialized)
                 throw new InvalidOperationException("Already initialized receiver, use Texture property");
 
             m_needFlip = true;
-            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-            m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-            m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
-
-            m_renderer = new UnityVideoRenderer(WebRTC.Context.CreateVideoRenderer(), this);
-
-            return m_destTexture;
+            m_renderer = new UnityVideoRenderer(this);
         }
 
         internal void UpdateReceiveTexture()
@@ -184,6 +189,31 @@ namespace Unity.WebRTC
             }
             base.Dispose();
         }
+
+        internal void OnVideoFrameResize(int width, int height)
+        {
+            if (m_sourceTexture == null)
+            {
+                var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+                m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
+                m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
+                OnVideoReceived?.Invoke(m_destTexture);
+                return;
+            }
+
+            if (m_sourceTexture.width != width || m_sourceTexture.height != height)
+            {
+                var oldSource = m_sourceTexture;
+                var oldDest = m_destTexture;
+                var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+                m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
+                m_destTexture = CreateRenderTexture(width, height);
+                OnVideoReceived?.Invoke(m_destTexture);
+
+                WebRTC.DestroyOnMainThread(oldSource);
+                WebRTC.DestroyOnMainThread(oldDest);
+            }
+        }
     }
 
     public static class CameraExtension
@@ -259,9 +289,9 @@ namespace Unity.WebRTC
         internal uint id => NativeMethods.GetVideoRendererId(self);
         private bool disposed;
 
-        public UnityVideoRenderer(IntPtr ptr, VideoStreamTrack track)
+        public UnityVideoRenderer(VideoStreamTrack track)
         {
-            self = ptr;
+            self = WebRTC.Context.CreateVideoRenderer(OnVideoFrameResize);
             this.track = track;
             NativeMethods.VideoTrackAddOrUpdateSink(track.GetSelfOrThrow(), self);
             WebRTC.Table.Add(self, this);
@@ -294,6 +324,23 @@ namespace Unity.WebRTC
 
             this.disposed = true;
             GC.SuppressFinalize(this);
+        }
+
+        private void OnVideoFrameResizeInternal(int width, int height)
+        {
+            track.OnVideoFrameResize(width, height);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateVideoFrameResize))]
+        static void OnVideoFrameResize(IntPtr ptrRenderer, int width, int height)
+        {
+            WebRTC.Sync(ptrRenderer, () =>
+            {
+                if (WebRTC.Table[ptrRenderer] is UnityVideoRenderer renderer)
+                {
+                    renderer.OnVideoFrameResizeInternal(width, height);
+                }
+            });
         }
     }
 }
