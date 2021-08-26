@@ -197,27 +197,15 @@ namespace Unity.WebRTC
 
         internal void OnVideoFrameResize(int width, int height)
         {
-            if (m_sourceTexture == null)
+            if (m_sourceTexture != null && (m_sourceTexture.width == width && m_sourceTexture.height == height))
             {
-                var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-                m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-                m_destTexture = CreateRenderTexture(m_sourceTexture.width, m_sourceTexture.height);
-                OnVideoReceived?.Invoke(m_destTexture);
                 return;
             }
 
-            if (m_sourceTexture.width != width || m_sourceTexture.height != height)
-            {
-                var oldSource = m_sourceTexture;
-                var oldDest = m_destTexture;
-                var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-                m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-                m_destTexture = CreateRenderTexture(width, height);
-                OnVideoReceived?.Invoke(m_destTexture);
-
-                WebRTC.DestroyOnMainThread(oldSource);
-                WebRTC.DestroyOnMainThread(oldDest);
-            }
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            m_destTexture = CreateRenderTexture(width, height);
+            OnVideoReceived?.Invoke(m_destTexture);
         }
     }
 
