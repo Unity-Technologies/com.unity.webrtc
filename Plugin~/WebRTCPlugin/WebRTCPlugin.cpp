@@ -415,12 +415,12 @@ extern "C"
         track->RemoveSink(sink);
     }
 
-    UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func, bool enableNativeLog)
+    UNITY_INTERFACE_EXPORT void RegisterDebugLog(DelegateDebugLog func, bool enableNativeLog, rtc::LoggingSeverity loggingSeverity)
     {
         delegateDebugLog = func;
         if (func != nullptr && enableNativeLog)
         {
-            UnityLogStream::AddLogStream(func);
+            UnityLogStream::AddLogStream(func, loggingSeverity);
         } else if (func == nullptr)
         {
             UnityLogStream::RemoveLogStream();

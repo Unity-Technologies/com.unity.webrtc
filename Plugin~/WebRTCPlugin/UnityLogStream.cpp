@@ -18,11 +18,11 @@ namespace unity {
         }
     }
 
-    void UnityLogStream::AddLogStream(DelegateDebugLog callback)
+    void UnityLogStream::AddLogStream(DelegateDebugLog callback, rtc::LoggingSeverity loggingSeverity)
     {
         rtc::LogMessage::LogTimestamps(true);
         log_stream.reset(new UnityLogStream(callback));
-        rtc::LogMessage::AddLogToStream(log_stream.get(), rtc::INFO);
+        rtc::LogMessage::AddLogToStream(log_stream.get(), loggingSeverity);
     }
 
     void UnityLogStream::RemoveLogStream()
