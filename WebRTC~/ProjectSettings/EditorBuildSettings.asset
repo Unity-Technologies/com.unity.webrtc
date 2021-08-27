@@ -44,4 +44,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Samples/PerfectNegotiation/PerfectNegotiation.unity
     guid: 230a6bb1d81354b0988a940b657c5674
+  - enabled: 1
+    path: Assets/Samples/Audio/Audio.unity
+    guid: 5367027ce2f25f54c87033bdf6604607
+  - enabled: 1
+    path: Assets/Samples/MultiAudioReceive/MultiAudioReceive.unity
+    guid: f2c574ba8fa6e413d80d51085132df4f
   m_configObjects: {}

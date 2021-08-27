@@ -60,6 +60,7 @@ namespace Unity.WebRTC
 
         private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
         private RTCSessionDescriptionAsyncOperation m_opSetRemoteDesc;
+        private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
 
         private bool disposed;
 
@@ -82,7 +83,6 @@ namespace Unity.WebRTC
             {
                 Close();
                 DisposeAllTransceivers();
-                WebRTC.Context.DeletePeerConnection(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
             }
@@ -98,8 +98,8 @@ namespace Unity.WebRTC
             {
                 // Dispose of MediaStreamTrack when disposing of RTCRtpReceiver.
                 // On the other hand, do not dispose a track when disposing of RTCRtpSender.
+                transceiver.Stop();
                 transceiver.Receiver?.Track?.Dispose();
-
                 transceiver.Receiver?.Dispose();
                 transceiver.Sender?.Dispose();
                 transceiver.Dispose();
@@ -166,7 +166,7 @@ namespace Unity.WebRTC
         /// <seealso cref="GetTransceivers()"/>
         public IEnumerable<RTCRtpReceiver> GetReceivers()
         {
-            IntPtr buf = NativeMethods.PeerConnectionGetReceivers(GetSelfOrThrow(), out ulong length);
+            IntPtr buf = WebRTC.Context.PeerConnectionGetReceivers(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, CreateReceiver);
         }
 
@@ -183,7 +183,7 @@ namespace Unity.WebRTC
         /// <seealso cref="GetTransceivers()"/>
         public IEnumerable<RTCRtpSender> GetSenders()
         {
-            var buf = NativeMethods.PeerConnectionGetSenders(GetSelfOrThrow(), out ulong length);
+            var buf = WebRTC.Context.PeerConnectionGetSenders(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, CreateSender);
         }
 
@@ -200,7 +200,7 @@ namespace Unity.WebRTC
         /// <seealso cref="GetReceivers()"/>
         public IEnumerable<RTCRtpTransceiver> GetTransceivers()
         {
-            var buf = NativeMethods.PeerConnectionGetTransceivers(GetSelfOrThrow(), out ulong length);
+            var buf = WebRTC.Context.PeerConnectionGetTransceivers(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, CreateTransceiver);
         }
 
@@ -368,7 +368,24 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnTrack?.Invoke(new RTCTrackEvent(transceiver, connection));
+                    var e = new RTCTrackEvent(transceiver, connection);
+                    connection.OnTrack?.Invoke(e);
+                    connection.cacheTracks.Add(e.Track);
+                }
+            });
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnRemoveTrack))]
+        static void PCOnRemoveTrack(IntPtr ptr, IntPtr receiverPtr)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    var receiver = WebRTC.FindOrCreate(
+                        receiverPtr, _ptr => new RTCRtpReceiver(_ptr, connection));
+                    if(receiver != null)
+                        connection.cacheTracks.Remove(receiver.Track);
                 }
             });
         }
@@ -394,7 +411,8 @@ namespace Unity.WebRTC
         {
             IntPtr ptr = NativeMethods.PeerConnectionGetConfiguration(GetSelfOrThrow());
             string str = ptr.AsAnsiStringWithFreeMem();
-            return JsonUtility.FromJson<RTCConfiguration>(str);
+            var conf = JsonUtility.FromJson<RTCConfigurationInternal>(str);
+            return new RTCConfiguration(ref conf);
         }
 
         /// <summary>
@@ -430,7 +448,9 @@ namespace Unity.WebRTC
         /// <seealso cref="GetConfiguration()"/>
         public RTCErrorType SetConfiguration(ref RTCConfiguration configuration)
         {
-            return NativeMethods.PeerConnectionSetConfiguration(GetSelfOrThrow(), JsonUtility.ToJson(configuration));
+            var conf_ = configuration.Cast();
+            string str = JsonUtility.ToJson(conf_);
+            return NativeMethods.PeerConnectionSetConfiguration(GetSelfOrThrow(), str);
         }
 
         /// <summary>
@@ -457,7 +477,8 @@ namespace Unity.WebRTC
         /// <seealso cref="RTCPeerConnection()"/>
         public RTCPeerConnection(ref RTCConfiguration configuration)
         {
-            string configStr = JsonUtility.ToJson(configuration);
+            var conf_ = configuration.Cast();
+            string configStr = JsonUtility.ToJson(conf_);
             self = WebRTC.Context.CreatePeerConnection(configStr);
             if (self == IntPtr.Zero)
             {
@@ -479,6 +500,7 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterOnDataChannel(self, PCOnDataChannel);
             NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);
             NativeMethods.PeerConnectionRegisterOnTrack(self, PCOnTrack);
+            NativeMethods.PeerConnectionRegisterOnRemoveTrack(self, PCOnRemoveTrack);
             WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(
                 self, OnSetSessionDescSuccess);
             WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(
@@ -514,8 +536,11 @@ namespace Unity.WebRTC
             }
 
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
-            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(
-                GetSelfOrThrow(), track.GetSelfOrThrow(), streamId);
+            RTCErrorType error = NativeMethods.PeerConnectionAddTrack(
+                GetSelfOrThrow(), track.GetSelfOrThrow(), streamId, out var ptr);
+            if (error != RTCErrorType.None)
+                throw new InvalidOperationException($"error occurred :{error}");
+            cacheTracks.Add(track);
             return CreateSender(ptr);
         }
 
@@ -524,10 +549,10 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="sender"></param>
         /// <seealso cref="AddTrack"/>
-        public void RemoveTrack(RTCRtpSender sender)
+        public RTCErrorType RemoveTrack(RTCRtpSender sender)
         {
-            NativeMethods.PeerConnectionRemoveTrack(
-                GetSelfOrThrow(), sender.self);
+            cacheTracks.Remove(sender.Track);
+            return NativeMethods.PeerConnectionRemoveTrack(GetSelfOrThrow(), sender.self);
         }
 
         /// <summary>
@@ -537,7 +562,7 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track)
         {
-            IntPtr ptr = NativeMethods.PeerConnectionAddTransceiver(
+            IntPtr ptr = WebRTC.Context.PeerConnectionAddTransceiver(
                 GetSelfOrThrow(), track.GetSelfOrThrow());
             return CreateTransceiver(ptr);
         }
@@ -549,7 +574,7 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(TrackKind kind)
         {
-            IntPtr ptr = NativeMethods.PeerConnectionAddTransceiverWithType(
+            IntPtr ptr = WebRTC.Context.PeerConnectionAddTransceiverWithType(
                 GetSelfOrThrow(), kind);
             return CreateTransceiver(ptr);
         }

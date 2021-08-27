@@ -64,6 +64,7 @@
 #include "common_video/include/bitrate_adjuster.h"
 
 #include "pc/media_stream_observer.h"
+#include "pc/local_audio_source.h"
 
 #pragma endregion
 
@@ -113,6 +114,9 @@
 #include <crtdbg.h>
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
+
+// audio codec isac
+#define WEBRTC_USE_BUILTIN_ISAC_FLOAT 1
 
 namespace unity
 {

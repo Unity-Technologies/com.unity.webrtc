@@ -28,8 +28,11 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
+#if UNITY_2021
+        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel22;
+#else
         public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
-
+#endif
         /// <summary>
         ///
         /// </summary>
@@ -125,16 +128,6 @@ namespace Unity.WebRTC.Editor
         /// </summary>
         static void EnsureOSXArchitecture()
         {
-            var platformName = BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneOSX);
-            var architecture = EditorUserBuildSettings.GetPlatformSettings(platformName, "Architecture");
-
-            // throws exception when selecting  "ARM64" or "x64ARM64" for the architecture
-            if (architecture != "x64")
-            {
-                Debug.LogWarning(
-                    $"Apple Silicon architecture is not supported by WebRTC package" +
-                    $"Currently set to {architecture}");
-            }
         }
     }
 }

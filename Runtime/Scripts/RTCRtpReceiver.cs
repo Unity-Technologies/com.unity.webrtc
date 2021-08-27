@@ -7,17 +7,23 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    public class RTCRtpReceiver : IDisposable
+    public class RTCRtpReceiver : RefCountedObject
     {
-        internal IntPtr self;
         private RTCPeerConnection peer;
-        private bool disposed;
 
-        internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer)
+        internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
             this.peer = peer;
+        }
+
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("This instance has been disposed.");
+            }
+            return self;
         }
 
         ~RTCRtpReceiver()
@@ -25,7 +31,7 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (this.disposed)
             {
@@ -34,10 +40,8 @@ namespace Unity.WebRTC
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
         /// <summary>
@@ -64,7 +68,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                IntPtr ptr = NativeMethods.ReceiverGetTrack(self);
+                IntPtr ptr = NativeMethods.ReceiverGetTrack(GetSelfOrThrow());
                 if (ptr == IntPtr.Zero)
                     return null;
                 return WebRTC.FindOrCreate(ptr, MediaStreamTrack.Create);
@@ -75,7 +79,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                IntPtr ptrStreams = NativeMethods.ReceiverGetStreams(self, out ulong length);
+                IntPtr ptrStreams = NativeMethods.ReceiverGetStreams(GetSelfOrThrow(), out ulong length);
                 return WebRTC.Deserialize(ptrStreams, (int)length, ptr => new MediaStream(ptr));
             }
         }

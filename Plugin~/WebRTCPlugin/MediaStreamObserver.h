@@ -9,7 +9,7 @@ namespace webrtc
     class MediaStreamObserver : public webrtc::MediaStreamObserver, public sigslot::has_slots<>
     {
     public:
-        explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream);
+        explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream, Context* context);
         void RegisterOnAddTrack(DelegateMediaStreamOnAddTrack callback);
         void RegisterOnRemoveTrack(DelegateMediaStreamOnRemoveTrack callback);
     private:
@@ -20,6 +20,7 @@ namespace webrtc
 
         std::list<DelegateMediaStreamOnAddTrack> m_listOnAddTrack;
         std::list<DelegateMediaStreamOnRemoveTrack> m_listOnRemoveTrack;
+        Context* m_context;
     };
 
 } // end namespace webrtc

@@ -9,18 +9,17 @@ using Unity.WebRTC.Samples;
 
 class StatsSample : MonoBehaviour
 {
-    #pragma warning disable 0649
+#pragma warning disable 0649
     [SerializeField] private Button callButton;
     [SerializeField] private Button hangupButton;
     [SerializeField] private InputField text;
     [SerializeField] private Dropdown dropdown;
-
+    [SerializeField] private AudioSource source;
+    [SerializeField] private Camera cam;
 #pragma warning restore 0649
 
     private RTCPeerConnection pc1, pc2;
     private RTCDataChannel dataChannel, remoteDataChannel;
-    private Coroutine sdpCheck;
-    private string msg;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange = null;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange = null;
     private DelegateOnIceCandidate pc1OnIceCandidate = null;
@@ -116,23 +115,6 @@ class StatsSample : MonoBehaviour
                 break;
         }
     }
-    void Pc1OnIceConnectinChange(RTCIceConnectionState state)
-    {
-        OnIceConnectionChange(pc1, state);
-    }
-    void Pc2OnIceConnectionChange(RTCIceConnectionState state)
-    {
-        OnIceConnectionChange(pc2, state);
-    }
-
-    void Pc1OnIceCandidate(RTCIceCandidate candidate)
-    {
-        OnIceCandidate(pc1, candidate);
-    }
-    void Pc2OnIceCandidate(RTCIceCandidate candidate)
-    {
-        OnIceCandidate(pc2, candidate);
-    }
 
     IEnumerator Call()
     {
@@ -151,6 +133,13 @@ class StatsSample : MonoBehaviour
 
         dataChannel = pc1.CreateDataChannel("data");
         dataChannel.OnOpen = onDataChannelOpen;
+
+        var audioTrack = new AudioStreamTrack(source);
+        var videoTrack = cam.CaptureStreamTrack(1280, 720, 0);
+        yield return 0;
+
+        pc1.AddTrack(audioTrack);
+        pc1.AddTrack(videoTrack);
 
         Debug.Log("pc1 createOffer start");
         var op = pc1.CreateOffer();

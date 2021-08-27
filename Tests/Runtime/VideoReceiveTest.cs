@@ -31,7 +31,8 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            WebRTC.Initialize(encoderType);
+            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
+            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
@@ -68,64 +69,162 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
+        internal class TestValue
+        {
+            public int width;
+            public int height;
+            public int count;
+        }
+
+        internal static TestValue[] testValues = new TestValue[]
+        {
+            new TestValue{width = 256, height = 256, count = 1},
+            new TestValue{width = 256, height = 256, count = 2},
+            new TestValue{width = 256, height = 256, count = 3},
+            new TestValue{width = 1280, height = 720, count = 1},
+            new TestValue{width = 1280, height = 720, count = 2},
+            new TestValue{width = 1280, height = 720, count = 3},
+        };
+
+        internal static int[] range = Enumerable.Range(0, 6).ToArray();
+
+        // not supported TestCase attribute on UnityTest
+        // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest]
-        [Timeout(5000)]
+        [Timeout(10000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
-        public IEnumerator VideoReceive()
+        public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
         {
-            const int width = 256;
-            const int height = 256;
+            if(SystemInfo.processorType == "Apple M1")
+                Assert.Ignore("todo:: This test will hang up on Apple M1");
 
+            var value = testValues[index];
+            var test = new MonoBehaviourTest<VideoReceivePeers>();
+            test.component.SetResolution(value.width, value.height);
+            yield return test;
+            test.component.CoroutineUpdate();
+
+            IEnumerator VideoReceive()
+            {
+                test.component.CreatePeers();
+                test.component.CreateVideoStreamTrack();
+                test.component.AddTrack();
+
+                yield return test.component.Signaling();
+
+                var receiveVideoTrack = test.component.RecvVideoTrack;
+                yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized, 5000);
+                Assert.That(test.component.RecvTexture, Is.Not.Null);
+
+                yield return new WaitForSeconds(0.1f);
+
+                test.component.Clear();
+            }
+
+            for (int i = 0; i < value.count; i++)
+            {
+                yield return VideoReceive();
+                yield return new WaitForSeconds(1);
+            }
+
+            Object.DestroyImmediate(test.gameObject);
+        }
+    }
+
+    class VideoReceivePeers : MonoBehaviour, IMonoBehaviourTest
+    {
+        public bool IsTestFinished { get; private set; }
+
+        public VideoStreamTrack SendVideoTrack { get; private set; }
+        public VideoStreamTrack RecvVideoTrack { get; private set; }
+        public Texture SendTexture { get; private set; }
+        public Texture RecvTexture { get; private set; }
+
+        RTCPeerConnection offerPc;
+        RTCPeerConnection answerPc;
+        RTCRtpSender sender;
+        GameObject camObj;
+        Camera cam;
+        int width;
+        int height;
+
+        void Start()
+        {
+            camObj = new GameObject("Camera");
+            cam = camObj.AddComponent<Camera>();
+
+            IsTestFinished = true;
+        }
+
+        public void SetResolution(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+        }
+
+        public void CreatePeers()
+        {
             var config = new RTCConfiguration
             {
-                iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}}
+                iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } }
             };
-            var pc1 = new RTCPeerConnection(ref config);
-            var pc2 = new RTCPeerConnection(ref config);
+            offerPc = new RTCPeerConnection(ref config);
+            answerPc = new RTCPeerConnection(ref config);
 
-            VideoStreamTrack receiveVideoTrack = null;
-            Texture receiveImage = null;
-
-            pc2.OnTrack = e =>
+            answerPc.OnTrack = e =>
             {
                 if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
                 {
-                    receiveVideoTrack = track;
-                    receiveImage = track.InitializeReceiver(width, height);
+                    RecvVideoTrack = track;
+                    RecvTexture = track.InitializeReceiver(width, height);
                 }
             };
-
-            var camObj = new GameObject("Camera");
-            var cam = camObj.AddComponent<Camera>();
-            cam.backgroundColor = Color.red;
-            var sendVideoTrack = cam.CaptureStreamTrack(width, height, 1000000);
-
-            yield return new WaitForSeconds(0.1f);
-
-            pc1.AddTrack(sendVideoTrack);
-
-            yield return SignalingPeers(pc1, pc2);
-
-            yield return new WaitUntil(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized);
-            Assert.That(receiveImage, Is.Not.Null);
-
-            sendVideoTrack.Update();
-            yield return new WaitForSeconds(0.1f);
-
-            receiveVideoTrack.UpdateReceiveTexture();
-            yield return new WaitForSeconds(0.1f);
-
-            receiveVideoTrack.Dispose();
-            sendVideoTrack.Dispose();
-            yield return 0;
-
-            pc2.Dispose();
-            pc1.Dispose();
-            Object.DestroyImmediate(camObj);
+        }
+        public void CreateVideoStreamTrack()
+        {
+            SendVideoTrack = cam.CaptureStreamTrack(width, height, 1000000);
+            SendTexture = cam.targetTexture;
         }
 
-        private static IEnumerator SignalingPeers(RTCPeerConnection offerPc, RTCPeerConnection answerPc)
+        public void AddTrack()
+        {
+            sender = offerPc.AddTrack(SendVideoTrack);
+        }
+
+        public void RemoveTrack()
+        {
+            offerPc.RemoveTrack(sender);
+        }
+
+        public Coroutine CoroutineUpdate()
+        {
+            return StartCoroutine(WebRTC.Update());
+        }
+
+        public void Clear()
+        {
+            SendVideoTrack?.Dispose();
+            SendVideoTrack = null;
+
+            offerPc?.Close();
+            offerPc?.Dispose();
+            offerPc = null;
+            answerPc?.Close();
+            answerPc?.Dispose();
+            answerPc = null;
+            SendTexture = null;
+            RecvTexture = null;
+        }
+
+        void OnDestroy()
+        {
+            Clear();
+            DestroyImmediate(camObj);
+            camObj = null;
+        }
+
+        public IEnumerator Signaling()
         {
             offerPc.OnIceCandidate = candidate => answerPc.AddIceCandidate(candidate);
             answerPc.OnIceCandidate = candidate => offerPc.AddIceCandidate(candidate);
