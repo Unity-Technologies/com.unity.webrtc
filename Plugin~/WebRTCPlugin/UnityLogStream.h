@@ -21,7 +21,7 @@ namespace webrtc {
         // log format can be defined in this interface
         void OnLogMessage(const std::string& message) override;
 
-        static void AddLogStream(DelegateDebugLog callback);
+        static void AddLogStream(DelegateDebugLog callback, rtc::LoggingSeverity loggingSeverity);
         static void RemoveLogStream();
 
 
