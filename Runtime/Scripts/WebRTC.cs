@@ -392,6 +392,7 @@ namespace Unity.WebRTC
 
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+            
             var flipShader = Resources.Load<Shader>("Flip");
             if (flipShader != null)
             {

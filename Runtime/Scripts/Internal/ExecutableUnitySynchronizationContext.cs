@@ -15,12 +15,12 @@ namespace Unity.WebRTC
     /// </remarks>
     class ExecutableUnitySynchronizationContext : SynchronizationContext
     {
-        const int kAwqInitialCapacity = 20;
+        const int k_AwqInitialCapacity = 20;
 
         static SynchronizationContext s_MainThreadContext;
 
         readonly List<WorkRequest> m_AsyncWorkQueue;
-        readonly List<WorkRequest> m_CurrentFrameWork = new List<WorkRequest>(kAwqInitialCapacity);
+        readonly List<WorkRequest> m_CurrentFrameWork = new List<WorkRequest>(k_AwqInitialCapacity);
         readonly int m_MainThreadID;
         int m_TrackedCount;
 
