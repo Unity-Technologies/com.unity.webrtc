@@ -47,9 +47,9 @@ namespace Unity.WebRTC.RuntimeTest
             return channel;
         }
 
-        public RTCDataChannel GetDataChannel(int indexPeer, int indexDataChannel)
+        public List<RTCDataChannel> GetDataChannelList(int indexPeer)
         {
-            return dataChannels[peers[indexPeer]][indexDataChannel];
+            return dataChannels[peers[indexPeer]];
         }
 
         public RTCStatsReportAsyncOperation GetPeerStats(int indexPeer)
@@ -119,7 +119,6 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.That(e.Track, Is.Not.Null);
                 Assert.That(e.Receiver, Is.Not.Null);
                 Assert.That(e.Transceiver, Is.Not.Null);
-                //peers[1].AddTrack(e.Track);
             };
             peers[0].OnDataChannel = e =>
             {
