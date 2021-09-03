@@ -180,22 +180,28 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(channel1.Id, Is.EqualTo(channel2.Id));
 
             // send string
+            const int millisecondTimeout = 1000;
             const string message1 = "hello";
             string message2 = null;
             channel2.OnMessage = bytes => { message2 = System.Text.Encoding.UTF8.GetString(bytes); };
             channel1.Send(message1);
 
-            const int millisecondTimeout = 1000;
-            Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            while (message2 == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
             Assert.That(message1, Is.EqualTo(message2));
 
             // send byte array
             byte[] message3 = { 1, 2, 3 };
             byte[] message4 = null;
-            channel2.OnMessage = bytes => { message4 = bytes; UnityEngine.Debug.Log("aaa"); };
+            channel2.OnMessage = bytes => { message4 = bytes; };
             channel1.Send(message3);
-            Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
 
+            while(message4 == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
             Assert.That(message3, Is.EqualTo(message4));
 
             // todo:: native array
