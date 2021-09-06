@@ -389,7 +389,10 @@ namespace Unity.WebRTC
 #endif
             s_context = Context.Create(encoderType:type, forTest:forTest);
             NativeMethods.SetCurrentContext(s_context.self);
-            s_syncContext = SynchronizationContext.Current;
+
+            // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
+            s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+            
             var flipShader = Resources.Load<Shader>("Flip");
             if (flipShader != null)
             {
@@ -425,6 +428,26 @@ namespace Unity.WebRTC
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes any pending tasks generated asynchronously during the WebRTC runtime.
+        /// </summary>
+        /// <param name="millisecondTimeout">
+        /// The amount of time in milliseconds that the task queue can take before task execution will cease.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if all pending tasks were completed within <see cref="millisecondTimeout"/> milliseconds and <c>false</c>
+        /// otherwise.
+        /// </returns>
+        public static bool ExecutePendingTasks(int millisecondTimeout)
+        {
+            if (s_syncContext is ExecutableUnitySynchronizationContext executableContext)
+            {
+                return executableContext.ExecutePendingTasks(millisecondTimeout);
+            }
+
+            return false;
         }
 
         /// <summary>
