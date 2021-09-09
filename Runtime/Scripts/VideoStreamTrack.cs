@@ -202,9 +202,30 @@ namespace Unity.WebRTC
                 return;
             }
 
-            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-            m_sourceTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-            m_destTexture = CreateRenderTexture(width, height);
+            if (m_sourceTexture != null && m_sourceTexture is RenderTexture source)
+            {
+                source.Release();
+                source.width = width;
+                source.height = width;
+                source.Create();
+            }
+            else
+            {
+                m_sourceTexture = CreateRenderTexture(width, height);
+            }
+
+            if (m_destTexture != null)
+            {
+                m_destTexture.Release();
+                m_destTexture.width = width;
+                m_destTexture.height = width;
+                m_destTexture.Create();
+            }
+            else
+            {
+                m_destTexture = CreateRenderTexture(width, height);
+            }
+
             OnVideoReceived?.Invoke(m_destTexture);
         }
     }
