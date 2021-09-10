@@ -113,83 +113,101 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator EventsAreSentToOther()
+        public IEnumerator SendAndReceiveMessage()
         {
-            RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
-            var peer1 = new RTCPeerConnection(ref config);
-            var peer2 = new RTCPeerConnection(ref config);
-            RTCDataChannel channel2 = null;
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var label = "test";
 
-            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
-            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
-            peer2.OnDataChannel = channel => { channel2 = channel; };
+            RTCDataChannel channel1 = test.component.CreateDataChannel(0, label);
+            Assert.That(channel1, Is.Not.Null);
+            yield return test;
 
-            var channel1 = peer1.CreateDataChannel("data");
-            bool channel1Opened = false;
-            bool channel1Closed = false;
-            channel1.OnOpen = () => { channel1Opened = true; };
-            channel1.OnClose = () => { channel1Closed = true; };
-
-            var op1 = peer1.CreateOffer();
+            var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
             yield return op1;
-            var desc = op1.Desc;
-            var op2 = peer1.SetLocalDescription(ref desc);
-            yield return op2;
-            var op3 = peer2.SetRemoteDescription(ref desc);
-            yield return op3;
-            var op4 = peer2.CreateAnswer();
-            yield return op4;
-            desc = op4.Desc;
-            var op5 = peer2.SetLocalDescription(ref desc);
-            yield return op5;
-            var op6 = peer1.SetRemoteDescription(ref desc);
-            yield return op6;
+            RTCDataChannel channel2 = test.component.GetDataChannelList(1)[0];
+            Assert.That(channel2, Is.Not.Null);
 
-            var op7 = new WaitUntilWithTimeout(
-                () => peer1.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer1.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op7;
-            Assert.True(op7.IsCompleted);
-            var op8 = new WaitUntilWithTimeout(
-                () => peer2.IceConnectionState == RTCIceConnectionState.Connected ||
-                      peer2.IceConnectionState == RTCIceConnectionState.Completed, 5000);
-            yield return op8;
-            Assert.True(op8.IsCompleted);
-            var op9 = new WaitUntilWithTimeout(() => channel2 != null, 5000);
-            yield return op9;
-            Assert.True(op9.IsCompleted);
+            Assert.That(channel1.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
+            Assert.That(channel2.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
+            Assert.That(channel1.Label, Is.EqualTo(channel2.Label));
+            Assert.That(channel1.Id, Is.EqualTo(channel2.Id));
 
-            Assert.True(channel1Opened);
-            Assert.AreEqual(channel1.Label, channel2.Label);
-            Assert.AreEqual(channel1.Id, channel2.Id);
-
+            // send string
             const string message1 = "hello";
             string message2 = null;
             channel2.OnMessage = bytes => { message2 = System.Text.Encoding.UTF8.GetString(bytes); };
             channel1.Send(message1);
             var op10 = new WaitUntilWithTimeout(() => !string.IsNullOrEmpty(message2), 5000);
             yield return op10;
-            Assert.True(op10.IsCompleted);
-            Assert.AreEqual(message1, message2);
+            Assert.That(op10.IsCompleted, Is.True);
+            Assert.That(message1, Is.EqualTo(message2));
 
+            // send byte array
             byte[] message3 = {1, 2, 3};
             byte[] message4 = null;
             channel2.OnMessage = bytes => { message4 = bytes; };
             channel1.Send(message3);
             var op11 = new WaitUntilWithTimeout(() => message4 != null, 5000);
             yield return op11;
-            Assert.True(op11.IsCompleted);
-            Assert.AreEqual(message3, message4);
+            Assert.That(op11.IsCompleted, Is.True);
+            Assert.That(message3, Is.EqualTo(message4));
+            
+            // todo:: native array
 
-            channel1.Close();
-            var op12 = new WaitUntilWithTimeout(() => channel1Closed, 5000);
-            yield return op12;
-            Assert.True(op12.IsCompleted);
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
+        }
 
-            channel2.Close();
-            peer1.Close();
-            peer2.Close();
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator SendAndReceiveMessageWithExecuteTasks()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var label = "test";
+
+            RTCDataChannel channel1 = test.component.CreateDataChannel(0, label);
+            Assert.That(channel1, Is.Not.Null);
+            yield return test;
+
+            var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
+            yield return op1;
+            RTCDataChannel channel2 = test.component.GetDataChannelList(1)[0];
+            Assert.That(channel2, Is.Not.Null);
+
+            Assert.That(channel1.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
+            Assert.That(channel2.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
+            Assert.That(channel1.Label, Is.EqualTo(channel2.Label));
+            Assert.That(channel1.Id, Is.EqualTo(channel2.Id));
+
+            // send string
+            const int millisecondTimeout = 1000;
+            const string message1 = "hello";
+            string message2 = null;
+            channel2.OnMessage = bytes => { message2 = System.Text.Encoding.UTF8.GetString(bytes); };
+            channel1.Send(message1);
+
+            while (message2 == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
+            Assert.That(message1, Is.EqualTo(message2));
+
+            // send byte array
+            byte[] message3 = { 1, 2, 3 };
+            byte[] message4 = null;
+            channel2.OnMessage = bytes => { message4 = bytes; };
+            channel1.Send(message3);
+
+            while(message4 == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
+            Assert.That(message3, Is.EqualTo(message4));
+
+            // todo:: native array
+
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
     }
 }
