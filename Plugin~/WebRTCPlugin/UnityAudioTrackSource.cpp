@@ -74,7 +74,7 @@ UnityAudioTrackSource::UnityAudioTrackSource()
 {
 }
 UnityAudioTrackSource::UnityAudioTrackSource(const cricket::AudioOptions& audio_options)
-{
+    : _options(audio_options) {
 }
 
 UnityAudioTrackSource::~UnityAudioTrackSource()
