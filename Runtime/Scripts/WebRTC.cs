@@ -365,11 +365,11 @@ namespace Unity.WebRTC
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
 
-            Initialize(type, limitTextureSize, false);
+            Initialize(type, limitTextureSize, false, enableNativeLog, nativeLoggingSeverity);
         }
 
 
-        internal static void Initialize(EncoderType type, bool limitTextureSize, bool forTest)
+        internal static void Initialize(EncoderType type, bool limitTextureSize, bool forTest, bool enableNativeLog = false, NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.LS_INFO)
         {
             // todo(kazuki): Add this event to avoid crash caused by hot-reload.
             // Dispose of all before reloading assembly.
