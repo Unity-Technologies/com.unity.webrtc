@@ -54,7 +54,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var guid = Guid.NewGuid().ToString();
             var source = new VideoTrackSource();
-            var track = new VideoStreamTrack(WebRTC.Context.CreateVideoTrack(guid, source.self));
+            var track = new VideoStreamTrack(WebRTC.Context.CreateVideoTrack(source.self, IntPtr.Zero, 256, 256));
             Assert.That(track, Is.Not.Null);
             Assert.That(track.Id, Is.EqualTo(guid));
             track.Dispose();
