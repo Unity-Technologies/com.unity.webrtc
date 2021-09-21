@@ -290,7 +290,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                 param->width, param->height, s_gfxDevice.get(), encoderType, param->textureFormat);
             if (!s_context->InitializeEncoder(s_mapEncoder[track].get(), track))
             {
-                // DebugLog("Encoder initialization faild.");
+                // DebugLog("Encoder initialization failed.");
             }
             return;
         }
