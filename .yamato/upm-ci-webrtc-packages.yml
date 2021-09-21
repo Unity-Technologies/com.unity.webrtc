@@ -352,7 +352,6 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
       paths:
         - "build/test-results/**"
 {% endfor %}
-{% endfor %}
 
 test_{{ package.name }}_{{ editor.version }}_webgl_win:
   name: Test {{ package.packagename }} with {{ editor.version }} on WebGL {{ target.name }}
@@ -368,6 +367,7 @@ test_{{ package.name }}_{{ editor.version }}_webgl_win:
       - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
       - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat --output utr.bat
       - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
+{% endfor %}
 
 {% for target in test_targets %}
 {% for editor in editors %}
