@@ -349,7 +349,7 @@ int NvDecoder::ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat)
     // If external reconfigure is called along with resolution change even if post processing params is not changed,
     // do full reconfigure params update
     if ((m_bReconfigExternal && bDecodeResChange) || m_bReconfigExtPPChange) {
-        // update display rect and target resolution if requested explicitely
+        // update display rect and target resolution if requested explicitly
         m_bReconfigExternal = false;
         m_bReconfigExtPPChange = false;
         m_videoFormat = *pVideoFormat;

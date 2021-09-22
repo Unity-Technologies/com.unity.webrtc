@@ -40,7 +40,7 @@ void NvEncoderCuda::AllocateInputBuffers(int32_t numInputBuffers)
         NVENC_THROW_ERROR("Encoder intialization failed", NV_ENC_ERR_ENCODER_NOT_INITIALIZED);
     }
 
-    // for MEOnly mode we need to allocate seperate set of buffers for reference frame
+    // for MEOnly mode we need to allocate separate set of buffers for reference frame
     int numCount = m_bMotionEstimationOnly ? 2 : 1;
 
     for (int count = 0; count < numCount; count++)

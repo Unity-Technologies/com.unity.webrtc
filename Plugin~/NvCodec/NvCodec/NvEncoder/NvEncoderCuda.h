@@ -62,7 +62,7 @@ public:
 
     /**
     *  @brief This is a static function to copy input data from host memory to device memory.
-    *  Application must pass a seperate device pointer for each YUV plane.
+    *  Application must pass a separate device pointer for each YUV plane.
     */
     static void CopyToDeviceFrame(CUcontext device,
         void* pSrcFrame,

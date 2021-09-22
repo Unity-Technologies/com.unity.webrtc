@@ -196,7 +196,7 @@ namespace webrtc
     }
 
     ///
-    /// avoid compile erorr for vector<bool>
+    /// avoid compile error for vector<bool>
     /// https://en.cppreference.com/w/cpp/container/vector_bool
     bool* ConvertArray(std::vector<bool> vec, size_t* length)
     {
