@@ -356,17 +356,18 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 test_{{ package.name }}_{{ editor.version }}_webgl_win:
   name: Test {{ package.packagename }} with {{ editor.version }} on WebGL {{ target.name }}
   agent:
-    type: Unity::VM::GPU
-    image: package-ci/win10:stable
-    flavor: b1.large
-  # todo:  
-  # dependencies:
-  #   - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+    type: Unity::VM::osx
+    image: package-ci/mac:latest
+    flavor: m1.mac
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
   commands:
-      - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-      - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
-      - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat --output utr.bat
-      - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
+    - find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+    - cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
+    - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
 {% endfor %}
 
 {% for target in test_targets %}
