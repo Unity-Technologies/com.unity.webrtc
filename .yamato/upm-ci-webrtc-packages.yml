@@ -353,8 +353,8 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
         - "build/test-results/**"
 {% endfor %}
 
-test_{{ package.name }}_{{ editor.version }}_webgl_win:
-  name: Test {{ package.packagename }} with {{ editor.version }} on WebGL {{ target.name }}
+test_{{ package.name }}_{{ editor.version }}_webgl_macos:
+  name: Test {{ package.packagename }} with {{ editor.version }} on WebGL macOS
   agent:
     type: Unity::VM::osx
     image: package-ci/mac:latest
@@ -367,6 +367,7 @@ test_{{ package.name }}_{{ editor.version }}_webgl_win:
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
     - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
 {% endfor %}
 
