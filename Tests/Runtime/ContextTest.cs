@@ -98,7 +98,11 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
             var source = context.CreateVideoTrackSource();
+#if UNITY_WEBGL
             var track = context.CreateVideoTrack(source, System.IntPtr.Zero, width, height);
+#else
+            var track = context.CreateVideoTrack("video", source);
+#endif
             context.DeleteRefPtr(track);
             context.DeleteRefPtr(source);
             context.Dispose();
