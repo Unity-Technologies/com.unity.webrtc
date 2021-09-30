@@ -1,9 +1,9 @@
 var UnityWebRTCRtpTransceiver = {
-  DeleteTransceiver: function (transceiverPtr){
+  DeleteTransceiver: function (transceiverPtr) {
     if (!uwcom_existsCheck(transceiverPtr, 'DeleteTransceiver', 'transceiver')) return;
     delete UWManaged[transceiverPtr];
   },
-  
+
   TransceiverGetDirection: function (transceiverPtr) {
     if (!uwcom_existsCheck(transceiverPtr, 'TransceiverGetDirection', 'transceiver')) return;
     var transceiver = UWManaged[transceiverPtr];
@@ -38,19 +38,25 @@ var UnityWebRTCRtpTransceiver = {
 
   TransceiverSetCodecPreferences: function (transceiverPtr, codecsPtr) {
     if (!uwcom_existsCheck(transceiverPtr, 'TransceiverSetCodecPreferences', 'transceiver')) return 11; // OperationErrorWithData
-  
+
     var transceiver = UWManaged[transceiverPtr];
     var codecsJson = Pointer_stringify(codecsPtr);
     var codecs = JSON.parse(codecsJson);
-    codecs.forEach(function(codec){
+    codecs.forEach(function (codec) {
       delete codec.channels;
     })
+    console.log(codecs);
     const supportsSetCodecPreferences = window.RTCRtpTransceiver && 'setCodecPreferences' in window.RTCRtpTransceiver.prototype;
-    if(supportsSetCodecPreferences) transceiver.setCodecPreferences(codecs);
-    else console.warn("Can't set codec preferences");
+    if (supportsSetCodecPreferences) {
+      try {
+        transceiver.setCodecPreferences(codecs);
+      } catch (err) {
+        console.error("Invalid codecs object");
+      }
+    } else console.warn("Can't set codec preferences");
     //TODO Send correct RTCErrorType
     return 0;
-   },
+  },
 
   TransceiverStop: function (transceiverPtr) {
     if (!uwcom_existsCheck(transceiverPtr, 'TransceiverStop', 'transceiver')) return;

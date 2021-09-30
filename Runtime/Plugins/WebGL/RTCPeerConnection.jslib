@@ -8,8 +8,12 @@ var UnityWebRTCPeerConnection = {
 
     //debugger;
     conf = conf || {};
-    
-    var peer = new RTCPeerConnection(conf);
+
+    try {
+      var peer = new RTCPeerConnection(conf);
+    } catch (err) {
+      return 0;
+    }
     peer.label = label;
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'CreatePeerConnection', 'create peer: ' + peer.label);
     peer.onicecandidate = function (evt) {
@@ -24,7 +28,7 @@ var UnityWebRTCPeerConnection = {
       }
     };
     peer.oniceconnectionstatechange = function (evt) {
-      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'oniceconnectionstatechange', this.label + ':' +  this.iceConnectionState);
+      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'oniceconnectionstatechange', this.label + ':' + this.iceConnectionState);
       var idx = UWRTCIceConnectionState.indexOf(this.iceConnectionState);
       if (idx === -1) {
         console.error('unknown iceConnectionState: "' + this.iceConnectionState + '"');
@@ -32,12 +36,12 @@ var UnityWebRTCPeerConnection = {
       Module.dynCall_vii(uwevt_PCOnIceConnectionChange, peer.managePtr, idx);
     };
     peer.onconnectionstatechange = function (evt) {
-      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onconnectionstatechange', this.label + ':' +this.connectionState);
+      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onconnectionstatechange', this.label + ':' + this.connectionState);
       var idx = UWRTCPeerConnectionState.indexOf(this.connectionState);
       Module.dynCall_vii(uwevt_PCOnConnectionStateChange, peer.managePtr, idx);
     };
     peer.onicegatheringstatechange = function (evt) {
-      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onicegatheringstatechange', this.label + ':' +this.iceGatheringState);
+      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'onicegatheringstatechange', this.label + ':' + this.iceGatheringState);
       var idx = UWRTCIceGatheringState.indexOf(this.iceGatheringState);
       if (idx === -1) {
         console.error('unknown iceGatheringState: "' + this.iceGatheringState + '"');
@@ -51,7 +55,7 @@ var UnityWebRTCPeerConnection = {
     peer.ondatachannel = function (evt) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'ondatachannel', this.label + ':' + evt.channel.label);
       var channel = evt.channel;
-      channel.onmessage = (function(evt) {
+      channel.onmessage = (function (evt) {
         if (typeof evt.data === "string") {
           var msgPtr = uwcom_strToPtr(evt.data);
           Module.dynCall_vii(uwevt_DCOnTextMessage, channel.managePtr, msgPtr);
@@ -76,12 +80,12 @@ var UnityWebRTCPeerConnection = {
       var receiver = evt.receiver;
       var transceiver = evt.transceiver;
       var track = evt.track;
-      if(evt.streams[0])
+      if (evt.streams[0])
         evt.streams[0].removeTrack(track);
       uwcom_addManageObj(receiver);
       uwcom_addManageObj(transceiver);
       uwcom_addManageObj(track);
-      
+
       var stream = new MediaStream();
       stream.addTrack(track);
       if (track.kind === "audio") {
@@ -111,7 +115,7 @@ var UnityWebRTCPeerConnection = {
           video: video
         };
         video.play();
-        video.onloadedmetadata = function(evt){
+        video.onloadedmetadata = function (evt) {
           Module.dynCall_vii(uwevt_PCOnTrack, peer.managePtr, transceiver.managePtr);
         }
       }
@@ -133,12 +137,12 @@ var UnityWebRTCPeerConnection = {
       var idx = conf.iceServers[iceIdx].credentialType;
       conf.iceServers[iceIdx].credentialType = UWRTCIceCredentialType[idx];
     }
-    
+
     if (conf.iceTransportPolicy) conf.iceTransportPolicy = UWRTCIceTransportPolicy[conf.iceTransportPolicy.value];
     if (conf.iceCandidatePoolSize) conf.iceCandidatePoolSize = conf.iceCandidatePoolSize.value;
     if (conf.bundlePolicy) conf.bundlePolicy = UWRTCBundlePolicy[conf.bundlePolicy.value];
     if (conf.enableDtlsSrtp) conf.enableDtlsSrtp = conf.enableDtlsSrtp.value;
-    
+
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'CreatePeerConnectionWithConfig', JSON.stringify(conf));
     var ptr = _CreatePeerConnection(conf);
     return ptr;
@@ -148,7 +152,7 @@ var UnityWebRTCPeerConnection = {
     var peer = UWManaged[peerPtr];
     var type = UWRTCSdpType[typeIdx];
     var sdp = Pointer_stringify(sdpPtr);
-    peer['set' + side + 'Description']({ type: type, sdp: sdp }).then(function () {
+    peer['set' + side + 'Description']({type: type, sdp: sdp}).then(function () {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label + ':' + side + ':' + type + ':' /*+ sdp*/);
       Module.dynCall_vi(uwevt_OnSetSessionDescSuccess, peer.managePtr);
     }).catch(function (err) {
@@ -236,7 +240,7 @@ var UnityWebRTCPeerConnection = {
     return ptr;
   },
 
-  PeerConnectionGetConfiguration: function (evt) {
+  PeerConnectionGetConfiguration: function (peerPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionGetConfiguration', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var conf = peer.getConfiguration();
@@ -339,8 +343,8 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionRegisterOnTrack', peer.label);
     uwevt_PCOnTrack = PCOnTrack;
   },
-  
-  PeerConnectionRegisterOnRemoveTrack: function (peerPtr, PCOnRemoveTrack){
+
+  PeerConnectionRegisterOnRemoveTrack: function (peerPtr, PCOnRemoveTrack) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionRegisterOnRemoveTrack', 'peer')) return;
     var peer = UWManaged[peerPtr];
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionRegisterOnRemoveTrack', peer.label);
@@ -375,7 +379,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionAddTrack', peer.label + ':' + track.kind);
 
     // TODO: Only add video element for local webcam display
-    if(track.kind == "video"){
+    if (track.kind == "video") {
       var video = document.createElement("video");
       video.id = "video_send_" + track.managePtr.toString();
       //document.body.appendChild(video);
@@ -391,8 +395,8 @@ var UnityWebRTCPeerConnection = {
       };
       video.play();
     }
-    
-    
+
+
     var sender = peer.addTrack(track);
     uwcom_addManageObj(sender);
     return sender.managePtr;
@@ -407,18 +411,20 @@ var UnityWebRTCPeerConnection = {
     peer.removeTrack(sender);
   },
 
-  PeerConnectionAddTransceiver: function (peerPtr, trackPtr) {
+  PeerConnectionAddTransceiver: function (contextPtr, peerPtr, trackPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'PeerConnectionAddTransceiver', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionAddTransceiver', 'peer')) return;
     if (!uwcom_existsCheck(trackPtr, 'PeerConnectionAddTransceiver', 'track')) return;
     var peer = UWManaged[peerPtr];
     var track = UWManaged[trackPtr];
-    var transceiver = peer.addTransceiver(track);
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionAddTransceiver', peer.label + ':' + track.kind);
+    var transceiver = peer.addTransceiver(track);
     uwcom_addManageObj(transceiver);
     return transceiver.managePtr;
   },
 
-  PeerConnectionAddTransceiverWithType: function (peerPtr, kindIdx) {
+  PeerConnectionAddTransceiverWithType: function (contextPtr, peerPtr, kindIdx) {
+    if (!uwcom_existsCheck(contextPtr, 'PeerConnectionAddTransceiver', 'context')) return;
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionAddTransceiverWithType', 'peer')) return;
     var peer = UWManaged[peerPtr];
     var kind = UWMediaStreamTrackKind[kindIdx];
@@ -432,20 +438,23 @@ var UnityWebRTCPeerConnection = {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionAddIceCandidate', 'peer')) return;
     if (!uwcom_existsCheck(candidatePtr, 'PeerConnectionAddIceCandidate', 'candidate')) return;
     var peer = UWManaged[peerPtr];
-      var candidate = UWManaged[candidatePtr];
-      uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionAddIceCandidate', peer.label + ':' + JSON.stringify(candidate));
-      
-      // TEMP: Use timeout so we have a higher chance that the description is set before the first candidate arrives
-      // Timing bug: Often we icecandidate is received earlier than the description, and it's not possible to set an ice candiate without a description on the peer server
-      // Possible solution: Put icecandidates on a queue if the description is not set, and handle the queue when the description is set.
-      setTimeout(function(){
-        peer.addIceCandidate(candidate)
-          .then(function(){})
-          .catch(function(){console.error(err.message, peerPtr)});
-      }, 1000);
-      
-      // TODO: Fix async return value
-      return true;
+    var candidate = UWManaged[candidatePtr];
+    uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionAddIceCandidate', peer.label + ':' + JSON.stringify(candidate));
+
+    // TEMP: Use timeout so we have a higher chance that the description is set before the first candidate arrives
+    // Timing bug: Often we icecandidate is received earlier than the description, and it's not possible to set an ice candiate without a description on the peer server
+    // Possible solution: Put icecandidates on a queue if the description is not set, and handle the queue when the description is set.
+    setTimeout(function () {
+      peer.addIceCandidate(candidate)
+          .then(function () {
+          })
+          .catch(function () {
+            console.error(err.message, peerPtr)
+          });
+    }, 1000);
+
+    // TODO: Fix async return value
+    return true;
   },
 
   PeerConnectionCreateOffer: function (peerPtr, optionsPtr) {
@@ -491,9 +500,9 @@ var UnityWebRTCPeerConnection = {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetStats', peer.label + ': stats=' + stats.length);
       uwcom_addManageObj(stats);
       Module.dynCall_vii(uwevt_OnStatsDeliveredCallback, peer.managePtr, stats.managePtr);
-    }).catch(function(err) {
+    }).catch(function (err) {
       uwcom_debugLog('error', 'RTCPeerConnection.jslib', 'PeerConnectionGetStats', peer.label + ':' + err.message);
-    }); 
+    });
   },
 
   PeerConnectionTrackGetStats: function (peerPtr, trackPtr) {
@@ -505,7 +514,7 @@ var UnityWebRTCPeerConnection = {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionTrackGetStats', peer.label + ':' + track.kind + ':stats=' + stats.length);
       uwcom_addManageObj(stats);
       Module.dynCall_vii(uwevt_OnStatsDeliveredCallback, peer.managePtr, stats.managePtr);
-    }).catch(function(err) {
+    }).catch(function (err) {
       uwcom_debugLog('error', 'RTCPeerConnection.jslib', 'PeerConnectionTrackGetStats', peer.label + ':' + err.message);
     });
   },
@@ -519,7 +528,7 @@ var UnityWebRTCPeerConnection = {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionSenderGetStats', peer.label + ':' + sender.track.kind + ':stats=' + stats.length);
       uwcom_addManageObj(stats);
       Module.dynCall_vii(uwevt_OnStatsDeliveredCallback, peer.managePtr, stats.managePtr);
-    }).catch(function(err) {
+    }).catch(function (err) {
       uwcom_debugLog('error', 'RTCPeerConnection.jslib', 'PeerConnectionSenderGetStats', peer.label + ':' + err.message);
     });
   },
@@ -533,7 +542,7 @@ var UnityWebRTCPeerConnection = {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionReceiverGetStats', peer.label + ':' + receiver.track.kind + ':stats=' + stats.length);
       uwcom_addManageObj(stats);
       Module.dynCall_vii(uwevt_OnStatsDeliveredCallback, peer.managePtr, stats.managePtr);
-    }).catch(function(err) {
+    }).catch(function (err) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionReceiverGetStats', peer.label + ':' + err.message);
     })
   },
@@ -545,7 +554,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetLocalDescription', peer.label + ':' + pc.localDescription.type);
     var type = UWRTCSdpType.indexOf(peer.localDescription.type);
     var sdp = peer.localDescription.sdp;
-    return JSON.stringify({ type: type, sdp: sdp });
+    return JSON.stringify({type: type, sdp: sdp});
   },
 
   PeerConnectionGetRemoteDescription: function (peerPtr) {
@@ -555,7 +564,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetRemoteDescription', peer.label + ':' + pc.remoteDescription.type);
     var type = UWRTCSdpType.indexOf(peer.remoteDescription.type);
     var sdp = peer.remoteDescription.sdp;
-    return JSON.stringify({ type: type, sdp: sdp });
+    return JSON.stringify({type: type, sdp: sdp});
   },
 
   PeerConnectionGetCurrentLocalDescription: function (peerPtr) {
@@ -565,7 +574,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetCurrentLocalDescription', peer.label + ':' + pc.currentLocalDescription.type);
     var type = UWRTCSdpType.indexOf(peer.currentLocalDescription.type);
     var sdp = peer.currentLocalDescription.sdp;
-    return JSON.stringify({ type: type, sdp: sdp });
+    return JSON.stringify({type: type, sdp: sdp});
   },
 
   PeerConnectionGetCurrentRemoteDescription: function (peerPtr) {
@@ -575,7 +584,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetCurrentRemoteDescription', peer.label + ':' + pc.currentRemoteDescription.type);
     var type = UWRTCSdpType.indexOf(peer.currentRemoteDescription.type);
     var sdp = peer.currentRemoteDescription.sdp;
-    return JSON.stringify({ type: type, sdp: sdp });
+    return JSON.stringify({type: type, sdp: sdp});
   },
 
   PeerConnectionGetPendingLocalDescription: function (peerPtr) {
@@ -585,7 +594,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetPendingLocalDescription', peer.label + ':' + pc.pendingLocalDescription.type);
     var type = UWRTCSdpType.indexOf(peer.pendingLocalDescription.type);
     var sdp = peer.pendingLocalDescription.sdp;
-    return JSON.stringify({ type: type, sdp: sdp });
+    return JSON.stringify({type: type, sdp: sdp});
   },
 
   PeerConnectionGetPendingRemoteDescription: function (peerPtr) {
@@ -595,7 +604,7 @@ var UnityWebRTCPeerConnection = {
     uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionGetPendingRemoteDescription', peer.label + ':' + pc.pendingRemoteDescription.type);
     var type = UWRTCSdpType.indexOf(peer.pendingRemoteDescription.type);
     var sdp = peer.pendingRemoteDescription.sdp;
-    return JSON.stringify({ type: type, sdp: sdp });
+    return JSON.stringify({type: type, sdp: sdp});
   }
 };
 mergeInto(LibraryManager.library, UnityWebRTCPeerConnection);

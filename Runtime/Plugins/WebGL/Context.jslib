@@ -53,6 +53,7 @@ var UnityWebRTCContext = {
   
   ContextGetEncoderType: function (contextPtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextGetEncoderType', 'context')) return;
+    var context = UWManaged[contextPtr];
     var encodeTypeIdx = UWEncoderType.indexOf(context.encodeType);
     return encodeTypeIdx;
   },

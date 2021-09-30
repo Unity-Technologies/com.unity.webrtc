@@ -2,6 +2,7 @@ using System;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
@@ -91,6 +92,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         public IEnumerator SendThrowsExceptionAfterClose()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
@@ -113,6 +115,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         public IEnumerator EventsAreSentToOther()
         {
             RTCConfiguration config = default;

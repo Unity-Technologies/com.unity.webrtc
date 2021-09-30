@@ -1,3 +1,4 @@
+#if !UNITY_WEBGL
 using System.Collections;
 using System.Linq;
 using NUnit.Framework;
@@ -277,3 +278,5 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 }
+
+#endif

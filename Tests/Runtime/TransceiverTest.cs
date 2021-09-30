@@ -181,8 +181,8 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
         }
 
-
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Timeout(5000)]
         public IEnumerator TransceiverStop()
         {
