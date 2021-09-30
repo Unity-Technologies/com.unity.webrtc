@@ -225,7 +225,7 @@ namespace Unity.WebRTC
             if (sampleRate == 0 || channels == 0 || frames == 0)
                 throw new ArgumentException($"arguments are invalid values " +
                     $"sampleRate={sampleRate}, " +
-                    $"channels={channels}" +
+                    $"channels={channels}, " +
                     $"frames={frames}");
             NativeMethods.ProcessAudio(track, array, sampleRate, channels, frames);
         }
