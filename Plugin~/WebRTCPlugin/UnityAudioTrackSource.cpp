@@ -39,6 +39,11 @@ void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
 
 void UnityAudioTrackSource::OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
 {
+    RTC_DCHECK(pAudioData);
+    RTC_DCHECK(nSampleRate);
+    RTC_DCHECK(nNumChannels);
+    RTC_DCHECK(nNumFrames);
+
     std::lock_guard<std::mutex> lock(_mutex);
 
     if (_arrSink.empty())
