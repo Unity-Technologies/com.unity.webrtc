@@ -237,6 +237,8 @@ namespace Unity.WebRTC
         /// <param name="channels"></param>
         public void SetData(float[] array, int channels, int sampleRate)
         {
+            if (array == null)
+                throw new ArgumentNullException("array is null");
             NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
             SetData(ref nativeArray, channels, sampleRate);
             nativeArray.Dispose();
