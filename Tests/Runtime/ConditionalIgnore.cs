@@ -1,4 +1,3 @@
-#if !UNITY_WEBGL
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.TestTools;
@@ -29,5 +28,3 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 }
-
-#endif
