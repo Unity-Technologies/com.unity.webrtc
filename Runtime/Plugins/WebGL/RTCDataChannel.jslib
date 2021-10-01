@@ -17,8 +17,18 @@ var UnityWebRTCDataChannel = {
     else delete options.negotiated;
     if(options.id.hasValue) options.id = options.id.value;
     else delete options.id;
+
+    // Chrome (incorrectly?) accept maxRetransmits and maxRetransmitTime being set
+    if (options.maxRetransmits && options.maxRetransmitTime) return 0;
     
-    var dataChannel = peer.createDataChannel(label, options);
+    try {
+        var dataChannel = peer.createDataChannel(label, options);
+    }
+    catch(err){
+        console.log(err);   
+        return 0;
+    }
+    
     dataChannel.onmessage = function (evt) {
       if (typeof evt.data === 'string') {
         var msgPtr = uwcom_strToPtr(evt.data);
@@ -43,6 +53,7 @@ var UnityWebRTCDataChannel = {
   DataChannelGetID: function (dataChannelPtr) {
     if (!uwcom_existsCheck(dataChannelPtr, 'DataChannelGetID', 'dataChannel')) return;
     var dataChannel = UWManaged[dataChannelPtr];
+    if(dataChannel.id === null) return -1;
     return dataChannel.id;
   },
 
@@ -63,12 +74,14 @@ var UnityWebRTCDataChannel = {
   DataChannelGetMaxRetransmits: function (dataChannelPtr) {
     if (!uwcom_existsCheck(dataChannelPtr, 'DataChannelGetMaxRetransmits', 'dataChannel')) return;
     var dataChannel = UWManaged[dataChannelPtr];
+    if(dataChannel.maxRetransmits === null) return -1;
     return dataChannel.maxRetransmits;
   },
 
   DataChannelGetMaxRetransmitTime: function (dataChannelPtr) {
     if (!uwcom_existsCheck(dataChannelPtr, 'DataChannelGetMaxRetransmitTime', 'dataChannel')) return;
     var dataChannel = UWManaged[dataChannelPtr];
+    if(dataChannel.maxPacketLifeTime === null) return -1;
     return dataChannel.maxPacketLifeTime;
   },
 
