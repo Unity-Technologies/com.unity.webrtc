@@ -106,6 +106,21 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void AudioStreamTrackSetData()
+        {
+            var track = new AudioStreamTrack();
+            Assert.That(() => track.SetData(null, 0, 0), Throws.ArgumentNullException);
+
+            float[] data = new float[2048];
+            Assert.That(() => track.SetData(data, 0, 0), Throws.ArgumentException);
+
+            Assert.That(() => track.SetData(data, 1, 0), Throws.ArgumentException);
+            Assert.That(() => track.SetData(data, 0, 48000), Throws.ArgumentException);
+            Assert.That(() => track.SetData(data, 1, 48000), Throws.Nothing);
+            track.Dispose();
+        }
+
+        [Test]
         public void AudioStreamTrackPlayAudio()
         {
             GameObject obj = new GameObject("audio");
