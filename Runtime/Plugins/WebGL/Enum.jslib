@@ -108,6 +108,7 @@ var UnityWebRTCEnum = {
     'controlled'
   ],
   $UWRTCIceComponent: [
+    'none',
     'rtp',
     'rtcp'
   ],

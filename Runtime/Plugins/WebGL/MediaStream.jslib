@@ -1,6 +1,11 @@
 var UnityWebRTCMediaStream = {
-  CreateMediaStream: function () {
+  
+  // Note: MediaStream creates a read-only id field, so we cannot set it.
+  // Using custom 'guid' field instead.
+  CreateMediaStream: function (labelPtr) {
+    var label = Pointer_stringify(labelPtr);
     var stream = new MediaStream();
+    stream.guid = label;
     stream.onaddtrack = function (evt) {
       uwcom_addManageObj(evt.track);
       console.log('stream.ontrack' + evt.track.managePtr);
@@ -54,7 +59,8 @@ var UnityWebRTCMediaStream = {
   MediaStreamGetID: function (streamPtr) {
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamGetID', 'stream')) return;
     var stream = UWManaged[streamPtr];
-    var streamIdPtr = uwcom_strToPtr(stream.id);
+    var id = stream.guid || stream.id;
+    var streamIdPtr = uwcom_strToPtr(id);
     return streamIdPtr;
   },
 
@@ -89,8 +95,13 @@ var UnityWebRTCMediaStream = {
     if (!uwcom_existsCheck(trackPtr, 'MediaStreamAddTrack', 'track')) return;
     var stream = UWManaged[streamPtr];
     var track = UWManaged[trackPtr];
-    stream.addTrack(track);
-    Module.dynCall_vii(uwevt_MSOnAddTrack, stream.managePtr, track.managePtr);
+    try {
+      stream.addTrack(track);
+      Module.dynCall_vii(uwevt_MSOnAddTrack, stream.managePtr, track.managePtr);
+      return true;
+    } catch(err){
+      return false;
+    }
     // try {
     //   console.log('MediaStreamAddTrack:' + streamPtr + ':' + trackPtr);
     //   stream.addTrack(track);
@@ -130,7 +141,7 @@ var UnityWebRTCMediaStream = {
       stream.removeTrack(track);
       return true;
     } catch (err) {
-        console.log('MediaStreamRemoveTrack: ' + err.message);
+      console.log('MediaStreamRemoveTrack: ' + err.message);
       return false;
     }
   }

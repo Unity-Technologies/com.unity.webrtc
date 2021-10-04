@@ -47,7 +47,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.NotNull(candidate.Priority);
             Assert.IsNotEmpty(candidate.Address);
             Assert.NotNull(candidate.Protocol);
-            Assert.IsNotEmpty(candidate.RelatedAddress);
+            Assert.IsNotEmpty(candidate.RelatedAddress);        // TODO: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate/relatedAddress - is null for host
             Assert.NotNull(candidate.RelatedPort);
             Assert.IsNotEmpty(candidate.SdpMid);
             Assert.NotNull(candidate.SdpMLineIndex);

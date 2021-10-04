@@ -1138,7 +1138,7 @@ namespace Unity.WebRTC
         public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
 #else
         [DllImport(WebRTC.Lib)]
-        public static extern string TransceiverGetCurrentDirection(IntPtr transceiver);
+        public static extern int TransceiverGetCurrentDirection(IntPtr transceiver);
 #endif
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]

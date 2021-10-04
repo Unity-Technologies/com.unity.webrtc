@@ -26,7 +26,8 @@ var UnityWebRTCMediaStreamTrack = {
   MediaStreamTrackGetID: function (trackPtr) {
     if (!uwcom_existsCheck(trackPtr, 'MediaStreamTrackGetID', 'track')) return;
     var track = UWManaged[trackPtr];
-    var idPtr = uwcom_strToPtr(track.id);
+    var id = track.guid || track.id;
+    var idPtr = uwcom_strToPtr(id);
     return idPtr;
   }
 };

@@ -314,7 +314,7 @@ namespace Unity.WebRTC.RuntimeTest
             IntPtr buf = NativeMethods.MediaStreamGetVideoTracks(stream, out ulong length);
 #else
             IntPtr buf = NativeMethods.MediaStreamGetVideoTracks(stream);
-            var length = 0;
+            var length = NativeMethods.ptrToIntPtrArray(buf).Length;
 #endif
             Assert.AreNotEqual(buf, IntPtr.Zero);
             Assert.Greater(length, 0);
@@ -347,20 +347,21 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.MediaStreamAddTrack(stream, track);
 
             // This seems to be the same test case as the next one. Just different variable names.
-#if !UNITY_WEBGL
-            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, out ulong trackSize);
-#else
-            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream);
-            var trackSize = 0;
-#endif
-            Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
-            Assert.Greater(trackSize, 0);
+//#if !UNITY_WEBGL
+//            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream, out ulong trackSize);
+//#else
+//            var trackNativePtr = NativeMethods.MediaStreamGetAudioTracks(stream);
+//            var buf = NativeMethods.ptrToIntPtrArray(trackNativePtr);
+//            var trackSize = buf.Length;
+//#endif
+//            Assert.AreNotEqual(trackNativePtr, IntPtr.Zero);
+//            Assert.Greater(trackSize, 0);
 
 #if !UNITY_WEBGL
             IntPtr buf = NativeMethods.MediaStreamGetAudioTracks(stream, out ulong length);
 #else
             IntPtr buf = NativeMethods.MediaStreamGetAudioTracks(stream);
-            var length = 0;
+            var length = NativeMethods.ptrToIntPtrArray(buf).Length;
 #endif
             Assert.AreNotEqual(buf, IntPtr.Zero);
             Assert.Greater(length, 0);

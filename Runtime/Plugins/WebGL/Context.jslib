@@ -42,13 +42,19 @@ var UnityWebRTCContext = {
   },
   
   // TODO
-  ContextCreateAudioTrackSource: function(trackPtr){
-    
+  ContextCreateAudioTrackSource: function(contextPtr){
+    if (!uwcom_existsCheck(contextPtr, "ContextCreateAudioTrackSource", "context")) return;
+    const audioTrackSource = {};
+    uwcom_addManageObj(audioTrackSource);
+    return audioTrackSource.managePtr;
   },
   
   // TODO
-  ContextCreateVideoTrackSource: function(trackPtr){
-    
+  ContextCreateVideoTrackSource: function(contextPtr){
+    if (!uwcom_existsCheck(contextPtr, "ContextCreateVideoTrackSource", "context")) return;
+    const videoTrackSource = {};
+    uwcom_addManageObj(videoTrackSource);
+    return videoTrackSource.managePtr;
   },
   
   ContextGetEncoderType: function (contextPtr) {
@@ -115,9 +121,9 @@ var UnityWebRTCContext = {
     delete UWManaged[dataChannelPtr];
   },
 
-  ContextCreateMediaStream: function (contextPtr, label) {
+  ContextCreateMediaStream: function (contextPtr, labelPtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextCreateMediaStream', 'context')) return;
-    return _CreateMediaStream();
+    return _CreateMediaStream(labelPtr);
   },
 
   ContextDeleteMediaStream: function (contextPtr, streamPtr) {
@@ -165,9 +171,9 @@ var UnityWebRTCContext = {
 
   },
 
-  ContextCreateAudioTrack: function (contextPtr) {
+  ContextCreateAudioTrack: function (contextPtr, labelPtr, sourcePtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextCreateAudioTrack', 'context')) return;
-    return _CreateAudioTrack();
+    return _CreateAudioTrack(labelPtr, sourcePtr);
   },
 
   ContextCreateVideoTrack: function (contextPtr, srcTexturePtr, dstTexturePtr, width, height) {

@@ -12,23 +12,23 @@ var UnityWebRTCIceCandidate = {
   },
 
   IceCandidateGetCandidate: function (candPtr){
-    if (!uwcom_existsCheck(candPtr, "DeleteIceCandidate", "iceCandidate")) return;
+    if (!uwcom_existsCheck(candPtr, "IceCandidateGetCandidate", "iceCandidate")) return;
     var candidate = UWManaged[candPtr];
     var ret = {};
     ret.candidate = candidate.candidate;
-    ret.component = candidate.component;
+    ret.component =  UWRTCIceComponent.indexOf(candidate.component);
     ret.foundation = candidate.foundation;
     ret.ip = candidate.ip;
     ret.port = candidate.port;
     ret.priority = candidate.priority;
     ret.address = candidate.address;
     ret.protocol = candidate.protocol;
-    ret.relatedAddress = candidate.relatedAddress;
+    ret.relatedAddress = candidate.relatedAddress;    // TODO: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate/relatedAddress - Is null for host candidates
     ret.sdpMid = candidate.sdpMid;
     ret.sdpMLineIndex = candidate.sdpMLineIndex;
     ret.tcpType = candidate.tcpType;
     ret.type = candidate.type;
-    ret.usernameFragment = candidate.usernameFragment;
+    ret.usernameFragment = candidate.usernameFragment;  //TODO: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate/usernameFragment - This can be null?
     var json = JSON.stringify(ret);
     return uwcom_strToPtr(json);
   },
