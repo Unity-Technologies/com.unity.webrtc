@@ -110,10 +110,11 @@ namespace Unity.WebRTC
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
             return new RTCError { errorType = errorType, message = message};
 #else
-            RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
-                self, ptr, desc.type, desc.sdp);
-            // TODO
-            return new RTCError { errorType = errorType, message = "error" };
+            IntPtr buf = NativeMethods.PeerConnectionSetLocalDescription(self, ptr, desc.type, desc.sdp);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType errorType = (RTCErrorType)arr[0];
+            string errorMsg = arr[1].AsAnsiStringWithFreeMem();
+            return new RTCError { errorType = errorType, message = errorMsg };
 #endif
         }
 
@@ -130,8 +131,7 @@ namespace Unity.WebRTC
             return new RTCError { errorType = errorType, message = message };
         }
 
-        public RTCError PeerConnectionSetRemoteDescription(
-            IntPtr ptr, ref RTCSessionDescription desc)
+        public RTCError PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc)
         {
             IntPtr ptrError = IntPtr.Zero;
 #if !UNITY_WEBGL
@@ -140,10 +140,11 @@ namespace Unity.WebRTC
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
             return new RTCError { errorType = errorType, message = message};
 #else
-            RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
-                self, ptr, desc.type, desc.sdp);
-            // TODO
-            return new RTCError { errorType = errorType, message = "error" };
+            IntPtr buf = NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, desc.type, desc.sdp);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType errorType = (RTCErrorType)arr[0];
+            string errorMsg = arr[1].AsAnsiStringWithFreeMem();
+            return new RTCError { errorType = errorType, message = errorMsg };
 #endif
         }
 

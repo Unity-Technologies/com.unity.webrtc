@@ -86,15 +86,13 @@ var UnityWebRTCContext = {
   PeerConnectionSetLocalDescription: function (contextPtr, peerPtr, typeIdx, sdpPtr) {
     if (!uwcom_existsCheck(contextPtr, 'PeerConnectionSetLocalDescription', 'context')) return 11; // OperationErrorWithData
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetLocalDescription', 'peer')) return 11; // OperationErrorWithData
-    _PeerConnectionSetDescription(peerPtr, typeIdx, sdpPtr, 'Local');
-    return 0;
+    return _PeerConnectionSetDescription(peerPtr, typeIdx, sdpPtr, 'Local');
   },
 
   PeerConnectionSetRemoteDescription: function (contextPtr, peerPtr, typeIdx, sdpPtr) {
     if (!uwcom_existsCheck(contextPtr, 'PeerConnectionSetRemoteDescription', 'context')) return 11; // OperationErrorWithData
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetRemoteDescription', 'peer')) return 11; // OperationErrorWithData
-    _PeerConnectionSetDescription(peerPtr, typeIdx, sdpPtr, 'Remote');
-    return 0;
+    return _PeerConnectionSetDescription(peerPtr, typeIdx, sdpPtr, 'Remote');
   },
 
   PeerConnectionRegisterOnSetSessionDescSuccess: function (contextPtr, peerPtr, OnSetSessionDescSuccess) {

@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 
 namespace Unity.WebRTC
@@ -563,13 +564,16 @@ namespace Unity.WebRTC
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
             RTCErrorType error = NativeMethods.PeerConnectionAddTrack(
                 GetSelfOrThrow(), track.GetSelfOrThrow(), streamId, out var ptr);
+
+#else
+            var streamPtr = stream == null ? IntPtr.Zero : stream.GetSelfOrThrow();
+            IntPtr buf = NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow(), streamPtr);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType error = (RTCErrorType) arr[0];
+            var ptr = arr[1];
+#endif
             if (error != RTCErrorType.None)
                 throw new InvalidOperationException($"error occurred :{error}");
-#else
-            // TODO RTCErrorType
-            var streamPtr = stream == null ? IntPtr.Zero : stream.GetSelfOrThrow();
-            IntPtr ptr = NativeMethods.PeerConnectionAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow(), streamPtr);
-#endif
             cacheTracks.Add(track);
             return CreateSender(ptr);
         }
@@ -750,8 +754,7 @@ namespace Unity.WebRTC
                 throw new ArgumentException("sdp is null or empty");
 
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            RTCError error = WebRTC.Context.PeerConnectionSetLocalDescription(
-                GetSelfOrThrow(), ref desc);
+            RTCError error = WebRTC.Context.PeerConnectionSetLocalDescription(GetSelfOrThrow(), ref desc);
             if (error.errorType == RTCErrorType.None)
             {
                 return op;
@@ -795,8 +798,7 @@ namespace Unity.WebRTC
                 throw new ArgumentException("sdp is null or empty");
 
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            RTCError error = WebRTC.Context.PeerConnectionSetRemoteDescription(
-                GetSelfOrThrow(), ref desc);
+            RTCError error = WebRTC.Context.PeerConnectionSetRemoteDescription(GetSelfOrThrow(), ref desc);
             if (error.errorType == RTCErrorType.None)
             {
                 return op;

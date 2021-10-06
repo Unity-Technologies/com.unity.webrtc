@@ -228,8 +228,10 @@ namespace Unity.WebRTC.RuntimeTest
             var srcPtr = IntPtr.Zero;
             var destPtr = IntPtr.Zero;
             var track = NativeMethods.ContextCreateVideoTrack(context, srcPtr, destPtr, width, height);
-            var error = NativeMethods.PeerConnectionAddTrack(peer, track, stream);
-            var sender = IntPtr.Zero;
+            var buf = NativeMethods.PeerConnectionAddTrack(peer, track, stream);
+            IntPtr[] arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType error = (RTCErrorType) arr[0];
+            IntPtr sender = arr[1];
 #endif
             Assert.That(error, Is.EqualTo(RTCErrorType.None));
 
@@ -263,8 +265,10 @@ namespace Unity.WebRTC.RuntimeTest
             var srcPtr = IntPtr.Zero;
             var destPtr = IntPtr.Zero;
             var track = NativeMethods.ContextCreateVideoTrack(context, srcPtr, destPtr, width, height);
-            var error = NativeMethods.PeerConnectionAddTrack(peer, track, stream);
-            var sender = IntPtr.Zero;
+            var buf = NativeMethods.PeerConnectionAddTrack(peer, track, stream);
+            IntPtr[] arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType error = (RTCErrorType)arr[0];
+            IntPtr sender = arr[1];
 #endif
             Assert.That(error, Is.EqualTo(RTCErrorType.None));
 #if !UNITY_WEBGL
@@ -394,8 +398,10 @@ namespace Unity.WebRTC.RuntimeTest
 #if !UNITY_WEBGL
             var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
 #else
-            var sender = NativeMethods.PeerConnectionAddTrack(peer, track, stream);
-            var error = RTCErrorType.InternalError;
+            var buf = NativeMethods.PeerConnectionAddTrack(peer, track, stream);
+            IntPtr[] arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType error = (RTCErrorType)arr[0];
+            IntPtr sender = arr[1];
 #endif
             Assert.That(error, Is.EqualTo(RTCErrorType.None));
 

@@ -152,7 +152,8 @@ var UnityWebRTCPeerConnection = {
     var peer = UWManaged[peerPtr];
     var type = UWRTCSdpType[typeIdx];
     var sdp = Pointer_stringify(sdpPtr);
-    peer['set' + side + 'Description']({type: type, sdp: sdp}).then(function () {
+    peer['set' + side + 'Description']({type: type, sdp: sdp})
+        .then(function () {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label + ':' + side + ':' + type + ':' /*+ sdp*/);
       Module.dynCall_vi(uwevt_OnSetSessionDescSuccess, peer.managePtr);
     }).catch(function (err) {
@@ -161,6 +162,9 @@ var UnityWebRTCPeerConnection = {
       var errMsgPtr = uwcom_strToPtr(err.message);
       Module.dynCall_viii(uwevt_OnSetSessionDescFailure, peer.managePtr, errorNo, errMsgPtr);
     });
+    
+    // TODO: Use promises to wait for resolve/reject and return RTCErrorType
+    return uwcom_arrayToReturnPtr([UWRTCErrorType.indexOf("None"), uwcom_strToPtr("no error") ], Int32Array);
   },
 
   PeerConnectionIceConditionState: function (peerPtr) {
@@ -395,11 +399,19 @@ var UnityWebRTCPeerConnection = {
       };
       video.play();
     }
-
-
-    var sender = peer.addTrack(track);
-    uwcom_addManageObj(sender);
-    return sender.managePtr;
+    
+    var error = 0;
+    var sender = 0;
+    try {
+      sender = peer.addTrack(track);
+      uwcom_addManageObj(sender);
+    }
+    catch (err){
+      error = UWRTCErrorType.indexOf("InvalidState");
+    }
+    
+    var ptrs = [error, sender.managePtr];
+    return uwcom_arrayToReturnPtr(ptrs, Int32Array);
   },
 
   PeerConnectionRemoveTrack: function (peerPtr, senderPtr) {
