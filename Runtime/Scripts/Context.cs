@@ -100,8 +100,7 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
-        public RTCError PeerConnectionSetLocalDescription(
-            IntPtr ptr, ref RTCSessionDescription desc)
+        public RTCError PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc)
         {
             IntPtr ptrError = IntPtr.Zero;
 #if !UNITY_WEBGL

@@ -1042,17 +1042,17 @@ namespace Unity.WebRTC
         public static extern bool PeerConnectionGetCurrentRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc);
 #else
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetLocalDescription(IntPtr ptr);
+        public static extern string PeerConnectionGetLocalDescription(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetRemoteDescription(IntPtr ptr);
+        public static extern string PeerConnectionGetRemoteDescription(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetCurrentLocalDescription(IntPtr ptr);
+        public static extern string PeerConnectionGetCurrentLocalDescription(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetCurrentRemoteDescription(IntPtr ptr);
+        public static extern string PeerConnectionGetCurrentRemoteDescription(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetPendingLocalDescription(IntPtr ptr);
+        public static extern string PeerConnectionGetPendingLocalDescription(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionGetPendingRemoteDescription(IntPtr ptr);
+        public static extern string PeerConnectionGetPendingRemoteDescription(IntPtr ptr);
 #endif
 #if !UNITY_WEBGL
         [DllImport(WebRTC.Lib)]

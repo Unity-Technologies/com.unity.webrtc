@@ -9,9 +9,9 @@ var UnityWebRTCEnum = {
     'oauth'
   ],
   $UWRTCIceTransportPolicy: [
-    'all',
+    '',
     'relay',
-    'all',
+    '',
     'all'
   ],
   $UWRTCBundlePolicy: [

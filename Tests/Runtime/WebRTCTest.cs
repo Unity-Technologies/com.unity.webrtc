@@ -62,6 +62,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 #endif
 
+        // TODO replace with TestCaseSource
 #if !UNITY_WEBGL
         [Test]
         [TestCase(256, 256)]
@@ -82,6 +83,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => WebRTC.ValidateGraphicsFormat(format), Throws.Nothing);
         }
 
+        // TODO replace with TestCaseSource
 #if !UNITY_WEBGL
         [Test]
         [TestCase((GraphicsFormat)87)] //LegacyARGB32_sRGB
