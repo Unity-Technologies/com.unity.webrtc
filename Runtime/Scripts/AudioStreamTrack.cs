@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
@@ -37,10 +38,10 @@ namespace Unity.WebRTC
 
         internal class AudioStreamRenderer : IDisposable
         {
+            private const int SamplesPerSec = 100;
+
             private AudioClip m_clip;
-            private int m_sampleRate;
-            private int m_position = 0;
-            private int m_channel = 0;
+            private readonly BlockingCollection<float[]> m_recvBufs = new BlockingCollection<float[]>(SamplesPerSec);
 
             public AudioClip clip
             {
@@ -52,12 +53,10 @@ namespace Unity.WebRTC
 
             public AudioStreamRenderer(string name, int sampleRate, int channels)
             {
-                m_sampleRate = sampleRate;
-                m_channel = channels;
-                int lengthSamples = m_sampleRate;  // sample length for a second
+                int lengthSamples = sampleRate / SamplesPerSec;  // sample length for 10 milliseconds
 
                 // note:: OnSendAudio and OnAudioSetPosition callback is called before complete the constructor.
-                m_clip = AudioClip.Create(name, lengthSamples, channels, m_sampleRate, false);
+                m_clip = AudioClip.Create(name, lengthSamples, channels, sampleRate, true, OnAudioRead);
             }
 
             public void Dispose()
@@ -67,35 +66,32 @@ namespace Unity.WebRTC
                     WebRTC.DestroyOnMainThread(m_clip);
                 }
                 m_clip = null;
+                m_recvBufs.Dispose();
             }
 
             internal void SetData(float[] data)
             {
-                int length = data.Length / m_channel;
+                m_recvBufs.TryAdd(data);
+            }
 
-                if (m_position + length > m_clip.samples)
+            internal void OnAudioRead(float[] data)
+            {
+                if (m_recvBufs == null || m_clip == null)
                 {
-                    int remain = m_position + length - m_clip.samples;
-                    length = m_clip.samples - m_position;
-
-                    // Split two arrays from original data
-                    float[] _data = new float[length * m_channel];
-                    Buffer.BlockCopy(data, 0, _data, 0, length * m_channel);
-                    float[] _data2 = new float[remain * m_channel];
-                    Buffer.BlockCopy(data, length * m_channel, _data2, 0, remain * m_channel);
-
-                    // push the split array to the audio buffer
-                    SetData(_data);
-
-                    data = _data2;
-                    length = remain;
+                    return;
                 }
-                m_clip.SetData(data, m_position);
-                m_position += length;
 
-                if (m_position == m_clip.samples)
+                int remain = data.Length;
+                while (remain > 0)
                 {
-                    m_position = 0;
+                    if (m_recvBufs.TryTake(out float[] src) == false)
+                    {
+                        return;
+                    }
+
+                    var copyLen = Math.Min(src.Length, remain);
+                    Buffer.BlockCopy(src, 0, data, (data.Length - remain) * sizeof(float), copyLen * sizeof(float));
+                    remain -= copyLen;
                 }
             }
         }
