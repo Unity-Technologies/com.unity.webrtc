@@ -275,19 +275,15 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.SenderGetParameters(sender, out var ptr);
             var parameters = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
             Marshal.FreeHGlobal(ptr);
-            Assert.AreNotEqual(IntPtr.Zero, parameters.encodings);
-            Assert.AreNotEqual(IntPtr.Zero, parameters.transactionId);
 #else
             var ptr = NativeMethods.SenderGetParameters(sender);
             var parameters = JsonConvert.DeserializeObject<RTCRtpSendParameters>(ptr);
-
-            Assert.AreNotEqual("", parameters.encodings);
-            Assert.AreNotEqual("", parameters.transactionId);
 #endif
 
-
-
+            Assert.AreNotEqual(IntPtr.Zero, parameters.encodings);
+            Assert.AreNotEqual(IntPtr.Zero, parameters.transactionId);
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
+            
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeleteRefPtr(context, source);
