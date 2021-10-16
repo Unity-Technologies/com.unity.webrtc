@@ -9,6 +9,9 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
+#if UNITY_WEBGL
+[assembly: UnityEngine.Scripting.Preserve]
+#endif
 
 namespace Unity.WebRTC
 {
@@ -1368,35 +1371,49 @@ namespace Unity.WebRTC
 #endif
 
 #if UNITY_WEBGL
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern void UnityWebRTCInit(int logLebel);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateAudioTrack();
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateVideoTrack();
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateMediaStream();
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreatePeerConnection();
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreatePeerConnectionWithConfig(string confJson);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetDescription(IntPtr peerPtr, RTCSdpType type, string sdp, string side);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateDataChannel();
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DeleteMediaStream(IntPtr streamPtr);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DeleteReceiver(IntPtr receiverPtr);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DeleteSender(IntPtr senderPtr);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr DeleteTransceiver(IntPtr transceiverPtr);
-
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern void RenderLocalVideotrack(IntPtr trackPtr, bool needFlip);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern void UpdateRendererTexture(IntPtr trackPtr, IntPtr renderTexturePtr, bool needFlip);
+        [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateNativeTexture();
 #endif

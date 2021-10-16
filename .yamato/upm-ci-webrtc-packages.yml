@@ -366,7 +366,6 @@ test_{{ package.name }}_{{ editor.version }}_webgl_win:
     - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat --output utr.bat
     - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
-{% endfor %}
 
 test_{{ package.name }}_{{ editor.version }}_webgl_macos:
   name: Test {{ package.packagename }} with {{ editor.version }} on WebGL macOS
