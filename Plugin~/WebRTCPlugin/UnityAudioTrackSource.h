@@ -18,8 +18,6 @@ namespace webrtc
         void AddSink(AudioTrackSinkInterface* sink) override;
         void RemoveSink(AudioTrackSinkInterface* sink) override;
 
-        void OnData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames);
-
     protected:
         UnityAudioTrackSource();
         UnityAudioTrackSource(const cricket::AudioOptions& audio_options);

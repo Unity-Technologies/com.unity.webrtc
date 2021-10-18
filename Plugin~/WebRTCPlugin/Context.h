@@ -143,6 +143,9 @@ namespace webrtc
         void SetEncoderParameter(const MediaStreamTrackInterface* track, int width, int height,
             UnityRenderingExtTextureFormat format, void* textureHandle);
 
+        // AudioDevice
+        rtc::scoped_refptr<DummyAudioDevice> GetAudioDevice() const { return m_audioDevice; }
+
         // mutex;
         std::mutex mutex;
 

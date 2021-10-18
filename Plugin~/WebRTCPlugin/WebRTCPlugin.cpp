@@ -1376,22 +1376,29 @@ extern "C"
         ContextManager::GetInstance()->curContext = context;
     }
 
-    UNITY_INTERFACE_EXPORT void ProcessAudio(
-        AudioTrackInterface* track,
+    UNITY_INTERFACE_EXPORT void ContextInitLocalAudio(
+        Context* context,
+        int32 sample_rate,
+        int32 number_of_channels)
+    {
+        auto adm = context->GetAudioDevice();
+        if (adm != nullptr) {
+            adm->InitLocalAudio(sample_rate, number_of_channels);
+        }
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextProcessLocalAudio(
+        Context* context,
         float* audio_data,
         int32 sample_rate,
         int32 number_of_channels,
         int32 number_of_frames)
     {
-        UnityAudioTrackSource* source =
-            static_cast<UnityAudioTrackSource*>(track->GetSource());
-
-        source->OnData(audio_data,
-            sample_rate,
-            number_of_channels,
-            number_of_frames);
+        auto adm = context->GetAudioDevice();
+        if (adm != nullptr) {
+            adm->PushLocalAudio(audio_data, sample_rate, number_of_channels, number_of_frames);
+        }
     }
-
 
     UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(
         Context* context, AudioTrackInterface* track, DelegateAudioReceive callback)
