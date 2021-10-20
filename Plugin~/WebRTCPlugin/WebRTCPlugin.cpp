@@ -1085,6 +1085,16 @@ extern "C"
         return error.type();
     }
 
+    UNITY_INTERFACE_EXPORT char* TransceiverGetMid(RtpTransceiverInterface* transceiver)
+    {
+        auto mid = transceiver->mid();
+        if (!mid.has_value())
+        {
+            return nullptr;
+        }
+        return ConvertString(mid.value());
+    }
+
     UNITY_INTERFACE_EXPORT RtpReceiverInterface* TransceiverGetReceiver(RtpTransceiverInterface* transceiver)
     {
         return transceiver->receiver().get();
