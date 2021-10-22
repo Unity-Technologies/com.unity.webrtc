@@ -50,6 +50,9 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Requires video refactoring
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         public void EqualIdWithVideoTrack()
         {
             var guid = Guid.NewGuid().ToString();
@@ -81,6 +84,9 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Requires video refactoring
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         public void ConstructorThrowsExceptionWhenInvalidGraphicsFormat()
         {
             var width = 256;

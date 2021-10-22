@@ -440,6 +440,11 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Possible fixes:
+        // - For webgl, add an async method for NativeMethods.SetDescription which returns RTCErrorType
+        // - Wait for Unity 2021 to support ES6+ syntax, which allows to wait in javascript to return the RTCErrorType
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Category("PeerConnection")]
         public void SetLocalDescriptionThrowException()
         {
@@ -492,6 +497,11 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Possible fixes:
+        // - For webgl, add an async method for NativeMethods.SetDescription which returns RTCErrorType
+        // - Wait for Unity 2021 to support ES6+ syntax, which allows to wait in javascript to return the RTCErrorType
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Category("PeerConnection")]
         public void SetRemoteDescriptionThrowException()
         {

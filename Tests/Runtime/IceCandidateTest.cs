@@ -1,5 +1,7 @@
 using System;
 using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -25,7 +27,12 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.Throws<ArgumentException>(() => new RTCIceCandidate());
         }
 
+
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Fix test for WebGL platform. WebRTC returns null for relatedAddress when type is host
+        // https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate/relatedAddress - is null for host
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Category("IceCandidate")]
         public void ConstructWithOption()
         {
@@ -47,7 +54,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.NotNull(candidate.Priority);
             Assert.IsNotEmpty(candidate.Address);
             Assert.NotNull(candidate.Protocol);
-            Assert.IsNotEmpty(candidate.RelatedAddress);        // TODO: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate/relatedAddress - is null for host
+            Assert.IsNotEmpty(candidate.RelatedAddress);
             Assert.NotNull(candidate.RelatedPort);
             Assert.IsNotEmpty(candidate.SdpMid);
             Assert.NotNull(candidate.SdpMLineIndex);
