@@ -304,14 +304,9 @@ namespace Unity.WebRTC
             VideoDecoderMethods.UpdateRendererTexture(textureUpdateFunction, texture, rendererId);
         }
 
-        internal void InitLocalAudio(int sampleRate, int channels)
+        internal void ProcessLocalAudio(IntPtr track, IntPtr array, int sampleRate, int channels, int frames)
         {
-            NativeMethods.ContextInitLocalAudio(self, sampleRate, channels);
-        }
-
-        internal void ProcessLocalAudio(IntPtr array, int sampleRate, int channels, int frames)
-        {
-            NativeMethods.ContextProcessLocalAudio(self, array, sampleRate, channels, frames);
+            NativeMethods.ContextProcessLocalAudio(self, track, array, sampleRate, channels, frames);
         }
     }
 }

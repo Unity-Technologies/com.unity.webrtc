@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <unordered_map>
 
 #include "WebRTCPlugin.h"
 #include "api/task_queue/default_task_queue_factory.h"
@@ -11,6 +12,8 @@ namespace unity
 namespace webrtc
 {
     using namespace ::webrtc;
+
+    class UnityAudioTrackSource;
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
@@ -319,8 +322,7 @@ namespace webrtc
             return 0;
         }
 #endif
-        void InitLocalAudio(int sampleRate, int channels);
-        void PushLocalAudio(const float* audioData, int sampleRate, int channels, int numFrames);
+        void RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels);
 
     private:
         bool PlayoutThreadProcess();
@@ -336,9 +338,8 @@ namespace webrtc
 
         std::atomic<webrtc::AudioTransport*> audio_transport_{ nullptr };
 
-        int sampleRate_ = 0;
-        int channels_ = 0;
-        std::vector<int16_t> audioBuffer_;
+        using callback_t = std::function<void()>;
+        std::unordered_map<UnityAudioTrackSource*, callback_t> callbacks_;
     };
 
 } // end namespace webrtc

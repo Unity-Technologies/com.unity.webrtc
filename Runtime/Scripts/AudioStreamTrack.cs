@@ -182,7 +182,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                ProcessAudio((IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+                ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
         }
 #endif
@@ -198,7 +198,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                ProcessAudio((IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+                ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
         }
 
@@ -212,18 +212,18 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeSlice.GetUnsafeReadOnlyPtr();
-                ProcessAudio((IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
+                ProcessAudio(GetSelfOrThrow(), (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
             }
         }
 
-        static void ProcessAudio(IntPtr array, int sampleRate, int channels, int frames)
+        static void ProcessAudio(IntPtr track, IntPtr array, int sampleRate, int channels, int frames)
         {
             if (sampleRate == 0 || channels == 0 || frames == 0)
                 throw new ArgumentException($"arguments are invalid values " +
                     $"sampleRate={sampleRate}, " +
                     $"channels={channels}, " +
                     $"frames={frames}");
-            WebRTC.Context.ProcessLocalAudio(array, sampleRate, channels, frames);
+            WebRTC.Context.ProcessLocalAudio(track, array, sampleRate, channels, frames);
         }
 
         /// <summary>

@@ -34,7 +34,6 @@ namespace Unity.WebRTC
             sampleRate = clip.frequency;
             nativeArray = new NativeArray<float>(
                 clip.channels * clip.samples, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            WebRTC.Context.InitLocalAudio(sampleRate, channels);
         }
 
         private void OnDestroy()
