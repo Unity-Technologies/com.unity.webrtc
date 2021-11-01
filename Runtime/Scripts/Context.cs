@@ -123,11 +123,16 @@ namespace Unity.WebRTC
 #if !UNITY_WEBGL
             RTCErrorType errorType =
                 NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr, ref ptrError);
-#else
-            RTCErrorType errorType = RTCErrorType.InternalError; // TODO
-#endif
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
             return new RTCError { errorType = errorType, message = message };
+#else
+            IntPtr buf = NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType errorType = (RTCErrorType)arr[0];
+            string errorMsg = arr[1].AsAnsiStringWithFreeMem();
+            return new RTCError { errorType = errorType, message = errorMsg };
+#endif
+
         }
 
         public RTCError PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc)

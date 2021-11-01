@@ -998,6 +998,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, RTCSdpType type, string sdp);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionSetLocalDescriptionWithoutDescription(IntPtr context, IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, RTCSdpType type, string sdp);
 #endif
         [DllImport(WebRTC.Lib)]
@@ -1391,7 +1393,10 @@ namespace Unity.WebRTC
         public static extern IntPtr CreatePeerConnectionWithConfig(string confJson);
         [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
-        public static extern RTCErrorType PeerConnectionSetDescription(IntPtr peerPtr, RTCSdpType type, string sdp, string side);
+        public static extern IntPtr PeerConnectionSetDescription(IntPtr peerPtr, RTCSdpType type, string sdp, string side);
+        [UnityEngine.Scripting.Preserve]
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionSetDescriptionWithoutDescription(IntPtr peerPtr);
         [UnityEngine.Scripting.Preserve]
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr CreateDataChannel();

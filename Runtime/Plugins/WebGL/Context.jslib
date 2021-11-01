@@ -94,6 +94,12 @@ var UnityWebRTCContext = {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetRemoteDescription', 'peer')) return 11; // OperationErrorWithData
     return _PeerConnectionSetDescription(peerPtr, typeIdx, sdpPtr, 'Remote');
   },
+  
+  PeerConnectionSetLocalDescriptionWithoutDescription: function (contextPtr, peerPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'PeerConnectionSetLocalDescriptionWithoutDescription', 'context')) return 11; // OperationErrorWithData
+    if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetLocalDescriptionWithoutDescription', 'peer')) return 11; // OperationErrorWithData
+    return _PeerConnectionSetDescriptionWithoutDescription(peerPtr);
+  },
 
   PeerConnectionRegisterOnSetSessionDescSuccess: function (contextPtr, peerPtr, OnSetSessionDescSuccess) {
     if (!uwcom_existsCheck(contextPtr, 'PeerConnectionRegisterOnSetSessionDescSuccess', 'context')) return;

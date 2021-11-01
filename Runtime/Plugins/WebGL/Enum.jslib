@@ -25,8 +25,8 @@ var UnityWebRTCEnum = {
   $UWRTCSignalingState: [
     'stable',
     'have-local-offer',
-    'have-remote-offer',
     'have-local-pranswer',
+    'have-remote-offer',
     'have-remote-pranswer',
     'closed'
   ],
