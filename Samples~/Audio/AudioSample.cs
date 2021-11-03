@@ -450,9 +450,6 @@ namespace Unity.WebRTC
                     continue;
                 }
 
-                if (report.isRemote)
-                    return;
-
                 long now = report.Timestamp;
                 ulong bytes = report.bytesSent;
 
