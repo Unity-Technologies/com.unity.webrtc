@@ -142,7 +142,7 @@ namespace webrtc
         {
             recording_ = true;
             recordAudioThread_.reset(new rtc::PlatformThread(
-                [](void *pThis) { static_cast<DummyAudioDevice*>(pThis)->RecodingThread(); },
+                [](void *pThis) { static_cast<DummyAudioDevice*>(pThis)->RecordingThread(); },
                 this, "webrtc_audio_module_recording_thread", rtc::kRealtimePriority));
             recordAudioThread_->Start();
             return 0;
@@ -326,7 +326,7 @@ namespace webrtc
 
     private:
         bool PlayoutThreadProcess();
-        void RecodingThread();
+        void RecordingThread();
 
         std::atomic<bool> initialized_ {false};
         std::atomic<bool> playing_ {false};

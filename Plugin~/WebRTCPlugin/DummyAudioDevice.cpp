@@ -50,7 +50,7 @@ namespace webrtc
         return true;
     }
 
-    void DummyAudioDevice::RecodingThread() {
+    void DummyAudioDevice::RecordingThread() {
         bool buffer_init = false;
 
         while (recording_) {
