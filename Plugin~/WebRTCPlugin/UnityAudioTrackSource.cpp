@@ -49,6 +49,7 @@ void UnityAudioTrackSource::PushAudioData(const float* pAudioData, int nSampleRa
     if (_arrSink.empty())
         return;
 
+    _convertedAudioData.reserve(_convertedAudioData.size() + nNumFrames);
     for (size_t i = 0; i < nNumFrames; i++)
     {
         _convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
@@ -64,27 +65,28 @@ void UnityAudioTrackSource::SendAudioData(int nSampleRate, size_t nNumChannels) 
     // eg.  80 for 8KHz and 160 for 16kHz
     size_t nNumFramesFor10ms = nSampleRate / 100;
     size_t nNumSamplesFor10ms = nNumFramesFor10ms * nNumChannels;
-    size_t nBitPerSample = sizeof(int16_t) * 8;
+    size_t nNumSamplesForBuffering = nNumSamplesFor10ms * 10;
+    constexpr size_t nBitPerSample = sizeof(int16_t) * 8;
 
-    if (_bufferInit == false && _convertedAudioData.size() > nNumSamplesFor10ms * 8) {
+    if (!_bufferInit && _convertedAudioData.size() > nNumSamplesForBuffering) {
         _convertedAudioData.erase(
             _convertedAudioData.begin(),
-            _convertedAudioData.begin() + (_convertedAudioData.size() - nNumSamplesFor10ms * 8));
+            _convertedAudioData.begin() + (_convertedAudioData.size() - nNumSamplesForBuffering));
         _bufferInit = true;
     }
 
-    if (_bufferInit) {
+    if (_bufferInit && _convertedAudioData.size() >= nNumSamplesFor10ms) {
         for (auto sink : _arrSink)
         {
             sink->OnData(_convertedAudioData.data(),
                 nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
         }
-    }
 
-    // pop processed buffer, remained buffer will be processed the next time.
-    _convertedAudioData.erase(
-        _convertedAudioData.begin(),
-        _convertedAudioData.begin() + nNumSamplesFor10ms);
+        // pop processed buffer, remained buffer will be processed the next time.
+        _convertedAudioData.erase(
+            _convertedAudioData.begin(),
+            _convertedAudioData.begin() + nNumSamplesFor10ms);
+    }
 }
 
 UnityAudioTrackSource::UnityAudioTrackSource()
