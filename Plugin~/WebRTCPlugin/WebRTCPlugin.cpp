@@ -874,7 +874,7 @@ extern "C"
         obj->RegisterConnectionStateChange(callback);
     }
 
-    
+
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnIceCandidate(PeerConnectionObject*obj, DelegateIceCandidate callback)
     {
         obj->RegisterIceCandidate(callback);
@@ -1067,7 +1067,7 @@ extern "C"
             return *this;
         }
     };
-     
+
     UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetCodecPreferences(RtpTransceiverInterface* transceiver, RTCRtpCodecCapability* codecs, size_t length)
     {
         std::vector<RtpCodecCapability> _codecs(length);
@@ -1344,6 +1344,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT void DataChannelSend(DataChannelObject* dataChannelObj, const char* msg)
     {
         dataChannelObj->Send(msg);
+    }
+
+    UNITY_INTERFACE_EXPORT void DataChannelSendPtr(DataChannelObject* dataChannelObj, const byte* msg, int len)
+    {
+        dataChannelObj->Send(ptr, len);
     }
 
     UNITY_INTERFACE_EXPORT void DataChannelSendBinary(DataChannelObject* dataChannelObj, const byte* msg, int len)
