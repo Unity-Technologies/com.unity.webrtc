@@ -3,6 +3,8 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using Object = UnityEngine.Object;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -151,11 +153,126 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op11;
             Assert.That(op11.IsCompleted, Is.True);
             Assert.That(message3, Is.EqualTo(message4));
-            
-            // todo:: native array
+
+            // Native Arrays are tested elsewhere
 
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
+        }
+
+        [Test]
+        [Timeout(5000)]
+        public unsafe void SendAndReceiveNativeArray()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var label = "test";
+
+            RTCDataChannel channel1 = test.component.CreateDataChannel(0, label);
+            Assert.That(channel1, Is.Not.Null);
+            WebRTC.ExecutePendingTasks(5000);
+
+            var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
+            WebRTC.ExecutePendingTasks(5000);
+            RTCDataChannel channel2 = test.component.GetDataChannelList(1)[0];
+            Assert.That(channel2, Is.Not.Null);
+
+            Assert.That(channel1.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
+            Assert.That(channel2.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
+            Assert.That(channel1.Label, Is.EqualTo(channel2.Label));
+            Assert.That(channel1.Id, Is.EqualTo(channel2.Id));
+
+            // Native Array
+            // All the following tests reuse the message5 array.
+            var message5 = new NativeArray<byte>(3, Allocator.Temp) { [0] = 1, [1] = 2 , [2] = 3 };
+            Assert.That(message5.IsCreated, Is.True);
+            try
+            {
+                var nativeArrayTestMessageReceiver = default(byte[]);
+                // Only needs to be set once as it will be reused.
+                channel2.OnMessage = bytes => { nativeArrayTestMessageReceiver = bytes; };
+                channel1.Send(message5);
+                var op12 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+                WebRTC.ExecutePendingTasks(5000);
+                Assert.That(op12.IsCompleted, Is.True);
+                Assert.That(NativeArrayMemCmp(message5, nativeArrayTestMessageReceiver), Is.True);
+
+                // Native Slice
+                var message6 = message5.Slice();
+                nativeArrayTestMessageReceiver = null;
+                channel1.Send(message6);
+                var op13 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+                WebRTC.ExecutePendingTasks(5000);
+                Assert.That(op13.IsCompleted, Is.True);
+                Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True);
+
+                // NativeArray.ReadOnly
+                var message7 = message5.AsReadOnly();
+                nativeArrayTestMessageReceiver = null;
+                channel1.Send(message7);
+                var op14 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+                WebRTC.ExecutePendingTasks(5000);
+                Assert.That(op14.IsCompleted, Is.True);
+                Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True);
+
+                // IntPtr
+                var message8IntPtr = new IntPtr(message5.GetUnsafeReadOnlyPtr());
+                var message8Length = message5.Length;
+                nativeArrayTestMessageReceiver = null;
+                channel1.Send(message8IntPtr, message8Length);
+                var op15 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+                WebRTC.ExecutePendingTasks(5000);
+                Assert.That(op15.IsCompleted, Is.True);
+                Assert.That(IntPtrMemCmp(message8IntPtr, nativeArrayTestMessageReceiver), Is.True);
+            }
+            finally
+            {
+                message5.Dispose();
+            }
+        }
+
+        unsafe bool NativeArrayMemCmp<T>(NativeArray<T> array, byte[] buffer)
+            where T : struct
+        {
+            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
+            {
+                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
+                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
+            }
+
+            return false;
+        }
+
+        unsafe bool NativeArrayMemCmp<T>(NativeSlice<T> array, byte[] buffer)
+            where T : struct
+        {
+            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
+            {
+                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
+                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
+            }
+
+            return false;
+        }
+
+        unsafe bool NativeArrayMemCmp<T>(NativeArray<T>.ReadOnly array, byte[] buffer)
+            where T : struct
+        {
+            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
+            {
+                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
+                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
+            }
+
+            return false;
+        }
+
+        unsafe bool IntPtrMemCmp(IntPtr ptr, byte[] buffer)
+        {
+            fixed (byte* bufPtr = buffer)
+            {
+                var bufIntPtr = new IntPtr(bufPtr);
+                return UnsafeUtility.MemCmp((void*)ptr, (void*)bufIntPtr, buffer.Length) == 0;
+            }
         }
 
         [UnityTest]
