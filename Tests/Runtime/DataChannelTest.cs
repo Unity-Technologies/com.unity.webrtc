@@ -5,6 +5,7 @@ using System.Collections;
 using Object = UnityEngine.Object;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -156,7 +157,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             // Native Array
 
-            // Native Arrays that are declared in tests that use enumerators seem to have some oddities about them
+            // Native Arrays that are declared in tests that use IEnumerator seem to have some oddities about them
             // they tend to dispose themselves on yields so we recreate the array as needed.
 
             byte[] comparisonBuffer = { 1, 2, 3 };
@@ -204,51 +205,6 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
-        unsafe bool NativeArrayMemCmp<T>(NativeArray<T> array, byte[] buffer)
-            where T : struct
-        {
-            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
-            {
-                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
-                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
-            }
-
-            return false;
-        }
-
-        unsafe bool NativeArrayMemCmp<T>(NativeSlice<T> array, byte[] buffer)
-            where T : struct
-        {
-            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
-            {
-                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
-                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
-            }
-
-            return false;
-        }
-
-        unsafe bool NativeArrayMemCmp<T>(NativeArray<T>.ReadOnly array, byte[] buffer)
-            where T : struct
-        {
-            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
-            {
-                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
-                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
-            }
-
-            return false;
-        }
-
-        unsafe bool IntPtrMemCmp(IntPtr ptr, byte[] buffer)
-        {
-            fixed (byte* bufPtr = buffer)
-            {
-                var bufIntPtr = new IntPtr(bufPtr);
-                return UnsafeUtility.MemCmp((void*)ptr, (void*)bufIntPtr, buffer.Length) == 0;
-            }
-        }
-
         [UnityTest]
         [Timeout(5000)]
         public IEnumerator SendAndReceiveMessageWithExecuteTasks()
@@ -279,7 +235,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             while (message2 == null)
             {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
             }
             Assert.That(message1, Is.EqualTo(message2));
 
@@ -291,52 +247,96 @@ namespace Unity.WebRTC.RuntimeTest
 
             while(message4 == null)
             {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
             }
             Assert.That(message3, Is.EqualTo(message4));
 
-            // Native Array
-            // All the following tests reuse the message5 array.
-            byte[] comparisonBuffer = { 1, 2, 3 };
-            var message5 = new NativeArray<byte>(comparisonBuffer, Allocator.Temp);
-            Assert.That(message5.IsCreated, Is.True);
-            var nativeArrayTestMessageReceiver = default(byte[]);
-            // Only needs to be set once as it will be reused.
-            channel2.OnMessage = bytes => { nativeArrayTestMessageReceiver = bytes; };
-            channel1.Send(message5);
-            while (nativeArrayTestMessageReceiver == null)
+            // Native Collections Tests
+            Vector3[] structData = { Vector3.one, Vector3.zero, Vector3.up, Vector3.down };
+            using (var nativeArray = new NativeArray<Vector3>(structData, Allocator.Temp))
             {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
-            }
-            Assert.That(NativeArrayMemCmp(message5, nativeArrayTestMessageReceiver), Is.True);
+                var nativeArrayTestMessageReceiver = default(byte[]);
+                channel2.OnMessage = bytes => { nativeArrayTestMessageReceiver = bytes; };
 
-            // Native Slice
-            var message6 = message5.Slice();
-            nativeArrayTestMessageReceiver = null;
-            channel1.Send(message6);
-            while (nativeArrayTestMessageReceiver == null)
-            {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
-            }
-            Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True);
+                // Native Array
+                var message5 = nativeArray;
+                Assert.That(message5.IsCreated, Is.True);
+                nativeArrayTestMessageReceiver = null;
+                channel1.Send(message5);
+                while (nativeArrayTestMessageReceiver == null)
+                {
+                    Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
+                }
+                Assert.That(NativeArrayMemCmp(message5, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
 
-            // NativeArray.ReadOnly
-            var message7 = message5.AsReadOnly();
-            nativeArrayTestMessageReceiver = null;
-            channel1.Send(message7);
-            while (nativeArrayTestMessageReceiver == null)
-            {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
-            }
-            Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True);
+                // Native Slice
+                var message6 = nativeArray.Slice();
+                nativeArrayTestMessageReceiver = null;
+                channel1.Send(message6);
+                while (nativeArrayTestMessageReceiver == null)
+                {
+                    Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
+                }
+                Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
 
-            if (message5.IsCreated)
-            {
-                message5.Dispose();
+                // NativeArray.ReadOnly
+                var message7 = nativeArray.AsReadOnly();
+                nativeArrayTestMessageReceiver = null;
+                channel1.Send(message7);
+                while (nativeArrayTestMessageReceiver == null)
+                {
+                    Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
+                }
+                Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
             }
 
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
+        }
+
+        static unsafe bool NativeArrayMemCmp<T>(NativeArray<T> array, byte[] buffer)
+            where T : struct
+        {
+            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
+            {
+                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
+                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
+            }
+
+            return false;
+        }
+
+        static unsafe bool NativeArrayMemCmp<T>(NativeSlice<T> array, byte[] buffer)
+            where T : struct
+        {
+            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
+            {
+                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
+                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
+            }
+
+            return false;
+        }
+
+        static unsafe bool NativeArrayMemCmp<T>(NativeArray<T>.ReadOnly array, byte[] buffer)
+            where T : struct
+        {
+            if (array.Length * UnsafeUtility.SizeOf<T>() == buffer.Length)
+            {
+                var nativeArrayIntPtr = new IntPtr(array.GetUnsafeReadOnlyPtr());
+                return IntPtrMemCmp(nativeArrayIntPtr, buffer);
+            }
+
+            return false;
+        }
+
+        static unsafe bool IntPtrMemCmp(IntPtr ptr, byte[] buffer)
+        {
+            fixed (byte* bufPtr = buffer)
+            {
+                var bufIntPtr = new IntPtr(bufPtr);
+                return UnsafeUtility.MemCmp((void*)ptr, (void*)bufIntPtr, buffer.Length) == 0;
+            }
         }
     }
 }

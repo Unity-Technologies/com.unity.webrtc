@@ -101,16 +101,14 @@ namespace Unity.WebRTC
 
             while (HasPendingTasks())
             {
+                // To prevent work from posting more work indefinitely, stop processing after timeout.
+                // Does not prevent a given work queue from going over the time allotment
                 if (stopwatch.ElapsedMilliseconds > millisecondsTimeout)
                 {
                     break;
                 }
 
-                if (HasPendingTasks())
-                {
-                    Execute();
-                }
-
+                Execute();
                 Thread.Sleep(1);
             }
 
@@ -179,7 +177,7 @@ namespace Unity.WebRTC
             }
         }
 
-        struct WorkRequest
+        readonly struct WorkRequest
         {
             readonly SendOrPostCallback m_DelegateCallback;
             readonly object m_DelegateState;
