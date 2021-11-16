@@ -1346,11 +1346,6 @@ extern "C"
         dataChannelObj->Send(msg);
     }
 
-    UNITY_INTERFACE_EXPORT void DataChannelSendPtr(DataChannelObject* dataChannelObj, const byte* msg, int len)
-    {
-        dataChannelObj->Send(msg, len);
-    }
-
     UNITY_INTERFACE_EXPORT void DataChannelSendBinary(DataChannelObject* dataChannelObj, const byte* msg, int len)
     {
         dataChannelObj->Send(msg, len);

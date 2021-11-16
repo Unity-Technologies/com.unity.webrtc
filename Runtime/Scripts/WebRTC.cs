@@ -1019,7 +1019,7 @@ namespace Unity.WebRTC
         public static extern RTCDataChannelState DataChannelGetReadyState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelSend(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string msg);
-        [DllImport(WebRTC.Lib)]
+        [DllImport(WebRTC.Lib, EntryPoint = "DataChannelSendBinary")]
         public static extern void DataChannelSendPtr(IntPtr ptr, IntPtr dataPtr, int size);
         [DllImport(WebRTC.Lib)]
         public static extern void DataChannelSendBinary(IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] bytes, int size);
