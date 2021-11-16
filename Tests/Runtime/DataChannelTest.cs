@@ -154,80 +154,54 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(op11.IsCompleted, Is.True);
             Assert.That(message3, Is.EqualTo(message4));
 
-            // Native Arrays are tested elsewhere
-
-            test.component.Dispose();
-            Object.DestroyImmediate(test.gameObject);
-        }
-
-        [Test]
-        [Timeout(5000)]
-        public unsafe void SendAndReceiveNativeArray()
-        {
-            var test = new MonoBehaviourTest<SignalingPeers>();
-            var label = "test";
-
-            RTCDataChannel channel1 = test.component.CreateDataChannel(0, label);
-            Assert.That(channel1, Is.Not.Null);
-            WebRTC.ExecutePendingTasks(5000);
-
-            var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
-            WebRTC.ExecutePendingTasks(5000);
-            RTCDataChannel channel2 = test.component.GetDataChannelList(1)[0];
-            Assert.That(channel2, Is.Not.Null);
-
-            Assert.That(channel1.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
-            Assert.That(channel2.ReadyState, Is.EqualTo(RTCDataChannelState.Open));
-            Assert.That(channel1.Label, Is.EqualTo(channel2.Label));
-            Assert.That(channel1.Id, Is.EqualTo(channel2.Id));
-
             // Native Array
-            // All the following tests reuse the message5 array.
-            var message5 = new NativeArray<byte>(3, Allocator.Temp) { [0] = 1, [1] = 2 , [2] = 3 };
-            Assert.That(message5.IsCreated, Is.True);
-            try
+
+            // Native Arrays that are declared in tests that use enumerators seem to have some oddities about them
+            // they tend to dispose themselves on yields so we recreate the array as needed.
+
+            byte[] comparisonBuffer = { 1, 2, 3 };
+            var nativeArrayTestMessageReceiver = default(byte[]);
+
+            using (var message5 = new NativeArray<byte>(comparisonBuffer, Allocator.Temp))
             {
-                var nativeArrayTestMessageReceiver = default(byte[]);
+                Assert.That(message5.IsCreated, Is.True);
                 // Only needs to be set once as it will be reused.
                 channel2.OnMessage = bytes => { nativeArrayTestMessageReceiver = bytes; };
                 channel1.Send(message5);
-                var op12 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
-                WebRTC.ExecutePendingTasks(5000);
-                Assert.That(op12.IsCompleted, Is.True);
-                Assert.That(NativeArrayMemCmp(message5, nativeArrayTestMessageReceiver), Is.True);
+            }
+            var op12 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+            yield return op12;
+            Assert.That(op12.IsCompleted, Is.True);
+            Assert.That(comparisonBuffer, Is.EqualTo(nativeArrayTestMessageReceiver));
 
-                // Native Slice
-                var message6 = message5.Slice();
+            // Native Slice
+            using (var nativeArray = new NativeArray<byte>(comparisonBuffer, Allocator.Temp))
+            {
+                Assert.That(nativeArray.IsCreated, Is.True);
+                var message6 = nativeArray.Slice();
                 nativeArrayTestMessageReceiver = null;
                 channel1.Send(message6);
-                var op13 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
-                WebRTC.ExecutePendingTasks(5000);
-                Assert.That(op13.IsCompleted, Is.True);
-                Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True);
+            }
+            var op13 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+            yield return op13;
+            Assert.That(op13.IsCompleted, Is.True);
+            Assert.That(comparisonBuffer, Is.EqualTo(nativeArrayTestMessageReceiver));
 
-                // NativeArray.ReadOnly
-                var message7 = message5.AsReadOnly();
+            // NativeArray.ReadOnly
+            using (var nativeArray = new NativeArray<byte>(comparisonBuffer, Allocator.Temp))
+            {
+                Assert.That(nativeArray.IsCreated, Is.True);
+                var message7 = nativeArray.AsReadOnly();
                 nativeArrayTestMessageReceiver = null;
                 channel1.Send(message7);
-                var op14 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
-                WebRTC.ExecutePendingTasks(5000);
-                Assert.That(op14.IsCompleted, Is.True);
-                Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True);
+            }
+            var op14 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
+            yield return op14;
+            Assert.That(op14.IsCompleted, Is.True);
+            Assert.That(comparisonBuffer, Is.EqualTo(nativeArrayTestMessageReceiver));
 
-                // IntPtr
-                var message8IntPtr = new IntPtr(message5.GetUnsafeReadOnlyPtr());
-                var message8Length = message5.Length;
-                nativeArrayTestMessageReceiver = null;
-                channel1.Send(message8IntPtr, message8Length);
-                var op15 = new WaitUntilWithTimeout(() => nativeArrayTestMessageReceiver != null, 5000);
-                WebRTC.ExecutePendingTasks(5000);
-                Assert.That(op15.IsCompleted, Is.True);
-                Assert.That(IntPtrMemCmp(message8IntPtr, nativeArrayTestMessageReceiver), Is.True);
-            }
-            finally
-            {
-                message5.Dispose();
-            }
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
 
         unsafe bool NativeArrayMemCmp<T>(NativeArray<T> array, byte[] buffer)
@@ -321,7 +295,45 @@ namespace Unity.WebRTC.RuntimeTest
             }
             Assert.That(message3, Is.EqualTo(message4));
 
-            // todo:: native array
+            // Native Array
+            // All the following tests reuse the message5 array.
+            byte[] comparisonBuffer = { 1, 2, 3 };
+            var message5 = new NativeArray<byte>(comparisonBuffer, Allocator.Temp);
+            Assert.That(message5.IsCreated, Is.True);
+            var nativeArrayTestMessageReceiver = default(byte[]);
+            // Only needs to be set once as it will be reused.
+            channel2.OnMessage = bytes => { nativeArrayTestMessageReceiver = bytes; };
+            channel1.Send(message5);
+            while (nativeArrayTestMessageReceiver == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
+            Assert.That(NativeArrayMemCmp(message5, nativeArrayTestMessageReceiver), Is.True);
+
+            // Native Slice
+            var message6 = message5.Slice();
+            nativeArrayTestMessageReceiver = null;
+            channel1.Send(message6);
+            while (nativeArrayTestMessageReceiver == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
+            Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True);
+
+            // NativeArray.ReadOnly
+            var message7 = message5.AsReadOnly();
+            nativeArrayTestMessageReceiver = null;
+            channel1.Send(message7);
+            while (nativeArrayTestMessageReceiver == null)
+            {
+                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True);
+            }
+            Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True);
+
+            if (message5.IsCreated)
+            {
+                message5.Dispose();
+            }
 
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
