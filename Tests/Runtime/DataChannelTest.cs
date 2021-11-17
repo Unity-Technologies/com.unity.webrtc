@@ -2,6 +2,7 @@ using System;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using System.Diagnostics;
 using Object = UnityEngine.Object;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -227,16 +228,12 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(channel1.Id, Is.EqualTo(channel2.Id));
 
             // send string
-            const int millisecondTimeout = 1000;
+            const int millisecondTimeout = 5000;
             const string message1 = "hello";
             string message2 = null;
             channel2.OnMessage = bytes => { message2 = System.Text.Encoding.UTF8.GetString(bytes); };
             channel1.Send(message1);
-
-            while (message2 == null)
-            {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
-            }
+            ExecutePendingTasksWithTimeout(ref message2, millisecondTimeout);
             Assert.That(message1, Is.EqualTo(message2));
 
             // send byte array
@@ -244,11 +241,7 @@ namespace Unity.WebRTC.RuntimeTest
             byte[] message4 = null;
             channel2.OnMessage = bytes => { message4 = bytes; };
             channel1.Send(message3);
-
-            while(message4 == null)
-            {
-                Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
-            }
+            ExecutePendingTasksWithTimeout(ref message4, millisecondTimeout);
             Assert.That(message3, Is.EqualTo(message4));
 
             // Native Collections Tests
@@ -263,35 +256,46 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.That(message5.IsCreated, Is.True);
                 nativeArrayTestMessageReceiver = null;
                 channel1.Send(message5);
-                while (nativeArrayTestMessageReceiver == null)
-                {
-                    Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
-                }
+                ExecutePendingTasksWithTimeout(ref nativeArrayTestMessageReceiver, millisecondTimeout);
                 Assert.That(NativeArrayMemCmp(message5, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
 
                 // Native Slice
                 var message6 = nativeArray.Slice();
                 nativeArrayTestMessageReceiver = null;
                 channel1.Send(message6);
-                while (nativeArrayTestMessageReceiver == null)
-                {
-                    Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
-                }
+                ExecutePendingTasksWithTimeout(ref nativeArrayTestMessageReceiver, millisecondTimeout);
                 Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
 
                 // NativeArray.ReadOnly
                 var message7 = nativeArray.AsReadOnly();
                 nativeArrayTestMessageReceiver = null;
                 channel1.Send(message7);
-                while (nativeArrayTestMessageReceiver == null)
-                {
-                    Assert.That(WebRTC.ExecutePendingTasks(millisecondTimeout), Is.True, "Execute Pending Tasks returned false. Not all tasks were executed.");
-                }
+                ExecutePendingTasksWithTimeout(ref nativeArrayTestMessageReceiver, millisecondTimeout);
                 Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
             }
 
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
+        }
+
+        static void ExecutePendingTasksWithTimeout(ref string message, int timeoutInMilliseconds)
+        {
+            Stopwatch watchdog = Stopwatch.StartNew();
+            while(watchdog.ElapsedMilliseconds < timeoutInMilliseconds && message == null)
+            {
+                WebRTC.ExecutePendingTasks(timeoutInMilliseconds);
+            }
+            Assert.That(message, Is.Not.Null, "Message was not received in the allotted time!");
+        }
+
+        static void ExecutePendingTasksWithTimeout(ref byte[] message, int timeoutInMilliseconds)
+        {
+            Stopwatch watchdog = Stopwatch.StartNew();
+            while(watchdog.ElapsedMilliseconds < timeoutInMilliseconds && message == null)
+            {
+                WebRTC.ExecutePendingTasks(timeoutInMilliseconds);
+            }
+            Assert.That(message, Is.Not.Null, "Message was not received in the allotted time!");
         }
 
         static unsafe bool NativeArrayMemCmp<T>(NativeArray<T> array, byte[] buffer)
