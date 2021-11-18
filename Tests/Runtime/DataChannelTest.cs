@@ -189,6 +189,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(op13.IsCompleted, Is.True);
             Assert.That(comparisonBuffer, Is.EqualTo(nativeArrayTestMessageReceiver));
 
+#if UNITY_2021_1_OR_NEWER
             // NativeArray.ReadOnly
             using (var nativeArray = new NativeArray<byte>(comparisonBuffer, Allocator.Temp))
             {
@@ -201,6 +202,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op14;
             Assert.That(op14.IsCompleted, Is.True);
             Assert.That(comparisonBuffer, Is.EqualTo(nativeArrayTestMessageReceiver));
+#endif // UNITY_2020_1_OR_NEWER
 
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
@@ -266,12 +268,14 @@ namespace Unity.WebRTC.RuntimeTest
                 ExecutePendingTasksWithTimeout(ref nativeArrayTestMessageReceiver, millisecondTimeout);
                 Assert.That(NativeArrayMemCmp(message6, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
 
+#if UNITY_2021_1_OR_NEWER
                 // NativeArray.ReadOnly
                 var message7 = nativeArray.AsReadOnly();
                 nativeArrayTestMessageReceiver = null;
                 channel1.Send(message7);
                 ExecutePendingTasksWithTimeout(ref nativeArrayTestMessageReceiver, millisecondTimeout);
                 Assert.That(NativeArrayMemCmp(message7, nativeArrayTestMessageReceiver), Is.True, "Elements of the received message are not the same as the original message.");
+#endif // UNITY_2021_1_OR_NEWER
             }
 
             test.component.Dispose();
