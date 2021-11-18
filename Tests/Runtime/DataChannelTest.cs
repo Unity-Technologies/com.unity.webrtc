@@ -326,6 +326,7 @@ namespace Unity.WebRTC.RuntimeTest
             return false;
         }
 
+#if UNITY_2021_1_OR_NEWER
         static unsafe bool NativeArrayMemCmp<T>(NativeArray<T>.ReadOnly array, byte[] buffer)
             where T : struct
         {
@@ -337,6 +338,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             return false;
         }
+#endif // UNITY_2021_1_OR_NEWER
 
         static unsafe bool IntPtrMemCmp(IntPtr ptr, byte[] buffer)
         {
