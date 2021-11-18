@@ -27,7 +27,11 @@ namespace Unity.WebRTC
 
         internal ExecutableUnitySynchronizationContext(SynchronizationContext context)
         {
-            s_MainThreadContext ??= context;
+            if (s_MainThreadContext == null)
+            {
+                s_MainThreadContext = context;
+            }
+
             if (s_MainThreadContext == null || s_MainThreadContext != context)
             {
                 throw new InvalidOperationException("Unable to create executable synchronization context without a valid synchronization context.");
@@ -64,12 +68,14 @@ namespace Unity.WebRTC
             }
             else
             {
-                using var waitHandle = new ManualResetEvent(false);
-                lock (m_AsyncWorkQueue)
+                using (var waitHandle = new ManualResetEvent(false))
                 {
-                    m_AsyncWorkQueue.Add(new WorkRequest(callback, state, waitHandle));
+                    lock (m_AsyncWorkQueue)
+                    {
+                        m_AsyncWorkQueue.Add(new WorkRequest(callback, state, waitHandle));
+                    }
+                    waitHandle.WaitOne();
                 }
-                waitHandle.WaitOne();
             }
         }
 
