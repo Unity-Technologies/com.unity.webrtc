@@ -312,6 +312,7 @@ namespace Unity.WebRTC
             NativeMethods.DataChannelSendPtr(GetSelfOrThrow(), new IntPtr(msg.GetUnsafeReadOnlyPtr()), msg.Length * UnsafeUtility.SizeOf<T>());
         }
 
+#if UNITY_2020_1_OR_NEWER // ReadOnly support was introduced in 2020.1
         public unsafe void Send<T>(NativeArray<T>.ReadOnly msg)
             where T : struct
         {
@@ -321,6 +322,7 @@ namespace Unity.WebRTC
             }
             NativeMethods.DataChannelSendPtr(GetSelfOrThrow(), new IntPtr(msg.GetUnsafeReadOnlyPtr()), msg.Length * UnsafeUtility.SizeOf<T>());
         }
+#endif
 
         public unsafe void Send(void* msgPtr, int length)
         {
