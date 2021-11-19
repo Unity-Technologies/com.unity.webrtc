@@ -874,7 +874,7 @@ extern "C"
         obj->RegisterConnectionStateChange(callback);
     }
 
-    
+
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnIceCandidate(PeerConnectionObject*obj, DelegateIceCandidate callback)
     {
         obj->RegisterIceCandidate(callback);
@@ -1067,7 +1067,7 @@ extern "C"
             return *this;
         }
     };
-     
+
     UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetCodecPreferences(RtpTransceiverInterface* transceiver, RTCRtpCodecCapability* codecs, size_t length)
     {
         std::vector<RtpCodecCapability> _codecs(length);

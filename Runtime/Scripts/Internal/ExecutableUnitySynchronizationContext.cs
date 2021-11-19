@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Unity.WebRTC
@@ -26,7 +27,11 @@ namespace Unity.WebRTC
 
         internal ExecutableUnitySynchronizationContext(SynchronizationContext context)
         {
-            s_MainThreadContext ??= context;
+            if (s_MainThreadContext == null)
+            {
+                s_MainThreadContext = context;
+            }
+
             if (s_MainThreadContext == null || s_MainThreadContext != context)
             {
                 throw new InvalidOperationException("Unable to create executable synchronization context without a valid synchronization context.");
@@ -63,12 +68,14 @@ namespace Unity.WebRTC
             }
             else
             {
-                using var waitHandle = new ManualResetEvent(false);
-                lock (m_AsyncWorkQueue)
+                using (var waitHandle = new ManualResetEvent(false))
                 {
-                    m_AsyncWorkQueue.Add(new WorkRequest(callback, state, waitHandle));
+                    lock (m_AsyncWorkQueue)
+                    {
+                        m_AsyncWorkQueue.Add(new WorkRequest(callback, state, waitHandle));
+                    }
+                    waitHandle.WaitOne();
                 }
-                waitHandle.WaitOne();
             }
         }
 
@@ -94,6 +101,20 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// Executes the current set of pending tasks with a timeout that prevents the execution from continuously adding
+        /// and executing work. If the current set finishes and there is time left then take the next batch.
+        /// </summary>
+        /// <param name="millisecondsTimeout">
+        /// The timeout in milliseconds that the execute can take.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if all tasks have been executed and completed and <c>false</c> otherwise.
+        /// </returns>
+        /// <remarks>
+        /// The timeout is there to guard against tasks that spawn other tasks and threads adding jobs during processing.
+        /// It will not cease execution on the current set of tasks, just prevent execution of another set of tasks.
+        /// </remarks>
         internal bool ExecutePendingTasks(long millisecondsTimeout)
         {
             var stopwatch = new Stopwatch();
@@ -101,22 +122,22 @@ namespace Unity.WebRTC
 
             while (HasPendingTasks())
             {
+                // To prevent work from posting more work indefinitely, stop processing after timeout.
+                // Does not prevent a given work queue from going over the time allotment
                 if (stopwatch.ElapsedMilliseconds > millisecondsTimeout)
                 {
                     break;
                 }
 
-                if (HasPendingTasks())
-                {
-                    Execute();
-                }
-
+                Execute();
                 Thread.Sleep(1);
             }
+            stopwatch.Stop();
 
             return !HasPendingTasks();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool HasPendingTasks()
         {
             lock (m_AsyncWorkQueue)
@@ -179,7 +200,7 @@ namespace Unity.WebRTC
             }
         }
 
-        struct WorkRequest
+        readonly struct WorkRequest
         {
             readonly SendOrPostCallback m_DelegateCallback;
             readonly object m_DelegateState;
