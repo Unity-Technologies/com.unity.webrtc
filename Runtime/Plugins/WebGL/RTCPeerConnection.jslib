@@ -125,7 +125,7 @@ var UnityWebRTCPeerConnection = {
   },
 
   CreatePeerConnectionWithConfig: function (confPtr) {
-    var confJson = Pointer_stringify(confPtr);
+    var confJson = UTF8ToString(confPtr);
     var conf = JSON.parse(confJson);
     // conf.bundlePolicy = 'bundlePolicy' in conf ? conf.bundlePolicy : 0;
     // conf.bundlePolicy = UWRTCBundlePolicy[conf.bundlePolicy];
@@ -181,7 +181,7 @@ var UnityWebRTCPeerConnection = {
   PeerConnectionSetDescription: function (peerPtr, typeIdx, sdpPtr, side) {
     var peer = UWManaged[peerPtr];
     var type = UWRTCSdpType[typeIdx];
-    var sdp = Pointer_stringify(sdpPtr);
+    var sdp = UTF8ToString(sdpPtr);
     peer['set' + side + 'Description']({type: type, sdp: sdp})
         .then(function () {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label + ':' + side + ':' + type + ':' /*+ sdp*/);
@@ -333,7 +333,7 @@ var UnityWebRTCPeerConnection = {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetConfiguration', 'peer')) return 11; // OperationErrorWithData
     try {
       var peer = UWManaged[peerPtr];
-      var confJson = Pointer_stringify(confPtr);
+      var confJson = UTF8ToString(confPtr);
       var conf = JSON.parse(confJson);
       // conf.bundlePolicy = 'bundlePolicy' in conf ? conf.bundlePolicy : 0;
       // conf.bundlePolicy = UWRTCBundlePolicy[conf.bundlePolicy];
@@ -547,7 +547,7 @@ var UnityWebRTCPeerConnection = {
   PeerConnectionCreateOffer: function (peerPtr, optionsPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateOffer', 'peer')) return;
     var peer = UWManaged[peerPtr];
-    var options = Pointer_stringify(optionsPtr);
+    var options = UTF8ToString(optionsPtr);
     var options = JSON.parse(options);
     peer.createOffer(options).then(function (offer) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionCreateOffer', peer.label + ':' + JSON.stringify(options) + ':' + offer.type);
@@ -565,7 +565,7 @@ var UnityWebRTCPeerConnection = {
   PeerConnectionCreateAnswer: function (peerPtr, optionsPtr) {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionCreateAnswer', 'peer')) return;
     var peer = UWManaged[peerPtr];
-    var options = Pointer_stringify(optionsPtr);
+    var options = UTF8ToString(optionsPtr);
     var options = JSON.parse(options);
     peer.createAnswer(options).then(function (answer) {
       uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionCreateAnswer', peer.label + ':' + JSON.stringify(options) + ':' + answer.type);

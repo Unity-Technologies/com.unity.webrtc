@@ -1,7 +1,7 @@
 var UnityWebRTCIceCandidate = {
   CreateNativeRTCIceCandidate: function (candPtr, sdpMidPtr, sdpMLineIndex) {
-    var cand = Pointer_stringify(candPtr);
-    var sdpMid = Pointer_stringify(sdpMidPtr);
+    var cand = UTF8ToString(candPtr);
+    var sdpMid = UTF8ToString(sdpMidPtr);
     var candidate = new RTCIceCandidate({
       candidate: cand,
       sdpMid: sdpMid,

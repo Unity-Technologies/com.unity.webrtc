@@ -25,7 +25,7 @@ var UnityWebRTCRtpSender = {
   SenderSetParameters: function (senderPtr, parametersJsonPtr) {
     if (!uwcom_existsCheck(senderPtr, 'SenderSetParameters', 'sender')) return;
     var sender = UWManaged[senderPtr];
-    var parametersJson = Pointer_stringify(parametersJsonPtr);
+    var parametersJson = UTF8ToString(parametersJsonPtr);
     var parameters = JSON.parse(parametersJson);
     sender.setParameters(parameters).then(function () {
       // TODO Send correct RTCErrorType.

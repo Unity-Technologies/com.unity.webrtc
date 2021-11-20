@@ -2,8 +2,8 @@ var UnityWebRTCDataChannel = {
     
   CreateDataChannel: function(peerPtr, labelPtr, optionsJsonPtr) {
     var peer = UWManaged[peerPtr];
-    var label = Pointer_stringify(labelPtr);
-    var optionsJson = Pointer_stringify(optionsJsonPtr);
+    var label = UTF8ToString(labelPtr);
+    var optionsJson = UTF8ToString(optionsJsonPtr);
     var options = JSON.parse(optionsJson);
     
     // Firefox doesn't like null values, so remove them.
@@ -133,7 +133,7 @@ var UnityWebRTCDataChannel = {
   DataChannelSend: function (dataChannelPtr, textMsgPtr) {
     if (!uwcom_existsCheck(dataChannelPtr, 'DataChannelSend', 'dataChannel')) return;
     var dataChannel = UWManaged[dataChannelPtr];
-    var textMsg = Pointer_stringify(textMsgPtr);
+    var textMsg = UTF8ToString(textMsgPtr);
     dataChannel.send(textMsg);
   },
 

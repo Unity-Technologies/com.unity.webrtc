@@ -3,7 +3,7 @@ var UnityWebRTCMediaStream = {
   // Note: MediaStream creates a read-only id field, so we cannot set it.
   // Using custom 'guid' field instead.
   CreateMediaStream: function (labelPtr) {
-    var label = Pointer_stringify(labelPtr);
+    var label = UTF8ToString(labelPtr);
     var stream = new MediaStream();
     stream.guid = label;
     stream.onaddtrack = function (evt) {
@@ -30,7 +30,7 @@ var UnityWebRTCMediaStream = {
     uwcom_debugLog('log', 'MediaStream.jslib', 'AddUserMedia', streamPtr);
     
     var stream = UWManaged[streamPtr];
-    var optionsJson = Pointer_stringify(constraints);
+    var optionsJson = UTF8ToString(constraints);
     var options = JSON.parse(optionsJson);
     
     navigator.mediaDevices.getUserMedia(options)

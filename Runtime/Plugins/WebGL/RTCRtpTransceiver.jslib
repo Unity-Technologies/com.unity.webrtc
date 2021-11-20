@@ -40,7 +40,7 @@ var UnityWebRTCRtpTransceiver = {
     if (!uwcom_existsCheck(transceiverPtr, 'TransceiverSetCodecPreferences', 'transceiver')) return UWRTCErrorType.indexOf("OperationErrorWithData");
 
     var transceiver = UWManaged[transceiverPtr];
-    var codecsJson = Pointer_stringify(codecsPtr);
+    var codecsJson = UTF8ToString(codecsPtr);
     var codecs = JSON.parse(codecsJson);
 
     const supportsSetCodecPreferences = window.RTCRtpTransceiver && 'setCodecPreferences' in window.RTCRtpTransceiver.prototype;

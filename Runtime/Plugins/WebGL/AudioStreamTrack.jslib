@@ -8,7 +8,7 @@ var UnityWebRTCAudioStreamTrack = {
     var dest = uwcom_audioContext.createMediaStreamDestination();
     var audioTrack = dest.stream.getAudioTracks()[0];
     uwcom_addManageObj(audioTrack);
-    audioTrack.guid = Pointer_stringify(labelPtr);
+    audioTrack.guid = UTF8ToString(labelPtr);
     return audioTrack.managePtr;
   },
 
