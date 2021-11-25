@@ -126,56 +126,71 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void AddTrack()
+        {
+            var peer = new RTCPeerConnection();
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt.Create();
+
+            var track = new VideoStreamTrack(rt);
+            var sender = peer.AddTrack(track);
+
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(track, Is.EqualTo(sender.Track));
+
+            RTCRtpSendParameters parameters = sender.GetParameters();
+            Assert.That(parameters, Is.Not.Null);
+            Assert.That(parameters.encodings, Is.Empty);
+
+            track.Dispose();
+            peer.Dispose();
+            Object.DestroyImmediate(rt);
+        }
+
+        [Test]
         [Category("PeerConnection")]
         public void AddTransceiver()
         {
             var peer = new RTCPeerConnection();
 
-            var track = new AudioStreamTrack();
-            Assert.AreEqual(0, peer.GetTransceivers().Count());
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt.Create();
+
+            var track = new VideoStreamTrack(rt);
+            Assert.That(peer.GetTransceivers(), Is.Empty);
             var transceiver = peer.AddTransceiver(track);
-            Assert.NotNull(transceiver);
-            Assert.IsNull(transceiver.CurrentDirection);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
             RTCRtpSender sender = transceiver.Sender;
-            Assert.NotNull(sender);
-            Assert.AreEqual(track, sender.Track);
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(track, Is.EqualTo(sender.Track));
 
             RTCRtpSendParameters parameters = sender.GetParameters();
-            Assert.NotNull(parameters);
-            Assert.NotNull(parameters.encodings);
-            foreach (var encoding in parameters.encodings)
-            {
-                Assert.True(encoding.active);
-                Assert.Null(encoding.maxBitrate);
-                Assert.Null(encoding.minBitrate);
-                Assert.Null(encoding.maxFramerate);
-                Assert.Null(encoding.scaleResolutionDownBy);
-                Assert.IsNotEmpty(encoding.rid);
-            }
-            Assert.IsNotEmpty(parameters.transactionId);
-            Assert.AreEqual(1, peer.GetTransceivers().Count());
-            Assert.NotNull(peer.GetTransceivers().First());
-            Assert.NotNull(parameters.codecs);
-            foreach (var codec in parameters.codecs)
-            {
-                Assert.NotNull(codec);
-                Assert.NotZero(codec.payloadType);
-                Assert.IsNotEmpty(codec.mimeType);
-                Assert.IsNotEmpty(codec.sdpFmtpLine);
-                Assert.Null(codec.clockRate);
-                Assert.Null(codec.channels);
-            }
-            Assert.NotNull(parameters.rtcp);
-            Assert.NotNull(parameters.headerExtensions);
+            Assert.That(parameters, Is.Not.Null);
+            Assert.That(parameters.encodings, Is.Empty);
+
+            Assert.That(parameters.transactionId, Is.Not.Empty);
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            Assert.That(peer.GetTransceivers().First(), Is.Not.Null);
+            Assert.That(parameters.codecs, Is.Empty);
+            Assert.That(parameters.rtcp, Is.Not.Null);
+            Assert.That(parameters.headerExtensions, Is.Not.Null);
             foreach (var extension in parameters.headerExtensions)
             {
-                Assert.NotNull(extension);
-                Assert.IsNotEmpty(extension.uri);
-                Assert.NotZero(extension.id);
+                Assert.That(extension, Is.Not.Null);
+                Assert.That(extension.uri, Is.Not.Empty);
+                Assert.That(extension.id, Is.Not.Zero);
             }
 
             track.Dispose();
             peer.Dispose();
+            Object.DestroyImmediate(rt);
         }
 
         [Test]
