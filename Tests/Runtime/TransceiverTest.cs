@@ -191,9 +191,10 @@ namespace Unity.WebRTC.RuntimeTest
 
             var go = new GameObject("Test");
             var cam = go.AddComponent<Camera>();
+            var track = cam.CaptureStreamTrack(1280, 720, 0);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
+            test.component.AddTransceiver(0, track);
             yield return test;
             test.component.CoroutineUpdate();
 
@@ -218,6 +219,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             // Dispose on the main thread.
             test.component.Dispose();
+            track.Dispose();
 
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(test.gameObject);
