@@ -217,7 +217,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
             Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
 
-            // Dispose on the main thread.
+            //TODO:: Disposing process of MediaStreamTrack is unstable when using GC.
+            //At the moment, Dispose methods needs to be called on the main thread for workaround.
             test.component.Dispose();
             track.Dispose();
 
