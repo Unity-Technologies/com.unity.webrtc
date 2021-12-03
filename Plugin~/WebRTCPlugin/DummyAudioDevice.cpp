@@ -51,8 +51,6 @@ namespace webrtc
     }
 
     void DummyAudioDevice::RecordingThread() {
-        bool buffer_init = false;
-
         while (recording_) {
             const int64_t bgnTime = rtc::TimeMillis();
             {
