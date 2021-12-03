@@ -216,6 +216,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
             Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
 
+            // Dispose on the main thread.
+            test.component.Dispose();
+
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(test.gameObject);
         }
