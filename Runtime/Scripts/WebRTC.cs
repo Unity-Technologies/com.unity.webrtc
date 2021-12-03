@@ -1085,6 +1085,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
+        public static extern void ContextInitLocalAudio(IntPtr context, IntPtr track, int sampleRate, int channels);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextUninitLocalAudio(IntPtr context, IntPtr track);
+        [DllImport(WebRTC.Lib)]
         public static extern void ContextProcessLocalAudio(IntPtr context, IntPtr track, IntPtr array, int sampleRate, int channels, int frames);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsReportGetStatsList(IntPtr report, out ulong length, ref IntPtr types);

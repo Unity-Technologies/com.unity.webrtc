@@ -129,6 +129,7 @@ namespace Unity.WebRTC
                 throw new ArgumentException("AudioClip must to be attached on AudioSource");
             Source = source;
 
+            WebRTC.Context.InitLocalAudio(self, source.clip.frequency, source.clip.channels);
             _audioSourceRead = source.gameObject.AddComponent<AudioSourceRead>();
             _audioSourceRead.hideFlags = HideFlags.HideInHierarchy;
             _audioSourceRead.onAudioRead += SetData;
@@ -162,6 +163,7 @@ namespace Unity.WebRTC
                     // Unity API must be called from main thread.
                     _audioSourceRead.onAudioRead -= SetData;
                     WebRTC.DestroyOnMainThread(_audioSourceRead);
+                    WebRTC.Context.UninitLocalAudio(self);
                 }
                 _streamRenderer?.Dispose();
                 _source?.Dispose();

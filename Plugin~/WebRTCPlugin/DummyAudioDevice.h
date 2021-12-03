@@ -323,6 +323,7 @@ namespace webrtc
         }
 #endif
         void RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels);
+        void UnregisterSendAudioCallback(UnityAudioTrackSource* source);
 
     private:
         bool PlayoutThreadProcess();

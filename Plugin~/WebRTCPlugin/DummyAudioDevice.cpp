@@ -69,10 +69,17 @@ namespace webrtc
     }
 
     void DummyAudioDevice::RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels) {
+        std::lock_guard<std::mutex> lock(mutex_);
         if (callbacks_.find(source) == callbacks_.end()) {
-            std::lock_guard<std::mutex> lock(mutex_);
             callbacks_.emplace(source, [source, sampleRate, channels]() {
                 source->SendAudioData(sampleRate, channels); });
+        }
+    }
+
+    void DummyAudioDevice::UnregisterSendAudioCallback(UnityAudioTrackSource* source) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (callbacks_.find(source) != callbacks_.end()) {
+            callbacks_.erase(source);
         }
     }
 
