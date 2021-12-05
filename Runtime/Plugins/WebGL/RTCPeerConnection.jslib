@@ -165,10 +165,10 @@ var UnityWebRTCPeerConnection = {
     var peer = UWManaged[peerPtr];
     peer.setLocalDescription()
         .then(function () {
-          uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label + ':' + side);
+          uwcom_debugLog('log', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label);
           Module.dynCall_vi(uwevt_OnSetSessionDescSuccess, peer.managePtr);
         }).catch(function (err) {
-      uwcom_debugLog('error', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label + ':' + side + ':' + err.message);
+      uwcom_debugLog('error', 'RTCPeerConnection.jslib', 'PeerConnectionSetDescription', peer.label + ':' + err.message);
       var errorNo = uwcom_errorNo(err);
       var errMsgPtr = uwcom_strToPtr(err.message);
       Module.dynCall_viii(uwevt_OnSetSessionDescFailure, peer.managePtr, errorNo, errMsgPtr);
