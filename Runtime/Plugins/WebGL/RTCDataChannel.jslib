@@ -35,7 +35,7 @@ var UnityWebRTCDataChannel = {
         Module.dynCall_vii(uwevt_DCOnTextMessage, this.managePtr, msgPtr);
       } else {
         var msgPtr = uwcom_arrayToReturnPtr(evt.data, Uint8Array);
-        Module.dynCall_viii(uwevt_DCOnBinaryMessage, channel.managePtr, msgPtr + 4, evt.data.byteLength);
+        Module.dynCall_viii(uwevt_DCOnBinaryMessage, this.managePtr, msgPtr + 4, evt.data.byteLength);
       }
     };
     dataChannel.onopen = function (evt) {
