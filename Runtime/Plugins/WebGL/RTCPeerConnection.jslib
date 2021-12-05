@@ -535,7 +535,7 @@ var UnityWebRTCPeerConnection = {
       peer.addIceCandidate(candidate)
           .then(function () {
           })
-          .catch(function () {
+          .catch(function (err) {
             console.error(err.message, peerPtr)
           });
     }, 1000);
