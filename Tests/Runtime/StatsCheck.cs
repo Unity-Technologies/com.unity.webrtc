@@ -70,12 +70,12 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.IsNotEmpty(candidateStats.protocol);
                     Assert.IsNotEmpty(candidateStats.candidateType);
                     Ignore.Pass(candidateStats.ip);
+                    Ignore.Pass(candidateStats.address);
                     Assert.IsNotEmpty(candidateStats.transportId);
                     Ignore.Pass(candidateStats.url);
                     Ignore.Pass(candidateStats.relayProtocol);
                     Ignore.Pass(candidateStats.networkType);
                     Ignore.Pass(candidateStats.priority);
-                    Ignore.Pass(candidateStats.deleted);
                     Ignore.Pass(candidateStats.isRemote);
                     Ignore.Pass(candidateStats.port);
                     break;
@@ -102,19 +102,13 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.InboundRtp:
                     var inboundRtpStreamStats = stats as RTCInboundRTPStreamStats;
                     Assert.NotNull(inboundRtpStreamStats);
-                    Assert.AreEqual(56, inboundRtpStreamStats.Dict.Count);
+                    Assert.AreEqual(55, inboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(inboundRtpStreamStats.ssrc);
-                    Ignore.Pass(inboundRtpStreamStats.isRemote);
                     Assert.IsNotEmpty(inboundRtpStreamStats.mediaType);
                     Assert.IsNotEmpty(inboundRtpStreamStats.kind);
                     Ignore.Pass(inboundRtpStreamStats.trackId);
                     Assert.IsNotEmpty(inboundRtpStreamStats.transportId);
                     Ignore.Pass(inboundRtpStreamStats.codecId);
-                    Ignore.Pass(inboundRtpStreamStats.firCount);
-                    Ignore.Pass(inboundRtpStreamStats.pliCount);
-                    Ignore.Pass(inboundRtpStreamStats.nackCount);
-                    Ignore.Pass(inboundRtpStreamStats.sliCount);
-                    Ignore.Pass(inboundRtpStreamStats.qpSum);
                     Ignore.Pass(inboundRtpStreamStats.packetsReceived);
                     Ignore.Pass(inboundRtpStreamStats.fecPacketsReceived);
                     Ignore.Pass(inboundRtpStreamStats.fecPacketsDiscarded);
@@ -194,19 +188,13 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.OutboundRtp:
                     var outboundRtpStreamStats = stats as RTCOutboundRTPStreamStats;
                     Assert.NotNull(outboundRtpStreamStats);
-                    Assert.AreEqual(35, outboundRtpStreamStats.Dict.Count);
+                    Assert.AreEqual(33, outboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(outboundRtpStreamStats.ssrc);
-                    Ignore.Pass(outboundRtpStreamStats.isRemote);
                     Assert.IsNotEmpty(outboundRtpStreamStats.mediaType);
                     Assert.IsNotEmpty(outboundRtpStreamStats.kind);
                     Ignore.Pass(outboundRtpStreamStats.trackId);
                     Assert.IsNotEmpty(outboundRtpStreamStats.transportId);
                     Ignore.Pass(outboundRtpStreamStats.codecId);
-                    Ignore.Pass(outboundRtpStreamStats.firCount);
-                    Ignore.Pass(outboundRtpStreamStats.pliCount);
-                    Ignore.Pass(outboundRtpStreamStats.nackCount);
-                    Ignore.Pass(outboundRtpStreamStats.sliCount);
-                    Ignore.Pass(outboundRtpStreamStats.qpSum);
                     Ignore.Pass(outboundRtpStreamStats.mediaSourceId);
                     Ignore.Pass(outboundRtpStreamStats.remoteId);
                     Ignore.Pass(outboundRtpStreamStats.rid);
@@ -230,6 +218,10 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(outboundRtpStreamStats.qualityLimitationResolutionChanges);
                     Ignore.Pass(outboundRtpStreamStats.contentType);
                     Ignore.Pass(outboundRtpStreamStats.encoderImplementation);
+                    Ignore.Pass(outboundRtpStreamStats.firCount);
+                    Ignore.Pass(outboundRtpStreamStats.pliCount);
+                    Ignore.Pass(outboundRtpStreamStats.nackCount);
+                    Ignore.Pass(outboundRtpStreamStats.qpSum);
                     break;
                 case RTCStatsType.MediaSource:
                     var mediaSourceStats = stats as RTCMediaSourceStats;

@@ -50,9 +50,7 @@ trigger_build_libwebrtc:
   name : Trigger build libwebrtc {{ webrtc_version.name }} all platforms
   dependencies:
   {% for platform in platforms -%}
-  {% if platform.name != "android" -%}
     - .yamato/upm-ci-libwebrtc.yml#build_{{ platform.name }}
-  {% endif %}
   {% endfor %}
   triggers:
     tags:

@@ -182,11 +182,11 @@ namespace webrtc
 
     Context::Context(int uid, UnityEncoderType encoderType, bool forTest)
         : m_uid(uid)
+        , m_workerThread(rtc::Thread::CreateWithSocketServer())
+        , m_signalingThread(rtc::Thread::CreateWithSocketServer())
         , m_encoderType(encoderType)
     {
-        m_workerThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_workerThread->Start();
-        m_signalingThread.reset(new rtc::Thread(rtc::SocketServer::CreateDefault()));
         m_signalingThread->Start();
 
         rtc::InitializeSSL();

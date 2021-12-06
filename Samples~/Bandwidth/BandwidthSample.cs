@@ -332,9 +332,6 @@ class BandwidthSample : MonoBehaviour
                 continue;
             }
 
-            if (report.isRemote)
-                return;
-
             long now = report.Timestamp;
             ulong bytes = report.bytesSent;
 

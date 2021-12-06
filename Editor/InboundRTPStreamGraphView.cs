@@ -33,7 +33,6 @@ namespace Unity.WebRTC.Editor
             firCountGraph.AddInput(timestamp, input.firCount);
             pliCountGraph.AddInput(timestamp, input.pliCount);
             nackCountGraph.AddInput(timestamp, input.nackCount);
-            sliCountGraph.AddInput(timestamp, input.sliCount);
             qpSumGraph.AddInput(timestamp, input.qpSum);
             packetsReceivedGraph.AddInput(timestamp, input.packetsReceived);
             bytesReceivedGraph.AddInput(timestamp, input.bytesReceived);

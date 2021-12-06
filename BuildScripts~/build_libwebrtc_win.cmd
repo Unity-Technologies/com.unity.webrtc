@@ -6,7 +6,7 @@ if not exist depot_tools (
 
 set COMMAND_DIR=%~dp0
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=4389
+set WEBRTC_VERSION=4515
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set CPPFLAGS=/WX-
 set GYP_GENERATORS=ninja,msvs-ninja
