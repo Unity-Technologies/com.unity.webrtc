@@ -179,7 +179,9 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(peer.GetTransceivers().First(), Is.Not.Null);
             Assert.That(parameters.codecs, Is.Empty);
             Assert.That(parameters.rtcp, Is.Not.Null);
-            Assert.That(parameters.headerExtensions, Is.Not.Empty);
+
+            // Some platforms return an empty list
+            Assert.That(parameters.headerExtensions, Is.Not.Null);
             foreach (var extension in parameters.headerExtensions)
             {
                 Assert.That(extension, Is.Not.Null);
