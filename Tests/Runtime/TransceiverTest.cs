@@ -191,9 +191,10 @@ namespace Unity.WebRTC.RuntimeTest
 
             var go = new GameObject("Test");
             var cam = go.AddComponent<Camera>();
+            var track = cam.CaptureStreamTrack(1280, 720, 0);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.AddTransceiver(0, cam.CaptureStreamTrack(1280, 720, 0));
+            test.component.AddTransceiver(0, track);
             yield return test;
             test.component.CoroutineUpdate();
 
@@ -215,6 +216,11 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(transceiver1.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
             Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
             Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+
+            //TODO:: Disposing process of MediaStreamTrack is unstable when using GC.
+            //At the moment, Dispose methods needs to be called on the main thread for workaround.
+            test.component.Dispose();
+            track.Dispose();
 
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(test.gameObject);
