@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DummyAudioDevice.h"
+#include "UnityAudioTrackSource.h"
 #include "system_wrappers/include/sleep.h"
 
 namespace unity
@@ -12,8 +13,6 @@ namespace webrtc
         int64_t currentTime = rtc::TimeMillis();
 
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-
             if (audio_transport_ == nullptr) {
                 return false;
             }
@@ -38,7 +37,7 @@ namespace webrtc
                 int64_t ntp_time_ms = -1;
                 char data[kBytesPerSample * kChannels * kSamplesPerFrame];
 
-                audio_transport_->PullRenderData(kBytesPerSample * 8, kSamplingRate,
+                (*audio_transport_).PullRenderData(kBytesPerSample * 8, kSamplingRate,
                     kChannels, kSamplesPerFrame, data,
                     &elapsed_time_ms, &ntp_time_ms);
             }
@@ -46,9 +45,42 @@ namespace webrtc
 
         int64_t deltaTimeMillis = rtc::TimeMillis() - currentTime;
         if (deltaTimeMillis < 10) {
-            SleepMs(10 - deltaTimeMillis);
+            SleepMs(10 - (deltaTimeMillis + 1));
         }
         return true;
+    }
+
+    void DummyAudioDevice::RecordingThread() {
+        while (recording_) {
+            const int64_t bgnTime = rtc::TimeMillis();
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                for (const auto &pair : callbacks_) {
+                    pair.second();
+                }
+            }
+            if (recording_) {
+                const int64_t elapsed = rtc::TimeMillis() - bgnTime;
+                if (elapsed < 10) {
+                    SleepMs(10 - (elapsed + 1));
+                }
+            }
+        }
+    }
+
+    void DummyAudioDevice::RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (callbacks_.find(source) == callbacks_.end()) {
+            callbacks_.emplace(source, [source, sampleRate, channels]() {
+                source->SendAudioData(sampleRate, channels); });
+        }
+    }
+
+    void DummyAudioDevice::UnregisterSendAudioCallback(UnityAudioTrackSource* source) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (callbacks_.find(source) != callbacks_.end()) {
+            callbacks_.erase(source);
+        }
     }
 
 } // end namespace webrtc

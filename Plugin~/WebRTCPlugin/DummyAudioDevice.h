@@ -1,9 +1,11 @@
 #pragma once
 
 #include <mutex>
+#include <unordered_map>
 
 #include "WebRTCPlugin.h"
 #include "api/task_queue/default_task_queue_factory.h"
+#include "rtc_base/platform_thread.h"
 
 namespace unity
 {
@@ -11,8 +13,7 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-    const int kRecordingFixedSampleRate = 44100;
-    const size_t kRecordingNumChannels = 2;
+    class UnityAudioTrackSource;
 
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
@@ -27,8 +28,6 @@ namespace webrtc
         // Full-duplex transportation of PCM audio
         virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-
             audio_transport_ = transport;
             return 0;
         }
@@ -43,6 +42,7 @@ namespace webrtc
         {
             initialized_ = false;
             playing_ = false;
+            recording_ = false;
             return 0;
         }
         virtual bool Initialized() const override
@@ -140,15 +140,25 @@ namespace webrtc
 
         virtual int32 StartRecording() override
         {
+            recording_ = true;
+            recordAudioThread_.reset(new rtc::PlatformThread(
+                [](void *pThis) { static_cast<DummyAudioDevice*>(pThis)->RecordingThread(); },
+                this, "webrtc_audio_module_recording_thread", rtc::kRealtimePriority));
+            recordAudioThread_->Start();
             return 0;
         }
+
         virtual int32 StopRecording() override
         {
+            if (recording_) {
+                recording_ = false;
+                recordAudioThread_->Stop();
+            }
             return 0;
         }
         virtual bool Recording() const override
         {
-            return false;
+            return recording_;
         }
 
         // Audio mixer initialization
@@ -312,16 +322,25 @@ namespace webrtc
             return 0;
         }
 #endif
+        void RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels);
+        void UnregisterSendAudioCallback(UnityAudioTrackSource* source);
+
     private:
         bool PlayoutThreadProcess();
+        void RecordingThread();
 
         std::atomic<bool> initialized_ {false};
         std::atomic<bool> playing_ {false};
+        std::atomic<bool> recording_{ false };
         std::mutex mutex_;
         std::unique_ptr<rtc::Thread> playoutAudioThread_;
+        std::unique_ptr<rtc::PlatformThread> recordAudioThread_;
         int64_t lastCallRecordMillis_ = 0;
 
-        webrtc::AudioTransport* audio_transport_ = nullptr;
+        std::atomic<webrtc::AudioTransport*> audio_transport_{ nullptr };
+
+        using callback_t = std::function<void()>;
+        std::unordered_map<UnityAudioTrackSource*, callback_t> callbacks_;
     };
 
 } // end namespace webrtc
