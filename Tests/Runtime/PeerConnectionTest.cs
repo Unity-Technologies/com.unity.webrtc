@@ -155,7 +155,6 @@ namespace Unity.WebRTC.RuntimeTest
         public void AddTransceiver()
         {
             var peer = new RTCPeerConnection();
-
             var width = 256;
             var height = 256;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
@@ -166,6 +165,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(peer.GetTransceivers(), Is.Empty);
             var transceiver = peer.AddTransceiver(track);
             Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.Mid, Is.Null);
             Assert.That(transceiver.CurrentDirection, Is.Null);
             RTCRtpSender sender = transceiver.Sender;
             Assert.That(sender, Is.Not.Null);
@@ -174,18 +174,18 @@ namespace Unity.WebRTC.RuntimeTest
             RTCRtpSendParameters parameters = sender.GetParameters();
             Assert.That(parameters, Is.Not.Null);
             Assert.That(parameters.encodings, Is.Empty);
-
             Assert.That(parameters.transactionId, Is.Not.Empty);
             Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
             Assert.That(peer.GetTransceivers().First(), Is.Not.Null);
             Assert.That(parameters.codecs, Is.Empty);
             Assert.That(parameters.rtcp, Is.Not.Null);
+
+            // Some platforms return an empty list
             Assert.That(parameters.headerExtensions, Is.Not.Null);
             foreach (var extension in parameters.headerExtensions)
             {
                 Assert.That(extension, Is.Not.Null);
                 Assert.That(extension.uri, Is.Not.Empty);
-                Assert.That(extension.id, Is.Not.Zero);
             }
 
             track.Dispose();

@@ -40,6 +40,20 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public string Mid
+        {
+            get
+            {
+                IntPtr ptr = NativeMethods.TransceiverGetMid(GetSelfOrThrow());
+                if (ptr == IntPtr.Zero)
+                    return null;
+                return ptr.AsAnsiStringWithFreeMem();
+            }
+        }
+
+        /// <summary>
         /// This is used to set the transceiver's desired direction
         /// and will be used in calls to CreateOffer and CreateAnswer.
         /// </summary>
