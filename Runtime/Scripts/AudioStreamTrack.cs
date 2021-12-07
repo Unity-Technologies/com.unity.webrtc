@@ -84,7 +84,7 @@ namespace Unity.WebRTC
                 int remain = data.Length;
                 while (remain > 0)
                 {
-                    if (m_recvBufs.TryTake(out float[] src) == false)
+                    if (!m_recvBufs.TryTake(out float[] src))
                     {
                         return;
                     }
