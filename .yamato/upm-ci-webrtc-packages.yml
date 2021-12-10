@@ -286,7 +286,7 @@ test_{{ package.name }}_{{ editor.version }}_ios:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_ios
   commands:
     # Download standalone UnityTestRunner
-    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr --output utr
     # Give UTR execution permissions
     - chmod +x ./utr
     # Run the test build on the device
