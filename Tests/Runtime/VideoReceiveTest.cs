@@ -204,6 +204,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         public void Clear()
         {
+            RenderTexture.active = null;
             SendVideoTrack?.Dispose();
             SendVideoTrack = null;
 

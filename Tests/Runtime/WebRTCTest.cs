@@ -52,7 +52,7 @@ namespace Unity.WebRTC.RuntimeTest
 
 #if WEBRTC_TEST_PROJECT
         [Test]
-        [UnityPlatform(exclude = new[] {RuntimePlatform.Android})]
+        [UnityPlatform(exclude = new[] {RuntimePlatform.Android, RuntimePlatform.IPhonePlayer})]
         public void WebCamTextureFormat()
         {
             var webCam = new WebCamTexture(10, 10);

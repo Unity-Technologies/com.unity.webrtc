@@ -141,10 +141,10 @@ namespace webrtc
         virtual int32 StartRecording() override
         {
             recording_ = true;
-            recordAudioThread_.reset(new rtc::PlatformThread(
-                [](void *pThis) { static_cast<DummyAudioDevice*>(pThis)->RecordingThread(); },
-                this, "webrtc_audio_module_recording_thread", rtc::kRealtimePriority));
-            recordAudioThread_->Start();
+            recordAudioThread_ = rtc::PlatformThread::SpawnJoinable(
+                [this] { static_cast<DummyAudioDevice*>(this)->RecordingThread(); },
+                "webrtc_audio_module_recording_thread",
+                rtc::ThreadAttributes().SetPriority(rtc::ThreadPriority::kRealtime));
             return 0;
         }
 
@@ -152,7 +152,7 @@ namespace webrtc
         {
             if (recording_) {
                 recording_ = false;
-                recordAudioThread_->Stop();
+                recordAudioThread_.Finalize();
             }
             return 0;
         }
@@ -334,7 +334,7 @@ namespace webrtc
         std::atomic<bool> recording_{ false };
         std::mutex mutex_;
         std::unique_ptr<rtc::Thread> playoutAudioThread_;
-        std::unique_ptr<rtc::PlatformThread> recordAudioThread_;
+        rtc::PlatformThread recordAudioThread_;
         int64_t lastCallRecordMillis_ = 0;
 
         std::atomic<webrtc::AudioTransport*> audio_transport_{ nullptr };
