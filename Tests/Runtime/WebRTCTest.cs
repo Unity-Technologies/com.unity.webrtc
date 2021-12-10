@@ -5,8 +5,6 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    [TestFixture]
-    [Ignore("Ignore a fixture for workaround")]
     class WebRTCTest
     {
         [SetUp]
@@ -54,7 +52,7 @@ namespace Unity.WebRTC.RuntimeTest
 
 #if WEBRTC_TEST_PROJECT
         [Test]
-        [UnityPlatform(exclude = new[] {RuntimePlatform.Android})]
+        [UnityPlatform(exclude = new[] {RuntimePlatform.Android, RuntimePlatform.IPhonePlayer})]
         public void WebCamTextureFormat()
         {
             var webCam = new WebCamTexture(10, 10);
