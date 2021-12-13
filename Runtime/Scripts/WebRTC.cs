@@ -720,12 +720,24 @@ namespace Unity.WebRTC
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
-        public static bool SupportHardwareEncoder
+        // avoid crash when call GetHardwareEncoderSupport using OpenGL graphics on Win/Mac
+        public static bool HardwareEncoderSupport()
         {
-            get
+            // OpenGL APIs on windows/osx are not supported
+            if (Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.WindowsPlayer ||
+                Application.platform == RuntimePlatform.OSXEditor ||
+                Application.platform == RuntimePlatform.OSXPlayer)
             {
-                return NativeMethods.GetHardwareEncoderSupport();
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
+                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
+                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
+                {
+                    return false;
+                }
             }
+
+            return NativeMethods.GetHardwareEncoderSupport();
         }
 
         /// <summary>
