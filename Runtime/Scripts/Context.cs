@@ -17,7 +17,7 @@ namespace Unity.WebRTC
 
         public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware, bool forTest = false)
         {
-            if (encoderType == EncoderType.Hardware && !NativeMethods.GetHardwareEncoderSupport())
+            if (encoderType == EncoderType.Hardware && !WebRTC.HardwareEncoderSupport())
             {
                 throw new ArgumentException("Hardware encoder is not supported");
             }
