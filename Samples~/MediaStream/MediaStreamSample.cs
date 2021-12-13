@@ -61,7 +61,7 @@ class MediaStreamSample : MonoBehaviour
         pc2Ontrack = e => { OnTrack(_pc2, e); };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
         pc2OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc2)); };
-        infoText.text = !WebRTC.SupportHardwareEncoder ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
+        infoText.text = !WebRTC.HardwareEncoderSupport() ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
