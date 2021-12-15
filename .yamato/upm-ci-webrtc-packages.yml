@@ -481,7 +481,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
-{% endfor %} # {% for architecture in architectures %}
+{% endfor %}
 {% endif %}
 {% endfor %}
 {% endfor %}
