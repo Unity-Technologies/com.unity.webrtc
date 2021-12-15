@@ -188,6 +188,20 @@ test_targets_android:
     playergraphicsapi: OpenGLES3
     extra-editor-arg: gles3
 
+test_architectures_macos:
+  - name: x64
+    editor_version: 2019.4
+    architecture: x64
+  - name: x64
+    editor_version: 2020.3
+    architecture: x64
+  - name: x64 (Rosetta 2)
+    editor_version: 2021.2
+    architecture: x64
+  - name: arm64 (Apple Silicon)
+    editor_version: 2021.2
+    architecture: arm64
+
 package:
   name: webrtc
   packagename: com.unity.webrtc
@@ -434,8 +448,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 
 {% else %}
 
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
+{% assign architectures = test_architectures_macos | where: "editor_version", editor.version %}
+{% for architecture in architectures %}
+
+# editmode/playmode test on macOS(Intel/Silicon)
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ architecture.architecture }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ architecture.name }} {{ gfx_type.name }}
   agent:
     type: {{ target.type }}
     image: {{ target.image }}
@@ -447,7 +465,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
       TEST_RESULT_DIR: upm-ci~/test-results/
       TEST_TARGET: macos
       TEST_PLATFORM: {{ param.platform }}
-      TEST_ARCHITECTURE : {{ target.architecture }}
+      TEST_ARCHITECTURE : {{ architecture.architecture }}
       SCRIPTING_BACKEND: {{ param.backend }}
       EDITOR_VERSION: {{ editor.version }}
       EXTRA_EDITOR_ARG: {{ gfx_type.extra-editor-arg }}
@@ -463,6 +481,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
+{% endfor %} # {% for architecture in architectures %}
 {% endif %}
 {% endfor %}
 {% endfor %}

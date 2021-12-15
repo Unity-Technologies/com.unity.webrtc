@@ -52,7 +52,8 @@ curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-stand
   --output utr
 chmod +x ./utr
 
-if [ ${TEST_TARGET} = "macos" ] && [ ${architecture} = "arm64" ]
+# Install Rosetta when architecture is x64 and device is Apple Silicon
+if [ ${TEST_TARGET} = "macos" ] && [ ${architecture} = "x64" ] && [ `uname -m` == "arm64" ]
 then
   # install rosetta 2
   softwareupdate --install-rosetta --agree-to-license
