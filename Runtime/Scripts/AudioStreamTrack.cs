@@ -140,7 +140,7 @@ namespace Unity.WebRTC
                 while (numOfFrames-- > 0)
                 {
                     writtenSamples += WriteBuffer(
-                        m_recvBufs.Count > 0 ? m_recvBufs.Dequeue() : null,
+                        m_recvBufs.Count > 0 ? m_recvBufs.Dequeue() : new float[m_bufInfo.SamplesPer10ms * m_clip.channels],
                         baseOffset + writtenSamples);
                 }
 
@@ -148,7 +148,6 @@ namespace Unity.WebRTC
 
                 int WriteBuffer(float[] data, int offset)
                 {
-                    data ??= new float[m_bufInfo.SamplesPer10ms * m_clip.channels];
                     m_clip.SetData(data, offset % m_clip.samples);
                     return data.Length / m_clip.channels;
                 }
