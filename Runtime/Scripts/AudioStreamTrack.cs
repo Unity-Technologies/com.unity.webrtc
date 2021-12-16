@@ -157,7 +157,7 @@ namespace Unity.WebRTC
             {
                 m_recvBufs.Enqueue(data);
 
-                if (m_recvBufs.Count >= AudioBufferTracker.NumOfFramesForBuffering && m_bufferReady == false)
+                if (m_recvBufs.Count >= AudioBufferTracker.NumOfFramesForBuffering && !m_bufferReady)
                 {
                     var audioSource = FindAttachedAudioSource();
                     if (audioSource)
