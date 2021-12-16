@@ -18,6 +18,10 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D11)
 
     ID3D11RenderTargetView* (UNITY_INTERFACE_API * RTVFromRenderBuffer)(UnityRenderBuffer surface);
     ID3D11ShaderResourceView* (UNITY_INTERFACE_API * SRVFromNativeTexture)(UnityTextureID texture);
+
+    IDXGISwapChain* (UNITY_INTERFACE_API * GetSwapChain)();
+    UINT32(UNITY_INTERFACE_API * GetSyncInterval)();
+    UINT(UNITY_INTERFACE_API * GetPresentFlags)();
 };
 
 UNITY_REGISTER_INTERFACE_GUID(0xAAB37EF87A87D748ULL, 0xBF76967F07EFB177ULL, IUnityGraphicsD3D11)

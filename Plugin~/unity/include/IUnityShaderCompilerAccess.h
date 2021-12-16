@@ -42,6 +42,11 @@ enum UnityShaderCompilerExtCompilerPlatform
     kUnityShaderCompilerExtCompPlatformVulkan,          // Vulkan SPIR-V, compiled with MS D3DCompiler + HLSLcc
     kUnityShaderCompilerExtCompPlatformSwitch,          // Nintendo Switch (NVN)
     kUnityShaderCompilerExtCompPlatformXboxOneD3D12,    // Xbox One D3D12
+    kUnityShaderCompilerExtCompPlatformGameCoreXboxOne, // GameCore XboxOne
+    kUnityShaderCompilerExtCompPlatformGameCoreXboxSeries,// GameCore XboxSeries
+    kUnityShaderCompilerExtCompPlatformPS5,
+    kUnityShaderCompilerExtCompPlatformPS5NGGC,
+
     kUnityShaderCompilerExtCompPlatformCount
 };
 
