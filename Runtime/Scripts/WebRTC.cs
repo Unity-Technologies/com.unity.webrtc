@@ -329,17 +329,9 @@ namespace Unity.WebRTC
     /// </summary>
     public static class WebRTC
     {
-#if UNITY_EDITOR_OSX
-        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/macOS/webrtc.bundle/Contents/MacOS/webrtc";
-#elif UNITY_EDITOR_LINUX
-        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/libwebrtc.so";
-#elif UNITY_EDITOR_WIN
-        internal const string Lib = "Packages/com.unity.webrtc/Runtime/Plugins/x86_64/webrtc.dll";
-#elif UNITY_STANDALONE
-        internal const string Lib = "webrtc";
-#elif UNITY_IOS
+#if UNITY_IOS
         internal const string Lib = "__Internal";
-#elif UNITY_ANDROID
+#else
         internal const string Lib = "webrtc";
 #endif
         private static Context s_context = null;
