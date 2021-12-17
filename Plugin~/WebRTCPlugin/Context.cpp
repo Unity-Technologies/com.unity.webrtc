@@ -7,6 +7,7 @@
 
 #include "AudioTrackSinkAdapter.h"
 #include "Context.h"
+#include "EncodedStreamTransformer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "MediaStreamObserver.h"
@@ -233,7 +234,16 @@ namespace webrtc
     rtc::scoped_refptr<VideoTrackInterface>
     Context::CreateVideoTrack(const std::string& label, VideoTrackSourceInterface* source)
     {
-        return m_peerConnectionFactory->CreateVideoTrack(label, source);
+         return m_peerConnectionFactory->CreateVideoTrack(label, source);
+    }
+
+    FrameTransformerInterface* Context::CreateFrameTransformer(
+        DelegateTransformedFrame callback)
+    {
+        rtc::scoped_refptr<EncodedStreamTransformer> transformer =
+            new rtc::RefCountedObject<EncodedStreamTransformer>(callback);
+        AddRefPtr(transformer);
+        return transformer;
     }
 
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)

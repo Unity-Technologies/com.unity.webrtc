@@ -1184,6 +1184,8 @@ namespace Unity.WebRTC
     internal delegate void DelegateAudioReceive(IntPtr ptr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateVideoFrameResize(IntPtr renderer, int width, int height);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateTransformedFrame(IntPtr transform, IntPtr frame);
 
     internal static class NativeMethods
     {
@@ -1232,6 +1234,8 @@ namespace Unity.WebRTC
         public static extern void ContextAddRefPtr(IntPtr context, IntPtr ptr);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteRefPtr(IntPtr context, IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr ContextCreateFrameTransformer(IntPtr ptr, DelegateTransformedFrame callback);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -1359,6 +1363,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr SenderGetTrack(IntPtr sender);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr SenderSetTransform(IntPtr sender, IntPtr transform);
+        [DllImport(WebRTC.Lib)]
         public static extern void SenderGetParameters(IntPtr sender, out IntPtr parameters);
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType SenderSetParameters(IntPtr sender, IntPtr parameters);
@@ -1371,6 +1377,8 @@ namespace Unity.WebRTC
         public static extern IntPtr ReceiverGetStreams(IntPtr receiver, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ReceiverGetSources(IntPtr receiver, out ulong length);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ReceiverSetTransform(IntPtr receiver, IntPtr transform);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -1521,9 +1529,24 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
+<<<<<<< HEAD
         public static extern IntPtr StatsMemberGetMapStringUint64(IntPtr member, out IntPtr values, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetMapStringDouble(IntPtr member, out IntPtr values, out ulong length);
+=======
+        public static extern uint FrameGetTimestamp(IntPtr frame);
+        [DllImport(WebRTC.Lib)]
+        public static extern uint FrameGetSsrc(IntPtr frame);
+        [DllImport(WebRTC.Lib)]
+        public static extern void FrameGetData(IntPtr frame, out IntPtr data, out int size);
+        [DllImport(WebRTC.Lib)]
+        public static extern void FrameSetData(IntPtr frame, IntPtr data, int size);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoFrameGetMetadata(IntPtr frame, out IntPtr ptr);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool VideoFrameIsKeyFrame(IntPtr frame, [MarshalAs(UnmanagedType.U1)] out bool isKeyFrame);
+>>>>>>> 3b456d0c (implemented encoded transform API)
     }
 
     internal static class VideoEncoderMethods

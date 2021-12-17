@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpContributingSource
     {
@@ -15,17 +15,17 @@ namespace Unity.WebRTC
         public double? audioLevel { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public long? rtpTimestamp { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint? source { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public long? timestamp { get; private set; }
 
@@ -157,6 +157,17 @@ namespace Unity.WebRTC
                 if (ptr == IntPtr.Zero)
                     return null;
                 return WebRTC.FindOrCreate(ptr, MediaStreamTrack.Create);
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public RTCRtpTransform Transform
+        {
+            set
+            {
+                NativeMethods.ReceiverSetTransform(GetSelfOrThrow(), value.self);
             }
         }
 
