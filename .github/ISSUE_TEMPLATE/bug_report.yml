@@ -15,9 +15,9 @@ body:
         * Check to make sure someone hasn't already opened a similar [issue](https://github.com/Unity-Technologies/com.unity.webrtc/issues).
          
         Please note the following points.
-        * We try to reply as soon as possible but we will get in touch with you within 5 working days.
-        * If you solved the issue yourself, please post the comment and close your issue.
-        * We would close the issue if we do not receive a reply for more than 2 weeks.
+        * We try to reply as soon as possible but we will get in touch with you within **5 working days**.
+        * If you solved the issue yourself, please **post the comment and close your issue**.
+        * We would close the issue if we do not receive a reply for more than **2 weeks**.
 
   - type: dropdown
     id: version
@@ -25,7 +25,7 @@ body:
       label: Package version
       description: |
         What version of the package are you using?
-        You can check the Unity version in Package Manager Window. See [manual](https://docs.unity3d.com/Manual/upm-ui.html)
+        You can check the Unity version in Package Manager Window. See [manual](https://docs.unity3d.com/Manual/upm-ui.html).
       options:
         - 2.4.0-exp.4
         - 2.4.0-exp.3
