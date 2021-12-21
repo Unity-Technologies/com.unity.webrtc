@@ -23,7 +23,9 @@ body:
     id: version
     attributes:
       label: Package version
-      description: What version of the package are you using?
+      description: |
+        What version of the package are you using?
+        You can check the Unity version in Package Manager Window. See [manual](https://docs.unity3d.com/Manual/upm-ui.html)
       options:
         - 2.4.0-exp.4
         - 2.4.0-exp.3
@@ -38,12 +40,13 @@ body:
     attributes:
       label: Environment
       description: |
-        examples:
-          - **OS**: Windows
-          - **Unity version**: 2021.2
+        Please describe your environment when the issue occurred.
+        Example:
+          - **OS**: Windows10
+          - **Unity version**: Unity 2021.2
       value: |
-          - OS:
-          - Unity version:
+          * OS:
+          * Unity version:
       render: markdown
     validations:
       required: false
