@@ -110,6 +110,7 @@ typedef enum UnityRenderingExtQueryType
                                                                             //      and it will clear the whole render target not just per-eye on demand.
     kUnityRenderingExtQueryKeepOriginalDoubleWideWidth_DEPRECATED  = 1 << 4,           // Instructs unity to keep the original double wide width. By default unity will try and have a power-of-two width for mip-mapping requirements.
     kUnityRenderingExtQueryRequestVRFlushCallback       = 1 << 5,           // Instructs unity to provide callbacks when the VR eye textures need flushing. Useful for multi GPU synchronization.
+    kUnityRenderingExtQueryOverridePresentFrame         = 1 << 6,           // The plugin handles it's own SwapChain Present. Unity will skip its internal Present calls
 } UnityRenderingExtQueryType;
 
 
@@ -232,8 +233,8 @@ typedef enum UnityRenderingExtTextureFormat
     kUnityRenderingExtFormatD24_UNorm,
     kUnityRenderingExtFormatD24_UNorm_S8_UInt,
     kUnityRenderingExtFormatD32_SFloat,
-    kUnityRenderingExtFormatD32_SFloat_S8_Uint,
-    kUnityRenderingExtFormatS8_Uint,
+    kUnityRenderingExtFormatD32_SFloat_S8_UInt,
+    kUnityRenderingExtFormatS8_UInt,
 
     // Compression formats
     kUnityRenderingExtFormatRGBA_DXT1_SRGB,
@@ -290,9 +291,9 @@ typedef enum UnityRenderingExtTextureFormat
     kUnityRenderingExtFormatYUV2,
 
     // Automatic formats, back-end decides
-    kUnityRenderingExtFormatDepthAuto,
-    kUnityRenderingExtFormatShadowAuto,
-    kUnityRenderingExtFormatVideoAuto,
+    kUnityRenderingExtFormatDepthAuto_removed_donotuse,
+    kUnityRenderingExtFormatShadowAuto_removed_donotuse,
+    kUnityRenderingExtFormatVideoAuto_removed_donotuse,
 
     // ASTC hdr profile
     kUnityRenderingExtFormatRGBA_ASTC4X4_UFloat,
