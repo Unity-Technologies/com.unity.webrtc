@@ -265,13 +265,6 @@ if(iOS)
     PROPERTIES 
       FRAMEWORK TRUE
   )
-elseif(macOS)
-  add_library(WebRTCPlugin MODULE)
-  set_target_properties(WebRTCPlugin 
-    PROPERTIES
-      BUNDLE TRUE
-      BUNDLE_EXTENSION bundle
-  )
 else()
   add_library(WebRTCPlugin SHARED)
 endif()
