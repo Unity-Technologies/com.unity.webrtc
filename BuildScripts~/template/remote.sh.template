@@ -44,6 +44,7 @@ fi
 # install unity-downloader-cli
 pip3 install unity-downloader-cli                                                     \
   --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \
+  --no-use-pep517                                                                     \
   --upgrade                                                                           \
   --user
 
