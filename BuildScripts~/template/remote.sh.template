@@ -42,10 +42,8 @@ then
 fi
 
 # install unity-downloader-cli
-pip3 install unity-downloader-cli                                                     \
-  --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \
-  --upgrade                                                                           \
-  --user
+brew tap --force-auto-update unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+brew install unity/homebrew-unity/unity-downloader-cli
 
 # install utr
 curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr \
