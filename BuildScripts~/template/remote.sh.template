@@ -41,12 +41,12 @@ then
   suite=editor
 fi
 
-# install brew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
 # install unity-downloader-cli
-brew tap --force-auto-update unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
-brew install unity/homebrew-unity/unity-downloader-cli
+pip3 install unity-downloader-cli                                                     \
+  --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \
+  --no-use-pep517                                                                     \
+  --upgrade                                                                           \
+  --user
 
 # install utr
 curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr \
