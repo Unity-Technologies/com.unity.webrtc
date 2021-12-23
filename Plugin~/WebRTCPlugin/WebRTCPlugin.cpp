@@ -842,24 +842,15 @@ extern "C"
         Optional<int32_t> id;
     };
 
-    UNITY_INTERFACE_EXPORT DataChannelObject* ContextCreateDataChannel(
-        Context* ctx, PeerConnectionObject* obj, const char* label, const RTCDataChannelInit* options)
+    UNITY_INTERFACE_EXPORT DataChannelObject* ContextCreateDataChannel(Context* ctx, PeerConnectionObject* obj, const char* label, const RTCDataChannelInit* options)
     {
         DataChannelInit _options;
         _options.ordered = options->ordered.value_or(true);
-        _options.maxRetransmitTime =
-            static_cast<absl::optional<int32_t>>(options->maxRetransmitTime);
-        _options.maxRetransmits =
-            static_cast<absl::optional<int32_t>>(options->maxRetransmits);
+        _options.maxRetransmitTime = static_cast<absl::optional<int32_t>>(options->maxRetransmitTime);
+        _options.maxRetransmits = static_cast<absl::optional<int32_t>>(options->maxRetransmits);
         _options.protocol = options->protocol == nullptr ? "" : options->protocol;
         _options.negotiated = options->negotiated.value_or(false);
         _options.id = options->id.value_or(-1);
-
-        //if (options->maxRetransmitTime.hasValue)
-        //    return nullptr;
-
-        //if (options->maxRetransmits.hasValue && options->maxRetransmitTime.hasValue)
-        //    return nullptr;
 
         return ctx->CreateDataChannel(obj, label, _options);
     }

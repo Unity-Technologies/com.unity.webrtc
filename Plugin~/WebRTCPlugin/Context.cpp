@@ -456,17 +456,8 @@ namespace webrtc
         m_listStatsReport.erase(found);
 	}
 
-    DataChannelObject* Context::CreateDataChannel(
-        PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
+    DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
     {
-        // TODO: Return nullptr when setting along with maxRetransmitTime and maxRetransmits
-        // Currently sometimes "PeerConnectionInterface::CreateDataChannel" method not
-        // returned be set along with maxRetransmits and maxRetransmitTime.
-        // We will replace "CreateDataChannel" to "CreateDataChannelOrError" in near future.
-        if (options.maxRetransmitTime.has_value() &&
-            options.maxRetransmits.has_value())
-            return nullptr;
-
         auto channel = obj->connection->CreateDataChannel(label, &options);
         if (channel == nullptr)
             return nullptr;
