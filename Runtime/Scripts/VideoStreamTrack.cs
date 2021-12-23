@@ -71,15 +71,6 @@ namespace Unity.WebRTC
         /// </summary>
         public event OnVideoReceived OnVideoReceived;
 
-        public void InitializeReceiver()
-        {
-            if (IsDecoderInitialized)
-                throw new InvalidOperationException("Already initialized receiver, use Texture property");
-
-            m_needFlip = true;
-            m_renderer = new UnityVideoRenderer(this);
-        }
-
         internal void UpdateReceiveTexture()
         {
             if (m_sourceTexture == null || m_destTexture == null)
@@ -159,6 +150,9 @@ namespace Unity.WebRTC
         {
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
                 throw new InvalidOperationException();
+
+            m_needFlip = true;
+            m_renderer = new UnityVideoRenderer(this);
         }
 
         public override void Dispose()

@@ -81,9 +81,8 @@ class MultiVideoReceiveSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e =>
         {
-            if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
+            if (e.Track is VideoStreamTrack track && track.IsDecoderInitialized)
             {
-                track.InitializeReceiver();
                 track.OnVideoReceived += tex =>
                 {
                     receiveImages[videoIndex].texture = tex;
