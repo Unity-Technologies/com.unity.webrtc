@@ -4,12 +4,23 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.4.0-exp.5]
 
 ### Added
 
-- Added the ability to execute pending native tasks manually from the main thread
-- Added support for sending basic native collections (`NativeArray<T>`, `NativeSlice<T>` and `NativeArray<T>.ReadOnly`) to `RTCDataChannel`
+- Added the ability to execute pending native tasks manually from the main thread.
+- Added support for sending basic native collections (`NativeArray<T>`, `NativeSlice<T>` and `NativeArray<T>.ReadOnly`) to `RTCDataChannel`.
+- Added a property `RTCRtpTransceiver.Mid`.
+- Added enable native flag when Initializing WebRTC.
+
+### Changed
+
+- Upgraded libwebrtc [m92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ).
+
+### Fixed
+
+- Fixed a crash bug where initializing video streaming on Unity Editor on Apple Silicon.
+- Fixed a crash bug where configuring OpenGL Core as a graphics API on Unity Editor on windows.
 
 ## [2.4.0-exp.4] - 2021-08-19
 
