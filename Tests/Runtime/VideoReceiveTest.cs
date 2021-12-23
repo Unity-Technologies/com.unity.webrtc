@@ -98,7 +98,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<VideoReceivePeers>();
             test.component.SetResolution(value.width, value.height);
             yield return test;
-            test.component.CoroutineUpdate();
 
             IEnumerator VideoReceive()
             {
@@ -173,8 +172,8 @@ namespace Unity.WebRTC.RuntimeTest
                 if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
                 {
                     RecvVideoTrack = track;
-                    track.InitializeReceiver();
                     track.OnVideoReceived += tex => RecvTexture = tex;
+                    track.InitializeReceiver();
                 }
             };
         }
@@ -192,11 +191,6 @@ namespace Unity.WebRTC.RuntimeTest
         public void RemoveTrack()
         {
             offerPc.RemoveTrack(sender);
-        }
-
-        public Coroutine CoroutineUpdate()
-        {
-            return StartCoroutine(WebRTC.Update());
         }
 
         public void Clear()
@@ -220,6 +214,23 @@ namespace Unity.WebRTC.RuntimeTest
             Clear();
             DestroyImmediate(camObj);
             camObj = null;
+        }
+
+        private void Update()
+        {
+            foreach (var reference in VideoStreamTrack.s_tracks.Values)
+            {
+                if (!reference.TryGetTarget(out var track))
+                    continue;
+                if (track.IsEncoderInitialized)
+                {
+                    track.Update();
+                }
+                else if (track.IsDecoderInitialized)
+                {
+                    track.UpdateReceiveTexture();
+                }
+            }
         }
 
         public IEnumerator Signaling()
