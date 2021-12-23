@@ -53,14 +53,6 @@ namespace Unity.WebRTC
             }
         }
 
-        public bool IsDecoderInitialized
-        {
-            get
-            {
-                return m_renderer != null && m_renderer.self != IntPtr.Zero;
-            }
-        }
-
         /// <summary>
         /// encoded / decoded texture
         /// </summary>
@@ -169,19 +161,13 @@ namespace Unity.WebRTC
                     WebRTC.Context.FinalizeEncoder(self);
                     if (RenderTexture.active == m_destTexture)
                         RenderTexture.active = null;
-
-                    // Unity API must be called from main thread.
-                    WebRTC.DestroyOnMainThread(m_destTexture);
                 }
 
-                if (IsDecoderInitialized)
-                {
-                    m_renderer.Dispose();
+                m_sourceTexture = null;
+                // Unity API must be called from main thread.
+                WebRTC.DestroyOnMainThread(m_destTexture);
 
-                    // Unity API must be called from main thread.
-                    WebRTC.DestroyOnMainThread(m_destTexture);
-                }
-
+                m_renderer?.Dispose();
                 _source?.Dispose();
 
                 s_tracks.TryRemove(self, out var value);

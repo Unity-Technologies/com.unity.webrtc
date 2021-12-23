@@ -40,29 +40,6 @@ namespace Unity.WebRTC.RuntimeTest
             WebRTC.Dispose();
         }
 
-        [UnityTest]
-        [Timeout(5000)]
-        public IEnumerator InitializeReceiver()
-        {
-            var peer = new RTCPeerConnection();
-            var transceiver = peer.AddTransceiver(TrackKind.Video);
-            Assert.That(transceiver, Is.Not.Null);
-            RTCRtpReceiver receiver = transceiver.Receiver;
-            Assert.That(receiver, Is.Not.Null);
-            MediaStreamTrack track = receiver.Track;
-            Assert.That(track, Is.Not.Null);
-            Assert.AreEqual(TrackKind.Video, track.Kind);
-            Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
-            var videoTrack = track as VideoStreamTrack;
-            Assert.That(videoTrack, Is.Not.Null);
-            Assert.That(videoTrack.IsDecoderInitialized, Is.True);
-            videoTrack.Dispose();
-            // wait for disposing video track.
-            yield return 0;
-
-            peer.Dispose();
-        }
-
         internal class TestValue
         {
             public int width;
@@ -107,7 +84,7 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return test.component.Signaling();
 
                 var receiveVideoTrack = test.component.RecvVideoTrack;
-                yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized, 5000);
+                yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null, 5000);
                 yield return new WaitUntilWithTimeout(() => receiveVideoTrack.Texture != null, 5000);
                 Assert.That(receiveVideoTrack.Texture, Is.Not.Null);
 
@@ -168,7 +145,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             answerPc.OnTrack = e =>
             {
-                if (e.Track is VideoStreamTrack track && track.IsDecoderInitialized)
+                if (e.Track is VideoStreamTrack track)
                 {
                     RecvVideoTrack = track;
                     track.OnVideoReceived += tex => RecvTexture = tex;
@@ -224,7 +201,7 @@ namespace Unity.WebRTC.RuntimeTest
                 {
                     track.Update();
                 }
-                else if (track.IsDecoderInitialized)
+                else
                 {
                     track.UpdateReceiveTexture();
                 }

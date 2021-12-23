@@ -426,7 +426,7 @@ namespace Unity.WebRTC
                         {
                             track.Update();
                         }
-                        else if (track.IsDecoderInitialized)
+                        else
                         {
                             track.UpdateReceiveTexture();
                         }
