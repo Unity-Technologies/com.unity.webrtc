@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
@@ -89,6 +88,7 @@ class BandwidthSample : MonoBehaviour
         callButton.interactable = true;
         hangUpButton.interactable = false;
         bandwidthSelector.interactable = false;
+        scaleResolutionDownSelector.interactable = false;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -104,13 +104,20 @@ class BandwidthSample : MonoBehaviour
         {
             if (e.Track is VideoStreamTrack track)
             {
-                track.OnVideoReceived += tex =>
-                {
-                    receiveImage.texture = tex;
-                    receiveImage.color = Color.white;
-                };
+                track.OnVideoReceived += OnVideoReceived;
             }
         };
+    }
+
+    private void OnVideoReceived(Texture tex)
+    {
+        receiveImage.texture = tex;
+        receiveImage.color = Color.white;
+
+        statsField.text +=
+            $"Video resolution: {tex.width}x{tex.height}" + Environment.NewLine;
+        if (autoScroll.isOn)
+            statsField.MoveTextEnd(false);
     }
 
     private void Update()
@@ -199,6 +206,7 @@ class BandwidthSample : MonoBehaviour
         }
 
         bandwidthSelector.interactable = false;
+        scaleResolutionDownSelector.interactable = false;
     }
 
     private void RemoveTracks()
@@ -222,6 +230,7 @@ class BandwidthSample : MonoBehaviour
         callButton.interactable = false;
         hangUpButton.interactable = true;
         bandwidthSelector.interactable = true;
+        scaleResolutionDownSelector.interactable = true;
         statsField.text = string.Empty;
 
         var configuration = GetSelectedSdpSemantics();
@@ -302,6 +311,8 @@ class BandwidthSample : MonoBehaviour
         hangUpButton.interactable = false;
         bandwidthSelector.interactable = false;
         bandwidthSelector.value = 0;
+        scaleResolutionDownSelector.interactable = false;
+        scaleResolutionDownSelector.value = 0;
 
         sourceImage.color = Color.black;
         receiveImage.color = Color.black;
@@ -377,11 +388,9 @@ class BandwidthSample : MonoBehaviour
                 var lastStats = last as RTCOutboundRTPStreamStats;
                 var duration = (double)(now - lastStats.Timestamp) / 1000000;
                 ulong bitrate = (ulong)(8 * (bytes - lastStats.bytesSent) / duration);
-                statsField.text += bitrate + Environment.NewLine;
+                statsField.text += $"Bitrate: {bitrate}" + Environment.NewLine;
                 if (autoScroll.isOn)
-                {
                     statsField.MoveTextEnd(false);
-                }
             }
 
         }
@@ -452,6 +461,7 @@ class BandwidthSample : MonoBehaviour
         if (pc == _pc1)
         {
             bandwidthSelector.interactable = true;
+            scaleResolutionDownSelector.interactable = true;
         }
     }
 
