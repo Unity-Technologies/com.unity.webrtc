@@ -77,9 +77,12 @@ namespace Unity.WebRTC.Samples
             pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
             pc2Ontrack = e =>
             {
-                if (e.Track is VideoStreamTrack video && !video.IsDecoderInitialized)
+                if (e.Track is VideoStreamTrack video)
                 {
-                    receiveImage.texture = video.InitializeReceiver(streamSize.x, streamSize.y);
+                    video.OnVideoReceived += tex =>
+                    {
+                        receiveImage.texture = tex;
+                    };
                     receiveVideoStream = e.Streams.First();
                     receiveVideoStream.OnRemoveTrack = ev =>
                     {

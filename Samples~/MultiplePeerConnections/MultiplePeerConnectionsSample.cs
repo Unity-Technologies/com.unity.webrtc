@@ -88,9 +88,12 @@ namespace Unity.WebRTC.Samples
             pc1Remote = new RTCPeerConnection(ref configuration);
             pc1Remote.OnTrack = e =>
             {
-                if (e.Track is VideoStreamTrack videoTrack && !videoTrack.IsDecoderInitialized)
+                if (e.Track is VideoStreamTrack videoTrack)
                 {
-                    receiveImage1.texture = videoTrack.InitializeReceiver(streamingSize.x, streamingSize.y);
+                    videoTrack.OnVideoReceived += tex =>
+                    {
+                        receiveImage1.texture = tex;
+                    };
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)
@@ -111,9 +114,12 @@ namespace Unity.WebRTC.Samples
             pc2Remote = new RTCPeerConnection(ref configuration);
             pc2Remote.OnTrack = e =>
             {
-                if (e.Track is VideoStreamTrack videoTrack && !videoTrack.IsDecoderInitialized)
+                if (e.Track is VideoStreamTrack videoTrack)
                 {
-                    receiveImage2.texture = videoTrack.InitializeReceiver(streamingSize.x, streamingSize.y);
+                    videoTrack.OnVideoReceived += tex =>
+                    {
+                        receiveImage2.texture = tex;
+                    };
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)

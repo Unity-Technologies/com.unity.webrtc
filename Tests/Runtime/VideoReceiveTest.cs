@@ -31,42 +31,13 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
-            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
+            WebRTC.Initialize(type: encoderType, limitTextureSize: true, forTest: true);
         }
 
         [TearDown]
         public void TearDown()
         {
             WebRTC.Dispose();
-        }
-
-        [UnityTest]
-        [Timeout(5000)]
-        public IEnumerator InitializeReceiver()
-        {
-            const int width = 256;
-            const int height = 256;
-
-            var peer = new RTCPeerConnection();
-            var transceiver = peer.AddTransceiver(TrackKind.Video);
-            Assert.That(transceiver, Is.Not.Null);
-            RTCRtpReceiver receiver = transceiver.Receiver;
-            Assert.That(receiver, Is.Not.Null);
-            MediaStreamTrack track = receiver.Track;
-            Assert.That(track, Is.Not.Null);
-            Assert.AreEqual(TrackKind.Video, track.Kind);
-            Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
-            var videoTrack = track as VideoStreamTrack;
-            Assert.That(videoTrack, Is.Not.Null);
-            var rt = videoTrack.InitializeReceiver(width, height);
-            Assert.That(videoTrack.IsDecoderInitialized, Is.True);
-            videoTrack.Dispose();
-            // wait for disposing video track.
-            yield return 0;
-
-            peer.Dispose();
-            Object.DestroyImmediate(rt);
         }
 
         internal class TestValue
@@ -91,7 +62,7 @@ namespace Unity.WebRTC.RuntimeTest
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest]
-        [Timeout(10000)]
+        [Timeout(15000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
@@ -103,7 +74,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<VideoReceivePeers>();
             test.component.SetResolution(value.width, value.height);
             yield return test;
-            test.component.CoroutineUpdate();
 
             IEnumerator VideoReceive()
             {
@@ -114,8 +84,9 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return test.component.Signaling();
 
                 var receiveVideoTrack = test.component.RecvVideoTrack;
-                yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null && receiveVideoTrack.IsDecoderInitialized, 5000);
-                Assert.That(test.component.RecvTexture, Is.Not.Null);
+                yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null, 5000);
+                yield return new WaitUntilWithTimeout(() => receiveVideoTrack.Texture != null, 5000);
+                Assert.That(receiveVideoTrack.Texture, Is.Not.Null);
 
                 yield return new WaitForSeconds(0.1f);
 
@@ -125,7 +96,7 @@ namespace Unity.WebRTC.RuntimeTest
             for (int i = 0; i < value.count; i++)
             {
                 yield return VideoReceive();
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(0.5f);
             }
 
             Object.DestroyImmediate(test.gameObject);
@@ -174,10 +145,10 @@ namespace Unity.WebRTC.RuntimeTest
 
             answerPc.OnTrack = e =>
             {
-                if (e.Track is VideoStreamTrack track && !track.IsDecoderInitialized)
+                if (e.Track is VideoStreamTrack track)
                 {
                     RecvVideoTrack = track;
-                    RecvTexture = track.InitializeReceiver(width, height);
+                    track.OnVideoReceived += tex => RecvTexture = tex;
                 }
             };
         }
@@ -195,11 +166,6 @@ namespace Unity.WebRTC.RuntimeTest
         public void RemoveTrack()
         {
             offerPc.RemoveTrack(sender);
-        }
-
-        public Coroutine CoroutineUpdate()
-        {
-            return StartCoroutine(WebRTC.Update());
         }
 
         public void Clear()
@@ -223,6 +189,23 @@ namespace Unity.WebRTC.RuntimeTest
             Clear();
             DestroyImmediate(camObj);
             camObj = null;
+        }
+
+        private void Update()
+        {
+            foreach (var reference in VideoStreamTrack.s_tracks.Values)
+            {
+                if (!reference.TryGetTarget(out var track))
+                    continue;
+                if (track.IsEncoderInitialized)
+                {
+                    track.Update();
+                }
+                else
+                {
+                    track.UpdateReceiveTexture();
+                }
+            }
         }
 
         public IEnumerator Signaling()

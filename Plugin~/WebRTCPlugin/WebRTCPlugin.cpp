@@ -390,9 +390,9 @@ extern "C"
         track->set_enabled(enabled);
     }
 
-    UNITY_INTERFACE_EXPORT UnityVideoRenderer* CreateVideoRenderer(Context* context)
+    UNITY_INTERFACE_EXPORT UnityVideoRenderer* CreateVideoRenderer(Context* context, DelegateVideoFrameResize callback)
     {
-        return context->CreateVideoRenderer();
+        return context->CreateVideoRenderer(callback);
     }
 
     UNITY_INTERFACE_EXPORT uint32_t GetVideoRendererId(UnityVideoRenderer* sink)

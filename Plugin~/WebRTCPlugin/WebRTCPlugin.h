@@ -9,6 +9,7 @@ namespace webrtc
 
     class Context;
     class PeerConnectionObject;
+    class UnityVideoRenderer;
     enum class RTCSdpType;
     enum class RTCPeerConnectionEventType;
     struct MediaStreamEvent;
@@ -29,6 +30,10 @@ namespace webrtc
             int sample_rate,
             int number_of_channels,
             int number_of_frames);
+    using DelegateVideoFrameResize =
+        void(*)(UnityVideoRenderer* renderer,
+            int width,
+            int height);
 
     void debugLog(const char* buf);
     extern DelegateDebugLog delegateDebugLog;

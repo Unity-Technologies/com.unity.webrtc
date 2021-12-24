@@ -4,7 +4,7 @@
 namespace unity {
 namespace webrtc {
 
-UnityVideoRenderer::UnityVideoRenderer(uint32_t id) : m_id(id)
+UnityVideoRenderer::UnityVideoRenderer(uint32_t id, DelegateVideoFrameResize callback) : m_id(id), m_callback(callback)
 {
     DebugLog("Create UnityVideoRenderer Id:%d", id);
 }
@@ -51,6 +51,11 @@ void UnityVideoRenderer::SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuf
     if (!lock.owns_lock())
     {
         return;
+    }
+
+    if (m_frameBuffer == nullptr || m_frameBuffer->width() != buffer->width() || m_frameBuffer->height() != buffer->height())
+    {
+        m_callback(this, buffer->width(), buffer->height());
     }
 
     m_frameBuffer = buffer;

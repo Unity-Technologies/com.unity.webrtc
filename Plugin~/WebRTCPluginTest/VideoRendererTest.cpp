@@ -29,7 +29,8 @@ public:
         m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
             /*is_screencast=*/ false,
             /*needs_denoising=*/ absl::nullopt);
-        m_renderer = std::make_unique<UnityVideoRenderer>(1);
+        m_callback = &OnFrameSizeChange;
+        m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback);
         m_trackSource->AddOrUpdateSink(m_renderer.get(), rtc::VideoSinkWants());
         m_trackSource->SetEncoder(encoder_.get());
 
@@ -49,6 +50,7 @@ protected:
 
     std::unique_ptr<UnityVideoRenderer> m_renderer;
     rtc::scoped_refptr<UnityVideoTrackSource> m_trackSource;
+    DelegateVideoFrameResize m_callback;
 
     webrtc::VideoFrame::Builder CreateBlackFrameBuilder(int width, int height)
     {
@@ -57,6 +59,11 @@ protected:
 
         webrtc::I420Buffer::SetBlack(buffer);
         return webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer);
+    }
+
+    static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
+    {
+        RTC_LOG(LS_INFO) << StringFormat("OnFrameSizeChanges width:%d height:%d", width, height).c_str();
     }
 
     void SendTestFrame(int width, int height)

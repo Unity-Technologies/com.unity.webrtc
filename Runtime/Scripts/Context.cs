@@ -197,7 +197,6 @@ namespace Unity.WebRTC
             NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream.GetSelfOrThrow(), callback);
         }
 
-
         public void AudioTrackRegisterAudioReceiveCallback(IntPtr track, DelegateAudioReceive callback)
         {
             NativeMethods.ContextRegisterAudioReceiveCallback(self, track, callback);
@@ -243,10 +242,9 @@ namespace Unity.WebRTC
             NativeMethods.ContextStopMediaStreamTrack(self, track);
         }
 
-
-        public IntPtr CreateVideoRenderer()
+        public IntPtr CreateVideoRenderer(DelegateVideoFrameResize callback)
         {
-            return NativeMethods.CreateVideoRenderer(self);
+            return NativeMethods.CreateVideoRenderer(self, callback);
         }
 
         public void DeleteVideoRenderer(IntPtr sink)

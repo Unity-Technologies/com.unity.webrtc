@@ -75,8 +75,11 @@ class ChangeCodecsSample : MonoBehaviour
         {
             if (e.Track is VideoStreamTrack track)
             {
-                receiveImage.texture = track.InitializeReceiver(width, height);
-                receiveImage.color = Color.white;
+                track.OnVideoReceived += tex =>
+                {
+                    receiveImage.texture = tex;
+                    receiveImage.color = Color.white;
+                };
             }
         };
     }
