@@ -53,8 +53,12 @@ void UnityVideoRenderer::SetFrameBuffer(rtc::scoped_refptr<webrtc::VideoFrameBuf
         return;
     }
 
+    if (m_frameBuffer == nullptr || m_frameBuffer->width() != buffer->width() || m_frameBuffer->height() != buffer->height())
+    {
+        m_callback(this, buffer->width(), buffer->height());
+    }
+
     m_frameBuffer = buffer;
-    m_callback(this, buffer->width(), buffer->height());
 }
 
 void UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format)

@@ -186,7 +186,7 @@ namespace Unity.WebRTC
             {
                 source.Release();
                 source.width = width;
-                source.height = width;
+                source.height = height;
                 source.Create();
             }
             else
@@ -198,7 +198,7 @@ namespace Unity.WebRTC
             {
                 m_destTexture.Release();
                 m_destTexture.width = width;
-                m_destTexture.height = width;
+                m_destTexture.height = height;
                 m_destTexture.Create();
             }
             else
