@@ -20,6 +20,7 @@ protected:
     const int height = 256;
     std::unique_ptr<Context> context;
     std::unique_ptr<IEncoder> encoder_;
+    DelegateVideoFrameResize callback_videoframeresize;
 
     void SetUp() override {
         GraphicsDeviceTestBase::SetUp();
@@ -29,9 +30,15 @@ protected:
         EXPECT_NE(nullptr, encoder_);
 
         context = std::make_unique<Context>();
+        callback_videoframeresize = &OnFrameSizeChange;
     }
     void TearDown() override {
         GraphicsDeviceTestBase::TearDown();
+    }
+
+    static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
+    {
+        RTC_LOG(LS_INFO) << StringFormat("OnFrameSizeChanges width:%d height:%d", width, height).c_str();
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
@@ -110,13 +117,13 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoRenderer) {
-    const auto renderer = context->CreateVideoRenderer();
+    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize);
     EXPECT_NE(nullptr, renderer);
     context->DeleteVideoRenderer(renderer);
 }
 
 TEST_P(ContextTest, EqualRendererGetById) {
-    const auto renderer = context->CreateVideoRenderer();
+    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize);
     EXPECT_NE(nullptr, renderer);
     const auto rendererId = renderer->GetId();
     const auto rendererGetById = context->GetVideoRenderer(rendererId);
@@ -128,7 +135,7 @@ TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
-    const auto renderer = context->CreateVideoRenderer();
+    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize);
     track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
     track->RemoveSink(renderer);
     context->DeleteVideoRenderer(renderer);
