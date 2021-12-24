@@ -14,6 +14,7 @@ class BandwidthSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Dropdown bandwidthSelector;
+    [SerializeField] private Dropdown scaleResolutionDownSelector;
     [SerializeField] private Button callButton;
     [SerializeField] private Button hangUpButton;
     [SerializeField] private InputField statsField;
@@ -47,6 +48,15 @@ class BandwidthSample : MonoBehaviour
         { "125",  125 },
     };
 
+    private Dictionary<string, double> scaleResolutionDownOptions = new Dictionary<string, double>()
+    {
+        { "Not scaling", 1.0f },
+        { "Down scale by 2.0", 2.0f },
+        { "Down scale by 4.0", 4.0f },
+        { "Down scale by 8.0", 8.0f },
+        { "Down scale by 16.0", 16.0f }
+    };
+
     private const int width = 1280;
     private const int height = 720;
 
@@ -57,6 +67,11 @@ class BandwidthSample : MonoBehaviour
             .Select(pair => new Dropdown.OptionData{text = pair.Key })
             .ToList();
         bandwidthSelector.onValueChanged.AddListener(ChangeBandwitdh);
+        scaleResolutionDownSelector.options = scaleResolutionDownOptions
+            .Select(pair => new Dropdown.OptionData { text = pair.Key })
+            .ToList();
+        scaleResolutionDownSelector.onValueChanged.AddListener(ChangeScaleResolutionDown);
+
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
         copyClipboard.onClick.AddListener(CopyClipboard);
@@ -248,6 +263,22 @@ class BandwidthSample : MonoBehaviour
             parameters.encodings[0].maxBitrate = bandwidth * 1000;
             parameters.encodings[0].minBitrate = bandwidth * 1000;
         }
+
+        RTCErrorType error = sender.SetParameters(parameters);
+        if (error != RTCErrorType.None)
+        {
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+        }
+    }
+
+    private void ChangeScaleResolutionDown(int index)
+    {
+        if (_pc1 == null || _pc2 == null)
+            return;
+        double scale = scaleResolutionDownOptions.Values.ElementAt(index);
+        RTCRtpSender sender = _pc1.GetSenders().First();
+        RTCRtpSendParameters parameters = sender.GetParameters();
+        parameters.encodings[0].scaleResolutionDownBy = scale;
 
         RTCErrorType error = sender.SetParameters(parameters);
         if (error != RTCErrorType.None)
