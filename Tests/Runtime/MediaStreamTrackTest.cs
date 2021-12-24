@@ -176,8 +176,11 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("MediaStreamTrack")]
         public void AddAndRemoveAudioStreamTrack()
         {
+            GameObject obj = new GameObject("audio");
+            AudioSource source = obj.AddComponent<AudioSource>();
+            source.clip = AudioClip.Create("test", 480, 2, 48000, false);
             var stream = new MediaStream();
-            var track = new AudioStreamTrack();
+            var track = new AudioStreamTrack(source);
             Assert.AreEqual(TrackKind.Audio, track.Kind);
             Assert.AreEqual(0, stream.GetAudioTracks().Count());
             Assert.True(stream.AddTrack(track));
@@ -187,6 +190,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(0, stream.GetAudioTracks().Count());
             track.Dispose();
             stream.Dispose();
+            Object.DestroyImmediate(source.clip);
+            Object.DestroyImmediate(obj);
         }
 
         [Test]
