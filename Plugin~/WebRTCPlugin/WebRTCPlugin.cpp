@@ -105,6 +105,7 @@ namespace webrtc
             return *this;
         }
 
+        __attribute__((optnone))
         explicit operator const absl::optional<T>&() const
         {
             absl::optional<T> dst = absl::nullopt;

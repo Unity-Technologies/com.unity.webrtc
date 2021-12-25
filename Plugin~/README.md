@@ -8,7 +8,7 @@ Install dependencies to make development environment.
 
 ### Windows
 
-On windows, [chocolatey](https://chocolatey.org/) is used to install.
+On windows, first, the build process use the **clang** compiler. To install clang, see [MSDN](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170). And [chocolatey](https://chocolatey.org/) is used to install.
 
 ```powershell
 # Install CUDA

@@ -370,7 +370,8 @@ namespace webrtc
     VideoTrackSourceInterface* Context::CreateVideoSource()
     {
         rtc::scoped_refptr<UnityVideoTrackSource> source =
-            new rtc::RefCountedObject<UnityVideoTrackSource>(false, nullptr);
+            new rtc::RefCountedObject<UnityVideoTrackSource>(
+                false, absl::nullopt);
 
         AddRefPtr(source);
         return source;

@@ -9,8 +9,8 @@ platforms:
   - name: win
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.3.7-728388
-    gpu_image: renderstreaming/win10:v0.3.7-728285
+    image: renderstreaming/win10:latest
+    gpu_image: renderstreaming/win10:latest
     flavor: b1.large
     model: rtx2080
     build_command: BuildScripts~/build_plugin_win.cmd
@@ -57,7 +57,7 @@ platforms:
 test_targets:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:v0.3.7-728388
+    image: renderstreaming/win10:latest
     flavor: b1.large
     is_gpu: false
     gfx_types:
@@ -97,7 +97,7 @@ test_targets:
         platform: standalone
   - name: win-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.3.7-728285
+    image: renderstreaming/win10:latest
     flavor: b1.large
     model: rtx2080
     is_gpu: true
