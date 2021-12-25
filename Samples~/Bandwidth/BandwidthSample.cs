@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
@@ -14,6 +13,7 @@ class BandwidthSample : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Dropdown bandwidthSelector;
+    [SerializeField] private Dropdown scaleResolutionDownSelector;
     [SerializeField] private Button callButton;
     [SerializeField] private Button hangUpButton;
     [SerializeField] private InputField statsField;
@@ -47,6 +47,15 @@ class BandwidthSample : MonoBehaviour
         { "125",  125 },
     };
 
+    private Dictionary<string, double> scaleResolutionDownOptions = new Dictionary<string, double>()
+    {
+        { "Not scaling", 1.0f },
+        { "Down scale by 2.0", 2.0f },
+        { "Down scale by 4.0", 4.0f },
+        { "Down scale by 8.0", 8.0f },
+        { "Down scale by 16.0", 16.0f }
+    };
+
     private const int width = 1280;
     private const int height = 720;
 
@@ -57,6 +66,11 @@ class BandwidthSample : MonoBehaviour
             .Select(pair => new Dropdown.OptionData{text = pair.Key })
             .ToList();
         bandwidthSelector.onValueChanged.AddListener(ChangeBandwitdh);
+        scaleResolutionDownSelector.options = scaleResolutionDownOptions
+            .Select(pair => new Dropdown.OptionData { text = pair.Key })
+            .ToList();
+        scaleResolutionDownSelector.onValueChanged.AddListener(ChangeScaleResolutionDown);
+
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
         copyClipboard.onClick.AddListener(CopyClipboard);
@@ -74,6 +88,7 @@ class BandwidthSample : MonoBehaviour
         callButton.interactable = true;
         hangUpButton.interactable = false;
         bandwidthSelector.interactable = false;
+        scaleResolutionDownSelector.interactable = false;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -89,13 +104,20 @@ class BandwidthSample : MonoBehaviour
         {
             if (e.Track is VideoStreamTrack track)
             {
-                track.OnVideoReceived += tex =>
-                {
-                    receiveImage.texture = tex;
-                    receiveImage.color = Color.white;
-                };
+                track.OnVideoReceived += OnVideoReceived;
             }
         };
+    }
+
+    private void OnVideoReceived(Texture tex)
+    {
+        receiveImage.texture = tex;
+        receiveImage.color = Color.white;
+
+        statsField.text +=
+            $"Video resolution: {tex.width}x{tex.height}" + Environment.NewLine;
+        if (autoScroll.isOn)
+            statsField.MoveTextEnd(false);
     }
 
     private void Update()
@@ -184,6 +206,7 @@ class BandwidthSample : MonoBehaviour
         }
 
         bandwidthSelector.interactable = false;
+        scaleResolutionDownSelector.interactable = false;
     }
 
     private void RemoveTracks()
@@ -207,6 +230,7 @@ class BandwidthSample : MonoBehaviour
         callButton.interactable = false;
         hangUpButton.interactable = true;
         bandwidthSelector.interactable = true;
+        scaleResolutionDownSelector.interactable = true;
         statsField.text = string.Empty;
 
         var configuration = GetSelectedSdpSemantics();
@@ -256,6 +280,22 @@ class BandwidthSample : MonoBehaviour
         }
     }
 
+    private void ChangeScaleResolutionDown(int index)
+    {
+        if (_pc1 == null || _pc2 == null)
+            return;
+        double scale = scaleResolutionDownOptions.Values.ElementAt(index);
+        RTCRtpSender sender = _pc1.GetSenders().First();
+        RTCRtpSendParameters parameters = sender.GetParameters();
+        parameters.encodings[0].scaleResolutionDownBy = scale;
+
+        RTCErrorType error = sender.SetParameters(parameters);
+        if (error != RTCErrorType.None)
+        {
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+        }
+    }
+
     private void HangUp()
     {
         RemoveTracks();
@@ -271,6 +311,8 @@ class BandwidthSample : MonoBehaviour
         hangUpButton.interactable = false;
         bandwidthSelector.interactable = false;
         bandwidthSelector.value = 0;
+        scaleResolutionDownSelector.interactable = false;
+        scaleResolutionDownSelector.value = 0;
 
         sourceImage.color = Color.black;
         receiveImage.color = Color.black;
@@ -346,11 +388,9 @@ class BandwidthSample : MonoBehaviour
                 var lastStats = last as RTCOutboundRTPStreamStats;
                 var duration = (double)(now - lastStats.Timestamp) / 1000000;
                 ulong bitrate = (ulong)(8 * (bytes - lastStats.bytesSent) / duration);
-                statsField.text += bitrate + Environment.NewLine;
+                statsField.text += $"Bitrate: {bitrate}" + Environment.NewLine;
                 if (autoScroll.isOn)
-                {
                     statsField.MoveTextEnd(false);
-                }
             }
 
         }
@@ -421,6 +461,7 @@ class BandwidthSample : MonoBehaviour
         if (pc == _pc1)
         {
             bandwidthSelector.interactable = true;
+            scaleResolutionDownSelector.interactable = true;
         }
     }
 
