@@ -273,7 +273,8 @@ namespace Unity.WebRTC
         {
             if (self == IntPtr.Zero)
             {
-                throw new InvalidOperationException("This instance has been disposed.");
+                throw new ObjectDisposedException(
+                    GetType().FullName, "This instance has been disposed.");
             }
             return self;
         }

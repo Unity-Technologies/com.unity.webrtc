@@ -49,7 +49,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var stream = new MediaStream();
             stream.Dispose();
-            Assert.That(() => { var id = stream.Id; }, Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => { var id = stream.Id; }, Throws.TypeOf<ObjectDisposedException>());
         }
 
         [Test]

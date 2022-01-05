@@ -72,7 +72,7 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new VideoStreamTrack(rt);
             Assert.That(track, Is.Not.Null);
             track.Dispose();
-            Assert.That(() => { var id = track.Id; }, Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => { var id = track.Id; }, Throws.TypeOf<ObjectDisposedException>());
             Object.DestroyImmediate(rt);
         }
 
