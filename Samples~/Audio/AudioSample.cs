@@ -219,14 +219,14 @@ namespace Unity.WebRTC
         void OnAddTrack(MediaStreamTrackEvent e)
         {
             var track = e.Track as AudioStreamTrack;
+            outputAudioSource.SetTrack(track);
             track.OnAudioReceived += OnAudioReceived;
         }
 
-        void OnAudioReceived(AudioClip renderer)
+        void OnAudioReceived(AudioSource renderer)
         {
-            outputAudioSource.clip = renderer;
-            outputAudioSource.loop = true;
-            outputAudioSource.Play();
+            renderer.loop = true;
+            renderer.Play();
         }
 
         void OnHangUp()
