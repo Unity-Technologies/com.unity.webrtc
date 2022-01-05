@@ -242,8 +242,8 @@ namespace webrtc
         }
         if (nvEncInitializeParams.frameRateNum != m_frameRate)
         {
-            // nvcodec do not allow a framerate over 240
-            const uint32_t kMaxFramerate = 240;
+            // NV_ENC_LEVEL_H264_51 do not allow a framerate over 120
+            const uint32_t kMaxFramerate = 120;
             uint32_t targetFramerate = std::min(m_frameRate, kMaxFramerate);
             nvEncInitializeParams.frameRateNum = targetFramerate;
             settingChanged = true;
