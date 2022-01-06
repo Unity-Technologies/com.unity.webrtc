@@ -77,15 +77,6 @@ namespace Unity.WebRTC
 
             return new AudioStreamTrack(ptr);
         }
-
-        internal IntPtr GetSelfOrThrow()
-        {
-            if (self == IntPtr.Zero)
-            {
-                throw new InvalidOperationException("This instance has been disposed.");
-            }
-            return self;
-        }
     }
 
     public enum TrackKind

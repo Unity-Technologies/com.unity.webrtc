@@ -70,7 +70,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             peer.Dispose();
-            Assert.That(() => {  var state = peer.ConnectionState; }, Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => {  var state = peer.ConnectionState; }, Throws.TypeOf<ObjectDisposedException>());
         }
 
         [Test]
@@ -770,7 +770,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             Assert.That(track1, Is.Not.Null);
             peer2.Dispose();
-            Assert.That(() => track1.Id, Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => track1.Id, Throws.TypeOf<ObjectDisposedException>());
             track.Dispose();
             track1.Dispose();
             Object.DestroyImmediate(source.clip);

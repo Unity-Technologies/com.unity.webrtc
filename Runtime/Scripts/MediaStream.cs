@@ -94,15 +94,6 @@ namespace Unity.WebRTC
         {
         }
 
-        internal IntPtr GetSelfOrThrow()
-        {
-            if (self == IntPtr.Zero)
-            {
-                throw new InvalidOperationException("This instance has been disposed.");
-            }
-            return self;
-        }
-
         internal MediaStream(IntPtr ptr) :base(ptr)
         {
             WebRTC.Table.Add(self, this);

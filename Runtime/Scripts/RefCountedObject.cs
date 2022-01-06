@@ -14,6 +14,16 @@ namespace Unity.WebRTC
             WebRTC.Context.AddRefPtr(self);
         }
 
+        internal IntPtr GetSelfOrThrow()
+        {
+            if (self == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException(
+                    GetType().FullName, "This instance has been disposed.");
+            }
+            return self;
+        }
+
         public virtual void Dispose()
         {
             if (this.disposed)

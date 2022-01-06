@@ -30,15 +30,6 @@ namespace Unity.WebRTC
             base.Dispose();
         }
 
-        internal IntPtr GetSelfOrThrow()
-        {
-            if (self == IntPtr.Zero)
-            {
-                throw new InvalidOperationException("This instance has been disposed.");
-            }
-            return self;
-        }
-
         /// <summary>
         /// 
         /// </summary>

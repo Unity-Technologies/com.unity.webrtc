@@ -17,15 +17,6 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
-        internal IntPtr GetSelfOrThrow()
-        {
-            if (self == IntPtr.Zero)
-            {
-                throw new InvalidOperationException("This instance has been disposed.");
-            }
-            return self;
-        }
-
         ~RTCRtpReceiver()
         {
             this.Dispose();
