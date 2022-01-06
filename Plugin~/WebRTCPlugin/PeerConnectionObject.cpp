@@ -53,12 +53,12 @@ namespace webrtc
         }
     }
 
-    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
-        auto obj = std::make_unique<DataChannelObject>(channel, *this);
-        const auto ptr = obj.get();
-        context.AddDataChannel(std::move(obj));
+    void PeerConnectionObject::OnDataChannel(
+        rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
+    {
+        context.AddDataChannel(channel, *this);
         if (onDataChannel != nullptr) {
-            onDataChannel(this, ptr);
+            onDataChannel(this, channel);
         }
     }
 

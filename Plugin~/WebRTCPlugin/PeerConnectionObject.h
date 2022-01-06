@@ -17,7 +17,7 @@ namespace webrtc
     using DelegateOnIceConnectionChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceConnectionState);
     using DelegateOnIceGatheringChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::IceGatheringState);
     using DelegateOnConnectionStateChange = void(*)(PeerConnectionObject*, webrtc::PeerConnectionInterface::PeerConnectionState);
-    using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelObject*);
+    using DelegateOnDataChannel = void(*)(PeerConnectionObject*, DataChannelInterface*);
     using DelegateOnRenegotiationNeeded = void(*)(PeerConnectionObject*);
     using DelegateOnTrack = void(*)(PeerConnectionObject*, webrtc::RtpTransceiverInterface*);
     using DelegateOnRemoveTrack = void(*)(PeerConnectionObject*, webrtc::RtpReceiverInterface*);
