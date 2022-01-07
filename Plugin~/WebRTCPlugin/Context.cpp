@@ -456,27 +456,37 @@ namespace webrtc
         m_listStatsReport.erase(found);
 	}
 
-    DataChannelObject* Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
+    DataChannelInterface* Context::CreateDataChannel(
+        PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
     {
-        auto channel = obj->connection->CreateDataChannel(label, &options);
+        const rtc::scoped_refptr<DataChannelInterface> channel =
+            obj->connection->CreateDataChannel(label, &options);
+
         if (channel == nullptr)
             return nullptr;
-        auto dataChannelObj = std::make_unique<DataChannelObject>(channel, *obj);
-        DataChannelObject* ptr = dataChannelObj.get();
-        m_mapDataChannels[ptr] = std::move(dataChannelObj);
-        return ptr;
+
+        AddDataChannel(channel, *obj);
+        return channel;
     }
 
-    void Context::AddDataChannel(std::unique_ptr<DataChannelObject> channel) {
-        const auto ptr = channel.get();
-        m_mapDataChannels[ptr] = std::move(channel);
-    }
-
-    void Context::DeleteDataChannel(DataChannelObject* obj)
+    void Context::AddDataChannel(
+        DataChannelInterface* channel, PeerConnectionObject& pc)
     {
-        if (m_mapDataChannels.count(obj) > 0)
+        auto dataChannelObj = std::make_unique<DataChannelObject>(channel, pc);
+        m_mapDataChannels[channel] = std::move(dataChannelObj);
+    }
+
+    DataChannelObject* Context::GetDataChannelObject(
+        const DataChannelInterface* channel)
+    {
+        return m_mapDataChannels[channel].get();
+    }
+
+    void Context::DeleteDataChannel(DataChannelInterface* channel)
+    {
+        if (m_mapDataChannels.count(channel) > 0)
         {
-            m_mapDataChannels.erase(obj);
+            m_mapDataChannels.erase(channel);
         }
     }
 

@@ -172,6 +172,19 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteDataChannel(self, ptr);
         }
 
+        public void DataChannelRegisterOnMessage(IntPtr channel, DelegateNativeOnMessage callback)
+        {
+            NativeMethods.DataChannelRegisterOnMessage(self, channel, callback);
+        }
+        public void DataChannelRegisterOnOpen(IntPtr channel, DelegateNativeOnOpen callback)
+        {
+            NativeMethods.DataChannelRegisterOnOpen(self, channel, callback);
+        }
+        public void DataChannelRegisterOnClose(IntPtr channel, DelegateNativeOnClose callback)
+        {
+            NativeMethods.DataChannelRegisterOnClose(self, channel, callback);
+        }
+
         public IntPtr CreateMediaStream(string label)
         {
             return NativeMethods.ContextCreateMediaStream(self, label);

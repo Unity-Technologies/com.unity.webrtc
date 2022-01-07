@@ -5,33 +5,23 @@ namespace unity
 namespace webrtc
 {
 
-    namespace webrtc = ::webrtc;
+    using namespace ::webrtc;
 
     class PeerConnectionObject;
     class DataChannelObject;
-    using DelegateOnMessage = void(*)(DataChannelObject*, const byte*, int);
-    using DelegateOnOpen = void(*)(DataChannelObject*);
-    using DelegateOnClose = void(*)(DataChannelObject*);
+    using DelegateOnMessage = void(*)(DataChannelInterface*, const byte*, int);
+    using DelegateOnOpen = void(*)(DataChannelInterface*);
+    using DelegateOnClose = void(*)(DataChannelInterface*);
 
-    class DataChannelObject : public webrtc::DataChannelObserver
+    class DataChannelObject : public DataChannelObserver
     {
     public:
-        DataChannelObject(rtc::scoped_refptr<webrtc::DataChannelInterface> channel, PeerConnectionObject& pc);
+        DataChannelObject(rtc::scoped_refptr<DataChannelInterface> channel, PeerConnectionObject& pc);
         ~DataChannelObject();
 
         void Close()
         {
             dataChannel->Close();
-        }
-        void Send(const char* data)
-        {
-            dataChannel->Send(webrtc::DataBuffer(std::string(data)));
-        }
-
-        void Send(const byte* data, int len)
-        {
-            rtc::CopyOnWriteBuffer buf(data, len);
-            dataChannel->Send(webrtc::DataBuffer(buf, true));
         }
         void RegisterOnMessage(DelegateOnMessage callback)
         {

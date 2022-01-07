@@ -118,9 +118,13 @@ namespace webrtc
         void DeleteStatsReport(const webrtc::RTCStatsReport* report);
     
         // DataChannel
-        DataChannelObject* CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options);
-        void AddDataChannel(std::unique_ptr<DataChannelObject> channel);
-        void DeleteDataChannel(DataChannelObject* obj);
+        DataChannelInterface* CreateDataChannel(
+            PeerConnectionObject* obj, const char* label, const DataChannelInit& options);
+        void AddDataChannel(
+            DataChannelInterface* channel, PeerConnectionObject& pc);
+        DataChannelObject* GetDataChannelObject(
+            const DataChannelInterface* channel);
+        void DeleteDataChannel(DataChannelInterface* channel);
 
         // Renderer
         UnityVideoRenderer* CreateVideoRenderer(DelegateVideoFrameResize callback);
@@ -161,7 +165,7 @@ namespace webrtc
         std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
-        std::map<const DataChannelObject*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
+        std::map<const DataChannelInterface*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
         std::map<webrtc::AudioTrackInterface*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
         std::map<const rtc::RefCountInterface*, rtc::scoped_refptr<rtc::RefCountInterface>> m_mapRefPtr;

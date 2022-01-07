@@ -80,15 +80,11 @@ namespace Unity.WebRTC
     ///
     /// </summary>
     /// <seealso cref="RTCPeerConnection.CreateDataChannel(string, RTCDataChannelInit)"/>
-    public class RTCDataChannel : IDisposable
+    public class RTCDataChannel : RefCountedObject
     {
-        private IntPtr self;
         private DelegateOnMessage onMessage;
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
-
-        private int id;
-        private bool disposed;
 
         /// <summary>
         ///
@@ -213,22 +209,12 @@ namespace Unity.WebRTC
         }
 
         internal RTCDataChannel(IntPtr ptr, RTCPeerConnection peerConnection)
+            : base(ptr)
         {
-            self = ptr;
             WebRTC.Table.Add(self, this);
-            NativeMethods.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
-            NativeMethods.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);
-            NativeMethods.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
-        }
-
-        internal IntPtr GetSelfOrThrow()
-        {
-            if (self == IntPtr.Zero)
-            {
-                throw new ObjectDisposedException(
-                    GetType().FullName, "This instance has been disposed.");
-            }
-            return self;
+            WebRTC.Context.DataChannelRegisterOnMessage(self, DataChannelNativeOnMessage);
+            WebRTC.Context.DataChannelRegisterOnOpen(self, DataChannelNativeOnOpen);
+            WebRTC.Context.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
         }
 
         ~RTCDataChannel()
@@ -236,7 +222,7 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (this.disposed)
             {
@@ -247,10 +233,8 @@ namespace Unity.WebRTC
                 Close();
                 WebRTC.Context.DeleteDataChannel(self);
                 WebRTC.Table.Remove(self);
-                self = IntPtr.Zero;
             }
-            this.disposed = true;
-            GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
         /// <summary>

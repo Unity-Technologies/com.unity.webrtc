@@ -35,13 +35,13 @@ namespace webrtc
         case webrtc::DataChannelInterface::kOpen:
             if (onOpen != nullptr)
             {
-                onOpen(this);
+                onOpen(this->dataChannel);
             }
             break;
         case webrtc::DataChannelInterface::kClosed:
             if (onClose != nullptr)
             {
-                onClose(this);
+                onClose(this->dataChannel);
             }
             break;
         default:
@@ -56,7 +56,7 @@ namespace webrtc
             if (onMessage != nullptr)
             {
 #pragma warning(suppress: 4267)
-                onMessage(this, buffer.data.data(), size);
+                onMessage(this->dataChannel, buffer.data.data(), size);
             }
         }
     }
