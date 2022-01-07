@@ -1,40 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.WebRTC
 {
-    //public class TransformStreamDefaultController
-    //{
-    //    public double desiredSize;
-
-    //    //undefined enqueue(optional any chunk);
-    //    //undefined error(optional any reason);
-    //    //undefined terminate();
-    //};
-
-    //public delegate void TransformerStartCallback(TransformStreamDefaultController controller);
-    //public delegate void TransformerTransformCallback(TransformStreamDefaultController  controller);
-    //public delegate void TransformerFlushCallback(TransformStreamDefaultController controller );
-
-    //public class Transformer
-    //{
-    //    public TransformerStartCallback start;
-    //    public TransformerTransformCallback transform;
-    //    public TransformerFlushCallback flush;
-    //    //any readableType;
-    //    //any writableType;
-    //};
-
-    //public class RTCRtpScriptTransformer
-    //{
-    //    public readonly ReadableStream readable;
-    //    public readonly WritableStream writable;
-    //    // readonly public options;
-    //}
-
+    /// <summary>
+    /// 
+    /// </summary>
     public enum RTCEncodedVideoFrameType
     {
         Empty,
@@ -84,6 +57,9 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCEncodedFrame
     {
         protected IntPtr self;
@@ -171,41 +147,6 @@ namespace Unity.WebRTC
         public RTCEncodedVideoFrame(IntPtr ptr) : base(ptr) {}
     };
 
-    //public interface IReadableWritablePair
-    //{
-    //    public ReadableStream readable { get; }
-    //    public WritableStream writable { get; }
-    //}
-
-    //public class TransformStream : IReadableWritablePair
-    //{
-    //    public ReadableStream readable { get; private set; }
-    //    public WritableStream writable { get; private set; }
-
-    //    private Transformer transformer_;
-
-    //    public TransformStream(Transformer transformer = null)
-    //    {
-    //        transformer_ = transformer;
-    //    }
-    //}
-
-    //public class MediaStreamTrackProcessor
-    //{
-    //    public MediaStreamTrackProcessor(MediaStreamTrack track)
-    //    {
-
-    //    }
-
-    //    public ReadableStream readable
-    //    {
-    //        get
-    //        {
-    //            return null;
-    //        }
-    //    }
-    //}
-
     /// <summary>
     /// 
     /// </summary>
@@ -265,6 +206,9 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCTransformEvent
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCEncodedFrame Frame { get; }
 
         internal RTCTransformEvent(RTCEncodedFrame frame)
@@ -282,45 +226,4 @@ namespace Unity.WebRTC
         {
         }
     }
-
-    //public class SFrameTransform : RTCRtpTransform
-    //{
-    //    public SFrameTransform(TrackKind kind, TransformedFrameCallback callback)
-    //        : base(kind, callback)
-    //    {
-    //    }
-    //}
-
-    //public class StreamPipeOptions {
-    //    bool preventClose = false;
-    //    bool preventAbort = false;
-    //    bool preventCancel = false;
-    //    //AbortSignal signal;
-    //};
-
-    //public class ReadableStream
-    //{
-    //    public ReadableStream PipeThorough(IReadableWritablePair trasform, StreamPipeOptions options = null)
-    //    {
-    //        return this;
-    //    }
-    //    public AsyncOperationBase PipeTo(WritableStream destination, StreamPipeOptions options = null)
-    //    {
-    //        return null;
-    //    }
-    //}
-
-    //public class WritableStream
-    //{
-
-    //}
-
-
-    //public class MediaStreamTrackGenerator
-    //{
-    //    public MediaStreamTrackGenerator(TrackKind kind)
-    //    {
-
-    //    }
-    //}
 }
