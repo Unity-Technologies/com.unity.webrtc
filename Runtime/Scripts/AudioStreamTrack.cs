@@ -123,6 +123,20 @@ namespace Unity.WebRTC
                 m_audioSource.clip =
                     AudioClip.Create(clipName, lengthSamples, channels, sampleRate, false);
                 m_bufInfo = new AudioBufferTracker(m_audioSource.clip.frequency);
+
+                AudioSettings.OnAudioConfigurationChanged += (bool deviceWasChanged) =>
+                {
+                    var clip = m_audioSource.clip;
+                    bool clipInvalidated = clip != null && clip.channels < 1;
+                    if (clipInvalidated)
+                    {
+                        m_audioSource.clip =
+                            AudioClip.Create(clipName, lengthSamples, channels, sampleRate, false);
+                        m_bufInfo.Initialize(m_audioSource);
+                        m_audioSource.Play();
+                        UnityEngine.Object.Destroy(clip);
+                    }
+                };
             }
 
             public void Dispose()
@@ -152,7 +166,7 @@ namespace Unity.WebRTC
                 int WriteBuffer(float[] data, int offset)
                 {
                     clip.SetData(data, offset % clip.samples);
-                    return data.Length / clip.channels;
+                    return data.Length / Mathf.Max(clip.channels, 1);
                 }
             }
 
