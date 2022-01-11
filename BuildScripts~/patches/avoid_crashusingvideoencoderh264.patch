@@ -1,0 +1,22 @@
+--- sdk/objc/components/video_codec/RTCVideoEncoderH264.mm	2022-01-11 15:58:52.000000000 +0900
++++ sdk/objc/components/video_codec/RTCVideoEncoderH264.mm.change	2022-01-11 15:58:44.000000000 +0900
+@@ -559,6 +559,10 @@
+   OSType framePixelFormat = [self pixelFormatOfFrame:frame];
+ 
+   if (_compressionSession) {
++    if (!_pixelBufferPool) {
++      return NO;
++    }
++
+     // The pool attribute `kCVPixelBufferPixelFormatTypeKey` can contain either an array of pixel
+     // formats or a single pixel format.
+     NSDictionary *poolAttributes =
+@@ -664,7 +668,7 @@
+ 
+   // The pixel buffer pool is dependent on the compression session so if the session is reset, the
+   // pool should be reset as well.
+-  _pixelBufferPool = VTCompressionSessionGetPixelBufferPool(_compressionSession);
++  // _pixelBufferPool = VTCompressionSessionGetPixelBufferPool(_compressionSession);
+ 
+   return WEBRTC_VIDEO_CODEC_OK;
+ }
