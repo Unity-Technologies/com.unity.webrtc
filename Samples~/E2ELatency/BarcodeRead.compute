@@ -1,0 +1,21 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture2D<float4> Source;
+int Row;
+int Column;
+RWStructuredBuffer<float4> Result;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float width, height;
+    Source.GetDimensions(width, height);
+
+    uint x = (id.x + 0.5) * width / Row;
+    uint y = (id.y + 0.5) * height / Column;
+
+    Result[id.x + id.y * Row] = Source[uint2(x, y)];
+}
