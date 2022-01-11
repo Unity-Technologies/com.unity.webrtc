@@ -17,6 +17,7 @@ class E2ELatencySample : MonoBehaviour
     [SerializeField] private Text textLocalTimestamp;
     [SerializeField] private Text textRemoteTimestamp;
     [SerializeField] private Text textLatency;
+    [SerializeField] private Text textAverageLatency;
     [SerializeField] private Dropdown dropDownProtocol;
 
 //    [SerializeField] private Camera cam;
@@ -140,7 +141,8 @@ class E2ELatencySample : MonoBehaviour
             averageLantecy = (int)queueLatency.Average();
             queueLatency.Clear();
         }
-        textLatency.text = latency.ToString() + " average:" + averageLantecy.ToString();
+        textLatency.text = latency.ToString();
+        textAverageLatency.text = averageLantecy.ToString();
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
