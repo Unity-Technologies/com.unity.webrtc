@@ -29,7 +29,7 @@ Check Package Manager window, Click `+` button and select `Add package from git 
 
 ![Select add package from git url](images/install_select_add_package_from_git_url.png)
 
-Input the string below to the input field.
+Input the string below to the input field : https://github.com/Unity-Technologies/com.unity.webrtc.git
 
 ```
 com.unity.webrtc@2.4.0-exp.5
