@@ -55,9 +55,12 @@ namespace Unity.WebRTC.RuntimeTest
             new TestValue{width = 1280, height = 720, count = 1},
             new TestValue{width = 1280, height = 720, count = 2},
             new TestValue{width = 1280, height = 720, count = 3},
+            new TestValue{width = 1920, height = 1080, count = 1},
+            new TestValue{width = 1920, height = 1080, count = 2},
+            new TestValue{width = 1920, height = 1080, count = 3},
         };
 
-        internal static int[] range = Enumerable.Range(0, 6).ToArray();
+        internal static int[] range = Enumerable.Range(0, 9).ToArray();
 
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
