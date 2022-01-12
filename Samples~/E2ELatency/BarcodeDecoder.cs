@@ -11,7 +11,6 @@ public class BarcodeDecoder : MonoBehaviour
 
     Texture texture_;
     GraphicsBuffer readbackBuffer_;
-    //int kernelIndex_;
 
     private void Awake()
     {
