@@ -160,17 +160,6 @@ class E2ELatencySample : MonoBehaviour
         if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
         {
             StartCoroutine(CheckStats(pc));
-            StartCoroutine(CheckReceiverSources(pc));
-        }
-    }
-
-    IEnumerator CheckReceiverSources(RTCPeerConnection pc)
-    {
-        while(true)
-        {
-            yield return new WaitForSeconds(1f);
-            var receiver = pc?.GetReceivers().First();
-            receiver?.GetContributingSources();
         }
     }
 
