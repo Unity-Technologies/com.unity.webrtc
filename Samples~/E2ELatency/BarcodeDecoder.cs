@@ -18,6 +18,11 @@ public class BarcodeDecoder : MonoBehaviour
         data_ = new Color[count];
     }
 
+    private void OnDestroy()
+    {
+        readbackBuffer_.Dispose();
+    }
+
     public int GetValue(Texture texture)
     {
         return Decode(texture);

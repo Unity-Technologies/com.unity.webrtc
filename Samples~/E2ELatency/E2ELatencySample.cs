@@ -18,6 +18,7 @@ class E2ELatencySample : MonoBehaviour
     [SerializeField] private Text textLatency;
     [SerializeField] private Text textAverageLatency;
     [SerializeField] private Dropdown dropDownResolution;
+    [SerializeField] private Dropdown dropDownFramerate;
 
     [SerializeField] private BarcodeEncoder encoder;
     [SerializeField] private BarcodeDecoder decoder;
@@ -47,7 +48,14 @@ class E2ELatencySample : MonoBehaviour
         new Vector2Int(640, 360),
         new Vector2Int(1280, 720),
         new Vector2Int(1920, 1080),
+    };
 
+    List<int> listFramerate = new List<int>()
+    {
+        15,
+        30,
+        60,
+        90
     };
 
     private void Awake()
@@ -73,6 +81,11 @@ class E2ELatencySample : MonoBehaviour
         dropDownResolution.options =
             listResolution.Select(_ => new Dropdown.OptionData($"{_.x}x{_.y}")).ToList();
         dropDownResolution.value = 2;
+        dropDownFramerate.interactable = true;
+        dropDownFramerate.options =
+            listFramerate.Select(_ => new Dropdown.OptionData($"{_}")).ToList();
+        dropDownFramerate.value = 1;
+        dropDownFramerate.onValueChanged.AddListener(OnFramerateChanged);
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -97,12 +110,17 @@ class E2ELatencySample : MonoBehaviour
         };
     }
 
+    private void OnFramerateChanged(int value)
+    {
+        Application.targetFrameRate = listFramerate[value];
+    }
+
     private void OnStart()
     {
         startButton.interactable = false;
         callButton.interactable = true;
         dropDownResolution.interactable = false;
-
+        dropDownFramerate.interactable = false;
         if (videoStream == null)
         {
             Vector2Int resolution = listResolution[dropDownResolution.value];
@@ -308,7 +326,7 @@ class E2ELatencySample : MonoBehaviour
         callButton.interactable = false;
         hangUpButton.interactable = false;
         dropDownResolution.interactable = true;
-
+        dropDownFramerate.interactable = true;
         receiveImage.color = Color.black;
     }
 
