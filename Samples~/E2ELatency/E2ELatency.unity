@@ -3169,7 +3169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: 613e54056a7bcb248a067aab3744a812, type: 2}
+  m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3206,6 +3206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Row: 5
   Column: 5
+  Shader: {fileID: 4800000, guid: 576b38846a8f2e244b7ad5ba61657b08, type: 3}
 --- !u!1 &1885136251
 GameObject:
   m_ObjectHideFlags: 0

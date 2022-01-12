@@ -2,6 +2,7 @@ Shader "Unlit/Barcode"
 {
     Properties
     {
+        _MainTex("Texture", 2D) = "white" {}
         _Color1 ("Color1", Color) = (0,0,0,1)
         _Color2 ("Color2", Color) = (1,1,1,1)
         _Row ("Row", int) = 5
