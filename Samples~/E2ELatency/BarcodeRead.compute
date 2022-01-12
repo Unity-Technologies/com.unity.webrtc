@@ -5,14 +5,17 @@ int Row;
 int Column;
 RWStructuredBuffer<float4> Result;
 
-[numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+[numthreads(8,1,1)]
+void CSMain (uint id : SV_DispatchThreadID)
 {
     float width, height;
     Source.GetDimensions(width, height);
 
-    uint x = (id.x + 0.5) * width / Row;
-    uint y = (id.y + 0.5) * height / Column;
+    uint x = id.x % Row;
+    uint y = id.x / Row;
+    
+    uint pixelx = (x + 0.5) * width / Row;
+    uint pixely = (y + 0.5) * height / Column;
 
-    Result[id.x + id.y * Row] = Source[uint2(x, y)];
+    Result[id.x] = Source[uint2(pixelx, pixely)];
 }

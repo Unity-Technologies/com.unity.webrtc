@@ -12,28 +12,19 @@ class E2ELatencySample : MonoBehaviour
 #pragma warning disable 0649
     [SerializeField] private Button startButton;
     [SerializeField] private Button callButton;
-    [SerializeField] private Button restartButton;
     [SerializeField] private Button hangUpButton;
     [SerializeField] private Text textLocalTimestamp;
     [SerializeField] private Text textRemoteTimestamp;
     [SerializeField] private Text textLatency;
     [SerializeField] private Text textAverageLatency;
-    [SerializeField] private Dropdown dropDownProtocol;
+    [SerializeField] private Dropdown dropDownResolution;
 
-//    [SerializeField] private Camera cam;
     [SerializeField] private BarcodeEncoder encoder;
     [SerializeField] private BarcodeDecoder decoder;
 
     [SerializeField] private RawImage sourceImage;
     [SerializeField] private RawImage receiveImage;
 #pragma warning restore 0649
-
-    enum ProtocolOption
-    {
-        Default,
-        UDP,
-        TCP
-    }
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
@@ -45,20 +36,26 @@ class E2ELatencySample : MonoBehaviour
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private bool videoUpdateStarted;
-    private const int width = 1280;
-    private const int height = 720;
 
     RenderTexture destTexture;
     int averageLantecy = 0;
     Queue<int> queueLatency = new Queue<int>(10);
 
+    List<Vector2Int> listResolution = new List<Vector2Int>()
+    {
+        new Vector2Int(320, 180),
+        new Vector2Int(640, 360),
+        new Vector2Int(1280, 720),
+        new Vector2Int(1920, 1080),
+
+    };
+
     private void Awake()
     {
         WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
         startButton.onClick.AddListener(OnStart);
-        callButton.onClick.AddListener(Call);
-        restartButton.onClick.AddListener(RestartIce);
-        hangUpButton.onClick.AddListener(HangUp);
+        callButton.onClick.AddListener(OnCall);
+        hangUpButton.onClick.AddListener(OnHangUp);
         receiveStream = new MediaStream();
     }
 
@@ -71,8 +68,11 @@ class E2ELatencySample : MonoBehaviour
     {
         pc1Senders = new List<RTCRtpSender>();
         callButton.interactable = false;
-        restartButton.interactable = false;
         hangUpButton.interactable = false;
+        dropDownResolution.interactable = true;
+        dropDownResolution.options =
+            listResolution.Select(_ => new Dropdown.OptionData($"{_.x}x{_.y}")).ToList();
+        dropDownResolution.value = 2;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -101,9 +101,13 @@ class E2ELatencySample : MonoBehaviour
     {
         startButton.interactable = false;
         callButton.interactable = true;
+        dropDownResolution.interactable = false;
 
         if (videoStream == null)
         {
+            Vector2Int resolution = listResolution[dropDownResolution.value];
+            int width = resolution.x;
+            int height = resolution.y;
             var tex = new RenderTexture(width, height, 24, RenderTextureFormat.BGRA32);
             tex.Create();
             destTexture = new RenderTexture(width, height, 24, RenderTextureFormat.BGRA32);
@@ -118,6 +122,9 @@ class E2ELatencySample : MonoBehaviour
 
     private void Update()
     {
+        if (!videoUpdateStarted)
+            return;
+
         int localTimestamp = 0;
         int remoteTimestamp = 0;
 
@@ -248,6 +255,8 @@ class E2ELatencySample : MonoBehaviour
 
     private void RemoveTracks()
     {
+        videoUpdateStarted = false;
+
         foreach (var sender in pc1Senders)
         {
             _pc1.RemoveTrack(sender);
@@ -263,11 +272,10 @@ class E2ELatencySample : MonoBehaviour
         }
     }
 
-    private void Call()
+    private void OnCall()
     {
         callButton.interactable = false;
         hangUpButton.interactable = true;
-        restartButton.interactable = true;
 
         var configuration = GetSelectedSdpSemantics();
         _pc1 = new RTCPeerConnection(ref configuration);
@@ -282,14 +290,7 @@ class E2ELatencySample : MonoBehaviour
         AddTracks();
     }
 
-    private void RestartIce()
-    {
-        restartButton.interactable = false;
-
-        _pc1.RestartIce();
-    }
-
-    private void HangUp()
+    private void OnHangUp()
     {
         RemoveTracks();
 
@@ -300,31 +301,20 @@ class E2ELatencySample : MonoBehaviour
         _pc1 = null;
         _pc2 = null;
 
-        callButton.interactable = true;
-        restartButton.interactable = false;
+        videoStream.Dispose();
+        videoStream = null;
+
+        startButton.interactable = true;
+        callButton.interactable = false;
         hangUpButton.interactable = false;
+        dropDownResolution.interactable = true;
 
         receiveImage.color = Color.black;
     }
 
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
-        switch((ProtocolOption)dropDownProtocol.value)
-        {
-            case ProtocolOption.Default:
-                break;
-            case ProtocolOption.UDP:
-                if (candidate.Protocol != RTCIceProtocol.Udp)
-                    return;
-                break;
-            case ProtocolOption.TCP:
-                if (candidate.Protocol != RTCIceProtocol.Tcp)
-                    return;
-                break;
-        }
-
         GetOtherPc(pc).AddIceCandidate(candidate);
-        Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.Candidate}");
     }
 
     private string GetName(RTCPeerConnection pc)
@@ -395,7 +385,7 @@ class E2ELatencySample : MonoBehaviour
     void OnSetSessionDescriptionError(ref RTCError error)
     {
         Debug.LogError($"Error Detail Type: {error.message}");
-        HangUp();
+        OnHangUp();
     }
 
     private void OnSetRemoteSuccess(RTCPeerConnection pc)

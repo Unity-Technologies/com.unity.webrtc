@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BarcodeDecoder : MonoBehaviour
 {
@@ -9,8 +6,8 @@ public class BarcodeDecoder : MonoBehaviour
     [SerializeField] int Column;
     [SerializeField] ComputeShader Shader;
 
-    Texture texture_;
     GraphicsBuffer readbackBuffer_;
+    Color[] data_;
 
     private void Awake()
     {
@@ -18,6 +15,7 @@ public class BarcodeDecoder : MonoBehaviour
         int stride = sizeof(float) * 4;
         readbackBuffer_ =
             new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, stride);
+        data_ = new Color[count];
     }
 
     public int GetValue(Texture texture)
@@ -32,13 +30,13 @@ public class BarcodeDecoder : MonoBehaviour
         Shader.SetInt("Column", Column);
         Shader.SetBuffer(0, "Result", readbackBuffer_);
         Shader.Dispatch(0, Row, Column, 1);
-        Color[] array = new Color[Row * Column];
-        readbackBuffer_.GetData(array);
 
-        int value = 0; 
-        for(int i = 0; i < array.Length; i++)
+        readbackBuffer_.GetData(data_);
+
+        int value = 0;
+        for (int i = 0; i < data_.Length; i++)
         {
-            if(array[i].grayscale > 0.5)
+            if (data_[i].grayscale > 0.5)
                 value += 1 << i;
         }
         return value;
