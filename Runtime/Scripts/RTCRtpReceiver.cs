@@ -18,7 +18,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~RTCRtpReceiver()
         {
@@ -26,7 +26,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -60,7 +60,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
@@ -69,8 +69,13 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
+        public void GetContributingSources()
+        {
+            NativeMethods.ReceiverGetSources(self, out var length);
+        }
+
         public MediaStreamTrack Track
         {
             get
@@ -83,7 +88,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public IEnumerable<MediaStream> Streams
         {

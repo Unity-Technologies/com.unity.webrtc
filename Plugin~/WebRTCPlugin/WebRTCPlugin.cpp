@@ -1312,6 +1312,29 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelInterface* channel) { return channel->id(); }
 
+    struct RtpSource
+    {
+        uint32_t rtpTimestamp;
+    };
+
+    UNITY_INTERFACE_EXPORT void ReceiverGetSources(RtpReceiverInterface* receiver, size_t* length)
+    {
+        auto sources = receiver->GetSources();
+        *length = sources.size();
+        if (sources.empty())
+            return;
+        RTC_LOG(LS_INFO) << "ReceiverGetSources rtp_timestamp:"
+            << sources[0].rtp_timestamp()
+            << " timestamp_ms:"
+            << sources[0].timestamp_ms();
+
+        //CoTaskMemAlloc();
+        //for (auto& source : sources)
+        //{
+        //    = source.rtp_timestamp;
+        //}
+    }
+
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelInterface* channel)
     {
         return ConvertString(channel->label());
