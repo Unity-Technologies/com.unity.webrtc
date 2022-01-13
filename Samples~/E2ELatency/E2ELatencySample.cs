@@ -44,6 +44,7 @@ class E2ELatencySample : MonoBehaviour
 
     List<Vector2Int> listResolution = new List<Vector2Int>()
     {
+        new Vector2Int(160, 90),
         new Vector2Int(320, 180),
         new Vector2Int(640, 360),
         new Vector2Int(1280, 720),
@@ -80,7 +81,7 @@ class E2ELatencySample : MonoBehaviour
         dropDownResolution.interactable = true;
         dropDownResolution.options =
             listResolution.Select(_ => new Dropdown.OptionData($"{_.x}x{_.y}")).ToList();
-        dropDownResolution.value = 2;
+        dropDownResolution.value = 3;
         dropDownFramerate.interactable = true;
         dropDownFramerate.options =
             listFramerate.Select(_ => new Dropdown.OptionData($"{_}")).ToList();
