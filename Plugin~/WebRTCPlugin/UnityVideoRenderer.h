@@ -27,11 +27,11 @@ namespace webrtc {
         // called on RenderThread
         void* ConvertVideoFrameToTextureAndWriteToBuffer(
             int width, int height, libyuv::FourCC format);
-        std::vector<uint8_t> tempBuffer;
 
     private:
         uint32_t m_id;
         std::mutex m_mutex;
+        std::vector<uint8_t> tempBuffer;
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> m_frameBuffer;
         int64_t m_last_renderered_timestamp;
         std::atomic<int64_t> m_timestamp;
