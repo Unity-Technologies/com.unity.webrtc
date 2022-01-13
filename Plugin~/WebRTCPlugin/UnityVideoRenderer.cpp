@@ -5,11 +5,12 @@ namespace unity {
 namespace webrtc {
 
 UnityVideoRenderer::UnityVideoRenderer(
-    uint32_t id, DelegateVideoFrameResize callback)
+    uint32_t id, DelegateVideoFrameResize callback, bool needFlipVertical)
     : m_id(id)
     , m_last_renderered_timestamp(0)
     , m_timestamp(0)
     , m_callback(callback)
+    , m_needFlipVertical(needFlipVertical)
 {
     DebugLog("Create UnityVideoRenderer Id:%d", id);
 }
@@ -97,6 +98,9 @@ void* UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(
     size_t size = width * height * 4;
     if (tempBuffer.size() != size)
         tempBuffer.resize(size);
+
+    if (m_needFlipVertical)
+        height = -height;
 
     if(0 > libyuv::ConvertFromI420(
         i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),

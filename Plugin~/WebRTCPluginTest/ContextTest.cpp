@@ -117,13 +117,13 @@ TEST_P(ContextTest, CreateAndDeleteDataChannel) {
 }
 
 TEST_P(ContextTest, CreateAndDeleteVideoRenderer) {
-    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize);
+    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
     EXPECT_NE(nullptr, renderer);
     context->DeleteVideoRenderer(renderer);
 }
 
 TEST_P(ContextTest, EqualRendererGetById) {
-    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize);
+    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
     EXPECT_NE(nullptr, renderer);
     const auto rendererId = renderer->GetId();
     const auto rendererGetById = context->GetVideoRenderer(rendererId);
@@ -135,7 +135,7 @@ TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
-    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize);
+    const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
     track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
     track->RemoveSink(renderer);
     context->DeleteVideoRenderer(renderer);

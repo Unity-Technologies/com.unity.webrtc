@@ -13,7 +13,8 @@ namespace webrtc {
     class UnityVideoRenderer : public rtc::VideoSinkInterface<webrtc::VideoFrame>
     {
     public:
-        UnityVideoRenderer(uint32_t id, DelegateVideoFrameResize callback);
+        UnityVideoRenderer(
+            uint32_t id, DelegateVideoFrameResize callback, bool needFlipVertical);
         ~UnityVideoRenderer();
         void OnFrame(const webrtc::VideoFrame &frame) override;
 
@@ -36,6 +37,7 @@ namespace webrtc {
         int64_t m_last_renderered_timestamp;
         std::atomic<int64_t> m_timestamp;
         DelegateVideoFrameResize m_callback;
+        bool m_needFlipVertical;
     };
 
 } // end namespace webrtc
