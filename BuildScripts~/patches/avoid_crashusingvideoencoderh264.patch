@@ -1,0 +1,10 @@
+--- sdk/objc/components/video_codec/RTCVideoEncoderH264.mm	2022-01-13 11:18:55.000000000 +0900
++++ sdk/objc/components/video_codec/RTCVideoEncoderH264.mm.patch	2022-01-13 11:18:47.000000000 +0900
+@@ -393,6 +393,7 @@
+     return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
+   }
+   BOOL isKeyframeRequired = NO;
++  _pixelBufferPool = VTCompressionSessionGetPixelBufferPool(_compressionSession);
+ 
+   // Get a pixel buffer from the pool and copy frame data over.
+   if ([self resetCompressionSessionIfNeededWithFrame:frame]) {
