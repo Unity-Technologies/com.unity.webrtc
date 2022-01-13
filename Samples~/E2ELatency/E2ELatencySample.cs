@@ -29,7 +29,7 @@ class E2ELatencySample : MonoBehaviour
 
     private RTCPeerConnection _pc1, _pc2;
     private List<RTCRtpSender> pc1Senders;
-    private MediaStream videoStream, receiveStream;
+    private MediaStream sendStream, receiveStream;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
@@ -65,7 +65,6 @@ class E2ELatencySample : MonoBehaviour
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(OnCall);
         hangUpButton.onClick.AddListener(OnHangUp);
-        receiveStream = new MediaStream();
     }
 
     private void OnDestroy()
@@ -98,17 +97,7 @@ class E2ELatencySample : MonoBehaviour
         };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
 
-        receiveStream.OnAddTrack = e =>
-        {
-            if (e.Track is VideoStreamTrack track)
-            {
-                track.OnVideoReceived += tex =>
-                {
-                    receiveImage.texture = tex;
-                    receiveImage.color = Color.white;
-                };
-            }
-        };
+        StartCoroutine(WebRTC.Update());
     }
 
     private void OnFramerateChanged(int value)
@@ -122,7 +111,7 @@ class E2ELatencySample : MonoBehaviour
         callButton.interactable = true;
         dropDownResolution.interactable = false;
         dropDownFramerate.interactable = false;
-        if (videoStream == null)
+        if (sendStream == null)
         {
             Vector2Int resolution = listResolution[dropDownResolution.value];
             int width = resolution.x;
@@ -134,17 +123,30 @@ class E2ELatencySample : MonoBehaviour
             sourceImage.texture = tex;
             sourceImage.color = Color.white;
 
-            videoStream = new MediaStream();
-            videoStream.AddTrack(new VideoStreamTrack(destTexture));
+            sendStream = new MediaStream();
+            sendStream.AddTrack(new VideoStreamTrack(destTexture));
+        }
+        if (receiveStream == null)
+        {
+            receiveStream = new MediaStream();
+            receiveStream.OnAddTrack = e =>
+            {
+                if (e.Track is VideoStreamTrack track)
+                {
+                    track.OnVideoReceived += tex =>
+                    {
+                        receiveImage.texture = tex;
+                        receiveImage.color = Color.white;
+                        videoUpdateStarted = true;
+                    };
+                }
+            };
         }
     }
 
     private void Update()
     {
         if (!videoUpdateStarted)
-            return;
-
-        if (receiveImage.texture == null)
             return;
 
         int localTimestamp = (int)(Time.realtimeSinceStartup * 1000);
@@ -261,22 +263,14 @@ class E2ELatencySample : MonoBehaviour
 
     private void AddTracks()
     {
-        foreach (var track in videoStream.GetTracks())
+        foreach (var track in sendStream.GetTracks())
         {
-            pc1Senders.Add(_pc1.AddTrack(track, videoStream));
-        }
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
+            pc1Senders.Add(_pc1.AddTrack(track, sendStream));
         }
     }
 
     private void RemoveTracks()
     {
-        videoUpdateStarted = false;
-
         foreach (var sender in pc1Senders)
         {
             _pc1.RemoveTrack(sender);
@@ -312,6 +306,8 @@ class E2ELatencySample : MonoBehaviour
 
     private void OnHangUp()
     {
+        videoUpdateStarted = false;
+
         RemoveTracks();
 
         _pc1.Close();
@@ -321,8 +317,11 @@ class E2ELatencySample : MonoBehaviour
         _pc1 = null;
         _pc2 = null;
 
-        videoStream.Dispose();
-        videoStream = null;
+        sendStream.Dispose();
+        sendStream = null;
+
+        receiveStream.Dispose();
+        receiveStream = null;
 
         startButton.interactable = true;
         callButton.interactable = false;
