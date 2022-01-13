@@ -422,14 +422,8 @@ namespace Unity.WebRTC
                     {
                         if (!reference.TryGetTarget(out var track))
                             continue;
-                        if (track.IsEncoderInitialized)
-                        {
-                            track.Update();
-                        }
-                        else
-                        {
-                            track.UpdateReceiveTexture();
-                        }
+                        track.UpdateSendTexture();
+                        track.UpdateReceiveTexture();
                     }
                 }
             }
