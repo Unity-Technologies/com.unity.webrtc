@@ -144,25 +144,26 @@ class E2ELatencySample : MonoBehaviour
         if (!videoUpdateStarted)
             return;
 
-        int localTimestamp = 0;
-        int remoteTimestamp = 0;
+        if (receiveImage.texture == null)
+            return;
 
-        if (encoder != null)
-        {
-            localTimestamp = (int)(Time.realtimeSinceStartup * 1000);
-            encoder.SetValue(localTimestamp);
-            Graphics.Blit(sourceImage.texture, destTexture, encoder.Material);
-            textLocalTimestamp.text = localTimestamp.ToString();
-        }
-        if(decoder != null && receiveImage.texture != null)
-        {
-            remoteTimestamp = decoder.GetValue(receiveImage.texture);
-            textRemoteTimestamp.text = remoteTimestamp.ToString();
-        }
+        int localTimestamp = (int)(Time.realtimeSinceStartup * 1000);
+        encoder.SetValue(localTimestamp);
+        Graphics.Blit(sourceImage.texture, destTexture, encoder.Material);
+
+        int remoteTimestamp = decoder.GetValue(receiveImage.texture);
+
+        textLocalTimestamp.text = localTimestamp.ToString();
+        textRemoteTimestamp.text = remoteTimestamp.ToString();
+
         int latency = localTimestamp - remoteTimestamp;
+        UpdateLatencyInfo(latency);
+    }
 
+    void UpdateLatencyInfo(int latency)
+    {
         queueLatency.Enqueue(latency);
-        if(queueLatency.Count == 10)
+        if (queueLatency.Count == 10)
         {
             averageLantecy = (int)queueLatency.Average();
             queueLatency.Clear();
