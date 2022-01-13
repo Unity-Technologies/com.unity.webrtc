@@ -28,7 +28,6 @@ class E2ELatencySample : MonoBehaviour
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
-    private List<RTCRtpSender> pc1Senders;
     private MediaStream sendStream, receiveStream;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
@@ -74,7 +73,6 @@ class E2ELatencySample : MonoBehaviour
 
     private void Start()
     {
-        pc1Senders = new List<RTCRtpSender>();
         callButton.interactable = false;
         hangUpButton.interactable = false;
         dropDownResolution.interactable = true;
@@ -265,21 +263,21 @@ class E2ELatencySample : MonoBehaviour
     {
         foreach (var track in sendStream.GetTracks())
         {
-            pc1Senders.Add(_pc1.AddTrack(track, sendStream));
+            _pc1.AddTrack(track, sendStream);
         }
     }
 
-    private void RemoveTracks()
+    private void DeleteTracks()
     {
-        foreach (var sender in pc1Senders)
+        MediaStreamTrack[] senderTracks = sendStream.GetTracks().ToArray();
+        foreach (var track in senderTracks)
         {
-            _pc1.RemoveTrack(sender);
+            sendStream.RemoveTrack(track);
+            track.Dispose();
         }
 
-        pc1Senders.Clear();
-
-        MediaStreamTrack[] tracks = receiveStream.GetTracks().ToArray();
-        foreach (var track in tracks)
+        MediaStreamTrack[] receiveTracks = receiveStream.GetTracks().ToArray();
+        foreach (var track in receiveTracks)
         {
             receiveStream.RemoveTrack(track);
             track.Dispose();
@@ -308,7 +306,7 @@ class E2ELatencySample : MonoBehaviour
     {
         videoUpdateStarted = false;
 
-        RemoveTracks();
+        DeleteTracks();
 
         _pc1.Close();
         _pc2.Close();
