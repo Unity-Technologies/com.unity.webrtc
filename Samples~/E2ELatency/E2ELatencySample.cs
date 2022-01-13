@@ -73,6 +73,10 @@ class E2ELatencySample : MonoBehaviour
 
     private void Start()
     {
+        // This sample uses Compute Shader, so almost Android devices don't work correctly.
+        if (Application.platform == RuntimePlatform.Android)
+            throw new System.NotSupportedException("Android platform is not supported");
+
         callButton.interactable = false;
         hangUpButton.interactable = false;
         dropDownResolution.interactable = true;

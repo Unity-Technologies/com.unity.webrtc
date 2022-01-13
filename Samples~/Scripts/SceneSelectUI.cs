@@ -69,6 +69,10 @@ namespace Unity.WebRTC.Samples
             buttonBandwidth.onClick.AddListener(OnPressedBandwidthButton);
             buttonPerfectNegotiation.onClick.AddListener(OnPressedPerfectNegotiationButton);
             buttonLatency.onClick.AddListener(OnPressedLatencyButton);
+
+            // This sample uses Compute Shader, so almost Android devices don't work correctly.
+            if (Application.platform == RuntimePlatform.Android)
+                buttonLatency.interactable = false;
         }
 
         private void OnChangeHWCodec(bool enable)
