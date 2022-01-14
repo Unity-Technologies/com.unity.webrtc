@@ -119,9 +119,9 @@ class E2ELatencySample : MonoBehaviour
             int width = resolution.x;
             int height = resolution.y;
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-            var tex = new RenderTexture(width, height, 24, format);
+            var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
-            destTexture = new RenderTexture(width, height, 24, format);
+            destTexture = new RenderTexture(width, height, 0, format);
             destTexture.Create();
             sourceImage.texture = tex;
             sourceImage.color = Color.white;
