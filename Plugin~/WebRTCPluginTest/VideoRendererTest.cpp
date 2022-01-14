@@ -58,7 +58,9 @@ protected:
             webrtc::I420Buffer::Create(width, height);
 
         webrtc::I420Buffer::SetBlack(buffer);
-        return webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer);
+        return webrtc::VideoFrame::Builder()
+            .set_video_frame_buffer(buffer)
+            .set_timestamp_us(Clock::GetRealTimeClock()->TimeInMicroseconds());
     }
 
     static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
@@ -98,13 +100,10 @@ TEST_P(VideoRendererTest, ConvertVideoFrameToTexture)
     int height = 256;
     auto builder = CreateBlackFrameBuilder(width, height);
     m_renderer->OnFrame(builder.build());
-    EXPECT_EQ(0, m_renderer->tempBuffer.size());
-    EXPECT_EQ(nullptr, m_renderer->tempBuffer.data());
 
-    m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(width, height, libyuv::FOURCC_ARGB);
-    auto bufferSize = width * height * 4;
-    EXPECT_EQ(bufferSize, m_renderer->tempBuffer.size());
-    EXPECT_NE(nullptr, m_renderer->tempBuffer.data());
+    void* data = m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
+        width, height, libyuv::FOURCC_ARGB);
+    EXPECT_NE(nullptr, data);
 }
 
 INSTANTIATE_TEST_CASE_P(
