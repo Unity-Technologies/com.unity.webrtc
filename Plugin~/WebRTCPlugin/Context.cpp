@@ -293,6 +293,8 @@ namespace webrtc
 
     bool Context::FinalizeEncoder(IEncoder* encoder)
     {
+        if (encoder == nullptr)
+            return false;
         m_mapIdAndEncoder.erase(encoder->Id());
         return true;
     }
