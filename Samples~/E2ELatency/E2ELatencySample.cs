@@ -73,9 +73,9 @@ class E2ELatencySample : MonoBehaviour
 
     private void Start()
     {
-        // This sample uses Compute Shader, so almost Android devices don't work correctly.
-        if (Application.platform == RuntimePlatform.Android)
-            throw new System.NotSupportedException("Android platform is not supported");
+        // This sample uses Compute Shader.
+        if (!SystemInfo.supportsComputeShaders)
+            throw new System.NotSupportedException("Compute shader is not supported on this device");
 
         callButton.interactable = false;
         hangUpButton.interactable = false;
@@ -118,9 +118,10 @@ class E2ELatencySample : MonoBehaviour
             Vector2Int resolution = listResolution[dropDownResolution.value];
             int width = resolution.x;
             int height = resolution.y;
-            var tex = new RenderTexture(width, height, 24, RenderTextureFormat.BGRA32);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            var tex = new RenderTexture(width, height, 24, format);
             tex.Create();
-            destTexture = new RenderTexture(width, height, 24, RenderTextureFormat.BGRA32);
+            destTexture = new RenderTexture(width, height, 24, format);
             destTexture.Create();
             sourceImage.texture = tex;
             sourceImage.color = Color.white;

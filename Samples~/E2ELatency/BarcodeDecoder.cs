@@ -7,6 +7,7 @@ public class BarcodeDecoder : MonoBehaviour
     [SerializeField] ComputeShader Shader;
 
     GraphicsBuffer readbackBuffer_;
+    int kernelIndex_;
     Color[] data_;
 
     private void Awake()
@@ -16,6 +17,7 @@ public class BarcodeDecoder : MonoBehaviour
         readbackBuffer_ =
             new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, stride);
         data_ = new Color[count];
+        kernelIndex_ = Shader.FindKernel("Read");
     }
 
     private void OnDestroy()
@@ -30,11 +32,11 @@ public class BarcodeDecoder : MonoBehaviour
 
     int Decode(Texture source)
     {
-        Shader.SetTexture(0, "Source", source);
+        Shader.SetTexture(kernelIndex_, "Source", source);
         Shader.SetInt("Row", Row);
         Shader.SetInt("Column", Column);
-        Shader.SetBuffer(0, "Result", readbackBuffer_);
-        Shader.Dispatch(0, Row, Column, 1);
+        Shader.SetBuffer(kernelIndex_, "Result", readbackBuffer_);
+        Shader.Dispatch(kernelIndex_, Row, Column, 1);
 
         readbackBuffer_.GetData(data_);
 

@@ -71,7 +71,7 @@ namespace Unity.WebRTC.Samples
             buttonLatency.onClick.AddListener(OnPressedLatencyButton);
 
             // This sample uses Compute Shader, so almost Android devices don't work correctly.
-            if (Application.platform == RuntimePlatform.Android)
+            if (!SystemInfo.supportsComputeShaders)
                 buttonLatency.interactable = false;
         }
 

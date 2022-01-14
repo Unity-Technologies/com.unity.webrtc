@@ -1,4 +1,4 @@
-#pragma kernel CSMain
+#pragma kernel Read
 
 Texture2D<float4> Source;
 int Row;
@@ -6,7 +6,7 @@ int Column;
 RWStructuredBuffer<float4> Result;
 
 [numthreads(8,1,1)]
-void CSMain (uint id : SV_DispatchThreadID)
+void Read(uint id : SV_DispatchThreadID)
 {
     float width, height;
     Source.GetDimensions(width, height);
