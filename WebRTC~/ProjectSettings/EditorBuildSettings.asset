@@ -50,4 +50,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Samples/MultiAudioReceive/MultiAudioReceive.unity
     guid: f2c574ba8fa6e413d80d51085132df4f
+  - enabled: 1
+    path: Assets/Samples/E2ELatency/E2ELatency.unity
+    guid: d85785bc886b68348b04331dab320a33
   m_configObjects: {}

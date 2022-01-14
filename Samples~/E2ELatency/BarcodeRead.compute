@@ -1,0 +1,21 @@
+#pragma kernel Read
+
+Texture2D<float4> Source;
+int Row;
+int Column;
+RWStructuredBuffer<float4> Result;
+
+[numthreads(8,1,1)]
+void Read(uint id : SV_DispatchThreadID)
+{
+    float width, height;
+    Source.GetDimensions(width, height);
+
+    uint x = id.x % Row;
+    uint y = id.x / Row;
+    
+    uint pixelx = (x + 0.5) * width / Row;
+    uint pixely = (y + 0.5) * height / Column;
+
+    Result[id.x] = Source[uint2(pixelx, pixely)];
+}

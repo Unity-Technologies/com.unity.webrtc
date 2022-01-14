@@ -45,6 +45,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonVideoReceive;
         [SerializeField] private Button buttonBandwidth;
         [SerializeField] private Button buttonPerfectNegotiation;
+        [SerializeField] private Button buttonLatency;
 
         void Start()
         {
@@ -67,6 +68,11 @@ namespace Unity.WebRTC.Samples
             buttonVideoReceive.onClick.AddListener(OnPressedVideoReceiveButton);
             buttonBandwidth.onClick.AddListener(OnPressedBandwidthButton);
             buttonPerfectNegotiation.onClick.AddListener(OnPressedPerfectNegotiationButton);
+            buttonLatency.onClick.AddListener(OnPressedLatencyButton);
+
+            // This sample uses Compute Shader, so almost Android devices don't work correctly.
+            if (!SystemInfo.supportsComputeShaders)
+                buttonLatency.interactable = false;
         }
 
         private void OnChangeHWCodec(bool enable)
@@ -136,6 +142,11 @@ namespace Unity.WebRTC.Samples
         private void OnPressedPerfectNegotiationButton()
         {
             SceneManager.LoadScene("PerfectNegotiation", LoadSceneMode.Single);
+        }
+
+        private void OnPressedLatencyButton()
+        {
+            SceneManager.LoadScene("E2ELatency", LoadSceneMode.Single);
         }
     }
 }
