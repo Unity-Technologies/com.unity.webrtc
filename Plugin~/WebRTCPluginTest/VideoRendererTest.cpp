@@ -30,7 +30,7 @@ public:
             /*is_screencast=*/ false,
             /*needs_denoising=*/ absl::nullopt);
         m_callback = &OnFrameSizeChange;
-        m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback);
+        m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
         m_trackSource->AddOrUpdateSink(m_renderer.get(), rtc::VideoSinkWants());
         m_trackSource->SetEncoder(encoder_.get());
 

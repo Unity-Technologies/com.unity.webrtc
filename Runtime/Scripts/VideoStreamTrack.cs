@@ -77,18 +77,7 @@ namespace Unity.WebRTC
             {
                 return;
             }
-
-            // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
-            // note: streamed video is flipped vertical if no action was taken:
-            //  - duplicate RenderTexture from its source texture
-            //  - call Graphics.Blit command with flip material every frame
-            //  - it might be better to implement this if possible
-            if (m_needFlip)
-            {
-                Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
-            }
-
-            WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_sourceTexture);
+            WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_destTexture);
         }
 
         internal void UpdateSendTexture()
@@ -166,8 +155,7 @@ namespace Unity.WebRTC
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
                 throw new InvalidOperationException();
 
-            m_needFlip = true;
-            m_renderer = new UnityVideoRenderer(this);
+            m_renderer = new UnityVideoRenderer(this, true);
         }
 
         public override void Dispose()
@@ -306,9 +294,9 @@ namespace Unity.WebRTC
         internal uint id => NativeMethods.GetVideoRendererId(self);
         private bool disposed;
 
-        public UnityVideoRenderer(VideoStreamTrack track)
+        public UnityVideoRenderer(VideoStreamTrack track, bool needFlip)
         {
-            self = WebRTC.Context.CreateVideoRenderer(OnVideoFrameResize);
+            self = WebRTC.Context.CreateVideoRenderer(OnVideoFrameResize, needFlip);
             this.track = track;
             NativeMethods.VideoTrackAddOrUpdateSink(track.GetSelfOrThrow(), self);
             WebRTC.Table.Add(self, this);

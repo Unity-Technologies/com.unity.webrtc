@@ -255,9 +255,10 @@ namespace Unity.WebRTC
             NativeMethods.ContextStopMediaStreamTrack(self, track);
         }
 
-        public IntPtr CreateVideoRenderer(DelegateVideoFrameResize callback)
+        public IntPtr CreateVideoRenderer(
+            DelegateVideoFrameResize callback, bool needFlip)
         {
-            return NativeMethods.CreateVideoRenderer(self, callback);
+            return NativeMethods.CreateVideoRenderer(self, callback, needFlip);
         }
 
         public void DeleteVideoRenderer(IntPtr sink)
