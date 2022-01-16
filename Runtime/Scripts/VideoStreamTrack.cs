@@ -13,7 +13,7 @@ namespace Unity.WebRTC
     public delegate void OnVideoReceived(Texture renderer);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class VideoStreamTrack : MediaStreamTrack
     {
@@ -33,14 +33,6 @@ namespace Unity.WebRTC
             var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
             return tex;
-        }
-
-        internal VideoStreamTrack(Texture texture, RenderTexture dest, int width, int height)
-            : this(dest.GetNativeTexturePtr(), width, height, texture.graphicsFormat)
-        {
-            m_needFlip = true;
-            m_sourceTexture = texture;
-            m_destTexture = dest;
         }
 
         /// <summary>
@@ -93,6 +85,11 @@ namespace Unity.WebRTC
             {
                 Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
             }
+            else
+            {
+                Graphics.Blit(m_sourceTexture, m_destTexture);
+            }
+
             WebRTC.Context.Encode(GetSelfOrThrow());
         }
 
@@ -101,14 +98,22 @@ namespace Unity.WebRTC
         /// The track is created with a `source`.
         /// </summary>
         /// <param name="source"></param>
-        public VideoStreamTrack(Texture source)
+        /// <param name="needFlip"></param>
+        public VideoStreamTrack(Texture source, bool needFlip = true)
             : this(source,
                 CreateRenderTexture(source.width, source.height),
                 source.width,
-                source.height)
+                source.height,
+                needFlip)
         {
         }
 
+        internal VideoStreamTrack(Texture texture, RenderTexture dest, int width, int height, bool needFlip)
+            : this(dest.GetNativeTexturePtr(), width, height, texture.graphicsFormat, needFlip)
+        {
+            m_sourceTexture = texture;
+            m_destTexture = dest;
+        }
 
         /// <summary>
         /// Creates a new VideoStream object.
@@ -121,8 +126,8 @@ namespace Unity.WebRTC
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="format"></param>
-        public VideoStreamTrack(IntPtr texturePtr, int width, int height, GraphicsFormat format)
-            : this(Guid.NewGuid().ToString(), new VideoTrackSource())
+        public VideoStreamTrack(IntPtr texturePtr, int width, int height, GraphicsFormat format, bool needFlip)
+            : this(Guid.NewGuid().ToString(), new VideoTrackSource(), needFlip)
         {
             WebRTC.ValidateTextureSize(width, height, Application.platform, WebRTC.GetEncoderType());
             WebRTC.ValidateGraphicsFormat(format);
@@ -135,19 +140,19 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="label"></param>
         /// <param name="source"></param>
-
-        internal VideoStreamTrack(string label, VideoTrackSource source)
+        /// <param name="needFlip"></param>
+        internal VideoStreamTrack(string label, VideoTrackSource source, bool needFlip)
             : base(WebRTC.Context.CreateVideoTrack(label, source.self))
         {
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
                 throw new InvalidOperationException();
 
-            m_needFlip = true;
+            m_needFlip = needFlip;
             m_source = source;
         }
 
         /// <summary>
-        /// Video Receiver 
+        /// Video Receiver
         /// </summary>
         /// <param name="ptr"></param>
         internal VideoStreamTrack(IntPtr ptr) : base(ptr)
@@ -224,7 +229,7 @@ namespace Unity.WebRTC
     public static class CameraExtension
     {
         public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height, int bitrate,
-            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24, bool needFlip = true)
         {
             switch (depth)
             {
@@ -246,7 +251,7 @@ namespace Unity.WebRTC
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
-            return new VideoStreamTrack(rt);
+            return new VideoStreamTrack(rt, needFlip);
         }
 
 
