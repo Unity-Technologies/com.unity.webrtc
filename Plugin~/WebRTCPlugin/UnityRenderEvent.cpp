@@ -29,7 +29,6 @@ namespace webrtc
     IUnityGraphics* s_Graphics = nullptr;
     Context* s_context = nullptr;
     std::map<const MediaStreamTrackInterface*, std::unique_ptr<IEncoder>> s_mapEncoder;
-    std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     std::unique_ptr <Clock> s_clock;
 
     const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
@@ -118,7 +117,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         /// The actual value of UnityGfxRenderer is returned on second time.
 
         s_mapEncoder.clear();
-        s_mapVideoRenderer.clear();
 
         UnityGfxRenderer renderer =
             s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
@@ -149,7 +147,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     case kUnityGfxDeviceEventShutdown:
     {
         s_mapEncoder.clear();
-        s_mapVideoRenderer.clear();
 
         if (s_gfxDevice != nullptr)
         {
@@ -346,7 +343,6 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
             // DebugLog("VideoRenderer not found, rendererId:%d", params->userData);
             return;
         }
-        s_mapVideoRenderer[params->userData] = renderer;
         {
             ScopedProfiler profiler(*s_MarkerDecode);
             params->texData =
@@ -357,8 +353,6 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
     }
     if (event == kUnityRenderingExtEventUpdateTextureEndV2)
     {
-        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
-        s_mapVideoRenderer.erase(params->userData);
     }
 }
 
