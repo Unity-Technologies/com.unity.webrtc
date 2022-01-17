@@ -23,6 +23,7 @@ namespace Unity.WebRTC
         bool m_needFlip = false;
         Texture m_sourceTexture;
         RenderTexture m_destTexture;
+        Texture m_receiveTexture;
 
         UnityVideoRenderer m_renderer;
         VideoTrackSource m_source;
@@ -69,15 +70,9 @@ namespace Unity.WebRTC
 
         internal void UpdateReceiveTexture()
         {
-            // todo(kazuki):: workaround
-            if (m_renderer == null || m_source != null)
+            if (m_receiveTexture == null)
                 return;
-
-            if (m_sourceTexture == null || m_destTexture == null)
-            {
-                return;
-            }
-            WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_destTexture);
+            WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_receiveTexture);
         }
 
         internal void UpdateSendTexture()
@@ -178,6 +173,9 @@ namespace Unity.WebRTC
                 // Unity API must be called from main thread.
                 WebRTC.DestroyOnMainThread(m_destTexture);
 
+                if(m_receiveTexture != null)
+                    WebRTC.DestroyOnMainThread(m_receiveTexture);
+
                 m_renderer?.Dispose();
                 m_source?.Dispose();
 
@@ -188,36 +186,22 @@ namespace Unity.WebRTC
 
         internal void OnVideoFrameResize(int width, int height)
         {
-            if (m_sourceTexture != null && (m_sourceTexture.width == width && m_sourceTexture.height == height))
+            if (m_receiveTexture != null &&
+                m_receiveTexture.width == width &&
+                m_receiveTexture.height == height)
             {
                 return;
             }
 
-            if (m_sourceTexture != null && m_sourceTexture is RenderTexture source)
+            if (m_receiveTexture != null)
             {
-                source.Release();
-                source.width = width;
-                source.height = height;
-                source.Create();
-            }
-            else
-            {
-                m_sourceTexture = CreateRenderTexture(width, height);
+                WebRTC.DestroyOnMainThread(m_receiveTexture);
+                m_receiveTexture = null;
             }
 
-            if (m_destTexture != null)
-            {
-                m_destTexture.Release();
-                m_destTexture.width = width;
-                m_destTexture.height = height;
-                m_destTexture.Create();
-            }
-            else
-            {
-                m_destTexture = CreateRenderTexture(width, height);
-            }
-
-            OnVideoReceived?.Invoke(m_destTexture);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            m_receiveTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            OnVideoReceived?.Invoke(m_receiveTexture);
         }
     }
 
