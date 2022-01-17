@@ -60,7 +60,15 @@ namespace Unity.WebRTC
         /// <summary>
         /// encoded / decoded texture
         /// </summary>
-        public Texture Texture => m_destTexture;
+        public Texture Texture
+        {
+            get
+            {
+                if (m_renderer != null)
+                    return m_renderer.Texture;
+                return m_destTexture;
+            }
+        }
 
         /// <summary>
         ///
@@ -254,10 +262,11 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         private VideoStreamTrack track;
-        private Texture m_receiveTexture;
 
         internal uint id => NativeMethods.GetVideoRendererId(self);
         private bool disposed;
+
+        public Texture Texture { get; private set; }
 
         public UnityVideoRenderer(VideoStreamTrack track, bool needFlip)
         {
@@ -269,9 +278,9 @@ namespace Unity.WebRTC
 
         public void Update()
         {
-            if (m_receiveTexture == null)
+            if (Texture == null)
                 return;
-            WebRTC.Context.UpdateRendererTexture(id, m_receiveTexture);
+            WebRTC.Context.UpdateRendererTexture(id, Texture);
         }
 
         ~UnityVideoRenderer()
@@ -293,7 +302,7 @@ namespace Unity.WebRTC
                 {
                     NativeMethods.VideoTrackRemoveSink(trackPtr, self);
                 }
-                WebRTC.DestroyOnMainThread(m_receiveTexture);
+                WebRTC.DestroyOnMainThread(Texture);
                 WebRTC.Context.DeleteVideoRenderer(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
@@ -305,22 +314,22 @@ namespace Unity.WebRTC
 
         private void OnVideoFrameResizeInternal(int width, int height)
         {
-            if (m_receiveTexture != null &&
-                m_receiveTexture.width == width &&
-                m_receiveTexture.height == height)
+            if (Texture != null &&
+                Texture.width == width &&
+                Texture.height == height)
             {
                 return;
             }
 
-            if (m_receiveTexture != null)
+            if (Texture != null)
             {
-                WebRTC.DestroyOnMainThread(m_receiveTexture);
-                m_receiveTexture = null;
+                WebRTC.DestroyOnMainThread(Texture);
+                Texture = null;
             }
 
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
-            m_receiveTexture = new Texture2D(width, height, format, TextureCreationFlags.None);
-            track.OnVideoFrameResize(m_receiveTexture);
+            Texture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            track.OnVideoFrameResize(Texture);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateVideoFrameResize))]
