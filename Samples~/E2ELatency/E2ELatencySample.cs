@@ -41,6 +41,9 @@ class E2ELatencySample : MonoBehaviour
     int averageLantecy = 0;
     Queue<int> queueLatency = new Queue<int>(10);
 
+    int vSyncCount;
+    int targetFrameRate;
+
     List<Vector2Int> listResolution = new List<Vector2Int>()
     {
         new Vector2Int(160, 90),
@@ -68,6 +71,10 @@ class E2ELatencySample : MonoBehaviour
 
     private void OnDestroy()
     {
+        // Revert global settings
+        QualitySettings.vSyncCount = vSyncCount;
+        Application.targetFrameRate = targetFrameRate;
+
         WebRTC.Dispose();
     }
 
@@ -76,6 +83,9 @@ class E2ELatencySample : MonoBehaviour
         // This sample uses Compute Shader.
         if (!SystemInfo.supportsComputeShaders)
             throw new System.NotSupportedException("Compute shader is not supported on this device");
+
+        vSyncCount = QualitySettings.vSyncCount;
+        targetFrameRate = Application.targetFrameRate;
 
         callButton.interactable = false;
         hangUpButton.interactable = false;
@@ -104,6 +114,9 @@ class E2ELatencySample : MonoBehaviour
 
     private void OnFramerateChanged(int value)
     {
+        // Set "Don't Sync" for changing framerate,
+        // but iOS ignores this setting
+        QualitySettings.vSyncCount = 0; 
         Application.targetFrameRate = listFramerate[value];
     }
 
