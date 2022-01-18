@@ -1408,12 +1408,10 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void ContextInitLocalAudio(
         Context* context,
-        AudioTrackInterface* track,
+        UnityAudioTrackSource* source,
         int32 sample_rate,
         int32 number_of_channels)
     {
-        UnityAudioTrackSource* source =
-            static_cast<UnityAudioTrackSource*>(track->GetSource());
         auto adm = context->GetAudioDevice();
         if (source != nullptr && adm != nullptr)
         {
@@ -1423,10 +1421,8 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void ContextUninitLocalAudio(
         Context* context,
-        AudioTrackInterface* track)
+        UnityAudioTrackSource* source)
     {
-        UnityAudioTrackSource* source =
-            static_cast<UnityAudioTrackSource*>(track->GetSource());
         auto adm = context->GetAudioDevice();
         if (source != nullptr && adm != nullptr)
         {
@@ -1434,16 +1430,13 @@ extern "C"
         }
     }
 
-    UNITY_INTERFACE_EXPORT void ContextProcessLocalAudio(
-        Context* context,
-        AudioTrackInterface* track,
+    UNITY_INTERFACE_EXPORT void AudioSourceProcessLocalAudio(
+        UnityAudioTrackSource* source,
         float* audio_data,
         int32 sample_rate,
         int32 number_of_channels,
         int32 number_of_frames)
     {
-        UnityAudioTrackSource* source =
-            static_cast<UnityAudioTrackSource*>(track->GetSource());
         if (source != nullptr)
         {
             source->PushAudioData(
