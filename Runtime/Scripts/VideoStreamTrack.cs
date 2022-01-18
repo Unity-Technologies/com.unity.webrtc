@@ -60,7 +60,15 @@ namespace Unity.WebRTC
         /// <summary>
         /// encoded / decoded texture
         /// </summary>
-        public Texture Texture => m_destTexture;
+        public Texture Texture
+        {
+            get
+            {
+                if (m_renderer != null)
+                    return m_renderer.Texture;
+                return m_destTexture;
+            }
+        }
 
         /// <summary>
         ///
@@ -69,15 +77,7 @@ namespace Unity.WebRTC
 
         internal void UpdateReceiveTexture()
         {
-            // todo(kazuki):: workaround
-            if (m_renderer == null || m_source != null)
-                return;
-
-            if (m_sourceTexture == null || m_destTexture == null)
-            {
-                return;
-            }
-            WebRTC.Context.UpdateRendererTexture(m_renderer.id, m_destTexture);
+            m_renderer?.Update();
         }
 
         internal void UpdateSendTexture()
@@ -186,38 +186,9 @@ namespace Unity.WebRTC
             base.Dispose();
         }
 
-        internal void OnVideoFrameResize(int width, int height)
+        internal void OnVideoFrameResize(Texture texture)
         {
-            if (m_sourceTexture != null && (m_sourceTexture.width == width && m_sourceTexture.height == height))
-            {
-                return;
-            }
-
-            if (m_sourceTexture != null && m_sourceTexture is RenderTexture source)
-            {
-                source.Release();
-                source.width = width;
-                source.height = height;
-                source.Create();
-            }
-            else
-            {
-                m_sourceTexture = CreateRenderTexture(width, height);
-            }
-
-            if (m_destTexture != null)
-            {
-                m_destTexture.Release();
-                m_destTexture.width = width;
-                m_destTexture.height = height;
-                m_destTexture.Create();
-            }
-            else
-            {
-                m_destTexture = CreateRenderTexture(width, height);
-            }
-
-            OnVideoReceived?.Invoke(m_destTexture);
+            OnVideoReceived?.Invoke(texture);
         }
     }
 
@@ -291,8 +262,11 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         private VideoStreamTrack track;
+
         internal uint id => NativeMethods.GetVideoRendererId(self);
         private bool disposed;
+
+        public Texture Texture { get; private set; }
 
         public UnityVideoRenderer(VideoStreamTrack track, bool needFlip)
         {
@@ -300,6 +274,13 @@ namespace Unity.WebRTC
             this.track = track;
             NativeMethods.VideoTrackAddOrUpdateSink(track.GetSelfOrThrow(), self);
             WebRTC.Table.Add(self, this);
+        }
+
+        public void Update()
+        {
+            if (Texture == null)
+                return;
+            WebRTC.Context.UpdateRendererTexture(id, Texture);
         }
 
         ~UnityVideoRenderer()
@@ -321,7 +302,7 @@ namespace Unity.WebRTC
                 {
                     NativeMethods.VideoTrackRemoveSink(trackPtr, self);
                 }
-
+                WebRTC.DestroyOnMainThread(Texture);
                 WebRTC.Context.DeleteVideoRenderer(self);
                 WebRTC.Table.Remove(self);
                 self = IntPtr.Zero;
@@ -333,7 +314,22 @@ namespace Unity.WebRTC
 
         private void OnVideoFrameResizeInternal(int width, int height)
         {
-            track.OnVideoFrameResize(width, height);
+            if (Texture != null &&
+                Texture.width == width &&
+                Texture.height == height)
+            {
+                return;
+            }
+
+            if (Texture != null)
+            {
+                WebRTC.DestroyOnMainThread(Texture);
+                Texture = null;
+            }
+
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            Texture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            track.OnVideoFrameResize(Texture);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateVideoFrameResize))]
