@@ -261,6 +261,8 @@ namespace Unity.WebRTC
 
         void OnDeviceChanged(int value)
         {
+            if (dropdownMicrophoneDevices.options.Count == 0)
+                return;
             m_deviceName = dropdownMicrophoneDevices.options[value].text;
             Microphone.GetDeviceCaps(m_deviceName, out int minFreq, out int maxFreq);
         }
