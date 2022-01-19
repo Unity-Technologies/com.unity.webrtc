@@ -24,7 +24,6 @@ public class BarcodeDecoder : MonoBehaviour
 #else
         readbackBuffer_ =
             new ComputeBuffer(count, stride, ComputeBufferType.Structured);
-
 #endif
         data_ = new Color[count];
         kernelIndex_ = Shader.FindKernel("Read");
