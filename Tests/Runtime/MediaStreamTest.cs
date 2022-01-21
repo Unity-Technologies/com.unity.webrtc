@@ -297,8 +297,8 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.That(parameters.encodings, Has.Length.GreaterThan(0).And.All.Not.Null);
                 const uint framerate = 20;
                 parameters.encodings[0].maxFramerate = framerate;
-                RTCErrorType error = sender.SetParameters(parameters);
-                Assert.That(error, Is.EqualTo(RTCErrorType.None));
+                RTCError error = sender.SetParameters(parameters);
+                Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
                 var parameters2 = sender.GetParameters();
                 Assert.That(parameters2.encodings[0].maxFramerate, Is.EqualTo(framerate));
             }
@@ -341,16 +341,16 @@ namespace Unity.WebRTC.RuntimeTest
                 Assert.That(parameters.encodings, Has.Length.GreaterThan(0).And.All.Not.Null);
                 const uint nonErrorScale = 2;
                 parameters.encodings[0].scaleResolutionDownBy = nonErrorScale;
-                RTCErrorType error = sender.SetParameters(parameters);
-                Assert.That(error, Is.EqualTo(RTCErrorType.None));
+                RTCError error = sender.SetParameters(parameters);
+                Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
                 var parameters2 = sender.GetParameters();
                 Assert.That(parameters2.encodings[0].scaleResolutionDownBy, Is.EqualTo(nonErrorScale));
 
                 // limit texture size by WebRTC.ValidateTextureSize
                 const uint errorScale = 8;
                 parameters2.encodings[0].scaleResolutionDownBy = errorScale;
-                RTCErrorType error2 = sender.SetParameters(parameters2);
-                Assert.That(error2, Is.EqualTo(RTCErrorType.InvalidParameter));
+                RTCError error2 = sender.SetParameters(parameters2);
+                Assert.That(error2.errorType, Is.EqualTo(RTCErrorType.InvalidRange));
             }
 
             test.component.Dispose();

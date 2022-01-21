@@ -91,7 +91,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
+        public RTCError SetParameters(RTCRtpSendParameters parameters)
         {
             if (Track is VideoStreamTrack videoTrack)
             {
@@ -103,24 +103,17 @@ namespace Unity.WebRTC
                         continue;
                     }
 
-                    try
-                    {
-                        WebRTC.ValidateTextureSize((int)(videoTrack.Texture.width / scale),
-                            (int)(videoTrack.Texture.height / scale), Application.platform, WebRTC.GetEncoderType());
-                    }
-                    catch (ArgumentException)
-                    {
-                        return RTCErrorType.InvalidParameter;
-                    }
+                    return WebRTC.ValidateTextureSize((int)(videoTrack.Texture.width / scale),
+                        (int)(videoTrack.Texture.height / scale), Application.platform, WebRTC.GetEncoderType());
                 }
             }
 
             parameters.CreateInstance(out RTCRtpSendParametersInternal instance);
             IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(instance));
             Marshal.StructureToPtr(instance, ptr, false);
-            RTCErrorType error = NativeMethods.SenderSetParameters(GetSelfOrThrow(), ptr);
+            RTCErrorType type = NativeMethods.SenderSetParameters(GetSelfOrThrow(), ptr);
             Marshal.FreeCoTaskMem(ptr);
-            return error;
+            return new RTCError {errorType = type};
         }
 
         /// <summary>

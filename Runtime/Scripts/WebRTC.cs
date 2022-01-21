@@ -483,11 +483,12 @@ namespace Unity.WebRTC
         /// <param name="height"></param>
         /// <param name="platform"></param>
         /// <param name="encoderType"></param>
-        public static void ValidateTextureSize(int width, int height, RuntimePlatform platform, EncoderType encoderType)
+        /// <returns></returns>
+        public static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform, EncoderType encoderType)
         {
             if (!s_limitTextureSize)
             {
-                return;
+                return new RTCError {errorType = RTCErrorType.None};
             }
 
             // Check NVCodec capabilities
@@ -503,11 +504,14 @@ namespace Unity.WebRTC
                 if (width < minWidth || maxWidth < width ||
                     height < minHeight || maxHeight < height)
                 {
-                    throw new ArgumentException(
-                        $"Texture size is invalid. " +
-                        $"minWidth:{minWidth}, maxWidth:{maxWidth} " +
-                        $"minHeight:{minHeight}, maxHeight:{maxHeight} " +
-                        $"current size width:{width} height:{height}");
+                    return new RTCError
+                    {
+                        errorType = RTCErrorType.InvalidRange,
+                        message = $"Texture size is invalid. " +
+                                  $"minWidth:{minWidth}, maxWidth:{maxWidth} " +
+                                  $"minHeight:{minHeight}, maxHeight:{maxHeight} " +
+                                  $"current size width:{width} height:{height}"
+                    };
                 }
             }
 
@@ -517,10 +521,16 @@ namespace Unity.WebRTC
                 const int minimumTextureSize = 114;
                 if (width < minimumTextureSize || height < minimumTextureSize)
                 {
-                    throw new ArgumentException(
-                        $"Texture size need {minimumTextureSize}, current size width:{width} height:{height}");
+                    return new RTCError
+                    {
+                        errorType = RTCErrorType.InvalidRange,
+                        message =
+                            $"Texture size need {minimumTextureSize}, current size width:{width} height:{height}"
+                    };
                 }
             }
+
+            return new RTCError {errorType = RTCErrorType.None};
         }
 
         /// <summary>
