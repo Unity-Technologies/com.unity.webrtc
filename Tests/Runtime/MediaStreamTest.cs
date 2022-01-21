@@ -316,6 +316,56 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
+        [UnityTest]
+        [Timeout(5000)]
+        [UnityPlatform(include = new[] {RuntimePlatform.Android})]
+        public IEnumerator SetParametersReturnErrorIfInvalidTextureResolution()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            yield return new WaitForSeconds(0.1f);
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.AddStream(0, videoStream);
+            yield return test;
+            test.component.CoroutineUpdate();
+            yield return new WaitForSeconds(0.1f);
+
+            var senders = test.component.GetPeerSenders(0);
+            Assert.That(senders, Has.Count.GreaterThan(0));
+
+            foreach(var sender in senders)
+            {
+                var parameters = sender.GetParameters();
+                Assert.That(parameters.encodings, Has.Length.GreaterThan(0).And.All.Not.Null);
+                const uint nonErrorScale = 2;
+                parameters.encodings[0].scaleResolutionDownBy = nonErrorScale;
+                RTCErrorType error = sender.SetParameters(parameters);
+                Assert.That(error, Is.EqualTo(RTCErrorType.None));
+                var parameters2 = sender.GetParameters();
+                Assert.That(parameters2.encodings[0].scaleResolutionDownBy, Is.EqualTo(nonErrorScale));
+
+                // limit texture size by WebRTC.ValidateTextureSize
+                const uint errorScale = 8;
+                parameters2.encodings[0].scaleResolutionDownBy = errorScale;
+                RTCErrorType error2 = sender.SetParameters(parameters2);
+                Assert.That(error2, Is.EqualTo(RTCErrorType.InvalidParameter));
+            }
+
+            test.component.Dispose();
+            foreach (var track in videoStream.GetTracks())
+            {
+                track.Dispose();
+            }
+            // wait for disposing video track.
+            yield return 0;
+
+            videoStream.Dispose();
+            Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(test.gameObject);
+        }
+
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
