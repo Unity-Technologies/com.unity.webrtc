@@ -277,6 +277,8 @@ class BandwidthSample : MonoBehaviour
         if (error != RTCErrorType.None)
         {
             Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+            statsField.text += $"Failed change bandwidth to {bandwidth * 1000}{Environment.NewLine}";
+            bandwidthSelector.value = 0;
         }
     }
 
@@ -293,6 +295,9 @@ class BandwidthSample : MonoBehaviour
         if (error != RTCErrorType.None)
         {
             Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+            statsField.text +=
+                $"Failed scale down video resolution to {(int)(width / scale)}x{(int)(width / scale)}{Environment.NewLine}";
+            scaleResolutionDownSelector.value = 0;
         }
     }
 
