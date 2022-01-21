@@ -112,17 +112,43 @@ namespace Unity.WebRTC
                 }
             }
 
+            public bool IsSameParams(int sampleRate, int channels)
+            {
+                return source.clip.samples == sampleRate &&
+                    source.clip.channels == channels;
+            }
+
+            public void UpdateParams(int sampleRate, int channels)
+            {
+                var isPlaying = m_audioSource.isPlaying;
+
+                // Replace AudioClip for updating parameter
+                AudioClip oldClip = m_audioSource.clip;
+                UnityEngine.Object.DestroyImmediate(oldClip);
+                m_audioSource.clip =
+                    CreateClip($"{m_audioSource.name}-{GetHashCode():x}", sampleRate, channels);
+
+                // Restart AudioSource
+                if (isPlaying)
+                    m_audioSource.Play();
+            }
+
             public AudioStreamRenderer(AudioSource source, int sampleRate, int channels)
             {
                 if(source == null)
                     throw new ArgumentNullException("AudioSource argument is null");
 
                 m_audioSource = source;
-                int lengthSamples = sampleRate;  // sample length for 1 second
-                string clipName = $"{source.name}-{GetHashCode():x}";
                 m_audioSource.clip =
-                    AudioClip.Create(clipName, lengthSamples, channels, sampleRate, false);
+                    CreateClip($"{source.name}-{GetHashCode():x}", sampleRate, channels);
                 m_bufInfo = new AudioBufferTracker(m_audioSource.clip.frequency);
+            }
+
+            static AudioClip CreateClip(string clipName, int sampleRate, int channels)
+            {
+                int lengthSamples = sampleRate;  // sample length for 1 second
+                return AudioClip.Create(
+                    clipName, lengthSamples, channels, sampleRate, false);
             }
 
             public void Dispose()
@@ -183,18 +209,9 @@ namespace Unity.WebRTC
             }
         }
 
-        
-        /// <summary>
-        /// The channel count of streaming receiving audio is changing at the first few frames.
-        /// So This count is for ignoring the unstable audio frames
-        /// </summary>
-        const int MaxFrameCountReceiveDataForIgnoring = 5;
-
         readonly AudioSourceRead _audioSourceRead;
         AudioStreamRenderer _streamRenderer;
         AudioTrackSource _source;
-
-        int frameCountReceiveDataForIgnoring = 0;
 
         /// <summary>
         ///
@@ -340,15 +357,12 @@ namespace Unity.WebRTC
 
             if (_streamRenderer == null)
             {
-                if(frameCountReceiveDataForIgnoring < MaxFrameCountReceiveDataForIgnoring)
-                {
-                    frameCountReceiveDataForIgnoring++;
-                    return;
-                }
                 _streamRenderer = new AudioStreamRenderer(Renderer, sampleRate, channels);
                 OnAudioReceived?.Invoke(Renderer);
             }
-            _streamRenderer?.SetData(audioData);
+            if (!_streamRenderer.IsSameParams(sampleRate, channels))
+                _streamRenderer.UpdateParams(sampleRate, channels);
+            _streamRenderer.SetData(audioData);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateAudioReceive))]
