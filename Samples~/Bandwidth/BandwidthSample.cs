@@ -273,10 +273,12 @@ class BandwidthSample : MonoBehaviour
             parameters.encodings[0].minBitrate = bandwidth * 1000;
         }
 
-        RTCErrorType error = sender.SetParameters(parameters);
-        if (error != RTCErrorType.None)
+        RTCError error = sender.SetParameters(parameters);
+        if (error.errorType != RTCErrorType.None)
         {
-            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
+            statsField.text += $"Failed change bandwidth to {bandwidth * 1000}{Environment.NewLine}";
+            bandwidthSelector.value = 0;
         }
     }
 
@@ -289,10 +291,13 @@ class BandwidthSample : MonoBehaviour
         RTCRtpSendParameters parameters = sender.GetParameters();
         parameters.encodings[0].scaleResolutionDownBy = scale;
 
-        RTCErrorType error = sender.SetParameters(parameters);
-        if (error != RTCErrorType.None)
+        RTCError error = sender.SetParameters(parameters);
+        if (error.errorType != RTCErrorType.None)
         {
-            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
+            statsField.text +=
+                $"Failed scale down video resolution to {(int)(width / scale)}x{(int)(width / scale)}{Environment.NewLine}";
+            scaleResolutionDownSelector.value = 0;
         }
     }
 

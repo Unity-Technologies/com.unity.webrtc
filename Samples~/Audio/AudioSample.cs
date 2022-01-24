@@ -285,10 +285,10 @@ namespace Unity.WebRTC
                 parameters.encodings[0].minBitrate = bandwidth * 1000;
             }
 
-            RTCErrorType error = sender.SetParameters(parameters);
-            if (error != RTCErrorType.None)
+            RTCError error = sender.SetParameters(parameters);
+            if (error.errorType != RTCErrorType.None)
             {
-                Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error);
+                Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
             }
 
             Debug.Log("SetParameters:" + bandwidth);

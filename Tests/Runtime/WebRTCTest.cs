@@ -70,7 +70,8 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var encoderType = WebRTC.GetEncoderType();
             var platform = Application.platform;
-            Assert.That(() => WebRTC.ValidateTextureSize(width, height, platform, encoderType), Throws.Nothing);
+            var error = WebRTC.ValidateTextureSize(width, height, platform, encoderType);
+            Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
         }
 
         [Test]

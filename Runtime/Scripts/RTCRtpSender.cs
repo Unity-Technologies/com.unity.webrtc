@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -90,14 +91,33 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public RTCErrorType SetParameters(RTCRtpSendParameters parameters)
+        public RTCError SetParameters(RTCRtpSendParameters parameters)
         {
+            if (Track is VideoStreamTrack videoTrack)
+            {
+                foreach (var encoding in parameters.encodings)
+                {
+                    var scale = encoding.scaleResolutionDownBy;
+                    if (!scale.HasValue)
+                    {
+                        continue;
+                    }
+
+                    var error = WebRTC.ValidateTextureSize((int)(videoTrack.Texture.width / scale),
+                        (int)(videoTrack.Texture.height / scale), Application.platform, WebRTC.GetEncoderType());
+                    if (error.errorType != RTCErrorType.None)
+                    {
+                        return error;
+                    }
+                }
+            }
+
             parameters.CreateInstance(out RTCRtpSendParametersInternal instance);
             IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(instance));
             Marshal.StructureToPtr(instance, ptr, false);
-            RTCErrorType error = NativeMethods.SenderSetParameters(GetSelfOrThrow(), ptr);
+            RTCErrorType type = NativeMethods.SenderSetParameters(GetSelfOrThrow(), ptr);
             Marshal.FreeCoTaskMem(ptr);
-            return error;
+            return new RTCError {errorType = type};
         }
 
         /// <summary>

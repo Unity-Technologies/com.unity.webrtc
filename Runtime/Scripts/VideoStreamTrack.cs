@@ -129,7 +129,11 @@ namespace Unity.WebRTC
         public VideoStreamTrack(IntPtr texturePtr, int width, int height, GraphicsFormat format, bool needFlip)
             : this(Guid.NewGuid().ToString(), new VideoTrackSource(), needFlip)
         {
-            WebRTC.ValidateTextureSize(width, height, Application.platform, WebRTC.GetEncoderType());
+            var error = WebRTC.ValidateTextureSize(width, height, Application.platform, WebRTC.GetEncoderType());
+            if (error.errorType != RTCErrorType.None)
+            {
+                throw new ArgumentException(error.message);
+            }
             WebRTC.ValidateGraphicsFormat(format);
             WebRTC.Context.SetVideoEncoderParameter(GetSelfOrThrow(), width, height, format, texturePtr);
             WebRTC.Context.InitializeEncoder(GetSelfOrThrow());
