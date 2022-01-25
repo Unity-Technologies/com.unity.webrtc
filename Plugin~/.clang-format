@@ -1,7 +1,11 @@
-# Common settings
 BasedOnStyle: WebKit
 AlignAfterOpenBracket: AlwaysBreak
+NamespaceIndentation: Inner
 BreakBeforeBraces: Custom
 BraceWrapping:
+  AfterClass: true
   AfterControlStatement: Always
+  AfterEnum: true
   AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
