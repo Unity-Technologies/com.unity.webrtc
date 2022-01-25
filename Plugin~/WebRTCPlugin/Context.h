@@ -161,6 +161,7 @@ namespace webrtc
         UnityEncoderType m_encoderType;
         std::unique_ptr<rtc::Thread> m_workerThread;
         std::unique_ptr<rtc::Thread> m_signalingThread;
+        std::unique_ptr<TaskQueueFactory> m_taskQueueFactory;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
         std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;

@@ -4,8 +4,8 @@
 #include <unordered_map>
 
 #include "WebRTCPlugin.h"
-#include "api/task_queue/default_task_queue_factory.h"
 #include "rtc_base/platform_thread.h"
+#include "rtc_base/task_utils/repeating_task.h"
 
 namespace unity
 {
@@ -18,48 +18,47 @@ namespace webrtc
     class DummyAudioDevice : public webrtc::AudioDeviceModule
     {
     public:
+        DummyAudioDevice(TaskQueueFactory* factory);
+        ~DummyAudioDevice() override {
+            StopPlayout();
+            StopRecording();
+        }
+
         //webrtc::AudioDeviceModule
         // Retrieve the currently utilized audio layer
-        virtual int32 ActiveAudioLayer(AudioLayer* audioLayer) const override
+        int32_t ActiveAudioLayer(AudioLayer* audioLayer) const override
         {
             *audioLayer = AudioDeviceModule::kPlatformDefaultAudio;
             return 0;
         }
         // Full-duplex transportation of PCM audio
-        virtual int32 RegisterAudioCallback(webrtc::AudioTransport* transport) override
+        int32_t RegisterAudioCallback(webrtc::AudioTransport* transport) override
         {
+            std::lock_guard<std::mutex> lock(mutex_);
+            RTC_DCHECK_EQ(!audio_transport_, !!transport);
             audio_transport_ = transport;
             return 0;
         }
 
         // Main initialization and termination
-        virtual int32 Init() override
-        {
-            initialized_ = true;
-            return 0;
-        }
-        virtual int32 Terminate() override
-        {
-            initialized_ = false;
-            playing_ = false;
-            recording_ = false;
-            return 0;
-        }
+        int32_t Init() override;
+        int32_t Terminate() override;
         virtual bool Initialized() const override
         {
+            std::lock_guard<std::mutex> lock(mutex_);
             return initialized_;
         }
 
         // Device enumeration
-        virtual int16 PlayoutDevices() override
+        virtual int16_t PlayoutDevices() override
         {
             return 0;
         }
-        virtual int16 RecordingDevices() override
+        virtual int16_t RecordingDevices() override
         {
             return 0;
         }
-        virtual int32 PlayoutDeviceName(uint16 index,
+        virtual int32_t PlayoutDeviceName(uint16_t index,
             char name[webrtc::kAdmMaxDeviceNameSize],
             char guid[webrtc::kAdmMaxGuidSize]) override
         {
@@ -116,48 +115,40 @@ namespace webrtc
             return false;
         }
 
-        // Audio transport control
         virtual int32 StartPlayout() override
         {
+            std::lock_guard<std::mutex> lock(mutex_);
             playing_ = true;
-            playoutAudioThread_ = rtc::Thread::Create();
-            playoutAudioThread_->Start();
-            playoutAudioThread_->PostTask(RTC_FROM_HERE, [&] {
-                while (PlayoutThreadProcess()) {}
-                });
             return 0;
         }
         virtual int32 StopPlayout() override
         {
-            if (playoutAudioThread_ && !playoutAudioThread_->empty())
-                playoutAudioThread_->Stop();
+            std::lock_guard<std::mutex> lock(mutex_);
+            playing_ = false;
             return 0;
         }
         virtual bool Playing() const override
         {
+            std::lock_guard<std::mutex> lock(mutex_);
             return playing_;
         }
 
         virtual int32 StartRecording() override
         {
+            std::lock_guard<std::mutex> lock(mutex_);
             recording_ = true;
-            recordAudioThread_ = rtc::PlatformThread::SpawnJoinable(
-                [this] { static_cast<DummyAudioDevice*>(this)->RecordingThread(); },
-                "webrtc_audio_module_recording_thread",
-                rtc::ThreadAttributes().SetPriority(rtc::ThreadPriority::kRealtime));
             return 0;
         }
 
         virtual int32 StopRecording() override
         {
-            if (recording_) {
-                recording_ = false;
-                recordAudioThread_.Finalize();
-            }
+            std::lock_guard<std::mutex> lock(mutex_);
+            recording_ = false;
             return 0;
         }
         virtual bool Recording() const override
         {
+            std::lock_guard<std::mutex> lock(mutex_);
             return recording_;
         }
 
@@ -322,25 +313,27 @@ namespace webrtc
             return 0;
         }
 #endif
-        void RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels);
-        void UnregisterSendAudioCallback(UnityAudioTrackSource* source);
+        void RegisterSendAudioCallback(
+            UnityAudioTrackSource* source, int sampleRate, int channels);
+        void UnregisterSendAudioCallback(
+            UnityAudioTrackSource* source);
 
     private:
+        void ProcessAudio();
         bool PlayoutThreadProcess();
-        void RecordingThread();
 
+        const int32_t kFrameLengthMs = 10;
+
+        std::unique_ptr<rtc::TaskQueue> taskQueue_;
+        RepeatingTaskHandle task_;
         std::atomic<bool> initialized_ {false};
         std::atomic<bool> playing_ {false};
         std::atomic<bool> recording_{ false };
-        std::mutex mutex_;
-        std::unique_ptr<rtc::Thread> playoutAudioThread_;
-        rtc::PlatformThread recordAudioThread_;
-        int64_t lastCallRecordMillis_ = 0;
-
-        std::atomic<webrtc::AudioTransport*> audio_transport_{ nullptr };
-
+        mutable std::mutex mutex_;
+        webrtc::AudioTransport* audio_transport_{ nullptr };
         using callback_t = std::function<void()>;
         std::unordered_map<UnityAudioTrackSource*, callback_t> callbacks_;
+        TaskQueueFactory* tackQueueFactory_;
     };
 
 } // end namespace webrtc
