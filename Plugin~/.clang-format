@@ -1,0 +1,7 @@
+# Common settings
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: AlwaysBreak
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterControlStatement: Always
+  AfterFunction: true
