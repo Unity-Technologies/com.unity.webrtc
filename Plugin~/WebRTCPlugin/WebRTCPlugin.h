@@ -10,6 +10,7 @@ namespace webrtc
     class Context;
     class PeerConnectionObject;
     class UnityVideoRenderer;
+    class AudioTrackSinkAdapter;
     enum class RTCSdpType;
     enum class RTCPeerConnectionEventType;
     struct MediaStreamEvent;
@@ -24,7 +25,7 @@ namespace webrtc
     using DelegateSetSessionDescFailure =
         void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
     using DelegateAudioReceive =
-        void(*)(webrtc::AudioTrackInterface* track,
+        void(*)(AudioTrackSinkAdapter* sink,
             const void* audio_data,
             int size,
             int sample_rate,

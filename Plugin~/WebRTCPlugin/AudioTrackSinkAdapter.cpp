@@ -5,10 +5,8 @@ namespace unity
 {
 namespace webrtc
 {
-    AudioTrackSinkAdapter::AudioTrackSinkAdapter(
-        webrtc::AudioTrackInterface* track, DelegateAudioReceive callback)
-        : _track(track)
-        , _callback(callback)
+    AudioTrackSinkAdapter::AudioTrackSinkAdapter(DelegateAudioReceive callback)
+        : _callback(callback)
     {
     }
 
@@ -47,7 +45,7 @@ namespace webrtc
         }
 
         _callback(
-            _track,
+            this,
             _converted_data.data(),
             size,
             sample_rate,

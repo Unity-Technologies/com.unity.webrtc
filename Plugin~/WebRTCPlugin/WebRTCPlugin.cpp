@@ -1447,16 +1447,28 @@ extern "C"
         }
     }
 
-    UNITY_INTERFACE_EXPORT void ContextRegisterAudioReceiveCallback(
-        Context* context, AudioTrackInterface* track, DelegateAudioReceive callback)
+    UNITY_INTERFACE_EXPORT AudioTrackSinkAdapter* ContextCreateAudioTrackSink(
+        Context* context, DelegateAudioReceive callback)
     {
-        context->RegisterAudioReceiveCallback(track, callback);
+        return context->CreateAudioTrackSinkAdapter(callback);
     }
 
-    UNITY_INTERFACE_EXPORT void ContextUnregisterAudioReceiveCallback(
-        Context* context, AudioTrackInterface* track)
+    UNITY_INTERFACE_EXPORT void ContextDeleteAudioTrackSink(
+        Context* context, AudioTrackSinkAdapter* sink)
     {
-        context->UnregisterAudioReceiveCallback(track);
+        return context->DeleteAudioTrackSinkAdapter(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void AudioTrackAddSink(
+        AudioTrackInterface* track, AudioTrackSinkInterface* sink)
+    {
+        track->AddSink(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void AudioTrackRemoveSink(
+        AudioTrackInterface* track, AudioTrackSinkInterface* sink)
+    {
+        track->RemoveSink(sink);
     }
 }
 

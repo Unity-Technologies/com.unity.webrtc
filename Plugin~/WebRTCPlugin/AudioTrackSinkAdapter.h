@@ -9,10 +9,11 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-    class AudioTrackSinkAdapter : public webrtc::AudioTrackSinkInterface
+    class AudioTrackSinkAdapter
+        : public webrtc::AudioTrackSinkInterface
     {
     public:
-        AudioTrackSinkAdapter(AudioTrackInterface* track, DelegateAudioReceive callback);
+        AudioTrackSinkAdapter(DelegateAudioReceive callback);
         ~AudioTrackSinkAdapter() override {};
 
         void OnData(
@@ -22,8 +23,6 @@ namespace webrtc
             size_t number_of_channels,
             size_t number_of_frames) override;
     private:
-        rtc::scoped_refptr<webrtc::VideoFrameBuffer> m_frameBuffer;
-        AudioTrackInterface* _track;
         DelegateAudioReceive _callback;
     };
 } // end namespace webrtc

@@ -413,37 +413,23 @@ namespace webrtc
     {
         const rtc::scoped_refptr<AudioTrackInterface> track =
             m_peerConnectionFactory->CreateAudioTrack(label, source);
-
         AddRefPtr(track);
         return track;
     }
 
 
-    void Context::RegisterAudioReceiveCallback(
-        AudioTrackInterface* track, DelegateAudioReceive callback)
+    AudioTrackSinkAdapter* Context::CreateAudioTrackSinkAdapter(
+        DelegateAudioReceive callback)
     {
-        if (m_mapAudioTrackAndSink.find(track) != m_mapAudioTrackAndSink.end())
-        {
-            RTC_LOG(LS_WARNING) << "The callback is already registered.";
-            return;
-        }
-
-        std::unique_ptr<AudioTrackSinkAdapter> sink =
-            std::make_unique<AudioTrackSinkAdapter>(track, callback);
-
-        track->AddSink(sink.get());
-        m_mapAudioTrackAndSink[track] = std::move(sink);
+        auto sink = std::make_unique<AudioTrackSinkAdapter>(callback);
+        AudioTrackSinkAdapter* ptr = sink.get();
+        m_mapAudioTrackAndSink.emplace(ptr, std::move(sink));
+        return ptr;
     }
 
-    void Context::UnregisterAudioReceiveCallback(
-        AudioTrackInterface* track)
+    void Context::DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink)
     {
-        if (m_mapAudioTrackAndSink.find(track) == m_mapAudioTrackAndSink.end())
-            return;
-
-        AudioTrackSinkInterface* sink = m_mapAudioTrackAndSink[track].get();
-        track->RemoveSink(sink);
-        m_mapAudioTrackAndSink.erase(track);
+        m_mapAudioTrackAndSink.erase(sink);
     }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)

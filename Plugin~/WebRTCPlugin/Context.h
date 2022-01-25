@@ -66,11 +66,13 @@ namespace webrtc
         CodecInitializationResult GetInitializationResult(webrtc::MediaStreamTrackInterface* track);
 
         template <typename T>
-        bool ExistsRefPtr(T* ptr) {  return m_mapRefPtr.find(ptr) != m_mapRefPtr.end(); }
+        bool ExistsRefPtr(rtc::RefCountInterface* ptr) {
+            return m_mapRefPtr.find(ptr) != m_mapRefPtr.end(); }
         template <typename T>
-        void AddRefPtr(rtc::scoped_refptr<T> refptr) { m_mapRefPtr.emplace(refptr.get(), refptr); }
-        template <typename T>
-        void AddRefPtr(T* ptr) { m_mapRefPtr.emplace(ptr, ptr); }
+        void AddRefPtr(rtc::scoped_refptr<T> refptr) {
+            m_mapRefPtr.emplace(refptr.get(), refptr); }
+        void AddRefPtr(rtc::RefCountInterface* ptr) {
+            m_mapRefPtr.emplace(ptr, ptr); }
         template <typename T>
         void RemoveRefPtr(rtc::scoped_refptr<T>& refptr)
         {
@@ -92,6 +94,10 @@ namespace webrtc
 
         // Audio Source
         webrtc::AudioSourceInterface* CreateAudioSource();
+        // Audio Renderer
+        AudioTrackSinkAdapter* CreateAudioTrackSinkAdapter(
+            DelegateAudioReceive callback);
+        void DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink);
 
         // Video Source
         webrtc::VideoTrackSourceInterface* CreateVideoSource();
@@ -102,9 +108,6 @@ namespace webrtc
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
         UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
 
-        void RegisterAudioReceiveCallback(
-            AudioTrackInterface* track, DelegateAudioReceive callback);
-        void UnregisterAudioReceiveCallback(AudioTrackInterface* track);
 
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
@@ -168,7 +171,7 @@ namespace webrtc
         std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelInterface*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
-        std::map<webrtc::AudioTrackInterface*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
+        std::map<AudioTrackSinkAdapter*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
         std::map<const rtc::RefCountInterface*, rtc::scoped_refptr<rtc::RefCountInterface>> m_mapRefPtr;
 
         // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.

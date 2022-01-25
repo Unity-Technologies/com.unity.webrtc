@@ -104,5 +104,17 @@ namespace Unity.WebRTC.RuntimeTest
             context.Dispose();
             UnityEngine.Object.DestroyImmediate(rt);
         }
+
+        [Test]
+        [Category("Context")]
+        public void CreateAndDeleteAudioTrackSink()
+        {
+            var value = NativeMethods.GetHardwareEncoderSupport();
+            var context = Context.Create(
+                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var sink = context.CreateAudioTrackSink(null);
+            context.DeleteAudioTrackSink(sink);
+            context.Dispose();
+        }
     }
 }
