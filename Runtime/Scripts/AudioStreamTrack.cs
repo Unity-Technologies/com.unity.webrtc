@@ -129,14 +129,13 @@ namespace Unity.WebRTC
         {
             private bool m_bufferReady = false;
             private readonly Queue<float[]> m_recvBufs = new Queue<float[]>();
-            private readonly AudioBufferTracker m_bufInfo;
+            private AudioBufferTracker m_bufInfo;
             public event OnAudioReceived OnAudioReceived;
             private bool disposed;
 
             internal IntPtr self;
 
             private AudioSource m_audioSource;
-            private bool invokedReceivedAtOnce = false;
 
             public AudioSource Source 
             {
@@ -268,12 +267,12 @@ namespace Unity.WebRTC
             {
                 if (Source == null)
                     return;
-
-                // delegate
-                if (!invokedReceivedAtOnce)
+                if (Source.clip == null)
                 {
+                    m_audioSource.clip =
+                        CreateClip($"{Source.name}-{GetHashCode():x}", sampleRate, channels);
+                    m_bufInfo = new AudioBufferTracker(m_audioSource.clip.frequency);
                     OnAudioReceived?.Invoke(Source);
-                    invokedReceivedAtOnce = true;
                 }
 
                 if (!IsSameParams(sampleRate, channels))

@@ -168,6 +168,5 @@ namespace Unity.WebRTC.RuntimeTest
             renderer.Dispose();
             UnityEngine.Object.DestroyImmediate(obj);
         }
-        }
     }
 }

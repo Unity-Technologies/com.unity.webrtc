@@ -72,7 +72,7 @@ namespace Unity.WebRTC.Samples
                 clip = target.clip;
                 int channelCount = clip.channels;
                 var conf = AudioSettings.GetConfiguration();
-                int maxChannelCount = SpeakerModeToChannel[conf.speakerMode];
+                int maxChannelCount = AudioSettingsUtility.SpeakerModeToChannel(conf.speakerMode);
                 channelCount = Math.Min(channelCount, maxChannelCount);
                 ResetLines(channelCount);
             }
