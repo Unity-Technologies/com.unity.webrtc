@@ -1050,7 +1050,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextUnRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateAudioTrackSink(IntPtr context, DelegateAudioReceive callback);
+        public static extern IntPtr ContextCreateAudioTrackSink(
+            IntPtr context, DelegateAudioReceive callback, int sampleRate, int channels);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteAudioTrackSink(IntPtr context, IntPtr sink);
         [DllImport(WebRTC.Lib)]

@@ -96,7 +96,7 @@ namespace Unity.WebRTC
                 availableCodecs.Add(codec);
             }
             dropdownAudioCodecs.AddOptions(availableCodecs.Select(codec =>
-                new Dropdown.OptionData(string.Format($"{codec.mimeType} {codec.clockRate} {codec.sdpFmtpLine.Replace(";", " ")}"))).ToList());
+                new Dropdown.OptionData(CodecToOptionName(codec))).ToList());
 
             dropdownBandwidth.options = bandwidthOptions
                 .Select(pair => new Dropdown.OptionData { text = pair.Key })
@@ -112,6 +112,13 @@ namespace Unity.WebRTC
             buttonPause.onClick.AddListener(OnPause);
             buttonResume.onClick.AddListener(OnResume);
             buttonHangup.onClick.AddListener(OnHangUp);
+        }
+
+        static string CodecToOptionName(RTCRtpCodecCapability cap)
+        {
+            return string.Format($"{cap.mimeType} " +
+                $"{cap.clockRate} " +
+                $"channel={cap.channels}");
         }
 
         void OnDestroy()

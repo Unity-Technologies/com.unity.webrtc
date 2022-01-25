@@ -163,10 +163,81 @@ namespace Unity.WebRTC.RuntimeTest
         public void AudioStreamRenderer()
         {
             var obj = new GameObject("audio");
-            var renderer = new AudioStreamTrack.AudioStreamRenderer();
+            var sampleRate = 48000;
+            var channels = 2;
+            var renderer = new AudioStreamTrack.AudioStreamRenderer(sampleRate, channels);
             renderer.Source = obj.AddComponent<AudioSource>();
             renderer.Dispose();
             UnityEngine.Object.DestroyImmediate(obj);
         }
+
+        [Test]
+        public void NativeArrayCircleBufferPushBack()
+        {
+            // arr = [0, 1, 2, 3, 4, 5], index = 0
+            NativeArray<int> arr = new NativeArray<int>(
+                new int[]{0, 1, 2, 3, 4, 5}, Allocator.Temp);
+
+            // arr = [0, 0, 0, 3, 4, 5], index = 3
+            int index = arr.CircleBufferPushBack(0, new int[] {0,0,0});
+            Assert.That(arr.ToArray(), Is.EqualTo(new int[] { 0, 0, 0, 3, 4, 5 }));
+            Assert.That(index, Is.EqualTo(3));
+
+            // arr = [1, 1, 0, 1, 1, 1], index = 2
+            index = arr.CircleBufferPushBack(index, new int[] {1,1,1,1,1});
+            Assert.That(arr.ToArray(), Is.EqualTo(new int[] { 1, 1, 0, 1, 1, 1 }));
+            Assert.That(index, Is.EqualTo(2));
+
+            // arr = [1, 1, 2, 2, 2, 2], index = 0
+            index = arr.CircleBufferPushBack(index, new int[] {2,2,2,2});
+            Assert.That(arr.ToArray(), Is.EqualTo(new int[] { 1, 1, 2, 2, 2, 2 }));
+            Assert.That(index, Is.EqualTo(0));
+
+            // arr = [1, 1, 2, 2, 2, 2], index = 0
+            index = arr.CircleBufferPushBack(index, new int[] {});
+            Assert.That(arr.ToArray(), Is.EqualTo(new int[] { 1, 1, 2, 2, 2, 2 }));
+            Assert.That(index, Is.EqualTo(0));
+
+            // throw ArgumentException
+            Assert.That(() => arr.CircleBufferPushBack(index, new int[7]),
+                Throws.TypeOf<ArgumentException>());
+        }
+
+        [Test]
+        public void NativeArrayCircleBufferCopyTo()
+        {
+            NativeArray<int> arr = new NativeArray<int>(
+                new int[] { 0, 1, 2, 3, 4, 5 }, Allocator.Temp);
+
+            // dst = [0, 1, 2], index = 3
+            int[] dst = new int[3];
+            int index = arr.CircleBufferCopyTo(0, dst);
+            Assert.That(dst, Is.EqualTo(new int[] { 0, 1, 2 }));
+            Assert.That(index, Is.EqualTo(3));
+
+            // dst = [3, 4, 5, 0, 1, 2], index = 3
+            dst = new int[6];
+            index = arr.CircleBufferCopyTo(index, dst);
+            Assert.That(dst, Is.EqualTo(new int[] { 3, 4, 5, 0, 1, 2 }));
+            Assert.That(index, Is.EqualTo(3));
+
+            // dst = [3, 4, 5], index = 0
+            dst = new int[3];
+            index = arr.CircleBufferCopyTo(index, dst);
+            Assert.That(dst, Is.EqualTo(new int[] { 3, 4, 5 }));
+            Assert.That(index, Is.EqualTo(0));
+
+            // dst = [], index = 0
+            dst = new int[0];
+            index = arr.CircleBufferCopyTo(index, dst);
+            Assert.That(dst, Is.Empty);
+            Assert.That(index, Is.EqualTo(0));
+
+            // throw ArgumentException
+            dst = new int[7];
+            Assert.That(() => arr.CircleBufferCopyTo(index, dst),
+                Throws.TypeOf<ArgumentException>());
+        }
+
     }
 }

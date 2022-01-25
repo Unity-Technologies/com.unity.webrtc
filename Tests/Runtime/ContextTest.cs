@@ -112,7 +112,9 @@ namespace Unity.WebRTC.RuntimeTest
             var value = NativeMethods.GetHardwareEncoderSupport();
             var context = Context.Create(
                 encoderType: value ? EncoderType.Hardware : EncoderType.Software);
-            var sink = context.CreateAudioTrackSink(null);
+            int sampleRate = 48000;
+            int channel = 2;
+            var sink = context.CreateAudioTrackSink(null, sampleRate, channel);
             context.DeleteAudioTrackSink(sink);
             context.Dispose();
         }
