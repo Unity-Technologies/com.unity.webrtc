@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Unity.WebRTC;
 using UnityEngine.UI;
 using System.Text;
+using Unity.WebRTC;
 using Unity.WebRTC.Samples;
 
 class MediaStreamSample : MonoBehaviour
@@ -19,18 +20,14 @@ class MediaStreamSample : MonoBehaviour
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
-    private List<RTCRtpSender> pc1Senders, pc2Senders;
-    private MediaStream videoStream;
-    private RTCDataChannel remoteDataChannel;
-    private Coroutine sdpCheck;
-    private string msg;
+    private List<RTCRtpSender> pc1Senders;
+    private MediaStream videoStream, receiveStream;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
     private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
     private DelegateOnIceCandidate pc1OnIceCandidate;
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private DelegateOnNegotiationNeeded pc2OnNegotiationNeeded;
     private StringBuilder trackInfos;
     private bool videoUpdateStarted;
 
@@ -51,7 +48,6 @@ class MediaStreamSample : MonoBehaviour
     {
         trackInfos = new StringBuilder();
         pc1Senders = new List<RTCRtpSender>();
-        pc2Senders = new List<RTCRtpSender>();
         callButton.interactable = true;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
@@ -60,18 +56,15 @@ class MediaStreamSample : MonoBehaviour
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
         pc2Ontrack = e => { OnTrack(_pc2, e); };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
-        pc2OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc2)); };
-        infoText.text = !WebRTC.HardwareEncoderSupport() ? "Current GPU doesn't support encoder" : "Current GPU supports encoder";
+        infoText.text = !WebRTC.HardwareEncoderSupport()
+            ? "Current GPU doesn't support encoder"
+            : "Current GPU supports encoder";
     }
 
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[]
-        {
-            new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } }
-        };
-
+        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
         return config;
     }
 
@@ -107,6 +100,7 @@ class MediaStreamSample : MonoBehaviour
                 throw new ArgumentOutOfRangeException(nameof(state), state, null);
         }
     }
+
     IEnumerator PcOnNegotiationNeeded(RTCPeerConnection pc)
     {
         Debug.Log($"{GetName(pc)} createOffer start");
@@ -125,31 +119,29 @@ class MediaStreamSample : MonoBehaviour
 
     private void AddTracks()
     {
-        foreach(var track in videoStream.GetTracks())
+        foreach (var track in videoStream.GetTracks())
         {
             pc1Senders.Add(_pc1.AddTrack(track, videoStream));
         }
-        if(!videoUpdateStarted)
+
+        if (!videoUpdateStarted)
         {
             StartCoroutine(WebRTC.Update());
             videoUpdateStarted = true;
         }
+
         addTracksButton.interactable = false;
         removeTracksButton.interactable = true;
     }
 
     private void RemoveTracks()
     {
-        foreach(var sender in pc1Senders)
+        foreach (var sender in pc1Senders)
         {
             _pc1.RemoveTrack(sender);
         }
-        foreach (var sender in pc2Senders)
-        {
-            _pc2.RemoveTrack(sender);
-        }
+
         pc1Senders.Clear();
-        pc2Senders.Clear();
         addTracksButton.interactable = true;
         removeTracksButton.interactable = false;
         trackInfos.Clear();
@@ -170,7 +162,6 @@ class MediaStreamSample : MonoBehaviour
         Debug.Log("Created remote peer connection object pc2");
         _pc2.OnIceCandidate = pc2OnIceCandidate;
         _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
-        _pc2.OnNegotiationNeeded = pc2OnNegotiationNeeded;
         _pc2.OnTrack = pc2Ontrack;
 
         _pc1.CreateDataChannel("data");
@@ -186,7 +177,11 @@ class MediaStreamSample : MonoBehaviour
 
     private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
     {
-        pc2Senders.Add(pc.AddTrack(e.Track, videoStream));
+        receiveStream = e.Streams.First();
+        receiveStream.OnRemoveTrack = ev =>
+        {
+            ev.Track.Dispose();
+        };
         trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
         trackInfos.Append($"Track kind: {e.Track.Kind}\r\n");
         trackInfos.Append($"Track id: {e.Track.Id}\r\n");
@@ -233,6 +228,7 @@ class MediaStreamSample : MonoBehaviour
             var error = op2.Error;
             OnSetSessionDescriptionError(ref error);
         }
+
         Debug.Log($"{GetName(otherPc)} createAnswer start");
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
