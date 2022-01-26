@@ -55,6 +55,10 @@ xcodebuild archive \
 rm -rf "$WEBRTC_FRAMEWORK_DIR/webrtc.framework"
 cp -r "$WEBRTC_ARCHIVE_DIR/Products/@rpath/webrtc.framework" "$WEBRTC_FRAMEWORK_DIR/webrtc.framework"
 
-lipo -create -o "$WEBRTC_FRAMEWORK_DIR/webrtc.framework/webrtc" \
-  "$WEBRTC_ARCHIVE_DIR/Products/@rpath/webrtc.framework/webrtc" \
-  "$WEBRTC_SIM_ARCHIVE_DIR/Products/@rpath/webrtc.framework/webrtc"
+# todo(kazuki): The command below combines two libraries for supporting iOS and iOS simulator.
+# But currently this is commented out because the combined binary adds a troublesome task to developer 
+# when building iOS app on XCode. We need to support it using XCFramework or another way.
+# 
+# lipo -create -o "$WEBRTC_FRAMEWORK_DIR/webrtc.framework/webrtc" \
+#   "$WEBRTC_ARCHIVE_DIR/Products/@rpath/webrtc.framework/webrtc" \
+#   "$WEBRTC_SIM_ARCHIVE_DIR/Products/@rpath/webrtc.framework/webrtc"
