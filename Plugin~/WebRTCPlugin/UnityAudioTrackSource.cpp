@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "UnityAudioTrackSource.h"
+#include "common_audio/include/audio_util.h"
 
 namespace unity
 {
@@ -53,8 +54,7 @@ void UnityAudioTrackSource::PushAudioData(
     _convertedAudioData.reserve(_convertedAudioData.size() + nNumFrames);
     for (size_t i = 0; i < nNumFrames; i++)
     {
-        _convertedAudioData.push_back(
-            pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
+        _convertedAudioData.push_back(::webrtc::FloatToS16(pAudioData[i]));
     }
 }
 
