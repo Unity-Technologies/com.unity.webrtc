@@ -29,7 +29,7 @@ namespace webrtc
         // Retrieve the currently utilized audio layer
         int32_t ActiveAudioLayer(AudioLayer* audioLayer) const override
         {
-            *audioLayer = AudioDeviceModule::kPlatformDefaultAudio;
+            *audioLayer = AudioDeviceModule::kDummyAudio;
             return 0;
         }
         // Full-duplex transportation of PCM audio

@@ -1448,9 +1448,15 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT AudioTrackSinkAdapter* ContextCreateAudioTrackSink(
-        Context* context, DelegateAudioReceive callback)
+        Context* context)
     {
-        return context->CreateAudioTrackSinkAdapter(callback);
+        return context->CreateAudioTrackSinkAdapter();
+    }
+
+    UNITY_INTERFACE_EXPORT void ContextProcessAudioTrackSink(
+        Context* context, AudioTrackSinkAdapter* sink, float* data, int32 size, int channels, int sampleRate)
+    {
+        return context->ProcessAudioTrackSinkAdapter(sink, data, size, channels, sampleRate);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteAudioTrackSink(

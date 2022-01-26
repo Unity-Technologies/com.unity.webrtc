@@ -2,6 +2,8 @@
 
 #include <mutex>
 #include "WebRTCPlugin.h"
+#include "common_audio/ring_buffer.h"
+#include "audio/remix_resample.h"
 
 namespace unity
 {
@@ -13,8 +15,8 @@ namespace webrtc
         : public webrtc::AudioTrackSinkInterface
     {
     public:
-        AudioTrackSinkAdapter(DelegateAudioReceive callback);
-        ~AudioTrackSinkAdapter() override {};
+        AudioTrackSinkAdapter();
+        ~AudioTrackSinkAdapter() override;
 
         void OnData(
             const void* audio_data,
@@ -22,8 +24,14 @@ namespace webrtc
             int sample_rate,
             size_t number_of_channels,
             size_t number_of_frames) override;
+        void ProcessAudio(float* data, int32 size, int channels, int sampleRate);
     private:
-        DelegateAudioReceive _callback;
+        std::mutex m_mutex;
+        PushResampler<int16_t> m_resampler;
+        AudioFrame m_frame;
+        RingBuffer* m_ringBuffer;
+        int16_t *m_bufferIn;
+        int m_bufferInLen;
     };
 } // end namespace webrtc
 } // end namespace unity

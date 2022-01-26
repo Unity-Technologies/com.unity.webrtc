@@ -817,10 +817,6 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateAudioReceive(
-        IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
-        int sampleRate, int numOfChannels, int numOfFrames);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateVideoFrameResize(IntPtr renderer, int width, int height);
 
     internal static class NativeMethods
@@ -1050,7 +1046,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextUnRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateAudioTrackSink(IntPtr context, DelegateAudioReceive callback);
+        public static extern IntPtr ContextCreateAudioTrackSink(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern void ContextProcessAudioTrackSink(IntPtr context, IntPtr sink, float[] data, int size, int channels, int sampleRate);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteAudioTrackSink(IntPtr context, IntPtr sink);
         [DllImport(WebRTC.Lib)]
