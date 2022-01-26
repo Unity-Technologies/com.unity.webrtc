@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -13,6 +14,20 @@ namespace Unity.WebRTC
         private DelegateOnRemoveTrack onRemoveTrack;
 
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
+
+#if UNITY_WEBGL
+        // TODO Use MediaTrackConstraints instead of booleans
+        public class MediaStreamConstraints
+        {
+            public bool audio = true;
+            public bool video = true;
+        }
+
+        public void AddUserMedia(MediaStreamConstraints constraints)
+        {
+            NativeMethods.MediaStreamAddUserMedia(self, JsonUtility.ToJson(constraints));
+        }
+#endif
 
         /// <summary>
         ///
@@ -64,14 +79,26 @@ namespace Unity.WebRTC
 
         public IEnumerable<VideoStreamTrack> GetVideoTracks()
         {
+#if !UNITY_WEBGL
             var buf = NativeMethods.MediaStreamGetVideoTracks(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new VideoStreamTrack(ptr));
+#else
+            var ptr = NativeMethods.MediaStreamGetVideoTracks(GetSelfOrThrow());
+            var buf = NativeMethods.ptrToIntPtrArray(ptr);
+            return WebRTC.Deserialize(buf, p => new VideoStreamTrack(p));
+#endif
         }
 
         public IEnumerable<AudioStreamTrack> GetAudioTracks()
         {
+#if !UNITY_WEBGL
             var buf = NativeMethods.MediaStreamGetAudioTracks(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new AudioStreamTrack(ptr));
+#else
+            var ptr = NativeMethods.MediaStreamGetAudioTracks(GetSelfOrThrow());
+            var buf = NativeMethods.ptrToIntPtrArray(ptr);
+            return WebRTC.Deserialize(buf, p => new AudioStreamTrack(p));
+#endif
         }
 
         public IEnumerable<MediaStreamTrack> GetTracks()

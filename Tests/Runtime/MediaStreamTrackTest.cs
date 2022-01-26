@@ -50,11 +50,18 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Requires video refactoring
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         public void EqualIdWithVideoTrack()
         {
             var guid = Guid.NewGuid().ToString();
             var source = new VideoTrackSource();
+#if UNITY_WEBGL
+            var track = new VideoStreamTrack(WebRTC.Context.CreateVideoTrack(source.self, IntPtr.Zero, 256, 256));
+#else
             var track = new VideoStreamTrack(WebRTC.Context.CreateVideoTrack(guid, source.self));
+#endif
             Assert.That(track, Is.Not.Null);
             Assert.That(track.Id, Is.EqualTo(guid));
             track.Dispose();
@@ -77,6 +84,9 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        // TODO: Remove [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        // Requires video refactoring
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         public void ConstructorThrowsExceptionWhenInvalidGraphicsFormat()
         {
             var width = 256;
@@ -108,7 +118,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStreamTrack")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.WindowsPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.WindowsPlayer, RuntimePlatform.WebGLPlayer})]
         public IEnumerator VideoStreamTrackEnabled()
         {
             var width = 256;
@@ -145,7 +155,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStreamTrack")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer , RuntimePlatform.WebGLPlayer})]
         public IEnumerator CaptureStreamTrack()
         {
             var camObj = new GameObject("Camera");
@@ -207,7 +217,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [Category("MediaStreamTrack")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.WebGLPlayer })]
         public IEnumerator VideoStreamTrackInstantiateMultiple()
         {
             var width = 256;

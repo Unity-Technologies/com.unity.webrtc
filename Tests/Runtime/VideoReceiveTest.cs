@@ -42,6 +42,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Timeout(5000)]
         public IEnumerator InitializeReceiver()
         {
@@ -91,6 +92,7 @@ namespace Unity.WebRTC.RuntimeTest
         // not supported TestCase attribute on UnityTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Timeout(10000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]

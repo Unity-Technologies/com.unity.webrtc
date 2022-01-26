@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -114,8 +115,10 @@ namespace Unity.WebRTC
         {
             switch (src)
             {
+                case "host":
                 case "local":
                     return RTCIceCandidateType.Host;
+                case "srflx":
                 case "stun":
                     return RTCIceCandidateType.Srflx;
                 case "prflx":
@@ -127,7 +130,7 @@ namespace Unity.WebRTC
             }
         }
 
-        
+
         public static RTCIceTcpCandidateType? ParseRTCIceTcpCandidateType(this string src)
         {
             if (string.IsNullOrEmpty(src))
@@ -146,6 +149,7 @@ namespace Unity.WebRTC
         }
     }
 
+//#if !UNITY_WEBGL
     /// <summary>
     /// 
     /// </summary>
@@ -155,14 +159,17 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public string Candidate => NativeMethods.IceCandidateGetSdp(self);
+
         /// <summary>
         /// 
         /// </summary>
         public string SdpMid => NativeMethods.IceCandidateGetSdpMid(self);
+
         /// <summary>
         /// 
         /// </summary>
         public int? SdpMLineIndex => NativeMethods.IceCandidateGetSdpLineIndex(self);
+
         /// <summary>
         /// 
         /// </summary>
@@ -239,16 +246,21 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="candidateInfo"></param>
+#if !UNITY_WEBGL
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
+#else
+        public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null, IntPtr? iceCandidatePtr = null)
+#endif
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
             if(candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
                 throw new ArgumentException("sdpMid and sdpMLineIndex are both null");
 
-            RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
+            RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal) candidateInfo;
+#if !UNITY_WEBGL
             RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
             if (error != RTCErrorType.None)
                 throw new ArgumentException(
@@ -256,8 +268,18 @@ namespace Unity.WebRTC
                         $"candidate:{candidateInfo.candidate}\n" +
                         $"sdpMid:{candidateInfo.sdpMid}\n" +
                         $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
-
             NativeMethods.IceCandidateGetCandidate(self, out _candidate);
+#else
+
+            if (iceCandidatePtr == null)
+            {
+                iceCandidatePtr = NativeMethods.CreateNativeRTCIceCandidate(option.candidate, option.sdpMid, option.sdpMLineIndex);
+            }
+
+            self = iceCandidatePtr.Value;
+            string json = NativeMethods.IceCandidateGetCandidate(self);
+            _candidate = JsonUtility.FromJson<CandidateInternal>(json);
+#endif
         }
     }
 

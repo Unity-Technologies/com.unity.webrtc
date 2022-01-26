@@ -50,4 +50,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Samples/MultiAudioReceive/MultiAudioReceive.unity
     guid: f2c574ba8fa6e413d80d51085132df4f
+  - enabled: 1
+    path: Assets/Samples/WebGL/WebGL.unity
+    guid: 8566d76aec4c20e4e819f649f8c65945
   m_configObjects: {}

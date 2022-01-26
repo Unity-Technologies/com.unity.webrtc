@@ -42,9 +42,11 @@ class PluginTest {
                 continue;
             PluginImporter pluginImporter = assetImporter as PluginImporter;
             Assert.IsNotNull(pluginImporter);
-            Assert.IsTrue(pluginImporter.isPreloaded);
+            if(!path.Contains("WebGL"))
+            {
+                Assert.IsTrue(pluginImporter.isPreloaded);
+            }
         }
-       
     }
 
 }

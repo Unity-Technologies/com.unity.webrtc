@@ -45,6 +45,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonVideoReceive;
         [SerializeField] private Button buttonBandwidth;
         [SerializeField] private Button buttonPerfectNegotiation;
+        [SerializeField] private Button buttonWebGL;
 
         void Start()
         {
@@ -67,6 +68,7 @@ namespace Unity.WebRTC.Samples
             buttonVideoReceive.onClick.AddListener(OnPressedVideoReceiveButton);
             buttonBandwidth.onClick.AddListener(OnPressedBandwidthButton);
             buttonPerfectNegotiation.onClick.AddListener(OnPressedPerfectNegotiationButton);
+            buttonWebGL.onClick.AddListener(OnPressedWebGLButton);
         }
 
         private void OnChangeHWCodec(bool enable)
@@ -136,6 +138,11 @@ namespace Unity.WebRTC.Samples
         private void OnPressedPerfectNegotiationButton()
         {
             SceneManager.LoadScene("PerfectNegotiation", LoadSceneMode.Single);
+        }
+
+        private void OnPressedWebGLButton()
+        {
+            SceneManager.LoadScene("WebGL", LoadSceneMode.Single);
         }
     }
 }

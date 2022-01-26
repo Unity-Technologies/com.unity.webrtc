@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
+#if !UNITY_WEBGL
     public class RTCRtpEncodingParameters
     {
         public bool active;
@@ -288,4 +289,161 @@ namespace Unity.WebRTC
         public OptionalDouble scaleResolutionDownBy;
         public IntPtr rid;
     }
+#else
+    public class RTCRtpEncodingParameters
+        {
+            public bool active;
+            public ulong? maxBitrate;
+            public ulong? minBitrate;
+            public uint? maxFramerate;
+            public double? scaleResolutionDownBy;
+            public string rid;
+
+            public bool adaptivePtime;
+            public string? networkPriority;
+            public string? priority;
+        }
+
+        public class RTCRtpCodecParameters
+        {
+            public int payloadType;
+            public string mimeType;
+            public long? clockRate;
+            public short? channels;
+            public string sdpFmtpLine;
+        };
+
+        public class RTCRtpHeaderExtensionParameters
+        {
+            public string uri;
+            public ushort id;
+            public bool encrypted;
+        }
+
+        public class RTCRtcpParameters
+        {
+            public string cname;
+            public bool reducedSize;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public class RTCRtpParameters
+        {
+            public RTCRtpHeaderExtensionParameters[] headerExtensions;
+            public RTCRtcpParameters rtcp;
+            public RTCRtpCodecParameters[] codecs;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public class RTCRtpSendParameters : RTCRtpParameters
+        {
+            public RTCRtpEncodingParameters[] encodings;
+            public string transactionId;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public enum RTCRtpTransceiverDirection
+        {
+            SendRecv = 0,
+            SendOnly = 1,
+            RecvOnly = 2,
+            Inactive = 3,
+            Stopped = 4
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public class RTCRtpCodecCapability
+        {
+            public int? channels;
+            public int clockRate;
+            public string mimeType;
+            public string? sdpFmtpLine;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public class RTCRtpHeaderExtensionCapability
+        {
+            public string uri;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public class RTCRtpCapabilities
+        {
+            public RTCRtpCodecCapability[] codecs;
+            public RTCRtpHeaderExtensionCapability[] headerExtensions;
+        }
+
+        internal struct RTCRtpCodecCapabilityInternal
+        {
+            public string mimeType;
+            public int clockRate;
+            public int channels;
+            public string sdpFmtpLine;
+        }
+
+        internal struct RTCRtpHeaderExtensionCapabilityInternal
+        {
+            public string uri;
+        }
+
+        internal struct RTCRtpCapabilitiesInternal
+        {
+            public RTCRtpCodecCapabilityInternal codecs;
+            public RTCRtpHeaderExtensionCapabilityInternal extensionHeaders;
+        }
+
+        internal struct RTCRtpCodecParametersInternal
+        {
+            public int payloadType;
+            public string mimeType;
+            public long clockRate;
+            public short channels;
+            public string sdpFmtpLine;
+
+        }
+
+        internal struct RTCRtpHeaderExtensionParametersInternal
+        {
+            public string uri;
+            public short id;
+            public bool encrypted;
+        }
+
+        internal struct RTCRtcpParametersInternal
+        {
+            public string cname;
+            public bool reducedSize;
+        }
+
+        internal struct RTCRtpSendParametersInternal
+        {
+            public RTCRtpEncodingParametersInternal[] encodings;
+            public string transactionId;
+            public RTCRtpCodecParametersInternal[] codecs;
+            public RTCRtpHeaderExtensionParametersInternal[] headerExtensions;
+            public RTCRtcpParametersInternal rtcp;
+        }
+
+        internal struct RTCRtpEncodingParametersInternal
+        {
+            public bool active;
+            public long maxBitrate;
+            public long minBitrate;
+            public int maxFramerate;
+            public double scaleResolutionDownBy;
+            public string rid;
+        }
+#endif
 }
