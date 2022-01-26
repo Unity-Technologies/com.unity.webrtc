@@ -46,13 +46,19 @@ namespace webrtc
             int64_t elapsed_time_ms = -1;
             int64_t ntp_time_ms = -1;
 
-            const int kBytesPerSample = 2;
-            const int kChannels = 2;
-            const int kSamplingRate = 48000;
-            const int kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
+            const size_t kBytesPerSample = 2;
+            const size_t kChannels = 2;
+            const size_t kSamplingRate = 48000;
+            const size_t kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
+            std::vector<int16_t> audio_data(kChannels * kSamplesPerFrame);
+            void* data = audio_data.data();
 
-            char data[kBytesPerSample * kChannels * kSamplesPerFrame];
-
+            // note: The reason of calling `AudioTransport::PullRenderData` method here
+            // is processing `AudioTrackSinkInterface::OnData` in this method. The received
+            // audio data here is not used.
+            // The original function of the method is getting final audio data that resampling
+            // and mixing multiple audio stream. But we want each audio streams, not final
+            // result.
             audio_transport_->PullRenderData(kBytesPerSample * 8, kSamplingRate,
                 kChannels, kSamplesPerFrame, data,
                 &elapsed_time_ms, &ntp_time_ms);
