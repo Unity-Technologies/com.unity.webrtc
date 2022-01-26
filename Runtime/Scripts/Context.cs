@@ -210,14 +210,14 @@ namespace Unity.WebRTC
             NativeMethods.MediaStreamRegisterOnRemoveTrack(self, stream.GetSelfOrThrow(), callback);
         }
 
-        public void AudioTrackRegisterAudioReceiveCallback(IntPtr track, DelegateAudioReceive callback)
+        public IntPtr CreateAudioTrackSink(DelegateAudioReceive callback)
         {
-            NativeMethods.ContextRegisterAudioReceiveCallback(self, track, callback);
+            return NativeMethods.ContextCreateAudioTrackSink(self, callback);
         }
 
-        public void AudioTrackUnregisterAudioReceiveCallback(IntPtr track)
+        public void DeleteAudioTrackSink(IntPtr sink)
         {
-            NativeMethods.ContextUnregisterAudioReceiveCallback(self, track);
+            NativeMethods.ContextDeleteAudioTrackSink(self, sink);
         }
 
         public IntPtr GetRenderEventFunc()

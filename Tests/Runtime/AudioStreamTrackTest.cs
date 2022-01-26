@@ -1,9 +1,11 @@
+using System;
+using System.Collections;
+using System.Linq;
+
 using NUnit.Framework;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.TestTools;
+using Unity.Collections;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -35,8 +37,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             test.component.Dispose();
-            Object.DestroyImmediate(source.clip);
-            Object.DestroyImmediate(test.gameObject);
+            UnityEngine.Object.DestroyImmediate(source.clip);
+            UnityEngine.Object.DestroyImmediate(test.gameObject);
         }
 
         [Ignore("AudioManager is disabled when batch mode on CI")]
@@ -87,8 +89,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(audioTrack.Source.clip.channels, Is.EqualTo(channels));
 
             test.component.Dispose();
-            Object.DestroyImmediate(test.gameObject);
-            Object.DestroyImmediate(obj);
+            UnityEngine.Object.DestroyImmediate(test.gameObject);
+            UnityEngine.Object.DestroyImmediate(obj);
         }
 
 
@@ -100,8 +102,8 @@ namespace Unity.WebRTC.RuntimeTest
             source.clip = AudioClip.Create("test", 48000, 2, 48000, false);
             var track = new AudioStreamTrack(source);
             track.Dispose();
-            Object.DestroyImmediate(source.clip);
-            Object.DestroyImmediate(obj);
+            UnityEngine.Object.DestroyImmediate(source.clip);
+            UnityEngine.Object.DestroyImmediate(obj);
         }
 
         [Test]
@@ -117,10 +119,10 @@ namespace Unity.WebRTC.RuntimeTest
             var track2 = new AudioStreamTrack(source2);
             track1.Dispose();
             track2.Dispose();
-            Object.DestroyImmediate(source1.clip);
-            Object.DestroyImmediate(source2.clip);
-            Object.DestroyImmediate(obj1);
-            Object.DestroyImmediate(obj2);
+            UnityEngine.Object.DestroyImmediate(source1.clip);
+            UnityEngine.Object.DestroyImmediate(source2.clip);
+            UnityEngine.Object.DestroyImmediate(obj1);
+            UnityEngine.Object.DestroyImmediate(obj2);
         }
 
         [Test]
@@ -139,8 +141,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => track.SetData(data, 0, 48000), Throws.ArgumentException);
             Assert.That(() => track.SetData(data, 1, 48000), Throws.Nothing);
             track.Dispose();
-            Object.DestroyImmediate(source.clip);
-            Object.DestroyImmediate(obj);
+            UnityEngine.Object.DestroyImmediate(source.clip);
+            UnityEngine.Object.DestroyImmediate(obj);
         }
 
         [Test]
@@ -153,26 +155,18 @@ namespace Unity.WebRTC.RuntimeTest
             var track = new AudioStreamTrack(source);
             source.Play();
             track.Dispose();
-            Object.DestroyImmediate(source.clip);
-            Object.DestroyImmediate(obj);
+            UnityEngine.Object.DestroyImmediate(source.clip);
+            UnityEngine.Object.DestroyImmediate(obj);
         }
 
         [Test]
         public void AudioStreamRenderer()
         {
             var obj = new GameObject("audio");
-            var source = obj.AddComponent<AudioSource>();
-            var renderer = new AudioStreamTrack.AudioStreamRenderer(source, 48000, 2);
-            Assert.That(renderer.source, Is.Not.Null);
-            Assert.That(renderer.source.clip, Is.Not.Null);
-
-            for (int i = 0; i < 300; i++)
-            {
-                float[] data = new float[2048];
-                renderer.SetData(data);
-            }
+            var renderer = new AudioStreamTrack.AudioStreamRenderer();
+            renderer.Source = obj.AddComponent<AudioSource>();
             renderer.Dispose();
-            Object.DestroyImmediate(obj);
+            UnityEngine.Object.DestroyImmediate(obj);
         }
     }
 }

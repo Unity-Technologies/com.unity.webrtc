@@ -22,16 +22,6 @@ namespace Unity.WebRTC.Samples
         Vector3[] array;
         List<LineRenderer> lines = new List<LineRenderer>();
 
-        private Dictionary<AudioSpeakerMode, int> SpeakerModeToChannel = new Dictionary<AudioSpeakerMode, int>()
-        {
-            {AudioSpeakerMode.Mono, 1},
-            {AudioSpeakerMode.Stereo, 2},
-            {AudioSpeakerMode.Quad, 4},
-            {AudioSpeakerMode.Surround, 5},
-            {AudioSpeakerMode.Mode5point1, 6},
-            {AudioSpeakerMode.Mode7point1, 8},
-        };
-
         void Start()
         {
             array = new Vector3[positionCount];
@@ -82,7 +72,7 @@ namespace Unity.WebRTC.Samples
                 clip = target.clip;
                 int channelCount = clip.channels;
                 var conf = AudioSettings.GetConfiguration();
-                int maxChannelCount = SpeakerModeToChannel[conf.speakerMode];
+                int maxChannelCount = AudioSettingsUtility.SpeakerModeToChannel(conf.speakerMode);
                 channelCount = Math.Min(channelCount, maxChannelCount);
                 ResetLines(channelCount);
             }

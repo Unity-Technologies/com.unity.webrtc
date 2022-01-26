@@ -818,7 +818,7 @@ namespace Unity.WebRTC
     internal delegate void DelegateNativeMediaStreamOnRemoveTrack(IntPtr stream, IntPtr track);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateAudioReceive(
-        IntPtr track, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
+        IntPtr ptr, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] float[] audioData, int size,
         int sampleRate, int numOfChannels, int numOfFrames);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateVideoFrameResize(IntPtr renderer, int width, int height);
@@ -1050,9 +1050,13 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextUnRegisterMediaStreamObserver(IntPtr ctx, IntPtr stream);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextRegisterAudioReceiveCallback(IntPtr context, IntPtr track, DelegateAudioReceive callback);
+        public static extern IntPtr ContextCreateAudioTrackSink(IntPtr context, DelegateAudioReceive callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void ContextUnregisterAudioReceiveCallback(IntPtr context, IntPtr track);
+        public static extern void ContextDeleteAudioTrackSink(IntPtr context, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void AudioTrackAddSink(IntPtr track, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void AudioTrackRemoveSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]
         public static extern EncoderType ContextGetEncoderType(IntPtr context);
         [DllImport(WebRTC.Lib)]

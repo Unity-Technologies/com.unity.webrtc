@@ -37,7 +37,8 @@ void UnityAudioTrackSource::RemoveSink(AudioTrackSinkInterface* sink)
         _arrSink.erase(i);
 }
 
-void UnityAudioTrackSource::PushAudioData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
+void UnityAudioTrackSource::PushAudioData(
+    const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames)
 {
     RTC_DCHECK(pAudioData);
     RTC_DCHECK(nSampleRate);
@@ -52,7 +53,8 @@ void UnityAudioTrackSource::PushAudioData(const float* pAudioData, int nSampleRa
     _convertedAudioData.reserve(_convertedAudioData.size() + nNumFrames);
     for (size_t i = 0; i < nNumFrames; i++)
     {
-        _convertedAudioData.push_back(pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
+        _convertedAudioData.push_back(
+            pAudioData[i] >= 0 ? pAudioData[i] * SHRT_MAX : pAudioData[i] * -SHRT_MIN);
     }
 }
 
