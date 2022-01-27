@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// This event is called on audio thread.
     /// </summary>
     /// <param name="data"></param>
     /// <param name="channels"></param>
@@ -13,14 +13,25 @@ namespace Unity.WebRTC
     ///
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
-    internal class AudioCapturerFilter : MonoBehaviour
+    internal class AudioCustomFilter : MonoBehaviour
     {
         public event AudioReadEventHandler onAudioRead;
-        private int sampleRate;
+        private int m_sampleRate;
 
         void OnEnable()
         {
-            sampleRate = AudioSettings.outputSampleRate;
+            OnAudioConfigurationChanged(false);
+            AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChanged;
+        }
+
+        void OnDisable()
+        {
+            AudioSettings.OnAudioConfigurationChanged -= OnAudioConfigurationChanged;
+        }
+
+        void OnAudioConfigurationChanged(bool deviceWasChanged)
+        {
+            m_sampleRate = AudioSettings.outputSampleRate;
         }
 
         /// <summary>
@@ -32,7 +43,7 @@ namespace Unity.WebRTC
         /// <param name="channels"></param>
         void OnAudioFilterRead(float[] data, int channels)
         {
-            onAudioRead?.Invoke(data, channels, sampleRate);
+            onAudioRead?.Invoke(data, channels, m_sampleRate);
         }
     }
 }

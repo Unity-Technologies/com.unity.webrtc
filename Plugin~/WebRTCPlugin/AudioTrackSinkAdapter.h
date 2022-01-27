@@ -1,8 +1,14 @@
 #pragma once
 
+extern "C" {
+#include "common_audio/ring_buffer.h"
+}
+
 #include <mutex>
-#include "WebRTCPlugin.h"
+#include "api/media_stream_interface.h"
+#include "api/audio/audio_frame.h"
 #include "common_audio/resampler/include/push_resampler.h"
+#include "WebRTCPlugin.h"
 
 namespace unity
 {
@@ -14,11 +20,8 @@ namespace webrtc
         : public webrtc::AudioTrackSinkInterface
     {
     public:
-        AudioTrackSinkAdapter(
-            DelegateAudioReceive callback,
-            size_t sampleRate,
-            size_t channels);
-        ~AudioTrackSinkAdapter() override {};
+        AudioTrackSinkAdapter(DelegateAudioReceive callback);
+        ~AudioTrackSinkAdapter() override;
 
         void OnData(
             const void* audio_data,
@@ -27,18 +30,24 @@ namespace webrtc
             size_t number_of_channels,
             size_t number_of_frames) override;
 
-        std::unique_ptr<AudioFrame>  Resample(
-            const void* audio_data,
-            const size_t number_of_frames,
-            const size_t channels,
-            const size_t dst_channels,
-            const uint32_t sample_rate,
-            const uint32_t dst_sample_rate);
+        void ProcessAudio(
+            float* data, size_t length, size_t channels, int32_t sampleRate);
     private:
         DelegateAudioReceive _callback;
+        bool _delegate_once;
+        void ResizeBuffer(size_t channels, int32_t sampleRate, size_t length);
+
+        const size_t kChannels = 2;
+        const int32_t kSampleRate = 48000;
+        const size_t kBufferSize = kChannels * kSampleRate;
+        AudioFrame _frame;
+        std::mutex _mutex;
+        RingBuffer* _buffer;
+        std::vector<int16_t> _bufferIn;
+
         PushResampler<int16_t> _resampler;
-        size_t _sampleRate;
-        size_t _channels;
+        int32_t _sampleRate = kSampleRate;
+        size_t _channels = kChannels;
 
     };
 } // end namespace webrtc

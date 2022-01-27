@@ -422,12 +422,9 @@ namespace webrtc
 
 
     AudioTrackSinkAdapter* Context::CreateAudioTrackSinkAdapter(
-        DelegateAudioReceive callback,
-        int32_t sampleRate,
-        int32_t channels)
+        DelegateAudioReceive callback)
     {
-        auto sink = std::make_unique<AudioTrackSinkAdapter>(
-            callback, sampleRate, channels);
+        auto sink = std::make_unique<AudioTrackSinkAdapter>(callback);
         AudioTrackSinkAdapter* ptr = sink.get();
         m_mapAudioTrackAndSink.emplace(ptr, std::move(sink));
         return ptr;
