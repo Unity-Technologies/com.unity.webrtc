@@ -8,7 +8,8 @@ namespace unity
 namespace webrtc
 {
     DummyAudioDevice::DummyAudioDevice(TaskQueueFactory* taskQueueFactory)
-        : tackQueueFactory_(taskQueueFactory)
+        : audio_data(kChannels* kSamplesPerFrame)
+        , tackQueueFactory_(taskQueueFactory)
     {
     }
 
@@ -46,11 +47,8 @@ namespace webrtc
             int64_t elapsed_time_ms = -1;
             int64_t ntp_time_ms = -1;
 
-            const size_t kBytesPerSample = 2;
-            const size_t kChannels = 2;
-            const size_t kSamplingRate = 48000;
-            const size_t kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
-            std::vector<int16_t> audio_data(kChannels * kSamplesPerFrame);
+
+            
             void* data = audio_data.data();
 
             // note: The reason of calling `AudioTransport::PullRenderData` method here

@@ -5,6 +5,7 @@
 
 #include "WebRTCPlugin.h"
 #include "rtc_base/platform_thread.h"
+#include "rtc_base/task_queue.h"
 #include "rtc_base/task_utils/repeating_task.h"
 #include "modules/audio_device/include/audio_device.h"
 
@@ -324,11 +325,15 @@ namespace webrtc
         bool PlayoutThreadProcess();
 
         const int32_t kFrameLengthMs = 10;
-
+        const size_t kBytesPerSample = 2;
+        const size_t kChannels = 2;
+        const size_t kSamplingRate = 48000;
+        const size_t kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
+        std::vector<int16_t> audio_data;
         std::unique_ptr<rtc::TaskQueue> taskQueue_;
         RepeatingTaskHandle task_;
-        std::atomic<bool> initialized_ {false};
-        std::atomic<bool> playing_ {false};
+        std::atomic<bool> initialized_ { false };
+        std::atomic<bool> playing_ { false };
         std::atomic<bool> recording_{ false };
         mutable std::mutex mutex_;
         webrtc::AudioTransport* audio_transport_{ nullptr };
