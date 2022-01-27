@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AudioTrackSinkAdapter.h"
+#include "common_audio/include/audio_util.h"
 
 namespace unity
 {
@@ -35,13 +36,12 @@ namespace webrtc
 
         const size_t size = number_of_channels * number_of_frames;
         const int16_t* data = static_cast<const int16_t*>(audio_data);
-        const float_t INVERSE = 1.0 / SHRT_MAX;
 
         std::vector<float_t> _converted_data(size);
 
         for (size_t i = 0; i < size; i++)
         {
-            _converted_data[i] = data[i] * INVERSE;
+            _converted_data[i] = webrtc::S16ToFloat(data[i]);
         }
 
         _callback(
