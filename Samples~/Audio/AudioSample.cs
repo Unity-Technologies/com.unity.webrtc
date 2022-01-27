@@ -43,11 +43,11 @@ namespace Unity.WebRTC
         private Dictionary<string, ulong?> bandwidthOptions = new Dictionary<string, ulong?>()
         {
             { "undefined", null },
+            { "320",  320 },
             { "160",  160 },
             { "80", 80 },
             { "40", 40 },
             { "20",  20 },
-            { "10",  10 },
         };
 
         private Dictionary<string, int> dspBufferSizeOptions = new Dictionary<string, int>()
