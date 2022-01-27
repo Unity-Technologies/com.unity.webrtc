@@ -54,11 +54,8 @@ namespace webrtc
         RTC_DCHECK(channels);
         RTC_DCHECK(sampleRate);
 
-        _channels = channels;
-        _sampleRate = sampleRate;
-
-        // reallocate ring buffer.
-        size_t bufferSize = channels * sampleRate;
+        // reallocate ring buffer, keep it relatively short at 0.2s
+        size_t bufferSize = static_cast<size_t>(channels * sampleRate * 0.2f);
         if(_buffer != nullptr)
             WebRtc_FreeBuffer(_buffer);
         _buffer = WebRtc_CreateBuffer(bufferSize, sizeof(int16_t));
@@ -86,8 +83,8 @@ namespace webrtc
         // Reallocate audio buffer when Unity changes channel count, sample rate,
         // or data length.
         if (_buffer == nullptr ||
-            _channels != channels ||
-            _sampleRate != sampleRate ||
+            _frame.num_channels_ != channels ||
+            _frame.sample_rate_hz_ != sampleRate ||
             _bufferIn.size() != length)
         {
             ResizeBuffer(channels, sampleRate, length);

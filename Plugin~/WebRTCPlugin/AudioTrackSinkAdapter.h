@@ -34,18 +34,12 @@ namespace webrtc
     private:
         void ResizeBuffer(size_t channels, int32_t sampleRate, size_t length);
 
-        const size_t kChannels = 2;
-        const int32_t kSampleRate = 48000;
-        const size_t kBufferSize = kChannels * kSampleRate;
         AudioFrame _frame;
         std::mutex _mutex;
         RingBuffer* _buffer;
         std::vector<int16_t> _bufferIn;
 
         PushResampler<int16_t> _resampler;
-        int32_t _sampleRate = kSampleRate;
-        size_t _channels = kChannels;
-
     };
 } // end namespace webrtc
 } // end namespace unity

@@ -163,9 +163,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void AudioStreamRenderer()
         {
             var obj = new GameObject("audio");
-            var sampleRate = 48000;
-            var channels = 2;
-            var renderer = new AudioStreamTrack.AudioStreamRenderer(sampleRate, channels);
+            var renderer = new AudioStreamTrack.AudioStreamRenderer();
             renderer.Source = obj.AddComponent<AudioSource>();
             renderer.Dispose();
             UnityEngine.Object.DestroyImmediate(obj);

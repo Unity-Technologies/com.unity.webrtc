@@ -114,7 +114,7 @@ namespace Unity.WebRTC
                 Debug.Log("AddFilter");
             }
 
-            public AudioStreamRenderer(int sampleRate, int channel)
+            public AudioStreamRenderer()
                 : this(WebRTC.Context.CreateAudioTrackSink())
             {
             }
@@ -202,10 +202,7 @@ namespace Unity.WebRTC
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
         {
-            var sampleRate = AudioSettings.outputSampleRate;
-            var speakerMode = AudioSettings.GetConfiguration().speakerMode;
-            var channels = AudioSettingsUtility.SpeakerModeToChannel(speakerMode);
-            _streamRenderer = new AudioStreamRenderer(sampleRate, channels);
+            _streamRenderer = new AudioStreamRenderer();
             AddSink(_streamRenderer);
         }
 
