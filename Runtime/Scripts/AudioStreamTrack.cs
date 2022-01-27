@@ -52,22 +52,18 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public event OnAudioReceived OnAudioReceived
+        public AudioSource Source
         {
-            add
+            get
             {
-                _streamRenderer.OnAudioReceived += value;
-            }
-            remove
-            {
-                _streamRenderer.OnAudioReceived -= value;
+                if (_source != null)
+                    return _source;
+                return _streamRenderer.Source;
+
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public AudioSource Source { get; private set; }
+        private AudioSource _source;
 
         /// <summary>
         ///
@@ -76,7 +72,6 @@ namespace Unity.WebRTC
 
         internal class AudioStreamRenderer : IDisposable
         {
-            public event OnAudioReceived OnAudioReceived;
             private bool disposed;
 
             internal IntPtr self;
@@ -115,10 +110,12 @@ namespace Unity.WebRTC
                 _filter = GetOrAddComponent<AudioCustomFilter>(source.gameObject);
                 _filter.hideFlags = HideFlags.HideInInspector;
                 _filter.onAudioRead += SetData;
+                source.Play();
+                Debug.Log("AddFilter");
             }
 
             public AudioStreamRenderer(int sampleRate, int channel)
-                : this(WebRTC.Context.CreateAudioTrackSink(OnAudioReceive))
+                : this(WebRTC.Context.CreateAudioTrackSink())
             {
             }
 
@@ -165,28 +162,11 @@ namespace Unity.WebRTC
             {
                 NativeMethods.AudioTrackSinkProcessAudio(self, data, data.Length, channels, sampleRate);
             }
-
-            private void OnAudioReceivedInternal()
-            {
-                OnAudioReceived?.Invoke(Source);
-            }
-
-            [AOT.MonoPInvokeCallback(typeof(DelegateAudioReceive))]
-            static void OnAudioReceive(IntPtr ptr)
-            {
-                WebRTC.Sync(ptr, () =>
-                {
-                    if (WebRTC.Table[ptr] is AudioStreamRenderer receiver)
-                    {
-                        receiver.OnAudioReceivedInternal();
-                    }
-                });
-            }
         }
 
         readonly AudioCustomFilter _audioCapturer;
         internal AudioStreamRenderer _streamRenderer;
-        internal AudioTrackSource _source;
+        internal AudioTrackSource _trackSource;
 
         /// <summary>
         ///
@@ -207,7 +187,7 @@ namespace Unity.WebRTC
                 throw new ArgumentNullException("AudioSource argument is null.");
             if (source.clip == null)
                 throw new ArgumentException("AudioClip must to be attached on AudioSource.");
-            Source = source;
+            _source = source;
 
             _audioCapturer = source.gameObject.AddComponent<AudioCustomFilter>();
             _audioCapturer.hideFlags = HideFlags.HideInInspector;
@@ -217,7 +197,7 @@ namespace Unity.WebRTC
         internal AudioStreamTrack(string label, AudioTrackSource source)
             : base(WebRTC.Context.CreateAudioTrack(label, source.self))
         {
-            _source = source;
+            _trackSource = source;
         }
 
         internal AudioStreamTrack(IntPtr ptr) : base(ptr)
@@ -264,8 +244,8 @@ namespace Unity.WebRTC
                     _streamRenderer?.Dispose();
                     _streamRenderer = null;
                 }
-                _source?.Dispose();
-                _source = null;
+                _trackSource?.Dispose();
+                _trackSource = null;
             }
             base.Dispose();
         }
@@ -282,7 +262,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                ProcessAudio(_source, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+                ProcessAudio(_trackSource, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
         }
 #endif
@@ -298,7 +278,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                ProcessAudio(_source, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
+                ProcessAudio(_trackSource, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
             }
         }
 
@@ -312,7 +292,7 @@ namespace Unity.WebRTC
             unsafe
             {
                 void* ptr = nativeSlice.GetUnsafeReadOnlyPtr();
-                ProcessAudio(_source, (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
+                ProcessAudio(_trackSource, (IntPtr)ptr, sampleRate, channels, nativeSlice.Length);
             }
         }
 

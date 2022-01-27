@@ -8,7 +8,6 @@ extern "C" {
 #include "api/media_stream_interface.h"
 #include "api/audio/audio_frame.h"
 #include "common_audio/resampler/include/push_resampler.h"
-#include "WebRTCPlugin.h"
 
 namespace unity
 {
@@ -20,7 +19,7 @@ namespace webrtc
         : public webrtc::AudioTrackSinkInterface
     {
     public:
-        AudioTrackSinkAdapter(DelegateAudioReceive callback);
+        AudioTrackSinkAdapter();
         ~AudioTrackSinkAdapter() override;
 
         void OnData(
@@ -33,8 +32,6 @@ namespace webrtc
         void ProcessAudio(
             float* data, size_t length, size_t channels, int32_t sampleRate);
     private:
-        DelegateAudioReceive _callback;
-        bool _delegate_once;
         void ResizeBuffer(size_t channels, int32_t sampleRate, size_t length);
 
         const size_t kChannels = 2;

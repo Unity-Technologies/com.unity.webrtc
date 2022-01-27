@@ -8,10 +8,8 @@ namespace unity
 {
 namespace webrtc
 {
-    AudioTrackSinkAdapter::AudioTrackSinkAdapter(DelegateAudioReceive callback)
-        : _callback(callback)
-        , _delegate_once(false)
-        , _buffer(nullptr)
+    AudioTrackSinkAdapter::AudioTrackSinkAdapter()
+        : _buffer(nullptr)
     {
     }
 
@@ -25,13 +23,6 @@ namespace webrtc
         size_t number_of_channels, size_t number_of_frames)
     {
         std::lock_guard<std::mutex> lock(_mutex);
-
-        // callback once
-        if (!_delegate_once && _callback != nullptr)
-        {
-            _callback(this);
-            _delegate_once = true;
-        }
 
         if (_buffer == nullptr)
             return;
