@@ -99,11 +99,8 @@ namespace Unity.WebRTC.Samples
                 if (e.Track is AudioStreamTrack audioTrack)
                 {
                     receiveAudio1.SetTrack(audioTrack);
-                    audioTrack.OnAudioReceived += renderer =>
-                    {
-                        renderer.loop = true;
-                        renderer.Play();
-                    };
+                    receiveAudio1.loop = true;
+                    receiveAudio1.Play();
                 }
             };
             pc1Local.OnIceCandidate = candidate => pc1Remote.AddIceCandidate(candidate);
@@ -125,11 +122,8 @@ namespace Unity.WebRTC.Samples
                 if (e.Track is AudioStreamTrack audioTrack)
                 {
                     receiveAudio2.SetTrack(audioTrack);
-                    audioTrack.OnAudioReceived += renderer =>
-                    {
-                        renderer.loop = true;
-                        renderer.Play();
-                    };
+                    receiveAudio2.loop = true;
+                    receiveAudio2.Play();
                 }
             };
             pc2Local.OnIceCandidate = candidate => pc2Remote.AddIceCandidate(candidate);

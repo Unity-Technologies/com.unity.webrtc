@@ -1,7 +1,13 @@
 #pragma once
 
+extern "C" {
+#include "common_audio/ring_buffer.h"
+}
+
 #include <mutex>
-#include "WebRTCPlugin.h"
+#include "api/media_stream_interface.h"
+#include "api/audio/audio_frame.h"
+#include "common_audio/resampler/include/push_resampler.h"
 
 namespace unity
 {
@@ -13,8 +19,8 @@ namespace webrtc
         : public webrtc::AudioTrackSinkInterface
     {
     public:
-        AudioTrackSinkAdapter(DelegateAudioReceive callback);
-        ~AudioTrackSinkAdapter() override {};
+        AudioTrackSinkAdapter();
+        ~AudioTrackSinkAdapter() override;
 
         void OnData(
             const void* audio_data,
@@ -22,8 +28,18 @@ namespace webrtc
             int sample_rate,
             size_t number_of_channels,
             size_t number_of_frames) override;
+
+        void ProcessAudio(
+            float* data, size_t length, size_t channels, int32_t sampleRate);
     private:
-        DelegateAudioReceive _callback;
+        void ResizeBuffer(size_t channels, int32_t sampleRate, size_t length);
+
+        AudioFrame _frame;
+        std::mutex _mutex;
+        RingBuffer* _buffer;
+        std::vector<int16_t> _bufferIn;
+
+        PushResampler<int16_t> _resampler;
     };
 } // end namespace webrtc
 } // end namespace unity

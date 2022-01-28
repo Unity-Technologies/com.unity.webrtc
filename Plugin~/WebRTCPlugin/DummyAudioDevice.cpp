@@ -46,9 +46,6 @@ namespace webrtc
         {
             int64_t elapsed_time_ms = -1;
             int64_t ntp_time_ms = -1;
-
-
-            
             void* data = audio_data.data();
 
             // note: The reason of calling `AudioTransport::PullRenderData` method here

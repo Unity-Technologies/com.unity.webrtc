@@ -94,8 +94,7 @@ namespace webrtc
         // Audio Source
         webrtc::AudioSourceInterface* CreateAudioSource();
         // Audio Renderer
-        AudioTrackSinkAdapter* CreateAudioTrackSinkAdapter(
-            DelegateAudioReceive callback);
+        AudioTrackSinkAdapter* CreateAudioTrackSinkAdapter();
         void DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink);
 
         // Video Source

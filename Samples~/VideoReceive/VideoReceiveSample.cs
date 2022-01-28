@@ -94,11 +94,8 @@ namespace Unity.WebRTC.Samples
                 if (e.Track is AudioStreamTrack audioTrack)
                 {
                     receiveAudio.SetTrack(audioTrack);
-                    audioTrack.OnAudioReceived += renderer =>
-                    {
-                        renderer.loop = true;
-                        renderer.Play();
-                    };
+                    receiveAudio.loop = true;
+                    receiveAudio.Play();
                     receiveAudioStream = e.Streams.First();
                     receiveAudioStream.OnRemoveTrack = ev =>
                     {
