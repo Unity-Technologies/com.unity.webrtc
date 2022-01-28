@@ -794,7 +794,7 @@ namespace Unity.WebRTC
             IntPtr ptrStatsArray = NativeMethods.StatsReportGetStatsList(self, out ulong length, ref ptrStatsTypeArray);
 
             IntPtr[] array = ptrStatsArray.AsArray<IntPtr>((int)length);
-            byte[] types = ptrStatsTypeArray.AsArray<byte>((int)length);
+            uint[] types = ptrStatsTypeArray.AsArray<uint>((int)length);
 
             m_dictStats = new Dictionary<string, RTCStats>();
             for (int i = 0; i < (int)length; i++)

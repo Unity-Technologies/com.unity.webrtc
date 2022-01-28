@@ -105,7 +105,9 @@ namespace webrtc
             return *this;
         }
 
+        #if defined(__clang__) || defined(__GNUC__)
         __attribute__((optnone))
+        #endif
         explicit operator const absl::optional<T>&() const
         {
             absl::optional<T> dst = absl::nullopt;
@@ -583,7 +585,7 @@ extern "C"
     }
 
 
-    const std::map<std::string, byte> statsTypes =
+    const std::map<std::string, uint32_t> statsTypes =
     {
         { "codec", 0 },
         { "inbound-rtp", 1 },
@@ -608,11 +610,11 @@ extern "C"
         { "ice-server", 20 }
     };
 
-    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetStatsList(const RTCStatsReport* report, size_t* length, byte** types)
+    UNITY_INTERFACE_EXPORT const RTCStats** StatsReportGetStatsList(const RTCStatsReport* report, size_t* length, uint32_t** types)
     {
         const size_t size = report->size();
         *length = size;
-        *types = static_cast<byte*>(CoTaskMemAlloc(sizeof(byte) * size));
+        *types = static_cast<uint32_t*>(CoTaskMemAlloc(sizeof(uint32_t) * size));
         void* buf = CoTaskMemAlloc(sizeof(RTCStats*) * size);
         const RTCStats** ret = static_cast<const RTCStats**>(buf);
         if(size == 0)
@@ -649,7 +651,7 @@ extern "C"
         return ConvertString(stats->id());
     }
 
-    UNITY_INTERFACE_EXPORT byte StatsGetType(const RTCStats* stats)
+    UNITY_INTERFACE_EXPORT uint32_t StatsGetType(const RTCStats* stats)
     {
         return statsTypes.at(stats->type());
     }
