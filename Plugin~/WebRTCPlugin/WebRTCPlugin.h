@@ -24,8 +24,6 @@ namespace webrtc
     using DelegateSetSessionDescSuccess = void(*)(PeerConnectionObject*);
     using DelegateSetSessionDescFailure =
         void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
-    using DelegateAudioReceive =
-        void(*)(AudioTrackSinkAdapter* sink);
     using DelegateVideoFrameResize =
         void(*)(UnityVideoRenderer* renderer,
             int width,

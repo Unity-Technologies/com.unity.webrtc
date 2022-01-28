@@ -111,7 +111,6 @@ namespace Unity.WebRTC
                 _filter.hideFlags = HideFlags.HideInInspector;
                 _filter.onAudioRead += SetData;
                 source.Play();
-                Debug.Log("AddFilter");
             }
 
             public AudioStreamRenderer()
