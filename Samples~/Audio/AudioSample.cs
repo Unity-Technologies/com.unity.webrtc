@@ -149,6 +149,7 @@ namespace Unity.WebRTC
             buttonHangup.interactable = true;
             dropdownSpeakerMode.interactable = false;
             dropdownDSPBufferSize.interactable = false;
+            dropdownAudioCodecs.interactable = false;
         }
 
         void OnEnableMicrophone(bool enable)
@@ -258,6 +259,8 @@ namespace Unity.WebRTC
 
             dropdownSpeakerMode.interactable = true;
             dropdownDSPBufferSize.interactable = true;
+            dropdownAudioCodecs.interactable = true;
+
             dropdownBandwidth.interactable = false;
 
         }

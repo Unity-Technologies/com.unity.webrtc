@@ -296,7 +296,8 @@ class BandwidthSample : MonoBehaviour
         {
             Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
             statsField.text +=
-                $"Failed scale down video resolution to {(int)(width / scale)}x{(int)(width / scale)}{Environment.NewLine}";
+                $"Failed scale down video resolution to " +
+                $"{(int)(width / scale)}x{(int)(height / scale)}{Environment.NewLine}";
             scaleResolutionDownSelector.value = 0;
         }
     }

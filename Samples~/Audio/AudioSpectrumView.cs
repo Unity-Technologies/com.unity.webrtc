@@ -35,6 +35,11 @@ namespace Unity.WebRTC.Samples
             AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChanged;
         }
 
+        private void OnDestroy()
+        {
+            AudioSettings.OnAudioConfigurationChanged -= OnAudioConfigurationChanged;
+        }
+
         void OnAudioConfigurationChanged(bool deviceChanged)
         {
             var conf = AudioSettings.GetConfiguration();
