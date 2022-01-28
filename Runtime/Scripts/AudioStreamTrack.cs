@@ -41,12 +41,6 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    /// <param name="renderer"></param>
-    public delegate void OnAudioReceived(AudioSource renderer);
-
-    /// <summary>
-    ///
-    /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
     {
         /// <summary>
