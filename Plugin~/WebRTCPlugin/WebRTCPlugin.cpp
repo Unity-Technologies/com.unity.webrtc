@@ -688,7 +688,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT int64_t StatsMemberGetLong(const RTCStatsMemberInterface* member)
     {
-        return *member->cast_to<::webrtc::RTCStatsMember<uint64_t>>();
+        return *member->cast_to<::webrtc::RTCStatsMember<int64_t>>();
     }
 
     UNITY_INTERFACE_EXPORT uint64_t StatsMemberGetUnsignedLong(const RTCStatsMemberInterface* member)
