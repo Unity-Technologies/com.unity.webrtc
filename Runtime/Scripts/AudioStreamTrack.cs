@@ -184,8 +184,6 @@ namespace Unity.WebRTC
         {
             if (source == null)
                 throw new ArgumentNullException("AudioSource argument is null.");
-            if (source.clip == null)
-                throw new ArgumentException("AudioClip must to be attached on AudioSource.");
             _source = source;
 
             _audioCapturer = source.gameObject.AddComponent<AudioCustomFilter>();
