@@ -29,7 +29,7 @@ mkdir -p "$ARTIFACTS_DIR/lib"
 
 for target_cpu in "arm64"
 do
-  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+  mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
 
   for is_debug in "true" "false"
   do

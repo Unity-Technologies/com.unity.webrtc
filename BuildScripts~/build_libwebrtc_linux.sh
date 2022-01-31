@@ -29,7 +29,7 @@ mkdir -p "$ARTIFACTS_DIR/lib"
 
 for target_cpu in "x64"
 do
-  mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+  mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
   for is_debug in "true" "false"
   do
     args="is_debug=${is_debug} target_os=\"linux\" target_cpu=\"${target_cpu}\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false is_component_build=false use_rtti=true rtc_use_x11=false libcxx_abi_unstable=false";

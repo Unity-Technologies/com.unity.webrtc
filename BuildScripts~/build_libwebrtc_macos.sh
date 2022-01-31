@@ -58,7 +58,7 @@ do
     ninja -C "$OUTPUT_DIR" webrtc
 
     # copy static library
-    mkdir "$ARTIFACTS_DIR/lib/${target_cpu}"
+    mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
     cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
   done
 
