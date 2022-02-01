@@ -1,11 +1,9 @@
 BasedOnStyle: WebKit
 AlignAfterOpenBracket: AlwaysBreak
 NamespaceIndentation: Inner
-BreakBeforeBraces: Custom
-BraceWrapping:
-  AfterClass: true
-  AfterControlStatement: Always
-  AfterEnum: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterStruct: true
+BreakBeforeBraces: Allman
+BreakBeforeBinaryOperators: None
+SpaceAfterTemplateKeyword: false
+ColumnLimit: 120
+BinPackArguments: false
+BinPackParameters: false
