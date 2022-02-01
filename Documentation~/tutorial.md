@@ -5,7 +5,7 @@ This tutorial will cover the basics of using the WebRTC package.
 
 ### Adding a Namespace
 
-The namespace specifies `Unity.WebRTC`.
+The namespace specifies [`Unity.WebRTC`](../api/Unity.WebRTC.html).
 
 ```CSharp
 using UnityEngine;
@@ -14,7 +14,7 @@ using Unity.WebRTC;
 
 ### Initialization
 
-Call `WebRTC.Initialize()` to initialize and use `WebRTC`. Call `WebRTC.Finalize()` when finished.
+Call the [`WebRTC.Initialize`](../api/Unity.WebRTC.WebRTC.html#Unity_WebRTC_WebRTC_Initialize_) method to initialize and use WebRTC.
 
 ```CSharp
 public class MyPlayerScript : MonoBehaviour
@@ -29,7 +29,7 @@ public class MyPlayerScript : MonoBehaviour
 
 ### Creating a local peer
 
-Create a local peer and get `RTCDataChannel`. Use `RTCDataChannel` to enable binary data transmission. Register `OnOpen` and `OnClose` callbacks to run a process when `RTCDataChannel` starts or finishes. Set the `OnMessage` callback to receive messages.
+Create a local peer and get [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html). Use [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) to enable binary data transmission. Register [`OnOpen`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnOpen) and [`OnClose`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnClose) callbacks to run a process when [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) starts or finishes. Set the [`OnMessage`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnMessage) callback to receive messages.
 
 ```CSharp
     // Create local peer
@@ -41,7 +41,7 @@ Create a local peer and get `RTCDataChannel`. Use `RTCDataChannel` to enable bin
 
 ### Creating a remote peer
 
-Create a remote peer and set the `OnDataChannel` callback.
+Create a remote peer and set the [`OnDataChannel`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_OnDataChannel) callback.
 
 ```CSharp
     // Create remote peer
@@ -51,7 +51,7 @@ Create a remote peer and set the `OnDataChannel` callback.
 
 ### Register potential communication paths
 
-An ICE (Interactive Connectivity Establishment) exchange is required to establish a peer connection. Once the potential communication paths for all peers have been discovered, `OnIceCandidate` is called. Use callbacks to call `AddIceCandidate` on each peer to register potential paths.
+An ICE (Interactive Connectivity Establishment) exchange is required to establish a peer connection. Once the potential communication paths for all peers have been discovered, [`OnIceCandidate`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_OnIceCandidate) is called. Use callbacks to call [`AddIceCandidate`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_AddIceCandidate_) on each peer to register potential paths.
 
 
 ```CSharp
@@ -63,11 +63,11 @@ remoteConnection.OnIceCandidate = e => { !string.IsNullOrEmpty(e.candidate)
 
 ```
 
-### The Signaling Process
+### The signaling process
 
-SDP exchanges happen between peers. `CreateOffer` creates the initial Offer SDP. After getting the Offer SDP, both the local and remote peers set the SDP. Be careful not to mix up `SetLocalDescription` and `SetRemoteDescription` during this exchange. 
+SDP exchanges happen between peers. [`CreateOffer`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_CreateOffer) creates the initial Offer SDP. After getting the Offer SDP, both the local and remote peers set the SDP. Be careful not to mix up [`SetLocalDescription`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_SetLocalDescription) and [`SetRemoteDescription`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_SetRemoteDescription) during this exchange. 
 
-Once the Offer SDP is set, call `CreateAnswer` to create an Answer SDP. Like the Offer SDP, the Answer SDP is set on both the local and remote peers.
+Once the Offer SDP is set, call [`CreateAnswer`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_CreateAnswer) to create an Answer SDP. Like the Offer SDP, the Answer SDP is set on both the local and remote peers.
 
 ```csharp
 var op1 = localConnection.CreateOffer();
@@ -84,9 +84,9 @@ var op6 = localConnection.setRemoteDescription(op4.desc);
 yield return op6;
 ```
 
-### Check the ICE Connection Status
+### Check the ICE connection status
 
-When SDP exchanges happen between peers, ICE exchanges begin. Use the `OnIceConnectionChange` callback to check the ICE connection status.
+When SDP exchanges happen between peers, ICE exchanges begin. Use the [`OnIceConnectionChange`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_OnIceConnectionChange) callback to check the ICE connection status.
 
 ```CSharp
 localConnection.OnIceConnectionChange = state => {
@@ -94,9 +94,9 @@ localConnection.OnIceConnectionChange = state => {
 }
 ```
 
-### The Data Channel Connection
+### The DataChannel connection
 
-When the ICE exchange is finished, `OnDataChannel` is called and a one-way peer Data Channel is created.
+When the ICE exchange is finished, [`OnDataChannel`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_OnDataChannel) is called and a one-way peer Data Channel is created.
 Register the `OnMessage` callback and describe the procedure for when a message is received.
 
 ```CSharp
@@ -108,9 +108,9 @@ void ReceiveChannelCallback(RTCDataChannel channel)
 }
 ```
 
-### Sending Messages
+### Sending messages
 
-When both peers' `RTCDataChannel` is open, it's possible to exchange messages. `string` or `byte[]` message types can be sent. 
+When both peers' [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) is open, it's possible to exchange messages. `string` or `byte[]` message types can be sent. 
 
 ```csharp
 void SendMessage(string message)
@@ -124,9 +124,9 @@ void SendBinary(byte[] bytes)
 }
 ```
 
-### Receiving Messages
+### Receiving messages
 
-When a message is received, the callback registered to `OnMessage` is called. `byte[]` type messages can be received, and when treated like character strings they are converted as shown below.
+When a message is received, the callback registered to [`OnMessage`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnMessage) is called. `byte[]` type messages can be received, and when treated like character strings they are converted as shown below.
 
 ```csharp
 void HandleReceiveMessage(byte[] bytes)
@@ -136,9 +136,9 @@ void HandleReceiveMessage(byte[] bytes)
 }
 ```
 
-### The End Process
+### The end process
 
-When finished, `Close()` must be called for `RTCDataChannel` and `RTCPeerConnection`. Finally, after the object is discarded, call `WebRTC.Finalize()`.
+When finished, `Close` method must be called for [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) and [`RTCPeerConnection`](../api/Unity.WebRTC.RTCPeerConnection.html). Finally, after the object is discarded, call [`WebRTC.Dispose`](../api/Unity.WebRTC.WebRTC.html#Unity_WebRTC_WebRTC_Dispose).
 
 ```csharp
 private void OnDestroy()
@@ -149,72 +149,10 @@ private void OnDestroy()
   localConnection.Close();
   remoteConnection.Close();
   
-  WebRTC.Finalize();
+  WebRTC.Dispose();
 }
 ```
 
-### Audio Streaming
+## Next step
 
-Use the `Audio`'s `CaptureStream()` to use `MediaStream` in order to capture the audio stream. 
-
-```csharp
-audioStream = Audio.CaptureStream();
-```
-
-Add audio track to the peer. Get the instance of `RTCRtpSender` to use for disposing of the media.
-
-```csharp
-    var senders = new List<RTCRtpSender>();
-    foreach (var track in audioStream.GetTracks())
-    {
-        var sender = localConnection.AddTrack(track);
-        senders.Add(sender);
-    }
-```
-
-Call `RemoveTrack` method to dispose of the media.
-
-```csharp
-    foreach(var sender in senders)
-    {
-        localConnection.RemoveTrack(sender);
-    }
-```
-
-Call `Audio`'s `Update` method in `MonoBehaviour`'s `OnAudioFilterRead`.
-
-```csharp
-    private void OnAudioFilterRead(float[] data, int channels)
-    {
-        Audio.Update(data, data.Length);
-    }
-```
-
-> [!NOTE]
-> To use `OnAudioFilterRead` method, please add it to the `GameObject` which has `AudioListener` component.
-
-Another way would be to use `AudioRenderer`.
-
-```csharp
-
-    private void Start()
-    {
-        AudioRenderer.Start();
-    }
-
-    private void Update()
-    {
-        var sampleCountFrame = AudioRenderer.GetSampleCountForCaptureFrame();
-        var channelCount = 2; // AudioSettings.speakerMode == Stereo
-        var length = sampleCountFrame * channelCount;
-        var buffer = new NativeArray<float>(length, Allocator.Temp);
-        AudioRenderer.Render(buffer);
-        Audio.Update(buffer.ToArray(), buffer.Length);
-        buffer.Dispose();
-    }
-
-```
-
-### Video Streaming
-
-Use the `Camera`'s `CaptureStream()` to use `MediaStream` in order to capture the video stream. 
+This package provides sample scenes which demonstrate features like video/audio streaming. Please try them following [this page](sample.md).
