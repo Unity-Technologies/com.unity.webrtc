@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BarcodeEncoder : MonoBehaviour
+class BarcodeEncoder : MonoBehaviour
 {
     [SerializeField] int Row = 5;
     [SerializeField] int Column = 5;
