@@ -269,10 +269,19 @@ else()
   add_library(WebRTCPlugin SHARED)
 endif()
 
-target_link_libraries(WebRTCPlugin
-  PRIVATE
-    WebRTCLib
-)
+if(Windows)
+  # link delayimp.lib to use delayload when building with Clang on Windows.
+  target_link_libraries(WebRTCPlugin
+    PRIVATE
+      WebRTCLib
+      delayimp.lib
+  )
+else()
+  target_link_libraries(WebRTCPlugin
+    PRIVATE
+      WebRTCLib
+  )
+endif()  
 target_sources(WebRTCPlugin 
   PRIVATE
     pch.cpp
@@ -302,7 +311,7 @@ if(Windows)
   # Set linker option
   set_target_properties(WebRTCPlugin
     PROPERTIES 
-      LINK_FLAGS "/SUBSYSTEM:WINDOWS /DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+      LINK_FLAGS "/SUBSYSTEM:WINDOWS -delayload:nvcuda.dll"
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 endif()
