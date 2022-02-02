@@ -160,7 +160,7 @@ For codecs that support hardware acceleration, the following codecs are supporte
 - **VideoToolbox**
 - **MediaCodec**
 
-エンコーダが利用可能なプラットフォームを以下に示します。
+The encoders that support hardware acceleration are shown below.
 
 | Platform | Graphics API | NVCODEC | VideoToolbox | MediaCodec |
 | -------- | ------------ | ----- | ------------ | ---------- |
