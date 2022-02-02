@@ -18,7 +18,7 @@ enable_testing()
 
 # Define flags to determine the build target platform
 # Windows, Linux, macOS, iOS
-if(MSVC)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(Windows TRUE)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
