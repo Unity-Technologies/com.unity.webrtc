@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Upgraded libwebrtc [m92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ).
 - Changed compiler for native plugin on Windows (MSVC to Clang).
-- Changed to use `OnFilterAudioRead` method in `MonoBehaviour` for audio rendering.
+- Changed to use `OnAudioFilterRead` method in `MonoBehaviour` for audio rendering.
 - Changed resizing texture dynamically on receiver side when using a property `scaleResolutionDownBy` in `RTCRtpEncodingParameters` class.
 - Changed the exception type `ObjectDisposedException` when accessing instance after call Dispose method. 
 
