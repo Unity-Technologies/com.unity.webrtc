@@ -4,18 +4,21 @@ The package contains the following samples.
 
 | Scene | Details |
 | ----- | ------- |
-| PeerConnection          | Checking the process of connecting to a peer   |
-| DataChannel             | Sending and receiving text                     |
-| MediaStream             | Sending and receiving video/audio              |
-| Stats                   | Checking the process of getting stats          |
-| MungeSDP                | Checking effects with mungring SDP parameters  |
-| VideoReceive            | Sending and receiving video stream             |
-| MultiVideoReceive       | Receiving multiple video streams with one peer |
-| MultiplePeerConnections | Receiving video stream with multiple peers     |
-| ChangeCodecs            | Controlling codecs of the video sender         |
-| TricleIce               | Checking the trickle ICE functionality         |
-| RestartIce              | Checking do an ICE restart                     |
-| PerfectNegotiation      | Demonstrating [Perfect Negotiation Pattern](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation) |
+| PeerConnection | Checking the process of connecting to a peer |
+| DataChannel | Sending and receiving text |
+| Audio | Sending and receiving audio stream |
+| MediaStream | Sending and receiving video/audio |
+| MultiPeers | Instantiating multiple peers and streaming video/audio |
+| Stats | Checking the process of getting stats |
+| MungeSDP | Checking effects with mungring SDP parameters |
+| VideoReceive | Sending and receiving video stream |
+| MultiVideoReceive | Receiving multiple video streams with one peer |
+| MultiplePeerConnections | Receiving video stream with multiple peers |
+| ChangeCodecs | Controlling codecs of the video sender |
+| TricleIce | Checking the trickle ICE functionality |
+| RestartIce | Checking do an ICE restart |
+| PerfectNegotiation | Demonstrating [Perfect Negotiation Pattern](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation) |
+| Latency | Measuring a latency of video streaming |
 
 ## Import samples in project
 

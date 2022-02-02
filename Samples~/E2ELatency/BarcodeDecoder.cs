@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BarcodeDecoder : MonoBehaviour
+class BarcodeDecoder : MonoBehaviour
 {
     [SerializeField] int Row;
     [SerializeField] int Column;

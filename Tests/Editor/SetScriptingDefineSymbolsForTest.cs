@@ -4,7 +4,7 @@ using UnityEditor;
 namespace Unity.WebRTC.EditorTest
 {
     [InitializeOnLoad]
-    public class SetScriptingDefineSymbolsForTest
+    class SetScriptingDefineSymbolsForTest
     {
         static SetScriptingDefineSymbolsForTest()
         {

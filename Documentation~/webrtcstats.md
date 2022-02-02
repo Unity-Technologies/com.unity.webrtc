@@ -1,10 +1,10 @@
-# WebRTC Statistics Tool
+# WebRTC statistics tool
 
 Provides a tool to display statistics about WebRTC in the editor.
 
-## How to Use
+## How to use
 
-You can open it from the Window -> Analysis -> WebRTC Stats in the top toolbar.
+You can open it from the **Window -> Analysis -> WebRTC Stats** in the top toolbar.
 
 ![Guidline WebRTC Stats](images/guideline-webrtc-stats.png)
 
@@ -20,10 +20,10 @@ Run the scene in the Unity editor. When the PeerConnection is created, a list of
 
 Pressing the button on the list of PeerConnections will display the list of statistics for the target PeerConnection as a pull-down menu.
 
-![WebRTC Stats StatsType List] (images/webrtc-stats_statstypelist.png)
+![WebRTC Stats StatsType List](images/webrtc-stats_statstypelist.png)
 
 Selecting an item from the pulldown menu displays a list of statistics.
-Below is an example when you select `CandidatePair`.
+Below is an example when you select [`CandidatePair`]().
 
 ![WebRTC Stats Exsample StatsMember](images/webrtc-stats_example-statsmember.png)
 

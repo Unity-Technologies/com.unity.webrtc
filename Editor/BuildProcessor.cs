@@ -8,7 +8,7 @@ namespace Unity.WebRTC.Editor
     /// <summary>
     /// This type express a return value of "PlayerSettings.GetArchitecture(BuildTargetGroup.iOS)"
     /// </summary>
-    public enum iOSArchitecture
+    enum iOSArchitecture
     {
         ARMv7 = 0,
         ARM64 = 1,
@@ -18,7 +18,7 @@ namespace Unity.WebRTC.Editor
     /// <summary>
     ///
     /// </summary>
-    public class PreprocessBuild : IPreprocessBuildWithReport
+    class PreprocessBuild : IPreprocessBuildWithReport
     {
         /// <summary>
         ///

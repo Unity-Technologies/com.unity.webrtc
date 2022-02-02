@@ -1,84 +1,9 @@
 # WebRTC 
 
+WebRTC for Unity is a package that allows [WebRTC](https://webrtc.org) to be used in Unity. 
+
+First, please check [the requirements](requirements.md) to make sure that the platform you are expecting is supported.
+
+To get started, please see the [Installation](install.md) and [Tutorial](tutorial.md) pages. The package also provides a number of samples. Check out [the samples page](sample.md) to learn how to use them. And moreover, [Unity Render Streaming](https://docs.unity3d.com/Packages/com.unity.renderstreaming@latest) also uses this package to provide a higher layer of API.
+
 ![WebRTC header](images/webrtc_header.png)
-
-## What is WebRTC
-
-WebRTC for Unity is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
-
-## Installation
-
-Please see [Install package](install.md).
-
-## Package samples
-
-Please see [sample page](sample.md).
-
-## Requirements
-
-This version of the package is compatible with the following versions of the Unity Editor:
-
-- **Unity 2019.4**
-- **Unity 2020.3**
-
-### Platform
-
-- **Windows**
-- **Linux**
-- **macOS** (**Apple Slicon** is not supported yet)
-- **iOS**
-- **Android** (**ARM64** only. **ARMv7** is not supported)
-
-> [!NOTE]
-> Building for **iOS Simulator** is not supported.
-
-> [!NOTE]
-> **WebGL** platform is not supported.
-
-### Encoder support
-
-| Platform    | Graphics API | Hardware Encoder                                                                                                         | Software Encoder   |
-| ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
-| Windows x64 | DirectX11    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
-| Windows x64 | DirectX12    | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
-| Windows x64 | OpenGL Core  |                                                                                                                          |                    |
-| Windows x64 | Vulkan       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: | 
-| Linux x64   | OpenGL Core  | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
-| Linux x64   | Vulkan       | :white_check_mark: (Require [NVIDIA Graphics card](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix)) | :white_check_mark: |
-| MacOS       | Metal        | :white_check_mark:                              	                                                                        | :white_check_mark: |
-| iOS         | Metal        | :white_check_mark:                              	                                                                        | :white_check_mark: | 
-| Android     | Vulkan       | :white_check_mark:            	                                                                                        | :white_check_mark: |
-| Android     | OpenGL ES    | :white_check_mark:            	                                                                                        | :white_check_mark: |
-
-### Decoder support
-
-| Platform    | Graphics API | Hardware Decoder                                                                                                         | Software Decoder   |
-| ----------- | ------------ | ------------------ | ------------------ |
-| Windows x64 | DirectX11    |                    | :white_check_mark: | 
-| Windows x64 | DirectX12    |                    | :white_check_mark: | 
-| Windows x64 | OpenGL Core  |                    | :white_check_mark: |
-| Windows x64 | Vulkan       |                    | :white_check_mark: | 
-| Linux x64   | OpenGL Core  |                    | :white_check_mark: |
-| Linux x64   | Vulkan       |                    | :white_check_mark: |
-| MacOS       | Metal        | :white_check_mark: | :white_check_mark: |
-| iOS         | Metal        | :white_check_mark: | :white_check_mark: |
-| Android     | Vulkan       | :white_check_mark: | :white_check_mark: |
-| Android     | OpenGL ES    | :white_check_mark: | :white_check_mark: |
-
-To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
-
-This package depends on **NVIDIA Video Codec SDK 9.1**. Please check the graphics driver version.
-- Windows: Driver version `436.15` or higher
-- Linux:   Driver version `435.21` or higher
-
-> [!NOTE]
-> On Linux, `libc++1` `libc++abi1` packages should be installed.
-> Please install like command below 
->
-> ``` sudo apt install -y libc++1 libc++abi1 ```
-
-> [!NOTE]
-> To build the apk file for **Android platform**, you need to configure player settings below.
-> - **Scripting backend** - IL2CPP
-> - **Target Architectures** - ARM64 (Do disable ARMv7)
->
