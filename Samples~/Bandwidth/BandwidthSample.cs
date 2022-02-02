@@ -14,6 +14,7 @@ class BandwidthSample : MonoBehaviour
 #pragma warning disable 0649
     [SerializeField] private Dropdown bandwidthSelector;
     [SerializeField] private Dropdown scaleResolutionDownSelector;
+    [SerializeField] private Dropdown framerateSelector;
     [SerializeField] private Button callButton;
     [SerializeField] private Button hangUpButton;
     [SerializeField] private InputField statsField;
@@ -37,7 +38,8 @@ class BandwidthSample : MonoBehaviour
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private bool videoUpdateStarted;
 
-    private Dictionary<string, ulong?> bandwidthOptions = new Dictionary<string, ulong?>()
+    private Dictionary<string, ulong?> bandwidthOptions =
+        new Dictionary<string, ulong?>()
     {
         { "undefined", null },
         { "2000", 2000 },
@@ -47,7 +49,8 @@ class BandwidthSample : MonoBehaviour
         { "125",  125 },
     };
 
-    private Dictionary<string, double> scaleResolutionDownOptions = new Dictionary<string, double>()
+    private Dictionary<string, double> scaleResolutionDownOptions =
+        new Dictionary<string, double>()
     {
         { "Not scaling", 1.0f },
         { "Down scale by 2.0", 2.0f },
@@ -55,6 +58,19 @@ class BandwidthSample : MonoBehaviour
         { "Down scale by 8.0", 8.0f },
         { "Down scale by 16.0", 16.0f }
     };
+
+    private Dictionary<string, uint?> framerateOptions =
+        new Dictionary<string, uint?>
+    {
+        { "undefined", null },
+        { "60", 60 },
+        { "30", 30 },
+        { "20", 20 },
+        { "10", 10 },
+        { "5", 5 },
+        { "0", 0 },
+    };
+
 
     private const int width = 1280;
     private const int height = 720;
@@ -70,6 +86,11 @@ class BandwidthSample : MonoBehaviour
             .Select(pair => new Dropdown.OptionData { text = pair.Key })
             .ToList();
         scaleResolutionDownSelector.onValueChanged.AddListener(ChangeScaleResolutionDown);
+
+        framerateSelector.options = framerateOptions
+            .Select(pair => new Dropdown.OptionData { text = pair.Key })
+            .ToList();
+        framerateSelector.onValueChanged.AddListener(ChangeFramerate);
 
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
@@ -311,6 +332,25 @@ class BandwidthSample : MonoBehaviour
                 $"Failed scale down video resolution to " +
                 $"{(int)(width / scale)}x{(int)(height / scale)}{Environment.NewLine}";
             scaleResolutionDownSelector.value = 0;
+        }
+    }
+
+    private void ChangeFramerate(int index)
+    {
+        if (_pc1 == null || _pc2 == null)
+            return;
+        uint? framerate = framerateOptions.Values.ElementAt(index);
+        RTCRtpSender sender = _pc1.GetSenders().First();
+        RTCRtpSendParameters parameters = sender.GetParameters();
+        parameters.encodings[0].maxFramerate = framerate;
+        RTCError error = sender.SetParameters(parameters);
+        if (error.errorType != RTCErrorType.None)
+        {
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
+            statsField.text +=
+                $"Failed maxFramerate to " +
+                $"{framerate}{Environment.NewLine}";
+            framerateSelector.value = 0;
         }
     }
 
