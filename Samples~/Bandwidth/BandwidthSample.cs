@@ -42,6 +42,7 @@ class BandwidthSample : MonoBehaviour
         new Dictionary<string, ulong?>()
     {
         { "undefined", null },
+        { "10000", 10000 },
         { "2000", 2000 },
         { "1000", 1000 },
         { "500",  500 },
@@ -72,8 +73,8 @@ class BandwidthSample : MonoBehaviour
     };
 
 
-    private const int width = 1280;
-    private const int height = 720;
+    private const int width = 1920;
+    private const int height = 1080;
 
     private void Awake()
     {
