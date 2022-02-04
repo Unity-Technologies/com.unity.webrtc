@@ -235,7 +235,7 @@ extern "C"
     {
 #if CUDA_PLATFORM
         IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
-        if(!device->IsCudaSupport())
+        if(!device || !device->IsCudaSupport())
         {
             return false;
         }
