@@ -25,7 +25,7 @@ extern "C" {
 
 #define CHECK(cond, fmt, ...) do { \
     if(!(cond)) { \
-      fprintf(stderr, "implib-gen: libcuda.so: " fmt "\n", ##__VA_ARGS__); \
+      fprintf(stderr, "implib-gen: libcuda.so.1: " fmt "\n", ##__VA_ARGS__); \
       assert(0 && "Assertion in generated code"); \
       exit(1); \
     } \
@@ -49,10 +49,10 @@ static void *load_library() {
   CHECK(0, "internal error"); // We shouldn't get here
 #elif CALL_USER_CALLBACK
   extern void *(const char *lib_name);
-  lib_handle = ("libcuda.so");
+  lib_handle = ("libcuda.so.1");
   CHECK(lib_handle, "callback '' failed to load library");
 #else
-  lib_handle = dlopen("libcuda.so", RTLD_LAZY | RTLD_GLOBAL);
+  lib_handle = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
   CHECK(lib_handle, "failed to load library: %s", dlerror());
 #endif
 
