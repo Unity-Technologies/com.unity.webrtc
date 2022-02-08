@@ -31,10 +31,15 @@ namespace webrtc
         if (!initialized_)
             return 0;
 
+        initialized_ = false;
+
+        taskQueue_->PostTask([this] {
+          task_.Stop();
+        });
+
         StopRecording();
         StopPlayout();
 
-        initialized_ = false;
         return 0;
     }
 
