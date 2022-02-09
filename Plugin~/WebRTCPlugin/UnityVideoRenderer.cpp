@@ -17,7 +17,7 @@ UnityVideoRenderer::UnityVideoRenderer(
 
 UnityVideoRenderer::~UnityVideoRenderer()
 {
-    DebugLog("Destory UnityVideoRenderer Id:%d", m_id);
+    DebugLog("Destroy UnityVideoRenderer Id:%d", m_id);
     {
         std::unique_lock<std::mutex> lock(m_mutex);
     }
