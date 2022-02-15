@@ -23,7 +23,11 @@ platforms:
     build_command: BuildScripts~/build_libwebrtc_android.sh
   - name: ios
     type: Unity::VM::osx
-    image: package-ci/mac:latest
+    # `package-ci/mac:latest` is using xcode 12.2, but occurring the build error below.
+    # clang: error: unknown argument: '-ffile-compilation-dir=.'
+    # This option is available for clang 13 but not clang 11.
+    # https://bugs.chromium.org/p/chromium/issues/detail?id=1263993
+    image: slough-ops/macos-12-base:stable
     flavor: m1.mac  
     build_command: BuildScripts~/build_libwebrtc_ios.sh
 projects:
