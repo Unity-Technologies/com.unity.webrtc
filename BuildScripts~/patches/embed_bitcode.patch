@@ -1,0 +1,99 @@
+diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
+index 512662994..64e5235cf 100644
+--- a/config/compiler/BUILD.gn
++++ b/config/compiler/BUILD.gn
+@@ -1264,7 +1264,7 @@ config("compiler_deterministic") {
+     } else {
+       # -ffile-compilation-dir is an alias for both -fdebug-compilation-dir=
+       # and -fcoverage-compilation-dir=.
+-      cflags += [ "-ffile-compilation-dir=." ]
++      cflags += [ "-fdebug-compilation-dir=." ]
+     }
+     if (!is_win) {
+       # We don't use clang -cc1as on Windows (yet? https://crbug.com/762167)
+@@ -2407,13 +2407,17 @@ config("symbols") {
+       cflags += [ "-g2" ]
+     }
+ 
+-    if (!is_nacl && is_clang && !is_tsan && !is_asan) {
++    if (!is_nacl && is_clang && !is_tsan && !is_asan &&
++        !(is_ios && enable_ios_bitcode)) {
+       # gcc generates dwarf-aranges by default on -g1 and -g2. On clang it has
+       # to be manually enabled.
+       #
+       # It is skipped in tsan and asan because enabling it causes some
+       # formatting changes in the output which would require fixing bunches
+       # of expectation regexps.
++      #
++      # It is skipped when generating bitcode is enabled as -gdwars-aranges
++      # is incompatible with -fembed-bitcode/-fembed-bitcode-marker.
+       cflags += [ "-gdwarf-aranges" ]
+     }
+ 
+@@ -2518,9 +2522,19 @@ config("minimal_symbols") {
+       cflags += [ "-g1" ]
+     }
+ 
+-    if (!is_nacl && is_clang && !is_tsan && !is_asan) {
+-      # See comment for -gdwarf-aranges in config("symbols").
+-      cflags += [ "-gdwarf-aranges" ]
++    # Since only one of the build options -gdwarf-aranges and -fembed-bitcode
++    # can be specified, -gdwarf-aranges is not given under the condition that
++    # -fembed-bitcode is specified.
++    if (!(is_ios && use_xcode_clang && enable_ios_bitcode)) {
++      if (!is_nacl && is_clang && !is_tsan && !is_asan) {
++        # gcc generates dwarf-aranges by default on -g1 and -g2. On clang it has
++        # to be manually enabled.
++        #
++        # It is skipped in tsan and asan because enabling it causes some
++        # formatting changes in the output which would require fixing bunches
++        # of expectation regexps.
++        cflags += [ "-gdwarf-aranges" ]
++      }
+     }
+ 
+     ldflags = []
+diff --git a/config/ios/BUILD.gn b/config/ios/BUILD.gn
+index 6d63abf33..4a6050582 100644
+--- a/config/ios/BUILD.gn
++++ b/config/ios/BUILD.gn
+@@ -7,18 +7,6 @@ import("//build/toolchain/goma.gni")
+ import("//build/toolchain/toolchain.gni")
+ import("//build_overrides/build.gni")
+ 
+-declare_args() {
+-  # Enabling this option makes clang compile to an intermediate
+-  # representation ("bitcode"), and not to native code. This is preferred
+-  # when including WebRTC in the apps that will be sent to Apple's App Store
+-  # and mandatory for the apps that run on watchOS or tvOS.
+-  # The option only works when building with Xcode (use_xcode_clang = true).
+-  # Mimicking how Xcode handles it, the production builds (is_debug = false)
+-  # get real bitcode sections added, while the debug builds (is_debug = true)
+-  # only get bitcode-section "markers" added in them.
+-  enable_ios_bitcode = false
+-}
+-
+ # This is included by reference in the //build/config/compiler config that
+ # is applied to all targets. It is here to separate out the logic.
+ config("compiler") {
+diff --git a/config/ios/ios_sdk.gni b/config/ios/ios_sdk.gni
+index 1d0f5dc09..b251cb02b 100644
+--- a/config/ios/ios_sdk.gni
++++ b/config/ios/ios_sdk.gni
+@@ -65,6 +65,16 @@ declare_args() {
+ 
+   # Set to true if all test apps should use the same bundle id.
+   ios_use_shared_bundle_id_for_test_apps = false
++
++  # Enabling this option makes clang compile to an intermediate
++  # representation ("bitcode"), and not to native code. This is preferred
++  # when including WebRTC in the apps that will be sent to Apple's App Store
++  # and mandatory for the apps that run on watchOS or tvOS.
++  #
++  # Mimicking how Xcode handles it, the production builds (is_debug = false)
++  # get real bitcode sections added, while the debug builds (is_debug = true)
++  # only get bitcode-section "markers" added in them.
++  enable_ios_bitcode = false  
+ }
+ 
+ declare_args() {
