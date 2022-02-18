@@ -101,7 +101,7 @@ namespace Unity.WebRTC
                 : this(WebRTC.Context.CreateAudioTrackSink())
             {
                 _track = track;
-                _track.AddSink(this);
+                _track?.AddSink(this);
             }
 
             public AudioStreamRenderer(IntPtr ptr)
@@ -124,7 +124,7 @@ namespace Unity.WebRTC
 
                 if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
                 {
-                    _track.RemoveSink(this);
+                    _track?.RemoveSink(this);
                     WebRTC.Table.Remove(self);
                     WebRTC.Context.DeleteAudioTrackSink(self);
                 }
