@@ -724,7 +724,7 @@ namespace Unity.WebRTC
 
         internal static T FindOrCreate<T>(IntPtr ptr, Func<IntPtr, T> constructor) where T : class
         {
-            if (Context.table.ContainsKey(ptr))
+            if (Context.table.ContainsKey(ptr) && Context.table[ptr] != null)
             {
                 if(Context.table[ptr] is T value)
                     return value;
