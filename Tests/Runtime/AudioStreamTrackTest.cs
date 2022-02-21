@@ -163,7 +163,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void AudioStreamRenderer()
         {
             var obj = new GameObject("audio");
-            var renderer = new AudioStreamTrack.AudioStreamRenderer();
+            var renderer = new AudioStreamTrack.AudioStreamRenderer(null);
             renderer.Source = obj.AddComponent<AudioSource>();
             renderer.Dispose();
             UnityEngine.Object.DestroyImmediate(obj);

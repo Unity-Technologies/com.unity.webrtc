@@ -22,8 +22,7 @@ namespace webrtc
     public:
         DummyAudioDevice(TaskQueueFactory* factory);
         ~DummyAudioDevice() override {
-            StopPlayout();
-            StopRecording();
+            Terminate();
         }
 
         //webrtc::AudioDeviceModule
