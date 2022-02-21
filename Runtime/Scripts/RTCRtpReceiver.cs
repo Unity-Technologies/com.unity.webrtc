@@ -30,7 +30,10 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                WebRTC.Table.Remove(self);
+                if (WebRTC.Table.TryGetValue(self, out object value) && value == this)
+                {
+                    WebRTC.Table.Remove(self);
+                }
             }
             base.Dispose();
         }

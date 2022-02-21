@@ -724,10 +724,19 @@ namespace Unity.WebRTC
 
         internal static T FindOrCreate<T>(IntPtr ptr, Func<IntPtr, T> constructor) where T : class
         {
-            if (Context.table.ContainsKey(ptr) && Context.table[ptr] != null)
+            if (Context.table.ContainsKey(ptr))
             {
-                if(Context.table[ptr] is T value)
+                if (Context.table[ptr] == null)
+                {
+                    // The object has been garbage collected.
+                    // But the finalizer has not been called.
+                    Context.table.Remove(ptr);
+                    return constructor(ptr);
+                }
+                if (Context.table[ptr] is T value)
+                {
                     return value;
+                }
                 throw new InvalidCastException($"{ptr} is not {typeof(T).Name}");
             }
             else
