@@ -4,6 +4,12 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.0-exp.6] - 2022-02-24
+
+### Fixed
+
+- Fixed a crash bug where disposing `AudioStreamTrack` on a receiver side.
+
 ## [2.4.0-exp.5] - 2022-02-02
 
 ### Added
