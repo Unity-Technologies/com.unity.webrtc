@@ -43,7 +43,8 @@ Please read this if you have an interest to customize native code in this projec
 | `2.4.0-exp.3` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Fix bugs | Jun 2021 |
 | `2.4.0-exp.4` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Audio renderer support <br>- Apple Silicon support | Aug 2021 |
 | `2.4.0-exp.5` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix audio streaming issues | Feb 2022 |
-| `2.4.0-exp.6` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix video streaming issues | Apr 2022 |
+| `2.4.0-exp.6` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Feb 2022 |
+| `2.4.0-exp.7` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix video streaming issues | Apr 2022 |
 
 ## Licenses
 
