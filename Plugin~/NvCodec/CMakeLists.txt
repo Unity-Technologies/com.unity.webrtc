@@ -40,6 +40,13 @@ else ()
   find_library(NVENCODEAPI_LIB nvidia-encode)
 endif()
 
+if(WIN32)
+  # Select runtime library (MT, MTD) on windows platform
+  set_target_properties(NvCodec
+    PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+endif()
+
 set(NVCODEC_LIBRARIES
   NvCodec
   ${CUVID_LIB}
