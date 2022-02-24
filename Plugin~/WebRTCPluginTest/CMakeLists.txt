@@ -47,9 +47,10 @@ target_compile_options(WebRTCLibTest
   PRIVATE
     -Wall
     -Wextra
-    -Wno-missing-field-initializers
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
+    -Wno-missing-field-initializers
+    -Wno-missing-prototypes
     -Wno-padded
 )
 

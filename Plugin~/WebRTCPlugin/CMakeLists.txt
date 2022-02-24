@@ -52,9 +52,10 @@ target_compile_options(WebRTCLib
   PRIVATE 
     -Wall
     -Wextra
-    -Wno-missing-field-initializers
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
+    -Wno-missing-field-initializers
+    -Wno-missing-prototypes
     -Wno-padded
 )
 
@@ -310,9 +311,10 @@ target_compile_options(WebRTCPlugin
   PRIVATE 
     -Wall
     -Wextra
-    -Wno-missing-field-initializers
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
+    -Wno-missing-field-initializers
+    -Wno-missing-prototypes
     -Wno-padded
 )
 
