@@ -191,8 +191,8 @@ The decoders that support hardware acceleration are shown below.
 | Android | OpenGL ES | - | - | **Y** |
 
 **NVCODEC** is available on the PC installed NVIDIA driver.
-- Windows: NVIDIA Driver version `436.15` or higher
-- Linux:   NVIDIA Driver version `435.21` or higher
+- Windows: NVIDIA Driver version `456.71` or higher
+- Linux:   NVIDIA Driver version `455.27` or higher
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
 
