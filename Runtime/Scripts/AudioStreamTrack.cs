@@ -302,8 +302,6 @@ namespace Unity.WebRTC
 
     internal class AudioTrackSource : RefCountedObject
     {
-        bool inited = false;
-
         public AudioTrackSource() : base(WebRTC.Context.CreateAudioTrackSource())
         {
             WebRTC.Table.Add(self, this);
@@ -314,23 +312,8 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public void Initialize(int sampleRate, int channels)
-        {
-            // initialize audio streaming for sender
-            WebRTC.Context.AudioSourceInitLocalAudio(GetSelfOrThrow(), sampleRate, channels);
-            inited = true;
-        }
-
-        public void Uninitialize()
-        {
-            WebRTC.Context.AudioSourceUninitLocalAudio(GetSelfOrThrow());
-            inited = false;
-        }
-
         public void Update(IntPtr array, int sampleRate, int channels, int frames)
         {
-            if (!inited)
-                Initialize(sampleRate, channels);
             NativeMethods.AudioSourceProcessLocalAudio(GetSelfOrThrow(), array, sampleRate, channels, frames);
         }
 
@@ -345,8 +328,6 @@ namespace Unity.WebRTC
             {
                 WebRTC.Table.Remove(self);
             }
-            if (inited)
-                Uninitialize();
             base.Dispose();
         }
     }
