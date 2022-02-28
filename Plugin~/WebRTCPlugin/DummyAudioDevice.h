@@ -176,8 +176,6 @@ namespace webrtc
         virtual int GetPlayoutAudioParameters(webrtc::AudioParameters* params) const override { return 0; }
         virtual int GetRecordAudioParameters(webrtc::AudioParameters* params) const override { return 0; }
 #endif
-        void RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels);
-        void UnregisterSendAudioCallback(UnityAudioTrackSource* source);
 
     private:
         void ProcessAudio();
@@ -197,7 +195,6 @@ namespace webrtc
         mutable std::mutex mutex_;
         webrtc::AudioTransport* audio_transport_ { nullptr };
         using callback_t = std::function<void()>;
-        std::unordered_map<UnityAudioTrackSource*, callback_t> callbacks_;
         TaskQueueFactory* tackQueueFactory_;
     };
 

@@ -64,34 +64,6 @@ namespace webrtc
             audio_transport_->PullRenderData(
                 kBytesPerSample * 8, kSamplingRate, kChannels, kSamplesPerFrame, data, &elapsed_time_ms, &ntp_time_ms);
         }
-
-        if (recording_)
-        {
-            for (const auto& pair : callbacks_)
-            {
-                pair.second();
-            }
-        }
-    }
-
-    void DummyAudioDevice::RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels)
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (callbacks_.find(source) == callbacks_.end())
-        {
-            callbacks_.emplace(
-                source,
-                [source, sampleRate, channels]() { source->SendAudioData(sampleRate, static_cast<size_t>(channels)); });
-        }
-    }
-
-    void DummyAudioDevice::UnregisterSendAudioCallback(UnityAudioTrackSource* source)
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (callbacks_.find(source) != callbacks_.end())
-        {
-            callbacks_.erase(source);
-        }
     }
 
 } // end namespace webrtc
