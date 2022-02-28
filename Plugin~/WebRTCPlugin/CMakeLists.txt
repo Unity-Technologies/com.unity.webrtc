@@ -49,9 +49,13 @@ target_sources(WebRTCLib
 )
 
 target_compile_options(WebRTCLib
-  PRIVATE 
+  PUBLIC
+    -Werror 
     -Wall
     -Wextra
+    -Wformat=2
+    -Wno-undef
+    -Wno-type-limits
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
     -Wno-missing-field-initializers
@@ -306,17 +310,6 @@ if(Android)
       Jni.cpp
   )
 endif()
-
-target_compile_options(WebRTCPlugin
-  PRIVATE 
-    -Wall
-    -Wextra
-    -Wno-c++98-compat
-    -Wno-c++98-compat-pedantic
-    -Wno-missing-field-initializers
-    -Wno-missing-prototypes
-    -Wno-padded
-)
 
 target_compile_definitions(WebRTCPlugin
   PRIVATE 
