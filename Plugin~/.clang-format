@@ -1,0 +1,9 @@
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: AlwaysBreak
+NamespaceIndentation: Inner
+BreakBeforeBraces: Allman
+BreakBeforeBinaryOperators: None
+SpaceAfterTemplateKeyword: false
+ColumnLimit: 120
+BinPackArguments: false
+BinPackParameters: false
