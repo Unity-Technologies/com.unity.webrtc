@@ -2,12 +2,12 @@
 
 #include <mutex>
 
-using namespace ::webrtc;
-
 namespace unity
 {
 namespace webrtc
 {
+    using namespace ::webrtc;
+
     class UnityAudioTrackSource : public LocalAudioSource
     {
     public:

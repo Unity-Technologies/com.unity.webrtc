@@ -33,7 +33,7 @@ namespace webrtc
         // Default fallback: Just use the sum of bitrates as the single target rate.
         virtual void SetRates(const RateControlParameters& parameters) override;
     private:
-        webrtc::EncodedImageCallback* callback = nullptr;
+        webrtc::EncodedImageCallback* m_callback = nullptr;
         webrtc::EncodedImage m_encodedImage;
         webrtc::H264BitstreamParser m_h264BitstreamParser;
         webrtc::VideoCodec m_codec;

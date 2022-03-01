@@ -3,12 +3,11 @@
 #include "DataChannelObject.h"
 #include "PeerConnectionStatsCollectorCallback.h"
 
-using namespace ::webrtc;
-
 namespace unity
 {
 namespace webrtc
 {
+    using namespace ::webrtc;
 
     using DelegateCreateSDSuccess = void(*)(PeerConnectionObject*, RTCSdpType, const char*);
     using DelegateCreateSDFailure = void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);

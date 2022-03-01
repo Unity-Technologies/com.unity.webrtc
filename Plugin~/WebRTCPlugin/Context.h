@@ -9,12 +9,11 @@
 #include "UnityVideoTrackSource.h"
 #include "Codec/IEncoder.h"
 
-using namespace ::webrtc;
-
 namespace unity
 {
 namespace webrtc
 {
+    using namespace ::webrtc;
 
     class Context;
     class IGraphicsDevice;
@@ -23,8 +22,9 @@ namespace webrtc
     class ContextManager
     {
     public:
-        static ContextManager* GetInstance() { return &s_instance; }
-     
+        static ContextManager* GetInstance();
+        ~ContextManager();
+
         Context* GetContext(int uid) const;
         Context* CreateContext(int uid, UnityEncoderType encoderType, bool forTest);
         void DestroyContext(int uid);
@@ -33,9 +33,8 @@ namespace webrtc
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
     private:
-        ~ContextManager();
         std::map<int, ContextPtr> m_contexts;
-        static ContextManager s_instance;
+        static std::unique_ptr<ContextManager> s_instance;
     };
 
     struct VideoEncoderParameter

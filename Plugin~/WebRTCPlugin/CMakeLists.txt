@@ -54,13 +54,38 @@ target_compile_options(WebRTCLib
     -Wall
     -Wextra
     -Wformat=2
-    -Wno-undef
-    -Wno-type-limits
+    -Wno-class-varargs
+    -Wno-comma
+    -Wno-covered-switch-default
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
+    -Wno-deprecated-copy-dtor
+    -Wno-documentation
+    -Wno-documentation-unknown-command
+    -Wno-double-promotion
+    -Wno-float-equal
+    #-Wno-ignored-qualifiers
+    -Wno-implicit-int-float-conversion
+    -Wno-inconsistent-missing-destructor-override
+    -Wno-language-extension-token
     -Wno-missing-field-initializers
     -Wno-missing-prototypes
+    -Wno-nonportable-system-include-path
     -Wno-padded
+    -Wno-reserved-id-macro
+    -Wno-shadow-field
+    -Wno-shadow-field-in-constructor
+    -Wno-sign-conversion
+    -Wno-suggest-destructor-override
+    -Wno-suggest-override
+    -Wno-switch-enum
+    -Wno-thread-safety-negative
+    -Wno-type-limits
+    -Wno-undef
+    -Wno-undefined-func-template
+    -Wno-unused-parameter
+    -Wno-unused-template
+    -Wno-zero-as-null-pointer-constant
 )
 
 target_compile_definitions(WebRTCLib
@@ -125,6 +150,7 @@ if(Windows)
       Strmiids
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
@@ -159,6 +185,7 @@ elseif(macOS)
       ${FRAMEWORK_LIBS}
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
@@ -187,6 +214,7 @@ elseif(Linux)
       ${GLIB_LIBRARIES}
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
@@ -214,6 +242,7 @@ elseif(iOS)
       WEBRTC_POSIX
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
@@ -265,9 +294,26 @@ endif()
 target_include_directories(WebRTCLib
   PUBLIC
     .
-    ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
 )
+
+target_include_directories(WebRTCLib
+  SYSTEM
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}/unity/include
+)
+
+
+# file(GLOB UNITY_HEADER_FILES
+#   "${CMAKE_SOURCE_DIR}/unity/include/*.h"
+# )
+
+# set_source_files_properties(
+#   ${UNITY_HEADER_FILES}
+#   PROPERTIES 
+#   COMPILE_FLAGS 
+#   "-Wno-everything"
+# )
 
 #
 # Configure WebRTC Unity plugin

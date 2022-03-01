@@ -324,9 +324,9 @@ namespace webrtc
         bool PlayoutThreadProcess();
 
         const int32_t kFrameLengthMs = 10;
-        const size_t kBytesPerSample = 2;
+        const int32_t kBytesPerSample = 2;
         const size_t kChannels = 2;
-        const size_t kSamplingRate = 48000;
+        const int32_t kSamplingRate = 48000;
         const size_t kSamplesPerFrame = kSamplingRate * kFrameLengthMs / 1000;
         std::vector<int16_t> audio_data;
         std::unique_ptr<rtc::TaskQueue> taskQueue_;
