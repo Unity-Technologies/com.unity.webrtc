@@ -193,8 +193,7 @@ namespace webrtc
         std::atomic<bool> playing_ { false };
         std::atomic<bool> recording_ { false };
         mutable std::mutex mutex_;
-        webrtc::AudioTransport* audio_transport_ { nullptr };
-        using callback_t = std::function<void()>;
+        webrtc::AudioTransport* audio_transport_{ nullptr };
         TaskQueueFactory* tackQueueFactory_;
     };
 
