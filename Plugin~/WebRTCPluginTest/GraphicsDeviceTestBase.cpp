@@ -215,13 +215,10 @@ void* CreateDeviceVulkan()
     if(!LoadVulkanModule())
         assert("failed loading vulkan module");
 
-    std::vector<const char*> layers = { "VK_LAYER_LUNARG_standard_validation" };
     VkInstanceCreateInfo instanceInfo{};
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExtensions.size());
     instanceInfo.ppEnabledExtensionNames = instanceExtensions.data();
-    instanceInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
-    instanceInfo.ppEnabledLayerNames = layers.data();
     instanceInfo.pApplicationInfo = &appInfo;
     VkInstance instance = nullptr;
     VKCHECK(vkCreateInstance(&instanceInfo, nullptr, &instance));
