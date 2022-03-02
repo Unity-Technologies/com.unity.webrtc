@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2018 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -24,7 +24,11 @@
 #include <stdint.h>
 #include <string.h>
 #include "Logger.h"
+#include <ios>
+#include <sstream>
 #include <thread>
+#include <list>
+#include <condition_variable>
 
 extern simplelogger::Logger *logger;
 
@@ -91,7 +95,9 @@ inline bool check(NVENCSTATUS e, int iLine, const char *szFile) {
 #ifdef _WINERROR_
 inline bool check(HRESULT e, int iLine, const char *szFile) {
     if (e != S_OK) {
-        LOG(ERROR) << "HRESULT error 0x" << (void *)e << " at line " << iLine << " in file " << szFile;
+        std::stringstream stream;
+        stream << std::hex << std::uppercase << e;
+        LOG(FATAL) << "HRESULT error 0x" << stream.str() << " at line " << iLine << " in file " << szFile;
         return false;
     }
     return true;
@@ -236,28 +242,34 @@ template<typename T>
 class YuvConverter {
 public:
     YuvConverter(int nWidth, int nHeight) : nWidth(nWidth), nHeight(nHeight) {
-        pQuad = new T[nWidth * nHeight / 4];
+        pQuad = new T[((nWidth + 1) / 2) * ((nHeight + 1) / 2)];
     }
     ~YuvConverter() {
-        delete pQuad;
+        delete[] pQuad;
     }
     void PlanarToUVInterleaved(T *pFrame, int nPitch = 0) {
         if (nPitch == 0) {
             nPitch = nWidth;
         }
-        T *puv = pFrame + nPitch * nHeight;
+
+        // sizes of source surface plane
+        int nSizePlaneY = nPitch * nHeight;
+        int nSizePlaneU = ((nPitch + 1) / 2) * ((nHeight + 1) / 2);
+        int nSizePlaneV = nSizePlaneU;
+
+        T *puv = pFrame + nSizePlaneY;
         if (nPitch == nWidth) {
-            memcpy(pQuad, puv, nWidth * nHeight / 4 * sizeof(T));
+            memcpy(pQuad, puv, nSizePlaneU * sizeof(T));
         } else {
-            for (int i = 0; i < nHeight / 2; i++) {
-                memcpy(pQuad + nWidth / 2 * i, puv + nPitch / 2 * i, nWidth / 2 * sizeof(T));
+            for (int i = 0; i < (nHeight + 1) / 2; i++) {
+                memcpy(pQuad + ((nWidth + 1) / 2) * i, puv + ((nPitch + 1) / 2) * i, ((nWidth + 1) / 2) * sizeof(T));
             }
         }
-        T *pv = puv + (nPitch / 2) * (nHeight / 2);
-        for (int y = 0; y < nHeight / 2; y++) {
-            for (int x = 0; x < nWidth / 2; x++) {
-                puv[y * nPitch + x * 2] = pQuad[y * nWidth / 2 + x];
-                puv[y * nPitch + x * 2 + 1] = pv[y * nPitch / 2 + x];
+        T *pv = puv + nSizePlaneU;
+        for (int y = 0; y < (nHeight + 1) / 2; y++) {
+            for (int x = 0; x < (nWidth + 1) / 2; x++) {
+                puv[y * nPitch + x * 2] = pQuad[y * ((nWidth + 1) / 2) + x];
+                puv[y * nPitch + x * 2 + 1] = pv[y * ((nPitch + 1) / 2) + x];
             }
         }
     }
@@ -265,20 +277,28 @@ public:
         if (nPitch == 0) {
             nPitch = nWidth;
         }
-        T *puv = pFrame + nPitch * nHeight, 
+
+        // sizes of source surface plane
+        int nSizePlaneY = nPitch * nHeight;
+        int nSizePlaneU = ((nPitch + 1) / 2) * ((nHeight + 1) / 2);
+        int nSizePlaneV = nSizePlaneU;
+
+        T *puv = pFrame + nSizePlaneY,
             *pu = puv, 
-            *pv = puv + nPitch * nHeight / 4;
-        for (int y = 0; y < nHeight / 2; y++) {
-            for (int x = 0; x < nWidth / 2; x++) {
-                pu[y * nPitch / 2 + x] = puv[y * nPitch + x * 2];
-                pQuad[y * nWidth / 2 + x] = puv[y * nPitch + x * 2 + 1];
+            *pv = puv + nSizePlaneU;
+
+        // split chroma from interleave to planar
+        for (int y = 0; y < (nHeight + 1) / 2; y++) {
+            for (int x = 0; x < (nWidth + 1) / 2; x++) {
+                pu[y * ((nPitch + 1) / 2) + x] = puv[y * nPitch + x * 2];
+                pQuad[y * ((nWidth + 1) / 2) + x] = puv[y * nPitch + x * 2 + 1];
             }
         }
         if (nPitch == nWidth) {
-            memcpy(pv, pQuad, nWidth * nHeight / 4 * sizeof(T));
+            memcpy(pv, pQuad, nSizePlaneV * sizeof(T));
         } else {
-            for (int i = 0; i < nHeight / 2; i++) {
-                memcpy(pv + nPitch / 2 * i, pQuad + nWidth / 2 * i, nWidth / 2 * sizeof(T));
+            for (int i = 0; i < (nHeight + 1) / 2; i++) {
+                memcpy(pv + ((nPitch + 1) / 2) * i, pQuad + ((nWidth + 1) / 2) * i, ((nWidth + 1) / 2) * sizeof(T));
             }
         }
     }
@@ -302,6 +322,95 @@ public:
 
 private:
     std::chrono::high_resolution_clock::time_point t0;
+};
+
+template<typename T>
+class ConcurrentQueue
+{
+    public:
+
+    ConcurrentQueue() {}
+    ConcurrentQueue(size_t size) : maxSize(size) {}
+    ConcurrentQueue(const ConcurrentQueue&) = delete;
+    ConcurrentQueue& operator=(const ConcurrentQueue&) = delete;
+
+    void setSize(size_t s) {
+        maxSize = s;
+    }
+
+    void push_back(const T& value) {
+        // Do not use a std::lock_guard here. We will need to explicitly
+        // unlock before notify_one as the other waiting thread will
+        // automatically try to acquire mutex once it wakes up
+        // (which will happen on notify_one)
+        std::unique_lock<std::mutex> lock(m_mutex);
+        auto wasEmpty = m_List.empty();
+
+        while (full()) {
+            m_cond.wait(lock);
+        }
+
+        m_List.push_back(value);
+        if (wasEmpty && !m_List.empty()) {
+            lock.unlock();
+            m_cond.notify_one();
+        }
+    }
+
+    T pop_front() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        while (m_List.empty()) {
+            m_cond.wait(lock);
+        }
+        auto wasFull = full();
+        T data = std::move(m_List.front());
+        m_List.pop_front();
+
+        if (wasFull && !full()) {
+            lock.unlock();
+            m_cond.notify_one();
+        }
+
+        return data;
+    }
+
+    T front() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        while (m_List.empty()) {
+            m_cond.wait(lock);
+        }
+
+        return m_List.front();
+    }
+
+    size_t size() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        return m_List.size();
+    }
+
+    bool empty() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        return m_List.empty();
+    }
+    void clear() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_List.clear();
+    }
+
+private:
+    bool full() {
+        if (m_List.size() == maxSize)
+            return true;
+        return false;
+    }
+
+private:
+    std::list<T> m_List;
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
+    size_t maxSize;
 };
 
 inline void CheckInputFile(const char *szInFilePath) {

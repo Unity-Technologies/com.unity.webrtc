@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2018 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -40,6 +40,7 @@ private:
     AVPixelFormat eChromaFormat;
     int nWidth, nHeight, nBitDepth, nBPP, nChromaHeight;
     double timeBase = 0.0;
+    int64_t userTimeScale = 0; 
 
     uint8_t *pDataWithHeader = NULL;
 
@@ -58,7 +59,7 @@ private:
     *   @brief  Private constructor to initialize libavformat resources.
     *   @param  fmtc - Pointer to AVFormatContext allocated inside avformat_open_input()
     */
-    FFmpegDemuxer(AVFormatContext *fmtc) : fmtc(fmtc) {
+    FFmpegDemuxer(AVFormatContext *fmtc, int64_t timeScale = 1000 /*Hz*/) : fmtc(fmtc) {
         if (!fmtc) {
             LOG(ERROR) << "No AVFormatContext provided.";
             return;
@@ -80,11 +81,13 @@ private:
         eChromaFormat = (AVPixelFormat)fmtc->streams[iVideoStream]->codecpar->format;
         AVRational rTimeBase = fmtc->streams[iVideoStream]->time_base;
         timeBase = av_q2d(rTimeBase);
+        userTimeScale = timeScale;
 
         // Set bit depth, chroma height, bits per pixel based on eChromaFormat of input
         switch (eChromaFormat)
         {
         case AV_PIX_FMT_YUV420P10LE:
+        case AV_PIX_FMT_GRAY10LE:   // monochrome is treated as 420 with chroma filled with 0x0
             nBitDepth = 10;
             nChromaHeight = (nHeight + 1) >> 1;
             nBPP = 2;
@@ -113,12 +116,14 @@ private:
         case AV_PIX_FMT_YUVJ420P:
         case AV_PIX_FMT_YUVJ422P:   // jpeg decoder output is subsampled to NV12 for 422/444 so treat it as 420
         case AV_PIX_FMT_YUVJ444P:   // jpeg decoder output is subsampled to NV12 for 422/444 so treat it as 420
+        case AV_PIX_FMT_GRAY8:      // monochrome is treated as 420 with chroma filled with 0x0
             nBitDepth = 8;
             nChromaHeight = (nHeight + 1) >> 1;
             nBPP = 1;
             break;
         default:
             LOG(WARNING) << "ChromaFormat not recognized. Assuming 420";
+            eChromaFormat = AV_PIX_FMT_YUV420P;
             nBitDepth = 8;
             nChromaHeight = (nHeight + 1) >> 1;
             nBPP = 1;
@@ -213,7 +218,7 @@ private:
     }
 
 public:
-    FFmpegDemuxer(const char *szFilePath) : FFmpegDemuxer(CreateFormatContext(szFilePath)) {}
+    FFmpegDemuxer(const char *szFilePath, int64_t timescale = 1000 /*Hz*/) : FFmpegDemuxer(CreateFormatContext(szFilePath), timescale) {}
     FFmpegDemuxer(DataProvider *pDataProvider) : FFmpegDemuxer(CreateFormatContext(pDataProvider)) {avioc = fmtc->pb;}
     ~FFmpegDemuxer() {
 
@@ -289,7 +294,7 @@ public:
             *ppVideo = pktFiltered.data;
             *pnVideoBytes = pktFiltered.size;
             if (pts)
-                *pts = (int64_t) (pktFiltered.pts * 1000 * timeBase);
+                *pts = (int64_t) (pktFiltered.pts * userTimeScale * timeBase);
         } else {
 
             if (bMp4MPEG4 && (frameCount == 0)) {
@@ -319,7 +324,7 @@ public:
             }
 
             if (pts)
-                *pts = (int64_t)(pkt.pts * 1000 * timeBase);
+                *pts = (int64_t)(pkt.pts * userTimeScale * timeBase);
         }
 
         frameCount++;
@@ -337,12 +342,14 @@ inline cudaVideoCodec FFmpeg2NvCodecId(AVCodecID id) {
     case AV_CODEC_ID_MPEG1VIDEO : return cudaVideoCodec_MPEG1;
     case AV_CODEC_ID_MPEG2VIDEO : return cudaVideoCodec_MPEG2;
     case AV_CODEC_ID_MPEG4      : return cudaVideoCodec_MPEG4;
+    case AV_CODEC_ID_WMV3       :
     case AV_CODEC_ID_VC1        : return cudaVideoCodec_VC1;
     case AV_CODEC_ID_H264       : return cudaVideoCodec_H264;
     case AV_CODEC_ID_HEVC       : return cudaVideoCodec_HEVC;
     case AV_CODEC_ID_VP8        : return cudaVideoCodec_VP8;
     case AV_CODEC_ID_VP9        : return cudaVideoCodec_VP9;
     case AV_CODEC_ID_MJPEG      : return cudaVideoCodec_JPEG;
+    case AV_CODEC_ID_AV1        : return cudaVideoCodec_AV1;
     default                     : return cudaVideoCodec_NumCodecs;
     }
 }

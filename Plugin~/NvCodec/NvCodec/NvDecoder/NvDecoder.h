@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2018 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string.h>
 #include "nvcuvid.h"
+#include "../Utils/NvCodecUtils.h"
 
 /**
 * @brief Exception class for error reporting from the decode API.
@@ -88,9 +89,9 @@ public:
     *  Application must call this function to initialize the decoder, before
     *  starting to decode any frames.
     */
-    NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, std::mutex *pMutex = NULL, bool bLowLatency = false,
+    NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency = false,
               bool bDeviceFramePitched = false, const Rect *pCropRect = NULL, const Dim *pResizeDim = NULL,
-              int maxWidth = 0, int maxHeight = 0);
+              int maxWidth = 0, int maxHeight = 0, unsigned int clkRate = 1000);
     ~NvDecoder();
 
     /**
@@ -99,12 +100,19 @@ public:
     CUcontext GetContext() { return m_cuContext; }
 
     /**
-    *  @brief  This function is used to get the current decode width.
+    *  @brief  This function is used to get the output frame width.
+    *  NV12/P016 output format width is 2 byte aligned because of U and V interleave
     */
-    int GetWidth() { assert(m_nWidth); return m_nWidth; }
+    int GetWidth() { assert(m_nWidth); return (m_eOutputFormat == cudaVideoSurfaceFormat_NV12 || m_eOutputFormat == cudaVideoSurfaceFormat_P016) 
+                                                ? (m_nWidth + 1) & ~1 : m_nWidth; }
 
     /**
-    *  @brief  This function is used to get the current decode height (Luma height).
+    *  @brief  This function is used to get the actual decode width
+    */
+    int GetDecodeWidth() { assert(m_nWidth); return m_nWidth; }
+
+    /**
+    *  @brief  This function is used to get the output frame height (Luma height).
     */
     int GetHeight() { assert(m_nLumaHeight); return m_nLumaHeight; }
 
@@ -121,12 +129,22 @@ public:
     /**
     *   @brief  This function is used to get the current frame size based on pixel format.
     */
-    int GetFrameSize() { assert(m_nWidth); return m_nWidth * (m_nLumaHeight + m_nChromaHeight * m_nNumChromaPlanes) * m_nBPP; }
+    int GetFrameSize() { assert(m_nWidth); return GetWidth() * (m_nLumaHeight + (m_nChromaHeight * m_nNumChromaPlanes)) * m_nBPP; }
+
+    /**
+    *   @brief  This function is used to get the current frame Luma plane size.
+    */
+    int GetLumaPlaneSize() { assert(m_nWidth); return GetWidth() * m_nLumaHeight * m_nBPP; }
+
+    /**
+    *   @brief  This function is used to get the current frame chroma plane size.
+    */
+    int GetChromaPlaneSize() { assert(m_nWidth); return GetWidth() *  (m_nChromaHeight * m_nNumChromaPlanes) * m_nBPP; }
 
     /**
     *  @brief  This function is used to get the pitch of the device buffer holding the decoded frame.
     */
-    int GetDeviceFramePitch() { assert(m_nWidth); return m_nDeviceFramePitch ? (int)m_nDeviceFramePitch : m_nWidth * m_nBPP; }
+    int GetDeviceFramePitch() { assert(m_nWidth); return m_nDeviceFramePitch ? (int)m_nDeviceFramePitch : GetWidth() * m_nBPP; }
 
     /**
     *   @brief  This function is used to get the bit depth associated with the pixel format.
@@ -149,54 +167,66 @@ public:
     CUVIDEOFORMAT GetVideoFormatInfo() { assert(m_nWidth); return m_videoFormat; }
 
     /**
+    *   @brief  This function is used to get codec string from codec id
+    */
+    const char *GetCodecString(cudaVideoCodec eCodec);
+
+    /**
     *   @brief  This function is used to print information about the video stream
     */
     std::string GetVideoInfo() const { return m_videoInfo.str(); }
 
     /**
-    *   @brief  This function decodes a frame and returns frames that are available for display.
-        The frames should be used or buffered before making subsequent calls to the Decode function again
+    *   @brief  This function decodes a frame and returns the number of frames that are available for
+    *   display. All frames that are available for display should be read before making a subsequent decode call.
     *   @param  pData - pointer to the data buffer that is to be decoded
     *   @param  nSize - size of the data buffer in bytes
-    *   @param  pppFrame - CUvideopacketflags for setting decode options
-    *   @param  pnFrameReturned	 - pointer to array of decoded frames that are returned
-    *   @param  flags - CUvideopacketflags for setting decode options	
-    *   @param  ppTimestamp - pointer to array of timestamps for decoded frames that are returned
-    *   @param  timestamp - presentation timestamp
-    *   @param  stream - CUstream to be used for post-processing operations
+    *   @param  nFlags - CUvideopacketflags for setting decode options
+    *   @param  nTimestamp - presentation timestamp
     */
-    bool Decode(const uint8_t *pData, int nSize, uint8_t ***pppFrame, int *pnFrameReturned, uint32_t flags = 0, int64_t **ppTimestamp = NULL, int64_t timestamp = 0, CUstream stream = 0);
+    int Decode(const uint8_t *pData, int nSize, int nFlags = 0, int64_t nTimestamp = 0);
+
+    /**
+    *   @brief  This function returns a decoded frame and timestamp. This function should be called in a loop for
+    *   fetching all the frames that are available for display.
+    */
+    uint8_t* GetFrame(int64_t* pTimestamp = nullptr);
+
 
     /**
     *   @brief  This function decodes a frame and returns the locked frame buffers
     *   This makes the buffers available for use by the application without the buffers
     *   getting overwritten, even if subsequent decode calls are made. The frame buffers
-    *   remain locked, until ::UnlockFrame() is called
-    *   @param  pData - pointer to the data buffer that is to be decoded
-    *   @param  nSize - size of the data buffer in bytes
-    *   @param  pppFrame - CUvideopacketflags for setting decode options
-    *   @param  pnFrameReturned	 - pointer to array of decoded frames that are returned
-    *   @param  flags - CUvideopacketflags for setting decode options	
-    *   @param  ppTimestamp - pointer to array of timestamps for decoded frames that are returned
-    *   @param  timestamp - presentation timestamp	
-    *   @param  stream - CUstream to be used for post-processing operations
+    *   remain locked, until UnlockFrame() is called
     */
-    bool DecodeLockFrame(const uint8_t *pData, int nSize, uint8_t ***pppFrame, int *pnFrameReturned, uint32_t flags = 0, int64_t **ppTimestamp = NULL, int64_t timestamp = 0, CUstream stream = 0);
+    uint8_t* GetLockedFrame(int64_t* pTimestamp = nullptr);
 
     /**
     *   @brief  This function unlocks the frame buffer and makes the frame buffers available for write again
     *   @param  ppFrame - pointer to array of frames that are to be unlocked	
     *   @param  nFrame - number of frames to be unlocked
     */
-    void UnlockFrame(uint8_t **ppFrame, int nFrame);
+    void UnlockFrame(uint8_t **pFrame);
 
     /**
-    *   @brief  This function allow app to set decoder reconfig params
+    *   @brief  This function allows app to set decoder reconfig params
     *   @param  pCropRect - cropping rectangle coordinates
     *   @param  pResizeDim - width and height of resized output
     */
     int setReconfigParams(const Rect * pCropRect, const Dim * pResizeDim);
 
+    /**
+    *   @brief  This function allows app to set operating point for AV1 SVC clips
+    *   @param  opPoint - operating point of an AV1 scalable bitstream
+    *   @param  bDispAllLayers - Output all decoded frames of an AV1 scalable bitstream
+    */
+    void SetOperatingPoint(const uint32_t opPoint, const bool bDispAllLayers) { m_nOperatingPoint = opPoint; m_bDispAllLayers = bDispAllLayers; }
+
+    // start a timer
+    void   startTimer() { m_stDecode_time.Start(); }
+
+    // stop the timer
+    double stopTimer() { return m_stDecode_time.Stop(); }
 private:
     /**
     *   @brief  Callback function to be registered for getting a callback when decoding of sequence starts
@@ -212,6 +242,11 @@ private:
     *   @brief  Callback function to be registered for getting a callback when a decoded frame is available for display
     */
     static int CUDAAPI HandlePictureDisplayProc(void *pUserData, CUVIDPARSERDISPINFO *pDispInfo) { return ((NvDecoder *)pUserData)->HandlePictureDisplay(pDispInfo); }
+
+    /**
+    *   @brief  Callback function to be registered for getting a callback to get operating point when AV1 SVC sequence header start.
+    */
+    static int CUDAAPI HandleOperatingPointProc(void *pUserData, CUVIDOPERATINGPOINTINFO *pOPInfo) { return ((NvDecoder *)pUserData)->GetOperatingPoint(pOPInfo); }
 
     /**
     *   @brief  This function gets called when a sequence is ready to be decoded. The function also gets called
@@ -232,6 +267,10 @@ private:
     int HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo);
 
     /**
+    *   @brief  This function gets called when AV1 sequence encounter more than one operating points
+    */
+    int GetOperatingPoint(CUVIDOPERATINGPOINTINFO *pOPInfo);
+    /**
     *   @brief  This function reconfigure decoder if there is a change in sequence params.
     */
     int ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat);
@@ -239,7 +278,6 @@ private:
 private:
     CUcontext m_cuContext = NULL;
     CUvideoctxlock m_ctxLock;
-    std::mutex *m_pMutex;
     CUvideoparser m_hParser = NULL;
     CUvideodecoder m_hDecoder = NULL;
     bool m_bUseDeviceFrame;
@@ -250,16 +288,14 @@ private:
     int m_nSurfaceHeight = 0;
     int m_nSurfaceWidth = 0;
     cudaVideoCodec m_eCodec = cudaVideoCodec_NumCodecs;
-    cudaVideoChromaFormat m_eChromaFormat;
-    cudaVideoSurfaceFormat m_eOutputFormat;
+    cudaVideoChromaFormat m_eChromaFormat = cudaVideoChromaFormat_420;
+    cudaVideoSurfaceFormat m_eOutputFormat = cudaVideoSurfaceFormat_NV12;
     int m_nBitDepthMinus8 = 0;
     int m_nBPP = 1;
     CUVIDEOFORMAT m_videoFormat = {};
     Rect m_displayRect = {};
     // stock of frames
-    std::vector<uint8_t *> m_vpFrame; 
-    // decoded frames for return
-    std::vector<uint8_t *> m_vpFrameRet;
+    std::vector<uint8_t *> m_vpFrame;
     // timestamps of decoded frames
     std::vector<int64_t> m_vTimestamp;
     int m_nDecodedFrame = 0, m_nDecodedFrameReturned = 0;
@@ -277,4 +313,8 @@ private:
     unsigned int m_nMaxWidth = 0, m_nMaxHeight = 0;
     bool m_bReconfigExternal = false;
     bool m_bReconfigExtPPChange = false;
+    StopWatch m_stDecode_time;
+
+    unsigned int m_nOperatingPoint = 0;
+    bool  m_bDispAllLayers = false;
 };
