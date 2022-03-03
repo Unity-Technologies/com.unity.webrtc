@@ -27,7 +27,6 @@ namespace webrtc
 
     UnityVideoDecoderFactory::UnityVideoDecoderFactory(bool forTest)
     : internal_decoder_factory_(CreateDecoderFactory())
-    , forTest_(forTest)
     {
     }
 

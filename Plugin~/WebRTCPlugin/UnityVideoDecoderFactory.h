@@ -15,7 +15,6 @@ namespace webrtc
         UnityVideoDecoderFactory(bool forTest);
     private:
         const std::unique_ptr<VideoDecoderFactory> internal_decoder_factory_;
-        bool forTest_;
     };
 }
 }

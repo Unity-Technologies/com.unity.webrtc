@@ -15,9 +15,9 @@ namespace webrtc
 
     SoftwareEncoder::SoftwareEncoder(int width, int height, IGraphicsDevice* device, UnityRenderingExtTextureFormat textureFormat) :
     m_device(device),
+    m_encodeTex(nullptr),
     m_width(width),
     m_height(height),
-    m_encodeTex(nullptr),
     m_textureFormat(textureFormat)
     {
     }

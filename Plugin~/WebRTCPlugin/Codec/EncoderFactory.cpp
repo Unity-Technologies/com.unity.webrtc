@@ -121,7 +121,7 @@ namespace webrtc
             }           
         }
         encoder->InitV();
-        return std::move(encoder);
+        return encoder;
     }
     
 } // end namespace webrtc

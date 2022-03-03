@@ -154,8 +154,7 @@ namespace webrtc
         config.enable_implicit_rollback = true;
         return true;
     }
-#pragma warning(push)
-#pragma warning(disable: 4715)
+
     webrtc::SdpType ConvertSdpType(RTCSdpType type)
     {
         switch (type)
@@ -188,11 +187,9 @@ namespace webrtc
             throw std::invalid_argument("Unknown SdpType");
         }
     }
-#pragma warning(pop)
 
     Context::Context(int uid, UnityEncoderType encoderType, bool forTest)
-        : m_uid(uid)
-        , m_encoderType(encoderType)
+        : m_encoderType(encoderType)
         , m_workerThread(rtc::Thread::CreateWithSocketServer())
         , m_signalingThread(rtc::Thread::CreateWithSocketServer())
         , m_taskQueueFactory(CreateDefaultTaskQueueFactory())

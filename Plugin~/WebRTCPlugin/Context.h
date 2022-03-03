@@ -155,7 +155,6 @@ namespace webrtc
         std::mutex mutex;
 
     private:
-        int m_uid;
         UnityEncoderType m_encoderType;
         std::unique_ptr<rtc::Thread> m_workerThread;
         std::unique_ptr<rtc::Thread> m_signalingThread;

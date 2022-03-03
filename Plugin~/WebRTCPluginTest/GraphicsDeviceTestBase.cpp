@@ -357,8 +357,9 @@ IUnityInterface* CreateUnityInterface(UnityGfxRenderer renderer) {
     case kUnityGfxRendererMetal:
         return nullptr;
 #endif
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -387,8 +388,9 @@ void* CreateGfxDevice(UnityGfxRenderer renderer)
     case kUnityGfxRendererMetal:
         return CreateDeviceMetal();
 #endif
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -417,6 +419,8 @@ void DestroyGfxDevice(void* pGfxDevice, UnityGfxRenderer renderer)
     case kUnityGfxRendererMetal:
         return;
 #endif
+    default:
+        return;
     }
 }
 

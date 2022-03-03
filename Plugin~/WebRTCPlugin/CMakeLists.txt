@@ -48,7 +48,7 @@ target_sources(WebRTCLib
     UnityLogStream.cpp
 )
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Visual Studio Generator has not been supported supression warnings of external headers yet.
   # https://gitlab.kitware.com/cmake/cmake/-/issues/17904
   if(NOT CMAKE_GENERATOR MATCHES "Visual Studio")
@@ -58,37 +58,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         -Wall
         -Wextra
         -Wformat=2
-        # -Wno-class-varargs
-        # -Wno-comma
-        # -Wno-covered-switch-default
-        # -Wno-c++98-compat
-        # -Wno-c++98-compat-pedantic
-        # -Wno-deprecated-copy-dtor
-        # -Wno-documentation
-        # -Wno-documentation-unknown-command
-        # -Wno-double-promotion
-        # -Wno-float-equal
-        # -Wno-implicit-int-float-conversion
-        # -Wno-inconsistent-missing-destructor-override
-        # -Wno-language-extension-token
-        # -Wno-missing-field-initializers
-        # -Wno-missing-prototypes
-        # -Wno-nonportable-system-include-path
-        # -Wno-padded
-        # -Wno-reserved-id-macro
-        # -Wno-shadow-field
-        # -Wno-shadow-field-in-constructor
-        # -Wno-sign-conversion
-        # -Wno-suggest-destructor-override
-        # -Wno-suggest-override
-        # -Wno-switch-enum
-        # -Wno-thread-safety-negative
-        # -Wno-type-limits
-        # -Wno-undef
-        # -Wno-undefined-func-template
-        # -Wno-unused-parameter
-        # -Wno-unused-template
-        # -Wno-zero-as-null-pointer-constant
+        -Wno-unused-parameter
     )
   endif()
 endif()
@@ -297,32 +267,16 @@ elseif(Android)
 endif()
 
 target_include_directories(WebRTCLib
+  SYSTEM
   PUBLIC
-    .
+    ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
 )
 
 target_include_directories(WebRTCLib
-  SYSTEM
   PUBLIC
-    ${CMAKE_SOURCE_DIR}/unity/include
+    .
 )
-
-
-# file(GLOB UNITY_HEADER_FILES
-#   "${CMAKE_SOURCE_DIR}/unity/include/*.h"
-# )
-
-# set_source_files_properties(
-#   ${UNITY_HEADER_FILES}
-#   PROPERTIES 
-#   COMPILE_FLAGS 
-#   "-Wno-everything"
-# )
-
-#
-# Configure WebRTC Unity plugin
-#
 
 if(iOS)
   add_library(WebRTCPlugin SHARED)
