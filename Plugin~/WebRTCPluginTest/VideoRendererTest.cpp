@@ -65,7 +65,6 @@ protected:
 
     static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
     {
-        RTC_LOG(LS_INFO) << StringFormat("OnFrameSizeChanges width:%d height:%d", width, height).c_str();
     }
 
     void SendTestFrame(int width, int height)

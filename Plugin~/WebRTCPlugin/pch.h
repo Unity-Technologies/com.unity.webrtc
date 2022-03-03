@@ -136,14 +136,6 @@ namespace webrtc
 #if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
     void OnOpenGLDebugMessage( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 #endif
-    template<class ... Args>
-    std::string StringFormat(const std::string& format, Args ... args)
-    {
-        size_t size = snprintf(nullptr, 0, format.c_str(), args ...) + 1;
-        std::unique_ptr<char[]> buf(new char[size]);
-        snprintf(buf.get(), size, format.c_str(), args ...);
-        return std::string(buf.get(), buf.get() + size - 1);
-    }
 
     using byte = unsigned char;
     using uint8 = unsigned char;

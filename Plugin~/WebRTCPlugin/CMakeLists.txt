@@ -48,24 +48,27 @@ target_sources(WebRTCLib
     UnityLogStream.cpp
 )
 
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Visual Studio Generator has not been supported supression warnings of external headers yet.
   # https://gitlab.kitware.com/cmake/cmake/-/issues/17904
-  if(NOT CMAKE_GENERATOR MATCHES "Visual Studio")
-    target_compile_options(WebRTCLib
-      PUBLIC
-        -Werror 
-        -Wall
-        -Wextra
-        -Wformat=2
-        -Wno-unused-parameter
-    )
+  if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(VISUALSTUDIO_GENERATOR 1)
   endif()
+
+  target_compile_options(WebRTCLib
+    PUBLIC
+      $<$<NOT:${VISUALSTUDIO_GENERATOR}>:-Werror>
+      -Wall
+      -Wextra
+      -Wformat=2
+      -Wno-unused-parameter
+  )
 endif()
 
 target_compile_definitions(WebRTCLib
   PUBLIC 
-    "$<$<CONFIG:Debug>:DEBUG>"
+    $<$<CONFIG:Debug>:DEBUG>
 )
 
 
