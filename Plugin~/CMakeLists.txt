@@ -54,8 +54,6 @@ if(Windows)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0 /Zi /Od")
 endif()
 
-#set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-external:I")
-
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
 
