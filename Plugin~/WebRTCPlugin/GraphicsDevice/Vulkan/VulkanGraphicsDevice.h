@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+#include "IUnityRenderingExtensions.h"
+#include "IUnityGraphicsVulkan.h"
 #include "WebRTCConstants.h"
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaContext.h"
@@ -38,22 +41,20 @@ public:
     virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
 #endif
 private:
-
     VkResult CreateCommandPool();
 
     IUnityGraphicsVulkan*   m_unityVulkan;
-    VkInstance              m_instance;
     VkPhysicalDevice        m_physicalDevice;
     VkDevice                m_device;
     VkQueue                 m_graphicsQueue;
     VkCommandPool           m_commandPool;
     uint32_t m_queueFamilyIndex;
-
+    VkAllocationCallbacks* m_allocator;
 #if CUDA_PLATFORM
+    VkInstance m_instance;
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
 #endif
-    const VkAllocationCallbacks* m_allocator = nullptr;
 };
 
 //---------------------------------------------------------------------------------------------------------------------
