@@ -9,6 +9,10 @@ namespace unity
 namespace webrtc
 {
 
+// todo(kazuki):: fix workaround
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmacro-redefined"
+
 #define EXPORTED_VULKAN_FUNCTION(func) PFN_##func func;
 #define GLOBAL_VULKAN_FUNCTION(func) PFN_##func func;
 #define INSTANCE_VULKAN_FUNCTION(func) PFN_##func func;
@@ -77,6 +81,7 @@ bool LoadDeviceVulkanFunction(VkDevice device) {
 #include "ListOfVulkanFunctions.inl"
     return true;
 }
+#pragma clang diagnostic pop
 
 } // namespace webrtc
 } // namespace unity

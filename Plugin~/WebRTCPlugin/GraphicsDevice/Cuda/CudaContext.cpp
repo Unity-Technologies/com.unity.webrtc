@@ -91,8 +91,6 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
     }
 
     CUdevice cuDevice = 0;
-    bool foundDevice = false;
-
     result = cuInit(0);
     if (result != CUDA_SUCCESS) {
         return result;

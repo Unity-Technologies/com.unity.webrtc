@@ -158,7 +158,7 @@ int32_t GetPhysicalDeviceIndex(
     VkInstance instance, std::vector<VkPhysicalDevice>& list, bool* found)
 {
     std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
-    for(int i = 0; i < list.size(); ++i)
+    for(size_t i = 0; i < list.size(); ++i)
     {
         VkPhysicalDevice physicalDevice = list[i];
         if (!VulkanUtility::GetPhysicalDeviceUUIDInto(

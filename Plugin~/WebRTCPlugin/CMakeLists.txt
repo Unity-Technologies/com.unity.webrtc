@@ -54,6 +54,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # https://gitlab.kitware.com/cmake/cmake/-/issues/17904
   if(CMAKE_GENERATOR MATCHES "Visual Studio")
     set(VISUALSTUDIO_GENERATOR 1)
+  else()
+    set(VISUALSTUDIO_GENERATOR 0)
   endif()
 
   target_compile_options(WebRTCLib

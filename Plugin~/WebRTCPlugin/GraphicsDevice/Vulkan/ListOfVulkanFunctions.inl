@@ -1,3 +1,7 @@
+// todo(kazuki):: fix workaround
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-variable"
+
 #ifndef EXPORTED_VULKAN_FUNCTION
 #define EXPORTED_VULKAN_FUNCTION( function )
 #endif
@@ -76,3 +80,5 @@ DEVICE_VULKAN_FUNCTION(vkQueueSubmit)
 DEVICE_VULKAN_FUNCTION(vkDestroyPipelineLayout)
 
 #undef DEVICE_LEVEL_VULKAN_FUNCTION
+
+#pragma clang diagnostic pop

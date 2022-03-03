@@ -57,7 +57,7 @@ std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr)
     {
         return nullptr;
     }
-    return std::move(unityVulkanImage);
+    return unityVulkanImage;
 }
 
 //Returns null if failed
