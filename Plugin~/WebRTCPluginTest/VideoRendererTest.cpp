@@ -106,7 +106,7 @@ TEST_P(VideoRendererTest, ConvertVideoFrameToTexture)
     EXPECT_NE(nullptr, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     GraphicsDeviceParameters,
     VideoRendererTest,
     testing::ValuesIn(VALUES_TEST_ENV));

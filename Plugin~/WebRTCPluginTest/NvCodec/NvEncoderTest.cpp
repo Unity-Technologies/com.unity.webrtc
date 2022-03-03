@@ -49,7 +49,7 @@ TEST_P(NvEncoderTest, EncodeFrame) {
     EXPECT_EQ(before + 1, after);
 }
 
-INSTANTIATE_TEST_CASE_P( GraphicsDeviceParameters, NvEncoderTest, testing::ValuesIn(VALUES_TEST_ENV));
+INSTANTIATE_TEST_SUITE_P( GraphicsDeviceParameters, NvEncoderTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc
 } // end namespace unity

@@ -108,7 +108,7 @@ namespace webrtc
         #if defined(__clang__) || defined(__GNUC__)
         __attribute__((optnone))
         #endif
-        explicit operator const absl::optional<T>&() const
+        explicit operator const absl::optional<T>() const
         {
             absl::optional<T> dst = absl::nullopt;
             if (hasValue)
@@ -1053,9 +1053,10 @@ extern "C"
         return transceiver->direction();
     }
 
-    UNITY_INTERFACE_EXPORT void TransceiverSetDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection direction)
+    UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetDirection(RtpTransceiverInterface* transceiver, RtpTransceiverDirection direction)
     {
-        transceiver->SetDirection(direction);
+        RTCError error = transceiver->SetDirectionWithError(direction);
+        return error.type();
     }
 
     struct RTCRtpCodecCapability
@@ -1078,7 +1079,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT RTCErrorType TransceiverSetCodecPreferences(RtpTransceiverInterface* transceiver, RTCRtpCodecCapability* codecs, size_t length)
     {
         std::vector<RtpCodecCapability> _codecs(length);
-        for(int i = 0; i < length; i++)
+        for(size_t i = 0; i < length; i++)
         {
             std::string mimeType = ConvertString(codecs[i].mimeType);
             std::tie(_codecs[i].kind, _codecs[i].name) = ConvertMimeType(mimeType);
