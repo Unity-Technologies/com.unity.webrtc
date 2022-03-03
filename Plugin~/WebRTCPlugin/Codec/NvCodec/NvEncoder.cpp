@@ -50,7 +50,7 @@ namespace webrtc
         }
 #pragma region open an encode session
         //open an encode session
-        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncodeSessionExParams = { 0 };
+        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS openEncodeSessionExParams = {};
         openEncodeSessionExParams.version = NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER;
 
         openEncodeSessionExParams.device = m_device->GetEncodeDevicePtrV();
@@ -59,13 +59,13 @@ namespace webrtc
 
         errorCode = pNvEncodeAPI->nvEncOpenEncodeSessionEx(&openEncodeSessionExParams, &pEncoderInterface);
 
-        if(!NV_RESULT(errorCode))
+        if(!(NV_RESULT(errorCode)))
         {
             m_initializationResult = CodecInitializationResult::EncoderInitializationFailed;
             return;
         }
 
-        checkf(NV_RESULT(errorCode), StringFormat("Unable to open NvEnc encode session %d", errorCode).c_str());
+        checkf(NV_RESULT(errorCode), "Unable to open NvEnc encode session");
 #pragma endregion
 #pragma region set initialization parameters
         nvEncInitializeParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
@@ -88,7 +88,7 @@ namespace webrtc
         nvEncInitializeParams.maxEncodeHeight = 0;
 #pragma endregion
 #pragma region get preset config and set it
-        NV_ENC_PRESET_CONFIG presetConfig = { 0 };
+        NV_ENC_PRESET_CONFIG presetConfig = {};
         presetConfig.version = NV_ENC_PRESET_CONFIG_VER;
         presetConfig.presetCfg.version = NV_ENC_CONFIG_VER;
         errorCode = pNvEncodeAPI->nvEncGetEncodePresetConfig(pEncoderInterface, nvEncInitializeParams.encodeGUID, nvEncInitializeParams.presetGUID, &presetConfig);
@@ -110,7 +110,7 @@ namespace webrtc
         nvEncConfig.encodeCodecConfig.h264Config.level = NV_ENC_LEVEL_H264_51;
 #pragma endregion
 #pragma region get encoder capability
-        NV_ENC_CAPS_PARAM capsParam = { 0 };
+        NV_ENC_CAPS_PARAM capsParam = {};
         capsParam.version = NV_ENC_CAPS_PARAM_VER;
         capsParam.capsToQuery = NV_ENC_CAPS_ASYNC_ENCODE_SUPPORT;
         int32 asyncMode = 0;
@@ -284,7 +284,7 @@ namespace webrtc
         uint32 bufferIndexToWrite = frameCount % bufferedFrameNum;
         Frame& frame = bufferedFrames[bufferIndexToWrite];
 #pragma region configure per-frame encode parameters
-        NV_ENC_PIC_PARAMS picParams = { 0 };
+        NV_ENC_PIC_PARAMS picParams = {};
         picParams.version = NV_ENC_PIC_PARAMS_VER;
         picParams.pictureStruct = NV_ENC_PIC_STRUCT_FRAME;
         picParams.inputBuffer = frame.inputFrame.mappedResource;
@@ -312,7 +312,7 @@ namespace webrtc
     void NvEncoder::ProcessEncodedFrame(Frame& frame, int64_t timestamp_us)
     {
 #pragma region retrieve encoded frame from output buffer
-        NV_ENC_LOCK_BITSTREAM lockBitStream = { 0 };
+        NV_ENC_LOCK_BITSTREAM lockBitStream = {};
         lockBitStream.version = NV_ENC_LOCK_BITSTREAM_VER;
         lockBitStream.outputBitstream = frame.outputFrame;
         lockBitStream.doNotWait = nvEncInitializeParams.enableEncodeAsync;
@@ -347,7 +347,8 @@ namespace webrtc
 
     NV_ENC_REGISTERED_PTR NvEncoder::RegisterResource(NV_ENC_INPUT_RESOURCE_TYPE inputType, void *buffer)
     {
-        NV_ENC_REGISTER_RESOURCE registerResource = { NV_ENC_REGISTER_RESOURCE_VER };
+        NV_ENC_REGISTER_RESOURCE registerResource = {};
+        registerResource.version = NV_ENC_REGISTER_RESOURCE_VER;
         registerResource.resourceType = inputType;
         registerResource.resourceToRegister = buffer;
 
@@ -369,7 +370,7 @@ namespace webrtc
     }
     void NvEncoder::MapResources(InputFrame& inputFrame)
     {
-        NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { 0 };
+        NV_ENC_MAP_INPUT_RESOURCE mapInputResource = {};
         mapInputResource.version = NV_ENC_MAP_INPUT_RESOURCE_VER;
         mapInputResource.registeredResource = inputFrame.registeredResource;
         errorCode = pNvEncodeAPI->nvEncMapInputResource(pEncoderInterface, &mapInputResource);
@@ -378,7 +379,7 @@ namespace webrtc
     }
     NV_ENC_OUTPUT_PTR NvEncoder::InitializeBitstreamBuffer()
     {
-        NV_ENC_CREATE_BITSTREAM_BUFFER createBitstreamBuffer = { 0 };
+        NV_ENC_CREATE_BITSTREAM_BUFFER createBitstreamBuffer = {};
         createBitstreamBuffer.version = NV_ENC_CREATE_BITSTREAM_BUFFER_VER;
         errorCode = pNvEncodeAPI->nvEncCreateBitstreamBuffer(pEncoderInterface, &createBitstreamBuffer);
         checkf(NV_RESULT(errorCode), StringFormat("nvEncCreateBitstreamBuffer error is %d", errorCode).c_str());
