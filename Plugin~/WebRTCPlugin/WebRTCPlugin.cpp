@@ -55,7 +55,7 @@ namespace webrtc
         int32_t length;
         T* values;
 
-        T& operator[](int i) const
+        T& operator[](size_t i) const
         {
             return values[i];
         }
@@ -155,7 +155,7 @@ namespace webrtc
         while (true)
         {
             pos = s.find(delimiter);
-            int length = pos;
+            size_t length = pos;
             if(pos == std::string::npos)
                 length = str.length();
             if (length == 0)
