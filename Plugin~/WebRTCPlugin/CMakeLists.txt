@@ -64,7 +64,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 target_compile_definitions(WebRTCLib
-  PRIVATE 
+  PUBLIC 
     "$<$<CONFIG:Debug>:DEBUG>"
 )
 
@@ -315,11 +315,6 @@ if(Android)
       Jni.cpp
   )
 endif()
-
-target_compile_definitions(WebRTCPlugin
-  PRIVATE 
-    "$<$<CONFIG:Debug>:DEBUG>"
-)
 
 # rename dll/framework filename
 set_target_properties(WebRTCPlugin

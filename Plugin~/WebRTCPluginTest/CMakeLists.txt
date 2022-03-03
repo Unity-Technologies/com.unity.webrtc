@@ -43,11 +43,6 @@ endif()
 
 include(GoogleTest)
 
-target_compile_definitions(WebRTCLibTest
-  PRIVATE 
-    "$<$<CONFIG:Debug>:DEBUG>"
-)
-
 if(NOT iOS)
   target_include_directories(WebRTCLibTest
     PRIVATE
