@@ -26,6 +26,8 @@ namespace unity
 {
 namespace webrtc
 {
+    std::unique_ptr<ContextManager> ContextManager::s_instance;
+
     ContextManager* ContextManager::GetInstance()
     {
         if (s_instance == nullptr)
