@@ -51,7 +51,15 @@ namespace Unity.WebRTC
         public RTCRtpTransceiverDirection Direction
         {
             get { return NativeMethods.TransceiverGetDirection(GetSelfOrThrow()); }
-            set { NativeMethods.TransceiverSetDirection(GetSelfOrThrow(), value); }
+            set
+            {
+                RTCErrorType errorType = NativeMethods.TransceiverSetDirection(GetSelfOrThrow(), value);
+                if (errorType != RTCErrorType.None)
+                {
+                    var error = new RTCError { errorType = errorType };
+                    throw new RTCErrorException(ref error);
+                }
+            }
         }
 
         /// <summary>
