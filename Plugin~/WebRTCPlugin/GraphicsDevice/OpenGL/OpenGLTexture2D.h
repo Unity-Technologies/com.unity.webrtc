@@ -31,10 +31,14 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------------
 
+// todo(kazuki):: fix workaround
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
 void* OpenGLTexture2D::GetNativeTexturePtrV() { return (void*)m_texture; }
 const void* OpenGLTexture2D::GetNativeTexturePtrV() const { return (void*)m_texture; };
 void* OpenGLTexture2D::GetEncodeTexturePtrV() { return (void*)m_texture; }
 const void* OpenGLTexture2D::GetEncodeTexturePtrV() const { return (const void*)m_texture; }
+#pragma clang diagnostic pop
 
 } // end namespace webrtd
 } // end namespace unity

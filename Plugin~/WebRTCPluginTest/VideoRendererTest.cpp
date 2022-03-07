@@ -65,7 +65,6 @@ protected:
 
     static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
     {
-        RTC_LOG(LS_INFO) << StringFormat("OnFrameSizeChanges width:%d height:%d", width, height).c_str();
     }
 
     void SendTestFrame(int width, int height)
@@ -106,7 +105,7 @@ TEST_P(VideoRendererTest, ConvertVideoFrameToTexture)
     EXPECT_NE(nullptr, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     GraphicsDeviceParameters,
     VideoRendererTest,
     testing::ValuesIn(VALUES_TEST_ENV));

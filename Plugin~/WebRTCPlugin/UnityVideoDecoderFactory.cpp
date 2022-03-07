@@ -27,7 +27,9 @@ namespace webrtc
 
     UnityVideoDecoderFactory::UnityVideoDecoderFactory(bool forTest)
     : internal_decoder_factory_(CreateDecoderFactory())
+#if CUDA_PLATFORM
     , forTest_(forTest)
+#endif
     {
     }
 

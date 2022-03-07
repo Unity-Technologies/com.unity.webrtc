@@ -9,7 +9,7 @@ namespace webrtc
 
     class PeerConnectionObject;
     class DataChannelObject;
-    using DelegateOnMessage = void(*)(DataChannelInterface*, const byte*, int);
+    using DelegateOnMessage = void(*)(DataChannelInterface*, const byte*, int32_t);
     using DelegateOnOpen = void(*)(DataChannelInterface*);
     using DelegateOnClose = void(*)(DataChannelInterface*);
 

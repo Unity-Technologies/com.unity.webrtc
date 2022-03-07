@@ -55,8 +55,7 @@ namespace webrtc
             size_t size = buffer.data.size();
             if (onMessage != nullptr)
             {
-#pragma warning(suppress: 4267)
-                onMessage(this->dataChannel, buffer.data.data(), size);
+                onMessage(this->dataChannel, buffer.data.data(), static_cast<int32_t>(size));
             }
         }
     }

@@ -38,7 +38,6 @@ protected:
 
     static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
     {
-        RTC_LOG(LS_INFO) << StringFormat("OnFrameSizeChanges width:%d height:%d", width, height).c_str();
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
@@ -143,7 +142,7 @@ TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     context->RemoveRefPtr(source);
 }
 
-INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
+INSTANTIATE_TEST_SUITE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc
 } // end namespace unity

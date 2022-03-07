@@ -26,13 +26,21 @@ namespace unity
 {
 namespace webrtc
 {
+    std::unique_ptr<ContextManager> ContextManager::s_instance;
 
-    ContextManager ContextManager::s_instance;
+    ContextManager* ContextManager::GetInstance()
+    {
+        if (s_instance == nullptr)
+        {
+            s_instance = std::make_unique<ContextManager>();
+        }
+        return s_instance.get();
+    }
 
     Context* ContextManager::GetContext(int uid) const
     {
-        auto it = s_instance.m_contexts.find(uid);
-        if (it != s_instance.m_contexts.end()) {
+        auto it = s_instance->m_contexts.find(uid);
+        if (it != s_instance->m_contexts.end()) {
             return it->second.get();
         }
         return nullptr;
@@ -40,13 +48,13 @@ namespace webrtc
 
     Context* ContextManager::CreateContext(int uid, UnityEncoderType encoderType, bool forTest)
     {
-        auto it = s_instance.m_contexts.find(uid);
-        if (it != s_instance.m_contexts.end()) {
+        auto it = s_instance->m_contexts.find(uid);
+        if (it != s_instance->m_contexts.end()) {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
         auto ctx = new Context(uid, encoderType, forTest);
-        s_instance.m_contexts[uid].reset(ctx);
+        s_instance->m_contexts[uid].reset(ctx);
         return ctx;
     }
 
@@ -57,7 +65,7 @@ namespace webrtc
 
     bool ContextManager::Exists(Context *context)
     {
-        for(auto it = s_instance.m_contexts.begin(); it != s_instance.m_contexts.end(); ++it)
+        for(auto it = s_instance->m_contexts.begin(); it != s_instance->m_contexts.end(); ++it)
         {
             if(it->second.get() == context)
                 return true;
@@ -67,10 +75,10 @@ namespace webrtc
 
     void ContextManager::DestroyContext(int uid)
     {
-        auto it = s_instance.m_contexts.find(uid);
-        if (it != s_instance.m_contexts.end())
+        auto it = s_instance->m_contexts.find(uid);
+        if (it != s_instance->m_contexts.end())
         {
-            s_instance.m_contexts.erase(it);
+            s_instance->m_contexts.erase(it);
             DebugLog("Unregistered context with ID %d", uid);
         }
     }
@@ -146,8 +154,7 @@ namespace webrtc
         config.enable_implicit_rollback = true;
         return true;
     }
-#pragma warning(push)
-#pragma warning(disable: 4715)
+
     webrtc::SdpType ConvertSdpType(RTCSdpType type)
     {
         switch (type)
@@ -180,14 +187,12 @@ namespace webrtc
             throw std::invalid_argument("Unknown SdpType");
         }
     }
-#pragma warning(pop)
 
     Context::Context(int uid, UnityEncoderType encoderType, bool forTest)
-        : m_uid(uid)
+        : m_encoderType(encoderType)
         , m_workerThread(rtc::Thread::CreateWithSocketServer())
         , m_signalingThread(rtc::Thread::CreateWithSocketServer())
         , m_taskQueueFactory(CreateDefaultTaskQueueFactory())
-        , m_encoderType(encoderType)
     {
         m_workerThread->Start();
         m_signalingThread->Start();
@@ -496,10 +501,14 @@ namespace webrtc
         rtc::scoped_refptr<PeerConnectionObject> obj =
                 new rtc::RefCountedObject<PeerConnectionObject>(*this);
         PeerConnectionDependencies dependencies(obj);
-        obj->connection = m_peerConnectionFactory->CreatePeerConnection(
+        auto connection = m_peerConnectionFactory->CreatePeerConnectionOrError(
                 config, std::move(dependencies));
-        if (obj->connection == nullptr)
+        if (!connection.ok())
+        {
+            RTC_LOG(LS_ERROR) << connection.error().message();
             return nullptr;
+        }
+        obj->connection = connection.MoveValue();
         const PeerConnectionObject* ptr = obj.get();
         m_mapClients[ptr] = std::move(obj);
         return m_mapClients[ptr].get();

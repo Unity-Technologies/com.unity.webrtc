@@ -48,6 +48,32 @@ target_sources(WebRTCLib
     UnityLogStream.cpp
 )
 
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Visual Studio Generator has not been supported supression warnings of external headers yet.
+  # https://gitlab.kitware.com/cmake/cmake/-/issues/17904
+  if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(VISUALSTUDIO_GENERATOR 1)
+  else()
+    set(VISUALSTUDIO_GENERATOR 0)
+  endif()
+
+  target_compile_options(WebRTCLib
+    PUBLIC
+      $<$<NOT:${VISUALSTUDIO_GENERATOR}>:-Werror>
+      -Wall
+      -Wextra
+      -Wformat=2
+      -Wno-unused-parameter
+  )
+endif()
+
+target_compile_definitions(WebRTCLib
+  PUBLIC 
+    $<$<CONFIG:Debug>:DEBUG>
+)
+
+
 if(iOS OR macOS)
   target_sources(WebRTCLib
     PRIVATE
@@ -74,13 +100,6 @@ if(Windows)
                    CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
     string(REPLACE /GR /GR- "${flag_var}" "${${flag_var}}")
   endforeach()
-endif()
-
-if(UNIX)
-  target_compile_options(WebRTCLib 
-    PUBLIC
-      -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter -Wno-missing-field-initializers -Wno-long-long
-  )
 endif()
 
 if(Windows)
@@ -111,6 +130,7 @@ if(Windows)
       Strmiids
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
@@ -145,6 +165,7 @@ elseif(macOS)
       ${FRAMEWORK_LIBS}
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
@@ -173,6 +194,7 @@ elseif(Linux)
       ${GLIB_LIBRARIES}
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
@@ -200,6 +222,7 @@ elseif(iOS)
       WEBRTC_POSIX
   )
   target_include_directories(WebRTCLib
+    SYSTEM
     PUBLIC
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
@@ -249,15 +272,16 @@ elseif(Android)
 endif()
 
 target_include_directories(WebRTCLib
+  SYSTEM
   PUBLIC
-    .
     ${CMAKE_SOURCE_DIR}/unity/include
     ${WEBRTC_INCLUDE_DIR}
 )
 
-#
-# Configure WebRTC Unity plugin
-#
+target_include_directories(WebRTCLib
+  PUBLIC
+    .
+)
 
 if(iOS)
   add_library(WebRTCPlugin SHARED)

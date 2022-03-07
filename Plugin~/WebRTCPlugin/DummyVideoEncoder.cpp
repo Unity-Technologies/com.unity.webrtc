@@ -48,13 +48,13 @@ namespace webrtc
 
     int32_t DummyVideoEncoder::RegisterEncodeCompleteCallback(webrtc::EncodedImageCallback* callback)
     {
-        this->callback = callback;
+        this->m_callback = callback;
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
     int32_t DummyVideoEncoder::Release()
     {
-        this->callback = nullptr;
+        this->m_callback = nullptr;
         this->m_setKeyFrame.disconnect_all();
         this->m_setRates.disconnect_all();
         return WEBRTC_VIDEO_CODEC_OK;
@@ -103,7 +103,7 @@ namespace webrtc
         codecInfo.codecType = webrtc::kVideoCodecH264;
         codecInfo.codecSpecific.H264.packetization_mode = webrtc::H264PacketizationMode::NonInterleaved;
 
-        const auto result = callback->OnEncodedImage(m_encodedImage, &codecInfo);
+        const auto result = m_callback->OnEncodedImage(m_encodedImage, &codecInfo);
         if (result.error != webrtc::EncodedImageCallback::Result::OK)
         {
             LogPrint("Encode callback failed %d", result.error);
@@ -120,7 +120,7 @@ namespace webrtc
 
     void DummyVideoEncoder::SetRates(const RateControlParameters& parameters)
     {
-        int64_t frameRate = parameters.framerate_fps;
+        int64_t frameRate = static_cast<int64_t>(parameters.framerate_fps);
 
         uint32_t bitRate = parameters.bitrate.get_sum_bps();
 

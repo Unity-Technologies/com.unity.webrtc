@@ -14,12 +14,15 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, c
     const VkPhysicalDevice physicalDevice,
     const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex)
     : m_unityVulkan(unityVulkan)
-    , m_instance(instance)
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
     , m_commandPool(VK_NULL_HANDLE)
     , m_queueFamilyIndex(queueFamilyIndex)
+    , m_allocator(nullptr)
+#if CUDA_PLATFORM
+    , m_instance(instance)
+#endif
 {
 }
 
@@ -57,7 +60,7 @@ std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr)
     {
         return nullptr;
     }
-    return std::move(unityVulkanImage);
+    return unityVulkanImage;
 }
 
 //Returns null if failed

@@ -98,7 +98,7 @@ TEST_P(VideoTrackSourceTest, SendTestFrame)
 }
 #endif
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     GraphicsDeviceParameters,
     VideoTrackSourceTest,
     testing::ValuesIn(VALUES_TEST_ENV));

@@ -15,7 +15,9 @@ namespace webrtc
         UnityVideoDecoderFactory(bool forTest);
     private:
         const std::unique_ptr<VideoDecoderFactory> internal_decoder_factory_;
+#if CUDA_PLATFORM
         bool forTest_;
+#endif
     };
 }
 }

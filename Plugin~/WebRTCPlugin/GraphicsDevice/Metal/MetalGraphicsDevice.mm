@@ -114,7 +114,11 @@ namespace webrtc
         textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
         textureDescriptor.width = width;
         textureDescriptor.height = height;
-        textureDescriptor.allowGPUOptimizedContents = false;
+        if (@available(macOS 10.14, iOS 12.0, *)) {
+            textureDescriptor.allowGPUOptimizedContents = false;
+        } else {
+            // Fallback on earlier versions
+        }
 #if TARGET_OS_OSX
         textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeManaged);
 #else

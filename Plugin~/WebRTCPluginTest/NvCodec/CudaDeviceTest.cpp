@@ -17,7 +17,7 @@ TEST_P(CudaDeviceTest, IsNvSupported) {
     EXPECT_TRUE(m_device->IsCudaSupport());
 }
 
-INSTANTIATE_TEST_CASE_P(GraphicsDeviceParameters,
+INSTANTIATE_TEST_SUITE_P(GraphicsDeviceParameters,
     CudaDeviceTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc

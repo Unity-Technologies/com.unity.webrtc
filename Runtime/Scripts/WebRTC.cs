@@ -986,7 +986,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCRtpTransceiverDirection TransceiverGetDirection(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]
-        public static extern void TransceiverSetDirection(IntPtr transceiver, RTCRtpTransceiverDirection direction);
+        public static extern RTCErrorType TransceiverSetDirection(IntPtr transceiver, RTCRtpTransceiverDirection direction);
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType TransceiverSetCodecPreferences(IntPtr transceiver, IntPtr capabilities, long length);
         [DllImport(WebRTC.Lib)]
