@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
-# set default DEPLOYMENT_TARGET version for iOS platform
-if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-  set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 10.0)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
-endif()
+set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "10.0" CACHE STRING "Minimum iOS deployment version")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
 project(webrtc
   VERSION 2.4.0
