@@ -1,31 +1,36 @@
 #pragma once
-#include "gtest/gtest.h"
+#include "IUnityGraphics.h"
+#include "IUnityRenderingExtensions.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-using std::tuple;
-using testing::Values;
+    using std::tuple;
+    using testing::Values;
 
-class IGraphicsDevice;
-class GraphicsDeviceTestBase
-    : public testing::TestWithParam<tuple<UnityGfxRenderer, UnityEncoderType, UnityRenderingExtTextureFormat> >
-{
-public:
-    GraphicsDeviceTestBase();
-    virtual ~GraphicsDeviceTestBase();
-    void SetUp() override;
-    void TearDown() override;
-protected:
-    void* m_pNativeGfxDevice;
-    IGraphicsDevice* m_device;
-    UnityEncoderType m_encoderType;
-    UnityGfxRenderer m_unityGfxRenderer;
-    UnityRenderingExtTextureFormat m_textureFormat;
-};
+    class IGraphicsDevice;
+    class GraphicsDeviceContainer;
+
+    class GraphicsDeviceTestBase
+        : public testing::TestWithParam<tuple<UnityGfxRenderer, UnityEncoderType, UnityRenderingExtTextureFormat>>
+    {
+    public:
+        explicit GraphicsDeviceTestBase();
+        virtual ~GraphicsDeviceTestBase();
+        void SetUp() override;
+        void TearDown() override;
+        IGraphicsDevice* device();
+
+    protected:
+        UnityGfxRenderer m_unityGfxRenderer;
+        UnityRenderingExtTextureFormat m_textureFormat;
+        UnityEncoderType m_encoderType;
+        std::unique_ptr<GraphicsDeviceContainer> container_;
+    };
 
 static tuple<UnityGfxRenderer, UnityEncoderType, UnityRenderingExtTextureFormat> VALUES_TEST_ENV[] = {
 #if SUPPORT_D3D11

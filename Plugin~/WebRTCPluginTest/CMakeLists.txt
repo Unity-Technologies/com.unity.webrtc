@@ -6,17 +6,20 @@ target_sources(WebRTCLibTest
     pch.h
     ContextTest.cpp
     GraphicsDeviceTest.cpp
+    GraphicsDeviceContainer.cpp
+    GraphicsDeviceContainer.h
+    GraphicsDeviceContainerTest.cpp
     GraphicsDeviceTestBase.cpp
     GraphicsDeviceTestBase.h
 )
 
 # todo(kazuki):: fix linker error on macOS and iOS
 if(NOT (macOS OR iOS))
-target_sources(WebRTCLibTest
-  PRIVATE
-    VideoRendererTest.cpp
-    VideoTrackSourceTest.cpp
-)    
+  target_sources(WebRTCLibTest
+    PRIVATE
+      VideoRendererTest.cpp
+      VideoTrackSourceTest.cpp
+  )    
 endif()
 
 if(Windows OR Linux)
