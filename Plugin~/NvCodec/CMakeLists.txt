@@ -40,10 +40,18 @@ else ()
   find_library(NVENCODEAPI_LIB nvidia-encode)
 endif()
 
-if(WIN32)
+if(Windows)
   # Select runtime library (MT, MTD) on windows platform
   set_target_properties(NvCodec
     PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  )
+endif()
+
+if(Linux)
+  # enable -fPIC option
+  set_target_properties(NvCodec
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE ON
   )
 endif()
 

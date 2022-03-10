@@ -73,7 +73,6 @@ target_compile_definitions(WebRTCLib
     $<$<CONFIG:Debug>:DEBUG>
 )
 
-
 if(iOS OR macOS)
   target_sources(WebRTCLib
     PRIVATE
@@ -190,6 +189,7 @@ elseif(Linux)
     PRIVATE
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
+      ${NVCODEC_LIBRARIES}
       ${Vulkan_LIBRARY}
       ${GLIB_LIBRARIES}
   )
