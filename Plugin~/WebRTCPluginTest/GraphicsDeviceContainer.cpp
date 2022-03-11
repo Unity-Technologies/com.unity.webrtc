@@ -54,6 +54,10 @@ namespace webrtc
 
     void* CreateDeviceD3D11()
     {
+        // recycle device
+        if (pD3D11Device.Get() != nullptr)
+            return pD3D11Device.Get();
+
         auto hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory));
         EXPECT_TRUE(SUCCEEDED(hr));
         EXPECT_NE(nullptr, pFactory.Get());
@@ -428,7 +432,8 @@ namespace webrtc
     GraphicsDeviceContainer::GraphicsDeviceContainer(UnityGfxRenderer renderer)
     {
         nativeGfxDevice_ = CreateNativeGfxDevice(renderer);
-        const auto unityInterface = CreateUnityInterface(renderer);
+        renderer_ = renderer;
+        const auto unityInterface = CreateUnityInterface(renderer_);
 
         IGraphicsDevice* device = nullptr;
         if (renderer == kUnityGfxRendererD3D12)
