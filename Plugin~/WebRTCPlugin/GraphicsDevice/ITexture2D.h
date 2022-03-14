@@ -1,9 +1,5 @@
 #pragma once
 
-#if CUDA_PLATFORM
-#include <cuda.h>
-#endif
-
 #include "GpuMemoryBuffer.h"
 
 namespace unity
