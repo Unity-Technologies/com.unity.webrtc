@@ -12,6 +12,7 @@ namespace webrtc
         : array(nullptr)
         , devicePtr(0)
         , resource(nullptr)
+        , externalMemory(nullptr)
 #endif
     {
     }
@@ -21,6 +22,10 @@ namespace webrtc
     GpuMemoryBufferHandle::~GpuMemoryBufferHandle()
     {
 #if CUDA_PLATFORM
+        if (externalMemory != nullptr)
+        {
+            cuDestroyExternalMemory(externalMemory);
+        }
         if (resource != nullptr)
         {
             cuGraphicsUnmapResources(1, &resource, 0);

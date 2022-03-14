@@ -206,12 +206,6 @@ namespace webrtc
 
         const NvEncInputFrame* encoderInputFrame = m_encoder->GetNextInputFrame();
 
-        // if (!ck(cuCtxPushCurrent(m_context)))
-        //{
-        //    RTC_LOG(LS_ERROR) << "cuCtxPushCurrent";
-        //    return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
-        //}
-
         // Copy CUDA buffer in VideoFrame to encoderInputFrame.
         auto buffer = video_frame->GetGpuMemoryBuffer();
         CopyResource(encoderInputFrame, buffer, size, m_context, m_memoryType);

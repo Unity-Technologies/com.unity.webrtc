@@ -82,9 +82,12 @@ TEST_P(GraphicsDeviceTest, Map)
     const uint32_t width = 256;
     const uint32_t height = 256;
     const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
-
     std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
     EXPECT_NE(handle, nullptr);
+
+    const std::unique_ptr<ITexture2D> src2(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    std::unique_ptr<GpuMemoryBufferHandle> handle2 = device()->Map(src2.get());
+    EXPECT_NE(handle2, nullptr);
 }
 
 #endif

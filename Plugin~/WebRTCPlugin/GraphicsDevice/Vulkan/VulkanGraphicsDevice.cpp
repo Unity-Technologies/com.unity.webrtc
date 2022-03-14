@@ -203,7 +203,8 @@ bool VulkanGraphicsDevice::CopyResourceFromNativeV(
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-VkResult VulkanGraphicsDevice::CreateCommandPool() {
+VkResult VulkanGraphicsDevice::CreateCommandPool()
+{
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = m_queueFamilyIndex;
@@ -249,23 +250,74 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
     std::unique_ptr<GpuMemoryBufferHandle> VulkanGraphicsDevice::Map(ITexture2D* texture)
     {
 #if CUDA_PLATFORM
-        //todo(kazuki):: WIP
-
         // set context on the thread.
         cuCtxPushCurrent(GetCUcontext());
 
-        //VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
-        ////vulkanTexture->geet
+        VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
 
-        //if (CUDA_SUCCESS != m_cudaImage.Init(m_device, this))
-        //    throw;
+        void* exportHandle = VulkanUtility::GetExportHandle(m_device, vulkanTexture->GetTextureImageMemory());
+
+        if (!exportHandle)
+        {
+            RTC_LOG(LS_ERROR) << "cannot get export handle";
+            throw;
+        }
+
+        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
+#ifndef _WIN32
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD;
+#else
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32;
+#endif
+        memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(exportHandle));
+        memDesc.size = vulkanTexture->GetTextureImageMemorySize();
+
+        CUresult result;
+        CUexternalMemory externalMemory;
+        result = cuImportExternalMemory(&externalMemory, &memDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error";
+            throw;
+        }
+
+        const VkExtent2D extent = { texture->GetWidth(), texture->GetHeight() };
+        CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
+        arrayDesc.Width = extent.width;
+        arrayDesc.Height = extent.height;
+        arrayDesc.Depth = 0; /* CUDA 2D arrays are defined to have depth 0 */
+        arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT32;
+        arrayDesc.NumChannels = 1;
+        arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
+
+        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
+        mipmapArrayDesc.arrayDesc = arrayDesc;
+        mipmapArrayDesc.numLevels = 1;
+
+        CUmipmappedArray mipmappedArray;
+        result = cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error";
+            throw;
+        }
+
+        CUarray array;
+        result = cuMipmappedArrayGetLevel(&array, mipmappedArray, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
+            throw;
+        }
+
         cuCtxPopCurrent(NULL);
 
         std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
-        //handle->array = m_cudaImage.GetArray();
+        handle->array = array;
+        handle->externalMemory = externalMemory;
         return handle;
 #else
-    RTC_CHECK_NOTREACHED();
+        return nullptr;
 #endif
     }
 
