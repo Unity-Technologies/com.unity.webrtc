@@ -58,16 +58,5 @@ namespace webrtc
     }
 
     void GpuMemoryBufferFromUnity::CopyTo(ITexture2D* tex) { device_->CopyResourceV(tex, texture_.get()); }
-
-    //FakeGpuMemoryBuffer::FakeGpuMemoryBuffer(const ITexture2D* texture, UnityRenderingExtTextureFormat format)
-    //    : format_(format)
-    //    , texture_(texture)
-    //{
-    //    size_ = Size(texture_->GetWidth(), texture_->GetHeight());
-    //}
-
-    //void FakeGpuMemoryBuffer::CopyTo(ITexture2D* tex) { }
-
-    //FakeGpuMemoryBuffer::~FakeGpuMemoryBuffer() { }
 }
 }

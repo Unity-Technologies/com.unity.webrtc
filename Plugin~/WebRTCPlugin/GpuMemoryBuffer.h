@@ -40,6 +40,7 @@ namespace webrtc
         virtual rtc::scoped_refptr<I420BufferInterface> ToI420() = 0;
 
         virtual void CopyTo(ITexture2D* tex) = 0;
+
     protected:
         ~GpuMemoryBufferInterface() override = default;
     };
@@ -59,31 +60,12 @@ namespace webrtc
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;
 
         void CopyTo(ITexture2D* tex) override;
+
     private:
         IGraphicsDevice* device_;
         UnityRenderingExtTextureFormat format_;
         Size size_;
         std::unique_ptr<ITexture2D> texture_;
     };
-
-    //class FakeGpuMemoryBuffer : public rtc::RefCountedObject<GpuMemoryBufferInterface>
-    //{
-    //public:
-    //    FakeGpuMemoryBuffer(const ITexture2D* texture, UnityRenderingExtTextureFormat format);
-    //    FakeGpuMemoryBuffer(const FakeGpuMemoryBuffer&) = delete;
-    //    FakeGpuMemoryBuffer& operator=(const FakeGpuMemoryBuffer&) = delete;
-    //    ~FakeGpuMemoryBuffer() override;
-
-    //    Size GetSize() const override { return size_; }
-    //    UnityRenderingExtTextureFormat GetFormat() const override { return format_; }
-    //    rtc::scoped_refptr<I420BufferInterface> ToI420() override { return nullptr; }
-
-    //    void CopyTo(ITexture2D* tex) override;
-    //private:
-    //    Size size_;
-    //    UnityRenderingExtTextureFormat format_;
-    //    std::unique_ptr<const ITexture2D> texture_;
-    //};
-
 }
 }
