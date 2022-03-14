@@ -19,11 +19,11 @@ protected:
 
     void SetUp() override {
         GraphicsDeviceTestBase::SetUp();
-        EXPECT_NE(nullptr, m_device);
+        EXPECT_NE(nullptr, device());
 
         const auto width = 256;
         const auto height = 256;
-        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType, m_textureFormat);
+        encoder_ = EncoderFactory::GetInstance().Init(width, height, device(), m_encoderType, m_textureFormat);
         EXPECT_NE(nullptr, encoder_);
     }
     void TearDown() override {
@@ -37,7 +37,7 @@ TEST_P(NvEncoderTest, IsSupported) {
 TEST_P(NvEncoderTest, CopyBuffer) {
     const auto width = 256;
     const auto height = 256;
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto result = encoder_->CopyBuffer(tex->GetNativeTexturePtrV());
     EXPECT_TRUE(result);
 }
@@ -49,7 +49,7 @@ TEST_P(NvEncoderTest, EncodeFrame) {
     EXPECT_EQ(before + 1, after);
 }
 
-INSTANTIATE_TEST_SUITE_P( GraphicsDeviceParameters, NvEncoderTest, testing::ValuesIn(VALUES_TEST_ENV));
+INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece, NvEncoderTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc
 } // end namespace unity

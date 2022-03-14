@@ -28,8 +28,7 @@ class VideoTrackSourceTest : public GraphicsDeviceTestBase
 {
 public:
     VideoTrackSourceTest() :
-        encoder_(EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType, m_textureFormat)),
-        m_texture(m_device->CreateDefaultTextureV(width, height, m_textureFormat))
+        encoder_(EncoderFactory::GetInstance().Init(width, height, device(), m_encoderType, m_textureFormat)), m_texture(device()->CreateDefaultTextureV(width, height, m_textureFormat))
     {
         m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
             /*is_screencast=*/ false,
@@ -38,7 +37,7 @@ public:
         m_trackSource->Init(m_texture->GetNativeTexturePtrV());
         m_trackSource->SetEncoder(encoder_.get());
 
-        EXPECT_NE(nullptr, m_device);
+        EXPECT_NE(nullptr, device());
         EXPECT_NE(nullptr, encoder_);
 
         context = std::make_unique<Context>();
@@ -98,8 +97,7 @@ TEST_P(VideoTrackSourceTest, SendTestFrame)
 }
 #endif
 
-INSTANTIATE_TEST_SUITE_P(
-    GraphicsDeviceParameters,
+INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece,
     VideoTrackSourceTest,
     testing::ValuesIn(VALUES_TEST_ENV));
 

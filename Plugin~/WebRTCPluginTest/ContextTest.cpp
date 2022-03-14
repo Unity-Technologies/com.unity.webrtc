@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "GraphicsDeviceTestBase.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
@@ -13,6 +14,8 @@ namespace unity
 namespace webrtc
 {
 
+using namespace ::webrtc;
+
 class ContextTest : public GraphicsDeviceTestBase
 {
 protected:
@@ -24,14 +27,14 @@ protected:
 
     void SetUp() override {
         GraphicsDeviceTestBase::SetUp();
-        EXPECT_NE(nullptr, m_device);
-
-        encoder_ = EncoderFactory::GetInstance().Init(width, height, m_device, m_encoderType, m_textureFormat);
+        encoder_ = EncoderFactory::GetInstance().Init(width, height, device(), m_encoderType, m_textureFormat);
         EXPECT_NE(nullptr, encoder_);
+        EXPECT_NE(nullptr, device());
 
         context = std::make_unique<Context>();
         callback_videoframeresize = &OnFrameSizeChange;
     }
+
     void TearDown() override {
         GraphicsDeviceTestBase::TearDown();
     }
@@ -41,11 +44,12 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, m_textureFormat));
     EXPECT_NE(nullptr, tex);
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
+
     context->RemoveRefPtr(track);
     context->RemoveRefPtr(source);
 }
@@ -57,12 +61,13 @@ TEST_P(ContextTest, CreateAndDeleteMediaStream) {
 
 
 TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, m_textureFormat));
     EXPECT_NE(nullptr, tex.get());
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
     EXPECT_NE(nullptr, track);
     EXPECT_TRUE(context->InitializeEncoder(encoder_.get(), track));
+
     context->RemoveRefPtr(track);
     context->RemoveRefPtr(source);
 }
@@ -87,7 +92,7 @@ TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto stream = context->CreateMediaStream("videostream");
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
@@ -131,7 +136,7 @@ TEST_P(ContextTest, EqualRendererGetById) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
-    const std::unique_ptr<ITexture2D> tex(m_device->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, m_textureFormat));
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
     const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
@@ -142,7 +147,7 @@ TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
     context->RemoveRefPtr(source);
 }
 
-INSTANTIATE_TEST_SUITE_P(GraphicsDeviceParameters, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
+INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece, ContextTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc
 } // end namespace unity

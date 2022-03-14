@@ -1,24 +1,22 @@
 #include "pch.h"
-#include "GraphicsDeviceTestBase.h"
+
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDeviceTestBase.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-class CudaDeviceTest : public GraphicsDeviceTestBase {};
+    class CudaDeviceTest : public GraphicsDeviceTestBase
+    {
+    };
 
-TEST_P(CudaDeviceTest, GetCuContext) {
-    EXPECT_NE(m_device->GetCuContext(), nullptr);
-}
+    TEST_P(CudaDeviceTest, GetCUcontext) { EXPECT_NE(device()->GetCuContext(), nullptr); }
 
-TEST_P(CudaDeviceTest, IsNvSupported) {
-    EXPECT_TRUE(m_device->IsCudaSupport());
-}
+    TEST_P(CudaDeviceTest, IsNvSupported) { EXPECT_TRUE(device()->IsCudaSupport()); }
 
-INSTANTIATE_TEST_SUITE_P(GraphicsDeviceParameters,
-    CudaDeviceTest, testing::ValuesIn(VALUES_TEST_ENV));
+    INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece, CudaDeviceTest, testing::ValuesIn(VALUES_TEST_ENV));
 
 } // end namespace webrtc
 } // end namespace unity
