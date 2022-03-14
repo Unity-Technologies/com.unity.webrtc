@@ -245,8 +245,7 @@ CUresult CudaContext::Init(ID3D12Device* device)
 //---------------------------------------------------------------------------------------------------------------------
 
 // todo(kazuki):: not supported on windows
-// #if defined(SUPPORT_OPENGL_UNIFIED)
-#if defined(UNITY_LINUX)
+#if defined(SUPPORT_OPENGL_UNIFIED) && defined(UNITY_LINUX)
 CUresult CudaContext::InitGL()
 {
 
