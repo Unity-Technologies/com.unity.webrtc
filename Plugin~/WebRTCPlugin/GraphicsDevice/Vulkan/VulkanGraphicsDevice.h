@@ -38,7 +38,7 @@ public:
 
 #if CUDA_PLATFORM
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
 #endif
 private:
     VkResult CreateCommandPool();

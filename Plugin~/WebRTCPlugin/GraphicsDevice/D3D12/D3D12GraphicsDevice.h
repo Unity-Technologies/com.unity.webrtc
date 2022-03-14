@@ -58,7 +58,7 @@ public:
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
 private:
 
     D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
