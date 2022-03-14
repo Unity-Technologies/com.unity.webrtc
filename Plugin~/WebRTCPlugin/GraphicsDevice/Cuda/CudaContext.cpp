@@ -21,13 +21,15 @@ namespace unity
 {
 namespace webrtc
 {
-
 static void* s_hModule = nullptr;
 
-CudaContext::CudaContext() : m_context(nullptr) {
+CudaContext::CudaContext()
+    : m_context(nullptr)
+{
 }
 //---------------------------------------------------------------------------------------------------------------------
-CUresult LoadModule() {
+CUresult LoadModule()
+{
     // dll check
     if (s_hModule == nullptr)
     {
@@ -53,26 +55,29 @@ CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
     CUresult result = CUDA_SUCCESS;
     int numDevices = 0;
     result = cuDeviceGetCount(&numDevices);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
     CUuuid id = {};
 
-    //Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
-    //this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
-    for (int i = 0; i < numDevices; i++) {
+    // Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
+    // this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
+    for (int i = 0; i < numDevices; i++)
+    {
         result = cuDeviceGet(&_cuDevice, i);
-        if (result != CUDA_SUCCESS) {
+        if (result != CUDA_SUCCESS)
+        {
             return result;
         }
         result = cuDeviceGetUuid(&id, _cuDevice);
-        if (result != CUDA_SUCCESS) {
+        if (result != CUDA_SUCCESS)
+        {
             return result;
         }
 
-        if (!std::memcmp(static_cast<const void*>(&id),
-            static_cast<const void*>(uuid),
-            sizeof(CUuuid))) {
+        if (!std::memcmp(static_cast<const void*>(&id), static_cast<const void*>(uuid), sizeof(CUuuid)))
+        {
             if (cuDevice != nullptr)
                 *cuDevice = _cuDevice;
             return CUDA_SUCCESS;
@@ -80,53 +85,57 @@ CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
     }
     return CUDA_ERROR_NO_DEVICE;
 }
-//---------------------------------------------------------------------------------------------------------------------
 
-CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice) {
-
+CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice)
+{
     // dll check
     CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     CUdevice cuDevice = 0;
     result = cuInit(0);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     int numDevices = 0;
     result = cuDeviceGetCount(&numDevices);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     CUuuid id = {};
     std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
-    if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID)) {
+    if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID))
+    {
         return CUDA_ERROR_INVALID_DEVICE;
     }
 
-    //Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
-    //this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
+    // Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
+    // this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
     bool foundDevice = false;
-    for (int i = 0; i < numDevices; i++) {
+    for (int i = 0; i < numDevices; i++)
+    {
         cuDeviceGet(&cuDevice, i);
 
         cuDeviceGetUuid(&id, cuDevice);
 
-        if (!std::memcmp(static_cast<const void *>(&id),
-                static_cast<const void *>(deviceUUID.data()),
-                sizeof(CUuuid))) {
+        if (!std::memcmp(
+                static_cast<const void*>(&id), static_cast<const void*>(deviceUUID.data()), sizeof(CUuuid)))
+        {
             foundDevice = true;
             break;
         }
     }
 
-    if (!foundDevice) {
+    if (!foundDevice)
+    {
         return CUDA_ERROR_NO_DEVICE;
- 
     }
 
     result = cuCtxCreate(&m_context, 0, cuDevice);
@@ -135,21 +144,25 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
 //---------------------------------------------------------------------------------------------------------------------
 
 #if defined(SUPPORT_D3D11)
-CUresult CudaContext::Init(ID3D11Device* device) {
+CUresult CudaContext::Init(ID3D11Device* device)
+{
 
     // dll check
     CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     result = cuInit(0);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
     int numDevices = 0;
     result = cuDeviceGetCount(&numDevices);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
@@ -176,20 +189,24 @@ CUresult CudaContext::Init(ID3D11Device* device) {
 //---------------------------------------------------------------------------------------------------------------------
 
 #if defined(SUPPORT_D3D12)
-CUresult CudaContext::Init(ID3D12Device* device) {
+CUresult CudaContext::Init(ID3D12Device* device)
+{
 
     CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     result = cuInit(0);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
     int numDevices = 0;
     result = cuDeviceGetCount(&numDevices);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
@@ -201,13 +218,15 @@ CUresult CudaContext::Init(ID3D12Device* device) {
     for (int32_t deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
     {
         result = cuDeviceGet(&cuDevice, deviceIndex);
-        if (result != CUDA_SUCCESS) {
+        if (result != CUDA_SUCCESS)
+        {
             return result;
         }
         char luid_[8];
         unsigned int nodeMask;
         result = cuDeviceGetLuid(luid_, &nodeMask, cuDevice);
-        if (result != CUDA_SUCCESS) {
+        if (result != CUDA_SUCCESS)
+        {
             return result;
         }
         if (memcmp(&luid.LowPart, luid_, sizeof(luid.LowPart)) == 0 &&
@@ -228,33 +247,39 @@ CUresult CudaContext::Init(ID3D12Device* device) {
 // todo(kazuki):: not supported on windows
 // #if defined(SUPPORT_OPENGL_UNIFIED)
 #if defined(UNITY_LINUX)
-CUresult CudaContext::InitGL() {
+CUresult CudaContext::InitGL()
+{
 
     // dll check
     CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     result = cuInit(0);
-    if (result != CUDA_SUCCESS) {
+    if (result != CUDA_SUCCESS)
+    {
         return result;
     }
 
     int numDevices;
     result = cuDeviceGetCount(&numDevices);
-    if (CUDA_SUCCESS != result) {
+    if (CUDA_SUCCESS != result)
+    {
         return result;
     }
-    if (numDevices == 0) {
+    if (numDevices == 0)
+    {
         return CUDA_ERROR_NO_DEVICE;
     }
 
-    // TODO:: check GPU capability 
+    // TODO:: check GPU capability
     int cuDevId = 0;
     CUdevice cuDevice = 0;
     result = cuDeviceGet(&cuDevice, cuDevId);
-    if (CUDA_SUCCESS != result) {
+    if (CUDA_SUCCESS != result)
+    {
         return result;
     }
     return cuCtxCreate(&m_context, 0, cuDevice);
@@ -281,8 +306,10 @@ CUcontext CudaContext::GetContext() const
     return m_context;
 }
 
-void CudaContext::Shutdown() {
-    if (nullptr != m_context) {
+void CudaContext::Shutdown()
+{
+    if (nullptr != m_context)
+    {
         cuCtxDestroy(m_context);
         m_context = nullptr;
     }
