@@ -29,7 +29,6 @@ namespace webrtc
     protected:
         UnityGfxRenderer m_unityGfxRenderer;
         UnityRenderingExtTextureFormat m_textureFormat;
-        UnityEncoderType m_encoderType;
         std::unique_ptr<GraphicsDeviceContainer> container_;
     };
 
