@@ -32,7 +32,7 @@ namespace webrtc
     {
         cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
         codec.SetParam(cricket::kH264FmtpProfileLevelId, kProfileLevelIdString());
-        NvEncoderImpl encoder(codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB, container_->device());
+        NvEncoderImpl encoder(codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB);
 
         VideoCodec codec_settings;
         SetDefaultSettings(&codec_settings);

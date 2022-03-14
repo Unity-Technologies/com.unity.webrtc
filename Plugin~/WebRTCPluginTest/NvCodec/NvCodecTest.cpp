@@ -34,7 +34,7 @@ namespace webrtc
             cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
             codec.SetParam(cricket::kH264FmtpProfileLevelId, kProfileLevelIdString());
             return NvEncoder::Create(
-                codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB, container_->device());
+                codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB);
         }
 
         std::unique_ptr<VideoDecoder> CreateDecoder() override { return NvDecoder::Create(); }

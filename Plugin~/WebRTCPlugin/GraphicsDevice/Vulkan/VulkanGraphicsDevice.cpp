@@ -251,11 +251,15 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
 #if CUDA_PLATFORM
         //todo(kazuki):: WIP
 
+        // set context on the thread.
+        cuCtxPushCurrent(GetCUcontext());
+
         //VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
         ////vulkanTexture->geet
 
         //if (CUDA_SUCCESS != m_cudaImage.Init(m_device, this))
         //    throw;
+        cuCtxPopCurrent(NULL);
 
         std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
         //handle->array = m_cudaImage.GetArray();

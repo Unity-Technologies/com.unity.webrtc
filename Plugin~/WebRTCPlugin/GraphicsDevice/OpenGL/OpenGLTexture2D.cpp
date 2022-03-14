@@ -46,39 +46,5 @@ void OpenGLTexture2D::CreatePBO()
         m_buffer = static_cast<byte*>(malloc(bufferSize));
     }
 }
-
-    std::unique_ptr<GpuMemoryBufferHandle> OpenGLTexture2D::Map()
-    {
-        CUarray mappedArray;
-        CUgraphicsResource resource;
-        GLuint image = m_texture;
-        GLenum target = GL_TEXTURE_2D;
-
-        CUresult result = cuGraphicsGLRegisterImage(&resource, image, target, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsD3D11RegisterResource error" << result;
-            throw;
-        }
-
-        result = cuGraphicsMapResources(1, &resource, 0);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsMapResources";
-            throw;
-        }
-
-        result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsSubResourceGetMappedArray";
-            throw;
-        }
-        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
-        handle->array = mappedArray;
-        handle->resource = resource;
-        return handle;
-    }
-
 } // end namespace webrtc
 } // end namespace unity

@@ -23,13 +23,12 @@ public:
     inline void* GetEncodeTexturePtrV() override;
     inline const void* GetEncodeTexturePtrV() const override;
 
-    std::unique_ptr<GpuMemoryBufferHandle> Map() override;
-
     void CreatePBO();
     size_t GetBufferSize() const { return m_width * m_height * 4; }
     size_t GetPitch() const { return m_width * 4; }
     byte* GetBuffer() const { return m_buffer;  }
     GLuint GetPBO() const { return m_pbo; }
+    GLuint GetTexture() const { return m_texture; }
 private:
     GLuint m_texture;
     GLuint m_pbo;
