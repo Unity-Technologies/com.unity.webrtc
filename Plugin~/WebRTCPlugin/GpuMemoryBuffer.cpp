@@ -35,8 +35,13 @@ namespace webrtc
         , format_(format)
         , size_(size)
         , texture_(nullptr)
+        , handle_(nullptr)
     {
         texture_.reset(device_->CreateCPUReadTextureV(size.width(), size.height(), format));
+
+        // IGraphicsDevice::Map method is too heavy and stop the graphics process,
+        // so must not call this method on the worker thread instead of the render thread.
+        handle_ = device_->Map(texture_.get());
 
         CopyBuffer(ptr);
     }
@@ -56,7 +61,5 @@ namespace webrtc
     {
         return device_->ConvertRGBToI420(texture_.get());
     }
-
-    void GpuMemoryBufferFromUnity::CopyTo(ITexture2D* tex) { device_->CopyResourceV(tex, texture_.get()); }
 }
 }

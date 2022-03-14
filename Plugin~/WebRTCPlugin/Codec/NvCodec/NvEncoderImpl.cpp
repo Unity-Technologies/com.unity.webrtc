@@ -31,9 +31,6 @@ namespace webrtc
         , m_encodedCompleteCallback(nullptr)
         , m_encode_fps(1000, 1000)
         , m_clock(Clock::GetRealTimeClock())
-        , m_device(device)
-        , m_mappedTexture(nullptr)
-        , m_bufferHandle(nullptr)
     {
         RTC_CHECK(absl::EqualsIgnoreCase(codec.name, cricket::kH264CodecName));
         // not implemented for host memory
@@ -89,13 +86,6 @@ namespace webrtc
         {
             RTC_CHECK_NOTREACHED();
         }
-
-        // todo(kazuki):: determine color format from NV_ENC_BUFFER_FORMAT
-        m_mappedTexture.reset(
-            m_device->CreateDefaultTextureV(codec->width, codec->height, kUnityRenderingExtFormatR8G8B8A8_SRGB));
-        cuCtxPushCurrent(m_context);
-        m_bufferHandle = m_mappedTexture->Map();
-        cuCtxPopCurrent(nullptr);
 
         m_bitrateAdjuster = std::make_unique<BitrateAdjuster>(0.5f, 0.95f);
 
@@ -153,13 +143,13 @@ namespace webrtc
         CUcontext context,
         CUmemorytype memoryType)
     {
-        buffer->CopyTo(m_mappedTexture.get());
+        const GpuMemoryBufferHandle* handle = buffer->handle();
 
         if (memoryType == CU_MEMORYTYPE_DEVICE)
         {
             NvEncoderCuda::CopyToDeviceFrame(
                 context,
-                reinterpret_cast<void*>(m_bufferHandle->devicePtr),
+                reinterpret_cast<void*>(handle->devicePtr),
                 0,
                 reinterpret_cast<CUdeviceptr>(encoderInputFrame->inputPtr),
                 encoderInputFrame->pitch,
@@ -174,7 +164,7 @@ namespace webrtc
         {
             NvEncoderCudaWithCUarray::CopyToDeviceFrame(
                 context,
-                static_cast<void*>(m_bufferHandle->array),
+                static_cast<void*>(handle->array),
                 0,
                 static_cast<CUarray>(encoderInputFrame->inputPtr),
                 encoderInputFrame->pitch,

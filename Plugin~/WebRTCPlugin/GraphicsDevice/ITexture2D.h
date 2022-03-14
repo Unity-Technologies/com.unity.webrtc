@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GpuMemoryBuffer.h"
-
 namespace unity
 {
 namespace webrtc
@@ -28,8 +26,6 @@ public:
 
     virtual void* GetEncodeTexturePtrV() = 0;
     virtual const void* GetEncodeTexturePtrV() const = 0;
-
-    virtual std::unique_ptr<GpuMemoryBufferHandle> Map() = 0;
 
     uint32_t GetWidth() const { return m_width; };
     uint32_t GetHeight()  const { return m_height; };

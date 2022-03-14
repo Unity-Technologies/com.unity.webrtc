@@ -46,6 +46,8 @@ public:
     /// <returns></returns>
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
+    std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
 #if CUDA_PLATFORM

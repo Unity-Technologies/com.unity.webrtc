@@ -26,8 +26,6 @@ public:
     inline virtual const void* GetNativeTexturePtrV() const override;
     inline virtual void* GetEncodeTexturePtrV() override;
     inline virtual const void* GetEncodeTexturePtrV() const override;
-
-    std::unique_ptr<GpuMemoryBufferHandle> Map() override;
 };
 
 //---------------------------------------------------------------------------------------------------------------------

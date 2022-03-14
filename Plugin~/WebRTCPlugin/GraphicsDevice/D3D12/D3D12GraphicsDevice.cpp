@@ -280,5 +280,40 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
     return i420_buffer; 
 }
 
+    std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
+    {
+        CUarray mappedArray;
+        CUgraphicsResource resource;
+        ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
+
+        // set context on the thread.
+        cuCtxPushCurrent(GetCUcontext());
+
+        CUresult result = cuGraphicsD3D11RegisterResource(&resource, pResource, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
+        if (result != CUDA_SUCCESS)
+        {
+            throw;
+        }
+
+        result = cuGraphicsMapResources(1, &resource, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            throw;
+        }
+
+        result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            throw;
+        }
+
+        cuCtxPopCurrent(NULL);
+
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        handle->array = mappedArray;
+        handle->resource = resource;
+        return handle;
+    }
+
 } // end namespace webrtc
 } // end namespace unity

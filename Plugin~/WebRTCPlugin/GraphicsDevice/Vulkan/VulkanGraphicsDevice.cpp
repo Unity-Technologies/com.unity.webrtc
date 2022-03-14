@@ -3,6 +3,7 @@
 #include "VulkanTexture2D.h"
 
 #include "VulkanUtility.h"
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 namespace unity
@@ -244,6 +245,26 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
 
     return i420Buffer;
 }
+
+    std::unique_ptr<GpuMemoryBufferHandle> VulkanGraphicsDevice::Map(ITexture2D* texture)
+    {
+#if CUDA_PLATFORM
+        //todo(kazuki):: WIP
+
+        //VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
+        ////vulkanTexture->geet
+
+        //if (CUDA_SUCCESS != m_cudaImage.Init(m_device, this))
+        //    throw;
+
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        //handle->array = m_cudaImage.GetArray();
+        return handle;
+#else
+    RTC_CHECK_NOTREACHED();
+#endif
+    }
+
 
 } // end namespace webrtc
 } // end namespace unity

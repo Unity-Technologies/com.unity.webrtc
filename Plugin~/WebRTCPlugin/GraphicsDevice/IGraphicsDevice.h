@@ -12,7 +12,7 @@ namespace webrtc
 {
 using NativeTexPtr = void*;
 class ITexture2D;
-
+class GpuMemoryBufferHandle;
 class IGraphicsDevice
 #if CUDA_PLATFORM
     : public ICudaDevice
@@ -30,6 +30,7 @@ public:
     virtual NativeTexPtr ConvertNativeFromUnityPtr(void* tex) { return tex; }
     virtual GraphicsDeviceType GetDeviceType() const = 0;
     virtual UnityGfxRenderer GetGfxRenderer() const { return m_gfxRenderer; }
+    virtual std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) = 0;
 
     //Required for software encoding
     virtual ITexture2D* CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;

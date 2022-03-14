@@ -90,18 +90,6 @@ bool VulkanTexture2D::InitCpuRead(const VkPhysicalDevice physicalDevice, const V
     m_textureImageMemorySize = m_unityVulkanImage.memory.size;
     return true;
 }
-    std::unique_ptr<GpuMemoryBufferHandle> VulkanTexture2D::Map()
-    {
-#if CUDA_PLATFORM
-        if(CUDA_SUCCESS != m_cudaImage.Init(m_device, this))
-            throw;
 
-        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
-        handle->array = m_cudaImage.GetArray();
-        return handle;
-#else
-        RTC_CHECK_NOTREACHED();
-#endif
-    }
 } // end namespace webrtc
 } // end namespace unity

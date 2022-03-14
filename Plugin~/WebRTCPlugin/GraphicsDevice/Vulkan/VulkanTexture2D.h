@@ -32,8 +32,6 @@ public:
     inline VkDeviceSize GetTextureImageMemorySize() const;
     inline VkFormat     GetTextureFormat() const;
 
-    std::unique_ptr<GpuMemoryBufferHandle> Map() override;
-
 private:
     VkImage             m_textureImage;
     VkDeviceMemory      m_textureImageMemory;

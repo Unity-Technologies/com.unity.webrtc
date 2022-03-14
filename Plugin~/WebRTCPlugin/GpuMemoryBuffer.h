@@ -39,7 +39,8 @@ namespace webrtc
         virtual UnityRenderingExtTextureFormat GetFormat() const = 0;
         virtual rtc::scoped_refptr<I420BufferInterface> ToI420() = 0;
 
-        virtual void CopyTo(ITexture2D* tex) = 0;
+        virtual const GpuMemoryBufferHandle* handle() const = 0;
+        
 
     protected:
         ~GpuMemoryBufferInterface() override = default;
@@ -58,14 +59,13 @@ namespace webrtc
         UnityRenderingExtTextureFormat GetFormat() const override;
         Size GetSize() const override;
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;
-
-        void CopyTo(ITexture2D* tex) override;
-
+        const GpuMemoryBufferHandle* handle() const override { return handle_.get(); }
     private:
         IGraphicsDevice* device_;
         UnityRenderingExtTextureFormat format_;
         Size size_;
         std::unique_ptr<ITexture2D> texture_;
+        std::unique_ptr<GpuMemoryBufferHandle> handle_;
     };
 }
 }

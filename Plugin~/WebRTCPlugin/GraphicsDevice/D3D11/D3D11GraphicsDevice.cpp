@@ -2,11 +2,13 @@
 #include "D3D11GraphicsDevice.h"
 
 #include <cuda.h>
+#include <cudaD3D11.h>
 #include <wrl/client.h>
 
 
 #include "D3D11Texture2D.h"
 #include "NvCodecUtils.h"
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 using namespace Microsoft::WRL;
@@ -147,6 +149,42 @@ rtc::scoped_refptr<I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITexture2D*
     return i420_buffer;
 
 }
+
+    std::unique_ptr<GpuMemoryBufferHandle> D3D11GraphicsDevice::Map(ITexture2D* texture)
+    {
+        CUarray mappedArray;
+        CUgraphicsResource resource;
+        ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
+
+        // set context on the thread.
+        cuCtxPushCurrent(GetCUcontext());
+
+        CUresult result = cuGraphicsD3D11RegisterResource(&resource, pResource, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuGraphicsD3D11RegisterResource";
+            throw;
+        }
+        result = cuGraphicsMapResources(1, &resource, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuGraphicsMapResources";
+            throw;
+        }
+
+        result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuGraphicsSubResourceGetMappedArray";
+            throw;
+        }
+        cuCtxPopCurrent(NULL);
+
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        handle->array = mappedArray;
+        handle->resource = resource;
+        return handle;
+    }
 
 } //end namespace webrtc
 } //end namespace unity

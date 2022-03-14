@@ -94,11 +94,6 @@ namespace webrtc
         Clock* const m_clock;
         GUID m_profileGuid;
         NV_ENC_LEVEL m_level;
-
-        IGraphicsDevice* m_device;
-        std::unique_ptr<ITexture2D> m_mappedTexture;
-        std::unique_ptr<GpuMemoryBufferHandle> m_bufferHandle;
-
         bool m_keyframeRequest;
     };
 
