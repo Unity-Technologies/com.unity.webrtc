@@ -44,8 +44,7 @@ namespace webrtc
             const cricket::VideoCodec& codec,
             CUcontext context,
             CUmemorytype memoryType,
-            NV_ENC_BUFFER_FORMAT format,
-            IGraphicsDevice* device);
+            NV_ENC_BUFFER_FORMAT format);
         NvEncoderImpl(const NvEncoderImpl&) = delete;
         NvEncoderImpl& operator=(const NvEncoderImpl&) = delete;
         ~NvEncoderImpl() override;

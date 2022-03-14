@@ -6,24 +6,18 @@
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "UnityVideoTrackSource.h"
+
 #include "absl/strings/match.h"
 #include "api/video/video_codec_type.h"
 #include "api/video_codecs/h264_profile_level_id.h"
 #include "media/base/media_constants.h"
-
-#include "GraphicsDevice/IGraphicsDevice.h"
-#include "GraphicsDevice/ITexture2D.h"
 
 namespace unity
 {
 namespace webrtc
 {
     NvEncoderImpl::NvEncoderImpl(
-        const cricket::VideoCodec& codec,
-        CUcontext context,
-        CUmemorytype memoryType,
-        NV_ENC_BUFFER_FORMAT format,
-        IGraphicsDevice* device)
+        const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
         : m_context(context)
         , m_memoryType(memoryType)
         , m_encoder(nullptr)

@@ -18,7 +18,6 @@ namespace webrtc
     std::vector<SdpVideoFormat> SupportedNvEncoderCodecs(CUcontext context);
     std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context);
 
-    class IGraphicsDevice;
     class NvEncoder : public VideoEncoder
     {
     public:
@@ -26,8 +25,7 @@ namespace webrtc
             const cricket::VideoCodec& codec,
             CUcontext context,
             CUmemorytype memoryType,
-            NV_ENC_BUFFER_FORMAT format,
-            IGraphicsDevice* device);
+            NV_ENC_BUFFER_FORMAT format);
         // If H.264 is supported (any implementation).
         static bool IsSupported();
         static bool SupportsScalabilityMode(absl::string_view scalability_mode);
@@ -47,7 +45,7 @@ namespace webrtc
     class NvEncoderFactory : public VideoEncoderFactory
     {
     public:
-        NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format, IGraphicsDevice* gfxDevice);
+        NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format);
         ~NvEncoderFactory();
 
         std::vector<SdpVideoFormat> GetSupportedFormats() const override;
@@ -57,7 +55,6 @@ namespace webrtc
     private:
         CUcontext context_;
         NV_ENC_BUFFER_FORMAT format_;
-        IGraphicsDevice* gfxDevice_;
     };
 
     class NvDecoderFactory : public VideoDecoderFactory

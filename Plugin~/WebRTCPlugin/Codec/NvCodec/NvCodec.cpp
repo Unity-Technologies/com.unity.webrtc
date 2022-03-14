@@ -78,17 +78,16 @@ namespace webrtc
     }
 
     std::unique_ptr<NvEncoder> NvEncoder::Create(
-        const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format, IGraphicsDevice* device)
+        const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
     {
-        return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format, device);
+        return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format);
     }
 
     std::unique_ptr<NvDecoder> NvDecoder::Create() { return nullptr; }
 
-    NvEncoderFactory::NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format, IGraphicsDevice* gfxDevice)
+    NvEncoderFactory::NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format)
         : context_(context)
         , format_(format)
-        , gfxDevice_(gfxDevice)
     {
     }
     NvEncoderFactory::~NvEncoderFactory() = default;
@@ -106,7 +105,7 @@ namespace webrtc
     std::unique_ptr<VideoEncoder> NvEncoderFactory::CreateVideoEncoder(const SdpVideoFormat& format)
     {
         // todo(kazuki):: add CUmemorytype::CU_MEMORYTYPE_DEVICE option
-        return NvEncoder::Create(cricket::VideoCodec(format), context_, CU_MEMORYTYPE_ARRAY, format_, gfxDevice_);
+        return NvEncoder::Create(cricket::VideoCodec(format), context_, CU_MEMORYTYPE_ARRAY, format_);
     }
 
     NvDecoderFactory::NvDecoderFactory(CUcontext context)

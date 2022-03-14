@@ -31,7 +31,7 @@ namespace webrtc
 #elif CUDA_PLATFORM
         CUcontext context = gfxDevice->GetCUcontext();
         NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
-        return new NvEncoderFactory(context, format, gfxDevice);
+        return new NvEncoderFactory(context, format);
 #endif
         return nullptr;
     }
