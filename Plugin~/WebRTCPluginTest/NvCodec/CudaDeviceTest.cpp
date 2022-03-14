@@ -12,7 +12,7 @@ namespace webrtc
     {
     };
 
-    TEST_P(CudaDeviceTest, GetCUcontext) { EXPECT_NE(device()->GetCuContext(), nullptr); }
+    TEST_P(CudaDeviceTest, GetCUcontext) { EXPECT_NE(device()->GetCUcontext(), nullptr); }
 
     TEST_P(CudaDeviceTest, IsNvSupported) { EXPECT_TRUE(device()->IsCudaSupport()); }
 

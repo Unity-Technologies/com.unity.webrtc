@@ -7,7 +7,12 @@ namespace unity
 namespace webrtc
 {
 
-class CudaContext {
+// todo(kazuki):
+// This class manages only the context related on the render thread.
+// Not considered using on the multiple threads.
+
+class CudaContext
+{
 public:
     CudaContext();
     ~CudaContext() = default;
@@ -24,13 +29,13 @@ public:
 #endif
 
     void Shutdown();
-    inline CUcontext GetContext() const;
+
+    // This method returns context for the thread which called the method.
+    CUcontext GetContext() const;
 private:
     CUcontext m_context;
-
 };
 
-inline CUcontext CudaContext::GetContext() const { return m_context; }
 
 } // end namespace webrtc
 } // end namespace unity

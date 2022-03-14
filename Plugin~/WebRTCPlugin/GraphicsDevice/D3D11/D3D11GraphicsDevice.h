@@ -24,7 +24,7 @@ public:
     virtual rtc::scoped_refptr < ::webrtc::I420Buffer > ConvertRGBToI420(ITexture2D* tex) override;
 
     virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCuContext() override { return m_cudaContext.GetContext(); }
+    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
 private:
     ID3D11Device* m_d3d11Device;
     ID3D11DeviceContext* m_d3d11Context;

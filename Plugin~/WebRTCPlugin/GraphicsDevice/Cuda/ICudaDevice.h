@@ -11,7 +11,7 @@ class ICudaDevice
 {
 public:
     virtual bool IsCudaSupport() = 0;
-    virtual CUcontext GetCuContext() = 0;
+    virtual CUcontext GetCUcontext() = 0;
 };
 } // namespace webrtc
 } // namespace unity
