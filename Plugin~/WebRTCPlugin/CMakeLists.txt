@@ -191,9 +191,11 @@ elseif(Linux)
       VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
-    PRIVATE
+    PUBLIC
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
+      ${OPENGL_egl_LIBRARY}
+      ${OPENGL_glx_LIBRARY}
       ${NVCODEC_LIBRARIES}
       ${Vulkan_LIBRARY}
       ${GLIB_LIBRARIES}
@@ -204,6 +206,7 @@ elseif(Linux)
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
       ${OPENGL_INCLUDE_DIR}
+      ${OPENGL_EGL_INCLUDE_DIRS}
       ${NVCODEC_INCLUDE_DIR}
   )
 

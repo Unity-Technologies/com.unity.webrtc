@@ -14,6 +14,7 @@ namespace webrtc
 
 namespace webrtc = ::webrtc;
 
+class OpenGLContext;
 class OpenGLGraphicsDevice : public IGraphicsDevice
 {
 public:
@@ -44,6 +45,7 @@ private:
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
 #endif
+    std::vector<std::unique_ptr<OpenGLContext>> contexts_;
 };
 
 void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }

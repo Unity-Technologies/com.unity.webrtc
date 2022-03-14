@@ -13,8 +13,8 @@ namespace webrtc
     {
     public:
         explicit GpuMemoryBufferPoolTest()
-            : timestamp_(Timestamp::Zero())
-            , container_(CreateGraphicsDeviceContainer(GetParam()))
+            : container_(CreateGraphicsDeviceContainer(GetParam()))
+            , timestamp_(Timestamp::Zero())
         {
         }
 

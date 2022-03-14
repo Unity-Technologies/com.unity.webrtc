@@ -201,13 +201,9 @@ elseif(Linux)
 
   target_link_libraries(WebRTCLibTest
     PRIVATE
-      ${WEBRTC_LIBRARY}
-      ${OPENGL_opengl_LIBRARY}
       ${GLUT_LIBRARY}
       ${CMAKE_DL_LIBS}
       ${CMAKE_THREAD_LIBS_INIT}
-      ${Vulkan_LIBRARY}
-      ${GLIB_LIBRARIES}
       gtest
       gmock
       gtest_main
@@ -218,7 +214,6 @@ elseif(Linux)
       ..
       ${CUDA_INCLUDE_DIRS}
       ${NVCODEC_INCLUDE_DIR}
-      ${GLIB_INCLUDE_DIRS}
   )
 elseif(iOS)
   set(CMAKE_C_FLAGS "-x objective-c")

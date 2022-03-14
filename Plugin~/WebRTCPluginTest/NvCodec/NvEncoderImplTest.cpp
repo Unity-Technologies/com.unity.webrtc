@@ -3,7 +3,6 @@
 #include "Codec/NvCodec/NvEncoderImpl.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDeviceContainer.h"
-#include "GraphicsDeviceTestBase.h"
 #include "NvCodecUtils.h"
 #include "VideoCodecTest.h"
 

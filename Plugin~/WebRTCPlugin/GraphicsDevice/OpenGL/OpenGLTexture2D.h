@@ -23,11 +23,7 @@ public:
     inline void* GetEncodeTexturePtrV() override;
     inline const void* GetEncodeTexturePtrV() const override;
 
-    std::unique_ptr<GpuMemoryBufferHandle> Map() override
-    {
-        // todo(kazuki):: not supported yet.
-        throw;
-    }
+    std::unique_ptr<GpuMemoryBufferHandle> Map() override;
 
     void CreatePBO();
     size_t GetBufferSize() const { return m_width * m_height * 4; }

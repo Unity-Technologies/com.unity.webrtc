@@ -1,9 +1,12 @@
 #include "pch.h"
+
 #include "third_party/libyuv/include/libyuv.h"
 
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+
+#include "OpenGLContext.h"
 
 namespace unity
 {
@@ -18,11 +21,12 @@ OpenGLGraphicsDevice::OpenGLGraphicsDevice(
     UnityGfxRenderer renderer)
     : IGraphicsDevice(renderer)
 {
+    OpenGLContext::InitGLContext();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-OpenGLGraphicsDevice::~OpenGLGraphicsDevice() {
-
+OpenGLGraphicsDevice::~OpenGLGraphicsDevice()
+{
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -165,6 +169,9 @@ void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *p
 
 rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
 {
+    if(!OpenGLContext::CurrentContext())
+        contexts_.push_back(OpenGLContext::CreateGLContext());
+
     OpenGLTexture2D* sourceTex = static_cast<OpenGLTexture2D*>(tex);
     const GLuint sourceId = reinterpret_cast<uintptr_t>(sourceTex->GetNativeTexturePtrV());
     const GLuint pbo = sourceTex->GetPBO();
