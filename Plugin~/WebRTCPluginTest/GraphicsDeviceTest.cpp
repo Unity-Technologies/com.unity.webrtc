@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDeviceTestBase.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
@@ -82,8 +83,8 @@ TEST_P(GraphicsDeviceTest, Map)
     const uint32_t height = 256;
     const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
 
-    std::unique_ptr<GpuMemoryBufferHandle> handle = src->Map();
-    EXPECT_NE(handle->array, nullptr);
+    std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
+    EXPECT_NE(handle, nullptr);
 }
 
 #endif
