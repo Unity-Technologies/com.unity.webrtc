@@ -9,19 +9,14 @@ namespace webrtc
 {
 
     class MTLTexture;
-    struct MetalTexture2D : ITexture2D {
+    struct MetalTexture2D : ITexture2D
+    {
     public:
         id<MTLTexture> m_texture;
 
         MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex);
         virtual ~MetalTexture2D();
         
-        std::unique_ptr<GpuMemoryBufferHandle> Map() override
-        {
-            // todo(kazuki):: not supported
-            throw;
-        }
-
         inline void* GetNativeTexturePtrV() override;
         inline const void* GetNativeTexturePtrV() const override;
         inline void* GetEncodeTexturePtrV() override;
