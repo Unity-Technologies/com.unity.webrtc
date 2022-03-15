@@ -1,14 +1,16 @@
 #pragma once
 
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "WebRTCConstants.h"
+
 #include <Metal/Metal.h>
 
 namespace unity
 {
 namespace webrtc
 {
-    namespace webrtc = ::webrtc;
+    using namespace ::webrtc;
     class MetalGraphicsDevice : public IGraphicsDevice
     {
     public:
@@ -25,8 +27,8 @@ namespace webrtc
         bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         inline GraphicsDeviceType GetDeviceType() const override;
-        rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
-        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { /* todo */ throw; };
+        rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }
         
     private:
         id<MTLDevice> m_device;
