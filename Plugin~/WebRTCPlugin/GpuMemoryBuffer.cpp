@@ -35,9 +35,11 @@ namespace webrtc
         , format_(format)
         , size_(size)
         , texture_(nullptr)
+        , textureCpuRead_(nullptr)
         , handle_(nullptr)
     {
-        texture_.reset(device_->CreateCPUReadTextureV(size.width(), size.height(), format));
+        texture_.reset(device_->CreateDefaultTextureV(size.width(), size.height(), format));
+        textureCpuRead_.reset(device_->CreateCPUReadTextureV(size.width(), size.height(), format));
 
         // IGraphicsDevice::Map method is too heavy and stop the graphics process,
         // so must not call this method on the worker thread instead of the render thread.
@@ -50,7 +52,10 @@ namespace webrtc
 
     void GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)
     {
+        // One texture cannot map CUDA memory and CPU memory simultaneously.
+        // Believe there is still room for improvement.
         device_->CopyResourceFromNativeV(texture_.get(), ptr);
+        device_->CopyResourceFromNativeV(textureCpuRead_.get(), ptr);
     }
 
     UnityRenderingExtTextureFormat GpuMemoryBufferFromUnity::GetFormat() const { return format_; }
@@ -59,7 +64,7 @@ namespace webrtc
 
     rtc::scoped_refptr<I420BufferInterface> GpuMemoryBufferFromUnity::ToI420()
     {
-        return device_->ConvertRGBToI420(texture_.get());
+        return device_->ConvertRGBToI420(textureCpuRead_.get());
     }
 }
 }
