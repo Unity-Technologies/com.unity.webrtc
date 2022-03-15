@@ -73,7 +73,7 @@ namespace webrtc
 #ifndef _WIN32
     constexpr bool operator==(const GUID& a, const GUID& b)
     {
-        return a.Data1 == b.Data1 && a.Data2 == b.Data2 && a.Data3 == b.Data3 && std::memcmp(a.Data4, b.Data4, 8);
+        return a.Data1 == b.Data1 && a.Data2 == b.Data2 && a.Data3 == b.Data3 && std::memcmp(a.Data4, b.Data4, 8) == 0;
     }
 #endif
 
