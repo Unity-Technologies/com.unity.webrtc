@@ -144,7 +144,7 @@ namespace webrtc
         EGLContext context = eglGetCurrentContext();
         if(context)
             throw;
-        return std::make_unique<EGLContextImpl>();
+        return std::make_unique<EGLContextImpl>(g_display, g_context);
 #elif SUPPORT_OPENGL_CORE && UNITY_LINUX
         GLXContext context = glXGetCurrentContext();
         if(context)
