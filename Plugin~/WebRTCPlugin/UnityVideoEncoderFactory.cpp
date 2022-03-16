@@ -27,7 +27,9 @@ namespace webrtc
 #if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoEncoderFactory([[RTCDefaultVideoEncoderFactory alloc] init]).release();
 #elif UNITY_ANDROID
-        return CreateAndroidEncoderFactory().release();
+        // todo(kazuki)::workaround
+        // return CreateAndroidEncoderFactory().release();
+        return nullptr;
 #elif CUDA_PLATFORM
         CUcontext context = gfxDevice->GetCUcontext();
         NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
@@ -50,8 +52,11 @@ namespace webrtc
 
         for (const webrtc::SdpVideoFormat& format : internal_encoder_factory_->GetSupportedFormats())
             supported_codecs.push_back(format);
-        for (const webrtc::SdpVideoFormat& format : native_encoder_factory_->GetSupportedFormats())
-            supported_codecs.push_back(format);
+        if (native_encoder_factory_)
+        {
+            for (const webrtc::SdpVideoFormat& format : native_encoder_factory_->GetSupportedFormats())
+                supported_codecs.push_back(format);
+        }
 
         // Set video codec order: default video codec is VP8
         auto findIndex = [&](webrtc::SdpVideoFormat& format) -> long
@@ -72,7 +77,7 @@ namespace webrtc
     webrtc::VideoEncoderFactory::CodecInfo
     UnityVideoEncoderFactory::QueryVideoEncoder(const webrtc::SdpVideoFormat& format) const
     {
-        if (format.IsCodecInList(native_encoder_factory_->GetSupportedFormats()))
+        if (native_encoder_factory_ && format.IsCodecInList(native_encoder_factory_->GetSupportedFormats()))
         {
             return native_encoder_factory_->QueryVideoEncoder(format);
         }
@@ -83,7 +88,7 @@ namespace webrtc
     std::unique_ptr<webrtc::VideoEncoder>
     UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-        if (format.IsCodecInList(native_encoder_factory_->GetSupportedFormats()))
+        if (native_encoder_factory_ && format.IsCodecInList(native_encoder_factory_->GetSupportedFormats()))
         {
             return native_encoder_factory_->CreateVideoEncoder(format);
         }
