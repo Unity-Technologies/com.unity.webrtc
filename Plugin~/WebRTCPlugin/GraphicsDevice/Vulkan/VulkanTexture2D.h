@@ -3,10 +3,6 @@
 #include "WebRTCMacros.h"
 #include "GraphicsDevice/ITexture2D.h"
 
-#if CUDA_PLATFORM
-#include "GraphicsDevice/Cuda/CudaImage.h"
-#endif
-
 namespace unity
 {
 namespace webrtc
