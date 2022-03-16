@@ -1,14 +1,15 @@
 #include "pch.h"
-#include "D3D12GraphicsDevice.h"
+
 #include <cuda.h>
 #include <cudaD3D11.h>
 #include <wrl/client.h>
 
+#include "D3D12Constants.h"
+#include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
-#include "D3D12Constants.h" //DEFAULT_HEAP_PROPS
-#include "NvCodecUtils.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 #include "GraphicsDevice/D3D11/D3D11Texture2D.h"
+#include "GraphicsDevice/GraphicsUtility.h"
+#include "NvCodecUtils.h"
 
 using namespace Microsoft::WRL;
 
@@ -99,7 +100,7 @@ void D3D12GraphicsDevice::ShutdownV() {
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
 
-    return CreateSharedD3D12Texture(w,h);
+    return CreateSharedD3D12Texture(w, h);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -193,6 +194,7 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
 
     ID3D11Texture2D* sharedTex = nullptr;
     HANDLE handle = nullptr;
+
     ThrowIfFailed(m_d3d12Device->CreateSharedHandle(
         nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
 
@@ -200,7 +202,7 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
     ThrowIfFailed(m_d3d11Device->OpenSharedResource1(
         handle, IID_PPV_ARGS(&sharedTex)));
 
-    return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
+    return new D3D12Texture2D(w, h, nativeTex, handle, sharedTex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -282,36 +284,72 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
     {
-        CUarray mappedArray;
-        CUgraphicsResource resource;
-        ID3D12Resource* pResource = static_cast<ID3D12Resource*>(texture->GetNativeTexturePtrV());
+        D3D12Texture2D* d3d12Texure = static_cast<D3D12Texture2D*>(texture);
 
         // set context on the thread.
-        //cuCtxPushCurrent(GetCUcontext());
+        cuCtxPushCurrent(GetCUcontext());
 
-        //CUresult result = cuGraphicsD3D11RegisterResource(&resource, pResource, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
-        //if (result != CUDA_SUCCESS)
-        //{
-        //    throw;
-        //}
+        HANDLE sharedHandle = d3d12Texure->GetHandle();
+        if (!sharedHandle)
+        {
+            RTC_LOG(LS_ERROR) << "cannot get shared handle";
+            throw;
+        }
 
-        //result = cuGraphicsMapResources(1, &resource, 0);
-        //if (result != CUDA_SUCCESS)
-        //{
-        //    throw;
-        //}
+        size_t width = d3d12Texure->GetWidth();
+        size_t height = d3d12Texure->GetHeight();
+        D3D12_RESOURCE_DESC desc = d3d12Texure->GetDesc();
+		D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo;
+        d3d12ResourceAllocationInfo = m_d3d12Device->GetResourceAllocationInfo(0, 1, &desc);
+        size_t actualSize = d3d12ResourceAllocationInfo.SizeInBytes;
 
-        //result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
-        //if (result != CUDA_SUCCESS)
-        //{
-        //    throw;
-        //}
+        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE;
+        memDesc.handle.win32.handle = static_cast<void*>(sharedHandle);
+        memDesc.size = actualSize;
+        memDesc.flags = CUDA_EXTERNAL_MEMORY_DEDICATED;
 
-        //cuCtxPopCurrent(NULL);
+        CUresult result;
+        CUexternalMemory externalMemory = {};
+        result = cuImportExternalMemory(&externalMemory, &memDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error";
+            throw;
+        }
+
+        CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
+        arrayDesc.Width = width;
+        arrayDesc.Height = height;
+        arrayDesc.Depth = 0; /* CUDA 2D arrays are defined to have depth 0 */
+        arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT32;
+        arrayDesc.NumChannels = 1;
+        arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
+
+        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
+        mipmapArrayDesc.arrayDesc = arrayDesc;
+        mipmapArrayDesc.numLevels = 1;
+
+        CUmipmappedArray mipmappedArray;
+        result = cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error";
+            throw;
+        }
+
+        CUarray array;
+        result = cuMipmappedArrayGetLevel(&array, mipmappedArray, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
+            throw;
+        }
+        cuCtxPopCurrent(NULL);
 
         std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
-        handle->array = mappedArray;
-        handle->resource = resource;
+        handle->array = array;
+        handle->externalMemory = externalMemory;
         return handle;
     }
 
