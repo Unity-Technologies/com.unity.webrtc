@@ -69,6 +69,9 @@ class UnityVideoTrackSource :
 
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
+    
+    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast,
+                                                            absl::optional<bool> needs_denoising);
 
 private:
     void SendFeedback();

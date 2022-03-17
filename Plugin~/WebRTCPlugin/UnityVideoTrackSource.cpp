@@ -33,6 +33,11 @@ VideoFrameAdapter::ConvertToVideoFrameBuffer(
     return gmb->ToI420();
 }
 
+rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(bool is_screencast, absl::optional<bool> needs_denoising)
+{
+    return new rtc::RefCountedObject<UnityVideoTrackSource>(is_screencast, needs_denoising);
+}
+
 UnityVideoTrackSource::UnityVideoTrackSource(
     bool is_screencast,
     absl::optional<bool> needs_denoising)

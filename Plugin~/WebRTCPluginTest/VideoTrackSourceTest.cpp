@@ -31,13 +31,7 @@ class VideoTrackSourceTest : public GraphicsDeviceTestBase
 public:
     VideoTrackSourceTest() : m_texture(device()->CreateDefaultTextureV(width, height, m_textureFormat))
     {
-        m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
-            //m_device,
-            //m_texture->GetNativeTexturePtrV(),
-            //m_textureFormat,
-            //GPU_MEMORY | CPU_MEMORY,
-            /*is_screencast=*/ false,
-            /*needs_denoising=*/ absl::nullopt);
+        m_trackSource = UnityVideoTrackSource::Create(false, absl::nullopt);
         m_trackSource->AddOrUpdateSink(&mock_sink_, rtc::VideoSinkWants());
 
         EXPECT_NE(nullptr, device());
