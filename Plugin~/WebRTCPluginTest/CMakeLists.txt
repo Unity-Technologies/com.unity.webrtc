@@ -53,16 +53,6 @@ endif()
 
 include(GoogleTest)
 
-target_compile_options(WebRTCLibTest
-  PRIVATE
-    -Wall
-    -Wextra
-    -Wno-missing-field-initializers
-    -Wno-c++98-compat
-    -Wno-c++98-compat-pedantic
-    -Wno-padded
-)
-
 target_compile_definitions(WebRTCLibTest
   PRIVATE 
     "$<$<CONFIG:Debug>:DEBUG>"
