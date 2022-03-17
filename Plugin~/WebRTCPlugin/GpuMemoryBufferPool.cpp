@@ -59,7 +59,7 @@ namespace webrtc
     bool GpuMemoryBufferPool::AreFrameResourcesCompatible(
         const FrameReources* resources, const Size& size, UnityRenderingExtTextureFormat format)
     {
-        return resources->buffer_->GetSize() == size && resources->buffer_->GetFormat();
+        return resources->buffer_->GetSize() == size && resources->buffer_->GetFormat() == format;
     }
 
     void GpuMemoryBufferPool::OnReturnBuffer(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
