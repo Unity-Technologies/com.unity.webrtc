@@ -16,6 +16,7 @@
 #endif
 
 #if SUPPORT_METAL
+#include "Metal/MetalDevice.h"
 #include "Metal/MetalGraphicsDevice.h"
 #endif
 
@@ -66,9 +67,9 @@ IGraphicsDevice* GraphicsDevice::Init(IUnityInterfaces* unityInterface) {
 #endif
 #if SUPPORT_METAL
         case kUnityGfxRendererMetal: {
-            IUnityGraphicsMetal* deviceInterface =
-                unityInterface->Get<IUnityGraphicsMetal>();
-            return Init(rendererType, deviceInterface->MetalDevice(), deviceInterface);
+            std::unique_ptr<MetalDevice> device =
+                MetalDevice::Create(unityInterface->Get<IUnityGraphicsMetal>());
+            return Init(rendererType, device.release(), nullptr);
             break;
         }
 #endif
@@ -133,10 +134,8 @@ IGraphicsDevice* GraphicsDevice::Init(
 #if SUPPORT_METAL
     case kUnityGfxRendererMetal: {
         RTC_DCHECK(device);
-        id<MTLDevice> metalDevice = reinterpret_cast<id<MTLDevice>>(device);
-        IUnityGraphicsMetal* metalUnityInterface =
-            reinterpret_cast<IUnityGraphicsMetal*>(unityInterface);
-        pDevice = new MetalGraphicsDevice(metalDevice, metalUnityInterface, renderer);
+        MetalDevice* metalDevice = static_cast<MetalDevice*>(device);
+        pDevice = new MetalGraphicsDevice(metalDevice, renderer);
         break;
     }
 #endif

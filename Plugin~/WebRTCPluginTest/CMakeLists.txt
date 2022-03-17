@@ -5,29 +5,24 @@ target_sources(WebRTCLibTest
     pch.cpp
     pch.h
     ContextTest.cpp
-    GraphicsDeviceTest.cpp
+    FrameGenerator.cpp
+    FrameGenerator.h
     GpuMemoryBufferTest.cpp
     GpuMemoryBufferPoolTest.cpp
     GraphicsDeviceContainer.cpp
     GraphicsDeviceContainer.h
     GraphicsDeviceContainerTest.cpp
+    GraphicsDeviceTest.cpp
     GraphicsDeviceTestBase.cpp
     GraphicsDeviceTestBase.h
+    UnityVideoEncoderFactoryTest.cpp
+    UnityVideoDecoderFactoryTest.cpp
     VideoCodecTest.cpp
     VideoCodecTest.h
     VideoFrameTest.cpp
-    UnityVideoEncoderFactoryTest.cpp
-    UnityVideoDecoderFactoryTest.cpp
+    VideoRendererTest.cpp
+    VideoTrackSourceTest.cpp
 )
-
-# todo(kazuki):: fix linker error on macOS and iOS
-if(NOT (macOS OR iOS))
-  target_sources(WebRTCLibTest
-    PRIVATE
-      VideoRendererTest.cpp
-      VideoTrackSourceTest.cpp
-  )    
-endif()
 
 if(Windows OR Linux)
   add_subdirectory(NvCodec)

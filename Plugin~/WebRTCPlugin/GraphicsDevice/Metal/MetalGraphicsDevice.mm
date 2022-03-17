@@ -1,7 +1,10 @@
 #include "pch.h"
+
+#include "MetalDevice.h"
 #include "MetalGraphicsDevice.h"
 #include "MetalTexture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+
 #import <Metal/Metal.h>
 
 namespace unity
@@ -9,36 +12,30 @@ namespace unity
 namespace webrtc
 {
 
-    MetalGraphicsDevice::MetalGraphicsDevice(
-        id<MTLDevice>  device, IUnityGraphicsMetal* unityGraphicsMetal, UnityGfxRenderer renderer)
+    MetalGraphicsDevice::MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer)
         : IGraphicsDevice(renderer)
         , m_device(device)
-        , m_unityGraphicsMetal(unityGraphicsMetal)
+    {
+    }
+
+    bool MetalGraphicsDevice::InitV()
+    {
+        return true;
+    }
+
+    void MetalGraphicsDevice::ShutdownV()
     {
     }
 
 //---------------------------------------------------------------------------------------------------------------------
-    MetalGraphicsDevice::~MetalGraphicsDevice() {
-        m_device = nil;
-        m_unityGraphicsMetal = nullptr;
-    }
-
-//---------------------------------------------------------------------------------------------------------------------
-    bool MetalGraphicsDevice::InitV() {
-        return true;
-    }
-//---------------------------------------------------------------------------------------------------------------------
-
-    void MetalGraphicsDevice::ShutdownV() {
-    }
-
-//---------------------------------------------------------------------------------------------------------------------
-    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    {
+        id<MTLDevice> device = m_device->Device();
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
         textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
         textureDescriptor.width = w;
         textureDescriptor.height = h;
-        id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
+        id<MTLTexture> texture = [device newTextureWithDescriptor:textureDescriptor];
         return new MetalTexture2D(w, h, texture);
     }
 
@@ -76,9 +73,9 @@ namespace webrtc
         if(src.pixelFormat != dest.pixelFormat)
             return false;
 
-        m_unityGraphicsMetal->EndCurrentCommandEncoder();
+        m_device->EndCurrentCommandEncoder();
 
-        id<MTLCommandBuffer> commandBuffer = m_unityGraphicsMetal->CurrentCommandBuffer();
+        id<MTLCommandBuffer> commandBuffer = m_device->CurrentCommandEncoder();
         id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         
         NSUInteger width = src.width;
@@ -104,7 +101,7 @@ namespace webrtc
 #endif
         [blit endEncoding];
         blit = nil;
-        m_unityGraphicsMetal->EndCurrentCommandEncoder();
+        m_device->EndCurrentCommandEncoder();
 
         return true;
     }
@@ -112,6 +109,7 @@ namespace webrtc
 //---------------------------------------------------------------------------------------------------------------------
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
+        id<MTLDevice> device = m_device->Device();
         MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
         textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
         textureDescriptor.width = width;
@@ -126,7 +124,7 @@ namespace webrtc
 #else
         textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeShared);
 #endif
-        id<MTLTexture> texture = [m_device newTextureWithDescriptor:textureDescriptor];
+        id<MTLTexture> texture = [device newTextureWithDescriptor:textureDescriptor];
         return new MetalTexture2D(width, height, texture);
 
     }
@@ -166,6 +164,8 @@ namespace webrtc
                 return MTLPixelFormatBGRA8Unorm_sRGB;
             case kUnityRenderingExtFormatB8G8R8A8_UNorm:
                 return MTLPixelFormatBGRA8Unorm;
+            case kUnityRenderingExtFormatR8G8B8A8_SRGB:
+                return MTLPixelFormatRGBA8Unorm_sRGB;
             default:
                 return MTLPixelFormatInvalid;
         }

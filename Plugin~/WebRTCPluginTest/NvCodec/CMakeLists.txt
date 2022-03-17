@@ -4,6 +4,4 @@ target_sources(WebRTCLibTest
     NvDecoderImplTest.cpp
     NvEncoderImplTest.cpp
     NvCodecTest.cpp
-    FrameGenerator.cpp
-    FrameGenerator.h
 )

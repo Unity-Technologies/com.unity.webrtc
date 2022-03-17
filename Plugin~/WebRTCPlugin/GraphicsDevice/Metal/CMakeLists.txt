@@ -4,4 +4,6 @@ target_sources(WebRTCLib
     MetalGraphicsDevice.h
     MetalTexture2D.mm
     MetalTexture2D.h
+    MetalDevice.mm
+    MetalDevice.h
 )

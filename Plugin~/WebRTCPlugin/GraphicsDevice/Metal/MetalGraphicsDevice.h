@@ -11,11 +11,12 @@ namespace unity
 namespace webrtc
 {
     using namespace ::webrtc;
+    class MetalDevice;
     class MetalGraphicsDevice : public IGraphicsDevice
     {
     public:
-        MetalGraphicsDevice(id<MTLDevice> device, IUnityGraphicsMetal* unityGraphicsMetal, UnityGfxRenderer renderer);
-        virtual ~MetalGraphicsDevice();
+        MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer);
+        virtual ~MetalGraphicsDevice() = default;
 
         bool InitV() override;
         void ShutdownV() override;
@@ -31,15 +32,13 @@ namespace webrtc
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }
         
     private:
-        id<MTLDevice> m_device;
+        MetalDevice* m_device;
         
         bool CopyTexture(id<MTLTexture> dest, id<MTLTexture> src);
-        IUnityGraphicsMetal* m_unityGraphicsMetal;
-
         static MTLPixelFormat ConvertFormat(UnityRenderingExtTextureFormat format);
     };
 
-    void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device; }
+    void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device->Device(); }
     GraphicsDeviceType MetalGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_METAL;}
 } // end namespace webrtc
 } // end namespace unity

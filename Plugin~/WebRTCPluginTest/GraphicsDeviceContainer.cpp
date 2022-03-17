@@ -10,6 +10,7 @@
 #endif
 
 #if SUPPORT_METAL // Metal
+#include "GraphicsDevice/Metal/MetalDevice.h"
 #import <Metal/Metal.h>
 #endif
 
@@ -319,7 +320,13 @@ namespace webrtc
 
 #if defined(SUPPORT_METAL) // Metal
 
-    void* CreateDeviceMetal() { return MTLCreateSystemDefaultDevice(); }
+    void* CreateDeviceMetal() { return MetalDevice::CreateForTest().release(); }
+
+    void DestroyDeviceMetalDevice(void* ptr)
+    {
+        MetalDevice* device = static_cast<MetalDevice*>(ptr);
+        delete device;
+    }
 
 #endif
 
@@ -422,6 +429,7 @@ namespace webrtc
 #endif
 #if defined(SUPPORT_METAL)
         case kUnityGfxRendererMetal:
+            DestroyDeviceMetalDevice(pGfxDevice);
             return;
 #endif
         default:
