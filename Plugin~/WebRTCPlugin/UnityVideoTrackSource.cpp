@@ -17,6 +17,18 @@ namespace webrtc
       .build();
 }
 
+VideoFrameBuffer::Type VideoFrameAdapter::type() const
+{
+#if UNITY_IOS || UNITY_MACOS || UNITY_ANDROID
+    // todo(kazuki): support for kNative type for mobile platform and macOS.
+    // Need to pass ObjCFrameBuffer instead of VideoFrameAdapter on macOS/iOS.
+    // Need to pass AndroidVideoBuffer instead of VideoFrameAdapter on Android.
+    return ::webrtc::VideoFrameBuffer::Type::kI420;
+#else
+    return ::webrtc::VideoFrameBuffer::Type::kNative;
+#endif
+}
+
 rtc::scoped_refptr<I420BufferInterface> VideoFrameAdapter::ToI420() {
     return ConvertToVideoFrameBuffer(frame_)->ToI420();
 }

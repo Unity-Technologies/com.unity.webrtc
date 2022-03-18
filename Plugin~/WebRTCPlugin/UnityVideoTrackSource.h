@@ -20,9 +20,7 @@ public:
 
     rtc::scoped_refptr<VideoFrame> GetVideoFrame() const { return frame_; }
 
-    VideoFrameBuffer::Type type() const override {
-        return ::webrtc::VideoFrameBuffer::Type::kNative;
-    }
+    VideoFrameBuffer::Type type() const override;
     int width() const override { return size_.width(); }
     int height() const override { return size_.height(); }
 
