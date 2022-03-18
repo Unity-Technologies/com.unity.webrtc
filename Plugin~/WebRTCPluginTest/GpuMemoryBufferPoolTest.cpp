@@ -57,9 +57,11 @@ namespace webrtc
         void* ptr = tex->GetNativeTexturePtrV();
 
         auto frame1 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_.us());
+        EXPECT_NE(frame1, nullptr);
         EXPECT_EQ(1u, bufferPool_->bufferCount());
 
         auto frame2 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_.us());
+        EXPECT_NE(frame2, nullptr);
         EXPECT_EQ(2u, bufferPool_->bufferCount());
 
         frame1 = nullptr;
