@@ -186,13 +186,13 @@ elseif(Linux)
 
   target_link_libraries(WebRTCLibTest
     PRIVATE
+      WebRTCLib
       ${GLUT_LIBRARY}
       ${CMAKE_DL_LIBS}
       ${CMAKE_THREAD_LIBS_INIT}
       gtest
       gmock
       gtest_main
-      WebRTCLib
   )
   target_include_directories(WebRTCLibTest
     PRIVATE
