@@ -36,7 +36,7 @@ namespace webrtc
     class NvDecoder : public VideoDecoder
     {
     public:
-        static std::unique_ptr<NvDecoder> Create();
+        static std::unique_ptr<NvDecoder> Create(const cricket::VideoCodec& codec, CUcontext context);
         static bool IsSupported();
 
         ~NvDecoder() override { }

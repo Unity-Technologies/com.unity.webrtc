@@ -3,6 +3,8 @@
 #include "NvCodec.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
+#include "NvDecoder/NvDecoder.h"
+#include "NvDecoderImpl.h"
 
 #include "absl/strings/match.h"
 #include "api/video_codecs/video_encoder_factory.h"
@@ -71,10 +73,47 @@ namespace webrtc
         return supportedFormats;
     }
 
+    int GetCudaDeviceCapabilityMajorVersion(CUcontext context)
+    {
+        cuCtxSetCurrent(context);
+
+        CUdevice device;
+        cuCtxGetDevice(&device);
+
+        int major;
+        cuDeviceGetAttribute(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, device);
+
+        return major;
+    }
+
     std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context)
     {
-        // todo(kazuki)::fixme
-        return SupportedNvEncoderCodecs(context);
+        std::vector<SdpVideoFormat> supportedFormats;
+
+        // HardwareGeneration Kepler is 3.x
+        // https://docs.nvidia.com/deploy/cuda-compatibility/index.html#faq
+        // Kepler support h264 profile Main, Highprofile up to Level4.1
+        // https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/index.html#video-decoder-capabilities__table_o3x_fms_3lb
+        if (GetCudaDeviceCapabilityMajorVersion(context) <= 3)
+        {
+            supportedFormats = {
+                CreateH264Format(webrtc::H264Profile::kProfileConstrainedHigh, webrtc::H264Level::kLevel4_1, "1"),
+                CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel4_1, "1"),
+                CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel4_1, "1"),
+            };
+        }
+        else
+        {
+            supportedFormats = {
+                CreateH264Format(webrtc::H264Profile::kProfileBaseline, webrtc::H264Level::kLevel5_1, "1"),
+                CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel5_1, "1"),
+                CreateH264Format(webrtc::H264Profile::kProfileConstrainedHigh, webrtc::H264Level::kLevel5_1, "1"),
+                CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel5_1, "1"),
+                CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel5_1, "1"),
+            };
+        }
+
+        return supportedFormats;
     }
 
     std::unique_ptr<NvEncoder> NvEncoder::Create(
@@ -83,7 +122,10 @@ namespace webrtc
         return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format);
     }
 
-    std::unique_ptr<NvDecoder> NvDecoder::Create() { return nullptr; }
+    std::unique_ptr<NvDecoder> NvDecoder::Create(const cricket::VideoCodec& codec, CUcontext context)
+    {
+        return std::make_unique<NvDecoderImpl>(context);
+    }
 
     NvEncoderFactory::NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format)
         : context_(context)
@@ -111,18 +153,17 @@ namespace webrtc
     NvDecoderFactory::NvDecoderFactory(CUcontext context)
         : context_(context)
     {
-        // todo
     }
     NvDecoderFactory::~NvDecoderFactory() = default;
 
-    std::vector<webrtc::SdpVideoFormat> NvDecoderFactory::GetSupportedFormats() const
+    std::vector<SdpVideoFormat> NvDecoderFactory::GetSupportedFormats() const
     {
         return SupportedNvDecoderCodecs(context_);
     }
-    std::unique_ptr<webrtc::VideoDecoder> NvDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat& format)
+
+    std::unique_ptr<VideoDecoder> NvDecoderFactory::CreateVideoDecoder(const SdpVideoFormat& format)
     {
-        // todo
-        return NvDecoder::Create();
+        return NvDecoder::Create(cricket::VideoCodec(format), context_);
     }
 }
 }
