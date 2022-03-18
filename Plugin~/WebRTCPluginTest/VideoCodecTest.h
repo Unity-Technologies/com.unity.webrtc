@@ -24,7 +24,7 @@ namespace webrtc
     std::string kProfileLevelIdString();
     VideoEncoder::Settings kSettings();
 
-    constexpr void SetDefaultSettings(VideoCodec* codec_settings)
+    static void SetDefaultSettings(VideoCodec* codec_settings)
     {
         codec_settings->codecType = kVideoCodecH264;
         codec_settings->maxFramerate = 60;

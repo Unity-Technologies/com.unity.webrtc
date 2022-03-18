@@ -71,9 +71,9 @@ namespace webrtc
     };
 
 #ifndef _WIN32
-    constexpr bool operator==(const GUID& a, const GUID& b)
+    static bool operator==(const GUID& a, const GUID& b)
     {
-        return !memcmp(&a, &b, sizeof(GUID));
+        return !std::memcmp(&a, &b, sizeof(GUID));
     }
 #endif
 
