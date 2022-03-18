@@ -24,6 +24,9 @@ namespace webrtc
     std::string kProfileLevelIdString();
     VideoEncoder::Settings kSettings();
 
+// todo(kazuki):: fix workaround
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
     static void SetDefaultSettings(VideoCodec* codec_settings)
     {
         codec_settings->codecType = kVideoCodecH264;
@@ -36,6 +39,7 @@ namespace webrtc
         codec_settings->startBitrate = 2000;
         codec_settings->maxBitrate = 4000;
     }
+#pragma clang diagnostic pop
 
     class VideoCodecTest : public testing::TestWithParam<UnityGfxRenderer>
     {

@@ -77,6 +77,10 @@ namespace webrtc
     }
 #endif
 
+// todo(kazuki):: fix workaround
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+
     static absl::optional<H264Profile> GuidToProfile(GUID& guid)
     {
         if (guid == NV_ENC_H264_PROFILE_BASELINE_GUID)
@@ -102,5 +106,6 @@ namespace webrtc
             return NV_ENC_H264_PROFILE_CONSTRAINED_HIGH_GUID;
         return absl::nullopt;
     }
+#pragma clang diagnostic pop
 }
 }
