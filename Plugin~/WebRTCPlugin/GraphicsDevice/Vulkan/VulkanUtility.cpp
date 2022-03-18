@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "VulkanUtility.h"
 #include "WebRTCMacros.h"
 
@@ -262,11 +263,19 @@ void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory
     handleInfo.memory = memory;
     handleInfo.handleType = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
 
-    auto func = (PFN_vkGetMemoryWin32HandleKHR) \
-        vkGetDeviceProcAddr(device, "vkGetMemoryWin32HandleKHR");
+    PFN_vkGetMemoryWin32HandleKHR fpGetMemoryWin32HandleKHR =
+        (PFN_vkGetMemoryWin32HandleKHR) vkGetDeviceProcAddr(device, "vkGetMemoryWin32HandleKHR");
 
-    if (!func ||
-        func(device, &handleInfo, &handle) != VK_SUCCESS) {
+    if (!fpGetMemoryWin32HandleKHR)
+    {
+        RTC_LOG(LS_ERROR) << "Failed to retrieve vkGetMemoryWin32HandleKHR";
+        return nullptr;
+    }
+
+    VkResult result = fpGetMemoryWin32HandleKHR(device, &handleInfo, &handle);
+    if (result != VK_SUCCESS)
+    {
+        RTC_LOG(LS_ERROR) << "vkGetMemoryWin32HandleKHR error" << result;
         return nullptr;
     }
 
