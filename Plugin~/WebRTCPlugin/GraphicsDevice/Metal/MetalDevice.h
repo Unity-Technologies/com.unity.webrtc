@@ -15,7 +15,7 @@ namespace webrtc
         static std::unique_ptr<MetalDevice> Create(IUnityGraphicsMetal* device);
         static std::unique_ptr<MetalDevice> CreateForTest();
 
-        virtual ~MetalDevice() {}
+        virtual ~MetalDevice() { }
         virtual id<MTLDevice> Device() = 0;
         virtual id<MTLCommandBuffer> CurrentCommandEncoder() = 0;
         virtual void EndCurrentCommandEncoder() = 0;

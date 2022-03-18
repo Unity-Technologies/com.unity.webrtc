@@ -7,7 +7,6 @@ namespace unity
 {
 namespace webrtc
 {
-
     class MTLTexture;
     struct MetalTexture2D : ITexture2D
     {
@@ -16,15 +15,12 @@ namespace webrtc
 
         MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex);
         virtual ~MetalTexture2D();
-        
+
         inline void* GetNativeTexturePtrV() override;
         inline const void* GetNativeTexturePtrV() const override;
         inline void* GetEncodeTexturePtrV() override;
         inline const void* GetEncodeTexturePtrV() const override;
-
     };
-
-//---------------------------------------------------------------------------------------------------------------------
 
     void* MetalTexture2D::GetNativeTexturePtrV() { return m_texture; }
     const void* MetalTexture2D::GetNativeTexturePtrV() const { return m_texture; };
