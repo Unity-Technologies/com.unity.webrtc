@@ -73,11 +73,11 @@ namespace webrtc
 #ifndef _WIN32
     constexpr bool operator==(const GUID& a, const GUID& b)
     {
-        return a.Data1 == b.Data1 && a.Data2 == b.Data2 && a.Data3 == b.Data3 && std::memcmp(a.Data4, b.Data4, 8) == 0;
+        return !memcmp(&a, &b, sizeof(GUID));
     }
 #endif
 
-    constexpr absl::optional<H264Profile> GuidToProfile(GUID& guid)
+    static absl::optional<H264Profile> GuidToProfile(GUID& guid)
     {
         if (guid == NV_ENC_H264_PROFILE_BASELINE_GUID)
             return H264Profile::kProfileBaseline;
@@ -90,7 +90,7 @@ namespace webrtc
         return absl::nullopt;
     }
 
-    constexpr absl::optional<GUID> ProfileToGuid(H264Profile profile)
+    static absl::optional<GUID> ProfileToGuid(H264Profile profile)
     {
         if (profile == H264Profile::kProfileBaseline)
             return NV_ENC_H264_PROFILE_BASELINE_GUID;
