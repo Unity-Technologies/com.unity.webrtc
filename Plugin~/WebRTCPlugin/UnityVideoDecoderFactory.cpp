@@ -1,5 +1,8 @@
 #include "pch.h"
+
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "UnityVideoDecoderFactory.h"
+
 #include "absl/strings/match.h"
 
 #if UNITY_OSX || UNITY_IOS
@@ -9,61 +12,53 @@
 #include "Codec/AndroidCodec/android_codec_factory_helper.h"
 #endif
 
+#if CUDA_PLATFORM
+#include "Codec/NvCodec/NvCodec.h"
+#include <cuda.h>
+#endif
+
 namespace unity
 {
 namespace webrtc
 {
-    webrtc::VideoDecoderFactory* CreateDecoderFactory()
+    webrtc::VideoDecoderFactory* CreateNativeDecoderFactory(IGraphicsDevice* gfxDevice)
     {
 #if UNITY_OSX || UNITY_IOS
-        return webrtc::ObjCToNativeVideoDecoderFactory(
-            [[RTCDefaultVideoDecoderFactory alloc] init]).release();
+        return webrtc::ObjCToNativeVideoDecoderFactory([[RTCDefaultVideoDecoderFactory alloc] init]).release();
 #elif UNITY_ANDROID
         return CreateAndroidDecoderFactory().release();
-#else
-        return new webrtc::InternalDecoderFactory();
+#elif CUDA_PLATFORM
+        CUcontext context = gfxDevice->GetCUcontext();
+        return new NvDecoderFactory(context);
 #endif
+        return nullptr;
     }
 
-    UnityVideoDecoderFactory::UnityVideoDecoderFactory(bool forTest)
-    : internal_decoder_factory_(CreateDecoderFactory())
-#if CUDA_PLATFORM
-    , forTest_(forTest)
-#endif
+    UnityVideoDecoderFactory::UnityVideoDecoderFactory(IGraphicsDevice* gfxDevice)
+        : internal_decoder_factory_(new webrtc::InternalDecoderFactory())
+        , native_decoder_factory_(CreateNativeDecoderFactory(gfxDevice))
     {
     }
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoDecoderFactory::GetSupportedFormats() const
     {
-#if CUDA_PLATFORM
-        // todo(kazuki):: Support H.264 hardware decoder for CUDA platforms (Linux and Windows)
-        // This is a workaround to generate SDPs contains H.264 codec for unit testing.
-        // The workaround will be removed if CUDA HW decoder is supported.
-        if(forTest_)
-        {
-            return { webrtc::CreateH264Format(
-                webrtc::H264::kProfileConstrainedBaseline,
-                webrtc::H264::kLevel5_1, "1") };
-        }
-        else
-        {
-            return internal_decoder_factory_->GetSupportedFormats();
-        }
-#else
-        return internal_decoder_factory_->GetSupportedFormats();
-#endif
+        std::vector<SdpVideoFormat> supported_codecs;
+        for (const webrtc::SdpVideoFormat& format : native_decoder_factory_->GetSupportedFormats())
+            supported_codecs.push_back(format);
+        for (const webrtc::SdpVideoFormat& format : internal_decoder_factory_->GetSupportedFormats())
+            supported_codecs.push_back(format);
+        return supported_codecs;
     }
 
-    std::unique_ptr<webrtc::VideoDecoder> UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat & format)
+    std::unique_ptr<webrtc::VideoDecoder>
+    UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat& format)
     {
-
-        if (absl::EqualsIgnoreCase(format.name, cricket::kAv1CodecName))
+        if (format.IsCodecInList(native_decoder_factory_->GetSupportedFormats()))
         {
-            RTC_LOG(LS_INFO) << "AV1 codec is not supported";
-            return nullptr;
+            return native_decoder_factory_->CreateVideoDecoder(format);
         }
         return internal_decoder_factory_->CreateVideoDecoder(format);
     }
 
-}  // namespace webrtc
-}  // namespace unity
+} // namespace webrtc
+} // namespace unity

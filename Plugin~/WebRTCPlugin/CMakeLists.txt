@@ -8,8 +8,6 @@ target_sources(WebRTCLib
     DataChannelObject.h
     DummyAudioDevice.cpp
     DummyAudioDevice.h
-    DummyVideoEncoder.cpp
-    DummyVideoEncoder.h
     AudioTrackSinkAdapter.h
     AudioTrackSinkAdapter.cpp
     Logger.cpp
@@ -46,8 +44,15 @@ target_sources(WebRTCLib
     WebRTCPlugin.h
     UnityLogStream.h
     UnityLogStream.cpp
+    VideoFrame.cpp
+    VideoFrame.h
+    VideoFrameUtil.cpp
+    VideoFrameUtil.h
+    GpuMemoryBuffer.cpp
+    GpuMemoryBuffer.h
+    GpuMemoryBufferPool.cpp
+    GpuMemoryBufferPool.h
 )
-
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Visual Studio Generator has not been supported supression warnings of external headers yet.
@@ -186,9 +191,11 @@ elseif(Linux)
       VK_NO_PROTOTYPES
   )
   target_link_libraries(WebRTCLib
-    PRIVATE
+    PUBLIC
       ${WEBRTC_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
+      ${OPENGL_egl_LIBRARY}
+      ${OPENGL_glx_LIBRARY}
       ${NVCODEC_LIBRARIES}
       ${Vulkan_LIBRARY}
       ${GLIB_LIBRARIES}
@@ -199,6 +206,7 @@ elseif(Linux)
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
       ${OPENGL_INCLUDE_DIR}
+      ${OPENGL_EGL_INCLUDE_DIRS}
       ${NVCODEC_INCLUDE_DIR}
   )
 

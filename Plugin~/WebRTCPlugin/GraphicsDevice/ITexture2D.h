@@ -15,8 +15,15 @@ public:
 
     virtual ~ITexture2D() = 0;
 
+    /// <summary>
+    /// Get the pointer taken from Unity
+    /// </summary>
     virtual void* GetNativeTexturePtrV() = 0;
+    /// <summary>
+    /// Get the pointer taken from Unity
+    /// </summary>
     virtual const void* GetNativeTexturePtrV() const = 0;
+
     virtual void* GetEncodeTexturePtrV() = 0;
     virtual const void* GetEncodeTexturePtrV() const = 0;
 

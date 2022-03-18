@@ -14,7 +14,7 @@ class GraphicsDevice
         static GraphicsDevice& GetInstance();
         IGraphicsDevice* Init(IUnityInterfaces* unityInterface);
         IGraphicsDevice* Init(
-            UnityGfxRenderer rendererType, void* device,IUnityInterface* unityInterface);
+            UnityGfxRenderer renderer, void* device,IUnityInterface* unityInterface);
     private:
         GraphicsDevice();
         GraphicsDevice(GraphicsDevice const&) = delete;              

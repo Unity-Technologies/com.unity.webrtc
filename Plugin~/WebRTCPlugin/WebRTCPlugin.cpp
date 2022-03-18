@@ -6,7 +6,6 @@
 #include "UnityLogStream.h"
 #include "Context.h"
 #include "UnityAudioTrackSource.h"
-#include "Codec/EncoderFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #if defined(SUPPORT_VULKAN)
@@ -240,24 +239,7 @@ extern "C"
             return false;
         }
 #endif
-        return EncoderFactory::GetHardwareEncoderSupport();
-    }
-
-    UNITY_INTERFACE_EXPORT UnityEncoderType ContextGetEncoderType(Context* context)
-    {
-        return context->GetEncoderType();
-    }
-
-    UNITY_INTERFACE_EXPORT CodecInitializationResult GetInitializationResult(Context* context, MediaStreamTrackInterface* track)
-    {
-        return context->GetInitializationResult(track);
-    }
-
-    UNITY_INTERFACE_EXPORT void ContextSetVideoEncoderParameter(
-        Context* context, MediaStreamTrackInterface* track, int width, int height,
-        UnityRenderingExtTextureFormat textureFormat, void* textureHandle)
-    {
-        context->SetEncoderParameter(track, width, height, textureFormat, textureHandle);
+        return true;
     }
 
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
@@ -286,7 +268,8 @@ extern "C"
         context->StopMediaStreamTrack(track);
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::VideoTrackSourceInterface* ContextCreateVideoTrackSource(Context* context)
+    UNITY_INTERFACE_EXPORT webrtc::VideoTrackSourceInterface* ContextCreateVideoTrackSource(
+        Context* context)
     {
         return context->CreateVideoSource();
     }
@@ -358,6 +341,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT AudioTrackInterface** MediaStreamGetAudioTracks(MediaStreamInterface* stream, size_t* length)
     {
         return ConvertPtrArrayFromRefPtrArray<AudioTrackInterface>(stream->GetAudioTracks(), length);
+    }
+
+    UNITY_INTERFACE_EXPORT VideoTrackSourceInterface* ContextGetVideoSource(Context* context, VideoTrackInterface* track)
+    {
+        return track->GetSource();
     }
 
     UNITY_INTERFACE_EXPORT TrackKind MediaStreamTrackGetKind(MediaStreamTrackInterface* track)
@@ -437,7 +425,7 @@ extern "C"
         delegateSetResolution = func;
     }
 
-    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid, UnityEncoderType encoderType, bool forTest)
+    UNITY_INTERFACE_EXPORT Context* ContextCreate(int uid)
     {
         auto ctx = ContextManager::GetInstance()->GetContext(uid);
         if (ctx != nullptr)
@@ -445,7 +433,8 @@ extern "C"
             DebugLog("Already created context with ID %d", uid);
             return ctx;
         }
-        ctx = ContextManager::GetInstance()->CreateContext(uid, encoderType, forTest);
+        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
+        ctx = ContextManager::GetInstance()->CreateContext(uid, device);
         return ctx;
     }
 

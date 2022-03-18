@@ -3,11 +3,10 @@
 
 #include "AudioTrackSinkAdapter.h"
 #include "DummyAudioDevice.h"
-#include "DummyVideoEncoder.h"
 #include "PeerConnectionObject.h"
 #include "UnityVideoRenderer.h"
 #include "UnityVideoTrackSource.h"
-#include "Codec/IEncoder.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
@@ -26,43 +25,36 @@ namespace webrtc
         ~ContextManager();
 
         Context* GetContext(int uid) const;
-        Context* CreateContext(int uid, UnityEncoderType encoderType, bool forTest);
+        Context* CreateContext(
+            int uid, IGraphicsDevice* gfxDevice);
         void DestroyContext(int uid);
         void SetCurContext(Context*);
         bool Exists(Context* context);
         using ContextPtr = std::unique_ptr<Context>;
         Context* curContext = nullptr;
+        std::mutex mutex;
     private:
         std::map<int, ContextPtr> m_contexts;
         static std::unique_ptr<ContextManager> s_instance;
     };
 
-    struct VideoEncoderParameter
+    enum class CodecInitializationResult
     {
-        int width;
-        int height;
-        UnityRenderingExtTextureFormat textureFormat;
-        void* textureHandle;
-        VideoEncoderParameter(
-            int width, int height, UnityRenderingExtTextureFormat textureFormat, void* textureHandle)
-            : width(width)
-            , height(height)
-            , textureFormat(textureFormat)
-            , textureHandle(textureHandle)
-        {
-        }
+        NotInitialized,
+        Success,
+        DriverNotInstalled,
+        DriverVersionDoesNotSupportAPI,
+        APINotFound,
+        EncoderInitializationFailed
     };
 
-    class Context : public IVideoEncoderObserver
+    class Context
     {
     public:
         
-        explicit Context(int uid = -1, UnityEncoderType encoderType = UnityEncoderHardware, bool forTest = false);
+        explicit Context(
+            IGraphicsDevice* gfxDevice = nullptr);
         ~Context();
-
-        // Utility
-        UnityEncoderType GetEncoderType() const;
-        CodecInitializationResult GetInitializationResult(webrtc::MediaStreamTrackInterface* track);
 
         bool ExistsRefPtr(const rtc::RefCountInterface* ptr) {
             return m_mapRefPtr.find(ptr) != m_mapRefPtr.end(); }
@@ -103,8 +95,9 @@ namespace webrtc
         webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, webrtc::VideoTrackSourceInterface* source);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
-        UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
-
+        UnityVideoTrackSource* GetVideoSource(
+            const MediaStreamTrackInterface* track);
+        bool ExistsVideoSource(UnityVideoTrackSource* source);
 
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
@@ -140,14 +133,6 @@ namespace webrtc
         void GetRtpReceiverCapabilities(
             cricket::MediaType kind, RtpCapabilities* capabilities) const;
 
-        // You must call these methods on Rendering thread.
-        bool InitializeEncoder(IEncoder* encoder, webrtc::MediaStreamTrackInterface* track);
-        bool FinalizeEncoder(IEncoder* encoder);
-        // You must call these methods on Rendering thread.
-        const VideoEncoderParameter* GetEncoderParameter(const webrtc::MediaStreamTrackInterface* track);
-        void SetEncoderParameter(const MediaStreamTrackInterface* track, int width, int height,
-            UnityRenderingExtTextureFormat format, void* textureHandle);
-
         // AudioDevice
         rtc::scoped_refptr<DummyAudioDevice> GetAudioDevice() const { return m_audioDevice; }
 
@@ -155,7 +140,6 @@ namespace webrtc
         std::mutex mutex;
 
     private:
-        UnityEncoderType m_encoderType;
         std::unique_ptr<rtc::Thread> m_workerThread;
         std::unique_ptr<rtc::Thread> m_signalingThread;
         std::unique_ptr<TaskQueueFactory> m_taskQueueFactory;
@@ -165,23 +149,10 @@ namespace webrtc
         std::map<const PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
         std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;
         std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>> m_mapSetSessionDescriptionObserver;
-        std::map<const webrtc::MediaStreamTrackInterface*, std::unique_ptr<VideoEncoderParameter>> m_mapVideoEncoderParameter;
         std::map<const DataChannelInterface*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
         std::map<const AudioTrackSinkAdapter*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
         std::map<const rtc::RefCountInterface*, rtc::scoped_refptr<rtc::RefCountInterface>> m_mapRefPtr;
-
-        // todo(kazuki): remove map after moving hardware encoder instance to DummyVideoEncoder.
-        std::map<const uint32_t, IEncoder*> m_mapIdAndEncoder;
-
-        // todo(kazuki): remove these callback methods by moving hardware encoder instance to DummyVideoEncoder.
-        //               attention point is multi-threaded opengl implementation with nvcodec.
-        void SetKeyFrame(uint32_t id) override;
-        void SetRates(uint32_t id, uint32_t bitRate, int64_t frameRate) override;
-
-        // todo(kazuki): static variable to set id each encoder.
-        static uint32_t s_encoderId;
-        static uint32_t GenerateUniqueId();
 
         static uint32_t s_rendererId;
         static uint32_t GenerateRendererId();

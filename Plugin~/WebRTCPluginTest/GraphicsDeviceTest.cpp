@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDeviceTestBase.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
@@ -46,6 +47,15 @@ TEST_P(GraphicsDeviceTest, CopyResourceV) {
     EXPECT_TRUE(device()->CopyResourceV(dst.get(), src.get()));
 }
 
+TEST_P(GraphicsDeviceTest, CopyResourceVFromCPURead)
+{
+    const auto width = 256;
+    const auto height = 256;
+    const std::unique_ptr<ITexture2D> src(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    EXPECT_TRUE(device()->CopyResourceV(dst.get(), src.get()));
+}
+
 TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
     const auto width = 256;
     const auto height = 256;
@@ -54,17 +64,32 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV) {
     EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
 }
 
-TEST_P(GraphicsDeviceTest, ConvertRGBToI420) {
-    const auto width = 256;
-    const auto height = 256;
+TEST_P(GraphicsDeviceTest, ConvertRGBToI420)
+{
+    const uint32_t width = 256;
+    const uint32_t height = 256;
     const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
-    const std::unique_ptr <ITexture2D> dst(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> dst(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
     EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
     const auto frameBuffer = device()->ConvertRGBToI420(dst.get());
     EXPECT_NE(nullptr, frameBuffer);
     EXPECT_EQ(width, frameBuffer->width());
     EXPECT_EQ(height, frameBuffer->height());
 }
+
+TEST_P(GraphicsDeviceTest, Map)
+{
+    const uint32_t width = 256;
+    const uint32_t height = 256;
+    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
+    EXPECT_NE(handle, nullptr);
+
+    const std::unique_ptr<ITexture2D> src2(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    std::unique_ptr<GpuMemoryBufferHandle> handle2 = device()->Map(src2.get());
+    EXPECT_NE(handle2, nullptr);
+}
+
 #endif
 
 INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece, GraphicsDeviceTest, testing::ValuesIn(VALUES_TEST_ENV));

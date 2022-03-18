@@ -1,5 +1,10 @@
 ﻿#include "pch.h"
+
 #include "OpenGLTexture2D.h"
+
+#if CUDA_PLATFORM
+#include <cudaGL.h>
+#endif
 
 namespace unity
 {
@@ -10,6 +15,7 @@ namespace webrtc
 
 OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex) : ITexture2D(w,h)
         , m_texture(tex)
+        , m_buffer(nullptr)
 {
 }
 
@@ -35,11 +41,10 @@ void OpenGLTexture2D::CreatePBO()
     glBufferData(GL_PIXEL_UNPACK_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-    if(m_buffer != nullptr)
+    if(m_buffer == nullptr)
     {
-        free(m_buffer);
+        m_buffer = static_cast<byte*>(malloc(bufferSize));
     }
-    m_buffer = static_cast<byte*>(malloc(bufferSize));
 }
 } // end namespace webrtc
 } // end namespace unity

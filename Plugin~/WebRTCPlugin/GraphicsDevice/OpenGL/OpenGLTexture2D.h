@@ -3,6 +3,11 @@
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
 
+#if CUDA_PLATFORM
+#include "GraphicsDevice/Cuda/CudaContext.h"
+#endif
+
+
 namespace unity
 {
 namespace webrtc
@@ -13,16 +18,17 @@ public:
     OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex);
     virtual ~OpenGLTexture2D();
 
-    inline virtual void* GetNativeTexturePtrV();
-    inline virtual const void* GetNativeTexturePtrV() const;
-    inline virtual void* GetEncodeTexturePtrV();
-    inline virtual const void* GetEncodeTexturePtrV() const;
+    inline void* GetNativeTexturePtrV() override;
+    inline const void* GetNativeTexturePtrV() const override;
+    inline void* GetEncodeTexturePtrV() override;
+    inline const void* GetEncodeTexturePtrV() const override;
 
     void CreatePBO();
     size_t GetBufferSize() const { return m_width * m_height * 4; }
     size_t GetPitch() const { return m_width * 4; }
     byte* GetBuffer() const { return m_buffer;  }
     GLuint GetPBO() const { return m_pbo; }
+    GLuint GetTexture() const { return m_texture; }
 private:
     GLuint m_texture;
     GLuint m_pbo;

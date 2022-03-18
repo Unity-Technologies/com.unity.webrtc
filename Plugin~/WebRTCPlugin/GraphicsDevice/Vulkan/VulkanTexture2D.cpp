@@ -34,20 +34,17 @@ void VulkanTexture2D::Shutdown()
     VULKAN_SAFE_FREE_MEMORY(m_device, m_textureImageMemory, m_allocator);
     m_textureImageMemorySize = 0;
     m_device = VK_NULL_HANDLE;
-
-#if CUDA_PLATFORM
-    m_cudaImage.Shutdown();
-#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device) {
+    m_physicalDevice = physicalDevice;
     m_device = device;
 
     const bool EXPORT_HANDLE = true;
     VkResult result = VulkanUtility::CreateImage(
-        physicalDevice,device,m_allocator, m_width, m_height,
+        physicalDevice, device, m_allocator, m_width, m_height,
         VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -63,11 +60,7 @@ bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice
     m_textureImageMemory = m_unityVulkanImage.memory.memory;
     m_textureImageMemorySize = m_unityVulkanImage.memory.size;
 
-#if CUDA_PLATFORM
-    return (CUDA_SUCCESS == m_cudaImage.Init(m_device, this));
-#else
     return true;
-#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------

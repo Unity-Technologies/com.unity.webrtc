@@ -300,18 +300,19 @@ VkResult VulkanUtility::BeginOneTimeCommandBufferInto(const VkDevice device, con
 //---------------------------------------------------------------------------------------------------------------------
 
 //Uses vkQueueWaitIdle to synchronize
-VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(const VkDevice device, const VkCommandPool commandPool, 
-                                                  const VkQueue queue, VkCommandBuffer commandBuffer)
+VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(
+    const VkDevice device, const VkCommandPool commandPool, 
+    const VkQueue queue, VkCommandBuffer commandBuffer)
 {
-    vkEndCommandBuffer(commandBuffer);
+    RTC_CHECK_EQ(vkEndCommandBuffer(commandBuffer), VK_SUCCESS);
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
-    VULKAN_CHECK(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-    VULKAN_CHECK(vkQueueWaitIdle(queue));
+    RTC_CHECK_EQ(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE), VK_SUCCESS);
+    RTC_CHECK_EQ(vkQueueWaitIdle(queue), VK_SUCCESS);
 
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 
@@ -462,7 +463,7 @@ VkResult VulkanUtility::CopyImage(
         dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         1, &copyRegion);
 
-    return EndAndSubmitOneTimeCommandBuffer(device,commandPool,queue,commandBuffer);
+    return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
 }
 
 } // end namespace webrtc

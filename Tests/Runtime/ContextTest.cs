@@ -34,18 +34,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [Test]
         [Category("Context")]
-        public void GetSetEncoderType()
-        {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var encoderType = value? EncoderType.Hardware: EncoderType.Software;
-            var context = Context.Create(
-                encoderType: encoderType);
-            Assert.AreEqual(encoderType, context.GetEncoderType());
-            context.Dispose();
-        }
-
-        [Test]
-        [Category("Context")]
         public void CreateAndDeletePeerConnection()
         {
             var value = NativeMethods.GetHardwareEncoderSupport();

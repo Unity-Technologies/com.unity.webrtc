@@ -16,11 +16,14 @@ namespace webrtc
 
 namespace webrtc = ::webrtc;
 
-class VulkanGraphicsDevice : public IGraphicsDevice{
+class VulkanGraphicsDevice : public IGraphicsDevice
+{
 public:
     VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
         const VkPhysicalDevice physicalDevice, const VkDevice device,
-        const VkQueue graphicsQueue, const uint32_t queueFamilyIndex);
+        const VkQueue graphicsQueue,
+        const uint32_t queueFamilyIndex,
+        UnityGfxRenderer renderer);
 
     virtual ~VulkanGraphicsDevice() = default;
     virtual bool InitV() override;
@@ -32,13 +35,25 @@ public:
     std::unique_ptr<UnityVulkanImage> AccessTexture(void* ptr) const;
 
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+
+    virtual NativeTexPtr ConvertNativeFromUnityPtr(void* tex) override;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dest"></param>
+    /// <param name="nativeTexturePtr"> a pointer of UnityVulkanImage </param>
+    /// <returns></returns>
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
     inline virtual GraphicsDeviceType GetDeviceType() const override;
+    std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
 #if CUDA_PLATFORM
-    virtual bool IsCudaSupport() override { return m_isCudaSupport; }
-    virtual CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    bool IsCudaSupport() override { return m_isCudaSupport; }
+    CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
+    NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 #endif
 private:
     VkResult CreateCommandPool();
@@ -68,6 +83,5 @@ void* VulkanGraphicsDevice::GetEncodeDevicePtrV()
 #endif
 }
 GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_VULKAN; }
-
 } // end namespace webrtc
 } // end namespace unity

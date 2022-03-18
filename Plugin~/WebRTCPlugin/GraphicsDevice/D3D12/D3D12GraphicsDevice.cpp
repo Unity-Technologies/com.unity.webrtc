@@ -1,9 +1,17 @@
 #include "pch.h"
+
+#include <cuda.h>
+#include <cudaD3D11.h>
+#include <wrl/client.h>
+
+#include "D3D12Constants.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
-#include "D3D12Constants.h" //DEFAULT_HEAP_PROPS
-
+#include "GraphicsDevice/D3D11/D3D11Texture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "NvCodecUtils.h"
+
+using namespace Microsoft::WRL;
 
 namespace unity
 {
@@ -12,8 +20,10 @@ namespace webrtc
 
 //---------------------------------------------------------------------------------------------------------------------
 
-D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface)
-    : m_d3d12Device(nativeDevice)
+D3D12GraphicsDevice::D3D12GraphicsDevice(
+    ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer)
+    : IGraphicsDevice(renderer)
+    , m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
     , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
     , m_copyResourceFence(nullptr)
@@ -21,15 +31,16 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, IUnityGraph
 {
 }
 //---------------------------------------------------------------------------------------------------------------------
-D3D12GraphicsDevice::D3D12GraphicsDevice(ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue)
-    : m_d3d12Device(nativeDevice)
+D3D12GraphicsDevice::D3D12GraphicsDevice(
+    ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer)
+    : IGraphicsDevice(renderer)
+    , m_d3d12Device(nativeDevice)
     , m_d3d11Device(nullptr), m_d3d11Context(nullptr)
     , m_d3d12CommandQueue(commandQueue)
     , m_copyResourceFence(nullptr)
     , m_copyResourceEventHandle(nullptr)
 {
 }
-
 
 //---------------------------------------------------------------------------------------------------------------------
 D3D12GraphicsDevice::~D3D12GraphicsDevice()
@@ -89,7 +100,7 @@ void D3D12GraphicsDevice::ShutdownV() {
 //---------------------------------------------------------------------------------------------------------------------
 ITexture2D* D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
 
-    return CreateSharedD3D12Texture(w,h);
+    return CreateSharedD3D12Texture(w, h);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -174,17 +185,24 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
     const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
     ID3D12Resource* nativeTex = nullptr;
-    ThrowIfFailed(m_d3d12Device->CreateCommittedResource(&D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
+    ThrowIfFailed(m_d3d12Device->CreateCommittedResource(
+        &D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
         nullptr, IID_PPV_ARGS(&nativeTex)));
 
+    if (nativeTex == nullptr)
+        return nullptr;
+
     ID3D11Texture2D* sharedTex = nullptr;
-    HANDLE handle = nullptr;   
-    ThrowIfFailed(m_d3d12Device->CreateSharedHandle(nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
+    HANDLE handle = nullptr;
+
+    ThrowIfFailed(m_d3d12Device->CreateSharedHandle(
+        nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
 
     //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
-    ThrowIfFailed(m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex)));
+    ThrowIfFailed(m_d3d11Device->OpenSharedResource1(
+        handle, IID_PPV_ARGS(&sharedTex)));
 
-    return new D3D12Texture2D(w,h,nativeTex, handle, sharedTex);
+    return new D3D12Texture2D(w, h, nativeTex, handle, sharedTex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -214,7 +232,8 @@ void D3D12GraphicsDevice::Barrier(ID3D12Resource* res,
 
 //----------------------------------------------------------------------------------------------------------------------
 
-ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(
+    uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     D3D12Texture2D* tex = CreateSharedD3D12Texture(w,h);
     const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device);
     if (FAILED(hr)){
@@ -226,9 +245,11 @@ ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, U
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
+    ITexture2D* baseTex)
 {
-    D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
+    D3D12Texture2D* tex =
+        reinterpret_cast<D3D12Texture2D*>(baseTex);
     assert(nullptr != tex);
     if (nullptr == tex)
         return nullptr;
@@ -240,25 +261,97 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITe
 
     const uint32_t width = tex->GetWidth();
     const uint32_t height = tex->GetHeight();
-    const D3D12ResourceFootprint* resFP = tex->GetNativeTextureFootprint();
+    const D3D12ResourceFootprint* footprint = tex->GetNativeTextureFootprint();
+    const uint32_t rowSize = static_cast<uint32_t>(footprint->RowSize);
 
     //Map to read from CPU
     uint8* data{};
     const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
     assert(hr == S_OK);
-    if (hr!=S_OK) {
+    if (hr != S_OK) {
         return nullptr;
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-        width, height, static_cast<uint32_t>(resFP->RowSize), static_cast<uint8_t*>(data)
-    );
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
+        GraphicsUtility::ConvertRGBToI420Buffer(
+            width, height, rowSize, static_cast<uint8_t*>(data));
 
     D3D12_RANGE emptyRange{ 0, 0 };
-    readbackResource->Unmap(0,&emptyRange);
+    readbackResource->Unmap(0, &emptyRange);
 
     return i420_buffer; 
 }
+
+    std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
+    {
+        D3D12Texture2D* d3d12Texure = static_cast<D3D12Texture2D*>(texture);
+
+        // set context on the thread.
+        cuCtxPushCurrent(GetCUcontext());
+
+        HANDLE sharedHandle = d3d12Texure->GetHandle();
+        if (!sharedHandle)
+        {
+            RTC_LOG(LS_ERROR) << "cannot get shared handle";
+            throw;
+        }
+
+        size_t width = d3d12Texure->GetWidth();
+        size_t height = d3d12Texure->GetHeight();
+        D3D12_RESOURCE_DESC desc = d3d12Texure->GetDesc();
+		D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo;
+        d3d12ResourceAllocationInfo = m_d3d12Device->GetResourceAllocationInfo(0, 1, &desc);
+        size_t actualSize = d3d12ResourceAllocationInfo.SizeInBytes;
+
+        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE;
+        memDesc.handle.win32.handle = static_cast<void*>(sharedHandle);
+        memDesc.size = actualSize;
+        memDesc.flags = CUDA_EXTERNAL_MEMORY_DEDICATED;
+
+        CUresult result;
+        CUexternalMemory externalMemory = {};
+        result = cuImportExternalMemory(&externalMemory, &memDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error";
+            throw;
+        }
+
+        CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
+        arrayDesc.Width = width;
+        arrayDesc.Height = height;
+        arrayDesc.Depth = 0; /* CUDA 2D arrays are defined to have depth 0 */
+        arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT32;
+        arrayDesc.NumChannels = 1;
+        arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
+
+        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
+        mipmapArrayDesc.arrayDesc = arrayDesc;
+        mipmapArrayDesc.numLevels = 1;
+
+        CUmipmappedArray mipmappedArray;
+        result = cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error";
+            throw;
+        }
+
+        CUarray array;
+        result = cuMipmappedArrayGetLevel(&array, mipmappedArray, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
+            throw;
+        }
+        cuCtxPopCurrent(NULL);
+
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        handle->array = array;
+        handle->externalMemory = externalMemory;
+        return handle;
+    }
 
 } // end namespace webrtc
 } // end namespace unity

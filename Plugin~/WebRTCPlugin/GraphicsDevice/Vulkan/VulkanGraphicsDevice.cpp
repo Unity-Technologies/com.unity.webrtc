@@ -3,6 +3,7 @@
 #include "VulkanTexture2D.h"
 
 #include "VulkanUtility.h"
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 namespace unity
@@ -11,9 +12,9 @@ namespace webrtc
 {
 
 VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, const VkInstance instance,
-    const VkPhysicalDevice physicalDevice,
-    const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex)
-    : m_unityVulkan(unityVulkan)
+    const VkPhysicalDevice physicalDevice, const VkDevice device, const VkQueue graphicsQueue, const uint32_t queueFamilyIndex, UnityGfxRenderer renderer)
+        : IGraphicsDevice(renderer)
+    , m_unityVulkan(unityVulkan)
     , m_physicalDevice(physicalDevice)
     , m_device(device)
     , m_graphicsQueue(graphicsQueue)
@@ -64,7 +65,8 @@ std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr)
 }
 
 //Returns null if failed
-ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(
+    const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
 
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->Init(m_physicalDevice, m_device)) {
@@ -88,7 +90,8 @@ ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(const uint32_t w, const 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
+ITexture2D* VulkanGraphicsDevice::CreateCPUReadTextureV(
+    uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) {
     VulkanTexture2D* vulkanTexture = new VulkanTexture2D(w, h);
     if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device)) {
         delete (vulkanTexture);
@@ -150,6 +153,20 @@ bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+NativeTexPtr VulkanGraphicsDevice::ConvertNativeFromUnityPtr(void* tex)
+{
+    std::unique_ptr<UnityVulkanImage> unityVulkanImage = std::make_unique<UnityVulkanImage>();
+    VkImageSubresource subResource{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
+    if (!m_unityVulkan->AccessTexture(tex, &subResource, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_READ_BIT, kUnityVulkanResourceAccess_PipelineBarrier,
+        unityVulkanImage.get()))
+    {
+        return nullptr;
+    }
+    return unityVulkanImage.release();
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 bool VulkanGraphicsDevice::CopyResourceFromNativeV(
     ITexture2D* dest, void* nativeTexturePtr) {
     if (nullptr == dest || nullptr == nativeTexturePtr)
@@ -186,7 +203,8 @@ bool VulkanGraphicsDevice::CopyResourceFromNativeV(
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-VkResult VulkanGraphicsDevice::CreateCommandPool() {
+VkResult VulkanGraphicsDevice::CreateCommandPool()
+{
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = m_queueFamilyIndex;
@@ -228,6 +246,81 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
 
     return i420Buffer;
 }
+
+    std::unique_ptr<GpuMemoryBufferHandle> VulkanGraphicsDevice::Map(ITexture2D* texture)
+    {
+#if CUDA_PLATFORM
+        // set context on the thread.
+        cuCtxPushCurrent(GetCUcontext());
+
+        VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
+
+        void* exportHandle = VulkanUtility::GetExportHandle(m_device, vulkanTexture->GetTextureImageMemory());
+
+        if (!exportHandle)
+        {
+            RTC_LOG(LS_ERROR) << "cannot get export handle";
+            throw;
+        }
+
+        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
+#ifndef _WIN32
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD;
+#else
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32;
+#endif
+        memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(exportHandle));
+        memDesc.size = vulkanTexture->GetTextureImageMemorySize();
+
+        CUresult result;
+        CUexternalMemory externalMemory;
+        result = cuImportExternalMemory(&externalMemory, &memDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error";
+            throw;
+        }
+
+        const VkExtent2D extent = { texture->GetWidth(), texture->GetHeight() };
+        CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
+        arrayDesc.Width = extent.width;
+        arrayDesc.Height = extent.height;
+        arrayDesc.Depth = 0; /* CUDA 2D arrays are defined to have depth 0 */
+        arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT32;
+        arrayDesc.NumChannels = 1;
+        arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
+
+        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
+        mipmapArrayDesc.arrayDesc = arrayDesc;
+        mipmapArrayDesc.numLevels = 1;
+
+        CUmipmappedArray mipmappedArray;
+        result = cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error";
+            throw;
+        }
+
+        CUarray array;
+        result = cuMipmappedArrayGetLevel(&array, mipmappedArray, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
+            throw;
+        }
+
+        cuCtxPopCurrent(NULL);
+
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        handle->array = array;
+        handle->externalMemory = externalMemory;
+        return handle;
+#else
+        return nullptr;
+#endif
+    }
+
 
 } // end namespace webrtc
 } // end namespace unity

@@ -24,13 +24,15 @@ public:
         SAFE_RELEASE(m_nativeTexture);
     }
 
-    inline virtual void* GetNativeTexturePtrV() override;
-    inline virtual const void* GetNativeTexturePtrV() const override;
-    inline virtual void* GetEncodeTexturePtrV() override;
-    inline virtual const void* GetEncodeTexturePtrV() const override;
+    inline void* GetNativeTexturePtrV() override;
+    inline const void* GetNativeTexturePtrV() const override;
+    inline void* GetEncodeTexturePtrV() override;
+    inline const void* GetEncodeTexturePtrV() const override;
     HRESULT CreateReadbackResource(ID3D12Device* device);
     inline ID3D12Resource* GetReadbackResource() const;
     inline const D3D12ResourceFootprint* GetNativeTextureFootprint() const;
+    HANDLE GetHandle() const { return m_sharedHandle; }
+    D3D12_RESOURCE_DESC GetDesc() const { return m_nativeTexture->GetDesc(); }
 
 private:
     ID3D12Resource* m_nativeTexture;

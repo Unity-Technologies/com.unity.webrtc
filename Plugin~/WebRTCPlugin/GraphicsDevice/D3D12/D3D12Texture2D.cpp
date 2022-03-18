@@ -1,5 +1,8 @@
 #include "pch.h"
 
+#include <cuda.h>
+#include <cudaD3D11.h>
+
 #include "D3D12Texture2D.h"
 #include "D3D12Constants.h"
 
@@ -13,8 +16,11 @@ namespace webrtc
 D3D12Texture2D::D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle
                                , ID3D11Texture2D* sharedTex)
     : ITexture2D(w,h)
-    , m_nativeTexture(nativeTex), m_sharedHandle(handle), m_sharedTexture(sharedTex)
-    , m_readbackResource(nullptr), m_nativeTextureFootprint(nullptr)
+    , m_nativeTexture(nativeTex)
+    , m_sharedHandle(handle)
+    , m_sharedTexture(sharedTex)
+    , m_readbackResource(nullptr)
+    , m_nativeTextureFootprint(nullptr)
 {
 
 }
@@ -53,7 +59,6 @@ HRESULT D3D12Texture2D::CreateReadbackResource(ID3D12Device* device) {
     );
     return hr;
 }
-
 } // end namespace webrtc
 } // end namespace unity
 

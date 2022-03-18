@@ -15,14 +15,14 @@ namespace Unity.WebRTC
         private IntPtr renderFunction;
         private IntPtr textureUpdateFunction;
 
-        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware, bool forTest = false)
+        public static Context Create(int id = 0, EncoderType encoderType = EncoderType.Hardware)
         {
             if (encoderType == EncoderType.Hardware && !WebRTC.HardwareEncoderSupport())
             {
                 throw new ArgumentException("Hardware encoder is not supported");
             }
 
-            var ptr = NativeMethods.ContextCreate(id, encoderType, forTest);
+            var ptr = NativeMethods.ContextCreate(id);
             return new Context(ptr, id);
         }
 
@@ -76,11 +76,6 @@ namespace Unity.WebRTC
         public void DeleteRefPtr(IntPtr ptr)
         {
             NativeMethods.ContextDeleteRefPtr(self, ptr);
-        }
-
-        public EncoderType GetEncoderType()
-        {
-            return NativeMethods.ContextGetEncoderType(self);
         }
 
         public IntPtr CreatePeerConnection()
@@ -271,16 +266,6 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteStatsReport(self, report);
         }
 
-        public void SetVideoEncoderParameter(IntPtr track, int width, int height, GraphicsFormat format, IntPtr texturePtr)
-        {
-            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, format, texturePtr);
-        }
-
-        public CodecInitializationResult GetInitializationResult(IntPtr track)
-        {
-            return NativeMethods.GetInitializationResult(self, track);
-        }
-
         public void GetSenderCapabilities(TrackKind kind, out IntPtr capabilities)
         {
             NativeMethods.ContextGetSenderCapabilities(self, kind, out capabilities);
@@ -291,23 +276,10 @@ namespace Unity.WebRTC
             NativeMethods.ContextGetReceiverCapabilities(self, kind, out capabilities);
         }
 
-
-        internal void InitializeEncoder(IntPtr track)
+        internal void Encode(IntPtr ptr)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.InitializeEncoder(renderFunction, track);
-        }
-
-        internal void FinalizeEncoder(IntPtr track)
-        {
-            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.FinalizeEncoder(renderFunction, track);
-        }
-
-        internal void Encode(IntPtr track)
-        {
-            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.Encode(renderFunction, track);
+            VideoEncoderMethods.Encode(renderFunction, ptr);
         }
 
         internal void UpdateRendererTexture(uint rendererId, UnityEngine.Texture texture)

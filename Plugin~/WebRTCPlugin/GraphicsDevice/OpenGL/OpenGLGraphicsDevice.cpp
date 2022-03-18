@@ -1,9 +1,18 @@
 #include "pch.h"
+
 #include "third_party/libyuv/include/libyuv.h"
 
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+
+#include "OpenGLContext.h"
+
+#if CUDA_PLATFORM
+#include <cuda.h>
+#include <cudaGL.h>
+#endif
 
 namespace unity
 {
@@ -14,13 +23,16 @@ namespace webrtc
 GLuint fbo[2];
 #endif
 
-OpenGLGraphicsDevice::OpenGLGraphicsDevice()
+OpenGLGraphicsDevice::OpenGLGraphicsDevice(
+    UnityGfxRenderer renderer)
+    : IGraphicsDevice(renderer)
 {
+    OpenGLContext::InitGLContext();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-OpenGLGraphicsDevice::~OpenGLGraphicsDevice() {
-
+OpenGLGraphicsDevice::~OpenGLGraphicsDevice()
+{
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -163,6 +175,9 @@ void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *p
 
 rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
 {
+    if(!OpenGLContext::CurrentContext())
+        contexts_.push_back(OpenGLContext::CreateGLContext());
+
     OpenGLTexture2D* sourceTex = static_cast<OpenGLTexture2D*>(tex);
     const GLuint sourceId = reinterpret_cast<uintptr_t>(sourceTex->GetNativeTexturePtrV());
     const GLuint pbo = sourceTex->GetPBO();
@@ -204,6 +219,50 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     );
     return i420_buffer;
 }
+
+    std::unique_ptr<GpuMemoryBufferHandle> OpenGLGraphicsDevice::Map(ITexture2D* texture)
+    {
+#if CUDA_PLATFORM
+        OpenGLTexture2D* glTexture2D = static_cast<OpenGLTexture2D*>(texture);
+
+        CUarray mappedArray;
+        CUgraphicsResource resource;
+        GLuint image = glTexture2D->GetTexture();
+        GLenum target = GL_TEXTURE_2D;
+
+        // set context on the thread.
+        cuCtxPushCurrent(GetCUcontext());
+
+        CUresult result = cuGraphicsGLRegisterImage(&resource, image, target, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuGraphicsD3D11RegisterResource error" << result;
+            throw;
+        }
+
+        result = cuGraphicsMapResources(1, &resource, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuGraphicsMapResources";
+            throw;
+        }
+
+        result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuGraphicsSubResourceGetMappedArray";
+            throw;
+        }
+        cuCtxPopCurrent(NULL);
+
+        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        handle->array = mappedArray;
+        handle->resource = resource;
+        return handle;
+#else
+        return nullptr;
+#endif
+    }
 
 } // end namespace webrtc
 } // end namespace unity

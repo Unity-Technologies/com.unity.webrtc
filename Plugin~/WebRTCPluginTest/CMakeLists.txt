@@ -6,11 +6,16 @@ target_sources(WebRTCLibTest
     pch.h
     ContextTest.cpp
     GraphicsDeviceTest.cpp
+    GpuMemoryBufferTest.cpp
+    GpuMemoryBufferPoolTest.cpp
     GraphicsDeviceContainer.cpp
     GraphicsDeviceContainer.h
     GraphicsDeviceContainerTest.cpp
     GraphicsDeviceTestBase.cpp
     GraphicsDeviceTestBase.h
+    VideoCodecTest.cpp
+    VideoCodecTest.h
+    VideoFrameTest.cpp
     UnityVideoEncoderFactoryTest.cpp
     UnityVideoDecoderFactoryTest.cpp
 )
@@ -47,6 +52,11 @@ if(NOT googletest_POPULATED)
 endif()
 
 include(GoogleTest)
+
+target_compile_definitions(WebRTCLibTest
+  PRIVATE 
+    "$<$<CONFIG:Debug>:DEBUG>"
+)
 
 if(NOT iOS)
   target_include_directories(WebRTCLibTest
@@ -181,13 +191,9 @@ elseif(Linux)
 
   target_link_libraries(WebRTCLibTest
     PRIVATE
-      ${WEBRTC_LIBRARY}
-      ${OPENGL_opengl_LIBRARY}
       ${GLUT_LIBRARY}
       ${CMAKE_DL_LIBS}
       ${CMAKE_THREAD_LIBS_INIT}
-      ${Vulkan_LIBRARY}
-      ${GLIB_LIBRARIES}
       gtest
       gmock
       gtest_main
@@ -198,7 +204,6 @@ elseif(Linux)
       ..
       ${CUDA_INCLUDE_DIRS}
       ${NVCODEC_INCLUDE_DIR}
-      ${GLIB_INCLUDE_DIRS}
   )
 elseif(iOS)
   set(CMAKE_C_FLAGS "-x objective-c")

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/ITexture2D.h"
 #include "d3d11.h"
 
@@ -16,7 +17,8 @@ public:
 
     D3D11Texture2D(uint32_t w, uint32_t h, ID3D11Texture2D* tex);
 
-    virtual ~D3D11Texture2D() {
+    virtual ~D3D11Texture2D()
+    {
         SAFE_RELEASE(m_texture);
     }
 
@@ -24,7 +26,6 @@ public:
     inline virtual const void* GetNativeTexturePtrV() const override;
     inline virtual void* GetEncodeTexturePtrV() override;
     inline virtual const void* GetEncodeTexturePtrV() const override;
-
 };
 
 //---------------------------------------------------------------------------------------------------------------------
