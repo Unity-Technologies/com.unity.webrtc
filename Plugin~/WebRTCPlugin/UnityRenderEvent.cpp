@@ -4,6 +4,7 @@
 #include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrame.h"
@@ -30,6 +31,7 @@ namespace webrtc
     static IUnityInterfaces* s_UnityInterfaces = nullptr;
     static IUnityGraphics* s_Graphics = nullptr;
     static Context* s_context = nullptr;
+    static std::unique_ptr<ProfilerMarkerFactory> s_ProfilerMarkerFactory = nullptr;
     static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     static std::unique_ptr<Clock> s_clock;
 
@@ -38,17 +40,13 @@ namespace webrtc
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
     static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
 
-    IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
+    IGraphicsDevice* Plugin::GraphicsDevice()
     {
         RTC_DCHECK(s_gfxDevice.get());
         return s_gfxDevice.get();
     }
 
-    UnityGfxRenderer GraphicsUtility::GetGfxRenderer()
-    {
-        RTC_DCHECK(s_Graphics);
-        return s_Graphics->GetRenderer();
-    }
+    ProfilerMarkerFactory* Plugin::ProfilerMarkerFactory() { return s_ProfilerMarkerFactory.get(); }
 
     static libyuv::FourCC ConvertTextureFormat(UnityRenderingExtTextureFormat type)
     {
@@ -216,23 +214,17 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
         RTC_LOG(LS_INFO) << "AddInterceptInitialization failed.";
     }
 #endif
+    s_ProfilerMarkerFactory = ProfilerMarkerFactory::Create(unityInterfaces);
 
-    IUnityProfiler* unityProfiler = unityInterfaces->Get<IUnityProfiler>();
-    if (unityProfiler != nullptr)
+    if (s_ProfilerMarkerFactory)
     {
-        unityProfiler->CreateMarker(
-            &s_MarkerEncode,
-            "UnityVideoTrackSource.OnFrameCaptured",
-            kUnityProfilerCategoryRender,
-            kUnityProfilerMarkerFlagDefault,
-            0);
-        unityProfiler->CreateMarker(
-            &s_MarkerDecode,
+        s_MarkerEncode = s_ProfilerMarkerFactory->CreateMarker(
+            "UnityVideoTrackSource.OnFrameCaptured", kUnityProfilerCategoryRender, kUnityProfilerMarkerFlagDefault, 0);
+        s_MarkerDecode = s_ProfilerMarkerFactory->CreateMarker(
             "UnityVideoRenderer.ConvertVideoFrameToTextureAndWriteToBuffer",
             kUnityProfilerCategoryRender,
             kUnityProfilerMarkerFlagDefault,
             0);
-        ScopedProfiler::UnityProfiler = unityProfiler;
     }
 
     OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
@@ -286,12 +278,14 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         if (!s_context->ExistsRefPtr(source))
             return;
         Timestamp timestamp = s_clock->CurrentTime();
-        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
-        UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
+        IGraphicsDevice* device = Plugin::GraphicsDevice();
+        UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
         void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
-        unity::webrtc::Size size(encodeData->width, encodeData->height);
+        Size size(encodeData->width, encodeData->height);
         {
-            ScopedProfiler profiler(*s_MarkerEncode);
+            std::unique_ptr<const ScopedProfiler> profiler;
+            if (s_ProfilerMarkerFactory)
+                profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
             auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
             source->OnFrameCaptured(std::move(frame));
@@ -338,7 +332,10 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
         int height = static_cast<int>(params->height);
 
         {
-            ScopedProfiler profiler(*s_MarkerDecode);
+            std::unique_ptr<const ScopedProfiler> profiler;
+            if (s_ProfilerMarkerFactory)
+                profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerDecode);
+
             params->texData = renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
                 width, height, ConvertTextureFormat(params->format));
         }

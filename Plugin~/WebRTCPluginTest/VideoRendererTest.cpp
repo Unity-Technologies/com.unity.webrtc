@@ -27,6 +27,12 @@ namespace webrtc
         {
             m_callback = &OnFrameSizeChange;
             m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
+
+            EXPECT_NE(nullptr, device());
+
+            ContextDependencies dependencies;
+            dependencies.device = device();
+            context = std::make_unique<Context>(dependencies);
         }
         ~VideoRendererTest() override = default;
 
@@ -36,7 +42,10 @@ namespace webrtc
             if (!device())
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
             m_texture.reset(device()->CreateDefaultTextureV(kWidth, kHeight, format()));
-            context = std::make_unique<Context>(device());
+
+            ContextDependencies dependencies;
+            dependencies.device = device();
+            context = std::make_unique<Context>(dependencies);
         }
         std::unique_ptr<Context> context;
         std::unique_ptr<ITexture2D> m_texture;
