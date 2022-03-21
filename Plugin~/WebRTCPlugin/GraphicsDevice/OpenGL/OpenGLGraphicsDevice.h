@@ -15,6 +15,7 @@ namespace webrtc
 namespace webrtc = ::webrtc;
 
 class OpenGLContext;
+struct OpenGLTexture2D;
 class OpenGLGraphicsDevice : public IGraphicsDevice
 {
 public:
@@ -41,11 +42,12 @@ public:
 
 private:
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
-
+    void ReleaseTexture(OpenGLTexture2D* texture);
 #if CUDA_PLATFORM
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
 #endif
+    std::unique_ptr<OpenGLContext> mainContext_;
     std::vector<std::unique_ptr<OpenGLContext>> contexts_;
 };
 

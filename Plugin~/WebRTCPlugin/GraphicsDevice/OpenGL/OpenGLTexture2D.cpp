@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 
 #include "OpenGLTexture2D.h"
+#include "OpenGLContext.h"
 
 #if CUDA_PLATFORM
 #include <cudaGL.h>
@@ -13,13 +14,21 @@ namespace webrtc
 
 //---------------------------------------------------------------------------------------------------------------------
 
-OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex) : ITexture2D(w,h)
-        , m_texture(tex)
-        , m_buffer(nullptr)
+OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex, ReleaseOpenGLTextureCallback callback)
+    : ITexture2D(w,h)
+    , m_texture(tex)
+    , m_buffer(nullptr)
+    , m_callback(callback)
 {
+      RTC_DCHECK(m_texture);
 }
 
 OpenGLTexture2D::~OpenGLTexture2D()
+{
+    m_callback(this);
+}
+
+void OpenGLTexture2D::Release()
 {
     glDeleteTextures(1, &m_texture);
     m_texture = 0;

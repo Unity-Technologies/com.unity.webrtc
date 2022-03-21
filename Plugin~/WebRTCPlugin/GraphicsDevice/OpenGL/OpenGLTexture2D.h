@@ -15,7 +15,8 @@ namespace webrtc
 
 struct OpenGLTexture2D : ITexture2D {
 public:
-    OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex);
+    using ReleaseOpenGLTextureCallback = std::function<void(OpenGLTexture2D*)>;
+    OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex, ReleaseOpenGLTextureCallback callback);
     virtual ~OpenGLTexture2D();
 
     inline void* GetNativeTexturePtrV() override;
@@ -29,10 +30,12 @@ public:
     byte* GetBuffer() const { return m_buffer;  }
     GLuint GetPBO() const { return m_pbo; }
     GLuint GetTexture() const { return m_texture; }
+    void Release();
 private:
     GLuint m_texture;
     GLuint m_pbo;
     byte* m_buffer = nullptr;
+    ReleaseOpenGLTextureCallback m_callback;
 };
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -3,22 +3,27 @@
 #include "GraphicsDeviceContainer.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 
-#if SUPPORT_D3D11 // D3D11
+#if SUPPORT_D3D11
 #include "GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
 #include <d3d11.h>
 #include <wrl/client.h>
 #endif
 
-#if SUPPORT_METAL // Metal
+#if SUPPORT_METAL
 #include "GraphicsDevice/Metal/MetalDevice.h"
 #import <Metal/Metal.h>
 #endif
 
-#if SUPPORT_OPENGL_CORE // OpenGL
+#if SUPPORT_OPENGL_CORE
 #include <GL/glut.h>
+#include "GraphicsDevice/OpenGL/OpenGLContext.h"
 #endif
 
-#if SUPPORT_VULKAN // Vulkan
+#if SUPPORT_OPENGL_ES
+#include "GraphicsDevice/OpenGL/OpenGLContext.h"
+#endif
+
+#if SUPPORT_VULKAN
 
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaContext.h"
@@ -318,7 +323,7 @@ namespace webrtc
 
 #endif
 
-#if defined(SUPPORT_METAL) // Metal
+#if SUPPORT_METAL
 
     void* CreateDeviceMetal() { return MetalDevice::CreateForTest().release(); }
 
@@ -330,11 +335,11 @@ namespace webrtc
 
 #endif
 
-#if defined(SUPPORT_OPENGL_CORE) // OpenGL
+#if SUPPORT_OPENGL_CORE
 
     static bool s_glutInitialized;
 
-    void* CreateDeviceOpenGL()
+    void* CreateDeviceGLCore()
     {
         if (!s_glutInitialized)
         {
@@ -343,36 +348,32 @@ namespace webrtc
             s_glutInitialized = true;
             glutCreateWindow("test");
         }
-        return nullptr;
+        OpenGLContext::Init();
+        std::unique_ptr<OpenGLContext> context = OpenGLContext::CreateGLContext();
+        return context.release();
     }
 
-#endif
-
-    IUnityInterface* CreateUnityInterface(UnityGfxRenderer renderer)
+    void DestroyDeviceGLCore(void* pGfxDevice)
     {
-
-        switch (renderer)
-        {
-#if defined(SUPPORT_D3D11)
-        case kUnityGfxRendererD3D11:
-            return nullptr;
-#endif
-#if defined(SUPPORT_D3D12)
-        case kUnityGfxRendererD3D12:
-            return nullptr;
-#endif
-#if defined(SUPPORT_OPENGL_CORE)
-        case kUnityGfxRendererOpenGLCore:
-            return nullptr;
-#endif
-#if defined(SUPPORT_METAL) // Metal
-        case kUnityGfxRendererMetal:
-            return nullptr;
-#endif
-        default:
-            return nullptr;
-        }
+        OpenGLContext* context = static_cast<OpenGLContext*>(pGfxDevice);
+        delete context;
     }
+#endif
+
+#if SUPPORT_OPENGL_ES
+    void* CreateDeviceGLES()
+    {
+        OpenGLContext::Init();
+        std::unique_ptr<OpenGLContext> context = OpenGLContext::CreateGLContext();
+        return context.release();
+    }
+    void DestroyDeviceGLES(void* pGfxDevice)
+    {
+        OpenGLContext* context = static_cast<OpenGLContext*>(pGfxDevice);
+        delete context;
+    }
+
+#endif
 
     //---------------------------------------------------------------------------------------------------------------------
 
@@ -380,23 +381,28 @@ namespace webrtc
     {
         switch (renderer)
         {
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
         case kUnityGfxRendererD3D11:
             return CreateDeviceD3D11();
 #endif
-#if defined(SUPPORT_D3D12)
+#if SUPPORT_D3D12
         case kUnityGfxRendererD3D12:
             return CreateDeviceD3D12();
 #endif
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE
         case kUnityGfxRendererOpenGLCore:
-            return CreateDeviceOpenGL();
+            return CreateDeviceGLCore();
 #endif
-#if defined(SUPPORT_VULKAN)
+#if SUPPORT_OPENGL_ES
+            case kUnityGfxRendererOpenGLES20:
+            case kUnityGfxRendererOpenGLES30:
+                return CreateDeviceGLES();
+#endif
+#if SUPPORT_VULKAN
         case kUnityGfxRendererVulkan:
             return CreateDeviceVulkan();
 #endif
-#if defined(SUPPORT_METAL)
+#if SUPPORT_METAL
         case kUnityGfxRendererMetal:
             return CreateDeviceMetal();
 #endif
@@ -410,24 +416,31 @@ namespace webrtc
     {
         switch (renderer)
         {
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
         case kUnityGfxRendererD3D11:
             return;
 #endif
-#if defined(SUPPORT_D3D12)
+#if SUPPORT_D3D12
         case kUnityGfxRendererD3D12:
             return;
 #endif
-#if defined(SUPPORT_OPENGL_CORE)
+#if SUPPORT_OPENGL_CORE
         case kUnityGfxRendererOpenGLCore:
+            DestroyDeviceGLCore(pGfxDevice);
             return;
 #endif
-#if defined(SUPPORT_VULKAN)
+#if SUPPORT_OPENGL_ES
+        case kUnityGfxRendererOpenGLES20:
+        case kUnityGfxRendererOpenGLES30:
+            DestroyDeviceGLES(pGfxDevice);
+            return;
+#endif
+#if SUPPORT_VULKAN
         case kUnityGfxRendererVulkan:
             DestroyDeviceVulkan(pGfxDevice);
             return;
 #endif
-#if defined(SUPPORT_METAL)
+#if SUPPORT_METAL
         case kUnityGfxRendererMetal:
             DestroyDeviceMetalDevice(pGfxDevice);
             return;
@@ -441,8 +454,6 @@ namespace webrtc
     {
         nativeGfxDevice_ = CreateNativeGfxDevice(renderer);
         renderer_ = renderer;
-        const auto unityInterface = CreateUnityInterface(renderer_);
-
         IGraphicsDevice* device = nullptr;
         if (renderer == kUnityGfxRendererD3D12)
         {
@@ -453,7 +464,7 @@ namespace webrtc
         }
         else
         {
-            device = GraphicsDevice::GetInstance().Init(renderer, nativeGfxDevice_, unityInterface);
+            device = GraphicsDevice::GetInstance().Init(renderer, nativeGfxDevice_, nullptr);
         }
         device_ = std::unique_ptr<IGraphicsDevice>(device);
         device_->InitV();

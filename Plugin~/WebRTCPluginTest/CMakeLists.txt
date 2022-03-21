@@ -28,6 +28,13 @@ if(Windows OR Linux)
   add_subdirectory(NvCodec)
 endif()
 
+if(Linux OR Android)
+  target_sources(WebRTCLibTest
+    PRIVATE
+      OpenGLContextTest.cpp
+  )
+endif()
+
 include(FetchContent)
 
 FetchContent_Declare(
