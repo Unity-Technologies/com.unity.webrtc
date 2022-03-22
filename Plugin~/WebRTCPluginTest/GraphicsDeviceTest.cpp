@@ -100,7 +100,12 @@ namespace webrtc
         const uint32_t height = 256;
         const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
         std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
+
+#if CUDA_PLATFORM
         EXPECT_NE(handle, nullptr);
+#else
+        EXPECT_EQ(handle, nullptr);
+#endif
     }
 
     TEST_P(GraphicsDeviceTest, MapWithCPUReadTexture)

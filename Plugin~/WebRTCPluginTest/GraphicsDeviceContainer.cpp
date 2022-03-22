@@ -197,18 +197,19 @@ namespace webrtc
     {
         // Extension
         std::vector<const char*> instanceExtensions =
-    {
-        VK_KHR_SURFACE_EXTENSION_NAME,
+        {
+            VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef _WIN32
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
 #endif
 #if defined(_DEBUG)
-        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+            VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 #endif
-        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
-    };
+            VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+        };
 
-        std::vector<const char*> deviceExtensions = {
+        std::vector<const char*> deviceExtensions =
+        {
 
 #ifndef _WIN32
             VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME, VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
@@ -221,7 +222,12 @@ namespace webrtc
         VkApplicationInfo appInfo {};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "test";
+#if UNITY_ANDROID
+        // Android platform doesn't support vulkan api version 1.1.
+        appInfo.apiVersion = VK_API_VERSION_1_0;
+#else
         appInfo.apiVersion = VK_API_VERSION_1_1;
+#endif
         appInfo.engineVersion = 1;
 
         if (!LoadVulkanModule())
