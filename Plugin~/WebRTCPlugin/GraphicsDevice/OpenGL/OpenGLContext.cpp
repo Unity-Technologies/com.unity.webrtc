@@ -97,6 +97,7 @@ namespace webrtc
             XVisualInfo *vi = glXChooseVisual(display, DefaultScreen(display), dblBuf);
             context_ = glXCreateContext(display, vi, sharedCtx, GL_TRUE);
             RTC_DCHECK(context_);
+            XFree(vi);
 
             const int visualAttrs[] = { None };
             const int attrs[] = {
