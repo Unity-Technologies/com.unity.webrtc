@@ -27,14 +27,14 @@ public:
     void CreatePBO();
     size_t GetBufferSize() const { return m_width * m_height * 4; }
     size_t GetPitch() const { return m_width * 4; }
-    byte* GetBuffer() const { return m_buffer;  }
+    byte* GetBuffer() { return m_buffer.data(); }
     GLuint GetPBO() const { return m_pbo; }
     GLuint GetTexture() const { return m_texture; }
     void Release();
 private:
     GLuint m_texture;
     GLuint m_pbo;
-    byte* m_buffer = nullptr;
+    std::vector<byte> m_buffer;
     ReleaseOpenGLTextureCallback m_callback;
 };
 

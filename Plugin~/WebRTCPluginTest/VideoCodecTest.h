@@ -60,6 +60,7 @@ namespace webrtc
             absl::optional<FrameGeneratorInterface::OutputType> type,
             absl::optional<int> num_squares) = 0;
         void SetUp() override;
+        void TearDown() override;
 
         VideoFrame NextInputFrame();
 

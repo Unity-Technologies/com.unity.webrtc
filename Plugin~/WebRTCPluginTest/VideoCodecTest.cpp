@@ -134,5 +134,11 @@ namespace webrtc
         encoder_->RegisterEncodeCompleteCallback(&encodedImageCallback_);
         decoder_->RegisterDecodeCompleteCallback(&decodedImageCallback_);
     }
+
+    void VideoCodecTest::TearDown()
+    {
+        // call destructor
+        inputFrameGenerator_ = nullptr;
+    }
 }
 }

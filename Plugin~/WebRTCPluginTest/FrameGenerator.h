@@ -18,6 +18,7 @@ namespace webrtc
         absl::optional<FrameGeneratorInterface::OutputType> type,
         absl::optional<int> numFrames);
 
+    class ITexture2D;
     class VideoFrameGenerator : public FrameGeneratorInterface
     {
     public:
@@ -31,7 +32,7 @@ namespace webrtc
         Mutex mutex_;
         int width_;
         int height_;
-        //const OutputType type_;
+        std::queue<std::unique_ptr<ITexture2D>> queue_;
     };
 
 }

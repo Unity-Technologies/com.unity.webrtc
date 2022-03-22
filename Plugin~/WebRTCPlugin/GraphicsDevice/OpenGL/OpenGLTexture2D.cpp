@@ -17,7 +17,6 @@ namespace webrtc
 OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex, ReleaseOpenGLTextureCallback callback)
     : ITexture2D(w,h)
     , m_texture(tex)
-    , m_buffer(nullptr)
     , m_callback(callback)
 {
       RTC_DCHECK(m_texture);
@@ -36,9 +35,6 @@ void OpenGLTexture2D::Release()
     glBindBuffer(GL_ARRAY_BUFFER, m_pbo);
     glDeleteBuffers(1, &m_pbo);
     m_pbo = 0;
-
-    free(m_buffer);
-    m_buffer = nullptr;
 }
 
 void OpenGLTexture2D::CreatePBO()
@@ -50,10 +46,8 @@ void OpenGLTexture2D::CreatePBO()
     glBufferData(GL_PIXEL_UNPACK_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-    if(m_buffer == nullptr)
-    {
-        m_buffer = static_cast<byte*>(malloc(bufferSize));
-    }
+    if(m_buffer.empty())
+        m_buffer.resize(bufferSize);
 }
 } // end namespace webrtc
 } // end namespace unity

@@ -1,9 +1,9 @@
 #include "pch.h"
 
 #include "FrameGenerator.h"
-#include "GraphicsDeviceContainer.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameUtil.h"
+#include "GraphicsDevice/ITexture2D.h"
 
 namespace unity
 {
@@ -48,6 +48,7 @@ namespace webrtc
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
 
         ITexture2D* texture = device_->CreateCPUReadTextureV(width_, height_, kFormat);
+        queue_.push(std::unique_ptr<ITexture2D>(texture));
         rtc::scoped_refptr<VideoFrame> frame = CreateTestFrame(device_, texture, kFormat);
         
         ::webrtc::VideoFrame videoFrame = VideoFrameAdapter::CreateVideoFrame(frame);

@@ -211,7 +211,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
         GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
     if (pboPtr != nullptr)
     {
-        memcpy(data, pboPtr, bufferSize);
+        std::memcpy(data, pboPtr, bufferSize);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
