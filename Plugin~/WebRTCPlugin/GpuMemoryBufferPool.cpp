@@ -61,7 +61,7 @@ namespace webrtc
 
     void GpuMemoryBufferPool::OnReturnBuffer(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
     {
-        GpuMemoryBufferInterface* ptr = buffer.release();
+        GpuMemoryBufferInterface* ptr = buffer.get();
         auto result = std::find_if(
             resourcesPool_.begin(),
             resourcesPool_.end(),
@@ -69,7 +69,6 @@ namespace webrtc
         RTC_DCHECK(result != resourcesPool_.end());
 
         (*result)->MarkUnused();
-        ptr->Release();
     }
 }
 }

@@ -7,6 +7,7 @@
 #endif
 #if SUPPORT_OPENGL_CORE && UNITY_LINUX
 #include <GL/glx.h>
+#include <X11/Xlib.h>
 #endif
 
 namespace unity

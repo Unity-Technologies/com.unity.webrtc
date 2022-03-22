@@ -181,7 +181,10 @@ elseif(Linux)
   set(PROJECT_BINARY_DIR
     "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
+  # todo(kazuki):link in runtime
+  find_package(X11 REQUIRED)
   find_package(OpenGL REQUIRED)
+
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(GLIB REQUIRED glib-2.0)
 
@@ -195,6 +198,7 @@ elseif(Linux)
     PUBLIC
       ${WEBRTC_LIBRARY}
       ${NVCODEC_LIBRARIES}
+      ${X11_LIBRARIES}
       ${OPENGL_egl_LIBRARY}
       ${OPENGL_glx_LIBRARY}
       ${OPENGL_opengl_LIBRARY}
