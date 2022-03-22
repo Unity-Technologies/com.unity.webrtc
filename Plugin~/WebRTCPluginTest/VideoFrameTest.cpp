@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "VideoFrame.h"
 #include "GpuMemoryBuffer.h"
 #include "VideoFrameUtil.h"
 
@@ -30,11 +29,8 @@ namespace webrtc
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
         std::unique_ptr<ITexture2D> tex = std::unique_ptr<ITexture2D>(
             container_->device()->CreateDefaultTextureV(kSize.width(), kSize.height(), kFormat));
-        void* ptr = tex->GetNativeTexturePtrV();
-        rtc::scoped_refptr<GpuMemoryBufferFromUnity> buffer =
-            new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(container_->device(), ptr, kSize, kFormat);
-        //Timestamp timestamp = Clock::GetRealTimeClock()->CurrentTime();
-        VideoFrame::WrapExternalGpuMemoryBuffer(kSize, buffer, nullptr, TimeDelta::PlusInfinity());
+        rtc::scoped_refptr<VideoFrame> videoFrame = CreateTestFrame(container_->device(), tex.get(), kFormat);
+        ASSERT_NE(videoFrame, nullptr);
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDevice, VideoFrameTest, testing::ValuesIn(supportedGfxDevices));
