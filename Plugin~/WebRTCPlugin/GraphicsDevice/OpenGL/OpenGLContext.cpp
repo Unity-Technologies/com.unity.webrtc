@@ -113,6 +113,8 @@ namespace webrtc
                 RTC_LOG(LS_ERROR) << "glXMakeContextCurrent failed";
                 throw;
             }
+            XFree(configs);
+            configs = nullptr;
             created_ = true;
         }
         ~GLXContextImpl()

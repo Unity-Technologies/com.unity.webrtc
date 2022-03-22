@@ -25,9 +25,9 @@ namespace webrtc
         size_t bufferCount() { return resourcesPool_.size(); }
 
     private:
-        struct FrameReources
+        struct FrameResources
         {
-            FrameReources(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
+            FrameResources(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
                 : buffer_(std::move(buffer))
             {
             }
@@ -43,12 +43,12 @@ namespace webrtc
         void CopyBuffer();
 
         static bool AreFrameResourcesCompatible(
-            const FrameReources* resources,
+            const FrameResources* resources,
             const Size& size,
             UnityRenderingExtTextureFormat format);
 
         IGraphicsDevice* device_;
-        std::list<std::unique_ptr<FrameReources>> resourcesPool_;
+        std::list<std::unique_ptr<FrameResources>> resourcesPool_;
     };
 }
 }
