@@ -21,7 +21,6 @@ public:
     virtual ITexture2D* CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-    inline virtual GraphicsDeviceType GetDeviceType() const override;
     std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
     virtual rtc::scoped_refptr < ::webrtc::I420Buffer > ConvertRGBToI420(ITexture2D* tex) override;
 
@@ -38,7 +37,6 @@ private:
 //---------------------------------------------------------------------------------------------------------------------
 
 void* D3D11GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
-GraphicsDeviceType D3D11GraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_D3D11; }
 
 } // end namespace webrtc
 } // end namespace unity

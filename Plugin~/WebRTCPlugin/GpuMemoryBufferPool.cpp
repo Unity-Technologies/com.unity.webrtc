@@ -50,7 +50,7 @@ namespace webrtc
         resources->MarkUsed();
         buffer->CopyBuffer(ptr);
         resourcesPool_.push_back(std::move(resources));
-        return std::move(buffer);
+        return buffer;
     }
 
     bool GpuMemoryBufferPool::AreFrameResourcesCompatible(

@@ -31,7 +31,6 @@ public:
     bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
     bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-    inline virtual GraphicsDeviceType GetDeviceType() const override;
     std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
 
 #if CUDA_PLATFORM
@@ -52,7 +51,6 @@ private:
 };
 
 void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }
-GraphicsDeviceType OpenGLGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_OPENGL; }
 
 //---------------------------------------------------------------------------------------------------------------------
 } // end namespace webrtc

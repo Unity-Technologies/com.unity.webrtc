@@ -45,7 +45,6 @@ public:
     /// <param name="nativeTexturePtr"> a pointer of UnityVulkanImage </param>
     /// <returns></returns>
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-    inline virtual GraphicsDeviceType GetDeviceType() const override;
     std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
 
     virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
@@ -82,6 +81,5 @@ void* VulkanGraphicsDevice::GetEncodeDevicePtrV()
     return nullptr;
 #endif
 }
-GraphicsDeviceType VulkanGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_VULKAN; }
 } // end namespace webrtc
 } // end namespace unity

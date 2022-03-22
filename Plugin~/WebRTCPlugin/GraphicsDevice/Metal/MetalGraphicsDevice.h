@@ -29,7 +29,6 @@ namespace webrtc
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
         bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-        inline GraphicsDeviceType GetDeviceType() const override;
         rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }
 
@@ -41,6 +40,5 @@ namespace webrtc
     };
 
     void* MetalGraphicsDevice::GetEncodeDevicePtrV() { return m_device->Device(); }
-    GraphicsDeviceType MetalGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_METAL; }
 } // end namespace webrtc
 } // end namespace unity
