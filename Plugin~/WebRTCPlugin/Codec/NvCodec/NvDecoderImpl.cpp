@@ -7,8 +7,6 @@
 #include "api/video/video_codec_type.h"
 #include "third_party/libyuv/include/libyuv/convert.h"
 
-using namespace webrtc;
-
 namespace unity
 {
 namespace webrtc
