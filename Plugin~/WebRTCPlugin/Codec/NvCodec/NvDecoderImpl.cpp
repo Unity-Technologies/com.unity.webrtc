@@ -1,8 +1,8 @@
 #include "pch.h"
 
-#include "NvDecoderImpl.h"
-#include "NvDecoder/NvDecoder.h"
 #include "../Utils/NvCodecUtils.h"
+#include "NvDecoder/NvDecoder.h"
+#include "NvDecoderImpl.h"
 #include "api/video/i420_buffer.h"
 #include "api/video/video_codec_type.h"
 #include "third_party/libyuv/include/libyuv/convert.h"
@@ -112,6 +112,14 @@ namespace webrtc
                 m_decoder->Decode(input_image.data(), input_image.size(), CUVID_PKT_TIMESTAMP, input_image.Timestamp());
         } while (nFrameReturnd == 0);
 
+        // todo: support other output format
+        // Chromium's H264 Encoder is output on NV12, so currently only NV12 is supported.
+        if (m_decoder->GetOutputFormat() != cudaVideoSurfaceFormat_NV12)
+        {
+            RTC_LOG(LS_ERROR) << "not supported this format: " << m_decoder->GetOutputFormat();
+            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+        }
+
         for (int i = 0; i < nFrameReturnd; i++)
         {
             int64_t timeStamp;
@@ -134,10 +142,8 @@ namespace webrtc
                 m_decoder->GetWidth(),
                 m_decoder->GetHeight());
 
-            VideoFrame decoded_frame = VideoFrame::Builder()
-                                           .set_video_frame_buffer(i420_buffer)
-                                           .set_timestamp_rtp(timeStamp)
-                                           .build();
+            VideoFrame decoded_frame =
+                VideoFrame::Builder().set_video_frame_buffer(i420_buffer).set_timestamp_rtp(timeStamp).build();
 
             // todo: measurement decoding time
             absl::optional<int32_t> decodetime;
