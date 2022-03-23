@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "../Utils/NvCodecUtils.h"
+#include "NvCodecUtils.h"
 #include "NvDecoder/NvDecoder.h"
 #include "NvDecoderImpl.h"
 #include "api/video/i420_buffer.h"
