@@ -26,7 +26,7 @@ namespace webrtc
         virtual int32_t Decode(const EncodedImage& input_image, bool missing_frames, int64_t render_time_ms) override;
         virtual int32_t RegisterDecodeCompleteCallback(DecodedImageCallback* callback) override;
         virtual int32_t Release() override;
-        virtual DecoderInfo GetDecoderInfo() const;
+        virtual DecoderInfo GetDecoderInfo() const override;
 
     private:
         CUcontext m_context;
