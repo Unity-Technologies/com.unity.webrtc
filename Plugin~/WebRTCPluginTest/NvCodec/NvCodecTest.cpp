@@ -7,12 +7,13 @@
 #include "NvCodecUtils.h"
 #include "VideoCodecTest.h"
 
-using testing::Values;
 
 namespace unity
 {
 namespace webrtc
 {
+    using testing::Values;
+    
     class NvCodecTest : public VideoCodecTest
     {
     public:
