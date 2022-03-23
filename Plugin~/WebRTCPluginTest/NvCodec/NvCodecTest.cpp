@@ -7,13 +7,12 @@
 #include "NvCodecUtils.h"
 #include "VideoCodecTest.h"
 
-
 namespace unity
 {
 namespace webrtc
 {
     using testing::Values;
-    
+
     class NvCodecTest : public VideoCodecTest
     {
     public:
@@ -36,8 +35,7 @@ namespace webrtc
         {
             cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
             codec.SetParam(cricket::kH264FmtpProfileLevelId, kProfileLevelIdString());
-            return NvEncoder::Create(
-                codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB);
+            return NvEncoder::Create(codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB);
         }
 
         std::unique_ptr<VideoDecoder> CreateDecoder() override
@@ -55,6 +53,8 @@ namespace webrtc
         {
             return CreateVideoFrameGenerator(container_->device(), width, height, type, num_squares);
         }
+
+        void ModifyCodecSettings(VideoCodec* codec_settings) override { SetDefaultSettings(codec_settings); }
 
         void EncodeAndWaitForFrame(
             const VideoFrame& inputFrame,
@@ -131,7 +131,6 @@ namespace webrtc
             VideoEncoder::RateControlParameters(bitrate_allocation, static_cast<double>(codecSettings_.maxFramerate)));
     }
 
-    // todo(kazuki)
     TEST_P(NvCodecTest, EncodeFrameAndRelease)
     {
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->Release());

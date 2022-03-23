@@ -121,7 +121,7 @@ namespace webrtc
 
     void VideoCodecTest::SetUp()
     {
-        SetDefaultSettings(&codecSettings_);
+        ModifyCodecSettings(&codecSettings_);
 
          inputFrameGenerator_ = CreateFrameGenerator(
             codecSettings_.width,

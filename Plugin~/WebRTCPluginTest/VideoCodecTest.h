@@ -59,6 +59,7 @@ namespace webrtc
             int height,
             absl::optional<FrameGeneratorInterface::OutputType> type,
             absl::optional<int> num_squares) = 0;
+        virtual void ModifyCodecSettings(VideoCodec* codec_settings) = 0;
         void SetUp() override;
         void TearDown() override;
 
