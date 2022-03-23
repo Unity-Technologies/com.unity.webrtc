@@ -29,18 +29,26 @@ VideoFrameBuffer::Type VideoFrameAdapter::type() const
 #endif
 }
 
-rtc::scoped_refptr<I420BufferInterface> VideoFrameAdapter::ToI420() {
+const I420BufferInterface* VideoFrameAdapter::GetI420() const
+{
+    return ConvertToVideoFrameBuffer(frame_)->GetI420();
+}
+
+rtc::scoped_refptr<I420BufferInterface> VideoFrameAdapter::ToI420()
+{
     return ConvertToVideoFrameBuffer(frame_)->ToI420();
 }
 
 
-rtc::scoped_refptr<webrtc::VideoFrameBuffer>
-VideoFrameAdapter::ConvertToVideoFrameBuffer(
-    rtc::scoped_refptr<VideoFrame> video_frame)
+rtc::scoped_refptr<I420BufferInterface>
+VideoFrameAdapter::ConvertToVideoFrameBuffer(rtc::scoped_refptr<VideoFrame> video_frame) const
 {
     RTC_DCHECK(video_frame);
     RTC_DCHECK(video_frame->HasGpuMemoryBuffer());
 
+    // todo(kazuki)::
+    // ToI420 method copies buffer from GPU.
+    // I would be better to cache memory buffer.
     auto gmb = video_frame->GetGpuMemoryBuffer();
     return gmb->ToI420();
 }

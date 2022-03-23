@@ -1,10 +1,8 @@
 #include "pch.h"
 
-#include "Codec/NvCodec/NvCodec.h"
 #include "FrameGenerator.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDeviceContainer.h"
-#include "NvCodecUtils.h"
 #include "VideoCodecTest.h"
 
 #include "test/video_codec_settings.h"

@@ -24,12 +24,13 @@ public:
     int width() const override { return size_.width(); }
     int height() const override { return size_.height(); }
 
+    const I420BufferInterface* GetI420() const override;
     rtc::scoped_refptr<I420BufferInterface> ToI420() override;
 protected:
     ~VideoFrameAdapter() override {};
 private:
-    rtc::scoped_refptr<webrtc::VideoFrameBuffer> ConvertToVideoFrameBuffer(
-        rtc::scoped_refptr<VideoFrame> video_frame);
+    rtc::scoped_refptr<I420BufferInterface> ConvertToVideoFrameBuffer(
+        rtc::scoped_refptr<VideoFrame> video_frame) const;
     const rtc::scoped_refptr<VideoFrame> frame_;
     const Size size_;
 };
