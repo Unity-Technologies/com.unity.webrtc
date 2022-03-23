@@ -25,4 +25,4 @@ cmake \
 
 popd
 mkdir build
-cp $SOLUTION_DIR/Plugin~/build/WebRTCPluginTest/WebRTCLibTest build
+cp $SOLUTION_DIR/build/WebRTCPluginTest/WebRTCLibTest build
