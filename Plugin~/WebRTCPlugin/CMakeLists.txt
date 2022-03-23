@@ -85,6 +85,10 @@ if(iOS OR macOS)
   )
 endif()
 
+if(Android)
+  add_subdirectory(Android)
+endif()
+
 add_subdirectory(Codec)
 add_subdirectory(GraphicsDevice)
 
@@ -326,13 +330,6 @@ target_sources(WebRTCPlugin
     WebRTCPlugin.cpp
     UnityRenderEvent.cpp
 )
-
-if(Android)
-  target_sources(WebRTCPlugin
-    PRIVATE
-      Jni.cpp
-  )
-endif()
 
 # rename dll/framework filename
 set_target_properties(WebRTCPlugin
