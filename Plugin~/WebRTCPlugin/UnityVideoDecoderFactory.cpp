@@ -1,20 +1,19 @@
 #include "pch.h"
 
-#include "GraphicsDevice/IGraphicsDevice.h"
 #include "UnityVideoDecoderFactory.h"
 
-#include "absl/strings/match.h"
+#if CUDA_PLATFORM
+#include <cuda.h>
+#include "Codec/NvCodec/NvCodec.h"
+#endif
+
+#include "GraphicsDevice/GraphicsUtility.h"
 
 #if UNITY_OSX || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoDecoderFactory.h"
 #import "sdk/objc/native/api/video_decoder_factory.h"
 #elif UNITY_ANDROID
 #include "Codec/AndroidCodec/android_codec_factory_helper.h"
-#endif
-
-#if CUDA_PLATFORM
-#include "Codec/NvCodec/NvCodec.h"
-#include <cuda.h>
 #endif
 
 namespace unity
@@ -39,6 +38,8 @@ namespace webrtc
         , native_decoder_factory_(CreateNativeDecoderFactory(gfxDevice))
     {
     }
+
+    UnityVideoDecoderFactory::~UnityVideoDecoderFactory() = default;
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoDecoderFactory::GetSupportedFormats() const
     {

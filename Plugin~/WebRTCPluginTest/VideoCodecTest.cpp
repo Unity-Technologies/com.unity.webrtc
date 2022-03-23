@@ -3,6 +3,7 @@
 #include "VideoCodecTest.h"
 
 static const int kEncodeTimeoutMs = 100;
+static const int kDecodeTimeoutMs = 100;
 
 namespace unity
 {
@@ -40,9 +41,9 @@ namespace webrtc
         VideoFrame& frame, absl::optional<int32_t> decode_time_ms, absl::optional<uint8_t> qp)
     {
         MutexLock lock(&_test->decodedFrameSection_);
-        //_test->_decodedFrame.emplace(frame);
-        //_test->decoded_qp_ = qp;
-        //_test->decoded_frame_event_.Set();
+        _test->decodedFrame_.emplace(frame);
+        _test->decodedQp_ = qp;
+        _test->decodedFrameEvent_.Set();
     }
 
     VideoFrame VideoCodecTest::NextInputFrame()
@@ -53,12 +54,11 @@ namespace webrtc
                                      .set_update_rect(frame_data.update_rect)
                                      .build();
 
-        // I420Buffer::SetBlack(buffer);
-        // const uint32_t timestamp =
-        //    last_input_frame_timestamp_ + kVideoPayloadTypeFrequency / codec_settings_.maxFramerate;
-        // input_frame.set_timestamp(timestamp);
+         // I420Buffer::SetBlack(frame_data.buffer);
+         const uint32_t timestamp = lastInputFrameTimestamp_ + kVideoPayloadTypeFrequency / codecSettings_.maxFramerate;
+         input_frame.set_timestamp(timestamp);
 
-        // last_input_frame_timestamp_ = timestamp;
+         lastInputFrameTimestamp_ = timestamp;
         return input_frame;
     }
 
@@ -100,6 +100,25 @@ namespace webrtc
         return true;
     }
 
+    bool VideoCodecTest::WaitForDecodedFrame(std::unique_ptr<VideoFrame>* frame, absl::optional<uint8_t>* qp)
+    {
+        EXPECT_TRUE(decodedFrameEvent_.Wait(kDecodeTimeoutMs)) << "Timed out while waiting for a decoded frame.";
+        // This becomes unsafe if there are multiple threads waiting for frames.
+        MutexLock lock(&decodedFrameSection_);
+        EXPECT_TRUE(decodedFrame_);
+        if (decodedFrame_)
+        {
+            frame->reset(new VideoFrame(std::move(*decodedFrame_)));
+            *qp = decodedQp_;
+            decodedFrame_.reset();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     void VideoCodecTest::SetUp()
     {
         SetDefaultSettings(&codecSettings_);
@@ -113,8 +132,7 @@ namespace webrtc
         encoder_ = CreateEncoder();
         decoder_ = CreateDecoder();
         encoder_->RegisterEncodeCompleteCallback(&encodedImageCallback_);
-        // todo(kazuki)::
-        // decoder_->RegisterDecodeCompleteCallback(&_decodedImageCallback);
+        decoder_->RegisterDecodeCompleteCallback(&decodedImageCallback_);
     }
 }
 }

@@ -43,6 +43,7 @@ namespace webrtc
         VideoCodecTest()
             : encodedImageCallback_(this)
             , decodedImageCallback_(this)
+            , lastInputFrameTimestamp_(0)
         {
         }
         virtual ~VideoCodecTest() override { }
@@ -61,6 +62,9 @@ namespace webrtc
         // Helper method for waiting a single encoded frame.
         bool WaitForEncodedFrame(EncodedImage* frame, CodecSpecificInfo* codec_specific_info);
         bool WaitForEncodedFrames(std::vector<EncodedImage>* frames, std::vector<CodecSpecificInfo>* codec_specific_info);
+
+        // Helper method for waiting a single decoded frame.
+        bool WaitForDecodedFrame(std::unique_ptr<VideoFrame>* frame, absl::optional<uint8_t>* qp);
 
     protected:
         class FakeEncodedImageCallback : public EncodedImageCallback
@@ -107,8 +111,11 @@ namespace webrtc
         std::vector<EncodedImage> encodedFrames_;
         absl::optional<VideoFrame> decodedFrame_;
         std::vector<CodecSpecificInfo> codecSpecificInfos_;
+        absl::optional<uint8_t> decodedQp_;
         FakeEncodedImageCallback encodedImageCallback_;
         FakeDecodedImageCallback decodedImageCallback_;
+
+        uint32_t lastInputFrameTimestamp_;
     };
 }
 }
