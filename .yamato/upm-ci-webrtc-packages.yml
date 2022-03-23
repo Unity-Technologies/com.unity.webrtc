@@ -263,7 +263,7 @@ test_webrtc_plugin_android:
     flavor: b1.medium
   skip_checkout: true
   dependencies:
-    - build_webrtc_plugin_test_android
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_test_android
   commands:
     - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
     - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
