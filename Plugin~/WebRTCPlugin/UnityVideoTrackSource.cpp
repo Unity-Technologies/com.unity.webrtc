@@ -19,7 +19,7 @@ namespace webrtc
 
 VideoFrameBuffer::Type VideoFrameAdapter::type() const
 {
-#if UNITY_IOS || UNITY_MACOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_OSX || UNITY_ANDROID
     // todo(kazuki): support for kNative type for mobile platform and macOS.
     // Need to pass ObjCFrameBuffer instead of VideoFrameAdapter on macOS/iOS.
     // Need to pass AndroidVideoBuffer instead of VideoFrameAdapter on Android.
@@ -43,14 +43,15 @@ rtc::scoped_refptr<I420BufferInterface> VideoFrameAdapter::ToI420()
 rtc::scoped_refptr<I420BufferInterface>
 VideoFrameAdapter::ConvertToVideoFrameBuffer(rtc::scoped_refptr<VideoFrame> video_frame) const
 {
+    if (i420Buffer_)
+        return i420Buffer_;
+
     RTC_DCHECK(video_frame);
     RTC_DCHECK(video_frame->HasGpuMemoryBuffer());
 
-    // todo(kazuki)::
-    // ToI420 method copies buffer from GPU.
-    // I would be better to cache memory buffer.
     auto gmb = video_frame->GetGpuMemoryBuffer();
-    return gmb->ToI420();
+    i420Buffer_ = gmb->ToI420();
+    return i420Buffer_;
 }
 
 rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(bool is_screencast, absl::optional<bool> needs_denoising)

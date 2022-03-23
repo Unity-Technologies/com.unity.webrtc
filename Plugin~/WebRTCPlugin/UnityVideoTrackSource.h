@@ -31,6 +31,9 @@ protected:
 private:
     rtc::scoped_refptr<I420BufferInterface> ConvertToVideoFrameBuffer(
         rtc::scoped_refptr<VideoFrame> video_frame) const;
+    // todo(kazuki):
+    // Need this buffer because the type() method returns kI420.
+    mutable rtc::scoped_refptr<I420BufferInterface> i420Buffer_;
     const rtc::scoped_refptr<VideoFrame> frame_;
     const Size size_;
 };
