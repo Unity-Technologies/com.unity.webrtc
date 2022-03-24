@@ -97,7 +97,6 @@ namespace webrtc
         if (GetCudaDeviceCapabilityMajorVersion(context) <= 3)
         {
             supportedFormats = {
-                CreateH264Format(webrtc::H264Profile::kProfileConstrainedHigh, webrtc::H264Level::kLevel4_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel4_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel4_1, "1"),
             };
@@ -106,8 +105,6 @@ namespace webrtc
         {
             supportedFormats = {
                 CreateH264Format(webrtc::H264Profile::kProfileBaseline, webrtc::H264Level::kLevel5_1, "1"),
-                CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel5_1, "1"),
-                CreateH264Format(webrtc::H264Profile::kProfileConstrainedHigh, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel5_1, "1"),
             };
@@ -136,7 +133,12 @@ namespace webrtc
 
     std::vector<SdpVideoFormat> NvEncoderFactory::GetSupportedFormats() const
     {
-        return SupportedNvEncoderCodecs(context_);
+        // In RTCRtpTransceiver.SetCodecPreferences, the codec passed must be supported by both encoder and decoder.
+        // https://source.chromium.org/chromium/chromium/src/+/main:third_party/webrtc/pc/rtp_transceiver.cc;l=36
+        // About H264, Profile and its Level must also match in this implementation.
+        // NvEncoder supports a higher level of H264 Profile than NvDecoder.
+        // Therefore, return the support codec of NvDecoder as Workaround.
+        return SupportedNvDecoderCodecs(context_);
     }
 
     VideoEncoderFactory::CodecInfo NvEncoderFactory::QueryVideoEncoder(const SdpVideoFormat& format) const
