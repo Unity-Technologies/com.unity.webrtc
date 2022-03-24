@@ -19,6 +19,11 @@ file(GLOB sources
 
 add_library(NvCodec STATIC ${sources})
 
+# Delayload on linux
+if(Linux)
+  add_subdirectory(implib)
+endif()
+
 target_include_directories(NvCodec
   PRIVATE
     ${CUDA_INCLUDE_DIRS}
@@ -27,7 +32,7 @@ target_include_directories(NvCodec
     ${NVCODEC_INCLUDE_DIR}
 )
 
-if(WIN32)
+if(Windows)
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(CUVID_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/x64/nvcuvid.lib)
     set(NVENCODEAPI_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/x64/nvencodeapi.lib)
@@ -55,10 +60,21 @@ if(Linux)
   )
 endif()
 
-set(NVCODEC_LIBRARIES
-  NvCodec
-  ${CUVID_LIB}
-  ${NVENCODEAPI_LIB}
-  CACHE PATH 
-  "NVCODEC LIBRARIES PATH"
-)
+if(Windows)
+  # Use delayload linker option for nvEncodeAPI64.dll and nvcuvid.dll
+  set(NVCODEC_LIBRARIES
+    NvCodec
+    ${CUVID_LIB}
+    ${NVENCODEAPI_LIB}
+    CACHE PATH
+    "NVCODEC LIBRARIES PATH"
+  )
+elseif(Linux)
+  # Use implib.so for delayload on Linux
+  # If you don't use implib, need to link libnvcuvid.so and libnvidia-encode.so
+  set(NVCODEC_LIBRARIES
+    NvCodec
+    CACHE PATH
+    "NVCODEC LIBRARIES PATH"
+    )
+endif()

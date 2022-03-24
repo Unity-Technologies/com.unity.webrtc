@@ -1,4 +1,4 @@
-target_sources(WebRTCLib
+target_sources(NvCodec
   PRIVATE
     libcuda.so.init.c
     libcuda.so.tramp.S

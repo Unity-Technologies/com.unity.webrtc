@@ -3,6 +3,8 @@
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M92/webrtc-linux.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 
+source ~/.profile
+
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
@@ -11,6 +13,9 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
 sudo apt update
 sudo apt install -y clang-10 libc++-10-dev libc++abi-10-dev freeglut3-dev
+
+# Install glad2
+pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"

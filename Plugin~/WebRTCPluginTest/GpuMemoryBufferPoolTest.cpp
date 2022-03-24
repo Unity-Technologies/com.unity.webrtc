@@ -14,7 +14,7 @@ namespace webrtc
     public:
         explicit GpuMemoryBufferPoolTest()
             : container_(CreateGraphicsDeviceContainer(GetParam()))
-            , timestamp_(Timestamp::Zero())
+            , timestamp_(0)
         {
         }
 
@@ -22,7 +22,7 @@ namespace webrtc
         void SetUp() override
         {
             bufferPool_ = std::make_unique<GpuMemoryBufferPool>(container_->device());
-            timestamp_ = Clock::GetRealTimeClock()->CurrentTime();
+            timestamp_ = Clock::GetRealTimeClock()->TimeInMicroseconds();
         }
 
         std::unique_ptr<ITexture2D> CreateTexture(const Size& size, UnityRenderingExtTextureFormat format)
@@ -33,7 +33,7 @@ namespace webrtc
 
         std::unique_ptr<GraphicsDeviceContainer> container_;
         std::unique_ptr<GpuMemoryBufferPool> bufferPool_;
-        Timestamp timestamp_;
+        int64_t timestamp_;
     };
 
     TEST_P(GpuMemoryBufferPoolTest, CreateFrame)
@@ -43,7 +43,7 @@ namespace webrtc
         auto tex = CreateTexture(kSize, kFormat);
         void* ptr = tex->GetNativeTexturePtrV();
 
-        auto frame = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_.ms());
+        auto frame = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_);
         EXPECT_EQ(frame->size(), kSize);
         EXPECT_EQ(kFormat, frame->format());
         EXPECT_EQ(1u, bufferPool_->bufferCount());
@@ -56,17 +56,17 @@ namespace webrtc
         auto tex = CreateTexture(kSize, kFormat);
         void* ptr = tex->GetNativeTexturePtrV();
 
-        auto frame1 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_.us());
+        auto frame1 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_);
         EXPECT_NE(frame1, nullptr);
         EXPECT_EQ(1u, bufferPool_->bufferCount());
 
-        auto frame2 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_.us());
+        auto frame2 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_);
         EXPECT_NE(frame2, nullptr);
         EXPECT_EQ(2u, bufferPool_->bufferCount());
 
         frame1 = nullptr;
         frame2 = nullptr;
-        auto frame3 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_.us());
+        auto frame3 = bufferPool_->CreateFrame(ptr, kSize, kFormat, timestamp_);
         EXPECT_EQ(2u, bufferPool_->bufferCount());
     }
 
@@ -77,7 +77,7 @@ namespace webrtc
         auto tex1 = CreateTexture(kSize1, kFormat);
         void* ptr1 = tex1->GetNativeTexturePtrV();
 
-        auto frame1 = bufferPool_->CreateFrame(ptr1, kSize1, kFormat, timestamp_.us());
+        auto frame1 = bufferPool_->CreateFrame(ptr1, kSize1, kFormat, timestamp_);
         EXPECT_EQ(1u, bufferPool_->bufferCount());
 
         frame1 = nullptr;
@@ -86,7 +86,7 @@ namespace webrtc
         auto tex2 = CreateTexture(kSize2, kFormat);
         void* ptr2 = tex2->GetNativeTexturePtrV();
 
-        auto frame2 = bufferPool_->CreateFrame(ptr2, kSize2, kFormat, timestamp_.us());
+        auto frame2 = bufferPool_->CreateFrame(ptr2, kSize2, kFormat, timestamp_);
         EXPECT_EQ(2u, bufferPool_->bufferCount());
     }
 

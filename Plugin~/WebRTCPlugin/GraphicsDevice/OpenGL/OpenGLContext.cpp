@@ -6,8 +6,8 @@
 #include <EGL/egl.h>
 #endif
 #if SUPPORT_OPENGL_CORE && UNITY_LINUX
-#include <GL/glx.h>
 #include <X11/Xlib.h>
+#include <glad/glx.h>
 #endif
 
 namespace unity
@@ -150,8 +150,17 @@ namespace webrtc
             throw;
         }
 #elif SUPPORT_OPENGL_CORE && UNITY_LINUX
-        GLXContextImpl::display = glXGetCurrentDisplay();
-        RTC_DCHECK(GLXContextImpl::display);
+        int version = gladLoaderLoadGL();
+        RTC_DCHECK(version);
+
+        Display *display = XOpenDisplay(nullptr);
+        RTC_DCHECK(display);
+
+        int screen = DefaultScreen(display);
+        int result = gladLoaderLoadGLX(display, screen);
+        RTC_DCHECK(result);
+
+        GLXContextImpl::display = display;
 #endif
     }
 
