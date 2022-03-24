@@ -348,7 +348,7 @@ if(Windows)
   # Set linker option
   set_target_properties(WebRTCPlugin
     PROPERTIES 
-      LINK_FLAGS "/SUBSYSTEM:WINDOWS -delayload:nvcuda.dll"
+      LINK_FLAGS "/SUBSYSTEM:WINDOWS -delayload:nvcuda.dll -delayload:nvEncodeAPI64.dll -delayload:nvcuvid.dll"
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 endif()
