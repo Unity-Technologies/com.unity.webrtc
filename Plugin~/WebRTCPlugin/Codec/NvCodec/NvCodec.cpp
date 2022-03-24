@@ -97,7 +97,6 @@ namespace webrtc
         if (GetCudaDeviceCapabilityMajorVersion(context) <= 3)
         {
             supportedFormats = {
-                CreateH264Format(webrtc::H264Profile::kProfileConstrainedHigh, webrtc::H264Level::kLevel4_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel4_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel4_1, "1"),
             };
@@ -106,8 +105,6 @@ namespace webrtc
         {
             supportedFormats = {
                 CreateH264Format(webrtc::H264Profile::kProfileBaseline, webrtc::H264Level::kLevel5_1, "1"),
-                CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel5_1, "1"),
-                CreateH264Format(webrtc::H264Profile::kProfileConstrainedHigh, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel5_1, "1"),
             };
