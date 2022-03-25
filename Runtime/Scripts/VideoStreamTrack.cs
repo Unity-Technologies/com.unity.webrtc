@@ -98,8 +98,7 @@ namespace Unity.WebRTC
         internal VideoStreamTrack(Texture texture, RenderTexture dest, string label, VideoTrackSource source, bool needFlip)
             : base(WebRTC.Context.CreateVideoTrack(label, source.self))
         {
-            var error = WebRTC.ValidateTextureSize(
-                texture.width, texture.height, Application.platform, WebRTC.GetEncoderType());
+            var error = WebRTC.ValidateTextureSize(texture.width, texture.height, Application.platform);
             if (error.errorType != RTCErrorType.None)
             {
                 throw new ArgumentException(error.message);
