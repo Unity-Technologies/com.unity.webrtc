@@ -18,16 +18,12 @@ namespace unity {
 namespace webrtc {
 
 std::unique_ptr<VideoEncoderFactory> CreateAndroidEncoderFactory() {
-  RTC_LOG(LS_INFO) << "CreateAndroidEncoderFactory 0";
   JNIEnv* env = AttachCurrentThreadIfNeeded();
-  RTC_LOG(LS_INFO) << "CreateAndroidEncoderFactory 1";
   RTC_DCHECK(env);
   ScopedJavaLocalRef<jclass> factory_class =
       GetClass(env, "org/webrtc/HardwareVideoEncoderFactory");
-  RTC_LOG(LS_INFO) << "CreateAndroidEncoderFactory 2";
   jmethodID factory_constructor = env->GetMethodID(
       factory_class.obj(), "<init>", "(Lorg/webrtc/EglBase$Context;ZZ)V");
-  RTC_LOG(LS_INFO) << "CreateAndroidEncoderFactory 3";
   ScopedJavaLocalRef<jobject> factory_object(
       env, env->NewObject(factory_class.obj(), factory_constructor,
                           nullptr /* shared_context */,
