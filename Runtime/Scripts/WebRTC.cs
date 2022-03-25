@@ -1044,7 +1044,7 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
-            Debug.Log(str);
+            UnityEngine.Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "{0}", str);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateSetLocalDescription))]
