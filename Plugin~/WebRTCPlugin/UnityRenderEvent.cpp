@@ -209,6 +209,11 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 }
 #endif
 
+template<typename T> void InterceptInitialization(T& vulkan, UnityVulkanInitCallback func, void* userdata)
+{
+    vulkan.InterceptInitialization(InterceptVulkanInitialization, nullptr);
+}
+
 // Unity plugin load event
 void PluginLoad(IUnityInterfaces* unityInterfaces)
 {
@@ -225,7 +230,8 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
     if(vulkan != nullptr)
     {
-        vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+        InterceptInitialization(*vulkan, InterceptVulkanInitialization, nullptr);
+        //vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
     }
 #endif
 

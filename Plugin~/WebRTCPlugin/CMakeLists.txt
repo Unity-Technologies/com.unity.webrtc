@@ -350,6 +350,7 @@ target_sources(WebRTCPlugin
     pch.h
     WebRTCPlugin.cpp
     UnityRenderEvent.cpp
+    UnityVulkanInterfaceFunctions.h
 )
 
 # rename dll/framework filename
