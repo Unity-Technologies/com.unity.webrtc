@@ -13,7 +13,8 @@
 #import "sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h"
 #import "sdk/objc/native/api/video_encoder_factory.h"
 #elif UNITY_ANDROID
-#include "Codec/AndroidCodec/android_codec_factory_helper.h"
+#include "Android/Jni.h"
+#include "Android/AndroidCodecFactoryHelper.h"
 #endif
 
 namespace unity
@@ -27,8 +28,8 @@ namespace webrtc
 #if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoEncoderFactory([[RTCDefaultVideoEncoderFactory alloc] init]).release();
 #elif UNITY_ANDROID
-        // todo(kazuki)::workaround
-        // return CreateAndroidEncoderFactory().release();
+        if (IsVMInitialized())
+            return CreateAndroidEncoderFactory().release();
         return nullptr;
 #elif CUDA_PLATFORM
         CUcontext context = gfxDevice->GetCUcontext();

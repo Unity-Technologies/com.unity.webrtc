@@ -1,10 +1,11 @@
-#include "android_codec_factory_helper.h"
+#include "AndroidCodecFactoryHelper.h"
 
 #include <pthread.h>
 #include <memory>
 
 #include "rtc_base/checks.h"
 #include "rtc_base/ignore_wundef.h"
+#include "rtc_base/logging.h"
 #include "sdk/android/native_api/base/init.h"
 #include "sdk/android/native_api/codecs/wrapper.h"
 #include "sdk/android/native_api/jni/class_loader.h"
@@ -18,6 +19,7 @@ namespace webrtc {
 
 std::unique_ptr<VideoEncoderFactory> CreateAndroidEncoderFactory() {
   JNIEnv* env = AttachCurrentThreadIfNeeded();
+  RTC_DCHECK(env);
   ScopedJavaLocalRef<jclass> factory_class =
       GetClass(env, "org/webrtc/HardwareVideoEncoderFactory");
   jmethodID factory_constructor = env->GetMethodID(
@@ -32,6 +34,7 @@ std::unique_ptr<VideoEncoderFactory> CreateAndroidEncoderFactory() {
 
 std::unique_ptr<VideoDecoderFactory> CreateAndroidDecoderFactory() {
   JNIEnv* env = AttachCurrentThreadIfNeeded();
+  RTC_DCHECK(env);
   ScopedJavaLocalRef<jclass> factory_class =
       GetClass(env, "org/webrtc/HardwareVideoDecoderFactory");
   jmethodID factory_constructor = env->GetMethodID(
