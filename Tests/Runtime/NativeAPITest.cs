@@ -16,14 +16,16 @@ namespace Unity.WebRTC.RuntimeTest
         [OneTimeSetUp]
         public new void OneTimeInit()
         {
-            encoderType = EncoderType.Hardware;
+            // set codec
+            // encoderType = EncoderType.Hardware;
         }
 
     }
 
     class NativeAPITestWithSoftwareEncoder
     {
-        protected EncoderType encoderType;
+        // set codec
+        // protected EncoderType encoderType;
 
         private static RenderTexture CreateRenderTexture(int width, int height)
         {
@@ -57,7 +59,8 @@ namespace Unity.WebRTC.RuntimeTest
         [OneTimeSetUp]
         public void OneTimeInit()
         {
-            encoderType = EncoderType.Software;
+            // set codec
+            // encoderType = EncoderType.Hardware;
         }
 
         [Test]
@@ -448,12 +451,6 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer })]
         public IEnumerator CallVideoDecoderMethods()
         {
-            if (encoderType == EncoderType.Hardware)
-            {
-                //Todo: If Support Codec VP8/VP9 on HardwareEncoder or Support Codec H264 on Decoder, it can test on hardware encoder.
-                yield break;
-            }
-
             var context = NativeMethods.ContextCreate(0);
             const int width = 1280;
             const int height = 720;

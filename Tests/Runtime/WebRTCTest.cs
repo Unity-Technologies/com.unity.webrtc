@@ -10,8 +10,7 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            var type = TestHelper.HardwareCodecSupport() ? EncoderType.Hardware : EncoderType.Software;
-            WebRTC.Initialize(type: type, limitTextureSize: true, forTest: true);
+            WebRTC.Initialize(true);
         }
 
         [TearDown]
@@ -68,9 +67,8 @@ namespace Unity.WebRTC.RuntimeTest
         [TestCase(1920, 1080)]
         public void ValidateTextureSize(int width, int height)
         {
-            var encoderType = WebRTC.GetEncoderType();
             var platform = Application.platform;
-            var error = WebRTC.ValidateTextureSize(width, height, platform, encoderType);
+            var error = WebRTC.ValidateTextureSize(width, height, platform);
             Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
         }
 

@@ -26,9 +26,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDelete()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var context = Context.Create(
-                encoderType:value ? EncoderType.Hardware : EncoderType.Software);
+            var context = Context.Create();
             context.Dispose();
         }
 
@@ -36,9 +34,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeletePeerConnection()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var context = Context.Create(
-                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var context = Context.Create();
             var peerPtr = context.CreatePeerConnection();
             context.DeletePeerConnection(peerPtr);
             context.Dispose();
@@ -48,9 +44,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeleteDataChannel()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var context = Context.Create(
-                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var context = Context.Create();
             var peerPtr = context.CreatePeerConnection();
             var init = (RTCDataChannelInitInternal) new RTCDataChannelInit();
             var channelPtr = context.CreateDataChannel(peerPtr, "test", ref init);
@@ -63,9 +57,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeleteAudioTrack()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var context = Context.Create(
-                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var context = Context.Create();
             var source = context.CreateAudioTrackSource();
             var track = context.CreateAudioTrack("audio", source);
             context.DeleteRefPtr(track);
@@ -77,9 +69,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeleteVideoTrack()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var context = Context.Create(
-                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var context = Context.Create();
             var width = 256;
             var height = 256;
             var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
@@ -97,9 +87,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Category("Context")]
         public void CreateAndDeleteAudioTrackSink()
         {
-            var value = NativeMethods.GetHardwareEncoderSupport();
-            var context = Context.Create(
-                encoderType: value ? EncoderType.Hardware : EncoderType.Software);
+            var context = Context.Create();
             var sink = context.CreateAudioTrackSink();
             context.DeleteAudioTrackSink(sink);
             context.Dispose();

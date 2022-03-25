@@ -9,7 +9,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             if (!WebRTC.HardwareEncoderSupport())
                 return false;
-            WebRTC.Initialize(EncoderType.Hardware);
+            WebRTC.Initialize();
             var isSupported = CheckVideoCodecCapabilities();
             WebRTC.Dispose();
             return isSupported;
@@ -28,13 +28,13 @@ namespace Unity.WebRTC.RuntimeTest
 
         private static readonly string[] excludeCodecMimeType = {"video/red", "video/ulpfec", "video/rtx"};
 
-        public static bool CheckVideoSendRecvCodecSupport(EncoderType encoderType)
+        public static bool CheckVideoSendRecvCodecSupport()
         {
             // hardware encoder is not supported
-            if (encoderType == EncoderType.Hardware && !WebRTC.HardwareEncoderSupport())
+            if (!WebRTC.HardwareEncoderSupport())
                 return false;
 
-            WebRTC.Initialize(encoderType);
+            WebRTC.Initialize();
             var capabilitiesSenderCodec = RTCRtpSender.GetCapabilities(TrackKind.Video)
                 .codecs
                 .Select(x => x.mimeType)

@@ -17,7 +17,7 @@ namespace Unity.WebRTC.RuntimeTest
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedHardwareForHardwareCodec,
                 ignoreHardwareEncoderTest);
 
-            var ignoreReceiveVideoTest = !TestHelper.CheckVideoSendRecvCodecSupport(EncoderType.Hardware);
+            var ignoreReceiveVideoTest = !TestHelper.CheckVideoSendRecvCodecSupport();
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedReceiveVideoOnHardware,
                 ignoreReceiveVideoTest);
 

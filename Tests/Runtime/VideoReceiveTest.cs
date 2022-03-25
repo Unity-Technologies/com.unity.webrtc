@@ -6,8 +6,6 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    //ToDo: decoder is not supported H.264 codec on Windows/Linux.
-    [Ignore("WIP")]
     [TestFixture]
     [ConditionalIgnore(ConditionalIgnore.UnsupportedReceiveVideoOnHardware, "Not supported hardware decoder")]
     class VideoReceiveTestWithHardwareEncoder : VideoReceiveTestWithSoftwareEncoder
@@ -15,24 +13,26 @@ namespace Unity.WebRTC.RuntimeTest
         [OneTimeSetUp]
         public new void OneTimeInit()
         {
-            encoderType = EncoderType.Hardware;
+            // set codec
+            // encoderType = EncoderType.Hardware;
         }
     }
 
     class VideoReceiveTestWithSoftwareEncoder
     {
-        protected EncoderType encoderType;
+        // set codec
+        // protected EncoderType encoderType;
 
         [OneTimeSetUp]
         public void OneTimeInit()
         {
-            encoderType = EncoderType.Software;
+            // encoderType = EncoderType.Software;
         }
 
         [SetUp]
         public void SetUp()
         {
-            WebRTC.Initialize(type: encoderType, limitTextureSize: true, forTest: true);
+            WebRTC.Initialize(true);
         }
 
         [TearDown]
