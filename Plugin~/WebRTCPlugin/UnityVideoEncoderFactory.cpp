@@ -12,7 +12,7 @@
 using namespace ::webrtc::H264;
 
 namespace unity
-{    
+{
 namespace webrtc
 {
 
@@ -22,9 +22,7 @@ namespace webrtc
     {
         for (const webrtc::SdpVideoFormat& supported_format : supported_formats)
         {
-            if (cricket::IsSameCodec(format.name, format.parameters,
-                supported_format.name,
-                supported_format.parameters))
+            if (supported_format.IsSameCodec(format))
             {
                 return true;
             }
@@ -50,7 +48,7 @@ namespace webrtc
     {
         m_observer = observer;
     }
-    
+
     UnityVideoEncoderFactory::~UnityVideoEncoderFactory() = default;
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetHardwareEncoderFormats() const

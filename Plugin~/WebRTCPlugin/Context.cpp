@@ -86,7 +86,7 @@ namespace webrtc
 #pragma region open an encode session
     uint32_t Context::s_encoderId = 0;
     uint32_t Context::GenerateUniqueId() { return s_encoderId++; }
-#pragma endregion 
+#pragma endregion
 
     bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -449,14 +449,14 @@ namespace webrtc
     DataChannelInterface* Context::CreateDataChannel(
         PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
     {
-        const rtc::scoped_refptr<DataChannelInterface> channel =
-            obj->connection->CreateDataChannel(label, &options);
+        const RTCErrorOr<rtc::scoped_refptr<DataChannelInterface>> channel =
+            obj->connection->CreateDataChannelOrError(label, &options);
 
-        if (channel == nullptr)
+        if (channel.ok())
             return nullptr;
 
-        AddDataChannel(channel, *obj);
-        return channel;
+        AddDataChannel(channel.value(), *obj);
+        return channel.value();
     }
 
     void Context::AddDataChannel(
