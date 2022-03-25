@@ -452,7 +452,7 @@ namespace webrtc
         const RTCErrorOr<rtc::scoped_refptr<DataChannelInterface>> channel =
             obj->connection->CreateDataChannelOrError(label, &options);
 
-        if (channel.ok())
+        if (!channel.ok())
             return nullptr;
 
         AddDataChannel(channel.value(), *obj);
