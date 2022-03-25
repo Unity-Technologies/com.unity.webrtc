@@ -353,7 +353,7 @@ namespace webrtc
             obj->connection->CreateDataChannelOrError(label, &options);
 >>>>>>> a1f95846 (Fix build errors due to interface changes in M96.)
 
-        if (channel.ok())
+        if (!channel.ok())
             return nullptr;
 
         AddDataChannel(channel.value(), *obj);
