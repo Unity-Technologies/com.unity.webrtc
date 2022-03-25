@@ -30,8 +30,9 @@ namespace webrtc
         const Size kSize(1280, 960);
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
         IGraphicsDevice* device = container_->device();
-        const ITexture2D* texture = device->CreateDefaultTextureV(kSize.width(), kSize.height(), kFormat);
-        auto testFrame = CreateTestFrame(device, texture, kFormat);
+        std::unique_ptr<const ITexture2D> texture(
+            device->CreateDefaultTextureV(kSize.width(), kSize.height(), kFormat));
+        auto testFrame = CreateTestFrame(device, texture.get(), kFormat);
 
         auto frame = VideoFrameAdapter::CreateVideoFrame(testFrame);
         auto buffer = frame.video_frame_buffer();

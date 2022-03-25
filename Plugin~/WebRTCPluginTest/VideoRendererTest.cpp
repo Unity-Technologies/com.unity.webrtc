@@ -24,7 +24,7 @@ namespace webrtc
         VideoRendererTest()
             : m_texture(device()->CreateDefaultTextureV(width, height, m_textureFormat))
         {
-            m_trackSource = new rtc::RefCountedObject<UnityVideoTrackSource>(
+            m_trackSource = UnityVideoTrackSource::Create(
                 /*is_screencast=*/false,
                 /*needs_denoising=*/absl::nullopt);
             m_callback = &OnFrameSizeChange;

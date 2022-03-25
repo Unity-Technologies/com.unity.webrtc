@@ -22,8 +22,6 @@ namespace webrtc
     public:
         explicit GraphicsDeviceTestBase();
         virtual ~GraphicsDeviceTestBase();
-        void SetUp() override;
-        void TearDown() override;
         IGraphicsDevice* device();
 
     protected:

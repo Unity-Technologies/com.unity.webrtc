@@ -5,32 +5,35 @@ target_sources(WebRTCLibTest
     pch.cpp
     pch.h
     ContextTest.cpp
-    GraphicsDeviceTest.cpp
+    FrameGenerator.cpp
+    FrameGenerator.h
     GpuMemoryBufferTest.cpp
     GpuMemoryBufferPoolTest.cpp
     GraphicsDeviceContainer.cpp
     GraphicsDeviceContainer.h
     GraphicsDeviceContainerTest.cpp
+    GraphicsDeviceTest.cpp
     GraphicsDeviceTestBase.cpp
     GraphicsDeviceTestBase.h
+    InternalCodecsTest.cpp
+    UnityVideoEncoderFactoryTest.cpp
+    UnityVideoDecoderFactoryTest.cpp
     VideoCodecTest.cpp
     VideoCodecTest.h
     VideoFrameTest.cpp
-    UnityVideoEncoderFactoryTest.cpp
-    UnityVideoDecoderFactoryTest.cpp
+    VideoRendererTest.cpp
+    VideoTrackSourceTest.cpp
 )
-
-# todo(kazuki):: fix linker error on macOS and iOS
-if(NOT (macOS OR iOS))
-  target_sources(WebRTCLibTest
-    PRIVATE
-      VideoRendererTest.cpp
-      VideoTrackSourceTest.cpp
-  )    
-endif()
 
 if(Windows OR Linux)
   add_subdirectory(NvCodec)
+endif()
+
+if(Linux OR Android)
+  target_sources(WebRTCLibTest
+    PRIVATE
+      OpenGLContextTest.cpp
+  )
 endif()
 
 include(FetchContent)
@@ -166,11 +169,7 @@ elseif(macOS)
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
 elseif(Linux)
-  find_package(OpenGL REQUIRED)
   find_package(GLUT REQUIRED)
-  find_package(PkgConfig REQUIRED)
-
-  pkg_check_modules(GLIB REQUIRED glib-2.0)
 
   target_compile_options(WebRTCLibTest
     PUBLIC

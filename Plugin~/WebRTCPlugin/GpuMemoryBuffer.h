@@ -22,7 +22,7 @@ namespace webrtc
         GpuMemoryBufferHandle();
         GpuMemoryBufferHandle(GpuMemoryBufferHandle&& other);
         GpuMemoryBufferHandle& operator=(GpuMemoryBufferHandle&& other);
-        ~GpuMemoryBufferHandle();
+        virtual ~GpuMemoryBufferHandle();
 
 #if CUDA_PLATFORM
         CUarray array;
@@ -47,20 +47,21 @@ namespace webrtc
         ~GpuMemoryBufferInterface() override = default;
     };
 
-    class GpuMemoryBufferFromUnity : public rtc::RefCountedObject<GpuMemoryBufferInterface>
+    class GpuMemoryBufferFromUnity : public GpuMemoryBufferInterface
     {
     public:
         GpuMemoryBufferFromUnity(
             IGraphicsDevice* device, NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format);
         GpuMemoryBufferFromUnity(const GpuMemoryBufferFromUnity&) = delete;
         GpuMemoryBufferFromUnity& operator=(const GpuMemoryBufferFromUnity&) = delete;
-        ~GpuMemoryBufferFromUnity() override;
 
         void CopyBuffer(NativeTexPtr ptr);
         UnityRenderingExtTextureFormat GetFormat() const override;
         Size GetSize() const override;
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;
         const GpuMemoryBufferHandle* handle() const override { return handle_.get(); }
+    protected:
+        ~GpuMemoryBufferFromUnity() override;
     private:
         IGraphicsDevice* device_;
         UnityRenderingExtTextureFormat format_;

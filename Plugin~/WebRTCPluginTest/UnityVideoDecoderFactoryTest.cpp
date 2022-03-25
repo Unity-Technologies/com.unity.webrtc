@@ -22,6 +22,7 @@ namespace webrtc
     TEST_P(UnityVideoDecoderFactoryTest, GetSupportedFormats)
     {
         auto factory = std::make_unique<UnityVideoDecoderFactory>(container_->device());
+        EXPECT_NE(factory, nullptr);
         auto formats = factory->GetSupportedFormats();
         EXPECT_GT(formats.size(), 0);
     }

@@ -15,6 +15,7 @@ namespace webrtc
 namespace webrtc = ::webrtc;
 
 class OpenGLContext;
+struct OpenGLTexture2D;
 class OpenGLGraphicsDevice : public IGraphicsDevice
 {
 public:
@@ -30,7 +31,6 @@ public:
     bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
     rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
     bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-    inline virtual GraphicsDeviceType GetDeviceType() const override;
     std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
 
 #if CUDA_PLATFORM
@@ -41,16 +41,16 @@ public:
 
 private:
     bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
-
+    void ReleaseTexture(OpenGLTexture2D* texture);
 #if CUDA_PLATFORM
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
 #endif
+    std::unique_ptr<OpenGLContext> mainContext_;
     std::vector<std::unique_ptr<OpenGLContext>> contexts_;
 };
 
 void* OpenGLGraphicsDevice::GetEncodeDevicePtrV() { return nullptr; }
-GraphicsDeviceType OpenGLGraphicsDevice::GetDeviceType() const { return GRAPHICS_DEVICE_OPENGL; }
 
 //---------------------------------------------------------------------------------------------------------------------
 } // end namespace webrtc

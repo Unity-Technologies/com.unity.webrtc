@@ -20,18 +20,20 @@ public:
 
     rtc::scoped_refptr<VideoFrame> GetVideoFrame() const { return frame_; }
 
-    VideoFrameBuffer::Type type() const override {
-        return ::webrtc::VideoFrameBuffer::Type::kNative;
-    }
+    VideoFrameBuffer::Type type() const override;
     int width() const override { return size_.width(); }
     int height() const override { return size_.height(); }
 
+    const I420BufferInterface* GetI420() const override;
     rtc::scoped_refptr<I420BufferInterface> ToI420() override;
 protected:
     ~VideoFrameAdapter() override {};
 private:
-    rtc::scoped_refptr<webrtc::VideoFrameBuffer> ConvertToVideoFrameBuffer(
-        rtc::scoped_refptr<VideoFrame> video_frame);
+    rtc::scoped_refptr<I420BufferInterface> ConvertToVideoFrameBuffer(
+        rtc::scoped_refptr<VideoFrame> video_frame) const;
+    // todo(kazuki):
+    // Need this buffer because the type() method returns kI420.
+    mutable rtc::scoped_refptr<I420BufferInterface> i420Buffer_;
     const rtc::scoped_refptr<VideoFrame> frame_;
     const Size size_;
 };
@@ -69,6 +71,9 @@ class UnityVideoTrackSource :
 
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
+    
+    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast,
+                                                            absl::optional<bool> needs_denoising);
 
 private:
     void SendFeedback();

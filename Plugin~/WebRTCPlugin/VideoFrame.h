@@ -35,9 +35,6 @@ namespace webrtc
             rtc::scoped_refptr<GpuMemoryBufferInterface> gpu_memory_buffer,
             ReturnBufferToPoolCallback returnBufferToPoolCallback,
             TimeDelta timestamp);
-        static rtc::scoped_refptr<VideoFrame>
-        ConvertToMemoryMappedFrame(rtc::scoped_refptr<VideoFrame> video_frame);
-
     protected:
         VideoFrame(
             const Size& size,

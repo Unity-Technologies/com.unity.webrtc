@@ -121,7 +121,7 @@ namespace webrtc
 
     void VideoCodecTest::SetUp()
     {
-        SetDefaultSettings(&codecSettings_);
+        ModifyCodecSettings(&codecSettings_);
 
          inputFrameGenerator_ = CreateFrameGenerator(
             codecSettings_.width,
@@ -133,6 +133,12 @@ namespace webrtc
         decoder_ = CreateDecoder();
         encoder_->RegisterEncodeCompleteCallback(&encodedImageCallback_);
         decoder_->RegisterDecodeCompleteCallback(&decodedImageCallback_);
+    }
+
+    void VideoCodecTest::TearDown()
+    {
+        // call destructor
+        inputFrameGenerator_ = nullptr;
     }
 }
 }

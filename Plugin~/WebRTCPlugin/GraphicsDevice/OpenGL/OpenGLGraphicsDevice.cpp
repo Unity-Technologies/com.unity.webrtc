@@ -26,8 +26,12 @@ GLuint fbo[2];
 OpenGLGraphicsDevice::OpenGLGraphicsDevice(
     UnityGfxRenderer renderer)
     : IGraphicsDevice(renderer)
+    , mainContext_(nullptr)
 {
-    OpenGLContext::InitGLContext();
+    OpenGLContext::Init();
+
+    mainContext_ = OpenGLContext::CurrentContext();
+    RTC_DCHECK(mainContext_);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -80,7 +84,10 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
     glBindTexture(GL_TEXTURE_2D, 0);
-    return new OpenGLTexture2D(w, h, tex);
+
+    OpenGLTexture2D::ReleaseOpenGLTextureCallback callback =
+        std::bind(&OpenGLGraphicsDevice::ReleaseTexture, this, std::placeholders::_1);
+    return new OpenGLTexture2D(w, h, tex, callback);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -148,6 +155,13 @@ bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName, uint32 w
     return true;
 }
 
+void OpenGLGraphicsDevice::ReleaseTexture(OpenGLTexture2D* texture)
+{
+    if(!OpenGLContext::CurrentContext())
+        contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
+    texture->Release();
+}
+
 void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels)
 {
 #if SUPPORT_OPENGL_CORE
@@ -176,7 +190,7 @@ void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *p
 rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
 {
     if(!OpenGLContext::CurrentContext())
-        contexts_.push_back(OpenGLContext::CreateGLContext());
+        contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
 
     OpenGLTexture2D* sourceTex = static_cast<OpenGLTexture2D*>(tex);
     const GLuint sourceId = reinterpret_cast<uintptr_t>(sourceTex->GetNativeTexturePtrV());
@@ -197,7 +211,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
         GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
     if (pboPtr != nullptr)
     {
-        memcpy(data, pboPtr, bufferSize);
+        std::memcpy(data, pboPtr, bufferSize);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -223,6 +237,9 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     std::unique_ptr<GpuMemoryBufferHandle> OpenGLGraphicsDevice::Map(ITexture2D* texture)
     {
 #if CUDA_PLATFORM
+        if(!OpenGLContext::CurrentContext())
+            contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
+
         OpenGLTexture2D* glTexture2D = static_cast<OpenGLTexture2D*>(texture);
 
         CUarray mappedArray;

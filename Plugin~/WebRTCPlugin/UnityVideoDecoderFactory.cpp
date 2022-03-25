@@ -25,7 +25,9 @@ namespace webrtc
 #if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoDecoderFactory([[RTCDefaultVideoDecoderFactory alloc] init]).release();
 #elif UNITY_ANDROID
-        return CreateAndroidDecoderFactory().release();
+        // todo(kazuki)::workaround
+        // return CreateAndroidDecoderFactory().release();
+        return nullptr;
 #elif CUDA_PLATFORM
         CUcontext context = gfxDevice->GetCUcontext();
         return new NvDecoderFactory(context);
@@ -44,8 +46,9 @@ namespace webrtc
     std::vector<webrtc::SdpVideoFormat> UnityVideoDecoderFactory::GetSupportedFormats() const
     {
         std::vector<SdpVideoFormat> supported_codecs;
-        for (const webrtc::SdpVideoFormat& format : native_decoder_factory_->GetSupportedFormats())
-            supported_codecs.push_back(format);
+        if(native_decoder_factory_)
+            for (const webrtc::SdpVideoFormat& format : native_decoder_factory_->GetSupportedFormats())
+                supported_codecs.push_back(format);
         for (const webrtc::SdpVideoFormat& format : internal_decoder_factory_->GetSupportedFormats())
             supported_codecs.push_back(format);
         return supported_codecs;
@@ -54,7 +57,7 @@ namespace webrtc
     std::unique_ptr<webrtc::VideoDecoder>
     UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat& format)
     {
-        if (format.IsCodecInList(native_decoder_factory_->GetSupportedFormats()))
+        if (native_decoder_factory_ && format.IsCodecInList(native_decoder_factory_->GetSupportedFormats()))
         {
             return native_decoder_factory_->CreateVideoDecoder(format);
         }

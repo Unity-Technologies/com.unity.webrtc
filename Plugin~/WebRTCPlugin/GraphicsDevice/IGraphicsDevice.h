@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GraphicsDevice/GraphicsDeviceType.h"
-
 #if CUDA_PLATFORM
 #include "Cuda/ICudaDevice.h"
 #endif
@@ -28,7 +26,6 @@ public:
     virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
     virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;
     virtual NativeTexPtr ConvertNativeFromUnityPtr(void* tex) { return tex; }
-    virtual GraphicsDeviceType GetDeviceType() const = 0;
     virtual UnityGfxRenderer GetGfxRenderer() const { return m_gfxRenderer; }
     virtual std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) = 0;
 

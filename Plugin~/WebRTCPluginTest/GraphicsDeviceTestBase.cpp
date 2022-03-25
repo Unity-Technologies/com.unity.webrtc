@@ -17,21 +17,6 @@ namespace webrtc
         container_ = std::make_unique<GraphicsDeviceContainer>(m_unityGfxRenderer);
     }
 
-    void GraphicsDeviceTestBase::SetUp()
-    {
-#if defined(LEAK_SANITIZER)
-        __lsan_disable();
-        __lsan_enable();
-#endif
-    }
-
-    void GraphicsDeviceTestBase::TearDown()
-    {
-#if defined(LEAK_SANITIZER)
-        ASSERT_EQ(__lsan_do_recoverable_leak_check(), 0);
-#endif
-    }
-
     GraphicsDeviceTestBase::~GraphicsDeviceTestBase() { }
 
     IGraphicsDevice* GraphicsDeviceTestBase::device() { return container_->device(); }

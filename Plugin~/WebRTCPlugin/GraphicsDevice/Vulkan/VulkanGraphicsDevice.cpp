@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
 
@@ -277,7 +278,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
         result = cuImportExternalMemory(&externalMemory, &memDesc);
         if (result != CUDA_SUCCESS)
         {
-            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error";
+            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error:" << result;
             throw;
         }
 
@@ -298,7 +299,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
         result = cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc);
         if (result != CUDA_SUCCESS)
         {
-            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error";
+            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error:" << result;
             throw;
         }
 
@@ -306,7 +307,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
         result = cuMipmappedArrayGetLevel(&array, mipmappedArray, 0);
         if (result != CUDA_SUCCESS)
         {
-            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
+            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error:" << result;
             throw;
         }
 

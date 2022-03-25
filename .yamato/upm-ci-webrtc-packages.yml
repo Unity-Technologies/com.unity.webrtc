@@ -239,6 +239,7 @@ build_webrtc_plugin_{{ platform.name }}:
 {% endfor %}
 
 {% for platform in platforms %}
+{% if platform.name != "android" and platform.name != "ios" %}
 test_webrtc_plugin_{{ platform.name }}:
   name: Test webrtc plugin {{ platform.name }}
   agent:
@@ -250,13 +251,52 @@ test_webrtc_plugin_{{ platform.name }}:
 {% endif %}    
   commands:
     - {{ platform.test_command }}
+{% endif %}
 {% endfor %}
+
+#todo(kazuki): test it on Android mobile device
+test_webrtc_plugin_android:
+  name: Test webrtc plugin Android
+  agent:
+    type: Unity::mobile::shield
+    image: mobile/android-execution-base:v0.0.2-791667
+    flavor: b1.medium
+  skip_checkout: true
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_test_android
+  commands:
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
+    - |
+       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       # Establish an ADB connection with the device
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       # List the connected devices
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       NetSh Advfirewall set allprofiles state off
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push build/WebRTCLibTest /data/local/tmp
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
+
+build_webrtc_plugin_test_android:
+  name: Build webrtc plugin test runtime Android
+  agent:
+    type: Unity::VM
+    image: renderstreaming/android-linux-build:latest
+    flavor: b1.large
+  commands:
+    - BuildScripts~/build_test_runtime_android.sh
+  artifacts:
+    runtime:
+      paths:
+        - "build/WebRTCLibTest"
 
 test_webrtc_plugin_all_platform:
   name: Test webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
-    {% if platform.name != "android" and platform.name != "ios" %} # todo(kazuki) native plugin test is not supported on iOS and android 
+    # todo(kazuki) native plugin test is not supported on iOS
+    {% if platform.name != "ios" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
     {% endfor %}
@@ -547,16 +587,11 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_ios
 {% for target in test_targets_android %}
-# todo(kazuki): fix glcore support
-{% if target.name != "opengles3" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}
-{% endif -%}
 {% endfor %}
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-# todo(kazuki): fix glcore support
-{% if gfx_type.name != "glcore" %}
 {% if target.name == "macos" or target.name == "macos-m1" %}
 {% assign architectures = test_architectures_macos | where: "editor_version", editor.version | where: "target_name", target.name %}
 {% for architecture in architectures %}
@@ -564,7 +599,6 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% endfor %}
 {% elsif target.is_gpu == "true" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-{% endif -%}
 {% endif -%}
 {% endfor %}
 {% endfor %}

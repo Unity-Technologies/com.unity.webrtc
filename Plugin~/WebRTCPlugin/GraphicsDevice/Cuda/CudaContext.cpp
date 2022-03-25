@@ -248,7 +248,6 @@ CUresult CudaContext::Init(ID3D12Device* device)
 #if defined(SUPPORT_OPENGL_UNIFIED) && defined(UNITY_LINUX)
 CUresult CudaContext::InitGL()
 {
-
     // dll check
     CUresult result = LoadModule();
     if (result != CUDA_SUCCESS)
@@ -281,7 +280,12 @@ CUresult CudaContext::InitGL()
     {
         return result;
     }
-    return cuCtxCreate(&m_context, 0, cuDevice);
+    result = cuCtxCreate(&m_context, 0, cuDevice);
+    if (CUDA_SUCCESS != result)
+    {
+        return result;
+    }
+    return CUDA_SUCCESS;
 }
 #endif
 //---------------------------------------------------------------------------------------------------------------------
