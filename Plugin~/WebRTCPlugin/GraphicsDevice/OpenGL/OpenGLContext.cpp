@@ -22,6 +22,12 @@ namespace webrtc
         : created_(false)
         {
             RTC_DCHECK(display);
+
+            // Return if the context is already created.
+            context_ = eglGetCurrentContext();
+            if(context_ != nullptr)
+                return;
+
             int count = 0;
             if(!eglGetConfigs(display, 0, 0, &count))
             {
