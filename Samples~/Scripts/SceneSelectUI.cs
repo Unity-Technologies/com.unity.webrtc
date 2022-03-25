@@ -6,14 +6,8 @@ namespace Unity.WebRTC.Samples
 {
     internal static class WebRTCSettings
     {
-        private static bool s_enableHWCodec = false;
         private static bool s_limitTextureSize = true;
-
-        public static bool EnableHWCodec
-        {
-            get { return s_enableHWCodec; }
-            set { s_enableHWCodec = value; }
-        }
+        private static string s_useCodec = "VP8";
 
         public static bool LimitTextureSize
         {
@@ -21,15 +15,15 @@ namespace Unity.WebRTC.Samples
             set { s_limitTextureSize = value; }
         }
 
-        public static EncoderType EncoderType
+        public static string UseCodec
         {
-            get { return s_enableHWCodec ? EncoderType.Hardware : EncoderType.Software; }
+            get { return s_useCodec; }
+            set { s_useCodec = value; }
         }
     }
 
     internal class SceneSelectUI : MonoBehaviour
     {
-        [SerializeField] private Toggle toggleEnableHWCodec;
         [SerializeField] private Toggle toggleLimitTextureSize;
         [SerializeField] private Button buttonPeerConnection;
         [SerializeField] private Button buttonDataChannel;
@@ -49,9 +43,7 @@ namespace Unity.WebRTC.Samples
 
         void Start()
         {
-            toggleEnableHWCodec.isOn = WebRTCSettings.EnableHWCodec;
             toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
-            toggleEnableHWCodec.onValueChanged.AddListener(OnChangeHWCodec);
             toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
 
             buttonPeerConnection.onClick.AddListener(OnPressedPeerConnectionButton);
@@ -73,11 +65,6 @@ namespace Unity.WebRTC.Samples
             // This sample uses Compute Shader, so almost Android devices don't work correctly.
             if (!SystemInfo.supportsComputeShaders)
                 buttonLatency.interactable = false;
-        }
-
-        private void OnChangeHWCodec(bool enable)
-        {
-            WebRTCSettings.EnableHWCodec = enable;
         }
 
         private void OnChangeLimitTextureSize(bool enable)

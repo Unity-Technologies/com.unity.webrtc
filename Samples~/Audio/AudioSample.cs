@@ -59,7 +59,7 @@ namespace Unity.WebRTC
 
     void Start()
         {
-            WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
             StartCoroutine(LoopStatsCoroutine());
 

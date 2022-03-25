@@ -63,7 +63,7 @@ class E2ELatencySample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(OnCall);
         hangUpButton.onClick.AddListener(OnHangUp);
@@ -116,7 +116,7 @@ class E2ELatencySample : MonoBehaviour
     {
         // Set "Don't Sync" for changing framerate,
         // but iOS ignores this setting
-        QualitySettings.vSyncCount = 0; 
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = listFramerate[value];
     }
 

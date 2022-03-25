@@ -32,7 +32,7 @@ class StatsSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         callButton.onClick.AddListener(() =>
         {
             callButton.interactable = false;

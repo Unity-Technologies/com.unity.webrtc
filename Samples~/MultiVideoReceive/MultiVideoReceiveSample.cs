@@ -46,7 +46,7 @@ class MultiVideoReceiveSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
         addVideoObjectButton.onClick.AddListener(AddVideoObject);
