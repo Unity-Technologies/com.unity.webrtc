@@ -1,7 +1,11 @@
-#include
+//#include <vulkan/vulkan.h>
+#include <IUnityGraphicsVulkan.h>
+//#include <IUnityProfiler.h>
+//#include <IUnityRenderingExtensions.h>
 
-template<typename T> void InterceptInitialization(T& vulkan, UnityVulkanInitCallback func, void* userdata)
+template<typename T>
+void InterceptInitialization(T& vulkan, UnityVulkanInitCallback func, void* userdata)
 {
-    vulkan.InterceptInitialization(InterceptVulkanInitialization, nullptr);
+    vulkan.InterceptInitialization(func, nullptr);
 }
 

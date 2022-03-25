@@ -230,8 +230,8 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
     if(vulkan != nullptr)
     {
-        InterceptInitialization(*vulkan, InterceptVulkanInitialization, nullptr);
-        //vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+        //InterceptInitialization(*vulkan, InterceptVulkanInitialization, nullptr);
+        vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
     }
 #endif
 
