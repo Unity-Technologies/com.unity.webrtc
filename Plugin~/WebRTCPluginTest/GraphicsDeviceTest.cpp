@@ -36,7 +36,7 @@ TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV)
     EXPECT_FALSE(tex->IsSize(0, 0));
 }
 
-TEST_P(GraphicsDeviceTest, CreateTextureOnOtherThread)
+TEST_P(GraphicsDeviceTest, ReleaseTextureOnOtherThread)
 {
     const uint32_t width = 256;
     const uint32_t height = 256;
