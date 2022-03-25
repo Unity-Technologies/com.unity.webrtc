@@ -13,6 +13,7 @@
 #include "GpuMemoryBufferPool.h"
 
 #if defined(SUPPORT_VULKAN)
+#include "UnityVulkanInterfaceFunctions.h"
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
 #endif
 
@@ -209,10 +210,6 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 }
 #endif
 
-template<typename T> void InterceptInitialization(T& vulkan, UnityVulkanInitCallback func, void* userdata)
-{
-    vulkan.InterceptInitialization(InterceptVulkanInitialization, nullptr);
-}
 
 // Unity plugin load event
 void PluginLoad(IUnityInterfaces* unityInterfaces)
@@ -227,12 +224,13 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     s_clock.reset(Clock::GetRealTimeClock());
 
 #if defined(SUPPORT_VULKAN)
-    IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
-    if(vulkan != nullptr)
-    {
-        //InterceptInitialization(*vulkan, InterceptVulkanInitialization, nullptr);
-        vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
-    }
+    //IUnityGraphicsVulkanV2* vulkan = unityInterfaces->Get<IUnityGraphicsVulkanV2>();
+    auto vulkan = UnityGraphicsVulkan::Get(unityInterfaces);
+    vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+    //if (vulkan != nullptr)
+    //{
+    //    vulkan.InterceptInitialization(InterceptVulkanInitialization, nullptr);
+    //}
 #endif
 
     IUnityProfiler* unityProfiler = unityInterfaces->Get<IUnityProfiler>();
