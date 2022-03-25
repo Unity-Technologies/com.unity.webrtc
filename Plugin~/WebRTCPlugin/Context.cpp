@@ -93,7 +93,7 @@ namespace webrtc
         m_contexts.clear();
     }
 
-    bool Convert(const std::string& str, PeerConnectionInterface::RTCConfiguration& config)
+    bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
         config = PeerConnectionInterface::RTCConfiguration {};
         Json::CharReaderBuilder builder;
@@ -334,7 +334,7 @@ namespace webrtc
             m_listStatsReport.begin(),
             m_listStatsReport.end(),
             [report](rtc::scoped_refptr<const webrtc::RTCStatsReport> it) { return it.get() == report; });
-        
+
         if (result == m_listStatsReport.end())
         {
             RTC_LOG(LS_INFO) << "Calling DeleteStatsReport is failed. The reference of RTCStatsReport is not found.";
@@ -346,13 +346,18 @@ namespace webrtc
     DataChannelInterface*
     Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
     {
+<<<<<<< HEAD
         const rtc::scoped_refptr<DataChannelInterface> channel = obj->connection->CreateDataChannel(label, &options);
+=======
+        const RTCErrorOr<rtc::scoped_refptr<DataChannelInterface>> channel =
+            obj->connection->CreateDataChannelOrError(label, &options);
+>>>>>>> a1f95846 (Fix build errors due to interface changes in M96.)
 
-        if (channel == nullptr)
+        if (channel.ok())
             return nullptr;
 
-        AddDataChannel(channel, *obj);
-        return channel;
+        AddDataChannel(channel.value(), *obj);
+        return channel.value();
     }
 
     void Context::AddDataChannel(DataChannelInterface* channel, PeerConnectionObject& pc)

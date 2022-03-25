@@ -8,9 +8,8 @@ namespace unity
 {
 namespace webrtc
 {
-
     class Context;
-    class MediaStreamObserver : public ::webrtc::MediaStreamObserver, public sigslot::has_slots<>
+    class MediaStreamObserver : public webrtc::MediaStreamObserver
     {
     public:
         explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream, Context* context);
