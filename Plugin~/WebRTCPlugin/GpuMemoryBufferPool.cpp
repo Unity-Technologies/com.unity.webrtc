@@ -48,7 +48,6 @@ namespace webrtc
             new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(device_, ptr, size, format);
         std::unique_ptr<FrameResources> resources = std::make_unique<FrameResources>(buffer);
         resources->MarkUsed();
-        buffer->CopyBuffer(ptr);
         resourcesPool_.push_back(std::move(resources));
         return buffer;
     }
