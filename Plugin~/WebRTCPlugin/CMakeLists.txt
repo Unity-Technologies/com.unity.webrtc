@@ -66,6 +66,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(WebRTCLib
     PUBLIC
       $<$<NOT:${VISUALSTUDIO_GENERATOR}>:-Werror>
+      $<${VISUALSTUDIO_GENERATOR}:-Wno-c++98-compat>
+      $<${VISUALSTUDIO_GENERATOR}:-Wno-c++98-compat-pedantic>
       -Wall
       -Wextra
       -Wformat=2

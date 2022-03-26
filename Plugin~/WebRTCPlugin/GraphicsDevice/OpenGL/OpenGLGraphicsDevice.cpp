@@ -5,6 +5,7 @@
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
 #include "GpuMemoryBuffer.h"
+#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #include "OpenGLContext.h"
@@ -275,7 +276,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
         }
         cuCtxPopCurrent(NULL);
 
-        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        std::unique_ptr<CudaBufferHandle> handle = std::make_unique<CudaBufferHandle>();
         handle->array = mappedArray;
         handle->resource = resource;
         return handle;
