@@ -4,7 +4,7 @@
 #include "VulkanTexture2D.h"
 
 #include "VulkanUtility.h"
-#include "GpuMemoryBuffer.h"
+#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 namespace unity
@@ -313,7 +313,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
 
         cuCtxPopCurrent(NULL);
 
-        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
+        std::unique_ptr<CudaBufferHandle> handle = std::make_unique<CudaBufferHandle>();
         handle->array = array;
         handle->externalMemory = externalMemory;
         return handle;

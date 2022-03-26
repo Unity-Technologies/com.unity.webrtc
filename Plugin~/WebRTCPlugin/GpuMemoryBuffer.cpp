@@ -7,32 +7,11 @@ namespace unity
 {
 namespace webrtc
 {
-    GpuMemoryBufferHandle::GpuMemoryBufferHandle()
-#if CUDA_PLATFORM
-        : array(nullptr)
-        , devicePtr(0)
-        , resource(nullptr)
-        , externalMemory(nullptr)
-#endif
-    {
-    }
+    GpuMemoryBufferHandle::GpuMemoryBufferHandle() { }
     GpuMemoryBufferHandle::GpuMemoryBufferHandle(GpuMemoryBufferHandle&& other) = default;
     GpuMemoryBufferHandle& GpuMemoryBufferHandle::operator=(GpuMemoryBufferHandle&& other) = default;
 
-    GpuMemoryBufferHandle::~GpuMemoryBufferHandle()
-    {
-#if CUDA_PLATFORM
-        if (externalMemory != nullptr)
-        {
-            cuDestroyExternalMemory(externalMemory);
-        }
-        if (resource != nullptr)
-        {
-            cuGraphicsUnmapResources(1, &resource, 0);
-            cuGraphicsUnregisterResource(resource);
-        }
-#endif
-    }
+    GpuMemoryBufferHandle::~GpuMemoryBufferHandle() { }
 
     GpuMemoryBufferFromUnity::GpuMemoryBufferFromUnity(
         IGraphicsDevice* device, NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format)
