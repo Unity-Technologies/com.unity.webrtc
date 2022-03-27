@@ -243,6 +243,19 @@ build_webrtc_plugin_{{ platform.name }}:
 test_webrtc_plugin_{{ platform.name }}:
   name: Test webrtc plugin {{ platform.name }}
   agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - {{ platform.test_command }}
+{% endif %}
+{% endfor %}
+
+{% for platform in platforms %}
+{% if platform.name != "android" and platform.name != "ios" %}
+test_webrtc_plugin_{{ platform.name }}_GPU:
+  name: Test webrtc plugin {{ platform.name }} with GPU
+  agent:
     type: {{ platform.gpu_type }}
     image: {{ platform.gpu_image }}
     flavor: {{ platform.flavor }}
@@ -253,6 +266,7 @@ test_webrtc_plugin_{{ platform.name }}:
     - {{ platform.test_command }}
 {% endif %}
 {% endfor %}
+
 
 #todo(kazuki): test it on Android mobile device
 test_webrtc_plugin_android:
@@ -299,6 +313,10 @@ test_webrtc_plugin_all_platform:
     {% if platform.name != "ios" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
+    {% if platform.name != "android" and platform.name != "ios" %}
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}_gpu
+    {% endif %}
+
     {% endfor %}
 
 pack_{{ package.name }}:
