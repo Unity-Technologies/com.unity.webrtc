@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,7 +9,7 @@ namespace Unity.WebRTC.Samples
     internal static class WebRTCSettings
     {
         private static bool s_limitTextureSize = true;
-        private static string s_useCodec = "VP8";
+        private static RTCRtpCodecCapability s_useVideoCodec = null;
 
         public static bool LimitTextureSize
         {
@@ -15,15 +17,16 @@ namespace Unity.WebRTC.Samples
             set { s_limitTextureSize = value; }
         }
 
-        public static string UseCodec
+        public static RTCRtpCodecCapability UseVideoCodec
         {
-            get { return s_useCodec; }
-            set { s_useCodec = value; }
+            get { return s_useVideoCodec; }
+            set { s_useVideoCodec = value; }
         }
     }
 
     internal class SceneSelectUI : MonoBehaviour
     {
+        [SerializeField] private Dropdown codecSelector;
         [SerializeField] private Toggle toggleLimitTextureSize;
         [SerializeField] private Button buttonPeerConnection;
         [SerializeField] private Button buttonDataChannel;
@@ -41,8 +44,37 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonPerfectNegotiation;
         [SerializeField] private Button buttonLatency;
 
+        private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
+        private List<RTCRtpCodecCapability> availableCodecs;
+
+        void Awake()
+        {
+            WebRTC.Initialize();
+        }
+
+        void OnDestroy()
+        {
+            WebRTC.Dispose();
+        }
+
         void Start()
         {
+            var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+            availableCodecs = capabilities.codecs
+                .Where(codec => !excludeCodecMimeType.Contains(codec.mimeType))
+                .ToList();
+            var list = availableCodecs
+                .Select(codec => new Dropdown.OptionData {text = codec.mimeType + " " + codec.sdpFmtpLine})
+                .ToList();
+
+            codecSelector.options.AddRange(list);
+            var previewCodec = WebRTCSettings.UseVideoCodec;
+            codecSelector.value = previewCodec == null
+                ? 0
+                : availableCodecs.FindIndex(x =>
+                    x.mimeType == previewCodec.mimeType && x.sdpFmtpLine == previewCodec.sdpFmtpLine) + 1;
+            codecSelector.onValueChanged.AddListener(OnChangeCodecSelect);
+
             toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
             toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
 
@@ -65,6 +97,11 @@ namespace Unity.WebRTC.Samples
             // This sample uses Compute Shader, so almost Android devices don't work correctly.
             if (!SystemInfo.supportsComputeShaders)
                 buttonLatency.interactable = false;
+        }
+
+        private void OnChangeCodecSelect(int index)
+        {
+            WebRTCSettings.UseVideoCodec = index == 0 ? null : availableCodecs[index - 1];
         }
 
         private void OnChangeLimitTextureSize(bool enable)
