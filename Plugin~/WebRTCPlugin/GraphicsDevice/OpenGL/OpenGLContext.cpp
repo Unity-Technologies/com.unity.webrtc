@@ -42,17 +42,8 @@ namespace webrtc
             };
             context_ = eglCreateContext(display, configs[0], sharedCtx, contextAttr);
             RTC_DCHECK(context_);
-
-            EGLint surfaceAttr[] =
-            {
-                EGL_WIDTH, 1,
-                EGL_HEIGHT, 1,
-                EGL_NONE
-            };
-            surface_ = eglCreatePbufferSurface(display, configs[0], surfaceAttr);
-            RTC_DCHECK(surface_);
-
-            if(!eglMakeCurrent(display, surface_, surface_, context_))
+            
+            if(!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context_))
             {
                 RTC_LOG(LS_ERROR) << "eglMakeCurrent failed:" << eglGetError();
                 throw;
