@@ -237,6 +237,9 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     std::unique_ptr<GpuMemoryBufferHandle> OpenGLGraphicsDevice::Map(ITexture2D* texture)
     {
 #if CUDA_PLATFORM
+        if(!IsCudaSupport())
+            return nullptr;
+
         if(!OpenGLContext::CurrentContext())
             contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
 

@@ -32,7 +32,8 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, c
 bool VulkanGraphicsDevice::InitV()
 {
 #if CUDA_PLATFORM
-    m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_instance, m_physicalDevice);
+    CUresult result = m_cudaContext.Init(m_instance, m_physicalDevice);
+    m_isCudaSupport = CUDA_SUCCESS == result;
 #endif
     return VK_SUCCESS == CreateCommandPool();
 }
@@ -251,6 +252,9 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
     std::unique_ptr<GpuMemoryBufferHandle> VulkanGraphicsDevice::Map(ITexture2D* texture)
     {
 #if CUDA_PLATFORM
+        if(!IsCudaSupport())
+            return nullptr;
+
         // set context on the thread.
         cuCtxPushCurrent(GetCUcontext());
 

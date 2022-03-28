@@ -152,6 +152,9 @@ rtc::scoped_refptr<I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITexture2D*
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D11GraphicsDevice::Map(ITexture2D* texture)
     {
+        if(!IsCudaSupport())
+            return nullptr;
+
         CUarray mappedArray;
         CUgraphicsResource resource;
         ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());

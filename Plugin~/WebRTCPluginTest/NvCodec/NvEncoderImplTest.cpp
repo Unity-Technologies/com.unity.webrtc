@@ -19,10 +19,15 @@ namespace webrtc
         NvEncoderImplTest()
         {
             container_ = CreateGraphicsDeviceContainer(GetParam());
-            context_ = container_->device()->GetCUcontext();
         }
         ~NvEncoderImplTest() override { }
 
+        void SetUp() override
+        {
+            if(!container_->device()->IsCudaSupport())
+                GTEST_SKIP() << "CUDA is not supported on this device.";
+            context_ = container_->device()->GetCUcontext();
+        }
     protected:
         CUcontext context_;
         std::unique_ptr<GraphicsDeviceContainer> container_;

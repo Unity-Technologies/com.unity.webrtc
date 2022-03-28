@@ -102,7 +102,10 @@ TEST_P(GraphicsDeviceTest, Map)
     std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
 
 #if CUDA_PLATFORM
-    EXPECT_NE(handle, nullptr);
+    if(device()->IsCudaSupport())
+        EXPECT_NE(handle, nullptr);
+    else
+        EXPECT_EQ(handle, nullptr);
 #else
     EXPECT_EQ(handle, nullptr);
 #endif
@@ -114,7 +117,7 @@ TEST_P(GraphicsDeviceTest, MapWithCPUReadTexture)
     // which creating for reading from CPU.
     // It is unclear whether this is the bug or the specification of CUDA.
     if (device()->GetGfxRenderer() == kUnityGfxRendererVulkan)
-        GTEST_SKIP_SUCCESS() << "The Map method throw exception on vulkan platform";
+        GTEST_SKIP() << "The Map method throw exception on vulkan platform";
 
     const uint32_t width = 256;
     const uint32_t height = 256;

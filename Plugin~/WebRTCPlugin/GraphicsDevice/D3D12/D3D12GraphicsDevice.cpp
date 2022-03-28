@@ -284,6 +284,9 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
     {
+        if(!IsCudaSupport())
+            return nullptr;
+
         D3D12Texture2D* d3d12Texure = static_cast<D3D12Texture2D*>(texture);
 
         // set context on the thread.
