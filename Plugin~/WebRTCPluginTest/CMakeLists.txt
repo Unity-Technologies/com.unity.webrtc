@@ -128,6 +128,7 @@ if(Windows)
       wmcodecdspuuid
       WebRTCLib
       Strmiids
+      delayimp.lib
   )
   target_include_directories(WebRTCLibTest
     PRIVATE
@@ -141,8 +142,8 @@ if(Windows)
       COMPILE_FLAGS "/Yc /Ycpch.h"
   )
   set_target_properties(WebRTCLibTest
-    PROPERTIES
-      LINK_FLAGS "/DELAYLOAD:nvcuda.dll /DELAYLOAD:vulkan-1.dll"
+    PROPERTIES    
+      LINK_FLAGS "-delayload:nvcuda.dll -delayload:nvEncodeAPI64.dll -delayload:nvcuvid.dll -delayload:vulkan-1.dll"
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 elseif(macOS)
