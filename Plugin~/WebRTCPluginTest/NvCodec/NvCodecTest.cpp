@@ -32,6 +32,8 @@ namespace webrtc
             if(!container_->device()->IsCudaSupport())
                 GTEST_SKIP() << "CUDA is not supported on this device.";
             context_ = container_->device()->GetCUcontext();
+
+            VideoCodecTest::SetUp();
         }
     protected:
         std::unique_ptr<VideoEncoder> CreateEncoder() override
