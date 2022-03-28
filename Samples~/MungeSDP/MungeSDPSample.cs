@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
 using UnityEngine;
@@ -100,9 +101,22 @@ class MungeSDPSample : MonoBehaviour
         pcRemote.OnIceCandidate = candidate => pcLocal.AddIceCandidate(candidate);
         Debug.Log("pc1: created local and remote peer connection object");
 
+        var senders = new List<RTCRtpSender>();
         foreach (var track in sourceVideoStream.GetTracks())
         {
-            pcLocal.AddTrack(track, sourceVideoStream);
+            senders.Add(pcLocal.AddTrack(track, sourceVideoStream));
+        }
+
+        if (WebRTCSettings.UseVideoCodec != null)
+        {
+            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            foreach (var transceiver in pcLocal.GetTransceivers())
+            {
+                if (senders.Contains(transceiver.Sender))
+                {
+                    transceiver.SetCodecPreferences(codecs);
+                }
+            }
         }
 
         Debug.Log("Adding local stream to pcLocal");

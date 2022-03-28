@@ -279,9 +279,26 @@ class E2ELatencySample : MonoBehaviour
 
     private void AddTracks()
     {
+        var pc1VideoSenders = new List<RTCRtpSender>();
         foreach (var track in sendStream.GetTracks())
         {
-            _pc1.AddTrack(track, sendStream);
+            var sender = _pc1.AddTrack(track, sendStream);
+            if (track.Kind == TrackKind.Video)
+            {
+                pc1VideoSenders.Add(sender);
+            }
+        }
+
+        if (WebRTCSettings.UseVideoCodec != null)
+        {
+            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            foreach (var transceiver in _pc1.GetTransceivers())
+            {
+                if (pc1VideoSenders.Contains(transceiver.Sender))
+                {
+                    transceiver.SetCodecPreferences(codecs);
+                }
+            }
         }
     }
 

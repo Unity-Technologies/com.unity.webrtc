@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -130,10 +131,38 @@ namespace Unity.WebRTC.Samples
             pc2Remote.OnIceCandidate = candidate => pc2Local.AddIceCandidate(candidate);
             Debug.Log("pc2: created local and remote peer connection object");
 
+            var pc1VideoSenders = new List<RTCRtpSender>();
+            var pc2VideoSenders = new List<RTCRtpSender>();
             foreach (var track in sourceStream.GetTracks())
             {
-                pc1Local.AddTrack(track, sourceStream);
-                pc2Local.AddTrack(track, sourceStream);
+                var pc1Sender = pc1Local.AddTrack(track, sourceStream);
+                var pc2Sender = pc2Local.AddTrack(track, sourceStream);
+
+                if (track.Kind == TrackKind.Video)
+                {
+                    pc1VideoSenders.Add(pc1Sender);
+                    pc2VideoSenders.Add(pc2Sender);
+                }
+            }
+
+            if (WebRTCSettings.UseVideoCodec != null)
+            {
+                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                foreach (var transceiver in pc1Local.GetTransceivers())
+                {
+                    if (pc1VideoSenders.Contains(transceiver.Sender))
+                    {
+                        transceiver.SetCodecPreferences(codecs);
+                    }
+                }
+
+                foreach (var transceiver in pc2Local.GetTransceivers())
+                {
+                    if (pc2VideoSenders.Contains(transceiver.Sender))
+                    {
+                        transceiver.SetCodecPreferences(codecs);
+                    }
+                }
             }
 
             Debug.Log("Adding local stream to pc1Local/pc2Local");

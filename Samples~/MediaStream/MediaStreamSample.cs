@@ -124,6 +124,18 @@ namespace Unity.WebRTC.Samples
                 pc1Senders.Add(_pc1.AddTrack(track, videoStream));
             }
 
+            if (WebRTCSettings.UseVideoCodec != null)
+            {
+                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                foreach (var transceiver in _pc1.GetTransceivers())
+                {
+                    if (pc1Senders.Contains(transceiver.Sender))
+                    {
+                        transceiver.SetCodecPreferences(codecs);
+                    }
+                }
+            }
+
             if (!videoUpdateStarted)
             {
                 StartCoroutine(WebRTC.Update());

@@ -113,8 +113,8 @@ class Peer : IDisposable
     private bool srdAnswerPending;
     private bool sldGetBackStable;
 
-    private const int width = 128;
-    private const int height = 128;
+    private const int width = 256;
+    private const int height = 256;
 
     public Peer(
         PerfectNegotiationSample parent,
@@ -281,6 +281,13 @@ class Peer : IDisposable
             transceiver1.Direction = RTCRtpTransceiverDirection.SendOnly;
             var transceiver2 = pc.AddTransceiver(sourceVideoTrack2);
             transceiver2.Direction = RTCRtpTransceiverDirection.Inactive;
+
+            if (WebRTCSettings.UseVideoCodec != null)
+            {
+                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                transceiver1.SetCodecPreferences(codecs);
+                transceiver2.SetCodecPreferences(codecs);
+            }
 
             sendingTransceiverList.Add(transceiver1);
             sendingTransceiverList.Add(transceiver2);
