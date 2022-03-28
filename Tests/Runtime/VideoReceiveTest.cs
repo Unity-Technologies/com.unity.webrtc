@@ -7,7 +7,6 @@ using UnityEngine.TestTools;
 namespace Unity.WebRTC.RuntimeTest
 {
     [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedReceiveVideoCodec, "Not supported hardware decoder")]
     class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
