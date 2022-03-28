@@ -6,4 +6,8 @@ target_sources(WebRTCLib
     OpenGLTexture2D.h
     OpenGLContext.cpp
     OpenGLContext.h
-)
+  )
+
+if(Linux)
+  add_subdirectory(implib)
+endif()

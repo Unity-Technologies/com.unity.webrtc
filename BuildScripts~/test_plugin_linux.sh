@@ -8,6 +8,8 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0
 export LSAN_OPTIONS=suppressions=$(pwd)/Plugin~/tools/sanitizer/lsan_suppressions.txt
 
+source ~/.profile
+
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
@@ -16,6 +18,9 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 # TODO:: Remove this install process from here and recreate an image to build the plugin.
 sudo apt update
 sudo apt install -y clang-10 libc++-10-dev libc++abi-10-dev freeglut3-dev
+
+# Install glad2
+pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"

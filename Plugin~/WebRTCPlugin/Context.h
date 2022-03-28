@@ -38,16 +38,6 @@ namespace webrtc
         static std::unique_ptr<ContextManager> s_instance;
     };
 
-    enum class CodecInitializationResult
-    {
-        NotInitialized,
-        Success,
-        DriverNotInstalled,
-        DriverVersionDoesNotSupportAPI,
-        APINotFound,
-        EncoderInitializationFailed
-    };
-
     class Context
     {
     public:

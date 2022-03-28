@@ -296,7 +296,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             UnityVideoTrackSource* source = encodeData->source;
             if (source == nullptr)
                 return;
-            Timestamp timestamp = s_clock->CurrentTime();
+            int64_t timestamp = s_clock->TimeInMicroseconds();
             IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
             UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
             void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
@@ -306,7 +306,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                 ScopedProfiler profiler(*s_MarkerEncode);
 
                 auto frame =
-                    s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp.us());
+                    s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
                 source->OnFrameCaptured(std::move(frame));
             }
             return;

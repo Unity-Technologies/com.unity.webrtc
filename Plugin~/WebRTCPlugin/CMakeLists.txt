@@ -92,10 +92,6 @@ endif()
 add_subdirectory(Codec)
 add_subdirectory(GraphicsDevice)
 
-if(Linux)
-  add_subdirectory(Dynlink)
-endif()
-
 if(Windows)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -185,9 +181,32 @@ elseif(Linux)
   set(PROJECT_BINARY_DIR
     "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
-  # todo(kazuki):link in runtime
-  find_package(X11 REQUIRED)
-  find_package(OpenGL REQUIRED)
+  set(GLAD_SOURCES_DIR "${CMAKE_SOURCE_DIR}/glad")
+  add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
+
+  glad_add_library(glad_gl_core_46 REPRODUCIBLE STATIC LOADER API gl:core=4.6)
+  glad_add_library(glad_vulkan_11 REPRODUCIBLE STATIC LOADER API vulkan=1.1)
+  glad_add_library(glad_glx_14 REPRODUCIBLE STATIC LOADER API glx=1.4)
+
+  set_target_properties(glad_gl_core_46
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE ON
+  )
+
+  set_target_properties(glad_vulkan_11
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE ON
+  )
+
+  set_target_properties(glad_glx_14
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE ON
+  )
+
+  target_link_libraries(glad_glx_14
+    PUBLIC
+      glad_gl_core_46
+  )
 
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(GLIB REQUIRED glib-2.0)
@@ -200,22 +219,20 @@ elseif(Linux)
   )
   target_link_libraries(WebRTCLib
     PUBLIC
+      NvCodec
+      glad_gl_core_46
+      glad_vulkan_11
+      glad_glx_14
       ${WEBRTC_LIBRARY}
-      ${NVCODEC_LIBRARIES}
-      ${X11_LIBRARIES}
-      ${OPENGL_egl_LIBRARY}
-      ${OPENGL_glx_LIBRARY}
-      ${OPENGL_opengl_LIBRARY}
-      ${Vulkan_LIBRARY}
       ${GLIB_LIBRARIES}
   )
   target_include_directories(WebRTCLib
     SYSTEM
     PUBLIC
       ${CUDA_INCLUDE_DIRS}
-      ${Vulkan_INCLUDE_DIR}
-      ${OPENGL_INCLUDE_DIR}
-      ${OPENGL_EGL_INCLUDE_DIRS}
+      glad_gl_core_46
+      glad_vulkan_11
+      glad_glx_14
       ${NVCODEC_INCLUDE_DIR}
   )
 
