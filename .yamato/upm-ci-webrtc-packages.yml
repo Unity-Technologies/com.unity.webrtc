@@ -252,8 +252,8 @@ test_webrtc_plugin_{{ platform.name }}:
 {% endfor %}
 
 {% for platform in platforms %}
-{% if platform.name != "android" and platform.name != "ios" %}
-test_webrtc_plugin_{{ platform.name }}_GPU:
+{% if platform.name == "windows" or platform.name == "linux" %}
+test_webrtc_plugin_{{ platform.name }}_gpu:
   name: Test webrtc plugin {{ platform.name }} with GPU
   agent:
     type: {{ platform.gpu_type }}
@@ -313,10 +313,9 @@ test_webrtc_plugin_all_platform:
     {% if platform.name != "ios" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
-    {% if platform.name != "android" and platform.name != "ios" %}
+    {% if platform.name == "windows" or platform.name == "linux" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}_gpu
     {% endif %}
-
     {% endfor %}
 
 pack_{{ package.name }}:
