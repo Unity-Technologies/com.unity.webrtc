@@ -252,7 +252,7 @@ test_webrtc_plugin_{{ platform.name }}:
 {% endfor %}
 
 {% for platform in platforms %}
-{% if platform.name == "windows" or platform.name == "linux" %}
+{% if platform.name == "win" or platform.name == "linux" %}
 test_webrtc_plugin_{{ platform.name }}_gpu:
   name: Test webrtc plugin {{ platform.name }} with GPU
   agent:
@@ -305,15 +305,15 @@ build_webrtc_plugin_test_android:
       paths:
         - "build/WebRTCLibTest"
 
-test_webrtc_plugin_all_platform:
-  name: Test webrtc plugin for all platforms
+trigger_webrtc_plugin_all_platform:
+  name: Trigger webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
     # todo(kazuki) native plugin test is not supported on iOS
     {% if platform.name != "ios" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
     {% endif %}
-    {% if platform.name == "windows" or platform.name == "linux" %}
+    {% if platform.name == "win" or platform.name == "linux" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}_gpu
     {% endif %}
     {% endfor %}
