@@ -14,6 +14,7 @@ namespace webrtc
     public:
         explicit GpuMemoryBufferPoolTest()
             : container_(CreateGraphicsDeviceContainer(GetParam()))
+            , device_(container_->device())
             , timestamp_(0)
         {
         }
@@ -21,17 +22,23 @@ namespace webrtc
     protected:
         void SetUp() override
         {
-            bufferPool_ = std::make_unique<GpuMemoryBufferPool>(container_->device());
+            if (!device_)
+                GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            if (!device_->IsCudaSupport())
+                GTEST_SKIP() << "CUDA is not supported on this device.";
+
+            bufferPool_ = std::make_unique<GpuMemoryBufferPool>(device_);
             timestamp_ = Clock::GetRealTimeClock()->TimeInMicroseconds();
         }
 
         std::unique_ptr<ITexture2D> CreateTexture(const Size& size, UnityRenderingExtTextureFormat format)
         {
-            ITexture2D* tex = container_->device()->CreateDefaultTextureV(size.width(), size.height(), format);
+            ITexture2D* tex = device_->CreateDefaultTextureV(size.width(), size.height(), format);
             return std::unique_ptr<ITexture2D>(tex);
         }
 
         std::unique_ptr<GraphicsDeviceContainer> container_;
+        IGraphicsDevice* device_;
         std::unique_ptr<GpuMemoryBufferPool> bufferPool_;
         int64_t timestamp_;
     };

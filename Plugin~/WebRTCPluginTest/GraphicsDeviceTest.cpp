@@ -12,6 +12,14 @@ namespace webrtc
 
 class GraphicsDeviceTest : public GraphicsDeviceTestBase
 {
+protected:
+    void SetUp() override
+    {
+        if (!device())
+            GTEST_SKIP() << "The graphics driver is not installed on the device.";
+        if (!device()->IsCudaSupport())
+            GTEST_SKIP() << "CUDA is not supported on this device.";
+    }
 };
 
 TEST_P(GraphicsDeviceTest, GraphicsDeviceIsNotNull) { EXPECT_NE(nullptr, device()); }
@@ -20,7 +28,7 @@ TEST_P(GraphicsDeviceTest, CreateDefaultTextureV)
 {
     const auto width = 256;
     const auto height = 256;
-    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, format()));
     EXPECT_TRUE(tex->IsSize(width, height));
     EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
     EXPECT_FALSE(tex->IsSize(0, 0));
@@ -30,7 +38,7 @@ TEST_P(GraphicsDeviceTest, CreateCPUReadTextureV)
 {
     const auto width = 256;
     const auto height = 256;
-    const std::unique_ptr<ITexture2D> tex(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> tex(device()->CreateCPUReadTextureV(width, height, format()));
     EXPECT_TRUE(tex->IsSize(width, height));
     EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
     EXPECT_FALSE(tex->IsSize(0, 0));
@@ -43,7 +51,7 @@ TEST_P(GraphicsDeviceTest, ReleaseTextureOnOtherThread)
 
     std::unique_ptr<rtc::Thread> thread = rtc::Thread::CreateWithSocketServer();
     thread->Start();
-    std::unique_ptr<ITexture2D> texture(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    std::unique_ptr<ITexture2D> texture(device()->CreateDefaultTextureV(width, height, format()));
 
     thread->Invoke<void>(
         RTC_FROM_HERE,
@@ -58,8 +66,8 @@ TEST_P(GraphicsDeviceTest, CopyResourceV)
 {
     const auto width = 256;
     const auto height = 256;
-    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
-    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
+    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, format()));
     EXPECT_TRUE(device()->CopyResourceV(dst.get(), src.get()));
 }
 
@@ -67,8 +75,8 @@ TEST_P(GraphicsDeviceTest, CopyResourceVFromCPURead)
 {
     const auto width = 256;
     const auto height = 256;
-    const std::unique_ptr<ITexture2D> src(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
-    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> src(device()->CreateCPUReadTextureV(width, height, format()));
+    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, format()));
     EXPECT_TRUE(device()->CopyResourceV(dst.get(), src.get()));
 }
 
@@ -76,8 +84,8 @@ TEST_P(GraphicsDeviceTest, CopyResourceNativeV)
 {
     const auto width = 256;
     const auto height = 256;
-    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
-    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
+    const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, format()));
     EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
 }
 
@@ -85,8 +93,8 @@ TEST_P(GraphicsDeviceTest, ConvertRGBToI420)
 {
     const uint32_t width = 256;
     const uint32_t height = 256;
-    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
-    const std::unique_ptr<ITexture2D> dst(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
+    const std::unique_ptr<ITexture2D> dst(device()->CreateCPUReadTextureV(width, height, format()));
     EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
     const auto frameBuffer = device()->ConvertRGBToI420(dst.get());
     EXPECT_NE(nullptr, frameBuffer);
@@ -98,7 +106,7 @@ TEST_P(GraphicsDeviceTest, Map)
 {
     const uint32_t width = 256;
     const uint32_t height = 256;
-    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
     std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
 
 #if CUDA_PLATFORM
@@ -121,7 +129,7 @@ TEST_P(GraphicsDeviceTest, MapWithCPUReadTexture)
 
     const uint32_t width = 256;
     const uint32_t height = 256;
-    const std::unique_ptr<ITexture2D> src2(device()->CreateCPUReadTextureV(width, height, m_textureFormat));
+    const std::unique_ptr<ITexture2D> src2(device()->CreateCPUReadTextureV(width, height, format()));
     std::unique_ptr<GpuMemoryBufferHandle> handle2 = device()->Map(src2.get());
 }
 

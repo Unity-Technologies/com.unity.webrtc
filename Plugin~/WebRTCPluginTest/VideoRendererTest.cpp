@@ -22,7 +22,6 @@ namespace webrtc
     {
     public:
         VideoRendererTest()
-            : m_texture(device()->CreateDefaultTextureV(width, height, m_textureFormat))
         {
             m_trackSource = UnityVideoTrackSource::Create(
                 /*is_screencast=*/false,
@@ -30,14 +29,20 @@ namespace webrtc
             m_callback = &OnFrameSizeChange;
             m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
             m_trackSource->AddOrUpdateSink(m_renderer.get(), rtc::VideoSinkWants());
-
-            EXPECT_NE(nullptr, device());
-
-            context = std::make_unique<Context>(device());
         }
         ~VideoRendererTest() override { m_trackSource->RemoveSink(m_renderer.get()); }
 
     protected:
+        void SetUp() override
+        {
+            if (!device())
+                GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            if (!device()->IsCudaSupport())
+                GTEST_SKIP() << "CUDA is not supported on this device.";
+
+            m_texture.reset(device()->CreateDefaultTextureV(width, height, format()));
+            context = std::make_unique<Context>(device());
+        }
         std::unique_ptr<Context> context;
         std::unique_ptr<ITexture2D> m_texture;
 

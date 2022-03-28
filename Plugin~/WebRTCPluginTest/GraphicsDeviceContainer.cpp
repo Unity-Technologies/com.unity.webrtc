@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "GraphicsDeviceContainer.h"
 #include "GraphicsDevice/GraphicsDevice.h"
+#include "GraphicsDeviceContainer.h"
 
 #if SUPPORT_D3D11
 #include "GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
@@ -15,8 +15,8 @@
 #endif
 
 #if SUPPORT_OPENGL_CORE
-#include <GL/glut.h>
 #include "GraphicsDevice/OpenGL/OpenGLContext.h"
+#include <GL/glut.h>
 #endif
 
 #if SUPPORT_OPENGL_ES
@@ -208,8 +208,7 @@ namespace webrtc
             VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
         };
 
-        std::vector<const char*> deviceExtensions =
-        {
+        std::vector<const char*> deviceExtensions = {
 
 #ifndef _WIN32
             VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME, VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
@@ -231,7 +230,10 @@ namespace webrtc
         appInfo.engineVersion = 1;
 
         if (!LoadVulkanModule())
-            assert("failed loading vulkan module");
+        {
+            RTC_LOG(LS_INFO) << "failed loading vulkan module";
+            return nullptr;
+        }
 
         VkInstanceCreateInfo instanceInfo {};
         instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -400,9 +402,9 @@ namespace webrtc
             return CreateDeviceGLCore();
 #endif
 #if SUPPORT_OPENGL_ES
-            case kUnityGfxRendererOpenGLES20:
-            case kUnityGfxRendererOpenGLES30:
-                return CreateDeviceGLES();
+        case kUnityGfxRendererOpenGLES20:
+        case kUnityGfxRendererOpenGLES30:
+            return CreateDeviceGLES();
 #endif
 #if SUPPORT_VULKAN
         case kUnityGfxRendererVulkan:
@@ -457,9 +459,16 @@ namespace webrtc
     }
 
     GraphicsDeviceContainer::GraphicsDeviceContainer(UnityGfxRenderer renderer)
+        : nativeGfxDevice_(nullptr)
+        , device_(nullptr)
     {
         nativeGfxDevice_ = CreateNativeGfxDevice(renderer);
         renderer_ = renderer;
+
+        // native graphics device is not initialized.
+        if (!nativeGfxDevice_)
+            return;
+
         IGraphicsDevice* device = nullptr;
         if (renderer == kUnityGfxRendererD3D12)
         {
@@ -475,9 +484,13 @@ namespace webrtc
         device_ = std::unique_ptr<IGraphicsDevice>(device);
         device_->InitV();
     }
-    GraphicsDeviceContainer::~GraphicsDeviceContainer() {
-        device_->ShutdownV();
-        DestroyNativeGfxDevice(nativeGfxDevice_, renderer_); }
+    GraphicsDeviceContainer::~GraphicsDeviceContainer()
+    {
+        if (device_)
+            device_->ShutdownV();
+        if (nativeGfxDevice_)
+            DestroyNativeGfxDevice(nativeGfxDevice_, renderer_);
+    }
 
     std::unique_ptr<GraphicsDeviceContainer> CreateGraphicsDeviceContainer(UnityGfxRenderer renderer)
     {

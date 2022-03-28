@@ -23,13 +23,24 @@ protected:
     const int height = 256;
     std::unique_ptr<GraphicsDeviceContainer> container_;
     std::unique_ptr<Context> context;
+    IGraphicsDevice* device_;
     DelegateVideoFrameResize callback_videoframeresize;
 
     explicit ContextTest()
         : container_(CreateGraphicsDeviceContainer(GetParam()))
+        , device_(container_->device())
     {
-        context = std::make_unique<Context>(container_->device());
         callback_videoframeresize = &OnFrameSizeChange;
+    }
+
+    void SetUp() override
+    {
+        if (!device_)
+            GTEST_SKIP() << "The graphics driver is not installed on the device.";
+        if (!device_->IsCudaSupport())
+            GTEST_SKIP() << "CUDA is not supported on this device.";
+
+        context = std::make_unique<Context>(device_);
     }
 
     static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)

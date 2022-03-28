@@ -29,19 +29,27 @@ const int height = 720;
 class VideoTrackSourceTest : public GraphicsDeviceTestBase
 {
 public:
-    VideoTrackSourceTest() : m_texture(device()->CreateDefaultTextureV(width, height, m_textureFormat))
+    VideoTrackSourceTest()
+        : m_texture(nullptr)
     {
         m_trackSource = UnityVideoTrackSource::Create(false, absl::nullopt);
         m_trackSource->AddOrUpdateSink(&mock_sink_, rtc::VideoSinkWants());
-
-        EXPECT_NE(nullptr, device());
-        context = std::make_unique<Context>(device());
     }
     ~VideoTrackSourceTest() override
     {
         m_trackSource->RemoveSink(&mock_sink_);
     }
 protected:
+    void SetUp() override
+    {
+        if (!device())
+            GTEST_SKIP() << "The graphics driver is not installed on the device.";
+        if (!device()->IsCudaSupport())
+            GTEST_SKIP() << "CUDA is not supported on this device.";
+
+        m_texture.reset(device()->CreateDefaultTextureV(width, height, format()));
+        context = std::make_unique<Context>(device());
+    }
     std::unique_ptr<Context> context;
     std::unique_ptr<ITexture2D> m_texture;
 
