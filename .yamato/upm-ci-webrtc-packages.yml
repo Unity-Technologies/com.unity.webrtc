@@ -305,8 +305,8 @@ build_webrtc_plugin_test_android:
       paths:
         - "build/WebRTCLibTest"
 
-trigger_webrtc_plugin_all_platform:
-  name: Trigger webrtc plugin for all platforms
+trigger_test_webrtc_plugin_all_platform:
+  name: Trigger test for webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
     # todo(kazuki) native plugin test is not supported on iOS
