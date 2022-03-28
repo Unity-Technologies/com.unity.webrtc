@@ -25,8 +25,6 @@ namespace webrtc
         {
             if (!device_)
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
-            if (!device_->IsCudaSupport())
-                GTEST_SKIP() << "CUDA is not supported on this device.";
         }
         std::unique_ptr<GraphicsDeviceContainer> container_;
         IGraphicsDevice* device_;

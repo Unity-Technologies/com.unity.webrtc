@@ -459,8 +459,8 @@ namespace webrtc
     }
 
     GraphicsDeviceContainer::GraphicsDeviceContainer(UnityGfxRenderer renderer)
-        : nativeGfxDevice_(nullptr)
-        , device_(nullptr)
+        : device_(nullptr)
+        , nativeGfxDevice_(nullptr)
     {
         nativeGfxDevice_ = CreateNativeGfxDevice(renderer);
         renderer_ = renderer;

@@ -37,9 +37,6 @@ protected:
     {
         if (!device_)
             GTEST_SKIP() << "The graphics driver is not installed on the device.";
-        if (!device_->IsCudaSupport())
-            GTEST_SKIP() << "CUDA is not supported on this device.";
-
         context = std::make_unique<Context>(device_);
     }
 

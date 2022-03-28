@@ -44,8 +44,6 @@ protected:
     {
         if (!device())
             GTEST_SKIP() << "The graphics driver is not installed on the device.";
-        if (!device()->IsCudaSupport())
-            GTEST_SKIP() << "CUDA is not supported on this device.";
 
         m_texture.reset(device()->CreateDefaultTextureV(width, height, format()));
         context = std::make_unique<Context>(device());
