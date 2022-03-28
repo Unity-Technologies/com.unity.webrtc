@@ -8,25 +8,8 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    [Ignore("WIP")]
-    [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForHardwareCodec, "Ignored hardware encoder test.")]
-    class NativeAPITestWithHardwareEncoder : NativeAPITestWithSoftwareEncoder
+    class NativeAPITest
     {
-        [OneTimeSetUp]
-        public new void OneTimeInit()
-        {
-            // set codec
-            // encoderType = EncoderType.Hardware;
-        }
-
-    }
-
-    class NativeAPITestWithSoftwareEncoder
-    {
-        // set codec
-        // protected EncoderType encoderType;
-
         private static RenderTexture CreateRenderTexture(int width, int height)
         {
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
@@ -54,13 +37,6 @@ namespace Unity.WebRTC.RuntimeTest
         public void CleanUp()
         {
             NativeMethods.RegisterDebugLog(null, true, NativeLoggingSeverity.LS_VERBOSE);
-        }
-
-        [OneTimeSetUp]
-        public void OneTimeInit()
-        {
-            // set codec
-            // encoderType = EncoderType.Hardware;
         }
 
         [Test]
@@ -490,24 +466,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 
-    [Ignore("WIP")]
-    [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedHardwareForHardwareCodec, "Ignored hardware encoder test.")]
     [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
-    class NativeAPITestWithHardwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithHardwareEncoder, IPrebuildSetup
-    {
-        public void Setup()
-        {
-#if UNITY_EDITOR
-            EditorSettings.enterPlayModeOptionsEnabled = true;
-            EditorSettings.enterPlayModeOptions =
-                EnterPlayModeOptions.DisableDomainReload | EnterPlayModeOptions.DisableSceneReload;
-#endif
-        }
-    }
-
-    [UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxEditor)]
-    class NativeAPITestWithSoftwareEncoderAndEnterPlayModeOptionsEnabled : NativeAPITestWithSoftwareEncoder, IPrebuildSetup
+    class NativeAPITestAndEnterPlayModeOptionsEnabled : NativeAPITest, IPrebuildSetup
     {
         public void Setup()
         {

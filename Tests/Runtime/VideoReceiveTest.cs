@@ -7,11 +7,10 @@ using UnityEngine.TestTools;
 namespace Unity.WebRTC.RuntimeTest
 {
     [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedReceiveVideoOnHardware, "Not supported hardware decoder")]
-    class VideoReceiveTestWithH264Codec : VideoReceiveTestWithVP8Codec
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedReceiveVideoCodec, "Not supported hardware decoder")]
+    class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
-        [OneTimeSetUp]
-        public new void OneTimeInit()
+        protected override void SetUpCodecCapability()
         {
             WebRTC.Initialize();
             videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.First(c => c.mimeType.Contains("H264"));
@@ -19,16 +18,27 @@ namespace Unity.WebRTC.RuntimeTest
         }
     }
 
-    class VideoReceiveTestWithVP8Codec
+    [TestFixture]
+    class VideoReceiveTestWithVP8Codec : VideoReceiveTestBase
     {
-        protected RTCRtpCodecCapability videoCodec;
-
-        [OneTimeSetUp]
-        public void OneTimeInit()
+        protected override void SetUpCodecCapability()
         {
             WebRTC.Initialize();
             videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.First(c => c.mimeType.Contains("VP8"));
             WebRTC.Dispose();
+        }
+    }
+
+    abstract class VideoReceiveTestBase
+    {
+        protected RTCRtpCodecCapability videoCodec;
+
+        protected abstract void SetUpCodecCapability();
+
+        [OneTimeSetUp]
+        public void OneTimeInit()
+        {
+            SetUpCodecCapability();
         }
 
         [SetUp]
