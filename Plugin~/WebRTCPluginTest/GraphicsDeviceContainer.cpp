@@ -17,6 +17,7 @@
 #if SUPPORT_OPENGL_CORE
 #include "GraphicsDevice/OpenGL/OpenGLContext.h"
 #include <GL/glut.h>
+#include <sanitizer/lsan_interface.h>
 #endif
 
 #if SUPPORT_OPENGL_ES
@@ -371,6 +372,7 @@ namespace webrtc
 #if SUPPORT_OPENGL_CORE
 
     static bool s_glutInitialized;
+    static int s_window;
 
     void* CreateDeviceGLCore()
     {
@@ -378,8 +380,10 @@ namespace webrtc
         {
             int argc = 0;
             glutInit(&argc, nullptr);
+            __lsan_disable();
+            s_window = glutCreateWindow("test");
+            __lsan_enable();
             s_glutInitialized = true;
-            glutCreateWindow("test");
         }
         OpenGLContext::Init();
         std::unique_ptr<OpenGLContext> context = OpenGLContext::CreateGLContext();
