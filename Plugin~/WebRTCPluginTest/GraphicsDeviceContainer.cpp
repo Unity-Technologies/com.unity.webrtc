@@ -150,15 +150,6 @@ namespace webrtc
 #endif
 #if defined(SUPPORT_VULKAN) // Vulkan
 
-    inline void VKCHECK(VkResult result)
-    {
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << result;
-            throw result;
-        }
-    }
-
     LIBRARY_TYPE s_library = nullptr;
 
     bool LoadVulkanModule()
@@ -241,31 +232,61 @@ namespace webrtc
         instanceInfo.ppEnabledExtensionNames = instanceExtensions.data();
         instanceInfo.pApplicationInfo = &appInfo;
         VkInstance instance = nullptr;
-        VKCHECK(vkCreateInstance(&instanceInfo, nullptr, &instance));
+        VkResult result =vkCreateInstance(&instanceInfo, nullptr, &instance);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkCreateInstance failed. error:" << result;
+            return nullptr;
+        }
 
         if (!LoadInstanceVulkanFunction(instance))
-            assert("failed loading vulkan module");
+        {
+            RTC_LOG(LS_INFO) << "LoadInstanceVulkanFunction failed";
+            return nullptr;
+        }
 
         // create physical device
         uint32_t devCount = 0;
-        VKCHECK(vkEnumeratePhysicalDevices(instance, &devCount, nullptr));
+        result = vkEnumeratePhysicalDevices(instance, &devCount, nullptr);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
+            return nullptr;
+        }
         std::vector<VkPhysicalDevice> physicalDeviceList(devCount);
-        VKCHECK(vkEnumeratePhysicalDevices(instance, &devCount, physicalDeviceList.data()));
+        result = vkEnumeratePhysicalDevices(instance, &devCount, physicalDeviceList.data());
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
+            return nullptr;
+        }
         bool found = false;
         int32_t physicalDeviceIndex = GetPhysicalDeviceIndex(instance, physicalDeviceList, &found);
         if (!found)
-            assert("vulkan physical device not found");
-
+        {
+            RTC_LOG(LS_INFO) << "GetPhysicalDeviceIndex device not found.";
+            return nullptr;
+        }
         const VkPhysicalDevice physicalDevice = physicalDeviceList[physicalDeviceIndex];
         VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
 
         // create logical device
         uint32_t extensionCount = 0;
-        VKCHECK(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr));
+        result =vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumerateDeviceExtensionProperties failed. error:" << result;
+            return nullptr;
+        }
         std::vector<VkExtensionProperties> extensionPropertiesList(extensionCount);
-        VKCHECK(vkEnumerateDeviceExtensionProperties(
-            physicalDevice, nullptr, &extensionCount, extensionPropertiesList.data()));
+        result =vkEnumerateDeviceExtensionProperties(
+            physicalDevice, nullptr, &extensionCount, extensionPropertiesList.data());
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumerateDeviceExtensionProperties failed. error:" << result;
+            return nullptr;
+        }
         std::vector<const char*> availableExtensions;
         for (const auto& v : extensionPropertiesList)
         {
@@ -304,8 +325,12 @@ namespace webrtc
         deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
         deviceCreateInfo.queueCreateInfoCount = 1;
         VkDevice device;
-        VKCHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
-
+        result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkCreateDevice failed. error:" << result;
+            return nullptr;
+        }
         if (!LoadDeviceVulkanFunction(device))
             assert("failed loading vulkan module");
 
