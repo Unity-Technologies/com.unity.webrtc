@@ -24,6 +24,10 @@ namespace webrtc
         {
             if (!device_)
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            std::unique_ptr<ITexture2D> texture(device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+            if (!texture)
+                GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
+
             bufferPool_ = std::make_unique<GpuMemoryBufferPool>(device_);
             timestamp_ = Clock::GetRealTimeClock()->TimeInMicroseconds();
         }
@@ -38,12 +42,14 @@ namespace webrtc
         IGraphicsDevice* device_;
         std::unique_ptr<GpuMemoryBufferPool> bufferPool_;
         int64_t timestamp_;
+        const uint32_t kWidth = 256;
+        const uint32_t kHeight = 256;
+        const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
     };
 
     TEST_P(GpuMemoryBufferPoolTest, CreateFrame)
     {
-        const Size kSize(256, 256);
-        const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
+        const Size kSize(kWidth, kHeight);
         auto tex = CreateTexture(kSize, kFormat);
         void* ptr = tex->GetNativeTexturePtrV();
 
@@ -55,8 +61,7 @@ namespace webrtc
 
     TEST_P(GpuMemoryBufferPoolTest, ReuseFirstResource)
     {
-        const Size kSize(256, 256);
-        const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
+        const Size kSize(kWidth, kHeight);
         auto tex = CreateTexture(kSize, kFormat);
         void* ptr = tex->GetNativeTexturePtrV();
 
@@ -76,8 +81,7 @@ namespace webrtc
 
     TEST_P(GpuMemoryBufferPoolTest, DropResourceWhenSizeIsDifferent)
     {
-        const Size kSize1(256, 256);
-        const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
+        const Size kSize1(kWidth, kHeight);
         auto tex1 = CreateTexture(kSize1, kFormat);
         void* ptr1 = tex1->GetNativeTexturePtrV();
 

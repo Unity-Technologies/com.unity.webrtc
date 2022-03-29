@@ -2,6 +2,8 @@
 
 #include "FrameGenerator.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
+
 #include "GraphicsDeviceContainer.h"
 #include "VideoCodecTest.h"
 
@@ -14,6 +16,7 @@ namespace webrtc
 {
     constexpr int kWidth = 172;
     constexpr int kHeight = 144;
+    constexpr UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
 
     using testing::Values;
 
@@ -37,6 +40,10 @@ namespace webrtc
         {
             if (!device_)
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            std::unique_ptr<ITexture2D> texture(device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+            if (!texture)
+                GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
+
             VideoCodecTest::SetUp();
         }
 

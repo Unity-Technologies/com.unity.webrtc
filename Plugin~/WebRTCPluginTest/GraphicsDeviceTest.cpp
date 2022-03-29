@@ -17,7 +17,13 @@ protected:
     {
         if (!device())
             GTEST_SKIP() << "The graphics driver is not installed on the device.";
+
+        std::unique_ptr<ITexture2D> texture(device()->CreateDefaultTextureV(kWidth, kHeight, format()));
+        if (!texture)
+            GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
     }
+    const uint32_t kWidth = 256;
+    const uint32_t kHeight = 256;
 };
 
 TEST_P(GraphicsDeviceTest, GraphicsDeviceIsNotNull) { EXPECT_NE(nullptr, device()); }
