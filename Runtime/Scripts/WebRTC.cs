@@ -691,26 +691,6 @@ namespace Unity.WebRTC
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
-        // avoid crash when call GetHardwareEncoderSupport using OpenGL graphics on Win/Mac
-        public static bool HardwareEncoderSupport()
-        {
-            // OpenGL APIs on windows/osx are not supported
-            if (Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.OSXEditor ||
-                Application.platform == RuntimePlatform.OSXPlayer)
-            {
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
-                {
-                    return false;
-                }
-            }
-
-            return NativeMethods.GetHardwareEncoderSupport();
-        }
-
         /// <summary>
         /// Not implement this property.
         /// Please check each track about initialization. (VideoStreamTrack.IsInitialized)
@@ -802,9 +782,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterRenderingWebRTCPlugin();
 #endif
-        [DllImport(WebRTC.Lib)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func, [MarshalAs(UnmanagedType.U1)] bool enableNativeLog,
             NativeLoggingSeverity nativeLoggingSeverity);

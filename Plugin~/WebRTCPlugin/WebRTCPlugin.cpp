@@ -230,18 +230,6 @@ using namespace ::webrtc;
 
 extern "C"
 {
-    UNITY_INTERFACE_EXPORT bool GetHardwareEncoderSupport()
-    {
-#if CUDA_PLATFORM
-        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
-        if(!device || !device->IsCudaSupport())
-        {
-            return false;
-        }
-#endif
-        return true;
-    }
-
     UNITY_INTERFACE_EXPORT MediaStreamInterface* ContextCreateMediaStream(Context* context, const char* streamId)
     {
         return context->CreateMediaStream(streamId);

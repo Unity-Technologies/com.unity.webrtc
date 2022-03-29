@@ -56,9 +56,11 @@ namespace Unity.WebRTC.Samples
             pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
             pc2Ontrack = e => { OnTrack(_pc2, e); };
             pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
-            infoText.text = !WebRTC.HardwareEncoderSupport()
-                ? "Current GPU doesn't support encoder"
-                : "Current GPU supports encoder";
+
+            var codecName = WebRTCSettings.UseVideoCodec == null
+                ? "Default"
+                : $"{WebRTCSettings.UseVideoCodec.mimeType} {WebRTCSettings.UseVideoCodec.sdpFmtpLine}";
+            infoText.text = $"Currently selected video codec is {codecName}";
         }
 
         private static RTCConfiguration GetSelectedSdpSemantics()
