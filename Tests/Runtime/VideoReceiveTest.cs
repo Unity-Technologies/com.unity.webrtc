@@ -6,13 +6,14 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
+    [UnityPlatform(exclude = new[] {RuntimePlatform.Android})]
     [TestFixture]
     class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
         {
             WebRTC.Initialize();
-            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.First(c => c.mimeType.Contains("H264"));
+            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains("H264"));
             WebRTC.Dispose();
         }
     }
@@ -23,7 +24,7 @@ namespace Unity.WebRTC.RuntimeTest
         protected override void SetUpCodecCapability()
         {
             WebRTC.Initialize();
-            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.First(c => c.mimeType.Contains("VP8"));
+            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains("VP8"));
             WebRTC.Dispose();
         }
     }
@@ -183,8 +184,11 @@ namespace Unity.WebRTC.RuntimeTest
         public void AddTrack()
         {
             sender = offerPc.AddTrack(SendVideoTrack);
-            var transceiver = offerPc.GetTransceivers().First(t => t.Sender == sender);
-            transceiver.SetCodecPreferences(new[] {videoCodec});
+            if (videoCodec != null)
+            {
+                var transceiver = offerPc.GetTransceivers().First(t => t.Sender == sender);
+                transceiver.SetCodecPreferences(new[] {videoCodec});
+            }
         }
 
         public void RemoveTrack()
