@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 namespace Unity.WebRTC.RuntimeTest
 {
     [TestFixture]
-    [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.OSXPlayer })]
+    [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
     class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
@@ -19,7 +19,7 @@ namespace Unity.WebRTC.RuntimeTest
     }
 
     [TestFixture]
-    [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
+    [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
     class VideoReceiveTestWithVP8Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
