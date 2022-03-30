@@ -30,15 +30,14 @@ CudaContext::CudaContext()
 //---------------------------------------------------------------------------------------------------------------------
 CUresult LoadModule()
 {
-    // dll check
-    if (s_hModule == nullptr)
+    if (!s_hModule)
     {
-        // dll delay load
 #if defined(_WIN32)
+        // dll delay load
         HMODULE module = LoadLibrary(TEXT("nvcuda.dll"));
-        if (module == nullptr)
+        if (!module)
         {
-            LogPrint("nvcuda.dll is not found. Please be sure the environment supports CUDA API.");
+            RTC_LOG(LS_INFO) << "nvcuda.dll is not found.";
             return CUDA_ERROR_NOT_FOUND;
         }
         s_hModule = module;

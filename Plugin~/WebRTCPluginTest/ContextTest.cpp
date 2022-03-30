@@ -19,17 +19,32 @@ using namespace ::webrtc;
 class ContextTest : public testing::TestWithParam<UnityGfxRenderer>
 {
 protected:
-    const int width = 256;
-    const int height = 256;
+    const uint32_t kWidth = 256;
+    const uint32_t kHeight = 256;
+    const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
+
     std::unique_ptr<GraphicsDeviceContainer> container_;
     std::unique_ptr<Context> context;
+    IGraphicsDevice* device_;
     DelegateVideoFrameResize callback_videoframeresize;
 
     explicit ContextTest()
         : container_(CreateGraphicsDeviceContainer(GetParam()))
+        , device_(container_->device())
     {
-        context = std::make_unique<Context>(container_->device());
         callback_videoframeresize = &OnFrameSizeChange;
+    }
+
+    void SetUp() override
+    {
+        if (!device_)
+            GTEST_SKIP() << "The graphics driver is not installed on the device.";
+        std::unique_ptr<ITexture2D> texture(device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+        if (!texture)
+            GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
+
+
+        context = std::make_unique<Context>(device_);
     }
 
     static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height)
@@ -37,7 +52,7 @@ protected:
     }
 };
 TEST_P(ContextTest, InitializeAndFinalizeEncoder) {
-    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(width, height, kUnityRenderingExtFormatR8G8B8A8_SRGB));
+    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(kWidth, kHeight, kFormat));
     EXPECT_NE(nullptr, tex);
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
@@ -53,7 +68,7 @@ TEST_P(ContextTest, CreateAndDeleteMediaStream) {
 
 
 TEST_P(ContextTest, CreateAndDeleteVideoTrack) {
-    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(width, height, kUnityRenderingExtFormatR8G8B8A8_SRGB));
+    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(kWidth, kHeight, kFormat));
     EXPECT_NE(nullptr, tex.get());
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
@@ -83,7 +98,7 @@ TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream) {
-    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(width, height, kUnityRenderingExtFormatR8G8B8A8_SRGB));
+    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(kWidth, kHeight, kFormat));
     const auto stream = context->CreateMediaStream("videostream");
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
@@ -127,7 +142,7 @@ TEST_P(ContextTest, EqualRendererGetById) {
 }
 
 TEST_P(ContextTest, AddAndRemoveVideoRendererToVideoTrack) {
-    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(width, height, kUnityRenderingExtFormatR8G8B8A8_SRGB));
+    const std::unique_ptr<ITexture2D> tex(container_->device()->CreateDefaultTextureV(kWidth, kHeight, kFormat));
     const auto source = context->CreateVideoSource();
     const auto track = context->CreateVideoTrack("video", source);
     const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);

@@ -28,10 +28,12 @@ namespace webrtc
 #elif UNITY_ANDROID
         if (IsVMInitialized())
             return CreateAndroidDecoderFactory().release();
-        return nullptr;
 #elif CUDA_PLATFORM
-        CUcontext context = gfxDevice->GetCUcontext();
-        return new NvDecoderFactory(context);
+        if(gfxDevice->IsCudaSupport())
+        {
+            CUcontext context = gfxDevice->GetCUcontext();
+            return new NvDecoderFactory(context);
+        }
 #endif
         return nullptr;
     }

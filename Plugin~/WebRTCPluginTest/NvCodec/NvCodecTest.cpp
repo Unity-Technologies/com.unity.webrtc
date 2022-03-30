@@ -17,9 +17,9 @@ namespace webrtc
     {
     public:
         NvCodecTest()
+            : container_(CreateGraphicsDeviceContainer(GetParam()))
+            , device_(container_->device())
         {
-            container_ = CreateGraphicsDeviceContainer(GetParam());
-            context_ = container_->device()->GetCUcontext();
         }
         ~NvCodecTest() override
         {
@@ -27,7 +27,17 @@ namespace webrtc
                 encoder_ = nullptr;
             if (decoder_)
                 decoder_ = nullptr;
-            EXPECT_TRUE(ck(cuCtxDestroy(context_)));
+        }
+        void SetUp() override
+        {
+            if (!device_)
+                GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            if (!device_->IsCudaSupport())
+                GTEST_SKIP() << "CUDA is not supported on this device.";
+
+            context_ = device_->GetCUcontext();
+
+            VideoCodecTest::SetUp();
         }
 
     protected:
@@ -51,7 +61,7 @@ namespace webrtc
             absl::optional<FrameGeneratorInterface::OutputType> type,
             absl::optional<int> num_squares) override
         {
-            return CreateVideoFrameGenerator(container_->device(), width, height, type, num_squares);
+            return CreateVideoFrameGenerator(device_, width, height, type, num_squares);
         }
 
         void ModifyCodecSettings(VideoCodec* codec_settings) override { SetDefaultSettings(codec_settings); }
@@ -87,10 +97,11 @@ namespace webrtc
             EXPECT_EQ(encoded_frame.qp_, qp) << "Encoder QP != parsed bitstream QP.";
         }
 
-        CUdevice device_;
+        CUdevice cudevice_;
         CUcontext context_;
         H264BitstreamParser bitstreamParser_;
         std::unique_ptr<GraphicsDeviceContainer> container_;
+        IGraphicsDevice* device_;
     };
 
     TEST_P(NvCodecTest, SupportedNvEncoderCodecs)

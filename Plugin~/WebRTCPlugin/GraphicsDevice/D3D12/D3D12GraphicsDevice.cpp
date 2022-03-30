@@ -184,25 +184,37 @@ D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32
     const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_SHARED;
     const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 
-    ID3D12Resource* nativeTex = nullptr;
-    ThrowIfFailed(m_d3d12Device->CreateCommittedResource(
+    ID3D12Resource* resource = nullptr;
+    HRESULT result = m_d3d12Device->CreateCommittedResource(
         &D3D12_DEFAULT_HEAP_PROPS, flags, &desc, initialState,
-        nullptr, IID_PPV_ARGS(&nativeTex)));
+        nullptr, IID_PPV_ARGS(&resource));
 
-    if (nativeTex == nullptr)
+    if (result != S_OK)
+    {
+        RTC_LOG(LS_INFO) << "CreateCommittedResource failed. error:" << result;
         return nullptr;
+    }
 
-    ID3D11Texture2D* sharedTex = nullptr;
     HANDLE handle = nullptr;
+    result = m_d3d12Device->CreateSharedHandle(
+        resource, nullptr, GENERIC_ALL, nullptr, &handle);
+    if (result != S_OK)
+    {
+        RTC_LOG(LS_INFO) << "CreateSharedHandle failed. error:" << result;
+        return nullptr;
+    }
 
-    ThrowIfFailed(m_d3d12Device->CreateSharedHandle(
-        nativeTex, nullptr, GENERIC_ALL, nullptr, &handle));
+    // ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12.
+    // OpenSharedResource1() is needed.
+    ID3D11Texture2D* sharedTex = nullptr;
+    result = m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex));
+    if (result != S_OK)
+    {
+        RTC_LOG(LS_INFO) << "OpenSharedResource1 failed. error:" << result;
+        return nullptr;
+    }
 
-    //ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12. OpenSharedHandle1() is needed.
-    ThrowIfFailed(m_d3d11Device->OpenSharedResource1(
-        handle, IID_PPV_ARGS(&sharedTex)));
-
-    return new D3D12Texture2D(w, h, nativeTex, handle, sharedTex);
+    return new D3D12Texture2D(w, h, resource, handle, sharedTex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -284,6 +296,9 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
     {
+        if(!IsCudaSupport())
+            return nullptr;
+
         D3D12Texture2D* d3d12Texure = static_cast<D3D12Texture2D*>(texture);
 
         // set context on the thread.

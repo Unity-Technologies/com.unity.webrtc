@@ -3,3 +3,4 @@
 # Leaks in Nvidia's library
 leak:libcuda.so
 leak:libnvidia-glcore.so
+leak:libGLX_nvidia.so

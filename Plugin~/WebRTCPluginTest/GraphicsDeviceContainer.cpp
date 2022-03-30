@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "GraphicsDeviceContainer.h"
 #include "GraphicsDevice/GraphicsDevice.h"
+#include "GraphicsDeviceContainer.h"
 
 #if SUPPORT_D3D11
 #include "GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
@@ -15,8 +15,9 @@
 #endif
 
 #if SUPPORT_OPENGL_CORE
-#include <GL/glut.h>
 #include "GraphicsDevice/OpenGL/OpenGLContext.h"
+#include <GL/glut.h>
+#include <sanitizer/lsan_interface.h>
 #endif
 
 #if SUPPORT_OPENGL_ES
@@ -150,15 +151,6 @@ namespace webrtc
 #endif
 #if defined(SUPPORT_VULKAN) // Vulkan
 
-    inline void VKCHECK(VkResult result)
-    {
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << result;
-            throw result;
-        }
-    }
-
     LIBRARY_TYPE s_library = nullptr;
 
     bool LoadVulkanModule()
@@ -208,8 +200,7 @@ namespace webrtc
             VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
         };
 
-        std::vector<const char*> deviceExtensions =
-        {
+        std::vector<const char*> deviceExtensions = {
 
 #ifndef _WIN32
             VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME, VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
@@ -231,7 +222,10 @@ namespace webrtc
         appInfo.engineVersion = 1;
 
         if (!LoadVulkanModule())
-            assert("failed loading vulkan module");
+        {
+            RTC_LOG(LS_INFO) << "failed loading vulkan module";
+            return nullptr;
+        }
 
         VkInstanceCreateInfo instanceInfo {};
         instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -239,31 +233,61 @@ namespace webrtc
         instanceInfo.ppEnabledExtensionNames = instanceExtensions.data();
         instanceInfo.pApplicationInfo = &appInfo;
         VkInstance instance = nullptr;
-        VKCHECK(vkCreateInstance(&instanceInfo, nullptr, &instance));
+        VkResult result =vkCreateInstance(&instanceInfo, nullptr, &instance);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkCreateInstance failed. error:" << result;
+            return nullptr;
+        }
 
         if (!LoadInstanceVulkanFunction(instance))
-            assert("failed loading vulkan module");
+        {
+            RTC_LOG(LS_INFO) << "LoadInstanceVulkanFunction failed";
+            return nullptr;
+        }
 
         // create physical device
         uint32_t devCount = 0;
-        VKCHECK(vkEnumeratePhysicalDevices(instance, &devCount, nullptr));
+        result = vkEnumeratePhysicalDevices(instance, &devCount, nullptr);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
+            return nullptr;
+        }
         std::vector<VkPhysicalDevice> physicalDeviceList(devCount);
-        VKCHECK(vkEnumeratePhysicalDevices(instance, &devCount, physicalDeviceList.data()));
+        result = vkEnumeratePhysicalDevices(instance, &devCount, physicalDeviceList.data());
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
+            return nullptr;
+        }
         bool found = false;
         int32_t physicalDeviceIndex = GetPhysicalDeviceIndex(instance, physicalDeviceList, &found);
         if (!found)
-            assert("vulkan physical device not found");
-
+        {
+            RTC_LOG(LS_INFO) << "GetPhysicalDeviceIndex device not found.";
+            return nullptr;
+        }
         const VkPhysicalDevice physicalDevice = physicalDeviceList[physicalDeviceIndex];
         VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
 
         // create logical device
         uint32_t extensionCount = 0;
-        VKCHECK(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr));
+        result =vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumerateDeviceExtensionProperties failed. error:" << result;
+            return nullptr;
+        }
         std::vector<VkExtensionProperties> extensionPropertiesList(extensionCount);
-        VKCHECK(vkEnumerateDeviceExtensionProperties(
-            physicalDevice, nullptr, &extensionCount, extensionPropertiesList.data()));
+        result =vkEnumerateDeviceExtensionProperties(
+            physicalDevice, nullptr, &extensionCount, extensionPropertiesList.data());
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkEnumerateDeviceExtensionProperties failed. error:" << result;
+            return nullptr;
+        }
         std::vector<const char*> availableExtensions;
         for (const auto& v : extensionPropertiesList)
         {
@@ -302,8 +326,12 @@ namespace webrtc
         deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
         deviceCreateInfo.queueCreateInfoCount = 1;
         VkDevice device;
-        VKCHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
-
+        result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkCreateDevice failed. error:" << result;
+            return nullptr;
+        }
         if (!LoadDeviceVulkanFunction(device))
             assert("failed loading vulkan module");
 
@@ -344,6 +372,7 @@ namespace webrtc
 #if SUPPORT_OPENGL_CORE
 
     static bool s_glutInitialized;
+    static int s_window;
 
     void* CreateDeviceGLCore()
     {
@@ -351,8 +380,10 @@ namespace webrtc
         {
             int argc = 0;
             glutInit(&argc, nullptr);
+            __lsan_disable();
+            s_window = glutCreateWindow("test");
+            __lsan_enable();
             s_glutInitialized = true;
-            glutCreateWindow("test");
         }
         OpenGLContext::Init();
         std::unique_ptr<OpenGLContext> context = OpenGLContext::CreateGLContext();
@@ -400,9 +431,9 @@ namespace webrtc
             return CreateDeviceGLCore();
 #endif
 #if SUPPORT_OPENGL_ES
-            case kUnityGfxRendererOpenGLES20:
-            case kUnityGfxRendererOpenGLES30:
-                return CreateDeviceGLES();
+        case kUnityGfxRendererOpenGLES20:
+        case kUnityGfxRendererOpenGLES30:
+            return CreateDeviceGLES();
 #endif
 #if SUPPORT_VULKAN
         case kUnityGfxRendererVulkan:
@@ -457,9 +488,16 @@ namespace webrtc
     }
 
     GraphicsDeviceContainer::GraphicsDeviceContainer(UnityGfxRenderer renderer)
+        : device_(nullptr)
+        , nativeGfxDevice_(nullptr)
     {
         nativeGfxDevice_ = CreateNativeGfxDevice(renderer);
         renderer_ = renderer;
+
+        // native graphics device is not initialized.
+        if (!nativeGfxDevice_)
+            return;
+
         IGraphicsDevice* device = nullptr;
         if (renderer == kUnityGfxRendererD3D12)
         {
@@ -475,9 +513,13 @@ namespace webrtc
         device_ = std::unique_ptr<IGraphicsDevice>(device);
         device_->InitV();
     }
-    GraphicsDeviceContainer::~GraphicsDeviceContainer() {
-        device_->ShutdownV();
-        DestroyNativeGfxDevice(nativeGfxDevice_, renderer_); }
+    GraphicsDeviceContainer::~GraphicsDeviceContainer()
+    {
+        if (device_)
+            device_->ShutdownV();
+        if (nativeGfxDevice_)
+            DestroyNativeGfxDevice(nativeGfxDevice_, renderer_);
+    }
 
     std::unique_ptr<GraphicsDeviceContainer> CreateGraphicsDeviceContainer(UnityGfxRenderer renderer)
     {

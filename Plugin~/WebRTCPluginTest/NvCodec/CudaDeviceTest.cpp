@@ -13,16 +13,27 @@ namespace webrtc
     {
     public:
         CudaDeviceTest()
+            : container_(CreateGraphicsDeviceContainer(GetParam()))
+            , device_(container_->device())
         {
-            container_ = CreateGraphicsDeviceContainer(GetParam());
         }
+
     protected:
+        void SetUp() override
+        {
+            if (!device_)
+                GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            if(!device_->IsCudaSupport())
+                GTEST_SKIP() << "CUDA is not supported on this device.";
+        }
+
         std::unique_ptr<GraphicsDeviceContainer> container_;
+        IGraphicsDevice* device_;
     };
 
-    TEST_P(CudaDeviceTest, GetCUcontext) { EXPECT_NE(container_->device()->GetCUcontext(), nullptr); }
+    TEST_P(CudaDeviceTest, GetCUcontext) { EXPECT_NE(device_->GetCUcontext(), nullptr); }
 
-    TEST_P(CudaDeviceTest, IsNvSupported) { EXPECT_TRUE(container_->device()->IsCudaSupport()); }
+    TEST_P(CudaDeviceTest, IsCudaSupport) { EXPECT_TRUE(device_->IsCudaSupport()); }
 
     INSTANTIATE_TEST_SUITE_P(GfxDevice, CudaDeviceTest, testing::ValuesIn(supportedGfxDevices));
 

@@ -23,11 +23,12 @@ namespace webrtc
         explicit GraphicsDeviceTestBase();
         virtual ~GraphicsDeviceTestBase();
         IGraphicsDevice* device();
-
-    protected:
+        UnityRenderingExtTextureFormat format();
+    private:
         UnityGfxRenderer m_unityGfxRenderer;
         UnityRenderingExtTextureFormat m_textureFormat;
         std::unique_ptr<GraphicsDeviceContainer> container_;
+        IGraphicsDevice* device_;
     };
 
     static tuple<UnityGfxRenderer, UnityRenderingExtTextureFormat> VALUES_TEST_ENV[] = {

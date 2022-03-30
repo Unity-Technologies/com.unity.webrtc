@@ -46,10 +46,15 @@ namespace webrtc
         texture_.reset(device_->CreateDefaultTextureV(size.width(), size.height(), format));
         textureCpuRead_.reset(device_->CreateCPUReadTextureV(size.width(), size.height(), format));
 
-        // IGraphicsDevice::Map method is too heavy and stop the graphics process,
-        // so must not call this method on the worker thread instead of the render thread.
-        handle_ = device_->Map(texture_.get());
-
+// todo(kazuki): need to refactor
+#if CUDA_PLATFORM
+        if(device_->IsCudaSupport())
+        {
+            // IGraphicsDevice::Map method is too heavy and stop the graphics process,
+            // so must not call this method on the worker thread instead of the render thread.
+            handle_ = device_->Map(texture_.get());
+        }
+#endif
         CopyBuffer(ptr);
     }
 

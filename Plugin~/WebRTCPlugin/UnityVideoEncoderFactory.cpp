@@ -30,11 +30,13 @@ namespace webrtc
 #elif UNITY_ANDROID
         if (IsVMInitialized())
             return CreateAndroidEncoderFactory().release();
-        return nullptr;
 #elif CUDA_PLATFORM
-        CUcontext context = gfxDevice->GetCUcontext();
-        NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
-        return new NvEncoderFactory(context, format);
+        if(gfxDevice->IsCudaSupport())
+        {
+            CUcontext context = gfxDevice->GetCUcontext();
+            NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
+            return new NvEncoderFactory(context, format);
+        }
 #endif
         return nullptr;
     }

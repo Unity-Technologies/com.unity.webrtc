@@ -2,11 +2,13 @@
 
 #include "FrameGenerator.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
+
 #include "GraphicsDeviceContainer.h"
 #include "VideoCodecTest.h"
 
-#include "test/video_codec_settings.h"
 #include "modules/video_coding/utility/vp8_header_parser.h"
+#include "test/video_codec_settings.h"
 
 namespace unity
 {
@@ -14,13 +16,19 @@ namespace webrtc
 {
     constexpr int kWidth = 172;
     constexpr int kHeight = 144;
+    constexpr UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
 
     using testing::Values;
 
     class InternalCodecsTest : public VideoCodecTest
     {
     public:
-        InternalCodecsTest() { container_ = CreateGraphicsDeviceContainer(GetParam()); }
+        InternalCodecsTest()
+            : container_(CreateGraphicsDeviceContainer(GetParam()))
+            , device_(container_->device())
+        {
+            
+        }
         ~InternalCodecsTest() override
         {
             if (encoder_)
@@ -28,6 +36,18 @@ namespace webrtc
         }
 
     protected:
+        void SetUp() override
+        {
+            if (!device_)
+                GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            std::unique_ptr<ITexture2D> texture(device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+            if (!texture)
+                GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
+
+            VideoCodecTest::SetUp();
+        }
+
+
         SdpVideoFormat FindFormat(std::string name, const std::vector<SdpVideoFormat>& formats)
         {
             auto result =
@@ -98,6 +118,7 @@ namespace webrtc
         InternalEncoderFactory encoderFactory;
         InternalDecoderFactory decoderFactory;
         std::unique_ptr<GraphicsDeviceContainer> container_;
+        IGraphicsDevice* device_;
     };
 
     TEST_P(InternalCodecsTest, EncodeFrameAndRelease)

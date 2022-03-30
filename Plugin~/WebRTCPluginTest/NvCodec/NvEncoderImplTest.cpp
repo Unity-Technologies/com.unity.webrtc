@@ -17,15 +17,25 @@ namespace webrtc
     {
     public:
         NvEncoderImplTest()
+            : container_(CreateGraphicsDeviceContainer(GetParam()))
+            , device_(container_->device())
         {
-            container_ = CreateGraphicsDeviceContainer(GetParam());
-            context_ = container_->device()->GetCUcontext();
         }
         ~NvEncoderImplTest() override { }
 
     protected:
+        void SetUp() override
+        {
+            if (!device_)
+                GTEST_SKIP() << "The graphics driver is not installed on the device.";
+            if (!device_->IsCudaSupport())
+                GTEST_SKIP() << "CUDA is not supported on this device.";
+
+            context_ = container_->device()->GetCUcontext();
+        }
         CUcontext context_;
         std::unique_ptr<GraphicsDeviceContainer> container_;
+        IGraphicsDevice* device_;
     };
 
     TEST_P(NvEncoderImplTest, CanInitializeWithDefaultParameters)

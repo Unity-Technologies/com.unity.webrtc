@@ -61,7 +61,12 @@ ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, U
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = 0;
     desc.CPUAccessFlags = 0;
-    HRESULT r = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
+    HRESULT result = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
+    if (result != S_OK)
+    {
+        RTC_LOG(LS_INFO) << "CreateTexture2D failed. error:" << result;
+        return nullptr;
+    }
     return new D3D11Texture2D(w,h,texture);
 }
 
@@ -152,6 +157,9 @@ rtc::scoped_refptr<I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITexture2D*
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D11GraphicsDevice::Map(ITexture2D* texture)
     {
+        if(!IsCudaSupport())
+            return nullptr;
+
         CUarray mappedArray;
         CUgraphicsResource resource;
         ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
