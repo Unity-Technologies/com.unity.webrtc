@@ -20,7 +20,7 @@ platforms:
     type: Unity::VM
     gpu_type: Unity::VM::GPU
     image: renderstreaming/ubuntu-18.04:v0.2.17-948399
-    gpu_image: renderstreaming/ubuntu-18.04:v0.2.10-948404
+    gpu_image: renderstreaming/ubuntu-18.04:v0.2.17-895145
     flavor: b1.large
     model: rtx2080
     build_command: BuildScripts~/build_plugin_linux.sh
@@ -119,7 +119,7 @@ test_targets:
         platform: standalone
   - name: linux-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.17-895145
     flavor: b1.large
     model: rtx2080
     is_gpu: true
