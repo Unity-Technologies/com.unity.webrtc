@@ -19,8 +19,8 @@ platforms:
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu-18.04:latest
-    gpu_image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.17-948399
+    gpu_image: renderstreaming/ubuntu-18.04:v0.2.17-895145
     flavor: b1.large
     model: rtx2080
     build_command: BuildScripts~/build_plugin_linux.sh
@@ -78,7 +78,7 @@ test_targets:
         platform: standalone
   - name: linux
     type: Unity::VM
-    image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.17-948399
     flavor: b1.large
     is_gpu: false
     gfx_types:
@@ -119,7 +119,7 @@ test_targets:
         platform: standalone
   - name: linux-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.17-895145
     flavor: b1.large
     model: rtx2080
     is_gpu: true
@@ -305,7 +305,7 @@ pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
   agent:
     type: Unity::VM
-    image: renderstreaming/ubuntu-18.04:latest
+    image: renderstreaming/ubuntu-18.04:v0.2.17-948399
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}

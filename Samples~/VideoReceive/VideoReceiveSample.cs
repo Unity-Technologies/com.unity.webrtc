@@ -43,7 +43,7 @@ namespace Unity.WebRTC.Samples
 
         private void Awake()
         {
-            WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
             callButton.onClick.AddListener(Call);
             hangUpButton.onClick.AddListener(HangUp);
             addTracksButton.onClick.AddListener(AddTracks);
@@ -182,8 +182,17 @@ namespace Unity.WebRTC.Samples
 
         private void AddTracks()
         {
-            pc1Senders.Add(_pc1.AddTrack(videoStreamTrack));
+            var videoSender = _pc1.AddTrack(videoStreamTrack);
+            pc1Senders.Add(videoSender);
             pc1Senders.Add(_pc1.AddTrack(audioStreamTrack));
+
+            if (WebRTCSettings.UseVideoCodec != null)
+            {
+                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var transceiver = _pc1.GetTransceivers().First(t => t.Sender == videoSender);
+                transceiver.SetCodecPreferences(codecs);
+            }
+
             addTracksButton.interactable = false;
             removeTracksButton.interactable = true;
         }

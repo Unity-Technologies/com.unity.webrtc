@@ -33,7 +33,7 @@ namespace Unity.WebRTC.Samples
 
         private void Awake()
         {
-            WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
             callButton.onClick.AddListener(Call);
             addTracksButton.onClick.AddListener(AddTracks);
             removeTracksButton.onClick.AddListener(RemoveTracks);
@@ -56,9 +56,11 @@ namespace Unity.WebRTC.Samples
             pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
             pc2Ontrack = e => { OnTrack(_pc2, e); };
             pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
-            infoText.text = !WebRTC.HardwareEncoderSupport()
-                ? "Current GPU doesn't support encoder"
-                : "Current GPU supports encoder";
+
+            var codecName = WebRTCSettings.UseVideoCodec == null
+                ? "Default"
+                : $"{WebRTCSettings.UseVideoCodec.mimeType} {WebRTCSettings.UseVideoCodec.sdpFmtpLine}";
+            infoText.text = $"Currently selected video codec is {codecName}";
         }
 
         private static RTCConfiguration GetSelectedSdpSemantics()
@@ -122,6 +124,18 @@ namespace Unity.WebRTC.Samples
             foreach (var track in videoStream.GetTracks())
             {
                 pc1Senders.Add(_pc1.AddTrack(track, videoStream));
+            }
+
+            if (WebRTCSettings.UseVideoCodec != null)
+            {
+                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                foreach (var transceiver in _pc1.GetTransceivers())
+                {
+                    if (pc1Senders.Contains(transceiver.Sender))
+                    {
+                        transceiver.SetCodecPreferences(codecs);
+                    }
+                }
             }
 
             if (!videoUpdateStarted)

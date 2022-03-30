@@ -63,7 +63,7 @@ class E2ELatencySample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(OnCall);
         hangUpButton.onClick.AddListener(OnHangUp);
@@ -116,7 +116,7 @@ class E2ELatencySample : MonoBehaviour
     {
         // Set "Don't Sync" for changing framerate,
         // but iOS ignores this setting
-        QualitySettings.vSyncCount = 0; 
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = listFramerate[value];
     }
 
@@ -279,9 +279,26 @@ class E2ELatencySample : MonoBehaviour
 
     private void AddTracks()
     {
+        var pc1VideoSenders = new List<RTCRtpSender>();
         foreach (var track in sendStream.GetTracks())
         {
-            _pc1.AddTrack(track, sendStream);
+            var sender = _pc1.AddTrack(track, sendStream);
+            if (track.Kind == TrackKind.Video)
+            {
+                pc1VideoSenders.Add(sender);
+            }
+        }
+
+        if (WebRTCSettings.UseVideoCodec != null)
+        {
+            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            foreach (var transceiver in _pc1.GetTransceivers())
+            {
+                if (pc1VideoSenders.Contains(transceiver.Sender))
+                {
+                    transceiver.SetCodecPreferences(codecs);
+                }
+            }
         }
     }
 

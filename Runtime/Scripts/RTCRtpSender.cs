@@ -104,7 +104,7 @@ namespace Unity.WebRTC
                     }
 
                     var error = WebRTC.ValidateTextureSize((int)(videoTrack.Texture.width / scale),
-                        (int)(videoTrack.Texture.height / scale), Application.platform, WebRTC.GetEncoderType());
+                        (int)(videoTrack.Texture.height / scale), Application.platform);
                     if (error.errorType != RTCErrorType.None)
                     {
                         return error;

@@ -6,33 +6,46 @@ using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    //ToDo: decoder is not supported H.264 codec on Windows/Linux.
-    [Ignore("WIP")]
     [TestFixture]
-    [ConditionalIgnore(ConditionalIgnore.UnsupportedReceiveVideoOnHardware, "Not supported hardware decoder")]
-    class VideoReceiveTestWithHardwareEncoder : VideoReceiveTestWithSoftwareEncoder
+    [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
-        [OneTimeSetUp]
-        public new void OneTimeInit()
+        protected override void SetUpCodecCapability()
         {
-            encoderType = EncoderType.Hardware;
+            WebRTC.Initialize();
+            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains("H264"));
+            WebRTC.Dispose();
         }
     }
 
-    class VideoReceiveTestWithSoftwareEncoder
+    [TestFixture]
+    [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    class VideoReceiveTestWithVP8Codec : VideoReceiveTestBase
     {
-        protected EncoderType encoderType;
+        protected override void SetUpCodecCapability()
+        {
+            WebRTC.Initialize();
+            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains("VP8"));
+            WebRTC.Dispose();
+        }
+    }
+
+    abstract class VideoReceiveTestBase
+    {
+        protected RTCRtpCodecCapability videoCodec;
+
+        protected abstract void SetUpCodecCapability();
 
         [OneTimeSetUp]
         public void OneTimeInit()
         {
-            encoderType = EncoderType.Software;
+            SetUpCodecCapability();
         }
 
         [SetUp]
         public void SetUp()
         {
-            WebRTC.Initialize(type: encoderType, limitTextureSize: true, forTest: true);
+            WebRTC.Initialize(true);
         }
 
         [TearDown]
@@ -77,6 +90,7 @@ namespace Unity.WebRTC.RuntimeTest
             var value = testValues[index];
             var test = new MonoBehaviourTest<VideoReceivePeers>();
             test.component.SetResolution(value.width, value.height);
+            test.component.SetCodec(videoCodec);
             yield return test;
 
             IEnumerator VideoReceive()
@@ -123,6 +137,7 @@ namespace Unity.WebRTC.RuntimeTest
         Camera cam;
         int width;
         int height;
+        RTCRtpCodecCapability videoCodec;
 
         void Start()
         {
@@ -136,6 +151,11 @@ namespace Unity.WebRTC.RuntimeTest
         {
             this.width = width;
             this.height = height;
+        }
+
+        public void SetCodec(RTCRtpCodecCapability codec)
+        {
+            this.videoCodec = codec;
         }
 
         public void CreatePeers()
@@ -165,6 +185,11 @@ namespace Unity.WebRTC.RuntimeTest
         public void AddTrack()
         {
             sender = offerPc.AddTrack(SendVideoTrack);
+            if (videoCodec != null)
+            {
+                var transceiver = offerPc.GetTransceivers().First(t => t.Sender == sender);
+                transceiver.SetCodecPreferences(new[] {videoCodec});
+            }
         }
 
         public void RemoveTrack()

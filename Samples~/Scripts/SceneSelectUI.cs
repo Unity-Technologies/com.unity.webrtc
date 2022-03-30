@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -6,14 +8,8 @@ namespace Unity.WebRTC.Samples
 {
     internal static class WebRTCSettings
     {
-        private static bool s_enableHWCodec = false;
         private static bool s_limitTextureSize = true;
-
-        public static bool EnableHWCodec
-        {
-            get { return s_enableHWCodec; }
-            set { s_enableHWCodec = value; }
-        }
+        private static RTCRtpCodecCapability s_useVideoCodec = null;
 
         public static bool LimitTextureSize
         {
@@ -21,15 +17,16 @@ namespace Unity.WebRTC.Samples
             set { s_limitTextureSize = value; }
         }
 
-        public static EncoderType EncoderType
+        public static RTCRtpCodecCapability UseVideoCodec
         {
-            get { return s_enableHWCodec ? EncoderType.Hardware : EncoderType.Software; }
+            get { return s_useVideoCodec; }
+            set { s_useVideoCodec = value; }
         }
     }
 
     internal class SceneSelectUI : MonoBehaviour
     {
-        [SerializeField] private Toggle toggleEnableHWCodec;
+        [SerializeField] private Dropdown codecSelector;
         [SerializeField] private Toggle toggleLimitTextureSize;
         [SerializeField] private Button buttonPeerConnection;
         [SerializeField] private Button buttonDataChannel;
@@ -47,11 +44,38 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonPerfectNegotiation;
         [SerializeField] private Button buttonLatency;
 
+        private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
+        private List<RTCRtpCodecCapability> availableCodecs;
+
+        void Awake()
+        {
+            WebRTC.Initialize();
+        }
+
+        void OnDestroy()
+        {
+            WebRTC.Dispose();
+        }
+
         void Start()
         {
-            toggleEnableHWCodec.isOn = WebRTCSettings.EnableHWCodec;
+            var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+            availableCodecs = capabilities.codecs
+                .Where(codec => !excludeCodecMimeType.Contains(codec.mimeType))
+                .ToList();
+            var list = availableCodecs
+                .Select(codec => new Dropdown.OptionData {text = codec.mimeType + " " + codec.sdpFmtpLine})
+                .ToList();
+
+            codecSelector.options.AddRange(list);
+            var previewCodec = WebRTCSettings.UseVideoCodec;
+            codecSelector.value = previewCodec == null
+                ? 0
+                : availableCodecs.FindIndex(x =>
+                    x.mimeType == previewCodec.mimeType && x.sdpFmtpLine == previewCodec.sdpFmtpLine) + 1;
+            codecSelector.onValueChanged.AddListener(OnChangeCodecSelect);
+
             toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
-            toggleEnableHWCodec.onValueChanged.AddListener(OnChangeHWCodec);
             toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
 
             buttonPeerConnection.onClick.AddListener(OnPressedPeerConnectionButton);
@@ -75,9 +99,9 @@ namespace Unity.WebRTC.Samples
                 buttonLatency.interactable = false;
         }
 
-        private void OnChangeHWCodec(bool enable)
+        private void OnChangeCodecSelect(int index)
         {
-            WebRTCSettings.EnableHWCodec = enable;
+            WebRTCSettings.UseVideoCodec = index == 0 ? null : availableCodecs[index - 1];
         }
 
         private void OnChangeLimitTextureSize(bool enable)

@@ -46,7 +46,7 @@ class MultiVideoReceiveSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
         addVideoObjectButton.onClick.AddListener(AddVideoObject);
@@ -235,6 +235,18 @@ class MultiVideoReceiveSample : MonoBehaviour
         {
             var sender = _pc1.AddTrack(track);
             sendingSenderList.Add(sender);
+        }
+
+        if (WebRTCSettings.UseVideoCodec != null)
+        {
+            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            foreach (var transceiver in _pc1.GetTransceivers())
+            {
+                if (sendingSenderList.Contains(transceiver.Sender))
+                {
+                    transceiver.SetCodecPreferences(codecs);
+                }
+            }
         }
     }
 

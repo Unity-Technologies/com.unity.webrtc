@@ -61,7 +61,7 @@ class BandwidthSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         bandwidthSelector.options = bandwidthOptions
             .Select(pair => new Dropdown.OptionData{text = pair.Key })
             .ToList();
@@ -196,6 +196,18 @@ class BandwidthSample : MonoBehaviour
         foreach (var track in videoStream.GetTracks())
         {
             pc1Senders.Add(_pc1.AddTrack(track, videoStream));
+        }
+
+        if (WebRTCSettings.UseVideoCodec != null)
+        {
+            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            foreach (var transceiver in _pc1.GetTransceivers())
+            {
+                if (pc1Senders.Contains(transceiver.Sender))
+                {
+                    transceiver.SetCodecPreferences(codecs);
+                }
+            }
         }
 
         if (!videoUpdateStarted)

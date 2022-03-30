@@ -37,7 +37,7 @@ namespace Unity.WebRTC.Samples
 
         private void Awake()
         {
-            WebRTC.Initialize(WebRTCSettings.EncoderType, WebRTCSettings.LimitTextureSize);
+            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
             callButton.onClick.AddListener(Call);
             hangUpButton.onClick.AddListener(HangUp);

@@ -12,16 +12,6 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    /// <seealso cref="WebRTC.Initialize(EncoderType)"/>
-    public enum EncoderType
-    {
-        Software = 0,
-        Hardware = 1
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
     public enum RTCErrorDetailType
     {
         DataChannelFailure,
@@ -351,18 +341,12 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
-        public static void Initialize(EncoderType type = EncoderType.Hardware, bool limitTextureSize = true, bool enableNativeLog = false,
+        public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
             NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.LS_INFO)
         {
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
 
-            Initialize(type, limitTextureSize, false, enableNativeLog, nativeLoggingSeverity);
-        }
-
-
-        internal static void Initialize(EncoderType type, bool limitTextureSize, bool forTest, bool enableNativeLog = false, NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.LS_INFO)
-        {
             // todo(kazuki): Add this event to avoid crash caused by hot-reload.
             // Dispose of all before reloading assembly.
 #if UNITY_EDITOR
@@ -392,7 +376,7 @@ namespace Unity.WebRTC
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
-            s_context = Context.Create(encoderType:type);
+            s_context = Context.Create();
             NativeMethods.SetCurrentContext(s_context.self);
 
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
@@ -470,23 +454,12 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        /// <returns></returns>
-        [Obsolete]
-        public static EncoderType GetEncoderType()
-        {
-            // todo(kazuki): remove this APi
-            return EncoderType.Hardware;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="platform"></param>
         /// <param name="encoderType"></param>
         /// <returns></returns>
-        public static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform, EncoderType encoderType)
+        public static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
         {
             if (!s_limitTextureSize)
             {
@@ -496,7 +469,7 @@ namespace Unity.WebRTC
             // Check NVCodec capabilities
             // todo(kazuki):: The constant values should be replaced by values that are got from NvCodec API.
             // Use "nvEncGetEncodeCaps" function which is provided by the NvCodec API.
-            if (encoderType == EncoderType.Hardware && NvEncSupportedPlatdorm(platform))
+            if (NvEncSupportedPlatdorm(platform))
             {
                 const int minWidth = 145;
                 const int maxWidth = 4096;
@@ -718,26 +691,6 @@ namespace Unity.WebRTC
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
-        // avoid crash when call GetHardwareEncoderSupport using OpenGL graphics on Win/Mac
-        public static bool HardwareEncoderSupport()
-        {
-            // OpenGL APIs on windows/osx are not supported
-            if (Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.OSXEditor ||
-                Application.platform == RuntimePlatform.OSXPlayer)
-            {
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
-                {
-                    return false;
-                }
-            }
-
-            return NativeMethods.GetHardwareEncoderSupport();
-        }
-
         /// <summary>
         /// Not implement this property.
         /// Please check each track about initialization. (VideoStreamTrack.IsInitialized)
@@ -829,9 +782,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterRenderingWebRTCPlugin();
 #endif
-        [DllImport(WebRTC.Lib)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetHardwareEncoderSupport();
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterDebugLog(DelegateDebugLog func, [MarshalAs(UnmanagedType.U1)] bool enableNativeLog,
             NativeLoggingSeverity nativeLoggingSeverity);
