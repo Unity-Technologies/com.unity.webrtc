@@ -46,6 +46,8 @@ target_sources(WebRTCLib
     UnityLogStream.cpp
     VideoFrame.cpp
     VideoFrame.h
+    VideoFrameAdapter.cpp
+    VideoFrameAdapter.h
     VideoFrameUtil.cpp
     VideoFrameUtil.h
     GpuMemoryBuffer.cpp
@@ -127,6 +129,7 @@ if(Windows)
       ${Vulkan_LIBRARY}
       ${CUDA_CUDA_LIBRARY}
       ${NVCODEC_LIBRARIES}
+      CudaBicubic
       d3d11
       winmm
       Secur32
@@ -141,6 +144,7 @@ if(Windows)
       ${CUDA_INCLUDE_DIRS}
       ${Vulkan_INCLUDE_DIR}
       ${NVCODEC_INCLUDE_DIR}
+      ${CUDA_BICUBIC_DIR}
   )
 
   # Select runtime library (MT, MTD) on windows platform

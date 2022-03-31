@@ -1,25 +1,42 @@
 #include "pch.h"
 
-#include "NvCodecUtils.h"
+#include "BicubicTexture.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
+#include "NvCodecUtils.h"
 #include "NvEncoder/NvEncoder.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "UnityVideoTrackSource.h"
+#include "VideoFrameAdapter.h"
 
 #include "absl/strings/match.h"
 #include "api/video/video_codec_type.h"
 #include "api/video_codecs/h264_profile_level_id.h"
 #include "media/base/media_constants.h"
+#include "npp.h"
 
 namespace unity
 {
 namespace webrtc
 {
+    inline bool operator==(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs)
+    {
+        return lhs.Width == rhs.Width && lhs.Height == rhs.Height && lhs.NumChannels == rhs.NumChannels &&
+            lhs.Format == rhs.Format;
+    }
+
+    inline bool operator!=(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs) { return !(lhs == rhs); }
+
+    inline NppiSize Cast(const CUDA_ARRAY_DESCRIPTOR& desc)
+    {
+        return NppiSize { static_cast<int>(desc.Width), static_cast<int>(desc.Height) };
+    }
+
     NvEncoderImpl::NvEncoderImpl(
         const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
         : m_context(context)
+        , m_scaledArray(nullptr)
         , m_memoryType(memoryType)
         , m_encoder(nullptr)
         , m_format(format)
@@ -107,7 +124,8 @@ namespace webrtc
         m_encodeConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
         m_encodeConfig.rcParams.averageBitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
         m_encodeConfig.rcParams.vbvBufferSize = (m_encodeConfig.rcParams.averageBitRate *
-                                                 m_initializeParams.frameRateDen / m_initializeParams.frameRateNum) * 5;
+                                                 m_initializeParams.frameRateDen / m_initializeParams.frameRateNum) *
+            5;
         m_encodeConfig.rcParams.maxBitRate = m_encodeConfig.rcParams.averageBitRate;
         m_encodeConfig.rcParams.vbvInitialDelay = m_encodeConfig.rcParams.vbvBufferSize;
         m_encoder->CreateEncoder(&m_initializeParams);
@@ -128,7 +146,67 @@ namespace webrtc
             m_encoder->DestroyEncoder();
             m_encoder = nullptr;
         }
+        if (m_scaledArray)
+        {
+            cuArrayDestroy(m_scaledArray);
+            m_scaledArray = nullptr;
+        }
         return WEBRTC_VIDEO_CODEC_OK;
+    }
+
+    void NvEncoderImpl::Resize(const CUarray& src, CUarray& dst, const Size& size)
+    {
+        CUDA_ARRAY_DESCRIPTOR srcDesc = {};
+        CUresult result = cuArrayGetDescriptor(&srcDesc, src);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
+            return;
+        }
+        CUDA_ARRAY_DESCRIPTOR dstDesc = {};
+        dstDesc.Format = srcDesc.Format;
+        dstDesc.NumChannels = srcDesc.NumChannels;
+        dstDesc.Width = static_cast<size_t>(size.width());
+        dstDesc.Height = static_cast<size_t>(size.height());
+
+        bool create = false;
+        if (!dst)
+        {
+            create = true;
+        }
+        else
+        {
+            CUDA_ARRAY_DESCRIPTOR desc = {};
+            result = cuArrayGetDescriptor(&desc, dst);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
+                return;
+            }
+            if (desc != dstDesc)
+            {
+                result = cuArrayDestroy(dst);
+                if (result != CUDA_SUCCESS)
+                {
+                    RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
+                    return;
+                }
+                dst = nullptr;
+                create = true;
+            }
+        }
+
+        if (create)
+        {
+            CUresult result = cuArrayCreate(&dst, &dstDesc);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
+                return;
+            }
+        }
+
+        unity::webrtc::Resize(src, dst, size.width(), size.height(), MODE_NEAREST);
     }
 
     void NvEncoderImpl::CopyResource(
@@ -144,7 +222,7 @@ namespace webrtc
         {
             NvEncoderCuda::CopyToDeviceFrame(
                 context,
-                reinterpret_cast<void*>(handle->devicePtr),
+                reinterpret_cast<void*>(handle->mappedPtr),
                 0,
                 reinterpret_cast<CUdeviceptr>(encoderInputFrame->inputPtr),
                 encoderInputFrame->pitch,
@@ -157,9 +235,19 @@ namespace webrtc
         }
         else if (memoryType == CU_MEMORYTYPE_ARRAY)
         {
+            void* pSrcArray = static_cast<void*>(handle->mappedArray);
+
+            // Resize cuda array when the resolution of input buffer is different from output one.
+            // The output buffer named m_scaledArray is reused while the resolution is matched.
+            if (buffer->GetSize() != size)
+            {
+                Resize(handle->mappedArray, m_scaledArray, size);
+                pSrcArray = static_cast<void*>(m_scaledArray);
+            }
+
             NvEncoderCudaWithCUarray::CopyToDeviceFrame(
                 context,
-                static_cast<void*>(handle->mappedArray),
+                pSrcArray,
                 0,
                 static_cast<CUarray>(encoderInputFrame->inputPtr),
                 encoderInputFrame->pitch,
@@ -182,8 +270,11 @@ namespace webrtc
         if (!m_encodedCompleteCallback)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
 
-        rtc::scoped_refptr<VideoFrame> video_frame =
-            static_cast<VideoFrameAdapter*>(frame.video_frame_buffer().get())->GetVideoFrame();
+        auto videoFrameBuffer = static_cast<ScalableBufferInterface*>(frame.video_frame_buffer().get());
+        rtc::scoped_refptr<VideoFrame> video_frame = videoFrameBuffer->scaled()
+            ? static_cast<VideoFrameAdapter::ScaledBuffer*>(videoFrameBuffer)->GetVideoFrame()
+            : static_cast<VideoFrameAdapter*>(videoFrameBuffer)->GetVideoFrame();
+
         if (!video_frame)
         {
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
@@ -201,15 +292,13 @@ namespace webrtc
             }
         }
 
-        Size size = video_frame->size();
-        RTC_DCHECK_EQ(m_encoder->GetEncodeWidth(), size.width());
-        RTC_DCHECK_EQ(m_encoder->GetEncodeHeight(), size.height());
+        Size encodeSize(m_encoder->GetEncodeWidth(), m_encoder->GetEncodeHeight());
 
         const NvEncInputFrame* encoderInputFrame = m_encoder->GetNextInputFrame();
 
         // Copy CUDA buffer in VideoFrame to encoderInputFrame.
         auto buffer = video_frame->GetGpuMemoryBuffer();
-        CopyResource(encoderInputFrame, buffer, size, m_context, m_memoryType);
+        CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType);
 
         NV_ENC_PIC_PARAMS picParams = NV_ENC_PIC_PARAMS();
         picParams.version = NV_ENC_PIC_PARAMS_VER;
@@ -235,11 +324,6 @@ namespace webrtc
             int64_t now_ms = m_clock->TimeInMilliseconds();
             m_encode_fps.Update(1, now_ms);
         }
-        // if (!ck(cuCtxPopCurrent(&m_context)))
-        //{
-        //    RTC_LOG(LS_ERROR) << "cuCtxPopCurrent";
-        //    return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
-        //}
         return WEBRTC_VIDEO_CODEC_OK;
     }
 

@@ -11,7 +11,7 @@ namespace webrtc
     GpuMemoryBufferCudaHandle::GpuMemoryBufferCudaHandle()
         : array(nullptr)
         , mappedArray(nullptr)
-        , devicePtr(0)
+        , mappedPtr(0)
         , resource(nullptr)
         , externalMemory(nullptr)
     {

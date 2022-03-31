@@ -1,9 +1,10 @@
 #include "pch.h"
 
 #include "FrameGenerator.h"
-#include "UnityVideoTrackSource.h"
-#include "VideoFrameUtil.h"
 #include "GraphicsDevice/ITexture2D.h"
+#include "UnityVideoTrackSource.h"
+#include "VideoFrameAdapter.h"
+#include "VideoFrameUtil.h"
 
 namespace unity
 {
