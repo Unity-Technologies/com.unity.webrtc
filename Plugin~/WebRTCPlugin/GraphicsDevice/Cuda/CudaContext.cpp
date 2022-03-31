@@ -49,10 +49,11 @@ bool LoadModule()
         s_hModule = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
         if(!s_hModule)
             return false;
-        
+
         // Close handle immediately because going to call `dlopen` again
         // in the implib module when cuda api called.
         dlclose(s_hModule);
+        s_hModule = nullptr;
 #endif
     }
     return true;
