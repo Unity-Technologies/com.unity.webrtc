@@ -4,8 +4,11 @@
 #include "VulkanTexture2D.h"
 
 #include "VulkanUtility.h"
-#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+
+#if CUDA_PLATFORM
+#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
+#endif
 
 namespace unity
 {
