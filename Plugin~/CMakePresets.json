@@ -149,7 +149,7 @@
   ],
   "buildPresets": [
     {
-      "name": "debug-clang",
+      "name": "debug-windows-clang",
       "displayName": "Build Debug",
       "description": "Debug build using Clang",
       "configurePreset": "x64-windows-clang",
@@ -157,7 +157,7 @@
       "verbose": true
     },
     {
-      "name": "release-clang",
+      "name": "release-windows-clang",
       "displayName": "Build Release",
       "description": "Release build using Clang",
       "configurePreset": "x64-windows-clang",
@@ -165,7 +165,7 @@
       "cleanFirst": true
     },
     {
-      "name": "debug-msvc",
+      "name": "debug-windows-msvc",
       "displayName": "Build Debug",
       "description": "Debug build using MSVC",
       "configurePreset": "x64-windows-msvc",
@@ -173,7 +173,7 @@
       "verbose": true
     },
     {
-      "name": "release-msvc",
+      "name": "release-windows-msvc",
       "displayName": "Build Release",
       "description": "Release build using MSVC",
       "configurePreset": "x64-windows-msvc",
