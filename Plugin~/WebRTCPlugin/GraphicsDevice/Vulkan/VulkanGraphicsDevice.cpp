@@ -8,6 +8,8 @@
 
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaBufferHandle.h"
+#else
+#include "GpuMemoryBuffer.h"
 #endif
 
 namespace unity
