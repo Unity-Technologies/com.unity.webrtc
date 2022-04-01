@@ -4,17 +4,21 @@
 
 #include <array>
 
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
 #include <cudaD3D11.h>
 #include <wrl/client.h>
 #endif
 
-#if defined(SUPPORT_VULKAN)
+#if SUPPORT_VULKAN
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 #endif
 
-#if defined(SUPPORT_D3D11)
+#if SUPPORT_D3D11
 using namespace Microsoft::WRL;
+#endif
+
+#if UNITY_LINUX
+#include <dlfcn.h>
 #endif
 
 namespace unity
@@ -27,24 +31,32 @@ CudaContext::CudaContext()
     : m_context(nullptr)
 {
 }
-//---------------------------------------------------------------------------------------------------------------------
-CUresult LoadModule()
+
+bool LoadModule()
 {
     if (!s_hModule)
     {
-#if defined(_WIN32)
+#if UNITY_WIN
         // dll delay load
         HMODULE module = LoadLibrary(TEXT("nvcuda.dll"));
         if (!module)
         {
             RTC_LOG(LS_INFO) << "nvcuda.dll is not found.";
-            return CUDA_ERROR_NOT_FOUND;
+            return false;
         }
         s_hModule = module;
-#else
+#elif UNITY_LINUX
+        s_hModule = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
+        if(!s_hModule)
+            return false;
+
+        // Close handle immediately because going to call `dlopen` again
+        // in the implib module when cuda api called.
+        dlclose(s_hModule);
+        s_hModule = nullptr;
 #endif
     }
-    return CUDA_SUCCESS;
+    return true;
 }
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -88,14 +100,14 @@ CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
 CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice)
 {
     // dll check
-    CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS)
+    bool loaded = LoadModule();
+    if (!loaded)
     {
-        return result;
+        return CUDA_ERROR_NOT_FOUND;
     }
 
     CUdevice cuDevice = 0;
-    result = cuInit(0);
+    CUresult result = cuInit(0);
     if (result != CUDA_SUCCESS)
     {
         return result;
@@ -145,15 +157,13 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
 #if defined(SUPPORT_D3D11)
 CUresult CudaContext::Init(ID3D11Device* device)
 {
-
-    // dll check
-    CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS)
+    bool found = LoadModule();
+    if (!found)
     {
-        return result;
+        return CUDA_ERROR_NOT_FOUND;
     }
 
-    result = cuInit(0);
+    CUresult result = cuInit(0);
     if (result != CUDA_SUCCESS)
     {
         return result;
@@ -191,13 +201,13 @@ CUresult CudaContext::Init(ID3D11Device* device)
 CUresult CudaContext::Init(ID3D12Device* device)
 {
 
-    CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS)
+    bool found = LoadModule();
+    if (!found)
     {
-        return result;
+        return CUDA_ERROR_NOT_FOUND;
     }
 
-    result = cuInit(0);
+    CUresult result = cuInit(0);
     if (result != CUDA_SUCCESS)
     {
         return result;
@@ -248,13 +258,13 @@ CUresult CudaContext::Init(ID3D12Device* device)
 CUresult CudaContext::InitGL()
 {
     // dll check
-    CUresult result = LoadModule();
-    if (result != CUDA_SUCCESS)
+    bool found = LoadModule();
+    if (!found)
     {
-        return result;
+        return CUDA_ERROR_NOT_FOUND;
     }
 
-    result = cuInit(0);
+    CUresult result = cuInit(0);
     if (result != CUDA_SUCCESS)
     {
         return result;
@@ -317,9 +327,10 @@ void CudaContext::Shutdown()
     }
     if (s_hModule)
     {
-#if _WIN32
+#if UNITY_WIN
         FreeLibrary((HMODULE)s_hModule);
-#else
+#elif UNITY_LINUX
+        dlclose(s_hModule);
 #endif
         s_hModule = nullptr;
     }
