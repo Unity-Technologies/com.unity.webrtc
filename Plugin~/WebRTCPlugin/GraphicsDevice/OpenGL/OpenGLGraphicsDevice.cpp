@@ -4,8 +4,6 @@
 
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
-#include "GpuMemoryBuffer.h"
-#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #include "OpenGLContext.h"
@@ -13,6 +11,9 @@
 #if CUDA_PLATFORM
 #include <cuda.h>
 #include <cudaGL.h>
+#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
+#else
+#include "GpuMemoryBuffer.h"
 #endif
 
 namespace unity
