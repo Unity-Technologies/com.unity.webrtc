@@ -10,7 +10,7 @@ namespace webrtc
 {
 using NativeTexPtr = void*;
 class ITexture2D;
-class GpuMemoryBufferHandle;
+struct GpuMemoryBufferHandle;
 class IGraphicsDevice
 #if CUDA_PLATFORM
     : public ICudaDevice
