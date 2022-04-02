@@ -3,6 +3,6 @@ target_sources(WebRTCLib
     CudaContext.cpp
     CudaContext.h
     ICudaDevice.h
-    CudaBufferHandle.cpp
-    CudaBufferHandle.h
+    GpuMemoryBufferCudaHandle.cpp
+    GpuMemoryBufferCudaHandle.h
 )

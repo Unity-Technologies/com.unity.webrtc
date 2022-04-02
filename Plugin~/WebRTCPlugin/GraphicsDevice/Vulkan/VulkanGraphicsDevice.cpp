@@ -7,7 +7,7 @@
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #if CUDA_PLATFORM
-#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #else
 #include "GpuMemoryBuffer.h"
 #endif
@@ -322,8 +322,8 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
 
         cuCtxPopCurrent(NULL);
 
-        std::unique_ptr<CudaBufferHandle> handle = std::make_unique<CudaBufferHandle>();
-        handle->array = array;
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->mappedArray = array;
         handle->externalMemory = externalMemory;
         return handle;
 #else

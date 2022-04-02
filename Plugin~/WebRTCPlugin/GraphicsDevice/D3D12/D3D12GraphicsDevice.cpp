@@ -7,7 +7,7 @@
 #include "D3D12Constants.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
-#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "GraphicsDevice/D3D11/D3D11Texture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "NvCodecUtils.h"
@@ -363,8 +363,8 @@ rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
         }
         cuCtxPopCurrent(NULL);
 
-        std::unique_ptr<CudaBufferHandle> handle = std::make_unique<CudaBufferHandle>();
-        handle->array = array;
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->mappedArray = array;
         handle->externalMemory = externalMemory;
         return handle;
     }

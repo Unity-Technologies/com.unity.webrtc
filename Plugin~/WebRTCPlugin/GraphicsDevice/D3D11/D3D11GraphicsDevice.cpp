@@ -9,7 +9,7 @@
 #include "D3D11Texture2D.h"
 #include "NvCodecUtils.h"
 #include "GraphicsDevice/GraphicsUtility.h"
-#include "GraphicsDevice/Cuda/CudaBufferHandle.h"
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 
 using namespace Microsoft::WRL;
 using namespace ::webrtc;
@@ -188,8 +188,8 @@ rtc::scoped_refptr<I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITexture2D*
         }
         cuCtxPopCurrent(NULL);
 
-        std::unique_ptr<CudaBufferHandle> handle = std::make_unique<CudaBufferHandle>();
-        handle->array = mappedArray;
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->mappedArray = mappedArray;
         handle->resource = resource;
         return handle;
     }
