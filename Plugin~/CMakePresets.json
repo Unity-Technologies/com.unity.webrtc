@@ -95,20 +95,18 @@
     {
       "name": "x64-windows-msvc",
       "description": "Sets x64 arch, generator, compilers",
-      "inherits": "default-windows",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl",
-        "CMAKE_CXX_COMPILER": "cl"
-      }
+      "inherits": "default-windows"
     },
     {
       "name": "x64-windows-clang",
       "description": "Sets x64 arch, generator, compilers",
+      "toolset": "ClangCL",
       "inherits": "default-windows",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
-      }
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-clang-x64"
+        }
+      }      
     },
     {
       "name": "macos",
