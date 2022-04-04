@@ -29,8 +29,8 @@ namespace webrtc
     NvEncoderImpl::NvEncoderImpl(
         const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
         : m_context(context)
-        , m_scaledArray(nullptr)
         , m_memoryType(memoryType)
+        , m_scaledArray(nullptr)
         , m_encoder(nullptr)
         , m_format(format)
         , m_encodedCompleteCallback(nullptr)
