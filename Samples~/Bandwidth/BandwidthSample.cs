@@ -72,10 +72,6 @@ class BandwidthSample : MonoBehaviour
         { "0", 0 },
     };
 
-
-    private const int width = 1920;
-    private const int height = 1080;
-
     private void Awake()
     {
         WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
@@ -281,7 +277,7 @@ class BandwidthSample : MonoBehaviour
 
         if (videoStream == null)
         {
-            videoStream = cam.CaptureStream(width, height, 1000000);
+            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
         }
         sourceImage.texture = cam.targetTexture;
         sourceImage.color = Color.white;
@@ -331,7 +327,7 @@ class BandwidthSample : MonoBehaviour
             Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
             statsField.text +=
                 $"Failed scale down video resolution to " +
-                $"{(int)(width / scale)}x{(int)(height / scale)}{Environment.NewLine}";
+                $"{(int)(WebRTCSettings.StreamSize.x / scale)}x{(int)(WebRTCSettings.StreamSize.y / scale)}{Environment.NewLine}";
             scaleResolutionDownSelector.value = 0;
         }
     }

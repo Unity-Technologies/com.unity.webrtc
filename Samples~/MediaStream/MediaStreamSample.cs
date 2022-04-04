@@ -179,7 +179,7 @@ namespace Unity.WebRTC.Samples
             _pc2.OnTrack = pc2Ontrack;
 
             _pc1.CreateDataChannel("data");
-            videoStream = cam.CaptureStream(1280, 720, 1000000);
+            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
             RtImage.texture = cam.targetTexture;
         }
 

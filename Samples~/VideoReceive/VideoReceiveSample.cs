@@ -20,7 +20,6 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Dropdown micListDropdown;
         [SerializeField] private Camera cam;
         [SerializeField] private AudioClip clip;
-        [SerializeField] private Vector2Int streamSize = new Vector2Int(1280, 720);
         [SerializeField] private RawImage sourceImage;
         [SerializeField] private AudioSource sourceAudio;
         [SerializeField] private RawImage receiveImage;
@@ -280,7 +279,7 @@ namespace Unity.WebRTC.Samples
         {
             if (!useWebCamToggle.isOn)
             {
-                videoStreamTrack = cam.CaptureStreamTrack(streamSize.x, streamSize.y, 0);
+                videoStreamTrack = cam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 0);
                 sourceImage.texture = cam.targetTexture;
                 yield break;
             }
@@ -299,7 +298,7 @@ namespace Unity.WebRTC.Samples
             }
 
             WebCamDevice userCameraDevice = WebCamTexture.devices[webCamListDropdown.value];
-            webCamTexture = new WebCamTexture(userCameraDevice.name, streamSize.x, streamSize.y, 30);
+            webCamTexture = new WebCamTexture(userCameraDevice.name, WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 30);
             webCamTexture.Play();
             yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
 

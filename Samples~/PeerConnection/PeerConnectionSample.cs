@@ -42,9 +42,6 @@ class PeerConnectionSample : MonoBehaviour
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private bool videoUpdateStarted;
 
-    private const int width = 1280;
-    private const int height = 720;
-
     private void Awake()
     {
         WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
@@ -97,7 +94,7 @@ class PeerConnectionSample : MonoBehaviour
 
         if (videoStream == null)
         {
-            videoStream = cam.CaptureStream(width, height, 1000000);
+            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
         }
 
         sourceImage.texture = cam.targetTexture;
