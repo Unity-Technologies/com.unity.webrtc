@@ -1,0 +1,250 @@
+﻿{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default-windows",
+      "displayName": "Default Windows Config",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Visual Studio 16 2019",
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ]
+        }
+      }
+    },
+    {
+      "name": "default-macos",
+      "displayName": "Default macOS Config",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+      },      
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "macOS"
+          ]
+        }
+      }
+    },
+    {
+      "name": "default-linux",
+      "displayName": "Default Linux Config",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Unix Makefiles",
+      "environment": {
+        "ASAN_OPTIONS": "protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0",
+        "LSAN_OPTIONS": "suppressions=${sourceDir}/tools/sanitizer/lsan_suppressions.txt"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Linux"
+          ]
+        }
+      }
+    },
+    {
+      "name": "default-ios",
+      "displayName": "Default iOS Config",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=": "NO",
+        "CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE": "YES"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "macOS"
+          ]
+        }
+      }
+    },
+    {
+      "name": "default-android",
+      "displayName": "Default Android Config",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_NAME": "Android",
+        "CMAKE_ANDROID_API_MIN": "24",
+        "CMAKE_ANDROID_NDK": "$env{ANDROID_SDK}",
+        "CMAKE_ANDROID_STL_TYPE": "c++_static"
+      }
+    },
+    {
+      "name": "x64-windows-msvc",
+      "description": "Sets x64 arch, generator, compilers",
+      "inherits": "default-windows"
+    },
+    {
+      "name": "x64-windows-clang",
+      "description": "Sets x64 arch, generator, compilers",
+      "toolset": "ClangCL",
+      "inherits": "default-windows",
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-clang-x64"
+        }
+      }      
+    },
+    {
+      "name": "macos",
+      "description": "Sets x86_64 and arm64 arch, generator, compilers",
+      "inherits": "default-macos"
+    },
+    {
+      "name": "x86_64-linux",
+      "description": "Sets x86_64 arch, generator, compilers",
+      "inherits": "default-linux",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-10",
+        "CMAKE_CXX_COMPILER": "clang++-10",
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++"
+      }
+    },
+    {
+      "name": "ios",
+      "description": "Sets x86_64 and arm64 arch, generator, compilers",
+      "inherits": "default-ios"
+    },
+    {
+      "name": "armv7-android",
+      "description": "Sets armv7 arch, generator, compilers",
+      "inherits": "default-android",
+      "cacheVariables": {
+        "CMAKE_ANDROID_ARCH_ABI": "armeabi-v7a"
+      }
+    },
+    {
+      "name": "arm64-android",
+      "description": "Sets arm64 arch, generator, compilers",
+      "inherits": "default-android",
+      "cacheVariables": {
+        "CMAKE_ANDROID_ARCH_ABI": "arm64-v8a"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug-windows-clang",
+      "displayName": "Build Debug",
+      "description": "Debug build using Clang",
+      "configurePreset": "x64-windows-clang",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-windows-clang",
+      "displayName": "Build Release",
+      "description": "Release build using Clang",
+      "configurePreset": "x64-windows-clang",
+      "configuration": "Release",
+      "cleanFirst": true
+    },
+    {
+      "name": "debug-windows-msvc",
+      "displayName": "Build Debug",
+      "description": "Debug build using MSVC",
+      "configurePreset": "x64-windows-msvc",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-windows-msvc",
+      "displayName": "Build Release",
+      "description": "Release build using MSVC",
+      "configurePreset": "x64-windows-msvc",
+      "configuration": "Release",
+      "cleanFirst": true
+    },
+    {
+      "name": "debug-macos",
+      "displayName": "Build Debug",
+      "description": "Debug build for macOS",
+      "configurePreset": "macos",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-macos",
+      "displayName": "Build Release",
+      "description": "Release build for macOS",
+      "configurePreset": "macos",
+      "configuration": "Release",
+      "cleanFirst": true
+    },
+    {
+      "name": "debug-linux",
+      "displayName": "Build Debug",
+      "description": "Debug build for Linux",
+      "configurePreset": "x86_64-linux",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-linux",
+      "displayName": "Build Release",
+      "description": "Release build for Linux",
+      "configurePreset": "x86_64-linux",
+      "configuration": "Release",
+      "cleanFirst": true
+    },
+    {
+      "name": "debug-android",
+      "displayName": "Build Debug",
+      "description": "Debug build for Android",
+      "configurePreset": "arm64-android",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-android",
+      "displayName": "Build Release",
+      "description": "Release build for Linux",
+      "configurePreset": "arm64-android",
+      "configuration": "Release",
+      "cleanFirst": true
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "test-windows-clang",
+      "configurePreset": "x64-windows-clang",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    },
+    {
+      "name": "test-macos",
+      "configurePreset": "macos",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    },
+    {
+      "name": "test-linux",
+      "configurePreset": "x86_64-linux",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    }
+  ]  
+}
