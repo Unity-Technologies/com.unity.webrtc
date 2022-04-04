@@ -305,7 +305,7 @@ build_webrtc_plugin_test_android:
       paths:
         - "build/WebRTCLibTest"
 
-trigger_test_webrtc_plugin_all_platform:
+test_webrtc_plugin_all_platform:
   name: Trigger test for webrtc plugin for all platforms
   dependencies:
     {% for platform in platforms %}
@@ -571,16 +571,20 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 {% endfor %}
 
+trigger_pullrequest:
+  name : Trigger by Pull request direct to develop branch or feature branch
+    dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
+  triggers:
+    expression: pull_request.target eq "develop" OR pull_request.target match "feat/.*"
+
 {% for editor in editors %}
 
 trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Trigger test {{ package.packagename }} {{ editor.version }} all platforms with GPU
-  dependencies: 
+  dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor.version }}_gpu
-{% if editor.version == "2020.3" -%}
-  triggers:
-    expression: pull_request.target eq "develop"
-{% endif -%}
 
 test_{{ package.name }}_{{ editor.version }}_nogpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms without GPU
