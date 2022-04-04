@@ -38,6 +38,7 @@ namespace webrtc
             eglGetConfigs(display, configs.data(), count, &count);
             EGLint contextAttr[] =
             {
+                EGL_CONTEXT_CLIENT_VERSION, 2,
                 EGL_NONE
             };
             context_ = eglCreateContext(display, configs[0], sharedCtx, contextAttr);
