@@ -26,11 +26,6 @@ namespace webrtc
 
     inline bool operator!=(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs) { return !(lhs == rhs); }
 
-    inline NppiSize Cast(const CUDA_ARRAY_DESCRIPTOR& desc)
-    {
-        return NppiSize { static_cast<int>(desc.Width), static_cast<int>(desc.Height) };
-    }
-
     NvEncoderImpl::NvEncoderImpl(
         const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
         : m_context(context)
@@ -203,8 +198,6 @@ namespace webrtc
                 return;
             }
         }
-
-        unity::webrtc::Resize(src, dst, size.width(), size.height(), MODE_NEAREST);
     }
 
     void NvEncoderImpl::CopyResource(

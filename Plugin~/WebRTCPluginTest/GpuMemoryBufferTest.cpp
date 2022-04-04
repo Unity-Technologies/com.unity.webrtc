@@ -74,7 +74,7 @@ namespace webrtc
         auto i420Buffer = buffer2->ToI420();
 
         EXPECT_NE(i420Buffer, nullptr);
-        EXPECT_EQ(buffer2->type(), VideoFrameBuffer::Type::kI420);
+        EXPECT_EQ(i420Buffer->type(), VideoFrameBuffer::Type::kI420);
         EXPECT_EQ(i420Buffer->width(), kSize2.width());
         EXPECT_EQ(i420Buffer->height(), kSize2.height());
     }
