@@ -18,7 +18,7 @@ namespace webrtc
 
     class ITexture2D;
     class IGraphicsDevice;
-    class GpuMemoryBufferHandle;
+    struct GpuMemoryBufferHandle;
     class GpuMemoryBufferInterface;
     class NvEncoderImpl : public unity::webrtc::NvEncoder
     {
@@ -41,10 +41,7 @@ namespace webrtc
         };
         NvEncoderImpl();
         NvEncoderImpl(
-            const cricket::VideoCodec& codec,
-            CUcontext context,
-            CUmemorytype memoryType,
-            NV_ENC_BUFFER_FORMAT format);
+            const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
         NvEncoderImpl(const NvEncoderImpl&) = delete;
         NvEncoderImpl& operator=(const NvEncoderImpl&) = delete;
         ~NvEncoderImpl() override;

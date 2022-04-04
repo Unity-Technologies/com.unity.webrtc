@@ -16,20 +16,12 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-    class GpuMemoryBufferHandle
+    struct GpuMemoryBufferHandle
     {
-    public:
         GpuMemoryBufferHandle();
         GpuMemoryBufferHandle(GpuMemoryBufferHandle&& other);
         GpuMemoryBufferHandle& operator=(GpuMemoryBufferHandle&& other);
         virtual ~GpuMemoryBufferHandle();
-
-#if CUDA_PLATFORM
-        CUarray array;
-        CUdeviceptr devicePtr;
-        CUgraphicsResource resource;
-        CUexternalMemory externalMemory;
-#endif
     };
 
     class ITexture2D;

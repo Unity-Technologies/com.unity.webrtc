@@ -4,7 +4,6 @@
 
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
-#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 
 #include "OpenGLContext.h"
@@ -12,6 +11,9 @@
 #if CUDA_PLATFORM
 #include <cuda.h>
 #include <cudaGL.h>
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
+#else
+#include "GpuMemoryBuffer.h"
 #endif
 
 namespace unity
@@ -275,8 +277,8 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
         }
         cuCtxPopCurrent(NULL);
 
-        std::unique_ptr<GpuMemoryBufferHandle> handle = std::make_unique<GpuMemoryBufferHandle>();
-        handle->array = mappedArray;
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->mappedArray = mappedArray;
         handle->resource = resource;
         return handle;
 #else

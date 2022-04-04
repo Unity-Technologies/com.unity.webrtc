@@ -1,7 +1,8 @@
 #include "pch.h"
 
-#include "../Utils/NvCodecUtils.h"
+#include "NvCodecUtils.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "NvEncoder/NvEncoder.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
@@ -137,7 +138,7 @@ namespace webrtc
         CUcontext context,
         CUmemorytype memoryType)
     {
-        const GpuMemoryBufferHandle* handle = buffer->handle();
+        const GpuMemoryBufferCudaHandle* handle = static_cast<const GpuMemoryBufferCudaHandle*>(buffer->handle());
 
         if (memoryType == CU_MEMORYTYPE_DEVICE)
         {
@@ -158,7 +159,7 @@ namespace webrtc
         {
             NvEncoderCudaWithCUarray::CopyToDeviceFrame(
                 context,
-                static_cast<void*>(handle->array),
+                static_cast<void*>(handle->mappedArray),
                 0,
                 static_cast<CUarray>(encoderInputFrame->inputPtr),
                 encoderInputFrame->pitch,

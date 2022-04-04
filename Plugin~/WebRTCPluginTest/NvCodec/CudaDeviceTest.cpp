@@ -1,6 +1,10 @@
 #include "pch.h"
 
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
+
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/ITexture2D.h"
+
 #include "GraphicsDeviceTestBase.h"
 #include "GraphicsDeviceContainer.h"
 
