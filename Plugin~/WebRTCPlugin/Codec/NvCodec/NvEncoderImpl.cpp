@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "BicubicTexture.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "NvCodecUtils.h"
@@ -14,7 +13,6 @@
 #include "api/video/video_codec_type.h"
 #include "api/video_codecs/h264_profile_level_id.h"
 #include "media/base/media_constants.h"
-#include "npp.h"
 
 namespace unity
 {

@@ -5,7 +5,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ve
 
 project(webrtc
   VERSION 2.4.0
-  LANGUAGES C CXX ASM CUDA
+  LANGUAGES C CXX ASM
 )
 
 cmake_policy(SET CMP0076 NEW)
@@ -65,10 +65,9 @@ if(iOS OR macOS)
 endif()
 
 if(Windows OR Linux)
-  find_package(CUDAToolkit REQUIRED)
+  find_package(CUDA REQUIRED)
   find_package(Vulkan REQUIRED)
   add_subdirectory(NvCodec)
-  add_subdirectory(Cuda/Bicubic)
 endif()
 
 add_subdirectory(WebRTCPlugin)
