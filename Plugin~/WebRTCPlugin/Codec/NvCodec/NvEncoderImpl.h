@@ -71,8 +71,11 @@ namespace webrtc
             CUcontext context,
             CUmemorytype memoryType);
 
+        void Resize(const CUarray& src, CUarray& dst, const Size& size);
+
         CUcontext m_context;
         CUmemorytype m_memoryType;
+        CUarray m_scaledArray;
         std::unique_ptr<NvEncoderInternal> m_encoder;
 
         VideoCodec m_codec;

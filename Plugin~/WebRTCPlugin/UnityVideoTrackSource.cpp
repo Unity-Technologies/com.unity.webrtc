@@ -1,58 +1,12 @@
 #include "pch.h"
+
 #include "UnityVideoTrackSource.h"
+#include "VideoFrameAdapter.h"
 
 namespace unity
 {
 namespace webrtc
 {
-
-::webrtc::VideoFrame VideoFrameAdapter::CreateVideoFrame( rtc::scoped_refptr<VideoFrame> frame)
-{
-    rtc::scoped_refptr<VideoFrameAdapter> adapter(
-      new rtc::RefCountedObject<VideoFrameAdapter>(
-          std::move(frame)));
-
-    return ::webrtc::VideoFrame::Builder()
-      .set_video_frame_buffer(adapter)
-      .build();
-}
-
-VideoFrameBuffer::Type VideoFrameAdapter::type() const
-{
-#if UNITY_IOS || UNITY_OSX || UNITY_ANDROID
-    // todo(kazuki): support for kNative type for mobile platform and macOS.
-    // Need to pass ObjCFrameBuffer instead of VideoFrameAdapter on macOS/iOS.
-    // Need to pass AndroidVideoBuffer instead of VideoFrameAdapter on Android.
-    return ::webrtc::VideoFrameBuffer::Type::kI420;
-#else
-    return ::webrtc::VideoFrameBuffer::Type::kNative;
-#endif
-}
-
-const I420BufferInterface* VideoFrameAdapter::GetI420() const
-{
-    return ConvertToVideoFrameBuffer(frame_)->GetI420();
-}
-
-rtc::scoped_refptr<I420BufferInterface> VideoFrameAdapter::ToI420()
-{
-    return ConvertToVideoFrameBuffer(frame_)->ToI420();
-}
-
-
-rtc::scoped_refptr<I420BufferInterface>
-VideoFrameAdapter::ConvertToVideoFrameBuffer(rtc::scoped_refptr<VideoFrame> video_frame) const
-{
-    if (i420Buffer_)
-        return i420Buffer_;
-
-    RTC_DCHECK(video_frame);
-    RTC_DCHECK(video_frame->HasGpuMemoryBuffer());
-
-    auto gmb = video_frame->GetGpuMemoryBuffer();
-    i420Buffer_ = gmb->ToI420();
-    return i420Buffer_;
-}
 
 rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(bool is_screencast, absl::optional<bool> needs_denoising)
 {

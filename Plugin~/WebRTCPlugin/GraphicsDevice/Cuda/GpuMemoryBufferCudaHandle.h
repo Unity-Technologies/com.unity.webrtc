@@ -16,7 +16,7 @@ namespace webrtc
 
         CUarray array;
         CUarray mappedArray;
-        CUdeviceptr devicePtr;
+        CUdeviceptr mappedPtr;
         CUgraphicsResource resource;
         CUexternalMemory externalMemory;
     };

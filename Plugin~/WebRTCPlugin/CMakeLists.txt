@@ -46,6 +46,8 @@ target_sources(WebRTCLib
     UnityLogStream.cpp
     VideoFrame.cpp
     VideoFrame.h
+    VideoFrameAdapter.cpp
+    VideoFrameAdapter.h
     VideoFrameUtil.cpp
     VideoFrameUtil.h
     GpuMemoryBuffer.cpp
