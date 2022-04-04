@@ -8,13 +8,23 @@ namespace Unity.WebRTC.Samples
 {
     internal static class WebRTCSettings
     {
+        public const int DefaultStreamWidth = 1280;
+        public const int DefaultStreamHeight = 720;
+
         private static bool s_limitTextureSize = true;
+        private static Vector2Int s_StreamSize = new Vector2Int(DefaultStreamWidth, DefaultStreamHeight);
         private static RTCRtpCodecCapability s_useVideoCodec = null;
 
         public static bool LimitTextureSize
         {
             get { return s_limitTextureSize; }
             set { s_limitTextureSize = value; }
+        }
+
+        public static Vector2Int StreamSize
+        {
+            get { return s_StreamSize; }
+            set { s_StreamSize = value; }
         }
 
         public static RTCRtpCodecCapability UseVideoCodec
@@ -27,6 +37,8 @@ namespace Unity.WebRTC.Samples
     internal class SceneSelectUI : MonoBehaviour
     {
         [SerializeField] private Dropdown codecSelector;
+        [SerializeField] private InputField textureWidthInput;
+        [SerializeField] private InputField textureHeightInput;
         [SerializeField] private Toggle toggleLimitTextureSize;
         [SerializeField] private Button buttonPeerConnection;
         [SerializeField] private Button buttonDataChannel;
@@ -75,6 +87,15 @@ namespace Unity.WebRTC.Samples
                     x.mimeType == previewCodec.mimeType && x.sdpFmtpLine == previewCodec.sdpFmtpLine) + 1;
             codecSelector.onValueChanged.AddListener(OnChangeCodecSelect);
 
+            if (WebRTCSettings.StreamSize.x != WebRTCSettings.DefaultStreamWidth ||
+                WebRTCSettings.StreamSize.y != WebRTCSettings.DefaultStreamHeight)
+            {
+                textureWidthInput.text = WebRTCSettings.StreamSize.x.ToString();
+                textureHeightInput.text = WebRTCSettings.StreamSize.y.ToString();
+            }
+            textureWidthInput.onValueChanged.AddListener(OnChangeTextureWidthInput);
+            textureHeightInput.onValueChanged.AddListener(OnChangeTextureHeightInput);
+
             toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
             toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
 
@@ -102,6 +123,38 @@ namespace Unity.WebRTC.Samples
         private void OnChangeCodecSelect(int index)
         {
             WebRTCSettings.UseVideoCodec = index == 0 ? null : availableCodecs[index - 1];
+        }
+
+        private void OnChangeTextureWidthInput(string input)
+        {
+            var height = WebRTCSettings.StreamSize.y;
+
+            if (string.IsNullOrEmpty(input))
+            {
+                WebRTCSettings.StreamSize = new Vector2Int(WebRTCSettings.DefaultStreamWidth, height);
+                return;
+            }
+
+            if (int.TryParse(input, out var width))
+            {
+                WebRTCSettings.StreamSize = new Vector2Int(width, height);
+            }
+        }
+
+        private void OnChangeTextureHeightInput(string input)
+        {
+            var width = WebRTCSettings.StreamSize.x;
+
+            if (string.IsNullOrEmpty(input))
+            {
+                WebRTCSettings.StreamSize = new Vector2Int(width, WebRTCSettings.DefaultStreamHeight);
+                return;
+            }
+
+            if (int.TryParse(input, out var height))
+            {
+                WebRTCSettings.StreamSize = new Vector2Int(width, height);
+            }
         }
 
         private void OnChangeLimitTextureSize(bool enable)
