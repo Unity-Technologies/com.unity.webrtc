@@ -51,6 +51,8 @@ namespace webrtc
         int offset_x, int offset_y, int crop_width, int crop_height, int scaled_width, int scaled_height)
     {
         RTC_NOTREACHED();
+
+        return nullptr;
     }
 
     VideoFrameAdapter::VideoFrameAdapter(rtc::scoped_refptr<VideoFrame> frame)
