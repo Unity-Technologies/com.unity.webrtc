@@ -2,8 +2,6 @@
 
 #include "GpuMemoryBufferCudaHandle.h"
 
-#include <nppi.h>
-
 namespace unity
 {
 namespace webrtc
