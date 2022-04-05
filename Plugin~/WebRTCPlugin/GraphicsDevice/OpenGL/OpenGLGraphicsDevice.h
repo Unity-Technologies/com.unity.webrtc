@@ -36,7 +36,7 @@ public:
 #if CUDA_PLATFORM
     bool IsCudaSupport() override { return m_isCudaSupport; }
     CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
-    NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
+    NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ABGR; }
 #endif
 
 private:
