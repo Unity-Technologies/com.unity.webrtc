@@ -133,6 +133,11 @@ namespace webrtc
 
     std::vector<SdpVideoFormat> NvEncoderFactory::GetSupportedFormats() const
     {
+        // If NvCodec Encoder is not supported, return empty vector.
+        auto codecs = SupportedNvEncoderCodecs(context_);
+        if(codecs.empty())
+            return std::vector<SdpVideoFormat>();
+
         // In RTCRtpTransceiver.SetCodecPreferences, the codec passed must be supported by both encoder and decoder.
         // https://source.chromium.org/chromium/chromium/src/+/main:third_party/webrtc/pc/rtp_transceiver.cc;l=36
         // About H264, Profile and its Level must also match in this implementation.
