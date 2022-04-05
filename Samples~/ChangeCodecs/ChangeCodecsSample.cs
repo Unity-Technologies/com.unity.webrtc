@@ -37,9 +37,6 @@ class ChangeCodecsSample : MonoBehaviour
     private readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
     private RTCRtpCodecCapability[] availableCodecs;
 
-    private const int width = 1280;
-    private const int height = 720;
-
     private void Awake()
     {
         WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
@@ -233,7 +230,7 @@ class ChangeCodecsSample : MonoBehaviour
 
         if (videoStream == null)
         {
-            videoStream = cam.CaptureStream(width, height, 1000000);
+            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
         }
         sourceImage.texture = cam.targetTexture;
         sourceImage.color = Color.white;

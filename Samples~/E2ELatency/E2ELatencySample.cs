@@ -17,7 +17,6 @@ class E2ELatencySample : MonoBehaviour
     [SerializeField] private Text textRemoteTimestamp;
     [SerializeField] private Text textLatency;
     [SerializeField] private Text textAverageLatency;
-    [SerializeField] private Dropdown dropDownResolution;
     [SerializeField] private Dropdown dropDownFramerate;
 
     [SerializeField] private BarcodeEncoder encoder;
@@ -43,15 +42,6 @@ class E2ELatencySample : MonoBehaviour
 
     int vSyncCount;
     int targetFrameRate;
-
-    List<Vector2Int> listResolution = new List<Vector2Int>()
-    {
-        new Vector2Int(160, 90),
-        new Vector2Int(320, 180),
-        new Vector2Int(640, 360),
-        new Vector2Int(1280, 720),
-        new Vector2Int(1920, 1080),
-    };
 
     List<int> listFramerate = new List<int>()
     {
@@ -89,10 +79,6 @@ class E2ELatencySample : MonoBehaviour
 
         callButton.interactable = false;
         hangUpButton.interactable = false;
-        dropDownResolution.interactable = true;
-        dropDownResolution.options =
-            listResolution.Select(_ => new Dropdown.OptionData($"{_.x}x{_.y}")).ToList();
-        dropDownResolution.value = 3;
         dropDownFramerate.interactable = true;
         dropDownFramerate.options =
             listFramerate.Select(_ => new Dropdown.OptionData($"{_}")).ToList();
@@ -124,13 +110,11 @@ class E2ELatencySample : MonoBehaviour
     {
         startButton.interactable = false;
         callButton.interactable = true;
-        dropDownResolution.interactable = false;
         dropDownFramerate.interactable = false;
         if (sendStream == null)
         {
-            Vector2Int resolution = listResolution[dropDownResolution.value];
-            int width = resolution.x;
-            int height = resolution.y;
+            int width = WebRTCSettings.StreamSize.x;
+            int height = WebRTCSettings.StreamSize.y;
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             var tex = new RenderTexture(width, height, 0, format);
             tex.Create();
@@ -359,7 +343,6 @@ class E2ELatencySample : MonoBehaviour
         startButton.interactable = true;
         callButton.interactable = false;
         hangUpButton.interactable = false;
-        dropDownResolution.interactable = true;
         dropDownFramerate.interactable = true;
         receiveImage.color = Color.black;
     }

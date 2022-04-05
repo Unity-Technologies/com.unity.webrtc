@@ -11,7 +11,6 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button startButton;
         [SerializeField] private Button callButton;
         [SerializeField] private Button hangUpButton;
-        [SerializeField] private Vector2Int streamingSize;
         [SerializeField] private Camera cam;
         [SerializeField] private RawImage sourceImage;
         [SerializeField] private RawImage receiveImage1;
@@ -67,7 +66,7 @@ namespace Unity.WebRTC.Samples
             Debug.Log("Set up source/receive streams");
             sourceStream = new MediaStream();
 
-            var videoTrack = cam.CaptureStreamTrack(streamingSize.x, streamingSize.y, 0);
+            var videoTrack = cam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 0);
             sourceStream.AddTrack(videoTrack);
             sourceImage.texture = cam.targetTexture;
 
