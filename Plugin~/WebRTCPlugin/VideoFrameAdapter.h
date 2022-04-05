@@ -77,6 +77,7 @@ namespace webrtc
         mutable rtc::scoped_refptr<I420BufferInterface> i420Buffer_;
         const rtc::scoped_refptr<VideoFrame> frame_;
         const Size size_;
+        mutable std::mutex frameLock_;
     };
 }
 }
