@@ -37,6 +37,7 @@ namespace Unity.WebRTC.Samples
     internal class SceneSelectUI : MonoBehaviour
     {
         [SerializeField] private Dropdown codecSelector;
+        [SerializeField] private Dropdown streamSizeSelector;
         [SerializeField] private InputField textureWidthInput;
         [SerializeField] private InputField textureHeightInput;
         [SerializeField] private Toggle toggleLimitTextureSize;
@@ -55,6 +56,15 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonBandwidth;
         [SerializeField] private Button buttonPerfectNegotiation;
         [SerializeField] private Button buttonLatency;
+
+        List<Vector2Int> streamSizeList = new List<Vector2Int>()
+        {
+            new Vector2Int(640, 360),
+            new Vector2Int(1280, 720),
+            new Vector2Int(1920, 1080),
+            new Vector2Int(2560, 1440),
+            new Vector2Int(3840, 2160),
+        };
 
         private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
         private List<RTCRtpCodecCapability> availableCodecs;
@@ -87,12 +97,25 @@ namespace Unity.WebRTC.Samples
                     x.mimeType == previewCodec.mimeType && x.sdpFmtpLine == previewCodec.sdpFmtpLine) + 1;
             codecSelector.onValueChanged.AddListener(OnChangeCodecSelect);
 
-            if (WebRTCSettings.StreamSize.x != WebRTCSettings.DefaultStreamWidth ||
-                WebRTCSettings.StreamSize.y != WebRTCSettings.DefaultStreamHeight)
+            var optionList = streamSizeList.Select(size => new Dropdown.OptionData($" {size.x} x {size.y} ")).ToList();
+            optionList.Add(new Dropdown.OptionData(" Custom "));
+            streamSizeSelector.options = optionList;
+
+            var existInList = streamSizeList.Contains(WebRTCSettings.StreamSize);
+            if (existInList)
             {
+                streamSizeSelector.value = streamSizeList.IndexOf(WebRTCSettings.StreamSize);
+            }
+            else
+            {
+                streamSizeSelector.value = optionList.Count - 1;
                 textureWidthInput.text = WebRTCSettings.StreamSize.x.ToString();
                 textureHeightInput.text = WebRTCSettings.StreamSize.y.ToString();
+                textureWidthInput.interactable = true;
+                textureHeightInput.interactable = true;
             }
+
+            streamSizeSelector.onValueChanged.AddListener(OnChangeStreamSizeSelect);
             textureWidthInput.onValueChanged.AddListener(OnChangeTextureWidthInput);
             textureHeightInput.onValueChanged.AddListener(OnChangeTextureHeightInput);
 
@@ -123,6 +146,20 @@ namespace Unity.WebRTC.Samples
         private void OnChangeCodecSelect(int index)
         {
             WebRTCSettings.UseVideoCodec = index == 0 ? null : availableCodecs[index - 1];
+        }
+
+        private void OnChangeStreamSizeSelect(int index)
+        {
+            var isCustom = index >= streamSizeList.Count;
+            textureWidthInput.interactable = isCustom;
+            textureHeightInput.interactable = isCustom;
+
+            if (isCustom)
+            {
+                return;
+            }
+
+            WebRTCSettings.StreamSize = streamSizeList[index];
         }
 
         private void OnChangeTextureWidthInput(string input)
