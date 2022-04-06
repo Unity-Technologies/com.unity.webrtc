@@ -55,6 +55,9 @@ namespace webrtc
     private:
         CUcontext context_;
         NV_ENC_BUFFER_FORMAT format_;
+
+        // Cache of capability to reduce calling SessionOpenAPI of NvEncoder
+        std::vector<SdpVideoFormat> m_cachedSupportedFormats;
     };
 
     class NvDecoderFactory : public VideoDecoderFactory
