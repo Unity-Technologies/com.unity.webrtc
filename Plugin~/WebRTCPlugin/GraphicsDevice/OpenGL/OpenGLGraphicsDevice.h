@@ -40,7 +40,7 @@ public:
 #endif
 
 private:
-    bool CopyResource(GLuint dstName, GLuint srcName, uint32 width, uint32 height);
+    bool CopyResource(GLuint dstName, GLuint srcName);
     void ReleaseTexture(OpenGLTexture2D* texture);
 #if CUDA_PLATFORM
     CudaContext m_cudaContext;
