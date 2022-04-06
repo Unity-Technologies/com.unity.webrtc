@@ -377,7 +377,12 @@ namespace Unity.WebRTC.RuntimeTest
 
         // todo(kazuki):There are bugs some platforms. Remove exclude platform.
         [UnityTest]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] {
+            RuntimePlatform.LinuxEditor,
+            RuntimePlatform.LinuxPlayer,
+            RuntimePlatform.WindowsEditor,
+            RuntimePlatform.WindowsPlayer,
+        })]
         public IEnumerator CallVideoEncoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -430,6 +435,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] {
             RuntimePlatform.LinuxEditor,
             RuntimePlatform.LinuxPlayer,
+            RuntimePlatform.WindowsEditor,
             RuntimePlatform.WindowsPlayer,
         })]
         public IEnumerator CallVideoDecoderMethods()
