@@ -10,17 +10,14 @@ namespace webrtc
     class GpuMemoryBufferPool
     {
     public:
-        GpuMemoryBufferPool(IGraphicsDevice* device);
+        GpuMemoryBufferPool(IGraphicsDevice* device, Clock* clock);
         GpuMemoryBufferPool(const GpuMemoryBufferPool&) = delete;
         GpuMemoryBufferPool& operator=(const GpuMemoryBufferPool&) = delete;
 
         virtual ~GpuMemoryBufferPool();
 
-        rtc::scoped_refptr<VideoFrame> CreateFrame(
-            NativeTexPtr ptr,
-            const Size& size,
-            UnityRenderingExtTextureFormat format,
-            int64_t timestamp);
+        rtc::scoped_refptr<VideoFrame>
+        CreateFrame(NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp);
 
         size_t bufferCount() { return resourcesPool_.size(); }
 
@@ -29,26 +26,39 @@ namespace webrtc
         {
             FrameResources(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
                 : buffer_(std::move(buffer))
+                , lastUsetime_(Timestamp::Zero())
             {
             }
             rtc::scoped_refptr<GpuMemoryBufferInterface> buffer_;
             bool IsUsed() { return isUsed_; }
-            void MarkUsed() { isUsed_ = true; }
-            void MarkUnused() { isUsed_ = false; }
+            void MarkUsed(Timestamp timestamp)
+            {
+                isUsed_ = true;
+                lastUsetime_ = timestamp;
+            }
+            void MarkUnused(Timestamp timestamp)
+            {
+                isUsed_ = false;
+                lastUsetime_ = timestamp;
+            }
+            Timestamp lastUseTime() { return lastUsetime_; }
             bool isUsed_;
+            Timestamp lastUsetime_;
         };
-        rtc::scoped_refptr<GpuMemoryBufferInterface> GetOrCreateFrameResources(
-            NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format);
+        rtc::scoped_refptr<GpuMemoryBufferInterface>
+        GetOrCreateFrameResources(NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format);
         void OnReturnBuffer(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer);
-        void CopyBuffer();
+
+        // define friend class for test
+        friend class GpuMemoryBufferPoolTest;
+        void ReleaseStaleBuffers(Timestamp timestamp);
 
         static bool AreFrameResourcesCompatible(
-            const FrameResources* resources,
-            const Size& size,
-            UnityRenderingExtTextureFormat format);
+            const FrameResources* resources, const Size& size, UnityRenderingExtTextureFormat format);
 
         IGraphicsDevice* device_;
         std::list<std::unique_ptr<FrameResources>> resourcesPool_;
+        Clock* const clock_;
     };
 }
 }

@@ -147,7 +147,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             s_gfxDevice->InitV();
         }
-        s_bufferPool = std::make_unique<GpuMemoryBufferPool>(s_gfxDevice.get());
+        s_bufferPool = std::make_unique<GpuMemoryBufferPool>(s_gfxDevice.get(), s_clock.get());
         break;
     }
     case kUnityGfxDeviceEventShutdown:
@@ -296,7 +296,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             UnityVideoTrackSource* source = encodeData->source;
             if (source == nullptr)
                 return;
-            int64_t timestamp = s_clock->TimeInMicroseconds();
+            Timestamp timestamp = s_clock->CurrentTime();
             IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
             UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
             void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
