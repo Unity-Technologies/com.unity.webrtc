@@ -100,6 +100,7 @@ namespace webrtc
         }
         catch (const NVENCException& e)
         {
+            // todo: If Encoder initialization fails, need to notify for Managed side.
             RTC_LOG(LS_ERROR) << "Failed Initialize NvEncoder " << e.what();
             return WEBRTC_VIDEO_CODEC_ERROR;
         }
