@@ -223,9 +223,9 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
 
 #if defined(SUPPORT_VULKAN)
     auto vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
-    if (!vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr))
+    if (!vulkan->AddInterceptInitialization(InterceptVulkanInitialization, nullptr, 0))
     {
-        RTC_LOG(LS_INFO) << "InterceptInitialization failed.";
+        RTC_LOG(LS_INFO) << "AddInterceptInitialization failed.";
     }
 #endif
 

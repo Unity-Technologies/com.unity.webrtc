@@ -4,10 +4,25 @@ namespace unity
 {
 namespace webrtc
 {
+    template<typename T>
+    inline bool AddInterceptInitialization(T* instance, UnityVulkanInitCallback func, void* userdata, int priority)
+    {
+        return instance->AddInterceptInitialization(func, userdata, priority);
+    }
+
+    template<>
+    inline bool AddInterceptInitialization(IUnityGraphicsVulkan* instance, UnityVulkanInitCallback func, void* userdata, int priority)
+    {
+        // IUnityGraphicsVulkan is not supported AddInterceptInitialization.
+        return instance->InterceptInitialization(func, userdata);
+    }
+
     class UnityGraphicsVulkan
     {
     public:
         virtual bool InterceptInitialization(UnityVulkanInitCallback func, void* userdata) = 0;
+        virtual PFN_vkVoidFunction InterceptVulkanAPI(const char* name, PFN_vkVoidFunction func) = 0;
+        virtual bool AddInterceptInitialization(UnityVulkanInitCallback func, void* userdata, int priority) = 0;
         virtual UnityVulkanInstance Instance() = 0;
         virtual ~UnityGraphicsVulkan() = default;
 
@@ -27,6 +42,16 @@ namespace webrtc
         bool InterceptInitialization(UnityVulkanInitCallback func, void* userdata) override
         {
             return vulkanInterface_->InterceptInitialization(func, userdata);
+        }
+
+        PFN_vkVoidFunction InterceptVulkanAPI(const char* name, PFN_vkVoidFunction func) override
+        {
+            return vulkanInterface_->InterceptVulkanAPI(name, func);
+        }
+
+        bool AddInterceptInitialization(UnityVulkanInitCallback func, void* userdata, int priority) override
+        {
+            return unity::webrtc::AddInterceptInitialization(vulkanInterface_, func, userdata, priority);
         }
 
         UnityVulkanInstance Instance() override { return vulkanInterface_->Instance(); }

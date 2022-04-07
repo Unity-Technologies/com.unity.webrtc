@@ -35,6 +35,8 @@ public:
         std::array<uint8_t, VK_UUID_SIZE>* deviceUUID
     );
 
+    static bool LoadDeviceFunctions(const VkDevice device);
+    static bool LoadInstanceFunctions(const VkInstance instance);
     static void* GetExportHandle(const VkDevice device, const VkDeviceMemory memory);
 
     static VkResult BeginOneTimeCommandBufferInto(const VkDevice device, const VkCommandPool commandPool,
