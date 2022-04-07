@@ -19,7 +19,9 @@ namespace unity
 namespace webrtc
 {
 
+#ifdef _WIN32
     static PFN_vkGetMemoryWin32HandleKHR vkGetMemoryWin32HandleKHR = nullptr;
+#endif
     static PFN_vkGetMemoryFdKHR vkGetMemoryFdKHR = nullptr;
     static PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = nullptr;
 
