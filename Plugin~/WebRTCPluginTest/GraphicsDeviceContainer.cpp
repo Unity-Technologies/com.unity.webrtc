@@ -261,6 +261,12 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
             return nullptr;
         }
+
+        if (!VulkanUtility::LoadInstanceFunctions(instance))
+        {
+            return nullptr;
+        }
+
         bool found = false;
         int32_t physicalDeviceIndex = GetPhysicalDeviceIndex(instance, physicalDeviceList, &found);
         if (!found)
