@@ -133,14 +133,12 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 #if defined(SUPPORT_VULKAN)
         if (renderer == kUnityGfxRendererVulkan)
         {
-            IUnityGraphicsVulkan* vulkan = s_UnityInterfaces->Get<IUnityGraphicsVulkan>();
-            if (vulkan != nullptr)
+            std::unique_ptr<UnityGraphicsVulkan> vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
+            UnityVulkanInstance instance = vulkan->Instance();
+            if (!LoadVulkanFunctions(instance))
             {
-                UnityVulkanInstance instance = vulkan->Instance();
-                if (!LoadVulkanFunctions(instance))
-                {
-                    return;
-                }
+                RTC_LOG(LS_INFO) << "LoadVulkanFunctions failed";
+                return;
             }
         }
 #endif
@@ -224,13 +222,8 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     s_clock.reset(Clock::GetRealTimeClock());
 
 #if defined(SUPPORT_VULKAN)
-    //IUnityGraphicsVulkanV2* vulkan = unityInterfaces->Get<IUnityGraphicsVulkanV2>();
-    auto vulkan = UnityGraphicsVulkan::Get(unityInterfaces);
+    auto vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
     vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
-    //if (vulkan != nullptr)
-    //{
-    //    vulkan.InterceptInitialization(InterceptVulkanInitialization, nullptr);
-    //}
 #endif
 
     IUnityProfiler* unityProfiler = unityInterfaces->Get<IUnityProfiler>();
