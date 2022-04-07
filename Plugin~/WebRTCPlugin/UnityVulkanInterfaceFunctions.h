@@ -9,6 +9,7 @@ namespace webrtc
     public:
         virtual void InterceptInitialization(UnityVulkanInitCallback func, void* userdata) = 0;
         virtual UnityVulkanInstance Instance() = 0;
+        virtual ~UnityGraphicsVulkan() = default;
 
         static std::unique_ptr<UnityGraphicsVulkan> Get(IUnityInterfaces* unityInterfaces);
     };
