@@ -7,7 +7,7 @@ namespace webrtc
     class UnityGraphicsVulkan
     {
     public:
-        virtual void InterceptInitialization(UnityVulkanInitCallback func, void* userdata) = 0;
+        virtual bool InterceptInitialization(UnityVulkanInitCallback func, void* userdata) = 0;
         virtual UnityVulkanInstance Instance() = 0;
         virtual ~UnityGraphicsVulkan() = default;
 
@@ -24,9 +24,9 @@ namespace webrtc
         }
         ~UnityGraphicsVulkanImpl() = default;
 
-        void InterceptInitialization(UnityVulkanInitCallback func, void* userdata) override
+        bool InterceptInitialization(UnityVulkanInitCallback func, void* userdata) override
         {
-            vulkanInterface_->InterceptInitialization(func, userdata);
+            return vulkanInterface_->InterceptInitialization(func, userdata);
         }
 
         UnityVulkanInstance Instance() override { return vulkanInterface_->Instance(); }

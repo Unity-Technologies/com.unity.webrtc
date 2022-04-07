@@ -223,7 +223,10 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
 
 #if defined(SUPPORT_VULKAN)
     auto vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
-    vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+    if (!vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr))
+    {
+        RTC_LOG(LS_INFO) << "InterceptInitialization failed.";
+    }
 #endif
 
     IUnityProfiler* unityProfiler = unityInterfaces->Get<IUnityProfiler>();

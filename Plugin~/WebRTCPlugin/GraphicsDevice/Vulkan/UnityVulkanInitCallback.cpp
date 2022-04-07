@@ -52,13 +52,20 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
         std::inserter(newExtensions, std::end(newExtensions))
         );
 
+    RTC_LOG(LS_INFO) << "WebRTC plugin intercepts vkCreateDevice.";
+
+    for (auto extension : newExtensions)
+    {
+        RTC_LOG(LS_INFO) << "[Vulkan init intercept] extensions: name=" << extension;
+    }
+
     // replace extension name list
     newCreateInfo.ppEnabledExtensionNames = newExtensions.data();
     newCreateInfo.enabledExtensionCount = static_cast<uint32_t>(newExtensions.size());
     VkResult result = vkCreateDevice(physicalDevice, &newCreateInfo, pAllocator, pDevice);
     if(result != VK_SUCCESS)
     {
-        RTC_LOG(LS_ERROR) << "vkCreateDevice:" << result;
+        RTC_LOG(LS_ERROR) << "vkCreateDevice failed. error:" << result;
         return result;
     }
     if (!LoadDeviceVulkanFunction(*pDevice))
@@ -70,7 +77,6 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
 static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)
 {
-
     if (!LoadGlobalVulkanFunction())
         return VK_ERROR_INITIALIZATION_FAILED;
 
@@ -93,6 +99,13 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
         std::inserter(newExtensions, std::end(newExtensions))
     );
 
+    RTC_LOG(LS_INFO) << "WebRTC plugin intercepts vkCreateInstance.";
+
+    for (auto extension : newExtensions)
+    {
+        RTC_LOG(LS_INFO) << "[Vulkan init intercept] extensions: name=" << extension;
+    }
+
     // replace extension name list
     newCreateInfo.ppEnabledExtensionNames = newExtensions.data();
     newCreateInfo.enabledExtensionCount = static_cast<uint32_t>(newExtensions.size());
@@ -100,7 +113,8 @@ static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateInstance(
     VkResult result = vkCreateInstance(&newCreateInfo, pAllocator, pInstance);
     if (result != VK_SUCCESS)
     {
-        RTC_LOG(LS_ERROR) << "vkCreateInstance:" << result;
+        RTC_LOG(LS_ERROR) << "vkCreateInstance failed. error:" << result;
+        return result;
     }
 
     if (!LoadInstanceVulkanFunction(*pInstance))
