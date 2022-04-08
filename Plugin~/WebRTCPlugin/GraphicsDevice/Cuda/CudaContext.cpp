@@ -160,7 +160,7 @@ CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalD
 #if defined(SUPPORT_D3D11)
 CUresult CudaContext::Init(ID3D11Device* device)
 {
-    bool found = LoadModule();
+    bool found = FindModule();
     if (!found)
     {
         return CUDA_ERROR_NOT_FOUND;
@@ -204,7 +204,7 @@ CUresult CudaContext::Init(ID3D11Device* device)
 CUresult CudaContext::Init(ID3D12Device* device)
 {
 
-    bool found = LoadModule();
+    bool found = FindModule();
     if (!found)
     {
         return CUDA_ERROR_NOT_FOUND;
