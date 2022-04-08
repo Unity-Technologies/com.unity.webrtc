@@ -14,7 +14,7 @@ source ~/.profile
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install libglfw3-dev
+# Install glfw3
 sudo apt install -y libglfw3-dev
 
 # Install glad2
