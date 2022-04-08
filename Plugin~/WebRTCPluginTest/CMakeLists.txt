@@ -170,7 +170,7 @@ elseif(macOS)
       ${WEBRTC_OBJC_INCLUDE_DIR}
   )
 elseif(Linux)
-  find_package(GLUT REQUIRED)
+  find_package(glfw3 REQUIRED)
 
   target_compile_options(WebRTCLibTest
     PUBLIC
@@ -191,9 +191,9 @@ elseif(Linux)
 
   target_link_libraries(WebRTCLibTest
     PRIVATE
-      ${GLUT_LIBRARY}
       ${CMAKE_DL_LIBS}
       ${CMAKE_THREAD_LIBS_INIT}
+      glfw
       gtest
       gmock
       gtest_main

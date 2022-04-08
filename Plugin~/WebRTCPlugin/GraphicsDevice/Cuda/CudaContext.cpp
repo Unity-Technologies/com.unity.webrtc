@@ -27,41 +27,44 @@ namespace webrtc
 {
 static void* s_hModule = nullptr;
 
+bool FindModule()
+{
+    if(s_hModule)
+        return true;
+
+#if UNITY_WIN
+    // dll delay load
+    HMODULE module = LoadLibrary(TEXT("nvcuda.dll"));
+    if (!module)
+    {
+        RTC_LOG(LS_INFO) << "nvcuda.dll is not found.";
+        return false;
+    }
+    s_hModule = module;
+#elif UNITY_LINUX
+    s_hModule = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
+    if(!s_hModule)
+        return false;
+
+    // Close handle immediately because going to call `dlopen` again
+    // in the implib module when cuda api called on Linux.
+    dlclose(s_hModule);
+    s_hModule = nullptr;
+#endif
+    return true;
+}
+
 CudaContext::CudaContext()
     : m_context(nullptr)
 {
 }
 
-bool LoadModule()
-{
-    if (!s_hModule)
-    {
-#if UNITY_WIN
-        // dll delay load
-        HMODULE module = LoadLibrary(TEXT("nvcuda.dll"));
-        if (!module)
-        {
-            RTC_LOG(LS_INFO) << "nvcuda.dll is not found.";
-            return false;
-        }
-        s_hModule = module;
-#elif UNITY_LINUX
-        s_hModule = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
-        if(!s_hModule)
-            return false;
-
-        // Close handle immediately because going to call `dlopen` again
-        // in the implib module when cuda api called.
-        dlclose(s_hModule);
-        s_hModule = nullptr;
-#endif
-    }
-    return true;
-}
-//---------------------------------------------------------------------------------------------------------------------
-
 CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
 {
+    bool found = FindModule();
+    if(!found)
+        return CUDA_ERROR_NO_DEVICE;
+
     CUdevice _cuDevice = 0;
     CUresult result = CUDA_SUCCESS;
     int numDevices = 0;
@@ -100,8 +103,8 @@ CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
 CUresult CudaContext::Init(const VkInstance instance, VkPhysicalDevice physicalDevice)
 {
     // dll check
-    bool loaded = LoadModule();
-    if (!loaded)
+    bool found = FindModule();
+    if (!found)
     {
         return CUDA_ERROR_NOT_FOUND;
     }
@@ -258,7 +261,7 @@ CUresult CudaContext::Init(ID3D12Device* device)
 CUresult CudaContext::InitGL()
 {
     // dll check
-    bool found = LoadModule();
+    bool found = FindModule();
     if (!found)
     {
         return CUDA_ERROR_NOT_FOUND;
@@ -320,7 +323,7 @@ CUcontext CudaContext::GetContext() const
 
 void CudaContext::Shutdown()
 {
-    if (nullptr != m_context)
+    if (m_context)
     {
         cuCtxDestroy(m_context);
         m_context = nullptr;

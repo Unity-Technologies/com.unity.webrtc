@@ -14,10 +14,8 @@ source ~/.profile
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install libc++, libc++abi googletest clang glut
-# TODO:: Remove this install process from here and recreate an image to build the plugin.
-sudo apt update
-sudo apt install -y clang-10 libc++-10-dev libc++abi-10-dev freeglut3-dev
+# Install libglfw3-dev
+sudo apt install -y libglfw3-dev
 
 # Install glad2
 pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad

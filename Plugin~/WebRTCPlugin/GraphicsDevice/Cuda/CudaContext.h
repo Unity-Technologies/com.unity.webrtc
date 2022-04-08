@@ -18,7 +18,7 @@ public:
     ~CudaContext() = default;
 
     CUresult Init(const VkInstance instance, VkPhysicalDevice physicalDevice);
-    static CUresult FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice);
+    void Shutdown();
 
 #if defined(UNITY_WIN)
     CUresult Init(ID3D11Device* device);
@@ -28,10 +28,11 @@ public:
     CUresult InitGL();
 #endif
 
-    void Shutdown();
 
     // This method returns context for the thread which called the method.
     CUcontext GetContext() const;
+
+    static CUresult FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice);
 private:
     CUcontext m_context;
 };
