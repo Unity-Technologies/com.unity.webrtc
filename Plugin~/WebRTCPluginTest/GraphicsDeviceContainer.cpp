@@ -393,7 +393,9 @@ namespace webrtc
 
             const GLuint kWidth = 320;
             const GLuint kHeight = 240;
+            __lsan_disable();
             s_window = glfwCreateWindow(kWidth, kHeight, "test", nullptr, nullptr);
+            __lsan_enable();
             glfwMakeContextCurrent(s_window);
             s_glfwInitialized = true;
         }
