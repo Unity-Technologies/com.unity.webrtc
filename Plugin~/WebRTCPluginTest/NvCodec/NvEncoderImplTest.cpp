@@ -49,6 +49,37 @@ namespace webrtc
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder.InitEncode(&codec_settings, kSettings()));
     }
 
+    TEST_P(NvEncoderImplTest, CanInitializeWithProfileLevel51Resolution3840x2160)
+    {
+        H264ProfileLevelId profileLevelId(H264Profile::kProfileBaseline, H264Level::kLevel5_1);
+
+        cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
+        codec.SetParam(cricket::kH264FmtpProfileLevelId, *H264ProfileLevelIdToString(profileLevelId));
+        NvEncoderImpl encoder(codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB);
+
+        VideoCodec codec_settings;
+        SetDefaultSettings(&codec_settings);
+        codec_settings.width = 3840;
+        codec_settings.height = 2160;
+        EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder.InitEncode(&codec_settings, kSettings()));
+    }
+
+    TEST_P(NvEncoderImplTest, ThrowInitializeWithProfileLevel51Resolution4000x4000)
+    {
+        H264ProfileLevelId profileLevelId(H264Profile::kProfileBaseline, H264Level::kLevel5_1);
+
+        cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
+        codec.SetParam(cricket::kH264FmtpProfileLevelId, *H264ProfileLevelIdToString(profileLevelId));
+        NvEncoderImpl encoder(codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB);
+
+        VideoCodec codec_settings;
+        SetDefaultSettings(&codec_settings);
+        codec_settings.width = 4000;
+        codec_settings.height = 4000;
+      
+        EXPECT_THROW(encoder.InitEncode(&codec_settings, kSettings()), NVENCException);
+    }
+
     INSTANTIATE_TEST_SUITE_P(GfxDevice, NvEncoderImplTest, testing::ValuesIn(supportedGfxDevices));
 
 } // end namespace webrtc
