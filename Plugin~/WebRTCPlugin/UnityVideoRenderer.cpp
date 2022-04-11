@@ -102,12 +102,14 @@ void* UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(
     if (m_needFlipVertical)
         height = -height;
 
-    if(0 > libyuv::ConvertFromI420(
+    int result = libyuv::ConvertFromI420(
         i420_buffer->DataY(), i420_buffer->StrideY(), i420_buffer->DataU(),
         i420_buffer->StrideU(), i420_buffer->DataV(), i420_buffer->StrideV(),
-        tempBuffer.data(), 0, width, height, format))
+        tempBuffer.data(), 0, width, height, format);
+
+    if(result)
     {
-        RTC_LOG(LS_INFO) << "failed libyuv::ConvertFromI420";
+        RTC_LOG(LS_INFO) << "libyuv::ConvertFromI420 failed. error:" << result;
     }
     return tempBuffer.data();
 }

@@ -98,6 +98,7 @@ namespace webrtc
     rtc::scoped_refptr<I420BufferInterface>
     VideoFrameAdapter::ConvertToVideoFrameBuffer(rtc::scoped_refptr<VideoFrame> video_frame) const
     {
+        std::unique_lock<std::mutex> guard(frameLock_);
         if (i420Buffer_)
             return i420Buffer_;
 

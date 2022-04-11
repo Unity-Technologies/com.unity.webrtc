@@ -424,7 +424,6 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoDecoderMethods.UpdateRendererTexture is not supported on Direct3D12.")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor, RuntimePlatform.LinuxPlayer })]
         public IEnumerator CallVideoDecoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);
