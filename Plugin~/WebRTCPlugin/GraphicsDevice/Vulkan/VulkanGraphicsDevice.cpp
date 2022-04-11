@@ -29,6 +29,7 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, c
     , m_allocator(nullptr)
 #if CUDA_PLATFORM
     , m_instance(instance)
+    , m_isCudaSupport(false)
 #endif
 {
 }
@@ -37,11 +38,24 @@ VulkanGraphicsDevice::VulkanGraphicsDevice( IUnityGraphicsVulkan* unityVulkan, c
 bool VulkanGraphicsDevice::InitV()
 {
 #if CUDA_PLATFORM
-    CUresult result = m_cudaContext.Init(m_instance, m_physicalDevice);
-    m_isCudaSupport = CUDA_SUCCESS == result;
+    m_isCudaSupport = InitCudaContext();
 #endif
     return VK_SUCCESS == CreateCommandPool();
 }
+
+#if CUDA_PLATFORM
+bool VulkanGraphicsDevice::InitCudaContext()
+{
+    if (!VulkanUtility::LoadInstanceFunctions(m_instance))
+        return false;
+    if (!VulkanUtility::LoadDeviceFunctions(m_device))
+        return false;
+    CUresult result = m_cudaContext.Init(m_instance, m_physicalDevice);
+    if (CUDA_SUCCESS != result)
+        return false;
+    return true;
+}
+#endif
 
 //---------------------------------------------------------------------------------------------------------------------
 

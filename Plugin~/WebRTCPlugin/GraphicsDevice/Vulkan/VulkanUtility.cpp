@@ -19,7 +19,12 @@ namespace unity
 namespace webrtc
 {
 
-//
+#ifdef _WIN32
+    static PFN_vkGetMemoryWin32HandleKHR vkGetMemoryWin32HandleKHR = nullptr;
+#endif
+    static PFN_vkGetMemoryFdKHR vkGetMemoryFdKHR = nullptr;
+    static PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = nullptr;
+
 bool VulkanUtility::FindMemoryTypeInto(
     const VkPhysicalDevice physicalDevice, uint32_t typeFilter,
         VkMemoryPropertyFlags properties, uint32_t* memoryTypeIndex)
@@ -219,19 +224,43 @@ bool VulkanUtility::GetPhysicalDeviceUUIDInto(VkInstance instance, VkPhysicalDev
     props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
     props.pNext = &deviceIDProps;
 
-    PFN_vkGetPhysicalDeviceProperties2KHR func = (PFN_vkGetPhysicalDeviceProperties2KHR) 
-        vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties2KHR");
-    if (func == nullptr) {
-        return false;
-    }
-
-    func(phyDevice, &props);
+    vkGetPhysicalDeviceProperties2KHR(phyDevice, &props);
     std::memcpy(deviceUUID->data(), deviceIDProps.deviceUUID, VK_UUID_SIZE);
 
     return true;
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+bool VulkanUtility::LoadDeviceFunctions(const VkDevice device)
+{
+#ifndef _WIN32
+    vkGetMemoryFdKHR = (PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(device, "vkGetMemoryFdKHR");
+    if (!vkGetMemoryFdKHR)
+    {
+        RTC_LOG(LS_INFO) << "Failed to retrieve vkGetMemoryFdKHR";
+        return false;
+    }
+#else
+    vkGetMemoryWin32HandleKHR = (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(device, "vkGetMemoryWin32HandleKHR");
+    if (!vkGetMemoryWin32HandleKHR)
+    {
+        RTC_LOG(LS_INFO) << "Failed to retrieve vkGetMemoryWin32HandleKHR";
+        return false;
+    }
+#endif
+    return true;
+}
+
+bool VulkanUtility::LoadInstanceFunctions(const VkInstance instance)
+{
+    vkGetPhysicalDeviceProperties2KHR =
+        (PFN_vkGetPhysicalDeviceProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties2KHR");
+    if (vkGetPhysicalDeviceProperties2KHR == nullptr)
+    {
+        RTC_LOG(LS_INFO) << "Failed to retrieve vkGetPhysicalDeviceProperties2KHR";
+        return false;
+    }
+    return true;
+}
 
 #ifndef _WIN32
 void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory memory)
@@ -243,11 +272,10 @@ void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory
     fdInfo.memory = memory;
     fdInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
 
-    auto func = (PFN_vkGetMemoryFdKHR) \
-        vkGetDeviceProcAddr(device, "vkGetMemoryFdKHR");
-
-    if (!func ||
-        func(device, &fdInfo, &fd) != VK_SUCCESS) {
+    VkResult result = vkGetMemoryFdKHR(device, &fdInfo, &fd);
+    if (result != VK_SUCCESS)
+    {
+        RTC_LOG(LS_ERROR) << "vkGetMemoryFdKHR error" << result;
         return nullptr;
     }
 
@@ -263,16 +291,7 @@ void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory
     handleInfo.memory = memory;
     handleInfo.handleType = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
 
-    PFN_vkGetMemoryWin32HandleKHR fpGetMemoryWin32HandleKHR =
-        (PFN_vkGetMemoryWin32HandleKHR) vkGetDeviceProcAddr(device, "vkGetMemoryWin32HandleKHR");
-
-    if (!fpGetMemoryWin32HandleKHR)
-    {
-        RTC_LOG(LS_ERROR) << "Failed to retrieve vkGetMemoryWin32HandleKHR";
-        return nullptr;
-    }
-
-    VkResult result = fpGetMemoryWin32HandleKHR(device, &handleInfo, &handle);
+    VkResult result = vkGetMemoryWin32HandleKHR(device, &handleInfo, &handle);
     if (result != VK_SUCCESS)
     {
         RTC_LOG(LS_ERROR) << "vkGetMemoryWin32HandleKHR error" << result;

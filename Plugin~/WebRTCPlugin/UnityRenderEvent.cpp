@@ -13,6 +13,7 @@
 #include "GpuMemoryBufferPool.h"
 
 #if defined(SUPPORT_VULKAN)
+#include "UnityVulkanInterfaceFunctions.h"
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
 #endif
 
@@ -132,14 +133,12 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 #if defined(SUPPORT_VULKAN)
         if (renderer == kUnityGfxRendererVulkan)
         {
-            IUnityGraphicsVulkan* vulkan = s_UnityInterfaces->Get<IUnityGraphicsVulkan>();
-            if (vulkan != nullptr)
+            std::unique_ptr<UnityGraphicsVulkan> vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
+            UnityVulkanInstance instance = vulkan->Instance();
+            if (!LoadVulkanFunctions(instance))
             {
-                UnityVulkanInstance instance = vulkan->Instance();
-                if (!LoadVulkanFunctions(instance))
-                {
-                    return;
-                }
+                RTC_LOG(LS_INFO) << "LoadVulkanFunctions failed";
+                return;
             }
         }
 #endif
@@ -209,6 +208,7 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 }
 #endif
 
+
 // Unity plugin load event
 void PluginLoad(IUnityInterfaces* unityInterfaces)
 {
@@ -222,10 +222,10 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     s_clock.reset(Clock::GetRealTimeClock());
 
 #if defined(SUPPORT_VULKAN)
-    IUnityGraphicsVulkan* vulkan = unityInterfaces->Get<IUnityGraphicsVulkan>();
-    if(vulkan != nullptr)
+    auto vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
+    if (!vulkan->AddInterceptInitialization(InterceptVulkanInitialization, nullptr, 0))
     {
-        vulkan->InterceptInitialization(InterceptVulkanInitialization, nullptr);
+        RTC_LOG(LS_INFO) << "AddInterceptInitialization failed.";
     }
 #endif
 

@@ -16,7 +16,7 @@
 
 #if SUPPORT_OPENGL_CORE
 #include "GraphicsDevice/OpenGL/OpenGLContext.h"
-#include <GL/glut.h>
+#include <GLFW/glfw3.h>
 #include <sanitizer/lsan_interface.h>
 #endif
 
@@ -162,7 +162,7 @@ namespace webrtc
         return LoadGlobalVulkanFunction();
     }
 
-    int32_t GetPhysicalDeviceIndex(VkInstance instance, std::vector<VkPhysicalDevice>& list, bool* found)
+    int32_t GetPhysicalDeviceIndex(VkInstance instance, std::vector<VkPhysicalDevice>& list, bool findCudaDevice, bool* found)
     {
         std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
         for (size_t i = 0; i < list.size(); ++i)
@@ -173,7 +173,7 @@ namespace webrtc
                 continue;
             }
 #if CUDA_PLATFORM
-            if (CudaContext::FindCudaDevice(deviceUUID.data(), nullptr) != CUDA_SUCCESS)
+            if (findCudaDevice && CudaContext::FindCudaDevice(deviceUUID.data(), nullptr) != CUDA_SUCCESS)
             {
                 continue;
             }
@@ -261,8 +261,16 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
             return nullptr;
         }
+
+        if (!VulkanUtility::LoadInstanceFunctions(instance))
+        {
+            return nullptr;
+        }
+
         bool found = false;
-        int32_t physicalDeviceIndex = GetPhysicalDeviceIndex(instance, physicalDeviceList, &found);
+        // todo:: Add test pattern for HWA codecs.
+        bool findCudaDevice = false;
+        int32_t physicalDeviceIndex = GetPhysicalDeviceIndex(instance, physicalDeviceList, findCudaDevice, &found);
         if (!found)
         {
             RTC_LOG(LS_INFO) << "GetPhysicalDeviceIndex device not found.";
@@ -371,19 +379,25 @@ namespace webrtc
 
 #if SUPPORT_OPENGL_CORE
 
-    static bool s_glutInitialized;
-    static int s_window;
+    static bool s_glfwInitialized;
+    static GLFWwindow* s_window;
 
     void* CreateDeviceGLCore()
     {
-        if (!s_glutInitialized)
+        if (!s_glfwInitialized)
         {
-            int argc = 0;
-            glutInit(&argc, nullptr);
+            glfwInit();
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+            const GLuint kWidth = 320;
+            const GLuint kHeight = 240;
             __lsan_disable();
-            s_window = glutCreateWindow("test");
+            s_window = glfwCreateWindow(kWidth, kHeight, "test", nullptr, nullptr);
             __lsan_enable();
-            s_glutInitialized = true;
+            glfwMakeContextCurrent(s_window);
+            s_glfwInitialized = true;
         }
         OpenGLContext::Init();
         std::unique_ptr<OpenGLContext> context = OpenGLContext::CreateGLContext();
@@ -394,6 +408,10 @@ namespace webrtc
     {
         OpenGLContext* context = static_cast<OpenGLContext*>(pGfxDevice);
         delete context;
+
+        glfwSetWindowShouldClose(s_window, GL_TRUE);
+        glfwTerminate();
+        s_glfwInitialized = false;
     }
 #endif
 

@@ -65,6 +65,7 @@ private:
     uint32_t m_queueFamilyIndex;
     VkAllocationCallbacks* m_allocator;
 #if CUDA_PLATFORM
+    bool InitCudaContext();
     VkInstance m_instance;
     CudaContext m_cudaContext;
     bool m_isCudaSupport;
