@@ -375,14 +375,7 @@ namespace Unity.WebRTC.RuntimeTest
             instance.Dispose();
         }
 
-        // todo(kazuki):There are bugs some platforms. Remove exclude platform.
         [UnityTest]
-        [UnityPlatform(exclude = new[] {
-            RuntimePlatform.LinuxEditor,
-            RuntimePlatform.LinuxPlayer,
-            RuntimePlatform.WindowsEditor,
-            RuntimePlatform.WindowsPlayer,
-        })]
         public IEnumerator CallVideoEncoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -428,16 +421,9 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.GetUpdateTextureFunc(IntPtr.Zero);
         }
 
-        // todo(kazuki):There are bugs some platforms. Remove exclude platform.
         [UnityTest]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoDecoderMethods.UpdateRendererTexture is not supported on Direct3D12.")]
-        [UnityPlatform(exclude = new[] {
-            RuntimePlatform.LinuxEditor,
-            RuntimePlatform.LinuxPlayer,
-            RuntimePlatform.WindowsEditor,
-            RuntimePlatform.WindowsPlayer,
-        })]
         public IEnumerator CallVideoDecoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);
