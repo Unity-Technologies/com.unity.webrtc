@@ -2,7 +2,6 @@
 
 #include "GpuMemoryBufferPool.h"
 
-#include "media/base/video_common.h"
 #include "rtc_base/ref_counted_object.h"
 #include "system_wrappers/include/clock.h"
 

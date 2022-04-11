@@ -89,6 +89,13 @@ if(iOS OR macOS)
   )
 endif()
 
+if(Linux)
+  target_sources(WebRTCLib
+    PRIVATE
+      X11.h
+    )
+endif()
+
 if(Android)
   add_subdirectory(Android)
 endif()
