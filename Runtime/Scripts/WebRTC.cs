@@ -466,6 +466,23 @@ namespace Unity.WebRTC
                 return new RTCError {errorType = RTCErrorType.None};
             }
 
+            const int maxPixelCount = 3840 * 2160;
+
+            // Using codec is determined when the Encoder initialization process.
+            // Therefore, it is not possible to limit the resolution before that. (supported resolutions depend on the codec and its profile.)
+            // For workaround, all 4k resolutions and above are considered as errors.
+            // (Because under 4k resolution is almost supported by the supported codecs.)
+            // todo: Resize the texture size when encoder initialization process, or fall back to another encoder.
+            if (width * height > maxPixelCount)
+            {
+                return new RTCError
+                {
+                    errorType = RTCErrorType.InvalidRange,
+                    message = $"Texture pixel count is invalid. " +
+                              $"width:{width} x height:{height} is over 4k pixel count ({maxPixelCount})."
+                };
+            }
+
             // Check NVCodec capabilities
             // todo(kazuki):: The constant values should be replaced by values that are got from NvCodec API.
             // Use "nvEncGetEncodeCaps" function which is provided by the NvCodec API.
