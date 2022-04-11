@@ -5,10 +5,6 @@
 #if SUPPORT_OPENGL_ES
 #include <EGL/egl.h>
 #endif
-#if SUPPORT_OPENGL_CORE && UNITY_LINUX
-#include <X11/Xlib.h>
-#include <glad/glx.h>
-#endif
 
 namespace unity
 {

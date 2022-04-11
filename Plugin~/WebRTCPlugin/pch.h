@@ -78,6 +78,7 @@
 #endif
 
 #if SUPPORT_OPENGL_CORE
+#include "X11.h"
 #include <glad/gl.h>
 #include <glad/glx.h>
 #endif
