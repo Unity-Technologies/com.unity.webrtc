@@ -128,14 +128,18 @@ namespace webrtc
         : context_(context)
         , format_(format)
     {
+        // Some NVIDIA GPUs have a limited Encode Session count.
+        // refer: https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new
+        // It consumes a session to check the encoder capability.
+        // Therefore, we check encoder capability only once in the constructor and cache it.
+        m_cachedSupportedFormats = SupportedNvEncoderCodecs(context_);
     }
     NvEncoderFactory::~NvEncoderFactory() = default;
 
     std::vector<SdpVideoFormat> NvEncoderFactory::GetSupportedFormats() const
     {
         // If NvCodec Encoder is not supported, return empty vector.
-        auto codecs = SupportedNvEncoderCodecs(context_);
-        if(codecs.empty())
+        if (m_cachedSupportedFormats.empty())
             return std::vector<SdpVideoFormat>();
 
         // In RTCRtpTransceiver.SetCodecPreferences, the codec passed must be supported by both encoder and decoder.

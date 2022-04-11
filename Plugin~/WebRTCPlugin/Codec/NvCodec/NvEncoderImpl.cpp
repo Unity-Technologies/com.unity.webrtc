@@ -79,17 +79,30 @@ namespace webrtc
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
         }
 
-        if (m_memoryType == CU_MEMORYTYPE_DEVICE)
+        // Some NVIDIA GPUs have a limited Encode Session count.
+        // We can't get the Session count, so catching NvEncThrow to avoid the crash.
+        // refer: https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new
+        try
         {
-            m_encoder = std::make_unique<NvEncoderCuda>(m_context, codec->width, codec->height, m_format, 0);
+            if (m_memoryType == CU_MEMORYTYPE_DEVICE)
+            {
+                m_encoder = std::make_unique<NvEncoderCuda>(m_context, codec->width, codec->height, m_format, 0);
+            }
+            else if (m_memoryType == CU_MEMORYTYPE_ARRAY)
+            {
+                m_encoder =
+                    std::make_unique<NvEncoderCudaWithCUarray>(m_context, codec->width, codec->height, m_format, 0);
+            }
+            else
+            {
+                RTC_CHECK_NOTREACHED();
+            }
         }
-        else if (m_memoryType == CU_MEMORYTYPE_ARRAY)
+        catch (const NVENCException& e)
         {
-            m_encoder = std::make_unique<NvEncoderCudaWithCUarray>(m_context, codec->width, codec->height, m_format, 0);
-        }
-        else
-        {
-            RTC_CHECK_NOTREACHED();
+            // todo: If Encoder initialization fails, need to notify for Managed side.
+            RTC_LOG(LS_ERROR) << "Failed Initialize NvEncoder " << e.what();
+            return WEBRTC_VIDEO_CODEC_ERROR;
         }
 
         m_bitrateAdjuster = std::make_unique<BitrateAdjuster>(0.5f, 0.95f);
