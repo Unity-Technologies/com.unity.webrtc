@@ -65,11 +65,26 @@ namespace Unity.WebRTC.RuntimeTest
         [TestCase(640, 360)]
         [TestCase(1280, 720)]
         [TestCase(1920, 1080)]
+        [TestCase(3840, 2160)]
+        [TestCase(360, 640)]
+        [TestCase(720, 1280)]
+        [TestCase(1080, 1920)]
+        [TestCase(2160, 3840)]
         public void ValidateTextureSize(int width, int height)
         {
             var platform = Application.platform;
             var error = WebRTC.ValidateTextureSize(width, height, platform);
             Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
+        }
+
+        [Test]
+        [TestCase(2500, 3500)]
+        [TestCase(4000, 4000)]
+        public void ErrorOnValidateTextureSize(int width, int height)
+        {
+            var platform = Application.platform;
+            var error = WebRTC.ValidateTextureSize(width, height, platform);
+            Assert.That(error.errorType, Is.EqualTo(RTCErrorType.InvalidRange));
         }
 
         [Test]
