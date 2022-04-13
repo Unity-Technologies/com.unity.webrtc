@@ -309,7 +309,9 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
                     s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
                 source->OnFrameCaptured(std::move(frame));
             }
+
             s_bufferPool->ReleaseStaleBuffers(timestamp);
+
             return;
         }
         default: {

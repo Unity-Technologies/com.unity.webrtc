@@ -71,8 +71,6 @@ namespace webrtc
         RTC_DCHECK(result != resourcesPool_.end());
         
         (*result)->MarkUnused(clock_->CurrentTime());
-
-      //  ReleaseStaleBuffers(clock_->CurrentTime());
     }
 
     void GpuMemoryBufferPool::ReleaseStaleBuffers(Timestamp now)
