@@ -397,10 +397,11 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public static IEnumerator Update()
         {
+            var wait = new WaitForEndOfFrame();
             while (true)
             {
                 // Wait until all frame rendering is done
-                yield return new WaitForEndOfFrame();
+                yield return wait;
                 {
                     foreach (var reference in VideoStreamTrack.s_tracks.Values)
                     {
@@ -1120,6 +1121,8 @@ namespace Unity.WebRTC
         public static extern IntPtr StatsMemberGetDoubleArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoTrackSourceSetData(IntPtr source, IntPtr texture, int width, int height, GraphicsFormat format);
     }
 
     internal static class VideoEncoderMethods

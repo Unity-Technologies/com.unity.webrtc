@@ -254,48 +254,32 @@ void PluginUnload()
     s_clock.reset();
 }
 
-// Data format used by the managed code.
-// CommandBuffer.IssuePluginEventAndData method pass data packed by this format. 
-struct EncodeData
-{
-    void* texture;
-    UnityVideoTrackSource* source;
-    int width;
-    int height;
-    UnityRenderingExtTextureFormat format;
-};
-
 // Notice: When DebugLog is used in a method called from RenderingThread, 
 // it hangs when attempting to leave PlayMode and re-enter PlayMode.
 // So, we comment out `DebugLog`.
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
-    if (s_context == nullptr)
-        return;
+    RTC_DCHECK(s_context);
     if (!ContextManager::GetInstance()->Exists(s_context))
+    {
+        RTC_LOG(LS_INFO) << "webrtc context has been destroyed.";
         return;
+    }
     std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
     if(!lock.owns_lock())
         return;
 
-    EncodeData* encodeData =
-        static_cast<EncodeData*>(data);
-
-    RTC_DCHECK_GT(encodeData->width, 0);
-    RTC_DCHECK_GT(encodeData->height, 0);
-
-    const VideoStreamRenderEventID event =
-        static_cast<VideoStreamRenderEventID>(eventID);
-
+    const VideoStreamRenderEventID event = static_cast<VideoStreamRenderEventID>(eventID);
 
     switch(event)
     {
         case VideoStreamRenderEventID::Encode:
         {
-            UnityVideoTrackSource* source = encodeData->source;
+            UnityVideoTrackSource* source = static_cast<UnityVideoTrackSource*>(data);
             if (source == nullptr)
                 return;
+            const UnityVideoTrackSource::EncodeData* encodeData = source->encodeData();
             Timestamp timestamp = s_clock->CurrentTime();
             IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
             UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
@@ -304,10 +288,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             Size size(encodeData->width, encodeData->height);
             {
                 ScopedProfiler profiler(*s_MarkerEncode);
-
-                auto frame =
-                    s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
-                source->OnFrameCaptured(std::move(frame));
+                auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
+                source->OnFrameCaptured(frame);
             }
             return;
         }

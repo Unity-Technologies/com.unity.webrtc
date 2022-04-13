@@ -336,6 +336,11 @@ extern "C"
         return track->GetSource();
     }
 
+    UNITY_INTERFACE_EXPORT void VideoTrackSourceSetData(UnityVideoTrackSource* source, void* texture, int width, int height, UnityRenderingExtTextureFormat format)
+    {
+        source->SetEncodeData(texture, width, height, format);
+    }
+
     UNITY_INTERFACE_EXPORT TrackKind MediaStreamTrackGetKind(MediaStreamTrackInterface* track)
     {
         const auto kindStr = track->kind();

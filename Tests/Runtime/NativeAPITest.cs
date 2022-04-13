@@ -394,13 +394,11 @@ namespace Unity.WebRTC.RuntimeTest
             var callback = NativeMethods.GetRenderEventFunc(context);
             yield return new WaitForSeconds(1.0f);
 
-            VideoTrackSource.EncodeData data = new VideoTrackSource.EncodeData(renderTexture, source);
-            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoTrackSource.EncodeData)));
-            Marshal.StructureToPtr(data, ptr, true);
-            VideoEncoderMethods.Encode(callback, ptr);
+            NativeMethods.VideoTrackSourceSetData(source, renderTexture.GetNativeTexturePtr(), renderTexture.width,
+                renderTexture.height, renderTexture.graphicsFormat);
+            VideoEncoderMethods.Encode(callback, source);
             yield return new WaitForSeconds(1.0f);
 
-            Marshal.FreeHGlobal(ptr);
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
@@ -442,10 +440,9 @@ namespace Unity.WebRTC.RuntimeTest
 
             yield return new WaitForSeconds(1.0f);
 
-            VideoTrackSource.EncodeData data = new VideoTrackSource.EncodeData(renderTexture, source);
-            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoTrackSource.EncodeData)));
-            Marshal.StructureToPtr(data, ptr, true);
-            VideoEncoderMethods.Encode(renderEvent, ptr);
+            NativeMethods.VideoTrackSourceSetData(source, renderTexture.GetNativeTexturePtr(), renderTexture.width,
+                renderTexture.height, renderTexture.graphicsFormat);
+            VideoEncoderMethods.Encode(renderEvent, source);
             yield return new WaitForSeconds(1.0f);
 
             // this method is not supported on Direct3D12
@@ -454,7 +451,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             yield return new WaitForSeconds(1.0f);
 
-            Marshal.FreeHGlobal(ptr);
+//            Marshal.FreeHGlobal(ptr);
             NativeMethods.VideoTrackRemoveSink(track, renderer);
             NativeMethods.DeleteVideoRenderer(context, renderer);
             NativeMethods.ContextDeleteRefPtr(context, track);

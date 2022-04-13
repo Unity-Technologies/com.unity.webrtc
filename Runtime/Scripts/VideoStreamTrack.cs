@@ -200,32 +200,12 @@ namespace Unity.WebRTC
 
     internal class VideoTrackSource : RefCountedObject
     {
-        public struct EncodeData
-        {
-            public IntPtr ptrTexture;
-            public IntPtr ptrTrackSource;
-            public int width;
-            public int height;
-            public GraphicsFormat format;
-
-            public EncodeData(Texture texture, IntPtr ptrSource)
-            {
-                ptrTexture = texture.GetNativeTexturePtr();
-                ptrTrackSource = ptrSource;
-                width = texture.width;
-                height = texture.height;
-                format = texture.graphicsFormat;
-            }
-        }
-
-        IntPtr ptr_ = IntPtr.Zero;
-        EncodeData data_;
+        Texture prev_;
 
         public VideoTrackSource()
             : base(WebRTC.Context.CreateVideoTrackSource())
         {
             WebRTC.Table.Add(self, this);
-            ptr_ = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EncodeData)));
         }
 
         ~VideoTrackSource()
@@ -236,13 +216,29 @@ namespace Unity.WebRTC
         public void Update(Texture texture)
         {
             if (texture == null)
-                Debug.LogError("texture is null");
-            if (data_.ptrTexture != texture.GetNativeTexturePtr())
             {
-                data_ = new EncodeData(texture, self);
-                Marshal.StructureToPtr(data_, ptr_, true);
+                Debug.LogError("texture is null");
+                return;
             }
-            WebRTC.Context.Encode(ptr_);
+
+            if (prev_ != texture)
+            {
+                SetData(texture);
+                prev_ = texture;
+            }
+
+            WebRTC.Context.Encode(self);
+        }
+
+        void SetData(Texture texture)
+        {
+            NativeMethods.VideoTrackSourceSetData(
+                self,
+                texture.GetNativeTexturePtr(),
+                texture.width,
+                texture.height,
+                texture.graphicsFormat
+            );
         }
 
         public override void Dispose()
@@ -251,9 +247,6 @@ namespace Unity.WebRTC
             {
                 return;
             }
-
-            if(ptr_ != IntPtr.Zero)
-                Marshal.FreeHGlobal(ptr_);
 
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {

@@ -15,7 +15,15 @@ using namespace ::webrtc;
 class UnityVideoTrackSource :
     public rtc::AdaptedVideoTrackSource
 {
-    public:
+public:
+    struct EncodeData
+    {
+        void* texture;
+        size_t width;
+        size_t height;
+        UnityRenderingExtTextureFormat format;
+    };
+
         //struct FrameAdaptationParams
         //{
         //    bool should_drop_frame;
@@ -32,6 +40,15 @@ class UnityVideoTrackSource :
         absl::optional<bool> needs_denoising);
     ~UnityVideoTrackSource() override;
 
+    const EncodeData* encodeData() const { return &encodeData_; }
+    void SetEncodeData(void* texture, int width, int height, UnityRenderingExtTextureFormat format)
+    {
+        encodeData_.texture = texture;
+        encodeData_.width = width;
+        encodeData_.height = height;
+        encodeData_.format = format;
+    }
+    
     SourceState state() const override;
 
     bool remote() const override;
@@ -65,6 +82,7 @@ private:
 
     // State for the timestamp translation.
     rtc::TimestampAligner timestamp_aligner_;
+    EncodeData encodeData_;
 
     const bool is_screencast_;
     const absl::optional<bool> needs_denoising_;
