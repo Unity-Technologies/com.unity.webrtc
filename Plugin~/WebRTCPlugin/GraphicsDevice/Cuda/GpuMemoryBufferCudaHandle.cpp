@@ -20,18 +20,39 @@ namespace webrtc
 
     GpuMemoryBufferCudaHandle::~GpuMemoryBufferCudaHandle()
     {
+        CUresult result;
         if (externalMemory != nullptr)
         {
-            cuDestroyExternalMemory(externalMemory);
+            result = cuDestroyExternalMemory(externalMemory);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuDestroyExternalMemory CUresult: " << result;
+                throw;
+            }
         }
         if (resource != nullptr)
         {
-            cuGraphicsUnmapResources(1, &resource, 0);
-            cuGraphicsUnregisterResource(resource);
+            result = cuGraphicsUnmapResources(1, &resource, 0);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuGraphicsUnmapResources CUresult: " << result;
+                throw;
+            }
+            result = cuGraphicsUnregisterResource(resource);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuGraphicsUnregisterResource CUresult: " << result;
+                throw;
+            }
         }
         if (array != nullptr)
         {
             cuArrayDestroy(array);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuArrayDestroy CUresult: " << result;
+                throw;
+            }
         }
     }
 }

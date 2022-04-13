@@ -72,7 +72,7 @@ namespace webrtc
         
         (*result)->MarkUnused(clock_->CurrentTime());
 
-        ReleaseStaleBuffers(clock_->CurrentTime());
+      //  ReleaseStaleBuffers(clock_->CurrentTime());
     }
 
     void GpuMemoryBufferPool::ReleaseStaleBuffers(Timestamp now)
