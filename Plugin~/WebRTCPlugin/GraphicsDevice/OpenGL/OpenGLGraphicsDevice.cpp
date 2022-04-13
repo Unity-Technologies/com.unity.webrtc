@@ -298,6 +298,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
         cuCtxPopCurrent(NULL);
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = GetCUcontext();
         handle->mappedArray = mappedArray;
         handle->resource = resource;
         return handle;

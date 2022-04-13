@@ -14,6 +14,7 @@ namespace webrtc
         GpuMemoryBufferCudaHandle& operator=(GpuMemoryBufferCudaHandle&& other);
         virtual ~GpuMemoryBufferCudaHandle();
 
+        CUcontext context;
         CUarray array;
         CUarray mappedArray;
         CUdeviceptr mappedPtr;

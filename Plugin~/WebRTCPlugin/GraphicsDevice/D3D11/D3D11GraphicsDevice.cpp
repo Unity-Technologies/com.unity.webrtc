@@ -189,6 +189,7 @@ rtc::scoped_refptr<I420Buffer> D3D11GraphicsDevice::ConvertRGBToI420(ITexture2D*
         cuCtxPopCurrent(NULL);
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = GetCUcontext();
         handle->mappedArray = mappedArray;
         handle->resource = resource;
         return handle;

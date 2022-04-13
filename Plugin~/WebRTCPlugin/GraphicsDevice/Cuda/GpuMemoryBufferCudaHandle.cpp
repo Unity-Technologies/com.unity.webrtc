@@ -7,7 +7,8 @@ namespace unity
 namespace webrtc
 {
     GpuMemoryBufferCudaHandle::GpuMemoryBufferCudaHandle()
-        : array(nullptr)
+        : context(nullptr)
+        , array(nullptr)
         , mappedArray(nullptr)
         , mappedPtr(0)
         , resource(nullptr)
@@ -20,6 +21,8 @@ namespace webrtc
 
     GpuMemoryBufferCudaHandle::~GpuMemoryBufferCudaHandle()
     {
+        cuCtxPushCurrent(context);
+
         CUresult result;
         if (externalMemory != nullptr)
         {
@@ -54,6 +57,8 @@ namespace webrtc
                 throw;
             }
         }
+
+        cuCtxPopCurrent(NULL);
     }
 }
 }

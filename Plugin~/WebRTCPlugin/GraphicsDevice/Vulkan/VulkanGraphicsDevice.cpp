@@ -337,6 +337,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(
         cuCtxPopCurrent(NULL);
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = GetCUcontext();
         handle->mappedArray = array;
         handle->externalMemory = externalMemory;
         return handle;
