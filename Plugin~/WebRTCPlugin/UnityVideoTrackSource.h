@@ -19,8 +19,8 @@ public:
     struct EncodeData
     {
         void* texture;
-        size_t width;
-        size_t height;
+        int width;
+        int height;
         UnityRenderingExtTextureFormat format;
     };
 
