@@ -30,7 +30,6 @@ namespace webrtc
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "faild cuDestroyExternalMemory CUresult: " << result;
-                throw;
             }
         }
         if (resource != nullptr)
@@ -39,22 +38,19 @@ namespace webrtc
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "faild cuGraphicsUnmapResources CUresult: " << result;
-                throw;
             }
             result = cuGraphicsUnregisterResource(resource);
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "faild cuGraphicsUnregisterResource CUresult: " << result;
-                throw;
             }
         }
         if (array != nullptr)
         {
-            cuArrayDestroy(array);
+            result = cuArrayDestroy(array);
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "faild cuArrayDestroy CUresult: " << result;
-                throw;
             }
         }
 
