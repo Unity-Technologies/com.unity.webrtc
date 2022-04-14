@@ -282,6 +282,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     EncodeData* encodeData =
         static_cast<EncodeData*>(data);
 
+    RTC_DCHECK(encodeData->texture);
+    RTC_DCHECK(encodeData->source);
     RTC_DCHECK_GT(encodeData->width, 0);
     RTC_DCHECK_GT(encodeData->height, 0);
 
@@ -294,8 +296,6 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         case VideoStreamRenderEventID::Encode:
         {
             UnityVideoTrackSource* source = encodeData->source;
-            if (source == nullptr)
-                return;
             Timestamp timestamp = s_clock->CurrentTime();
             IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
             UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();

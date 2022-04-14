@@ -200,7 +200,8 @@ namespace Unity.WebRTC
 
     internal class VideoTrackSource : RefCountedObject
     {
-        public struct EncodeData
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct EncodeData
         {
             public IntPtr ptrTexture;
             public IntPtr ptrTrackSource;
