@@ -6,6 +6,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
@@ -638,9 +639,19 @@ namespace Unity.WebRTC
             }
             return false;
         }
-        internal static void DestroyOnMainThread(UnityEngine.Object obj)
+        internal static void DestroyOnMainThread(UnityEngine.Object obj, float delay = 0f)
         {
-            s_syncContext.Post(DestroyImmediate, obj);
+            if (delay < 0f)
+                throw new ArgumentException($"The delay value is smaller than zero. delay:{delay}");
+            if(Mathf.Approximately(delay, 0f))
+                s_syncContext.Post(DestroyImmediate, obj);
+            else
+                s_syncContext.Post(Destroy, Tuple.Create(obj, delay));
+        }
+
+        internal static void DelayActionOnMainThread(Action callback, float delay)
+        {
+            s_syncContext.Post(DelayAction, Tuple.Create(callback, delay));
         }
 
         internal static void Sync(IntPtr ptr, Action callback)
@@ -666,6 +677,23 @@ namespace Unity.WebRTC
         {
             var obj = state as UnityEngine.Object;
             UnityEngine.Object.DestroyImmediate(obj);
+        }
+
+        static void Destroy(object state)
+        {
+            (UnityEngine.Object obj, float delay)  = state as Tuple<UnityEngine.Object, float>;
+            UnityEngine.Object.Destroy(obj, delay);
+        }
+
+        static void DelayAction(object state)
+        {
+            (Action callback, float delay)  = state as Tuple<Action, float>;
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                int milliseconds = (int)(delay * 1000f);
+                Thread.Sleep(milliseconds);
+                callback();
+            });
         }
 
 
