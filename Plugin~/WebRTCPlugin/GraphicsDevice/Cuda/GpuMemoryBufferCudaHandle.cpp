@@ -7,7 +7,8 @@ namespace unity
 namespace webrtc
 {
     GpuMemoryBufferCudaHandle::GpuMemoryBufferCudaHandle()
-        : array(nullptr)
+        : context(nullptr)
+        , array(nullptr)
         , mappedArray(nullptr)
         , mappedPtr(0)
         , resource(nullptr)
@@ -20,19 +21,40 @@ namespace webrtc
 
     GpuMemoryBufferCudaHandle::~GpuMemoryBufferCudaHandle()
     {
+        cuCtxPushCurrent(context);
+
+        CUresult result;
         if (externalMemory != nullptr)
         {
-            cuDestroyExternalMemory(externalMemory);
+            result = cuDestroyExternalMemory(externalMemory);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuDestroyExternalMemory CUresult: " << result;
+            }
         }
         if (resource != nullptr)
         {
-            cuGraphicsUnmapResources(1, &resource, 0);
-            cuGraphicsUnregisterResource(resource);
+            result = cuGraphicsUnmapResources(1, &resource, 0);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuGraphicsUnmapResources CUresult: " << result;
+            }
+            result = cuGraphicsUnregisterResource(resource);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuGraphicsUnregisterResource CUresult: " << result;
+            }
         }
         if (array != nullptr)
         {
-            cuArrayDestroy(array);
+            result = cuArrayDestroy(array);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "faild cuArrayDestroy CUresult: " << result;
+            }
         }
+
+        cuCtxPopCurrent(NULL);
     }
 }
 }

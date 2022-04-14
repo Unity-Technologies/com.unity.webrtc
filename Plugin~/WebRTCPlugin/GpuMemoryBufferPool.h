@@ -18,6 +18,7 @@ namespace webrtc
 
         rtc::scoped_refptr<VideoFrame>
         CreateFrame(NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp);
+        void ReleaseStaleBuffers(Timestamp timestamp);
 
         size_t bufferCount() { return resourcesPool_.size(); }
 
@@ -48,10 +49,6 @@ namespace webrtc
         rtc::scoped_refptr<GpuMemoryBufferInterface>
         GetOrCreateFrameResources(NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format);
         void OnReturnBuffer(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer);
-
-        // define friend class for test
-        friend class GpuMemoryBufferPoolTest;
-        void ReleaseStaleBuffers(Timestamp timestamp);
 
         static bool AreFrameResourcesCompatible(
             const FrameResources* resources, const Size& size, UnityRenderingExtTextureFormat format);
