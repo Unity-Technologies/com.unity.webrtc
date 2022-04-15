@@ -105,6 +105,7 @@ bool D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     ComPtr<ID3D11DeviceContext> context;
     m_d3d11Device->GetImmediateContext(context.GetAddressOf());
     context->CopyResource(nativeDest, nativeSrc);
+    context->Flush();
     return true;
 }
 
@@ -120,6 +121,7 @@ bool D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
     ComPtr<ID3D11DeviceContext> context;
     m_d3d11Device->GetImmediateContext(context.GetAddressOf());
     context->CopyResource(nativeDest, nativeSrc);
+    context->Flush();
     return true;
 }
 
