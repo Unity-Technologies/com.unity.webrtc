@@ -681,7 +681,13 @@ namespace Unity.WebRTC
 
         static void Destroy(object state)
         {
-            (UnityEngine.Object obj, float delay)  = state as Tuple<UnityEngine.Object, float>;
+            (UnityEngine.Object obj, float delay) = state as Tuple<UnityEngine.Object, float>;
+
+            if (!Application.isPlaying)
+            {
+                UnityEngine.Object.DestroyImmediate(obj);
+                return;
+            }
             UnityEngine.Object.Destroy(obj, delay);
         }
 
