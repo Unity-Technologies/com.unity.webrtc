@@ -142,8 +142,11 @@ namespace Unity.WebRTC
                 }
 
                 m_sourceTexture = null;
+
                 // Unity API must be called from main thread.
-                WebRTC.DestroyOnMainThread(m_destTexture);
+                // This texture is referred from the rendering thread,
+                // so set the delay 100ms to wait the task of another thread.
+                WebRTC.DestroyOnMainThread(m_destTexture, 0.1f);
 
                 m_renderer?.Dispose();
                 m_source?.Dispose();
@@ -200,7 +203,8 @@ namespace Unity.WebRTC
 
     internal class VideoTrackSource : RefCountedObject
     {
-        public struct EncodeData
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct EncodeData
         {
             public IntPtr ptrTexture;
             public IntPtr ptrTrackSource;
@@ -220,6 +224,7 @@ namespace Unity.WebRTC
 
         IntPtr ptr_ = IntPtr.Zero;
         EncodeData data_;
+        Texture prevTexture_;
 
         public VideoTrackSource()
             : base(WebRTC.Context.CreateVideoTrackSource())
@@ -237,10 +242,14 @@ namespace Unity.WebRTC
         {
             if (texture == null)
                 Debug.LogError("texture is null");
-            if (data_.ptrTexture != texture.GetNativeTexturePtr())
+
+            // todo:: This comparison is not sufficiency but it is for workaround of freeze bug.
+            // Texture.GetNativeTexturePtr method freezes Unity Editor on apple silicon.
+            if (prevTexture_ != texture)
             {
                 data_ = new EncodeData(texture, self);
                 Marshal.StructureToPtr(data_, ptr_, true);
+                prevTexture_ = texture;
             }
             WebRTC.Context.Encode(ptr_);
         }
@@ -252,8 +261,15 @@ namespace Unity.WebRTC
                 return;
             }
 
-            if(ptr_ != IntPtr.Zero)
-                Marshal.FreeHGlobal(ptr_);
+            if (ptr_ != IntPtr.Zero)
+            {
+                // This buffer is referred from the rendering thread,
+                // so set the delay 100ms to wait the task of another thread.
+                WebRTC.DelayActionOnMainThread(() =>
+                {
+                    Marshal.FreeHGlobal(ptr_);
+                }, 0.1f);
+            }
 
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {

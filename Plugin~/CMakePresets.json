@@ -221,11 +221,27 @@
     {
       "name": "release-android",
       "displayName": "Build Release",
-      "description": "Release build for Linux",
+      "description": "Release build for Android",
       "configurePreset": "arm64-android",
       "configuration": "Release",
       "cleanFirst": true
-    }
+    },
+    {
+      "name": "debug-ios",
+      "displayName": "Build Debug",
+      "description": "Debug build for iOS",
+      "configurePreset": "ios",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-ios",
+      "displayName": "Build Release",
+      "description": "Release build for iOS",
+      "configurePreset": "ios",
+      "configuration": "Release",
+      "cleanFirst": true
+    }    
   ],
   "testPresets": [
     {
