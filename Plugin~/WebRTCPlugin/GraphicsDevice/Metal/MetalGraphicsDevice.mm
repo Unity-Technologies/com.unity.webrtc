@@ -90,9 +90,11 @@ namespace webrtc
              destinationLevel:0
             destinationOrigin:outTxtOrigin];
 
+#if TARGET_OS_OSX
         // must be explicitly synchronized if the storageMode is Managed.
         if (dest.storageMode == MTLStorageModeManaged)
             [blit synchronizeResource:dest];
+#endif            
         [blit endEncoding];
         [commandBuffer commit];
         
