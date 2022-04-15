@@ -22,7 +22,11 @@ namespace webrtc
         {
             return device_;
         }
-        id<MTLCommandBuffer> CurrentCommandEncoder() override
+        id<MTLCommandBuffer> CurrentCommandBuffer() override
+        {
+            return nullptr;
+        }
+        id<MTLCommandEncoder> CurrentCommandEncoder() override
         {
             return nullptr;
         }
@@ -46,9 +50,13 @@ namespace webrtc
         {
             return graphics_->MetalDevice();
         }
-        id<MTLCommandBuffer> CurrentCommandEncoder() override
+        id<MTLCommandBuffer> CurrentCommandBuffer() override
         {
             return graphics_->CurrentCommandBuffer();
+        }
+        id<MTLCommandEncoder> CurrentCommandEncoder() override
+        {
+            return graphics_->CurrentCommandEncoder();
         }
         void EndCurrentCommandEncoder() override
         {

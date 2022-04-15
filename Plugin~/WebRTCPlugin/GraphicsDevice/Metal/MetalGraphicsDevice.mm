@@ -20,6 +20,7 @@ namespace webrtc
 
     bool MetalGraphicsDevice::InitV()
     {
+        m_queue = [m_device->Device() newCommandQueue];
         return true;
     }
 
@@ -69,10 +70,9 @@ namespace webrtc
         RTC_DCHECK_EQ(src.height, dest.height);
 
         m_device->EndCurrentCommandEncoder();
-
-        id<MTLCommandBuffer> commandBuffer = m_device->CurrentCommandEncoder();
-        id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         
+        id<MTLCommandBuffer> commandBuffer = [m_queue commandBuffer];
+        id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         NSUInteger width = src.width;
         NSUInteger height = src.height;
 
@@ -81,23 +81,21 @@ namespace webrtc
         MTLOrigin outTxtOrigin = MTLOriginMake(0, 0, 0);
 
         [blit copyFromTexture:src
-                        sourceSlice:0
-                        sourceLevel:0
-                        sourceOrigin:inTxtOrigin
-                        sourceSize:inTxtSize
-                        toTexture:dest
-                        destinationSlice:0
-                        destinationLevel:0
-                        destinationOrigin:outTxtOrigin];
-        
-        //[TODO-sin: 2019-12-18] We don't need this if we are not using software encoding
-#if TARGET_OS_OSX
-        [blit synchronizeResource:dest];
-#endif
-        [blit endEncoding];
-        blit = nil;
-        m_device->EndCurrentCommandEncoder();
+                  sourceSlice:0
+                  sourceLevel:0
+                 sourceOrigin:inTxtOrigin
+                   sourceSize:inTxtSize
+                    toTexture:dest
+             destinationSlice:0
+             destinationLevel:0
+            destinationOrigin:outTxtOrigin];
 
+        // must be explicitly synchronized if the storageMode is Managed.
+        if (dest.storageMode == MTLStorageModeManaged)
+            [blit synchronizeResource:dest];
+        [blit endEncoding];
+        [commandBuffer commit];
+        
         return true;
     }
 

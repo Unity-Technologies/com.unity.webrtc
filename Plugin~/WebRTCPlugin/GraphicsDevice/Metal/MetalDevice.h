@@ -17,7 +17,8 @@ namespace webrtc
 
         virtual ~MetalDevice() { }
         virtual id<MTLDevice> Device() = 0;
-        virtual id<MTLCommandBuffer> CurrentCommandEncoder() = 0;
+        virtual id<MTLCommandBuffer> CurrentCommandBuffer() = 0;
+        virtual id<MTLCommandEncoder> CurrentCommandEncoder() = 0;
         virtual void EndCurrentCommandEncoder() = 0;
     };
 } // end namespace webrtc
