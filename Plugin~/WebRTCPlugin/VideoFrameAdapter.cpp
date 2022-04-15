@@ -40,6 +40,11 @@ namespace webrtc
         return parent_->GetOrCreateFrameBufferForSize(Size(width_, height_))->ToI420();
     }
 
+    const I420BufferInterface* VideoFrameAdapter::ScaledBuffer::GetI420() const
+    {
+        return parent_->GetOrCreateFrameBufferForSize(Size(width_, height_))->GetI420();
+    }
+
     rtc::scoped_refptr<VideoFrameBuffer>
     VideoFrameAdapter::ScaledBuffer::GetMappedFrameBuffer(rtc::ArrayView<VideoFrameBuffer::Type> types)
     {
@@ -92,13 +97,26 @@ namespace webrtc
 
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::GetOrCreateFrameBufferForSize(const Size& size)
     {
-        return VideoFrameBuffer::CropAndScale(0, 0, width(), height(), size.width(), size.height());
+        std::unique_lock<std::mutex> guard(scaleLock_);
+
+        for(auto scaledI420buffer : scaledI40Buffers_)
+        {
+            Size bufferSize(scaledI420buffer->width(), scaledI420buffer->height());
+            if(size == bufferSize)
+            {
+                return scaledI420buffer;
+            }
+        }
+        auto buffer = VideoFrameBuffer::CropAndScale(0, 0, width(), height(), size.width(), size.height());
+        scaledI40Buffers_.push_back(buffer);
+        RTC_LOG(LS_INFO) << "size.width:" << size.width() << " size.height:" << size.height();
+        return buffer;
     }
 
     rtc::scoped_refptr<I420BufferInterface>
     VideoFrameAdapter::ConvertToVideoFrameBuffer(rtc::scoped_refptr<VideoFrame> video_frame) const
     {
-        std::unique_lock<std::mutex> guard(frameLock_);
+        std::unique_lock<std::mutex> guard(convertLock_);
         if (i420Buffer_)
             return i420Buffer_;
 
