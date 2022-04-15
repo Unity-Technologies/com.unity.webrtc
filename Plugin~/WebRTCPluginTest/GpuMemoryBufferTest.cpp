@@ -71,12 +71,25 @@ namespace webrtc
         EXPECT_EQ(buffer2->width(), kSize2.width());
         EXPECT_EQ(buffer2->height(), kSize2.height());
 
-        auto i420Buffer = buffer2->ToI420();
+        // check ScaledBuffer::ToI420()
+        {
+            auto i420Buffer = buffer2->ToI420();
 
-        EXPECT_NE(i420Buffer, nullptr);
-        EXPECT_EQ(i420Buffer->type(), VideoFrameBuffer::Type::kI420);
-        EXPECT_EQ(i420Buffer->width(), kSize2.width());
-        EXPECT_EQ(i420Buffer->height(), kSize2.height());
+            EXPECT_NE(i420Buffer, nullptr);
+            EXPECT_EQ(i420Buffer->type(), VideoFrameBuffer::Type::kI420);
+            EXPECT_EQ(i420Buffer->width(), kSize2.width());
+            EXPECT_EQ(i420Buffer->height(), kSize2.height());
+        }
+        
+        // check ScaledBuffer::GetI420()
+        {
+            auto i420Buffer = buffer2->GetI420();
+
+            EXPECT_NE(i420Buffer, nullptr);
+            EXPECT_EQ(i420Buffer->type(), VideoFrameBuffer::Type::kI420);
+            EXPECT_EQ(i420Buffer->width(), kSize2.width());
+            EXPECT_EQ(i420Buffer->height(), kSize2.height());
+        }
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDevice, GpuMemoryBufferTest, testing::ValuesIn(supportedGfxDevices));
