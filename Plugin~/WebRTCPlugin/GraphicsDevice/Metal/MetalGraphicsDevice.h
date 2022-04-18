@@ -34,7 +34,7 @@ namespace webrtc
 
     private:
         MetalDevice* m_device;
-
+        id<MTLCommandQueue> m_queue;
         bool CopyTexture(id<MTLTexture> dest, id<MTLTexture> src);
         static MTLPixelFormat ConvertFormat(UnityRenderingExtTextureFormat format);
     };
