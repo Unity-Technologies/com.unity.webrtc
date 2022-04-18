@@ -4,11 +4,25 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.4.0-exp.7] - 2022-05-20
+
+### Added
+
+- Supported Unity 2021.3 LTS.
+- Added clang-format file.
+- Added CMakePresets.json file.
+- Supported NVIDIA decoder for H264 codec.
+- Added the codec selection option and video resolution option in the menu scene.
 
 ### Changed
 
+- Moved CPU loads of the color conversion from the rendering thread to the worker thread.
 - Upgraded NVIDIA Codec SDK 11.0.
+
+### Fixed
+
+- Removed unnecessary dependencies of the native plugin on Linux.
+
 
 ## [2.4.0-exp.6] - 2022-02-24
 
