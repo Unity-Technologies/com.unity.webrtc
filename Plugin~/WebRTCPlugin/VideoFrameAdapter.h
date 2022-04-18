@@ -33,7 +33,8 @@ namespace webrtc
             bool scaled() const final { return true; }
 
             rtc::scoped_refptr<webrtc::I420BufferInterface> ToI420() override;
-
+            const webrtc::I420BufferInterface* GetI420() const override;
+            
             rtc::scoped_refptr<webrtc::VideoFrameBuffer>
             GetMappedFrameBuffer(rtc::ArrayView<webrtc::VideoFrameBuffer::Type> types) override;
 
@@ -75,9 +76,11 @@ namespace webrtc
         // todo(kazuki):
         // Need this buffer because the type() method returns kI420.
         mutable rtc::scoped_refptr<I420BufferInterface> i420Buffer_;
+        std::vector<rtc::scoped_refptr<VideoFrameBuffer>> scaledI40Buffers_;
         const rtc::scoped_refptr<VideoFrame> frame_;
         const Size size_;
-        mutable std::mutex frameLock_;
+        mutable std::mutex scaleLock_;
+        mutable std::mutex convertLock_;
     };
 }
 }
