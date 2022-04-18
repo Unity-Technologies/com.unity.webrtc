@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #include "OpenGLTexture2D.h"
 #include "OpenGLContext.h"
@@ -17,6 +17,7 @@ namespace webrtc
 OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex, ReleaseOpenGLTextureCallback callback)
     : ITexture2D(w,h)
     , m_texture(tex)
+    , m_pbo(0)
     , m_callback(callback)
 {
       RTC_DCHECK(m_texture);
@@ -29,16 +30,21 @@ OpenGLTexture2D::~OpenGLTexture2D()
 
 void OpenGLTexture2D::Release()
 {
-    glDeleteTextures(1, &m_texture);
-    m_texture = 0;
+    if(glIsTexture(m_texture))
+    {
+        glDeleteTextures(1, &m_texture);
+    }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_pbo);
-    glDeleteBuffers(1, &m_pbo);
-    m_pbo = 0;
+    if(glIsBuffer(m_pbo))
+    {
+        glDeleteBuffers(1, &m_pbo);
+    }
 }
 
 void OpenGLTexture2D::CreatePBO()
 {
+    RTC_DCHECK_EQ(m_pbo, 0);
+
     glGenBuffers(1, &m_pbo);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
 
