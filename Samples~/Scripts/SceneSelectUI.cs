@@ -64,6 +64,11 @@ namespace Unity.WebRTC.Samples
             new Vector2Int(1920, 1080),
             new Vector2Int(2560, 1440),
             new Vector2Int(3840, 2160),
+            new Vector2Int(360, 640),
+            new Vector2Int(720, 1280),
+            new Vector2Int(1080, 1920),
+            new Vector2Int(1440, 2560),
+            new Vector2Int(2160, 3840),
         };
 
         private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
