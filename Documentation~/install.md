@@ -19,7 +19,7 @@ Input `webrtc` to the search box at the top of the Package Manager window.
 
 Click `Install` button at the bottom left of the window, and will start install the package.
 
-## Case of Unity 2020.3 and 2021.2
+## Case of Unity 2020.3 and 2021.3
 
 Select `Window/Package Manager` in the menu bar.
 
@@ -32,7 +32,7 @@ Check Package Manager window, Click `+` button and select `Add package from git 
 Input the string below to the input field.
 
 ```
-com.unity.webrtc@2.4.0-exp.6
+com.unity.webrtc@2.4.0-exp.7
 ```
 
 The list of version string is [here](https://github.com/Unity-Technologies/com.unity.webrtc/tags). In most cases, the latest version is recommended to use.
