@@ -137,7 +137,7 @@ static VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Hook_vkGetInstanceProcAddr(VkIns
     {
         return reinterpret_cast<PFN_vkVoidFunction>(&Hook_vkCreateDevice);
     }
-    return nullptr;
+    return vkGetInstanceProcAddr(instance, funcName);
 }
 
 PFN_vkGetInstanceProcAddr InterceptVulkanInitialization(
