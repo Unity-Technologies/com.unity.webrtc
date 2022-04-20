@@ -273,7 +273,6 @@ namespace Unity.WebRTC.Samples
             sourceAudio.loop = true;
             sourceAudio.Play();
             audioStreamTrack = new AudioStreamTrack(sourceAudio);
-            audioStreamTrack.Loopback = false;
         }
 
         private IEnumerator CaptureVideoStart()

@@ -13,6 +13,7 @@ namespace Unity.WebRTC
         [SerializeField] private AudioSource inputAudioSource;
         [SerializeField] private AudioSource outputAudioSource;
         [SerializeField] private Toggle toggleEnableMicrophone;
+        [SerializeField] private Toggle toggleLoopback;
         [SerializeField] private Dropdown dropdownAudioClips;
         [SerializeField] private Dropdown dropdownMicrophoneDevices;
         [SerializeField] private Dropdown dropdownAudioCodecs;
@@ -65,6 +66,8 @@ namespace Unity.WebRTC
 
             toggleEnableMicrophone.isOn = false;
             toggleEnableMicrophone.onValueChanged.AddListener(OnEnableMicrophone);
+            toggleEnableMicrophone.isOn = false;
+            toggleLoopback.onValueChanged.AddListener(OnChangeLoopback);
             dropdownAudioClips.interactable = true;
             dropdownAudioClips.options =
                 audioclipList.Select(clip => new Dropdown.OptionData(clip.name)).ToList();
@@ -158,6 +161,14 @@ namespace Unity.WebRTC
             dropdownAudioClips.interactable = !enable;
         }
 
+        void OnChangeLoopback(bool loopback)
+        {
+            if (m_audioTrack != null)
+            {
+                m_audioTrack.Loopback = loopback;
+            }
+        }
+
         void OnCall()
         {
             buttonCall.interactable = false;
@@ -185,7 +196,7 @@ namespace Unity.WebRTC
             transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
             m_audioTrack = new AudioStreamTrack(inputAudioSource);
-            m_audioTrack.Loopback = !toggleEnableMicrophone.isOn;
+            m_audioTrack.Loopback = toggleLoopback.isOn;
             _pc1.AddTrack(m_audioTrack, _sendStream);
 
             var transceiver1 = _pc1.GetTransceivers().First();

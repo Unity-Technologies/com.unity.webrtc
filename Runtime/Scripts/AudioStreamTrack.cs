@@ -119,6 +119,7 @@ namespace Unity.WebRTC
                 _filter = GetOrAddComponent<AudioCustomFilter>(source.gameObject);
                 _filter.hideFlags = HideFlags.HideInInspector;
                 _filter.onAudioRead += SetData;
+                _filter.sender = false;
                 source.Play();
             }
 
@@ -201,6 +202,7 @@ namespace Unity.WebRTC
             _audioCapturer = source.gameObject.AddComponent<AudioCustomFilter>();
             _audioCapturer.hideFlags = HideFlags.HideInInspector;
             _audioCapturer.onAudioRead += SetData;
+            _audioCapturer.sender = true;
         }
 
         internal AudioStreamTrack(string label, AudioTrackSource source)
