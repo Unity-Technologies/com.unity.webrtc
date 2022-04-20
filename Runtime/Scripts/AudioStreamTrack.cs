@@ -54,6 +54,31 @@ namespace Unity.WebRTC
 
         private AudioSource _source;
 
+        /// <summary>
+        /// This flag only works on sender side track.
+        /// If True, Send audio input to remote and Play audio in local.
+        /// If False, only send to remote. Not play audio in local.
+        /// </summary>
+        public bool Loopback
+        {
+            get
+            {
+                if (_audioCapturer != null)
+                {
+                    return _audioCapturer.loopback;
+                }
+
+                return false;
+            }
+            set
+            {
+                if (_audioCapturer != null)
+                {
+                    _audioCapturer.loopback = value;
+                }
+            }
+        }
+
         internal class AudioStreamRenderer : IDisposable
         {
             private bool disposed;
@@ -94,7 +119,6 @@ namespace Unity.WebRTC
                 _filter = GetOrAddComponent<AudioCustomFilter>(source.gameObject);
                 _filter.hideFlags = HideFlags.HideInInspector;
                 _filter.onAudioRead += SetData;
-                _filter.mute = false;
                 source.Play();
             }
 
@@ -177,7 +201,6 @@ namespace Unity.WebRTC
             _audioCapturer = source.gameObject.AddComponent<AudioCustomFilter>();
             _audioCapturer.hideFlags = HideFlags.HideInInspector;
             _audioCapturer.onAudioRead += SetData;
-            _audioCapturer.mute = true;
         }
 
         internal AudioStreamTrack(string label, AudioTrackSource source)
