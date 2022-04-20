@@ -185,6 +185,7 @@ namespace Unity.WebRTC
             transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
 
             m_audioTrack = new AudioStreamTrack(inputAudioSource);
+            m_audioTrack.Loopback = !toggleEnableMicrophone.isOn;
             _pc1.AddTrack(m_audioTrack, _sendStream);
 
             var transceiver1 = _pc1.GetTransceivers().First();
