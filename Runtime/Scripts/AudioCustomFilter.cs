@@ -16,6 +16,7 @@ namespace Unity.WebRTC
     internal class AudioCustomFilter : MonoBehaviour
     {
         public event AudioReadEventHandler onAudioRead;
+        public bool mute;
         private int m_sampleRate;
 
         void OnEnable()
@@ -44,6 +45,14 @@ namespace Unity.WebRTC
         void OnAudioFilterRead(float[] data, int channels)
         {
             onAudioRead?.Invoke(data, channels, m_sampleRate);
+
+            if (mute)
+            {
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] = 0;
+                }
+            }
         }
     }
 }
