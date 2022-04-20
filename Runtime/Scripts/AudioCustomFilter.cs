@@ -16,7 +16,7 @@ namespace Unity.WebRTC
     internal class AudioCustomFilter : MonoBehaviour
     {
         public event AudioReadEventHandler onAudioRead;
-        public bool loopback = true;
+        public bool loopback = false;
         private int m_sampleRate;
 
         void OnEnable()
