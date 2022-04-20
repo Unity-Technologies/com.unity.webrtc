@@ -56,8 +56,8 @@ namespace Unity.WebRTC.RuntimeTest
         public void RegisterDelegate()
         {
             var stream = new MediaStream();
-            stream.OnAddTrack = e => {};
-            stream.OnRemoveTrack = e => {};
+            stream.OnAddTrack = e => { };
+            stream.OnRemoveTrack = e => { };
             stream.Dispose();
         }
 
@@ -139,7 +139,6 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
             Assert.That(videoStream.GetVideoTracks(), Has.Count.EqualTo(1));
             Assert.That(videoStream.GetAudioTracks(), Has.Count.EqualTo(0));
             Assert.That(videoStream.GetTracks().ToList(), Has.Count.EqualTo(1).And.All.InstanceOf<VideoStreamTrack>());
@@ -161,7 +160,6 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
@@ -191,8 +189,6 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
-
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
@@ -236,7 +232,6 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
@@ -279,7 +274,6 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
@@ -290,7 +284,7 @@ namespace Unity.WebRTC.RuntimeTest
             var senders = test.component.GetPeerSenders(0);
             Assert.That(senders, Has.Count.GreaterThan(0));
 
-            foreach(var sender in senders)
+            foreach (var sender in senders)
             {
                 var parameters = sender.GetParameters();
                 Assert.That(parameters.encodings, Has.Length.GreaterThan(0).And.All.Not.Null);
@@ -317,13 +311,12 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(include = new[] {RuntimePlatform.Android})]
+        [UnityPlatform(include = new[] { RuntimePlatform.Android })]
         public IEnumerator SetParametersReturnErrorIfInvalidTextureResolution()
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
@@ -334,7 +327,7 @@ namespace Unity.WebRTC.RuntimeTest
             var senders = test.component.GetPeerSenders(0);
             Assert.That(senders, Has.Count.GreaterThan(0));
 
-            foreach(var sender in senders)
+            foreach (var sender in senders)
             {
                 var parameters = sender.GetParameters();
                 Assert.That(parameters.encodings, Has.Length.GreaterThan(0).And.All.Not.Null);
@@ -365,6 +358,41 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator AddAndRemoveTrack()
+        {
+            var camObj = new GameObject("Camera");
+            var cam = camObj.AddComponent<Camera>();
+            var stream1 = cam.CaptureStream(1280, 720, 1000000);
+            var stream2 = new MediaStream();
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            test.component.AddStream(0, stream1);
+            yield return test;
+            test.component.CoroutineUpdate();
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+
+            bool calledOnAddTrack = false;
+            stream2.OnAddTrack = e =>
+            {
+                Assert.That(e.Track, Is.Not.Null);
+                calledOnAddTrack = true;
+            };
+            var receivers = test.component.GetPeerReceivers(1);
+            stream2.AddTrack(receivers.First().Track);
+            yield return new WaitUntil(() => calledOnAddTrack);
+
+            var tracks = stream2.GetTracks().ToArray();
+            foreach (var track in tracks)
+            {
+                stream2.RemoveTrack(track);
+                track.Dispose();
+            }
+            Object.DestroyImmediate(camObj);
+            Object.DestroyImmediate(test.gameObject);
+            yield return new WaitForSeconds(0.1f);
+        }
+
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
@@ -374,7 +402,6 @@ namespace Unity.WebRTC.RuntimeTest
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
             var videoStream = cam.CaptureStream(1280, 720, 1000000);
-            yield return new WaitForSeconds(0.1f);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);

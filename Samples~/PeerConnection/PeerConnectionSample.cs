@@ -234,11 +234,10 @@ class PeerConnectionSample : MonoBehaviour
 
         pc1Senders.Clear();
 
-        MediaStreamTrack[] tracks = receiveStream.GetTracks().ToArray();
+        var tracks = receiveStream.GetTracks().ToArray();
         foreach (var track in tracks)
         {
             receiveStream.RemoveTrack(track);
-            track.Dispose();
         }
     }
 
