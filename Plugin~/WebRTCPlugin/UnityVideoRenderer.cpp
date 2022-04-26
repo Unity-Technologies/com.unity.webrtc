@@ -79,6 +79,10 @@ void* UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(
 {
     auto frame = GetFrameBuffer();
 
+    size_t size = static_cast<size_t>(width * height * 4);
+    if (tempBuffer.size() != size)
+        tempBuffer.resize(size);
+
     // return a previous texture buffer when framebuffer is returned null.
     if (frame == nullptr)
         return tempBuffer.data();
@@ -94,10 +98,6 @@ void* UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(
         temp->ScaleFrom(*frame->ToI420());
         i420_buffer = temp;
     }
-
-    size_t size = width * height * 4;
-    if (tempBuffer.size() != size)
-        tempBuffer.resize(size);
 
     if (m_needFlipVertical)
         height = -height;
