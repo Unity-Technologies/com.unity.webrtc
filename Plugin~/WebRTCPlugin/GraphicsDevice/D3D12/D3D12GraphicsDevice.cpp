@@ -4,6 +4,8 @@
 #include <cudaD3D11.h>
 #include <wrl/client.h>
 
+#include "third_party/libyuv/include/libyuv.h"
+
 #include "D3D12Constants.h"
 #include "D3D12GraphicsDevice.h"
 #include "D3D12Texture2D.h"
@@ -258,41 +260,50 @@ ITexture2D* D3D12GraphicsDevice::CreateCPUReadTextureV(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(
-    ITexture2D* baseTex)
+rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
 {
-    D3D12Texture2D* tex =
-        reinterpret_cast<D3D12Texture2D*>(baseTex);
+    D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
     assert(nullptr != tex);
     if (nullptr == tex)
         return nullptr;
 
     ID3D12Resource* readbackResource = tex->GetReadbackResource();
     assert(nullptr != readbackResource);
-    if (nullptr == readbackResource) //the texture has to be prepared for CPU access
+    if (nullptr == readbackResource) // the texture has to be prepared for CPU access
         return nullptr;
 
     const uint32_t width = tex->GetWidth();
     const uint32_t height = tex->GetHeight();
     const D3D12ResourceFootprint* footprint = tex->GetNativeTextureFootprint();
-    const uint32_t rowSize = static_cast<uint32_t>(footprint->RowSize);
+    const uint32_t rowPitch = static_cast<uint32_t>(footprint->Footprint.Footprint.RowPitch);
 
-    //Map to read from CPU
-    uint8* data{};
-    const HRESULT hr = readbackResource->Map(0, nullptr,reinterpret_cast<void**>(&data));
+    // Map to read from CPU
+    uint8* data {};
+    const HRESULT hr = readbackResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
     assert(hr == S_OK);
-    if (hr != S_OK) {
+    if (hr != S_OK)
+    {
         return nullptr;
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
-        GraphicsUtility::ConvertRGBToI420Buffer(
-            width, height, rowSize, static_cast<uint8_t*>(data));
+    // RGBA -> I420
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
+    libyuv::ARGBToI420(
+        static_cast<uint8_t*>(data),
+        rowPitch,
+        i420_buffer->MutableDataY(),
+        i420_buffer->StrideY(),
+        i420_buffer->MutableDataU(),
+        i420_buffer->StrideU(),
+        i420_buffer->MutableDataV(),
+        i420_buffer->StrideV(),
+        width,
+        height);
 
-    D3D12_RANGE emptyRange{ 0, 0 };
+    D3D12_RANGE emptyRange { 0, 0 };
     readbackResource->Unmap(0, &emptyRange);
 
-    return i420_buffer; 
+    return i420_buffer;
 }
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
