@@ -7,7 +7,7 @@ test_editors:
 test_platforms:
   - name: win
     type: Unity::VM
-    image: package-ci/win10:stable
+    image: package-ci/win10:v1.20.1-1032259
     flavor: b1.large
 packages:
   - name: webrtc
@@ -41,7 +41,7 @@ promote_dry_run:
   name: Promote Dry Run {{ yamato_name }} to Production
   agent:
     type: Unity::VM
-    image: package-ci/win10:stable
+    image: package-ci/win10:v1.20.1-1032259
     flavor: b1.large
   variables:
     UPMCI_PROMOTION: 1
@@ -70,7 +70,7 @@ promote:
   name: Promote {{ yamato_name }} to Production
   agent:
     type: Unity::VM
-    image: package-ci/win10:stable
+    image: package-ci/win10:v1.20.1-1032259
     flavor: b1.large
   variables:
     UPMCI_PROMOTION: 1
