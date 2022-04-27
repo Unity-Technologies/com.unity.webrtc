@@ -72,7 +72,6 @@ namespace webrtc
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 
     private:
-    private:
         D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
         void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
         void Barrier(
