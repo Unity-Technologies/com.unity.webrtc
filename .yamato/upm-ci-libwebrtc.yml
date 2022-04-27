@@ -18,7 +18,7 @@ platforms:
     build_command: BuildScripts~/build_libwebrtc_linux.sh
   - name: android
     type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084242
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_android.sh
   - name: ios

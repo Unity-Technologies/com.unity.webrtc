@@ -48,8 +48,8 @@ platforms:
   - name: android
     type: Unity::VM
     gpu_type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084242
-    gpu_image: renderstreaming/android-linux-build:v0.1.8-1084242
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
+    gpu_image: renderstreaming/android-linux-build:v0.1.8-1084252
     flavor: b1.large
     build_command: BuildScripts~/build_plugin_android.sh
     test_command: BuildScripts~/test_plugin_android.sh
@@ -297,7 +297,7 @@ build_webrtc_plugin_test_android:
   name: Build webrtc plugin test runtime Android
   agent:
     type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084242
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
     flavor: b1.large
   commands:
     - BuildScripts~/build_test_runtime_android.sh
