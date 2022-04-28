@@ -25,7 +25,7 @@ UnityVideoTrackSource::UnityVideoTrackSource(
 UnityVideoTrackSource::~UnityVideoTrackSource()
 {
     {
-        std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
     }
 }
 
@@ -59,7 +59,7 @@ void UnityVideoTrackSource::SendFeedback()
 void UnityVideoTrackSource::OnFrameCaptured(
     rtc::scoped_refptr<VideoFrame> frame)
 {
-    const std::unique_lock<std::shared_timed_mutex> lock(m_mutex, std::try_to_lock);
+    const std::unique_lock<std::mutex> lock(m_mutex, std::try_to_lock);
     if (!lock)
     {
         // currently encoding
