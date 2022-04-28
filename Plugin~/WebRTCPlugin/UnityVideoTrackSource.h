@@ -1,6 +1,6 @@
 #pragma once
 
-#include <shared_mutex>
+#include <mutex>
 #include "VideoFrame.h"
 
 namespace unity {
@@ -68,7 +68,7 @@ private:
 
     const bool is_screencast_;
     const absl::optional<bool> needs_denoising_;
-    std::shared_timed_mutex m_mutex;
+    std::mutex m_mutex;
 };
 
 } // end namespace webrtc
