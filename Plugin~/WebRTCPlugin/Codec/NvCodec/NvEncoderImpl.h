@@ -37,7 +37,7 @@ namespace webrtc
             int key_frame_interval = 0;
             int num_temporal_layers = 1;
 
-            void SetStreamState(bool send_stream) { }
+            void SetStreamState(bool send_stream);
         };
         NvEncoderImpl();
         NvEncoderImpl(
@@ -61,8 +61,6 @@ namespace webrtc
 
     protected:
         int32_t ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame);
-        void SetStreamState(bool sendStream);
-
     private:
         void CopyResource(
             const NvEncInputFrame* encoderInputFrame,
@@ -93,7 +91,8 @@ namespace webrtc
         Clock* const m_clock;
         GUID m_profileGuid;
         NV_ENC_LEVEL m_level;
-        bool m_keyframeRequest;
+
+        std::vector<LayerConfig> m_configurations;
     };
 
 } // end namespace webrtc

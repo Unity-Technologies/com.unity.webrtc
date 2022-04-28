@@ -11,6 +11,7 @@
 
 #include "absl/strings/match.h"
 #include "api/video/video_codec_type.h"
+#include "api/video/video_codec_constants.h"
 #include "api/video_codecs/h264_profile_level_id.h"
 #include "media/base/media_constants.h"
 
@@ -46,6 +47,7 @@ namespace webrtc
         auto profileLevelId = ParseH264ProfileLevelId(profileLevelIdString.c_str());
         m_profileGuid = ProfileToGuid(profileLevelId.value().profile).value();
         m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
+        m_configurations.reserve(kMaxSimulcastStreams);
     }
 
     NvEncoderImpl::~NvEncoderImpl() { Release(); }
@@ -71,6 +73,8 @@ namespace webrtc
             return ret;
         }
 
+        const int number_of_streams = 1;
+        m_configurations.resize(number_of_streams);
         m_codec = *codec;
 
         const CUresult result = cuCtxSetCurrent(m_context);
@@ -104,6 +108,13 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "Failed Initialize NvEncoder " << e.what();
             return WEBRTC_VIDEO_CODEC_ERROR;
         }
+
+        m_configurations[0].sending = false;
+        m_configurations[0].max_frame_rate = static_cast<float>(m_codec.maxFramerate);
+        m_configurations[0].frame_dropping_on = m_codec.H264()->frameDroppingOn;
+        m_configurations[0].key_frame_interval = m_codec.H264()->keyFrameInterval;
+        m_configurations[0].max_bps = m_codec.maxBitrate * 1000;
+        m_configurations[0].target_bps = m_codec.startBitrate * 1000;
 
         m_bitrateAdjuster = std::make_unique<BitrateAdjuster>(0.5f, 0.95f);
 
@@ -157,6 +168,8 @@ namespace webrtc
             cuArrayDestroy(m_scaledArray);
             m_scaledArray = nullptr;
         }
+        m_configurations.clear();
+
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
@@ -285,12 +298,12 @@ namespace webrtc
         }
 
         bool send_key_frame = false;
-        if (m_keyframeRequest)
+        if (m_configurations[0].key_frame_request && m_configurations[0].sending)
             send_key_frame = true;
 
         if (!send_key_frame && frameTypes)
         {
-            if ((*frameTypes)[0] == VideoFrameType::kVideoFrameKey)
+            if (m_configurations[0].sending && (*frameTypes)[0] == VideoFrameType::kVideoFrameKey)
             {
                 send_key_frame = true;
             }
@@ -310,7 +323,7 @@ namespace webrtc
         if (send_key_frame)
         {
             picParams.encodePicFlags = NV_ENC_PIC_FLAG_FORCEINTRA | NV_ENC_PIC_FLAG_FORCEIDR;
-            m_keyframeRequest = false;
+            m_configurations[0].key_frame_request = false;
         }
 
         std::vector<std::vector<uint8_t>> vPacket;
@@ -391,7 +404,7 @@ namespace webrtc
         if (parameters.bitrate.get_sum_bps() == 0)
         {
             RTC_LOG(LS_WARNING) << "Encoder paused, turn off all encoding";
-            SetStreamState(false);
+            m_configurations[0].SetStreamState(false);
             return;
         }
         float fps = static_cast<float>(parameters.framerate_fps + 0.5);
@@ -402,7 +415,7 @@ namespace webrtc
         if (!requireLevel || m_level < static_cast<NV_ENC_LEVEL>(requireLevel.value()))
         {
             RTC_LOG(LS_WARNING) << "Not supported pixel count:" << pixelCount << ", fps:" << fps;
-            SetStreamState(false);
+            m_configurations[0].SetStreamState(false);
             return;
         }
 
@@ -432,9 +445,16 @@ namespace webrtc
         m_encoder->Reconfigure(&reconfigureParams);
 
         // Force send Keyframe
-        SetStreamState(true);
+        m_configurations[0].SetStreamState(true);
     }
 
-    void NvEncoderImpl::SetStreamState(bool sendStream) { m_keyframeRequest = sendStream; }
+    void NvEncoderImpl::LayerConfig::SetStreamState(bool sendStream)
+    {
+        if (sendStream && !sending)
+        {
+            key_frame_request = true;
+        }
+        sending = sendStream;
+    }
 } // end namespace webrtc
 } // end namespace unity
