@@ -3,27 +3,27 @@
 platforms:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:latest
+    image: renderstreaming/win10:v0.3.13-1084239
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_win.cmd
   - name: macos
     type: Unity::VM::osx
-    image: package-ci/mac:latest
+    image: package-ci/mac:v1.20.0-1079282
     flavor: m1.mac  
     build_command: BuildScripts~/build_libwebrtc_macos.sh
   - name: linux
     type: Unity::VM
-    image: cds-ops/ubuntu-18.04-base:stable
+    image: cds-ops/ubuntu-18.04-base:v1.6.0-546186
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_linux.sh
   - name: android
     type: Unity::VM
-    image: renderstreaming/android-linux-build:latest
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_android.sh
   - name: ios
     type: Unity::VM::osx
-    image: package-ci/mac:latest
+    image: package-ci/mac:v1.20.0-1079282
     flavor: m1.mac  
     build_command: BuildScripts~/build_libwebrtc_ios.sh
 projects:
