@@ -296,6 +296,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         case VideoStreamRenderEventID::Encode:
         {
             UnityVideoTrackSource* source = encodeData->source;
+            if (!s_context->ExistsRefPtr(source))
+                return;
             Timestamp timestamp = s_clock->CurrentTime();
             IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
             UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();

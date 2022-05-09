@@ -21,7 +21,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             foreach (var track in stream.GetTracks())
             {
-                peers[0].AddTrack(track, stream);
+                peers[indexPeer].AddTrack(track, stream);
             }
         }
 
@@ -141,11 +141,6 @@ namespace Unity.WebRTC.RuntimeTest
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[1], peers[0]));
             };
-        }
-
-        IEnumerator Start()
-        {
-            yield return new WaitUntil(() => NegotiationCompleted());
         }
 
         IEnumerator Negotiate(RTCPeerConnection peer1, RTCPeerConnection peer2)

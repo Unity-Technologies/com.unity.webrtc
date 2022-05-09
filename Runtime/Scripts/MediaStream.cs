@@ -103,13 +103,14 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
-        static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr trackPtr)
+        static void MediaStreamOnAddTrack(IntPtr ptr, IntPtr ptrTrack)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    var e = new MediaStreamTrackEvent(trackPtr);
+                    var track = WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
+                    var e = new MediaStreamTrackEvent(track);
                     stream.onAddTrack?.Invoke(e);
                     stream.cacheTracks.Add(e.Track);
                 }
@@ -117,15 +118,19 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnRemoveTrack))]
-        static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr trackPtr)
+        static void MediaStreamOnRemoveTrack(IntPtr ptr, IntPtr ptrTrack)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    var e = new MediaStreamTrackEvent(trackPtr);
-                    stream.onRemoveTrack?.Invoke(e);
-                    stream.cacheTracks.Remove(e.Track);
+                    if(WebRTC.Table.ContainsKey(ptrTrack))
+                    {
+                        var track = WebRTC.Table[ptrTrack] as MediaStreamTrack;
+                        var e = new MediaStreamTrackEvent(track);
+                        stream.onRemoveTrack?.Invoke(e);
+                        stream.cacheTracks.Remove(e.Track);
+                    }
                 }
             });
         }

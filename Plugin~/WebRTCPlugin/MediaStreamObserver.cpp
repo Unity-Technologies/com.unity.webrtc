@@ -18,7 +18,6 @@ namespace webrtc
 
     void MediaStreamObserver::OnVideoTrackAdded(webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        DebugLog("OnVideoTrackAdded trackId:%s, streamId:%s", track->id().c_str(), stream->id().c_str());
         m_context->AddRefPtr(track);
         for (auto callback : m_listOnAddTrack)
         {
@@ -28,7 +27,6 @@ namespace webrtc
 
     void MediaStreamObserver::OnAudioTrackAdded(webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        DebugLog("OnAudioTrackAdded trackId:%s, streamId:%s", track->id().c_str(), stream->id().c_str());
         m_context->AddRefPtr(track);
         for (auto callback : m_listOnAddTrack)
         {
@@ -38,7 +36,6 @@ namespace webrtc
 
     void MediaStreamObserver::OnVideoTrackRemoved(webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        DebugLog("OnVideoTrackRemoved trackId:%s, streamId:%s", track->id().c_str(), stream->id().c_str());
         for (auto callback : m_listOnRemoveTrack)
         {
             callback(stream, track);
@@ -47,7 +44,6 @@ namespace webrtc
 
     void MediaStreamObserver::OnAudioTrackRemoved(webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        DebugLog("OnAudioTrackRemoved trackId:%s, streamId:%s", track->id().c_str(), stream->id().c_str());
         for (auto callback : m_listOnRemoveTrack)
         {
             callback(stream, track);

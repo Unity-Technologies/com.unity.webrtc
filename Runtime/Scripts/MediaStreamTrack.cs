@@ -130,9 +130,9 @@ namespace Unity.WebRTC
     {
         public MediaStreamTrack Track { get; }
 
-        internal MediaStreamTrackEvent(IntPtr ptrTrack)
+        internal MediaStreamTrackEvent(MediaStreamTrack track)
         {
-            Track = WebRTC.FindOrCreate(ptrTrack, MediaStreamTrack.Create);
+            Track = track;
         }
     }
 }

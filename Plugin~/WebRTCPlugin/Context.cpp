@@ -284,7 +284,6 @@ namespace webrtc
         const rtc::scoped_refptr<UnityVideoTrackSource> source =
             new rtc::RefCountedObject<UnityVideoTrackSource>(
                 false, absl::nullopt);
-
         AddRefPtr(source);
         return source;
     }
@@ -294,7 +293,6 @@ namespace webrtc
     {
         const rtc::scoped_refptr<VideoTrackInterface> track =
             m_peerConnectionFactory->CreateVideoTrack(label, source);
-
         AddRefPtr(track);
         return track;
     }

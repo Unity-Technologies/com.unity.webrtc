@@ -46,7 +46,7 @@ namespace webrtc
             IGraphicsDevice* gfxDevice = nullptr);
         ~Context();
 
-        bool ExistsRefPtr(const rtc::RefCountInterface* ptr) {
+        bool ExistsRefPtr(const rtc::RefCountInterface* ptr) const {
             return m_mapRefPtr.find(ptr) != m_mapRefPtr.end(); }
         template <typename T>
         void AddRefPtr(rtc::scoped_refptr<T> refptr) {
@@ -85,9 +85,7 @@ namespace webrtc
         webrtc::VideoTrackInterface* CreateVideoTrack(const std::string& label, webrtc::VideoTrackSourceInterface* source);
         webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
-        UnityVideoTrackSource* GetVideoSource(
-            const MediaStreamTrackInterface* track);
-        bool ExistsVideoSource(UnityVideoTrackSource* source);
+        UnityVideoTrackSource* GetVideoSource(const MediaStreamTrackInterface* track);
 
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
