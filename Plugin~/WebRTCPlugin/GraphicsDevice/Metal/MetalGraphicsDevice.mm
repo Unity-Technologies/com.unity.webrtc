@@ -96,7 +96,10 @@ namespace webrtc
             [blit synchronizeResource:dest];
 #endif            
         [blit endEncoding];
+        
+        // Commit the current command buffer and wait until the GPU process is completed.
         [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
         
         return true;
     }
