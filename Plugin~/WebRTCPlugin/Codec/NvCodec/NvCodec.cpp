@@ -1,10 +1,10 @@
 #include "pch.h"
 
 #include "NvCodec.h"
-#include "NvEncoder/NvEncoderCuda.h"
-#include "NvEncoderImpl.h"
 #include "NvDecoder/NvDecoder.h"
 #include "NvDecoderImpl.h"
+#include "NvEncoder/NvEncoderCuda.h"
+#include "NvEncoderImpl.h"
 
 #include "absl/strings/match.h"
 #include "api/video_codecs/video_encoder_factory.h"
@@ -104,6 +104,9 @@ namespace webrtc
         else
         {
             supportedFormats = {
+                // Constrained Baseline Profile does not support NvDecoder, but WebRTC uses this profile by default,
+                // so it must be returned in this method.
+                CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileBaseline, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel5_1, "1"),
