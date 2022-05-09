@@ -10,7 +10,7 @@ This version of the package is compatible with the following versions of the Uni
 
 - **Unity 2019.4**
 - **Unity 2020.3**
-- **Unity 2021.2**
+- **Unity 2021.3**
 
 ## Support Platform
 
@@ -41,5 +41,6 @@ sudo apt install -y libc++1 libc++abi1
 
 To build the apk file for **Android platform**, you need to configure player settings below.
 
-- **Scripting backend** - IL2CPP
-- **Target Architectures** - ARM64 (Do disable ARMv7)
+- Choose **IL2CPP** for **Scripting backend** in Player Settings Window.
+- Set enadle **ARM64** and Set disable **ARMv7** for **Target Architectures** setting in Player Settings Window.
+- Set enable **Optimized Frame Pacing** in Player Settings Window.

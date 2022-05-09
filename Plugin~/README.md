@@ -12,7 +12,7 @@ On windows, first, the build process use the **clang** compiler. To install clan
 
 ```powershell
 # Install CUDA
-choco install cuda --version=10.1
+choco install cuda --version=11.0.3
 
 # Install Windows SDK
 # WARNING: If you have versions of Windows SDK earlier than Version 1809,
@@ -20,19 +20,17 @@ choco install cuda --version=10.1
 choco install -y vcredist2010 vcredist2013 vcredist140 windows-sdk-10-version-1809-all
 
 # Install Vulkan
-choco install -y wget
-wget https://vulkan.lunarg.com/sdk/download/1.1.121.2/windows/VulkanSDK-1.1.121.2-Installer.exe -O C:/Windows/Temp/VulkanSDK.exe
-C:/Windows/Temp/VulkanSDK.exe /S
+choco install vulkan-sdk --version=1.2.182.0
 
-# Install CMake 3.18.0
-choco install cmake -y --version 3.18.0
+# Install CMake 3.22.3
+choco install cmake -y --version=3.22.3
 
 # Install 7zip (used to extract Google's webrtc library after download)
 choco install 7zip
 
 # Setting up environment variables
-setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
-setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
+setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.0" /m
+setx VULKAN_SDK "C:\VulkanSDK\1.2.182.0" /m
 ```
 
 ### Ubuntu

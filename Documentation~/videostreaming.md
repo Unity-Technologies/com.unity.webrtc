@@ -143,14 +143,33 @@ It is possible to check the current bitrate on browsers. If using Google Chrome,
 
 You can choose from several codecs to use in this package. Noted that the available codecs vary by platform.
 
-### Encode
+### Selecting video codec
+
+To select video codec, first call [`GetCapabilities`](../api/Unity.WebRTC.RTCRtpSender.html#Unity_WebRTC_RTCRtpSender_GetCapabilities_Unity_WebRTC_TrackKind_) method to get a list of available codecs on the device. By default, all available codecs are used for negotiation with other peers. When negotiating between peers, each peers search for codecs that are commonly available to both peers in order of priority. Therefore, developers need to filter and sort the video codec list to explicitly select codecs to use. The following example extracts the H.264 codecs from the list of available codecs.
+
+```CSharp
+// Get all available video codecs.
+var codecs = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs;
+
+// Filter codecs.
+var h264Codecs = codecs.Where(codec => codec.mimeType == "video/H264");
+```
+
+Create a list of codecs to use and pass it to the [`SetCodecPreferences`](../api/Unity_WebRTC_RTCRtpTransceiver_SetCodecPreferences_Unity_WebRTC_RTCRtpCodecCapability___) method. If an unavailable codec is passed, [`InvalidParameter`](../api/Unity.WebRTC.RTCErrorType.html) is returned.
+
+```CSharp
+var error = transceiver.SetCodecPreferences(h264Codecs.ToArray());
+if (error != RTCErrorType.None)
+    Debug.LogError("SetCodecPreferences failed");
+```
+
+### Video Encoder
 
 There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding different kinds of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`, `VP9`, `AV1`.
 
-### Decode
+### Video Decoder
 
-Currently, only SoftwareDecoder can be used, in which case VP8/VP9 can be used as a codec.
-In this case, `VP8` or `VP9` can be used as a codec.
+As with video encoders, we offer hardware-intensive `H.264` decoders and non-hardware-intensive `VP8`, `VP9`, and `AV1` decoders.
 
 ### HWA Codec
 
@@ -179,12 +198,12 @@ The decoders that support hardware acceleration are shown below.
 
 | Platform | Graphics API | NVCODEC | VideoToolbox | MediaCodec |
 | -------- | ------------ | ----- | ------------ | ---------- |
-| Windows x64 | DirectX11    | N | - | - |
-| Windows x64 | DirectX12    | N | - | - |
+| Windows x64 | DirectX11    | **Y** | - | - |
+| Windows x64 | DirectX12    | **Y** | - | - |
 | Windows x64 | OpenGL Core | N | - | - |
-| Windows x64 | Vulkan | N | - | - |
-| Linux x64   | OpenGL Core | N | - | - |
-| Linux x64   | Vulkan | N | - | - |
+| Windows x64 | Vulkan | **Y** | - | - |
+| Linux x64   | OpenGL Core | **Y** | - | - |
+| Linux x64   | Vulkan | **Y** | - | - |
 | MacOS | Metal | - | **Y** | - |
 | iOS | Metal | - | **Y** | - |
 | Android | Vulkan | - | - | **Y** |
@@ -195,12 +214,3 @@ The decoders that support hardware acceleration are shown below.
 - Linux:   NVIDIA Driver version `455.27` or higher
 
 To check the compatible NVIDIA graphics card, please visit on the [NVIDIA VIDEO CODEC SDK web site](https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Encoder).
-
-### Enabling hardware acceleration
-
-We can select the type of encoder by specifying the [`EncoderType`](../api/api/Unity.WebRTC.EncoderType.html) in [`WebRTC.Initialize`](../api/Unity.WebRTC.WebRTC.html#Unity_WebRTC_WebRTC_Initialize_Unity_WebRTC_EncoderType_System_Boolean_System_Boolean_Unity_WebRTC_NativeLoggingSeverity_) method argument.
-
-```CSharp
-// Enable a hardware acceleration.
-WebRTC.Initialize(EncoderType.Hardware);
-```
