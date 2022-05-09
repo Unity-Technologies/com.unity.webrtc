@@ -109,6 +109,7 @@ namespace webrtc
             return WEBRTC_VIDEO_CODEC_ERROR;
         }
 
+        // todo(kazuki): Add multiple configurations to support simulcast
         m_configurations[0].sending = false;
         m_configurations[0].max_frame_rate = static_cast<float>(m_codec.maxFramerate);
         m_configurations[0].frame_dropping_on = m_codec.H264()->frameDroppingOn;
