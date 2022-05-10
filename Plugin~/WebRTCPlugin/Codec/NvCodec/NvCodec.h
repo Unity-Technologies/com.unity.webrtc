@@ -22,10 +22,7 @@ namespace webrtc
     {
     public:
         static std::unique_ptr<NvEncoder> Create(
-            const cricket::VideoCodec& codec,
-            CUcontext context,
-            CUmemorytype memoryType,
-            NV_ENC_BUFFER_FORMAT format);
+            const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
         // If H.264 is supported (any implementation).
         static bool IsSupported();
         static bool SupportsScalabilityMode(absl::string_view scalability_mode);
@@ -74,10 +71,7 @@ namespace webrtc
     };
 
 #ifndef _WIN32
-    static bool operator==(const GUID& a, const GUID& b)
-    {
-        return !std::memcmp(&a, &b, sizeof(GUID));
-    }
+    static bool operator==(const GUID& a, const GUID& b) { return !std::memcmp(&a, &b, sizeof(GUID)); }
 #endif
 
 // todo(kazuki):: fix workaround
@@ -100,6 +94,10 @@ namespace webrtc
     static absl::optional<GUID> ProfileToGuid(H264Profile profile)
     {
         if (profile == H264Profile::kProfileBaseline)
+            return NV_ENC_H264_PROFILE_BASELINE_GUID;
+        // Returns Baseline Profile instead because NVCodec is not supported Constrained Baseline Profile
+        // officially, but WebRTC use the profile in default.
+        if (profile == H264Profile::kProfileConstrainedBaseline)
             return NV_ENC_H264_PROFILE_BASELINE_GUID;
         if (profile == H264Profile::kProfileMain)
             return NV_ENC_H264_PROFILE_MAIN_GUID;
