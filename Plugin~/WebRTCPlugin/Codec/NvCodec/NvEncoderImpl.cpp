@@ -27,10 +27,10 @@ namespace webrtc
 
     inline bool operator!=(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs) { return !(lhs == rhs); }
 
-    inline absl::optional<webrtc::H264Level> H264RequiredLevel(const VideoCodec* codec)
+    inline absl::optional<webrtc::H264Level> H264RequiredLevel(const VideoCodec& codec)
     {
-        int pixelCount = codec->width * codec->height;
-        return H264SupportedLevel(pixelCount, static_cast<float>(codec->maxFramerate));
+        int pixelCount = codec.width * codec.height;
+        return H264SupportedLevel(pixelCount, static_cast<float>(codec.maxFramerate));
     }
 
     inline absl::optional<webrtc::H264Level> NvEncSupportedLevel(CUcontext context, const GUID& guid)
@@ -69,7 +69,16 @@ namespace webrtc
 
         auto profileLevelId = ParseH264ProfileLevelId(profileLevelIdString.c_str());
         m_profileGuid = ProfileToGuid(profileLevelId.value().profile).value();
-        m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
+
+        // workaround:
+        // H.264 defines the maximum number of pixels and framerate available depending on the profile level.
+        // The H264SupportedLevel function can be used to obtain the supported profile levels.
+        // However, NvEnc may return an error even when using the value returned by H264SupportedLevel,
+        // so `NV_ENC_LEVEL_AUTOSELECT` is used here.
+        // 
+        // m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
+        m_level = NV_ENC_LEVEL_AUTOSELECT;
+
         m_configurations.reserve(kMaxSimulcastStreams);
     }
 
@@ -90,32 +99,30 @@ namespace webrtc
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
 
-        // Check required level
-        auto requiredLevel = H264RequiredLevel(codec);
+        m_codec = *codec;
+
+        // todo(kazuki): Not supported framerate adjusting
+        m_codec.maxFramerate = 30;
+
+        // Check required level.
+        auto requiredLevel = H264RequiredLevel(m_codec);
         if (!requiredLevel)
         {
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
 
-        // Check NvEnc supported level
+        // Check NvEnc supported level.
         auto supportedLevel = NvEncSupportedLevel(m_context, m_profileGuid);
         if (!supportedLevel)
         {
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
 
-        // Check the profile level is over the required level. If less than the required level, as a workaround,
-        // use max level in the list of supported level by NvEnc.
-        if (static_cast<int>(requiredLevel.value()) > static_cast<int>(m_level))
+        // The supported level must be over the required level.
+        if (static_cast<int>(requiredLevel.value()) > static_cast<int>(supportedLevel.value()))
         {
-            if (static_cast<int>(requiredLevel.value()) > static_cast<int>(supportedLevel.value()))
-            {
-                return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
-            }
-            // workaround
-            m_level = static_cast<NV_ENC_LEVEL>(supportedLevel.value());
+            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
-
         int32_t ret = Release();
         if (ret != WEBRTC_VIDEO_CODEC_OK)
         {
@@ -124,7 +131,6 @@ namespace webrtc
 
         const int number_of_streams = 1;
         m_configurations.resize(number_of_streams);
-        m_codec = *codec;
 
         const CUresult result = cuCtxSetCurrent(m_context);
         if (!ck(result))
@@ -139,12 +145,12 @@ namespace webrtc
         {
             if (m_memoryType == CU_MEMORYTYPE_DEVICE)
             {
-                m_encoder = std::make_unique<NvEncoderCuda>(m_context, codec->width, codec->height, m_format, 0);
+                m_encoder = std::make_unique<NvEncoderCuda>(m_context, m_codec.width, m_codec.height, m_format, 0);
             }
             else if (m_memoryType == CU_MEMORYTYPE_ARRAY)
             {
                 m_encoder =
-                    std::make_unique<NvEncoderCudaWithCUarray>(m_context, codec->width, codec->height, m_format, 0);
+                    std::make_unique<NvEncoderCudaWithCUarray>(m_context, m_codec.width, m_codec.height, m_format, 0);
             }
             else
             {
@@ -167,6 +173,7 @@ namespace webrtc
         m_configurations[0].target_bps = m_codec.startBitrate * 1000;
 
         m_bitrateAdjuster = std::make_unique<BitrateAdjuster>(0.5f, 0.95f);
+        m_bitrateAdjuster->SetTargetBitrateBps(m_configurations[0].target_bps);
 
         m_initializeParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
         m_encodeConfig.version = NV_ENC_CONFIG_VER;
@@ -178,10 +185,8 @@ namespace webrtc
         m_encoder->CreateDefaultEncoderParams(
             &m_initializeParams, encodeGuid, presetGuid, NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY);
 
-        // todo(kazuki): Failed CreateEncoder method when maxFramerate is high.
-        // Should calculate max framerate using the table of H264 profile level.
-        // m_initializeParams.frameRateNum = std::min(m_codec.maxFramerate, 30u);
-        // m_initializeParams.frameRateDen = 1;
+        m_initializeParams.frameRateNum = m_codec.maxFramerate;
+        m_initializeParams.frameRateDen = 1;
 
         m_encodeConfig.profileGUID = m_profileGuid;
         m_encodeConfig.gopLength = NVENC_INFINITE_GOPLENGTH;
@@ -190,11 +195,11 @@ namespace webrtc
         m_encodeConfig.encodeCodecConfig.h264Config.idrPeriod = NVENC_INFINITE_GOPLENGTH;
         m_encodeConfig.rcParams.version = NV_ENC_RC_PARAMS_VER;
         m_encodeConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
-        m_encodeConfig.rcParams.averageBitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        m_encodeConfig.rcParams.averageBitRate = m_configurations[0].target_bps;
         m_encodeConfig.rcParams.vbvBufferSize = (m_encodeConfig.rcParams.averageBitRate *
                                                  m_initializeParams.frameRateDen / m_initializeParams.frameRateNum) *  5;
-        m_encodeConfig.rcParams.maxBitRate = m_encodeConfig.rcParams.averageBitRate;
         m_encodeConfig.rcParams.vbvInitialDelay = m_encodeConfig.rcParams.vbvBufferSize;
+
         m_encoder->CreateEncoder(&m_initializeParams);
 
         return WEBRTC_VIDEO_CODEC_OK;
@@ -457,22 +462,23 @@ namespace webrtc
             m_configurations[0].SetStreamState(false);
             return;
         }
-        float fps = static_cast<float>(parameters.framerate_fps + 0.5);
-        int32_t pixelCount = m_codec.width * m_codec.height;
 
-        auto requireLevel = H264SupportedLevel(pixelCount, fps);
+        m_codec.maxFramerate = static_cast<uint32_t>(parameters.framerate_fps);
 
-        if (!requireLevel || m_level < static_cast<NV_ENC_LEVEL>(requireLevel.value()))
+        // todo(kazuki): Not supported framerate adjusting
+        m_codec.maxFramerate = 30;
+
+        auto requiredLevel = H264RequiredLevel(m_codec);
+        if (!requiredLevel)
         {
-            RTC_LOG(LS_WARNING) << "Not supported pixel count:" << pixelCount << ", fps:" << fps;
+            RTC_LOG(LS_WARNING) << "Not supported codec parameter " <<
+                "width:" << m_codec.width << " " <<
+                "height:" << m_codec.height << " " <<
+                "maxFramerate:" << m_codec.maxFramerate;
+
             m_configurations[0].SetStreamState(false);
             return;
         }
-
-        // todo
-        fps = 30;
-
-        m_codec.maxFramerate = static_cast<uint32_t>(fps);
 
         m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
         const uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
@@ -485,12 +491,8 @@ namespace webrtc
         std::memcpy(&reInitCodecConfig, m_initializeParams.encodeConfig, sizeof(reInitCodecConfig));
         reconfigureParams.reInitEncodeParams.encodeConfig = &reInitCodecConfig;
 
-        // change framerate
+        // Change framerate and bitrate
         reconfigureParams.reInitEncodeParams.frameRateNum = m_codec.maxFramerate;
-        // reconfigureParams.resetEncoder = 1;
-        // reconfigureParams.forceIDR = 1;
-
-        // change bitrate
         reconfigureParams.reInitEncodeParams.encodeConfig->rcParams.averageBitRate = bitRate;
         m_encoder->Reconfigure(&reconfigureParams);
 
