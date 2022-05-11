@@ -75,7 +75,6 @@ namespace webrtc
         // The H264SupportedLevel function can be used to obtain the supported profile levels.
         // However, NvEnc may return an error even when using the value returned by H264SupportedLevel,
         // so `NV_ENC_LEVEL_AUTOSELECT` is used here.
-        // 
         // m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
         m_level = NV_ENC_LEVEL_AUTOSELECT;
 
@@ -471,10 +470,10 @@ namespace webrtc
         auto requiredLevel = H264RequiredLevel(m_codec);
         if (!requiredLevel)
         {
-            RTC_LOG(LS_WARNING) << "Not supported codec parameter " <<
-                "width:" << m_codec.width << " " <<
-                "height:" << m_codec.height << " " <<
-                "maxFramerate:" << m_codec.maxFramerate;
+            RTC_LOG(LS_WARNING) << "Not supported codec parameter "
+                                << "width:" << m_codec.width << " "
+                                << "height:" << m_codec.height << " "
+                                << "maxFramerate:" << m_codec.maxFramerate;
 
             m_configurations[0].SetStreamState(false);
             return;
