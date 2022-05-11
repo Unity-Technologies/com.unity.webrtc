@@ -11,7 +11,7 @@ namespace webrtc
 
     // Returns the minumum level which can supports given parameters.
     // webrtc::H264SupportedLevel function is defined in libwebrtc, but that is for decoder.
-    absl::optional<H264Level> H264SupportedLevel(int maxFramePixelCount, float maxFramerate);
+    absl::optional<H264Level> H264SupportedLevel(int maxFramePixelCount, int maxFramerate);
 
 } // end namespace webrtc
 } // end namespace unity

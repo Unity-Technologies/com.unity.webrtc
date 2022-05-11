@@ -35,11 +35,11 @@ namespace webrtc
         { 2073600, 36864, H264Level::kLevel5_2 },
     };
 
-    absl::optional<webrtc::H264Level> H264SupportedLevel(int maxFramePixelCount, float maxFramerate)
+    absl::optional<webrtc::H264Level> H264SupportedLevel(int maxFramePixelCount, int maxFramerate)
     {
         static const int kPixelsPerMacroblock = 16 * 16;
 
-        for (int i = 0; i < arraysize(kLevelConstraints); i++)
+        for (size_t i = 0; i < arraysize(kLevelConstraints); i++)
         {
             const LevelConstraint& level_constraint = kLevelConstraints[i];
             if (level_constraint.max_macroblock_frame_size * kPixelsPerMacroblock >= maxFramePixelCount &&
