@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "NvCodecUtils.h"
@@ -12,7 +13,6 @@
 #include "absl/strings/match.h"
 #include "api/video/video_codec_constants.h"
 #include "api/video/video_codec_type.h"
-#include "api/video_codecs/h264_profile_level_id.h"
 #include "media/base/media_constants.h"
 
 namespace unity
@@ -26,12 +26,6 @@ namespace webrtc
     }
 
     inline bool operator!=(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs) { return !(lhs == rhs); }
-
-    inline absl::optional<webrtc::H264Level> H264RequiredLevel(const VideoCodec& codec)
-    {
-        int pixelCount = codec.width * codec.height;
-        return H264SupportedLevel(pixelCount, static_cast<float>(codec.maxFramerate));
-    }
 
     inline absl::optional<webrtc::H264Level> NvEncSupportedLevel(CUcontext context, const GUID& guid)
     {
@@ -48,6 +42,32 @@ namespace webrtc
             }
         }
         return absl::nullopt;
+    }
+
+    inline absl::optional<NV_ENC_LEVEL>
+    NvEncRequiredLevel(const VideoCodec& codec, CUcontext context, const GUID& guid)
+    {
+        int pixelCount = codec.width * codec.height;
+        auto requiredLevel = unity::webrtc::H264SupportedLevel(pixelCount, static_cast<float>(codec.maxFramerate));
+
+        if (!requiredLevel)
+        {
+            return absl::nullopt;
+        }
+
+        // Check NvEnc supported level.
+        auto supportedLevel = NvEncSupportedLevel(context, guid);
+        if (!supportedLevel)
+        {
+            return absl::nullopt;
+        }
+
+        // The supported level must be over the required level.
+        if (static_cast<int>(requiredLevel.value()) > static_cast<int>(supportedLevel.value()))
+        {
+            return absl::nullopt;
+        }
+        return static_cast<NV_ENC_LEVEL>(requiredLevel.value());
     }
 
     NvEncoderImpl::NvEncoderImpl(
@@ -69,15 +89,7 @@ namespace webrtc
 
         auto profileLevelId = ParseH264ProfileLevelId(profileLevelIdString.c_str());
         m_profileGuid = ProfileToGuid(profileLevelId.value().profile).value();
-
-        // workaround:
-        // H.264 defines the maximum number of pixels and framerate available depending on the profile level.
-        // The H264SupportedLevel function can be used to obtain the supported profile levels.
-        // However, NvEnc may return an error even when using the value returned by H264SupportedLevel,
-        // so `NV_ENC_LEVEL_AUTOSELECT` is used here.
-        // m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
-        m_level = NV_ENC_LEVEL_AUTOSELECT;
-
+        m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
         m_configurations.reserve(kMaxSimulcastStreams);
     }
 
@@ -104,24 +116,19 @@ namespace webrtc
         m_codec.maxFramerate = 30;
 
         // Check required level.
-        auto requiredLevel = H264RequiredLevel(m_codec);
+        auto requiredLevel = NvEncRequiredLevel(m_codec, m_context, m_profileGuid);
         if (!requiredLevel)
         {
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
 
-        // Check NvEnc supported level.
-        auto supportedLevel = NvEncSupportedLevel(m_context, m_profileGuid);
-        if (!supportedLevel)
+        // workaround
+        // Use required level if the profile level is lower than required level.
+        if (requiredLevel.value() > m_level)
         {
-            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+            m_level = requiredLevel.value();
         }
 
-        // The supported level must be over the required level.
-        if (static_cast<int>(requiredLevel.value()) > static_cast<int>(supportedLevel.value()))
-        {
-            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
-        }
         int32_t ret = Release();
         if (ret != WEBRTC_VIDEO_CODEC_OK)
         {
@@ -467,7 +474,7 @@ namespace webrtc
         // todo(kazuki): Not supported framerate adjusting
         m_codec.maxFramerate = 30;
 
-        auto requiredLevel = H264RequiredLevel(m_codec);
+        auto requiredLevel = NvEncRequiredLevel(m_codec, m_context, m_profileGuid);
         if (!requiredLevel)
         {
             RTC_LOG(LS_WARNING) << "Not supported codec parameter "
@@ -477,6 +484,13 @@ namespace webrtc
 
             m_configurations[0].SetStreamState(false);
             return;
+        }
+
+        // workaround:
+        // Use required level if the profile level is lower than required level.
+        if (requiredLevel.value() > m_level)
+        {
+            m_level = requiredLevel.value();
         }
 
         m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
