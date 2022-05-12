@@ -93,7 +93,8 @@ namespace webrtc
         NV_ENC_LEVEL m_level;
 
         std::vector<LayerConfig> m_configurations;
-    };
 
+        static std::vector<SdpVideoFormat> s_formats;
+    };
 } // end namespace webrtc
 } // end namespace unity
