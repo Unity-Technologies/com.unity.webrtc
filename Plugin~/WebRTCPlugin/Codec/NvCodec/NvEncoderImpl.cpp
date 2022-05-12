@@ -48,7 +48,7 @@ namespace webrtc
     NvEncRequiredLevel(const VideoCodec& codec, CUcontext context, const GUID& guid)
     {
         int pixelCount = codec.width * codec.height;
-        auto requiredLevel = unity::webrtc::H264SupportedLevel(pixelCount, static_cast<int>(codec.maxFramerate));
+        auto requiredLevel = unity::webrtc::H264SupportedLevel(pixelCount, static_cast<int>(codec.maxFramerate), codec.maxBitrate);
 
         if (!requiredLevel)
         {
