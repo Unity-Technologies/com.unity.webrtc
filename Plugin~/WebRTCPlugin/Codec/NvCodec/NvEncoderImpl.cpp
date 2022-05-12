@@ -44,11 +44,11 @@ namespace webrtc
         return absl::nullopt;
     }
 
-    inline absl::optional<NV_ENC_LEVEL>
-    NvEncRequiredLevel(const VideoCodec& codec, CUcontext context, const GUID& guid)
+    inline absl::optional<NV_ENC_LEVEL> NvEncRequiredLevel(const VideoCodec& codec, CUcontext context, const GUID& guid)
     {
         int pixelCount = codec.width * codec.height;
-        auto requiredLevel = unity::webrtc::H264SupportedLevel(pixelCount, static_cast<int>(codec.maxFramerate), codec.maxBitrate);
+        auto requiredLevel =
+            unity::webrtc::H264SupportedLevel(pixelCount, static_cast<int>(codec.maxFramerate), codec.maxBitrate);
 
         if (!requiredLevel)
         {
@@ -171,6 +171,8 @@ namespace webrtc
         }
 
         // todo(kazuki): Add multiple configurations to support simulcast
+        m_configurations[0].width = m_codec.width;
+        m_configurations[0].height = m_codec.height;
         m_configurations[0].sending = false;
         m_configurations[0].max_frame_rate = static_cast<float>(m_codec.maxFramerate);
         m_configurations[0].frame_dropping_on = m_codec.H264()->frameDroppingOn;
@@ -191,7 +193,7 @@ namespace webrtc
         m_encoder->CreateDefaultEncoderParams(
             &m_initializeParams, encodeGuid, presetGuid, NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY);
 
-        m_initializeParams.frameRateNum = m_codec.maxFramerate;
+        m_initializeParams.frameRateNum = static_cast<uint32_t>(m_configurations[0].max_frame_rate);
         m_initializeParams.frameRateDen = 1;
 
         m_encodeConfig.profileGUID = m_profileGuid;
@@ -469,7 +471,11 @@ namespace webrtc
             return;
         }
 
+        m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
+        const uint32_t bitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+
         m_codec.maxFramerate = static_cast<uint32_t>(parameters.framerate_fps);
+        m_codec.maxBitrate = bitrate;
 
         // todo(kazuki): Not supported framerate adjusting
         m_codec.maxFramerate = 30;
@@ -493,8 +499,8 @@ namespace webrtc
             m_level = requiredLevel.value();
         }
 
-        m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
-        const uint32_t bitRate = m_bitrateAdjuster->GetAdjustedBitrateBps();
+        m_configurations[0].target_bps = m_codec.maxBitrate;
+        m_configurations[0].max_frame_rate = static_cast<float>(m_codec.maxFramerate);
 
         NV_ENC_RECONFIGURE_PARAMS reconfigureParams = NV_ENC_RECONFIGURE_PARAMS();
         reconfigureParams.version = NV_ENC_RECONFIGURE_PARAMS_VER;
@@ -505,8 +511,9 @@ namespace webrtc
         reconfigureParams.reInitEncodeParams.encodeConfig = &reInitCodecConfig;
 
         // Change framerate and bitrate
-        reconfigureParams.reInitEncodeParams.frameRateNum = m_codec.maxFramerate;
-        reconfigureParams.reInitEncodeParams.encodeConfig->rcParams.averageBitRate = bitRate;
+        reconfigureParams.reInitEncodeParams.encodeConfig->encodeCodecConfig.h264Config.level = m_level;
+        reconfigureParams.reInitEncodeParams.frameRateNum = m_configurations[0].max_frame_rate;
+        reconfigureParams.reInitEncodeParams.encodeConfig->rcParams.averageBitRate = m_configurations[0].target_bps;
         m_encoder->Reconfigure(&reconfigureParams);
 
         // Force send Keyframe
