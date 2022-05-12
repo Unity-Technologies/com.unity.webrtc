@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "H264ProfileLevelId.h"
 
 using namespace ::webrtc;
@@ -15,8 +16,7 @@ namespace webrtc
         const H264Level level;
     };
 
-    static constexpr LevelConstraint kLevelConstraints[] =
-    {
+    static constexpr LevelConstraint kLevelConstraints[] = {
         { 1485, 99, 64, H264Level::kLevel1 },
         { 1485, 99, 128, H264Level::kLevel1_b },
         { 3000, 396, 192, H264Level::kLevel1_1 },
@@ -33,7 +33,7 @@ namespace webrtc
         { 522240, 8704, 50000, H264Level::kLevel4_2 },
         { 589824, 22080, 135000, H264Level::kLevel5 },
         { 983040, 36864, 240000, H264Level::kLevel5_1 },
-        { 2073600, 36864, 240000, H264Level ::kLevel5_2 },
+        { 2073600, 36864, 240000, H264Level::kLevel5_2 },
     };
 
     absl::optional<webrtc::H264Level> H264SupportedLevel(int maxFramePixelCount, int maxFramerate, int maxBitrate)
