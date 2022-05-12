@@ -1,8 +1,13 @@
 #pragma once
 
+#include <d3d11.h>
+#include <wrl/client.h>
+
 #include "WebRTCConstants.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/Cuda/CudaContext.h"
+
+using namespace Microsoft::WRL;
 
 namespace unity
 {
@@ -28,7 +33,12 @@ public:
     CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
     NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
+    HRESULT WaitForFence(ID3D11Fence* fence, HANDLE handle, uint64_t* fenceValue);
+
     ID3D11Device* m_d3d11Device;
+    ComPtr<ID3D11Fence> m_copyResourceFence;
+    HANDLE m_copyResourceEventHandle;
+    uint64_t m_copyResourceFenceValue = 1;
 
     bool m_isCudaSupport;
     CudaContext m_cudaContext;

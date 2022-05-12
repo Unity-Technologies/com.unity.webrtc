@@ -1,18 +1,16 @@
 #include "pch.h"
-#include "D3D11GraphicsDevice.h"
 
 #include <cuda.h>
 #include <cudaD3D11.h>
-#include <wrl/client.h>
 
-
+#include "D3D11GraphicsDevice.h"
 #include "D3D11Texture2D.h"
-#include "NvCodecUtils.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
+#include "GraphicsDevice/GraphicsUtility.h"
+#include "NvCodecUtils.h"
 
-using namespace Microsoft::WRL;
 using namespace ::webrtc;
+using namespace Microsoft::WRL;
 
 namespace unity
 {
@@ -23,7 +21,8 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(
     ID3D11Device* nativeDevice, UnityGfxRenderer renderer) 
     : IGraphicsDevice(renderer)
     , m_d3d11Device(nativeDevice)
-{
+    , m_copyResourceEventHandle(nullptr)
+    {
     // Enable multithread protection
     ComPtr<ID3D11Multithread> thread;
     m_d3d11Device->QueryInterface(IID_PPV_ARGS(&thread));
@@ -31,13 +30,32 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
-D3D11GraphicsDevice::~D3D11GraphicsDevice() {
+D3D11GraphicsDevice::~D3D11GraphicsDevice()
+{
+
 }
 
-//---------------------------------------------------------------------------------------------------------------------
-bool D3D11GraphicsDevice::InitV() {
-    m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d11Device);
+bool D3D11GraphicsDevice::InitV()
+{
+    CUresult ret = m_cudaContext.Init(m_d3d11Device);
+    if (ret == CUDA_SUCCESS)
+    {
+        m_isCudaSupport = true;
+    }
+
+    ComPtr<ID3D11Device5> d3d11Device5;
+    m_d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11Device5));
+    HRESULT hr = d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
+    if (hr == S_OK)
+    {
+        RTC_LOG(LS_INFO) << "CreateFence failed. error:" << hr;
+        return false;
+    }
+    m_copyResourceEventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (m_copyResourceEventHandle == nullptr)
+    {
+        RTC_LOG(LS_INFO) << "CreateEvent failed. error:" << HRESULT_FROM_WIN32(GetLastError());
+    }
     return true;
 }
 
@@ -45,6 +63,12 @@ bool D3D11GraphicsDevice::InitV() {
 
 void D3D11GraphicsDevice::ShutdownV() {
     m_cudaContext.Shutdown();
+
+    if (m_copyResourceEventHandle)
+    {
+        CloseHandle(m_copyResourceEventHandle);
+        m_copyResourceEventHandle = nullptr;
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -61,7 +85,7 @@ ITexture2D* D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, U
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = 0;
     desc.CPUAccessFlags = 0;
-    HRESULT result = m_d3d11Device->CreateTexture2D(&desc, NULL, &texture);
+    HRESULT result = m_d3d11Device->CreateTexture2D(&desc, nullptr, &texture);
     if (result != S_OK)
     {
         RTC_LOG(LS_INFO) << "CreateTexture2D failed. error:" << result;
@@ -106,6 +130,12 @@ bool D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src) {
     m_d3d11Device->GetImmediateContext(context.GetAddressOf());
     context->CopyResource(nativeDest, nativeSrc);
     context->Flush();
+
+    HRESULT hr = WaitForFence(m_copyResourceFence.Get(), m_copyResourceEventHandle, &m_copyResourceFenceValue);
+    if (hr != S_OK)
+    {
+        return false;
+    }
     return true;
 }
 
@@ -122,7 +152,38 @@ bool D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* native
     m_d3d11Device->GetImmediateContext(context.GetAddressOf());
     context->CopyResource(nativeDest, nativeSrc);
     context->Flush();
+
+    HRESULT hr = WaitForFence(m_copyResourceFence.Get(), m_copyResourceEventHandle, &m_copyResourceFenceValue);
+    if (hr != S_OK)
+    {
+        return false;
+    }
+
     return true;
+}
+
+HRESULT D3D11GraphicsDevice::WaitForFence(ID3D11Fence* fence, HANDLE handle, uint64_t* fenceValue)
+{
+    ComPtr<ID3D11DeviceContext> context;
+    m_d3d11Device->GetImmediateContext(context.GetAddressOf());
+
+    ComPtr<ID3D11DeviceContext4> context4;
+    HRESULT hr = context->QueryInterface<ID3D11DeviceContext4>(&context4);
+    if (hr != S_OK)
+        return hr;
+
+    hr = context4->Signal(m_copyResourceFence.Get(), m_copyResourceFenceValue);
+    if (hr != S_OK)
+        return hr;
+
+    hr = m_copyResourceFence->SetEventOnCompletion(m_copyResourceFenceValue, m_copyResourceEventHandle);
+    if (hr != S_OK)
+        return hr;
+
+    WaitForSingleObject(m_copyResourceFence.Get(), INFINITE);
+    ++(*fenceValue);
+
+    return S_OK;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
