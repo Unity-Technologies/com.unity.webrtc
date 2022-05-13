@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mutex>
+
 #include "VideoFrame.h"
+#include "VideoCaptureFeedback.h"
 
 namespace unity {
 namespace webrtc {
@@ -69,6 +71,8 @@ private:
     const bool is_screencast_;
     const absl::optional<bool> needs_denoising_;
     std::mutex m_mutex;
+
+    const VideoCaptureFeedbackCB feedbackCallback;
 };
 
 } // end namespace webrtc
