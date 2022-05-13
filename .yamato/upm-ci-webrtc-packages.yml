@@ -726,7 +726,7 @@ publish_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_vulkan
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_glcore
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
@@ -753,6 +753,6 @@ publish_dry_run_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_vulkan
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_glcore
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
