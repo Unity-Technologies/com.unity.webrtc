@@ -33,12 +33,8 @@ public:
     CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
     NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 private:
-    HRESULT WaitForFence(ID3D11Fence* fence, HANDLE handle, uint64_t* fenceValue);
-
+    HRESULT WaitFlush();
     ID3D11Device* m_d3d11Device;
-    ComPtr<ID3D11Fence> m_copyResourceFence;
-    HANDLE m_copyResourceEventHandle;
-    uint64_t m_copyResourceFenceValue = 1;
 
     bool m_isCudaSupport;
     CudaContext m_cudaContext;
