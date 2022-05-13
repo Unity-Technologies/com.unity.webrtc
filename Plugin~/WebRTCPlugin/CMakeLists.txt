@@ -48,6 +48,8 @@ target_sources(WebRTCLib
     VideoFrame.h
     VideoFrameAdapter.cpp
     VideoFrameAdapter.h
+    VideoFrameScheduler.cpp
+    VideoFrameScheduler.h
     VideoFrameUtil.cpp
     VideoFrameUtil.h
     GpuMemoryBuffer.cpp
