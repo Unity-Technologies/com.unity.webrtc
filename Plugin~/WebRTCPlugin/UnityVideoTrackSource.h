@@ -3,7 +3,6 @@
 #include <mutex>
 
 #include "VideoFrame.h"
-#include "VideoCaptureFeedback.h"
 
 namespace unity {
 namespace webrtc {
@@ -14,8 +13,8 @@ using namespace ::webrtc;
 // the webrtc video pipeline, each received a media::VideoFrame is converted to
 // a webrtc::VideoFrame, taking any adaptation requested by downstream classes
 // into account.
-class UnityVideoTrackSource :
-    public rtc::AdaptedVideoTrackSource
+class VideoFrameScheduler;
+class UnityVideoTrackSource : public rtc::AdaptedVideoTrackSource
 {
     public:
         //struct FrameAdaptationParams
@@ -31,7 +30,7 @@ class UnityVideoTrackSource :
 
     UnityVideoTrackSource(
         bool is_screencast,
-        absl::optional<bool> needs_denoising, VideoCaptureFeedbackCB feedbackCallback);
+        absl::optional<bool> needs_denoising);
     ~UnityVideoTrackSource() override;
 
     SourceState state() const override;
@@ -44,7 +43,8 @@ class UnityVideoTrackSource :
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
     
-    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast, absl::optional<bool> needs_denoising, VideoCaptureFeedbackCB feedbackCallback);
+    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast,
+                                                            absl::optional<bool> needs_denoising);
 
 private:
     void SendFeedback();
@@ -71,7 +71,7 @@ private:
     const absl::optional<bool> needs_denoising_;
     std::mutex m_mutex;
 
-    const VideoCaptureFeedbackCB feedbackCallback_;
+    std::unique_ptr<VideoFrameScheduler> scheduler_;
 };
 
 } // end namespace webrtc

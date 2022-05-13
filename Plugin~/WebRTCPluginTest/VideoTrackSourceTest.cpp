@@ -32,7 +32,7 @@ public:
     VideoTrackSourceTest()
         : m_texture(nullptr)
     {
-        m_trackSource = UnityVideoTrackSource::Create(false, absl::nullopt, nullptr);
+        m_trackSource = UnityVideoTrackSource::Create(false, absl::nullopt);
         m_trackSource->AddOrUpdateSink(&mock_sink_, rtc::VideoSinkWants());
     }
     ~VideoTrackSourceTest() override

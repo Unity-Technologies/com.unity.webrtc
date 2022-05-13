@@ -2,25 +2,26 @@
 
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
+#include "VideoFrameScheduler.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(
-        bool is_screencast, absl::optional<bool> needs_denoising, VideoCaptureFeedbackCB feedbackCallback)
-    {
-    return new rtc::RefCountedObject<UnityVideoTrackSource>(is_screencast, needs_denoising, feedbackCallback);
+rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(bool is_screencast, absl::optional<bool> needs_denoising)
+{
+    return new rtc::RefCountedObject<UnityVideoTrackSource>(is_screencast, needs_denoising);
 }
 
 UnityVideoTrackSource::UnityVideoTrackSource(
-    bool is_screencast, absl::optional<bool> needs_denoising, VideoCaptureFeedbackCB feedbackCallback)
+    bool is_screencast,
+    absl::optional<bool> needs_denoising)
     : AdaptedVideoTrackSource(/*required_alignment=*/1)
     , is_screencast_(is_screencast)
-    , needs_denoising_(needs_denoising)
-    , feedbackCallback_(std::move(feedbackCallback))
 {
+    scheduler_ = std::make_unique<VideoFrameScheduler>();
+    scheduler_->Start(CaptureNextFrame);
 }
 
 UnityVideoTrackSource::~UnityVideoTrackSource()
@@ -53,14 +54,7 @@ absl::optional<bool> UnityVideoTrackSource::needs_denoising() const
 
 void UnityVideoTrackSource::SendFeedback()
 {
-    if (!feedbackCallback_)
-    {
-        return;
-    }
-    VideoCaptureFeedback feedback;
-    // feedback.max_pixels = video_adapter()->GetTargetPixels();
-    feedback.maxFramerate = video_adapter()->GetMaxFramerate();
-    feedbackCallback_(feedback);
+    //float maxFramerate = video_adapter()->GetMaxFramerate();
 }
 
 void UnityVideoTrackSource::OnFrameCaptured(
