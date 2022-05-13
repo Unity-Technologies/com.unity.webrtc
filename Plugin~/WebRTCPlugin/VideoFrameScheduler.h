@@ -16,7 +16,7 @@ namespace webrtc
 
         // Starts the scheduler. |capture_callback| will be called whenever a new
         // frame should be captured.
-        virtual void Start(const base::RepeatingClosure& capture_callback);
+        virtual void Start(std::function<void()> capture_callback);
 
         // Pause and resumes the scheduler.
         virtual void Pause(bool pause);

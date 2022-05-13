@@ -1,12 +1,14 @@
 #include "pch.h"
 
+#include <functional>
+
 #include "VideoFrameScheduler.h"
 
 namespace unity
 {
 namespace webrtc
 {
-    void VideoFrameScheduler::Start(const base::RepeatingClosure& capture_callback) { }
+    void VideoFrameScheduler::Start(std::function<void()> capture_callback) { }
 
     void VideoFrameScheduler::Pause(bool pause) {}
 

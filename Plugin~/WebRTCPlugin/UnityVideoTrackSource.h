@@ -47,6 +47,7 @@ class UnityVideoTrackSource : public rtc::AdaptedVideoTrackSource
                                                             absl::optional<bool> needs_denoising);
 
 private:
+    void CaptureNextFrame();
     void SendFeedback();
     //FrameAdaptationParams ComputeAdaptationParams(int width,
     //                                            int height,

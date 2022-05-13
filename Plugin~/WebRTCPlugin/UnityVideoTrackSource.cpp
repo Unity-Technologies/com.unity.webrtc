@@ -21,7 +21,7 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     , is_screencast_(is_screencast)
 {
     scheduler_ = std::make_unique<VideoFrameScheduler>();
-    scheduler_->Start(CaptureNextFrame);
+    scheduler_->Start(std::bind(&UnityVideoTrackSource::CaptureNextFrame, this));
 }
 
 UnityVideoTrackSource::~UnityVideoTrackSource()
@@ -52,9 +52,11 @@ absl::optional<bool> UnityVideoTrackSource::needs_denoising() const
     return needs_denoising_;
 }
 
+void UnityVideoTrackSource::CaptureNextFrame() { }
+
 void UnityVideoTrackSource::SendFeedback()
 {
-    //float maxFramerate = video_adapter()->GetMaxFramerate();
+    scheduler_->SetMaxFramerateFps(video_adapter()->GetMaxFramerate());
 }
 
 void UnityVideoTrackSource::OnFrameCaptured(
