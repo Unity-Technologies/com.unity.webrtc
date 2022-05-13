@@ -77,7 +77,7 @@ namespace webrtc
         codec_settings.width = 4000;
         codec_settings.height = 4000;
       
-        EXPECT_THROW(encoder.InitEncode(&codec_settings, kSettings()), NVENCException);
+        EXPECT_EQ(encoder.InitEncode(&codec_settings, kSettings()), WEBRTC_VIDEO_CODEC_ERR_PARAMETER);
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDevice, NvEncoderImplTest, testing::ValuesIn(supportedGfxDevices));

@@ -15,6 +15,7 @@ target_sources(WebRTCLibTest
     GraphicsDeviceTest.cpp
     GraphicsDeviceTestBase.cpp
     GraphicsDeviceTestBase.h
+    H264ProfileLevelIdTest.cpp
     InternalCodecsTest.cpp
     UnityVideoEncoderFactoryTest.cpp
     UnityVideoDecoderFactoryTest.cpp
