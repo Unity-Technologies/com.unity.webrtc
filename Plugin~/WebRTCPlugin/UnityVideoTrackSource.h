@@ -31,7 +31,7 @@ class UnityVideoTrackSource :
 
     UnityVideoTrackSource(
         bool is_screencast,
-        absl::optional<bool> needs_denoising);
+        absl::optional<bool> needs_denoising, VideoCaptureFeedbackCB feedbackCallback);
     ~UnityVideoTrackSource() override;
 
     SourceState state() const override;
@@ -44,8 +44,7 @@ class UnityVideoTrackSource :
     using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
     using ::webrtc::VideoTrackSourceInterface::RemoveSink;
     
-    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast,
-                                                            absl::optional<bool> needs_denoising);
+    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast, absl::optional<bool> needs_denoising, VideoCaptureFeedbackCB feedbackCallback);
 
 private:
     void SendFeedback();
@@ -72,7 +71,7 @@ private:
     const absl::optional<bool> needs_denoising_;
     std::mutex m_mutex;
 
-    const VideoCaptureFeedbackCB feedbackCallback;
+    const VideoCaptureFeedbackCB feedbackCallback_;
 };
 
 } // end namespace webrtc

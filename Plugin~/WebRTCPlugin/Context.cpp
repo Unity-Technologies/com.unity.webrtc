@@ -283,7 +283,7 @@ namespace webrtc
     {
         const rtc::scoped_refptr<UnityVideoTrackSource> source =
             new rtc::RefCountedObject<UnityVideoTrackSource>(
-                false, absl::nullopt);
+                false, absl::nullopt, nullptr);
         AddRefPtr(source);
         return source;
     }

@@ -1,19 +1,17 @@
 #pragma once
 
-#include "base/callback.h"
+#include <functional>
 
 namespace unity
 {
 namespace webrtc
 {
-    struct VideoCaptureFeedback;
-
-    using VideoCaptureFeedbackCB =
-    base::RepeatingCallback<void(const VideoCaptureFeedback&)>;
-
     struct VideoCaptureFeedback
     {
         float maxFramerate;
     };
+
+    using VideoCaptureFeedbackCB = std::function<void(const VideoCaptureFeedback&)>;
+
 }
 }

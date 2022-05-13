@@ -7,11 +7,6 @@ namespace unity
 {
 namespace webrtc
 {
-    struct VideoCaptureFeedback
-    {
-        float maxFramerate;
-    };
-
     class VideoFrameScheduler
     {
     public:
