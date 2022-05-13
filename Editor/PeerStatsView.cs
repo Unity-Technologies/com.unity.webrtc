@@ -248,7 +248,6 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(outboundStats.Id)}: {outboundStats.Id}"));
                 container.Add(new Label($"{nameof(outboundStats.Timestamp)}: {outboundStats.Timestamp}"));
                 container.Add(new Label($"{nameof(outboundStats.ssrc)}: {outboundStats.ssrc}"));
-                container.Add(new Label($"{nameof(outboundStats.estimatedPlayoutTimestamp)}: {outboundStats.estimatedPlayoutTimestamp}"));
                 container.Add(new Label($"{nameof(outboundStats.mediaType)}: {outboundStats.mediaType}"));
                 container.Add(new Label($"{nameof(outboundStats.kind)}: {outboundStats.kind}"));
                 container.Add(new Label($"{nameof(outboundStats.trackId)}: {outboundStats.trackId}"));

@@ -95,6 +95,11 @@ namespace Unity.WebRTC.Editor
                         break;
                 }
             };
+
+            if (EditorApplication.isPlaying && m_editorCoroutine == null)
+            {
+                m_editorCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(GetStatsPolling());
+            }
         }
 
         private void OnDisable()
