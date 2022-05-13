@@ -22,10 +22,10 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(
     : IGraphicsDevice(renderer)
     , m_d3d11Device(nativeDevice)
     , m_copyResourceEventHandle(nullptr)
-    {
+{
     // Enable multithread protection
     ComPtr<ID3D11Multithread> thread;
-    m_d3d11Device->QueryInterface(IID_PPV_ARGS(&thread));
+    m_d3d11Device->QueryInterface<ID3D11Multithread>(&thread);
     thread->SetMultithreadProtected(true);
 }
 
@@ -44,7 +44,7 @@ bool D3D11GraphicsDevice::InitV()
     }
 
     ComPtr<ID3D11Device5> d3d11Device5;
-    m_d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11Device5));
+    m_d3d11Device->QueryInterface<ID3D11Device5>(&d3d11Device5);
     HRESULT hr = d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
     if (hr == S_OK)
     {
