@@ -21,6 +21,7 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(
     ID3D11Device* nativeDevice, UnityGfxRenderer renderer) 
     : IGraphicsDevice(renderer)
     , m_d3d11Device(nativeDevice)
+    , m_isCudaSupport(false)
 {
     // Enable multithread protection
     ComPtr<ID3D11Multithread> thread;
