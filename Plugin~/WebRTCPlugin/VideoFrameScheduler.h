@@ -1,7 +1,7 @@
 #pragma once
 
 #include "VideoFrame.h"
-#include "base/callback_forward.h"
+#include "rtc_base/task_utils/repeating_task.h"
 
 namespace unity
 {
@@ -10,9 +10,11 @@ namespace webrtc
     class VideoFrameScheduler
     {
     public:
-        VideoFrameScheduler() = default;
+        VideoFrameScheduler(TaskQueueFactory* taskQueueFactory, Clock* clock = Clock::GetRealTimeClock());
         VideoFrameScheduler(const VideoFrameScheduler&) = delete;
         VideoFrameScheduler& operator=(const VideoFrameScheduler&) = delete;
+
+        virtual ~VideoFrameScheduler() = default;
 
         // Starts the scheduler. |capture_callback| will be called whenever a new
         // frame should be captured.
@@ -27,10 +29,22 @@ namespace webrtc
 
         // Called when WebRTC requests the VideoTrackSource to provide frames
         // at a maximum framerate.
-        virtual void SetMaxFramerateFps(int max_framerate_fps);
+        virtual void SetMaxFramerateFps(int maxFramerate);
 
-    protected:
-        virtual ~VideoFrameScheduler() = default;
+    private:
+        absl::optional<TimeDelta> ScheduleNextFrame();
+        void CaptureNextFrame();
+        void StartRepeatingTask();
+        void StopTask();
+
+        std::function<void()> callback_;
+        bool paused_ = false;
+        int maxFramerate_;
+        std::unique_ptr<rtc::TaskQueue> taskQueue_;
+        RepeatingTaskHandle task_;
+        TaskQueueFactory* tackQueueFactory_;
+        Timestamp lastCaptureStartedTime_;
+        Clock* clock_;
     };
 }
 }

@@ -6,6 +6,7 @@
 #include "GraphicsDeviceTestBase.h"
 #include "UnityVideoRenderer.h"
 #include "UnityVideoTrackSource.h"
+#include "api/task_queue/default_task_queue_factory.h"
 
 using testing::_;
 using testing::Invoke;
@@ -22,10 +23,12 @@ namespace webrtc
     {
     public:
         VideoRendererTest()
+            : m_taskQueueFactory(CreateDefaultTaskQueueFactory())
         {
             m_trackSource = UnityVideoTrackSource::Create(
                 /*is_screencast=*/false,
-                /*needs_denoising=*/absl::nullopt);
+                /*needs_denoising=*/absl::nullopt,
+                m_taskQueueFactory.get());
             m_callback = &OnFrameSizeChange;
             m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
             m_trackSource->AddOrUpdateSink(m_renderer.get(), rtc::VideoSinkWants());
@@ -43,6 +46,7 @@ namespace webrtc
         std::unique_ptr<Context> context;
         std::unique_ptr<ITexture2D> m_texture;
 
+        std::unique_ptr<TaskQueueFactory> m_taskQueueFactory;
         std::unique_ptr<UnityVideoRenderer> m_renderer;
         rtc::scoped_refptr<UnityVideoTrackSource> m_trackSource;
         DelegateVideoFrameResize m_callback;

@@ -44,8 +44,6 @@ target_sources(WebRTCLib
     WebRTCPlugin.h
     UnityLogStream.h
     UnityLogStream.cpp
-    VideoCaptureFeedback.cpp
-    VideoCaptureFeedback.h
     VideoFrame.cpp
     VideoFrame.h
     VideoFrameAdapter.cpp

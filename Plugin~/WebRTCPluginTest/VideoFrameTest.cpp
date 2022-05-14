@@ -6,8 +6,6 @@
 #include "GraphicsDevice/ITexture2D.h"
 #include "GraphicsDeviceContainer.h"
 
-//#include "api/utils/timedelta.h"
-
 namespace unity
 {
 namespace webrtc
