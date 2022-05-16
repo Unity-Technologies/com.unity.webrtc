@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Removed unnecessary dependencies of the native plugin on Linux.
 
+### Removed
+
+- Removed an argument `EncoderType` for `WebRTC.Initialize` method.
+- Removed `WebRTC.HardwareEncoderSupport` method.
 
 ## [2.4.0-exp.6] - 2022-02-24
 

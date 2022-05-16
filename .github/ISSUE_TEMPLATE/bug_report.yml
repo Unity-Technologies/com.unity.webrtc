@@ -46,7 +46,7 @@ body:
         Please describe your environment when the issue occurred.
         Example:
           - **OS**: Windows10
-          - **Unity version**: Unity 2021.2
+          - **Unity version**: Unity 2021.3
       value: |
           * OS:
           * Unity version:

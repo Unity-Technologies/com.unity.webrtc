@@ -12,7 +12,7 @@ On windows, first, the build process use the **clang** compiler. To install clan
 
 ```powershell
 # Install CUDA
-choco install cuda --version=10.1
+choco install cuda --version=11.0.3
 
 # Install Windows SDK
 # WARNING: If you have versions of Windows SDK earlier than Version 1809,
@@ -20,50 +20,43 @@ choco install cuda --version=10.1
 choco install -y vcredist2010 vcredist2013 vcredist140 windows-sdk-10-version-1809-all
 
 # Install Vulkan
-choco install -y wget
-wget https://vulkan.lunarg.com/sdk/download/1.1.121.2/windows/VulkanSDK-1.1.121.2-Installer.exe -O C:/Windows/Temp/VulkanSDK.exe
-C:/Windows/Temp/VulkanSDK.exe /S
+choco install vulkan-sdk --version=1.2.182.0
 
-# Install CMake 3.18.0
-choco install cmake -y --version 3.18.0
+# Install CMake 3.22.3
+choco install cmake -y --version=3.22.3
 
 # Install 7zip (used to extract Google's webrtc library after download)
 choco install 7zip
 
 # Setting up environment variables
-setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1" /m
-setx VULKAN_SDK "C:\VulkanSDK\1.1.121.2" /m
+setx CUDA_PATH "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.0" /m
+setx VULKAN_SDK "C:\VulkanSDK\1.2.182.0" /m
 ```
 
 ### Ubuntu
 
-The below commands shows the build process developing environment on Ubuntu `18.04` or `20.04`.
+The below commands shows the build process developing environment on Ubuntu `20.04`.
 
 ```bash
-# Install libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
-# Ubuntu `18.04`
-sudo apt install -y libc++-10-dev libc++abi-10-dev clang-10 vulkan-utils libvulkan1 libvulkan-dev
-
-# Ubuntu `20.04`
-sudo apt install -y libc++-dev libc++abi-dev clang vulkan-utils libvulkan1 libvulkan-dev
-
-# Install freeglut3-dev
-sudo apt update
-sudo apt install -y freeglut3-dev
+#install packages
+sudo apt install -y libc++1 libc++abi1 vulkan-utils libvulkan1 libvulkan-dev libglib2.0-dev python3-venv lld clang-10 libc++-10-dev libc++abi-10-dev freeglut3-dev
 
 # Install CUDA SDK
-sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.1.243-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu1804_10.1.243-1_amd64.deb
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt update
-sudo apt install -y cuda
+sudo apt install -y nvidia-driver-510 libnvidia-gl-510 libnvidia-decode-510 libnvidia-encode-510
+sudo apt install -y cuda-toolkit-11-0
 
-# Install CMake 3.18.0
+# Install CMake 3.22.3
 sudo apt install -y libssl-dev
 sudo apt purge -y cmake
-wget https://github.com/Kitware/CMake/releases/download/v3.18.0/cmake-3.18.0.tar.gz
-tar xvf cmake-3.18.0.tar.gz
-cd cmake-3.18.0
+wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3.tar.gz
+tar xvf cmake-3.22.3.tar.gz
+cd cmake-3.22.3
 ./bootstrap && make && sudo make install
 ```
 
@@ -91,12 +84,12 @@ wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
 # Set Android NDK root path to `ANDROID_NDK` environment variable
 echo "export ANDROID_NDK=~/android-ndk-r21d/" >> ~/.profile
 
-# Install CMake 3.18.0
+# Install CMake 3.22.3
 sudo apt install -y libssl-dev
 sudo apt purge -y cmake
-wget https://github.com/Kitware/CMake/releases/download/v3.18.0/cmake-3.18.0.tar.gz
-tar xvf cmake-3.18.0.tar.gz
-cd cmake-3.18.0
+wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3.tar.gz
+tar xvf cmake-3.22.3.tar.gz
+cd cmake-3.22.3
 ./bootstrap && make && sudo make install
 
 # Install pkg-config, zip

@@ -1,7 +1,7 @@
 # Install package
 
 > [!NOTE]
-> In Unity `2021.2`, `2020.3` and `2019.4`, there are differences about how to install WebRTC package so please pay attention to the Unity version you are using and follow the instructions below.
+> In Unity `2021.3`, `2020.3` and `2019.4`, there are differences about how to install WebRTC package so please pay attention to the Unity version you are using and follow the instructions below.
 
 ## Case of Unity 2019.4
 
