@@ -20,8 +20,8 @@ platforms:
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.2.3-1084235
-    gpu_image: renderstreaming/ubuntu:v0.2.3-1084236
+    image: renderstreaming/ubuntu:v0.2.4-1104052
+    gpu_image: renderstreaming/ubuntu:v0.2.4-1104053
     flavor: b1.large
     model: rtx2080
     build_command: BuildScripts~/build_plugin_linux.sh
@@ -79,7 +79,7 @@ test_targets:
         platform: standalone
   - name: linux
     type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.3-1084235
+    image: renderstreaming/ubuntu:v0.2.4-1104052
     flavor: b1.large
     is_gpu: false
     gfx_types:
@@ -120,7 +120,7 @@ test_targets:
         platform: standalone
   - name: linux-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.2.3-1084236
+    image: renderstreaming/ubuntu:v0.2.4-1104053
     flavor: b1.large
     model: rtx2080
     is_gpu: true
@@ -323,7 +323,7 @@ pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
   agent:
     type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.3-1084235
+    image: renderstreaming/ubuntu:v0.2.4-1104052
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
@@ -726,7 +726,7 @@ publish_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_vulkan
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_glcore
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
@@ -753,6 +753,6 @@ publish_dry_run_{{ package.name }}:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
     {% for editor in editors %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_vulkan
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_glcore
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
