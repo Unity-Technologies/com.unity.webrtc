@@ -29,7 +29,9 @@ UnityVideoTrackSource::UnityVideoTrackSource(
     , is_screencast_(is_screencast)
     , videoFrame_(BlackFrame(128, 128))
 {
-    scheduler_ = std::make_unique<VideoFrameScheduler>(taskQueueFactory);
+    taskQueue_ = std::make_unique<rtc::TaskQueue>(
+        taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
+    scheduler_ = std::make_unique<VideoFrameScheduler>(taskQueue_->Get());
     scheduler_->Start(std::bind(&UnityVideoTrackSource::CaptureNextFrame, this));
 }
 

@@ -8,14 +8,12 @@ namespace unity
 {
 namespace webrtc
 {
-    VideoFrameScheduler::VideoFrameScheduler(TaskQueueFactory* taskQueueFactory, Clock* clock)
+    VideoFrameScheduler::VideoFrameScheduler(TaskQueueBase* queue, Clock* clock)
         : maxFramerate_(30)
-        , tackQueueFactory_(taskQueueFactory)
+        , queue_(queue)
         , lastCaptureStartedTime_(Timestamp::Zero())
         , clock_(clock)
     {
-        taskQueue_ = std::make_unique<rtc::TaskQueue>(
-            tackQueueFactory_->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
     }
 
     void VideoFrameScheduler::Start(std::function<void()> callback)
@@ -82,7 +80,7 @@ namespace webrtc
         RTC_DCHECK(firstDelay);
 
         task_ = RepeatingTaskHandle::DelayedStart(
-            taskQueue_->Get(),
+            queue_,
             firstDelay.value(),
             [this]()
             {
@@ -97,7 +95,7 @@ namespace webrtc
     void VideoFrameScheduler::StopTask()
     {
         RTC_DCHECK(task_.Running());
-        taskQueue_->PostTask([this] { task_.Stop(); });
+        task_.Stop();
     }
 }
 }

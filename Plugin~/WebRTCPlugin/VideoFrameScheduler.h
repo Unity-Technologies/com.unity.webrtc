@@ -10,7 +10,7 @@ namespace webrtc
     class VideoFrameScheduler
     {
     public:
-        VideoFrameScheduler(TaskQueueFactory* taskQueueFactory, Clock* clock = Clock::GetRealTimeClock());
+        VideoFrameScheduler(TaskQueueBase* queue, Clock* clock = Clock::GetRealTimeClock());
         VideoFrameScheduler(const VideoFrameScheduler&) = delete;
         VideoFrameScheduler& operator=(const VideoFrameScheduler&) = delete;
 
@@ -40,9 +40,8 @@ namespace webrtc
         std::function<void()> callback_;
         bool paused_ = false;
         int maxFramerate_;
-        std::unique_ptr<rtc::TaskQueue> taskQueue_;
         RepeatingTaskHandle task_;
-        TaskQueueFactory* tackQueueFactory_;
+        TaskQueueBase* queue_;
         Timestamp lastCaptureStartedTime_;
         Clock* clock_;
     };

@@ -76,6 +76,7 @@ private:
     const absl::optional<bool> needs_denoising_;
     std::mutex mutex_;
 
+    std::unique_ptr<rtc::TaskQueue> taskQueue_; 
     std::unique_ptr<VideoFrameScheduler> scheduler_;
     ::webrtc::VideoFrame videoFrame_;
 };

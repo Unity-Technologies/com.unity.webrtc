@@ -7,6 +7,60 @@ namespace unity
 {
 namespace webrtc
 {
+    class FakeTaskQueue : public TaskQueueBase
+    {
+    public:
+        explicit FakeTaskQueue(SimulatedClock* clock)
+            : task_queue_setter_(this)
+            , clock_(clock)
+        {
+        }
+
+        void Delete() override {}
+
+        void PostTask(std::unique_ptr<QueuedTask> task) override
+        {
+            last_task_ = std::move(task);
+            last_delay_ = 0;
+        }
+
+        void PostDelayedTask(std::unique_ptr<QueuedTask> task, uint32_t milliseconds) override
+        {
+            last_task_ = std::move(task);
+            last_delay_ = milliseconds;
+        }
+
+        bool AdvanceTimeAndRunLastTask()
+        {
+            EXPECT_TRUE(last_task_);
+            EXPECT_TRUE(last_delay_);
+            clock_->AdvanceTimeMilliseconds(last_delay_.value_or(0));
+            last_delay_.reset();
+            auto task = std::move(last_task_);
+            bool delete_task = task->Run();
+            if (!delete_task)
+            {
+                // If the task should not be deleted then just release it.
+                task.release();
+            }
+            return delete_task;
+        }
+
+        bool IsTaskQueued() { return !!last_task_; }
+
+        uint32_t last_delay() const
+        {
+            EXPECT_TRUE(last_delay_.has_value());
+            return last_delay_.value_or(-1);
+        }
+
+    private:
+        CurrentTaskQueueSetter task_queue_setter_;
+        SimulatedClock* clock_;
+        std::unique_ptr<QueuedTask> last_task_;
+        absl::optional<uint32_t> last_delay_;
+    };
+
     class VideoFrameSchedulerTest : public ::testing::Test
     {
     public:
@@ -16,10 +70,10 @@ namespace webrtc
         {
         }
         ~VideoFrameSchedulerTest() override = default;
-        void InitScheduler()
+
+        void InitScheduler(FakeTaskQueue& queue)
         {
-            taskQueueFactory_ = CreateDefaultTaskQueueFactory();
-            scheduler_ = std::make_unique<VideoFrameScheduler>(taskQueueFactory_.get(), &clock_);
+            scheduler_ = std::make_unique<VideoFrameScheduler>(&queue, &clock_);
             scheduler_->SetMaxFramerateFps(kMaxFramerate);
             scheduler_->Start(std::bind(&VideoFrameSchedulerTest::CaptureCallback, this));
         }
@@ -34,45 +88,48 @@ namespace webrtc
         const TimeDelta kTimeDelta = TimeDelta::Seconds(1) / kMaxFramerate;
         int count_ = 0;
         SimulatedClock clock_;
-        std::unique_ptr<TaskQueueFactory> taskQueueFactory_;
         std::unique_ptr<VideoFrameScheduler> scheduler_;
     };
 
     TEST_F(VideoFrameSchedulerTest, Run)
     {
-        InitScheduler();
+        FakeTaskQueue queue(&clock_);
+        InitScheduler(queue);
         EXPECT_EQ(0, count_);
-
-        rtc::Thread::SleepMs(static_cast<int>(kTimeDelta.ms()) + 1);
+        EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(1, count_);
     }
 
     TEST_F(VideoFrameSchedulerTest, Pause)
     {
-        InitScheduler();
+        FakeTaskQueue queue(&clock_);
+        InitScheduler(queue);
         EXPECT_EQ(0, count_);
 
         scheduler_->Pause(true);
-        rtc::Thread::SleepMs(static_cast<int>(kTimeDelta.ms()) + 1);
+        EXPECT_TRUE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(0, count_);
 
         scheduler_->Pause(false);
-        rtc::Thread::SleepMs(static_cast<int>(kTimeDelta.ms()) + 1);
+        EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(1, count_);
     }
 
     TEST_F(VideoFrameSchedulerTest, SetMaxFramerateFps)
     {
-        InitScheduler();
+        FakeTaskQueue queue(&clock_);
+        InitScheduler(queue);
         EXPECT_EQ(0, count_);
 
         const int maxFramerate = 5;
         scheduler_->SetMaxFramerateFps(maxFramerate);
-        rtc::Thread::SleepMs(static_cast<int>(kTimeDelta.ms()) + 1);
+        uint32_t delay = queue.last_delay();
+        EXPECT_GT(delay, 0u);
+        EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(1, count_);
 
-        const TimeDelta timeDelta = TimeDelta::Seconds(1) / maxFramerate;
-        rtc::Thread::SleepMs(static_cast<int>(timeDelta.ms()) + 1);
+        EXPECT_GT(queue.last_delay(), delay);
+        EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(2, count_);
 
     }
