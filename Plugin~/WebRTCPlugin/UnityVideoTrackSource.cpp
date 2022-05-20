@@ -69,8 +69,10 @@ void UnityVideoTrackSource::CaptureNextFrame()
 
 void UnityVideoTrackSource::SendFeedback()
 {
-    int maxFramerate = static_cast<int>(video_adapter()->GetMaxFramerate());
-    scheduler_->SetMaxFramerateFps(maxFramerate);
+    float maxFramerate = video_adapter()->GetMaxFramerate();
+    if (maxFramerate <= std::numeric_limits<float>::infinity())
+        return;
+    scheduler_->SetMaxFramerateFps(static_cast<int>(maxFramerate));
 }
 
 void UnityVideoTrackSource::OnFrameCaptured(
