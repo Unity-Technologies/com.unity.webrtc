@@ -8,6 +8,8 @@ namespace unity
 {
 namespace webrtc
 {
+    constexpr TimeDelta kTimeout = TimeDelta::Millis(1000);
+
     VideoFrameScheduler::VideoFrameScheduler(TaskQueueBase* queue, Clock* clock)
         : maxFramerate_(30)
         , queue_(queue)
@@ -16,9 +18,24 @@ namespace webrtc
     {
     }
 
+    VideoFrameScheduler::~VideoFrameScheduler()
+    {
+        rtc::Event done;
+
+        // Waiting for stopping task.
+        queue_->PostTask(ToQueuedTask(
+            [task = std::move(task_), &done]() mutable
+            {
+                task.Stop();
+                done.Set();
+            }));
+        done.Wait(kTimeout.ms());
+    }
+
     void VideoFrameScheduler::Start(std::function<void()> callback)
     {
         callback_ = callback;
+        lastCaptureStartedTime_ = clock_->CurrentTime();
         StartRepeatingTask();
     }
 
@@ -37,10 +54,7 @@ namespace webrtc
 
     void VideoFrameScheduler::OnFrameCaptured(const VideoFrame* frame) { }
 
-    void VideoFrameScheduler::SetMaxFramerateFps(int maxFramerate)
-    {
-        maxFramerate_ = maxFramerate;
-    }
+    void VideoFrameScheduler::SetMaxFramerateFps(int maxFramerate) { maxFramerate_ = maxFramerate; }
 
     absl::optional<TimeDelta> VideoFrameScheduler::ScheduleNextFrame()
     {
@@ -84,7 +98,7 @@ namespace webrtc
             firstDelay.value(),
             [this]()
             {
-                CaptureNextFrame();                
+                CaptureNextFrame();
                 auto delay = ScheduleNextFrame();
                 if (delay.has_value())
                     return delay.value();

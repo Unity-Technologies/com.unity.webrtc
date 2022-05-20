@@ -98,6 +98,8 @@ namespace webrtc
         EXPECT_EQ(0, count_);
         EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(1, count_);
+
+        scheduler_ = nullptr;
     }
 
     TEST_F(VideoFrameSchedulerTest, Pause)
@@ -113,6 +115,8 @@ namespace webrtc
         scheduler_->Pause(false);
         EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(1, count_);
+
+        scheduler_ = nullptr;
     }
 
     TEST_F(VideoFrameSchedulerTest, SetMaxFramerateFps)
@@ -132,6 +136,7 @@ namespace webrtc
         EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(2, count_);
 
+        scheduler_ = nullptr;
     }
 }
 }

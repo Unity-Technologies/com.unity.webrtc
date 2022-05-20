@@ -37,6 +37,7 @@ UnityVideoTrackSource::UnityVideoTrackSource(
 
 UnityVideoTrackSource::~UnityVideoTrackSource()
 {
+    scheduler_ = nullptr;
 }
 
 UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const

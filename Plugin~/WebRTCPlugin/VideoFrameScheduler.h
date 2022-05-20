@@ -14,7 +14,7 @@ namespace webrtc
         VideoFrameScheduler(const VideoFrameScheduler&) = delete;
         VideoFrameScheduler& operator=(const VideoFrameScheduler&) = delete;
 
-        virtual ~VideoFrameScheduler() = default;
+        virtual ~VideoFrameScheduler();
 
         // Starts the scheduler. |capture_callback| will be called whenever a new
         // frame should be captured.
