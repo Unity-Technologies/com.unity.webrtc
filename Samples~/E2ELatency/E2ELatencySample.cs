@@ -281,8 +281,20 @@ class E2ELatencySample : MonoBehaviour
                 if (pc1VideoSenders.Contains(transceiver.Sender))
                 {
                     transceiver.SetCodecPreferences(codecs);
+                    ChangeFramerate(transceiver.Sender, (uint)Application.targetFrameRate);
                 }
             }
+        }
+    }
+
+    private void ChangeFramerate(RTCRtpSender sender, uint framerate)
+    {
+        RTCRtpSendParameters parameters = sender.GetParameters();
+        parameters.encodings[0].maxFramerate = framerate;
+        RTCError error = sender.SetParameters(parameters);
+        if (error.errorType != RTCErrorType.None)
+        {
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
         }
     }
 
