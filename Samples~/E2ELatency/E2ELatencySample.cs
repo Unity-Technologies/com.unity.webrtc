@@ -84,6 +84,7 @@ class E2ELatencySample : MonoBehaviour
             listFramerate.Select(_ => new Dropdown.OptionData($"{_}")).ToList();
         dropDownFramerate.value = 1;
         dropDownFramerate.onValueChanged.AddListener(OnFramerateChanged);
+        OnFramerateChanged(dropDownFramerate.value);
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
