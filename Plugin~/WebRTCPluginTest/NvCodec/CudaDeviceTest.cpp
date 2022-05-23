@@ -63,7 +63,7 @@ namespace webrtc
         dstDesc.Height = static_cast<size_t>(kHeight);
         result = cuArrayCreate(&dst, &dstDesc);
         EXPECT_EQ(result, CUDA_SUCCESS);
-        //unity::webrtc::Resize(src, dst, kWidth, kHeight, MODE_NEAREST);
+        // unity::webrtc::Resize(src, dst, kWidth, kHeight, MODE_NEAREST);
 
         result = cuArrayDestroy(dst);
         EXPECT_EQ(result, CUDA_SUCCESS);

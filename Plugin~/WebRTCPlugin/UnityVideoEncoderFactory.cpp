@@ -1,28 +1,27 @@
 #include "pch.h"
 
+#include "GraphicsDevice/GraphicsUtility.h"
 #include "UnityVideoEncoderFactory.h"
+#include "media/engine/internal_encoder_factory.h"
 
 #if CUDA_PLATFORM
-#include "Codec/NvCodec/NvCodec.h"
 #include <cuda.h>
-#endif
 
-#include "GraphicsDevice/GraphicsUtility.h"
+#include "Codec/NvCodec/NvCodec.h"
+#endif
 
 #if UNITY_OSX || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h"
 #import "sdk/objc/native/api/video_encoder_factory.h"
 #elif UNITY_ANDROID
-#include "Android/Jni.h"
 #include "Android/AndroidCodecFactoryHelper.h"
+#include "Android/Jni.h"
 #endif
 
 namespace unity
 {
 namespace webrtc
 {
-    using namespace ::webrtc::H264;
-
     webrtc::VideoEncoderFactory* CreateNativeEncoderFactory(IGraphicsDevice* gfxDevice)
     {
 #if UNITY_OSX || UNITY_IOS
@@ -31,7 +30,7 @@ namespace webrtc
         if (IsVMInitialized())
             return CreateAndroidEncoderFactory().release();
 #elif CUDA_PLATFORM
-        if(gfxDevice->IsCudaSupport())
+        if (gfxDevice->IsCudaSupport())
         {
             CUcontext context = gfxDevice->GetCUcontext();
             NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();

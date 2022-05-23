@@ -1,10 +1,13 @@
 #pragma once
+
+#include <shared_mutex>
+
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "IUnityRenderingExtensions.h"
+#include "PlatformBase.h"
 #include "Size.h"
 #include "common_video/include/video_frame_buffer.h"
 #include "rtc_base/ref_counted_object.h"
-#include <shared_mutex>
 
 #if CUDA_PLATFORM
 #include <cuda.h>
@@ -33,7 +36,6 @@ namespace webrtc
         virtual rtc::scoped_refptr<I420BufferInterface> ToI420() = 0;
 
         virtual const GpuMemoryBufferHandle* handle() const = 0;
-        
 
     protected:
         ~GpuMemoryBufferInterface() override = default;
@@ -52,8 +54,10 @@ namespace webrtc
         Size GetSize() const override;
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;
         const GpuMemoryBufferHandle* handle() const override { return handle_.get(); }
+
     protected:
         ~GpuMemoryBufferFromUnity() override;
+
     private:
         IGraphicsDevice* device_;
         UnityRenderingExtTextureFormat format_;

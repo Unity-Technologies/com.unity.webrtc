@@ -1,13 +1,16 @@
 #pragma once
-#include "api/video_codecs/video_codec.h"
-#include "api/video_codecs/video_encoder.h"
-#include "media/base/codec.h"
 
 #include <cuda.h>
 
 #include "NvCodec.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "Size.h"
+#include "api/video_codecs/video_codec.h"
+#include "api/video_codecs/video_encoder.h"
+#include "common_video/h264/h264_bitstream_parser.h"
+#include "common_video/include/bitrate_adjuster.h"
+#include "media/base/codec.h"
+#include "system_wrappers/include/clock.h"
 
 namespace unity
 {
@@ -39,7 +42,6 @@ namespace webrtc
 
             void SetStreamState(bool send_stream);
         };
-        NvEncoderImpl();
         NvEncoderImpl(
             const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
         NvEncoderImpl(const NvEncoderImpl&) = delete;
@@ -61,6 +63,7 @@ namespace webrtc
 
     protected:
         int32_t ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame);
+
     private:
         void CopyResource(
             const NvEncInputFrame* encoderInputFrame,

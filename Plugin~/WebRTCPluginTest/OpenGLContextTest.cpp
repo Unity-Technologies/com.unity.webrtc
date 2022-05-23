@@ -2,6 +2,7 @@
 
 #include "GraphicsDeviceContainer.h"
 #include "GraphicsDevice/OpenGL/OpenGLContext.h"
+#include "rtc_base/thread.h"
 
 namespace unity
 {

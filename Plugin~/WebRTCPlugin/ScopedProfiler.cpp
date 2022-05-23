@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "ScopedProfiler.h"
 
 namespace unity
@@ -8,7 +9,7 @@ namespace webrtc
     IUnityProfiler* ScopedProfiler::UnityProfiler = nullptr;
 
     ScopedProfiler::ScopedProfiler(const UnityProfilerMarkerDesc& desc)
-    : m_desc(&desc)
+        : m_desc(&desc)
     {
         if (UnityProfiler == nullptr || UnityProfiler->IsAvailable() == 0)
             return;

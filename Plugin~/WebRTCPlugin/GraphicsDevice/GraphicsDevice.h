@@ -6,20 +6,20 @@ namespace unity
 {
 namespace webrtc
 {
-    
-//Singleton
-class GraphicsDevice
-{
+
+    // Singleton
+    class GraphicsDevice
+    {
     public:
         static GraphicsDevice& GetInstance();
         IGraphicsDevice* Init(IUnityInterfaces* unityInterface);
-        IGraphicsDevice* Init(
-            UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface);
+        IGraphicsDevice* Init(UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface);
+
     private:
         GraphicsDevice();
-        GraphicsDevice(GraphicsDevice const&) = delete;              
+        GraphicsDevice(GraphicsDevice const&) = delete;
         void operator=(GraphicsDevice const&) = delete;
-};
+    };
 
 } // end namespace webrtc
 } // end namespace unity

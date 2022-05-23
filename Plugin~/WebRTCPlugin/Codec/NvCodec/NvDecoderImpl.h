@@ -1,8 +1,11 @@
 #pragma once
-#include "NvCodec.h"
-#include "common_video/include/video_frame_buffer_pool.h"
-#include <NvDecoder/NvDecoder.h>
+
 #include <cuda.h>
+
+#include "NvCodec.h"
+#include "NvDecoder/NvDecoder.h"
+#include "common_video/include/video_frame_buffer_pool.h"
+#include "common_video/h264/h264_bitstream_parser.h"
 
 using namespace webrtc;
 
@@ -16,7 +19,6 @@ namespace webrtc
     class NvDecoderImpl : public unity::webrtc::NvDecoder
     {
     public:
-        NvDecoderImpl();
         NvDecoderImpl(CUcontext context);
         NvDecoderImpl(const NvDecoderImpl&) = delete;
         NvDecoderImpl& operator=(const NvDecoderImpl&) = delete;

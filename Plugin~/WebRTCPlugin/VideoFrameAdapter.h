@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
+
 #include "VideoFrame.h"
+#include "api/video/video_frame.h"
 
 namespace unity
 {
@@ -13,6 +16,7 @@ namespace webrtc
     {
     public:
         virtual bool scaled() const = 0;
+
     protected:
         ~ScalableBufferInterface() override { }
     };
@@ -20,7 +24,6 @@ namespace webrtc
     class VideoFrameAdapter : public ScalableBufferInterface
     {
     public:
-
         class ScaledBuffer : public ScalableBufferInterface
         {
         public:
@@ -34,7 +37,7 @@ namespace webrtc
 
             rtc::scoped_refptr<webrtc::I420BufferInterface> ToI420() override;
             const webrtc::I420BufferInterface* GetI420() const override;
-            
+
             rtc::scoped_refptr<webrtc::VideoFrameBuffer>
             GetMappedFrameBuffer(rtc::ArrayView<webrtc::VideoFrameBuffer::Type> types) override;
 
@@ -67,7 +70,7 @@ namespace webrtc
             int offset_x, int offset_y, int crop_width, int crop_height, int scaled_width, int scaled_height) override;
 
     protected:
-        ~VideoFrameAdapter() override {};
+        ~VideoFrameAdapter() override { }
 
     private:
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> GetOrCreateFrameBufferForSize(const Size& size);

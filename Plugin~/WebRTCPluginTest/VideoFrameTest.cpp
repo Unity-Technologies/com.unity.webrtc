@@ -18,6 +18,7 @@ namespace webrtc
             , device_(container_->device())
         {
         }
+
     protected:
         void SetUp() override
         {
@@ -32,14 +33,14 @@ namespace webrtc
         IGraphicsDevice* device_;
         const uint32_t kWidth = 256;
         const uint32_t kHeight = 256;
+        const Size kSize = { static_cast<int>(kWidth), static_cast<int>(kHeight) };
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
     };
 
     TEST_P(VideoFrameTest, WrapExternalGpuMemoryBuffer)
     {
-        const Size kSize(kWidth, kHeight);
         std::unique_ptr<ITexture2D> tex = std::unique_ptr<ITexture2D>(
-            container_->device()->CreateDefaultTextureV(kSize.width(), kSize.height(), kFormat));
+            container_->device()->CreateDefaultTextureV(kWidth, kHeight, kFormat));
         rtc::scoped_refptr<VideoFrame> videoFrame = CreateTestFrame(container_->device(), tex.get(), kFormat);
         ASSERT_NE(videoFrame, nullptr);
     }

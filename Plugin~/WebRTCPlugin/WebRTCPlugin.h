@@ -1,11 +1,14 @@
 #pragma once
 
+#include "api/media_stream_interface.h"
+#include "api/rtc_error.h"
+
 namespace unity
 {
 namespace webrtc
 {
 
-    namespace webrtc = ::webrtc;
+    using namespace ::webrtc;
 
     class Context;
     class PeerConnectionObject;
@@ -15,19 +18,13 @@ namespace webrtc
     enum class RTCPeerConnectionEventType;
     struct MediaStreamEvent;
 
-    using DelegateDebugLog = void(*)(const char*);
-    using DelegateSetResolution = void(*)(int32*, int32*);
-    using DelegateMediaStreamOnAddTrack =
-        void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
-    using DelegateMediaStreamOnRemoveTrack =
-        void(*)(webrtc::MediaStreamInterface*, webrtc::MediaStreamTrackInterface*);
-    using DelegateSetSessionDescSuccess = void(*)(PeerConnectionObject*);
-    using DelegateSetSessionDescFailure =
-        void(*)(PeerConnectionObject*, webrtc::RTCErrorType, const char*);
-    using DelegateVideoFrameResize =
-        void(*)(UnityVideoRenderer* renderer,
-            int width,
-            int height);
+    using DelegateDebugLog = void (*)(const char*);
+    using DelegateSetResolution = void (*)(int32_t*, int32_t*);
+    using DelegateMediaStreamOnAddTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
+    using DelegateMediaStreamOnRemoveTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
+    using DelegateSetSessionDescSuccess = void (*)(PeerConnectionObject*);
+    using DelegateSetSessionDescFailure = void (*)(PeerConnectionObject*, RTCErrorType, const char*);
+    using DelegateVideoFrameResize = void (*)(UnityVideoRenderer* renderer, int width, int height);
 
     void debugLog(const char* buf);
     extern DelegateDebugLog delegateDebugLog;
@@ -151,6 +148,6 @@ namespace webrtc
         bool iceRestart;
         bool voiceActivityDetection;
     };
-    
+
 } // end namespace webrtc
 } // end namespace unity

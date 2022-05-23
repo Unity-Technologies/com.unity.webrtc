@@ -1,12 +1,16 @@
 #pragma once
+
+#include <cuda.h>
+#include <vector>
+
 #include "api/video_codecs/h264_profile_level_id.h"
 #include "api/video_codecs/sdp_video_format.h"
 #include "api/video_codecs/video_decoder.h"
+#include "api/video_codecs/video_decoder_factory.h"
 #include "api/video_codecs/video_encoder.h"
+#include "api/video_codecs/video_encoder_factory.h"
 #include "media/base/codec.h"
 #include "nvEncodeAPI.h"
-#include <cuda.h>
-#include <vector>
 
 namespace unity
 {
@@ -23,10 +27,6 @@ namespace webrtc
     public:
         static std::unique_ptr<NvEncoder> Create(
             const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
-        // If H.264 is supported (any implementation).
-        static bool IsSupported();
-        static bool SupportsScalabilityMode(absl::string_view scalability_mode);
-
         ~NvEncoder() override { }
     };
 
@@ -43,7 +43,7 @@ namespace webrtc
     {
     public:
         NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format);
-        ~NvEncoderFactory();
+        ~NvEncoderFactory() override;
 
         std::vector<SdpVideoFormat> GetSupportedFormats() const override;
         VideoEncoderFactory::CodecInfo QueryVideoEncoder(const SdpVideoFormat& format) const override;
@@ -61,7 +61,7 @@ namespace webrtc
     {
     public:
         NvDecoderFactory(CUcontext context);
-        ~NvDecoderFactory();
+        ~NvDecoderFactory() override;
 
         std::vector<webrtc::SdpVideoFormat> GetSupportedFormats() const override;
         std::unique_ptr<webrtc::VideoDecoder> CreateVideoDecoder(const webrtc::SdpVideoFormat& format) override;

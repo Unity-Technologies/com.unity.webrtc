@@ -4,9 +4,10 @@
 #include "GraphicsDeviceContainer.h"
 
 #if SUPPORT_D3D11
-#include "GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
 #include <d3d11.h>
 #include <wrl/client.h>
+
+#include "GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
 #endif
 
 #if SUPPORT_METAL
@@ -27,15 +28,21 @@
 #if SUPPORT_VULKAN
 
 #if CUDA_PLATFORM
+#include <cuda.h>
+
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #include "NvCodecUtils.h"
-#include <cuda.h>
 #endif
 
 #if _WIN32
 #include <vulkan/vulkan_win32.h>
 #endif
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
+#endif
+
+#if _WIN32
+// nonstandard extension used : class rvalue used as lvalue
+#pragma clang diagnostic ignored "-Wlanguage-extension-token"
 #endif
 
 namespace unity
@@ -45,21 +52,22 @@ namespace webrtc
 
 #if defined(SUPPORT_D3D11) // D3D11
 
-    Microsoft::WRL::ComPtr<IDXGIFactory1> pFactory;
-    Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
-    Microsoft::WRL::ComPtr<ID3D11Device> pD3D11Device;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11DeviceContext;
+    using namespace Microsoft::WRL;
 
-    Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter1;
-    Microsoft::WRL::ComPtr<IDXGIFactory4> pFactory4;
-    Microsoft::WRL::ComPtr<ID3D12Device5> pD3D12Device;
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> pCommandQueue;
+    ComPtr<IDXGIFactory1> pFactory;
+    ComPtr<IDXGIAdapter> pAdapter;
+    ComPtr<ID3D11Device> pD3D11Device;
+    ComPtr<ID3D11DeviceContext> pD3D11DeviceContext;
+    ComPtr<IDXGIAdapter1> pAdapter1;
+    ComPtr<IDXGIFactory4> pFactory4;
+    ComPtr<ID3D12Device5> pD3D12Device;
+    ComPtr<ID3D12CommandQueue> pCommandQueue;
 
     const int kD3D12NodeMask = 0;
 
     //---------------------------------------------------------------------------------------------------------------------
 
-    void* CreateDeviceD3D11()
+    static void* CreateDeviceD3D11()
     {
         // recycle device
         if (pD3D11Device.Get() != nullptr)
@@ -92,12 +100,12 @@ namespace webrtc
 
     // Helper function for acquiring the first available hardware adapter that supports Direct3D 12.
     // If no such adapter can be found, *ppAdapter will be set to nullptr.
-    void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter)
+    static void GetHardwareAdapter(IDXGIFactory2* pDXGIFactory2, IDXGIAdapter1** ppAdapter)
     {
         Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
         *ppAdapter = nullptr;
 
-        for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != pFactory->EnumAdapters1(adapterIndex, &adapter);
+        for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != pDXGIFactory2->EnumAdapters1(adapterIndex, &adapter);
              ++adapterIndex)
         {
             DXGI_ADAPTER_DESC1 desc;
@@ -120,7 +128,7 @@ namespace webrtc
         *ppAdapter = adapter.Detach();
     }
 
-    void* CreateDeviceD3D12()
+    static void* CreateDeviceD3D12()
     {
         auto hr = CreateDXGIFactory2(0, IID_PPV_ARGS(&pFactory4));
         EXPECT_TRUE(SUCCEEDED(hr));
@@ -151,9 +159,9 @@ namespace webrtc
 #endif
 #if defined(SUPPORT_VULKAN) // Vulkan
 
-    LIBRARY_TYPE s_library = nullptr;
+    static LIBRARY_TYPE s_library = nullptr;
 
-    bool LoadVulkanModule()
+    static bool LoadVulkanModule()
     {
         if (!LoadVulkanLibrary(s_library))
             return false;
@@ -162,7 +170,8 @@ namespace webrtc
         return LoadGlobalVulkanFunction();
     }
 
-    int32_t GetPhysicalDeviceIndex(VkInstance instance, std::vector<VkPhysicalDevice>& list, bool findCudaDevice, bool* found)
+    static int32_t
+    GetPhysicalDeviceIndex(VkInstance instance, std::vector<VkPhysicalDevice>& list, bool findCudaDevice, bool* found)
     {
         std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
         for (size_t i = 0; i < list.size(); ++i)
@@ -179,13 +188,13 @@ namespace webrtc
             }
 #endif
             *found = true;
-            return i;
+            return static_cast<int32_t>(i);
         }
         *found = false;
         return 0;
     }
 
-    void* CreateDeviceVulkan()
+    static void* CreateDeviceVulkan()
     {
         // Extension
         std::vector<const char*> instanceExtensions =
@@ -233,8 +242,8 @@ namespace webrtc
         instanceInfo.ppEnabledExtensionNames = instanceExtensions.data();
         instanceInfo.pApplicationInfo = &appInfo;
         VkInstance instance = nullptr;
-        VkResult result =vkCreateInstance(&instanceInfo, nullptr, &instance);
-        if(result != VK_SUCCESS)
+        VkResult result = vkCreateInstance(&instanceInfo, nullptr, &instance);
+        if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkCreateInstance failed. error:" << result;
             return nullptr;
@@ -249,14 +258,14 @@ namespace webrtc
         // create physical device
         uint32_t devCount = 0;
         result = vkEnumeratePhysicalDevices(instance, &devCount, nullptr);
-        if(result != VK_SUCCESS)
+        if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
             return nullptr;
         }
         std::vector<VkPhysicalDevice> physicalDeviceList(devCount);
         result = vkEnumeratePhysicalDevices(instance, &devCount, physicalDeviceList.data());
-        if(result != VK_SUCCESS)
+        if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkEnumeratePhysicalDevices failed. error:" << result;
             return nullptr;
@@ -276,22 +285,22 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "GetPhysicalDeviceIndex device not found.";
             return nullptr;
         }
-        const VkPhysicalDevice physicalDevice = physicalDeviceList[physicalDeviceIndex];
+        const VkPhysicalDevice physicalDevice = physicalDeviceList[static_cast<size_t>(physicalDeviceIndex)];
         VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
 
         // create logical device
         uint32_t extensionCount = 0;
-        result =vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
-        if(result != VK_SUCCESS)
+        result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+        if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkEnumerateDeviceExtensionProperties failed. error:" << result;
             return nullptr;
         }
         std::vector<VkExtensionProperties> extensionPropertiesList(extensionCount);
-        result =vkEnumerateDeviceExtensionProperties(
+        result = vkEnumerateDeviceExtensionProperties(
             physicalDevice, nullptr, &extensionCount, extensionPropertiesList.data());
-        if(result != VK_SUCCESS)
+        if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkEnumerateDeviceExtensionProperties failed. error:" << result;
             return nullptr;
@@ -335,13 +344,16 @@ namespace webrtc
         deviceCreateInfo.queueCreateInfoCount = 1;
         VkDevice device;
         result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device);
-        if(result != VK_SUCCESS)
+        if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkCreateDevice failed. error:" << result;
             return nullptr;
         }
         if (!LoadDeviceVulkanFunction(device))
-            assert("failed loading vulkan module");
+        {
+            RTC_LOG(LS_INFO) << "Failed loading vulkan module";
+            return nullptr;
+        }
 
         VkQueue queue;
         vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
@@ -355,7 +367,7 @@ namespace webrtc
         return pVkInstance;
     }
 
-    void DestroyDeviceVulkan(void* pGfxDevice)
+    static void DestroyDeviceVulkan(void* pGfxDevice)
     {
         UnityVulkanInstance* pVkInstance = static_cast<UnityVulkanInstance*>(pGfxDevice);
         vkDestroyDevice(pVkInstance->device, nullptr);
@@ -367,9 +379,9 @@ namespace webrtc
 
 #if SUPPORT_METAL
 
-    void* CreateDeviceMetal() { return MetalDevice::CreateForTest().release(); }
+    static void* CreateDeviceMetal() { return MetalDevice::CreateForTest().release(); }
 
-    void DestroyDeviceMetalDevice(void* ptr)
+    static void DestroyDeviceMetalDevice(void* ptr)
     {
         MetalDevice* device = static_cast<MetalDevice*>(ptr);
         delete device;
@@ -382,7 +394,7 @@ namespace webrtc
     static bool s_glfwInitialized;
     static GLFWwindow* s_window;
 
-    void* CreateDeviceGLCore()
+    static void* CreateDeviceGLCore()
     {
         if (!s_glfwInitialized)
         {
@@ -404,7 +416,7 @@ namespace webrtc
         return context.release();
     }
 
-    void DestroyDeviceGLCore(void* pGfxDevice)
+    static void DestroyDeviceGLCore(void* pGfxDevice)
     {
         OpenGLContext* context = static_cast<OpenGLContext*>(pGfxDevice);
         delete context;
@@ -416,13 +428,14 @@ namespace webrtc
 #endif
 
 #if SUPPORT_OPENGL_ES
-    void* CreateDeviceGLES()
+    static void* CreateDeviceGLES()
     {
         OpenGLContext::Init();
         std::unique_ptr<OpenGLContext> context = OpenGLContext::CreateGLContext();
         return context.release();
     }
-    void DestroyDeviceGLES(void* pGfxDevice)
+
+    static void DestroyDeviceGLES(void* pGfxDevice)
     {
         OpenGLContext* context = static_cast<OpenGLContext*>(pGfxDevice);
         delete context;
@@ -432,7 +445,7 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
 
-    void* CreateNativeGfxDevice(UnityGfxRenderer renderer)
+    static void* CreateNativeGfxDevice(UnityGfxRenderer renderer)
     {
         switch (renderer)
         {
@@ -467,7 +480,7 @@ namespace webrtc
     }
     //---------------------------------------------------------------------------------------------------------------------
 
-    void DestroyNativeGfxDevice(void* pGfxDevice, UnityGfxRenderer renderer)
+    static void DestroyNativeGfxDevice(void* pGfxDevice, UnityGfxRenderer renderer)
     {
         switch (renderer)
         {
@@ -531,6 +544,7 @@ namespace webrtc
         device_ = std::unique_ptr<IGraphicsDevice>(device);
         device_->InitV();
     }
+
     GraphicsDeviceContainer::~GraphicsDeviceContainer()
     {
         if (device_)

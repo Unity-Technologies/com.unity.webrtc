@@ -1,13 +1,11 @@
 #pragma once
 
-extern "C" {
-#include "common_audio/ring_buffer.h"
-}
-
 #include <mutex>
-#include "api/media_stream_interface.h"
+
 #include "api/audio/audio_frame.h"
+#include "api/media_stream_interface.h"
 #include "common_audio/resampler/include/push_resampler.h"
+#include "common_audio/ring_buffer.h"
 
 namespace unity
 {
@@ -15,8 +13,7 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-    class AudioTrackSinkAdapter
-        : public webrtc::AudioTrackSinkInterface
+    class AudioTrackSinkAdapter : public webrtc::AudioTrackSinkInterface
     {
     public:
         AudioTrackSinkAdapter();
@@ -29,8 +26,8 @@ namespace webrtc
             size_t number_of_channels,
             size_t number_of_frames) override;
 
-        void ProcessAudio(
-            float* data, size_t length, size_t channels, int32_t sampleRate);
+        void ProcessAudio(float* data, size_t length, size_t channels, int32_t sampleRate);
+
     private:
         void ResizeBuffer(size_t channels, int32_t sampleRate, size_t length);
 

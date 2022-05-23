@@ -7,11 +7,14 @@
 #include "api/task_queue/task_queue_factory.h"
 #include "media/base/adapted_video_track_source.h"
 #include "VideoFrame.h"
+#include "media/base/adapted_video_track_source.h"
 
-namespace unity {
-namespace webrtc {
+namespace unity
+{
+namespace webrtc
+{
 
-using namespace ::webrtc;
+    using namespace ::webrtc;
 
 // This class implements webrtc's VideoTrackSourceInterface. To pass frames down
 // the webrtc video pipeline, each received a media::VideoFrame is converted to
@@ -21,7 +24,7 @@ class VideoFrameScheduler;
 class UnityVideoTrackSource : public rtc::AdaptedVideoTrackSource
 {
     public:
-        //struct FrameAdaptationParams
+        // struct FrameAdaptationParams
         //{
         //    bool should_drop_frame;
         //    int crop_x;
@@ -38,12 +41,12 @@ class UnityVideoTrackSource : public rtc::AdaptedVideoTrackSource
         TaskQueueFactory* taskQueueFactory);
     ~UnityVideoTrackSource() override;
 
-    SourceState state() const override;
+        SourceState state() const override;
 
-    bool remote() const override;
-    bool is_screencast() const override;
-    absl::optional<bool> needs_denoising() const override;
-    void OnFrameCaptured(rtc::scoped_refptr<VideoFrame> frame);
+        bool remote() const override;
+        bool is_screencast() const override;
+        absl::optional<bool> needs_denoising() const override;
+        void OnFrameCaptured(rtc::scoped_refptr<VideoFrame> frame);
 
     using VideoTrackSourceInterface::AddOrUpdateSink;
     using VideoTrackSourceInterface::RemoveSink;
@@ -57,20 +60,20 @@ private:
     //                                            int height,
     //                                            int64_t time_us);
 
-    // Delivers |frame| to base class method
-    // rtc::AdaptedVideoTrackSource::OnFrame(). If the cropping (given via
-    // |frame->visible_rect()|) has changed since the last delivered frame, the
-    // whole frame is marked as updated.
-    // void DeliverFrame(rtc::scoped_refptr<::webrtc::VideoFrame> frame,
-    //                  gfx::Rect* update_rect,
-    //                  int64_t timestamp_us);
+        // Delivers |frame| to base class method
+        // rtc::AdaptedVideoTrackSource::OnFrame(). If the cropping (given via
+        // |frame->visible_rect()|) has changed since the last delivered frame, the
+        // whole frame is marked as updated.
+        // void DeliverFrame(rtc::scoped_refptr<::webrtc::VideoFrame> frame,
+        //                  gfx::Rect* update_rect,
+        //                  int64_t timestamp_us);
 
-    // |thread_checker_| is bound to the libjingle worker thread.
-    // todo::(kazuki) change compiler vc to clang
-    // media::VideoFramePool scaled_frame_pool_;
+        // |thread_checker_| is bound to the libjingle worker thread.
+        // todo::(kazuki) change compiler vc to clang
+        // media::VideoFramePool scaled_frame_pool_;
 
-    // State for the timestamp translation.
-    rtc::TimestampAligner timestamp_aligner_;
+        // State for the timestamp translation.
+        rtc::TimestampAligner timestamp_aligner_;
 
     const bool is_screencast_;
     const absl::optional<bool> needs_denoising_;

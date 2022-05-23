@@ -32,15 +32,13 @@
 #elif defined(__linux__)
 #define UNITY_LINUX 1
 #elif defined(UNITY_METRO) || defined(UNITY_WEBGL)
-    // these are defined externally
+// these are defined externally
 #elif defined(__EMSCRIPTEN__)
-    // this is already defined in Unity 5.6
+// this is already defined in Unity 5.6
 #define UNITY_WEBGL 1
 #else
 #error "Unknown platform!"
 #endif
-
-
 
 // Which graphics device APIs we possibly support?
 #if UNITY_METRO
@@ -69,7 +67,7 @@
 #define SUPPORT_SOFTWARE_ENCODER 1
 #endif
 
-#if UNITY_IOS || UNITY_OSX  || UNITY_IOS_SIMULATOR
+#if UNITY_IOS || UNITY_OSX || UNITY_IOS_SIMULATOR
 #define SUPPORT_METAL 1
 #endif
 

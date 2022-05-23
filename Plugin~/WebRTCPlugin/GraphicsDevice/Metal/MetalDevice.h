@@ -8,7 +8,6 @@ namespace unity
 {
 namespace webrtc
 {
-    using namespace ::webrtc;
     class MetalDevice
     {
     public:

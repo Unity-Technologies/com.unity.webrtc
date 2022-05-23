@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cuda.h>
+
 #include "GpuMemoryBuffer.h"
 
 namespace unity
@@ -12,7 +13,7 @@ namespace webrtc
         GpuMemoryBufferCudaHandle();
         GpuMemoryBufferCudaHandle(GpuMemoryBufferCudaHandle&& other);
         GpuMemoryBufferCudaHandle& operator=(GpuMemoryBufferCudaHandle&& other);
-        virtual ~GpuMemoryBufferCudaHandle();
+        virtual ~GpuMemoryBufferCudaHandle() override;
 
         CUcontext context;
         CUarray array;

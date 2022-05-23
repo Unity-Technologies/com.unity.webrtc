@@ -1,26 +1,27 @@
 #include "pch.h"
-#include "WebRTCPlugin.h"
-#include "Context.h"
-
-#include "UnityAudioEncoderFactory.h"
-#include "UnityAudioDecoderFactory.h"
 
 #include "AudioTrackSinkAdapter.h"
-#include "MediaStreamObserver.h"
-#include "SetSessionDescriptionObserver.h"
-#include "UnityAudioTrackSource.h"
-#include "UnityVideoEncoderFactory.h"
-#include "UnityVideoDecoderFactory.h"
-#include "UnityVideoTrackSource.h"
+#include "Context.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "MediaStreamObserver.h"
+#include "SetSessionDescriptionObserver.h"
+#include "UnityAudioDecoderFactory.h"
+#include "UnityAudioEncoderFactory.h"
+#include "UnityAudioTrackSource.h"
+#include "UnityVideoDecoderFactory.h"
+#include "UnityVideoEncoderFactory.h"
+#include "UnityVideoTrackSource.h"
+#include "WebRTCPlugin.h"
+#include "api/create_peerconnection_factory.h"
+#include "api/task_queue/default_task_queue_factory.h"
+#include "rtc_base/ssl_adapter.h"
+#include "rtc_base/strings/json.h"
 
 #if CUDA_PLATFORM
 #include "Logger.h"
 simplelogger::Logger* logger = simplelogger::LoggerFactory::CreateConsoleLogger();
 #endif
-
-#include "api/task_queue/default_task_queue_factory.h"
 
 using namespace ::webrtc;
 
@@ -42,7 +43,8 @@ namespace webrtc
     Context* ContextManager::GetContext(int uid) const
     {
         auto it = s_instance->m_contexts.find(uid);
-        if (it != s_instance->m_contexts.end()) {
+        if (it != s_instance->m_contexts.end())
+        {
             return it->second.get();
         }
         return nullptr;
@@ -51,25 +53,22 @@ namespace webrtc
     Context* ContextManager::CreateContext(int uid, IGraphicsDevice* gfxDevice)
     {
         auto it = s_instance->m_contexts.find(uid);
-        if (it != s_instance->m_contexts.end()) {
+        if (it != s_instance->m_contexts.end())
+        {
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
-        auto ctx = new Context(gfxDevice);
-        s_instance->m_contexts[uid].reset(ctx);
-        return ctx;
+        s_instance->m_contexts[uid] = std::make_unique<Context>(gfxDevice);
+        return s_instance->m_contexts[uid].get();
     }
 
-    void ContextManager::SetCurContext(Context* context)
-    {
-        curContext = context;
-    }
+    void ContextManager::SetCurContext(Context* context) { curContext = context; }
 
-    bool ContextManager::Exists(Context *context)
+    bool ContextManager::Exists(Context* context)
     {
-        for(auto it = s_instance->m_contexts.begin(); it != s_instance->m_contexts.end(); ++it)
+        for (auto it = s_instance->m_contexts.begin(); it != s_instance->m_contexts.end(); ++it)
         {
-            if(it->second.get() == context)
+            if (it->second.get() == context)
                 return true;
         }
         return false;
@@ -86,7 +85,8 @@ namespace webrtc
 
     ContextManager::~ContextManager()
     {
-        if (m_contexts.size()) {
+        if (m_contexts.size())
+        {
             DebugWarning("%lu remaining context(s) registered", m_contexts.size());
         }
         m_contexts.clear();
@@ -94,7 +94,7 @@ namespace webrtc
 
     bool Convert(const std::string& str, PeerConnectionInterface::RTCConfiguration& config)
     {
-        config = PeerConnectionInterface::RTCConfiguration{};
+        config = PeerConnectionInterface::RTCConfiguration {};
         Json::CharReaderBuilder builder;
         const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
         Json::Value configJson;
@@ -102,7 +102,7 @@ namespace webrtc
         auto ok = reader->parse(str.c_str(), str.c_str() + static_cast<int>(str.length()), &configJson, &err);
         if (!ok)
         {
-            //json parse failed.
+            // json parse failed.
             return false;
         }
 
@@ -127,7 +127,7 @@ namespace webrtc
             config.servers.push_back(iceServer);
         }
         Json::Value iceTransportPolicy = configJson["iceTransportPolicy"];
-        if(iceTransportPolicy["hasValue"].asBool())
+        if (iceTransportPolicy["hasValue"].asBool())
         {
             config.type = static_cast<PeerConnectionInterface::IceTransportsType>(iceTransportPolicy["value"].asInt());
         }
@@ -179,9 +179,8 @@ namespace webrtc
             return RTCSdpType::Answer;
         case webrtc::SdpType::kRollback:
             return RTCSdpType::Rollback;
-        default:
-            throw std::invalid_argument("Unknown SdpType");
         }
+        throw std::invalid_argument("Unknown SdpType");
     }
 
     Context::Context(IGraphicsDevice* gfxDevice)
@@ -195,11 +194,7 @@ namespace webrtc
         rtc::InitializeSSL();
 
         m_audioDevice = m_workerThread->Invoke<rtc::scoped_refptr<DummyAudioDevice>>(
-            RTC_FROM_HERE, [&]()
-            {
-                return new rtc::RefCountedObject<DummyAudioDevice>(
-                    m_taskQueueFactory.get());
-            });
+            RTC_FROM_HERE, [&]() { return new rtc::RefCountedObject<DummyAudioDevice>(m_taskQueueFactory.get()); });
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
             std::make_unique<UnityVideoEncoderFactory>(gfxDevice);
@@ -207,22 +202,20 @@ namespace webrtc
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
             std::make_unique<UnityVideoDecoderFactory>(gfxDevice);
 
-        rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory =
-            CreateAudioEncoderFactory();
-        rtc::scoped_refptr<AudioDecoderFactory>  audioDecoderFactory =
-            CreateAudioDecoderFactory();
+        rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
+        rtc::scoped_refptr<AudioDecoderFactory> audioDecoderFactory = CreateAudioDecoderFactory();
 
         m_peerConnectionFactory = CreatePeerConnectionFactory(
-                                m_workerThread.get(),
-                                m_workerThread.get(),
-                                m_signalingThread.get(),
-                                m_audioDevice,
-                                audioEncoderFactory,
-                                audioDecoderFactory,
-                                std::move(videoEncoderFactory),
-                                std::move(videoDecoderFactory),
-                                nullptr,
-                                nullptr);
+            m_workerThread.get(),
+            m_workerThread.get(),
+            m_signalingThread.get(),
+            m_audioDevice,
+            audioEncoderFactory,
+            audioDecoderFactory,
+            std::move(videoEncoderFactory),
+            std::move(videoDecoderFactory),
+            nullptr,
+            nullptr);
     }
 
     Context::~Context()
@@ -231,12 +224,7 @@ namespace webrtc
             std::lock_guard<std::mutex> lock(mutex);
 
             m_peerConnectionFactory = nullptr;
-            m_workerThread->Invoke<void>(
-                RTC_FROM_HERE,
-                [this]()
-                {
-                    m_audioDevice = nullptr;
-                });
+            m_workerThread->Invoke<void>(RTC_FROM_HERE, [this]() { m_audioDevice = nullptr; });
             m_mapClients.clear();
 
             // check count of refptr to avoid to forget disposing
@@ -273,8 +261,7 @@ namespace webrtc
         m_mapMediaStreamObserver.erase(stream);
     }
 
-    MediaStreamObserver* Context::GetObserver(
-        const webrtc::MediaStreamInterface* stream)
+    MediaStreamObserver* Context::GetObserver(const webrtc::MediaStreamInterface* stream)
     {
         return m_mapMediaStreamObserver[stream].get();
     }
@@ -288,11 +275,9 @@ namespace webrtc
         return source;
     }
 
-    webrtc::VideoTrackInterface* Context::CreateVideoTrack(
-        const std::string& label, VideoTrackSourceInterface* source)
+    webrtc::VideoTrackInterface* Context::CreateVideoTrack(const std::string& label, VideoTrackSourceInterface* source)
     {
-        const rtc::scoped_refptr<VideoTrackInterface> track =
-            m_peerConnectionFactory->CreateVideoTrack(label, source);
+        const rtc::scoped_refptr<VideoTrackInterface> track = m_peerConnectionFactory->CreateVideoTrack(label, source);
         AddRefPtr(track);
         return track;
     }
@@ -304,14 +289,13 @@ namespace webrtc
 
     webrtc::AudioSourceInterface* Context::CreateAudioSource()
     {
-        //avoid optimization specially for voice
+        // avoid optimization specially for voice
         cricket::AudioOptions audioOptions;
         audioOptions.auto_gain_control = false;
         audioOptions.noise_suppression = false;
         audioOptions.highpass_filter = false;
 
-        const rtc::scoped_refptr<UnityAudioTrackSource> source =
-            UnityAudioTrackSource::Create(audioOptions);
+        const rtc::scoped_refptr<UnityAudioTrackSource> source = UnityAudioTrackSource::Create(audioOptions);
 
         AddRefPtr(source);
         return source;
@@ -319,12 +303,10 @@ namespace webrtc
 
     AudioTrackInterface* Context::CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source)
     {
-        const rtc::scoped_refptr<AudioTrackInterface> track =
-            m_peerConnectionFactory->CreateAudioTrack(label, source);
+        const rtc::scoped_refptr<AudioTrackInterface> track = m_peerConnectionFactory->CreateAudioTrack(label, source);
         AddRefPtr(track);
         return track;
     }
-
 
     AudioTrackSinkAdapter* Context::CreateAudioTrackSinkAdapter()
     {
@@ -334,10 +316,7 @@ namespace webrtc
         return ptr;
     }
 
-    void Context::DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink)
-    {
-        m_mapAudioTrackAndSink.erase(sink);
-    }
+    void Context::DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink) { m_mapAudioTrackAndSink.erase(sink); }
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
     {
@@ -346,16 +325,17 @@ namespace webrtc
 
     void Context::DeleteStatsReport(const webrtc::RTCStatsReport* report)
     {
-        auto found = std::find_if(m_listStatsReport.begin(), m_listStatsReport.end(),
-             [report](rtc::scoped_refptr<const webrtc::RTCStatsReport> it){ return it.get() == report; });
+        auto found = std::find_if(
+            m_listStatsReport.begin(),
+            m_listStatsReport.end(),
+            [report](rtc::scoped_refptr<const webrtc::RTCStatsReport> it) { return it.get() == report; });
         m_listStatsReport.erase(found);
-	}
+    }
 
-    DataChannelInterface* Context::CreateDataChannel(
-        PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
+    DataChannelInterface*
+    Context::CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options)
     {
-        const rtc::scoped_refptr<DataChannelInterface> channel =
-            obj->connection->CreateDataChannel(label, &options);
+        const rtc::scoped_refptr<DataChannelInterface> channel = obj->connection->CreateDataChannel(label, &options);
 
         if (channel == nullptr)
             return nullptr;
@@ -364,15 +344,13 @@ namespace webrtc
         return channel;
     }
 
-    void Context::AddDataChannel(
-        DataChannelInterface* channel, PeerConnectionObject& pc)
+    void Context::AddDataChannel(DataChannelInterface* channel, PeerConnectionObject& pc)
     {
         auto dataChannelObj = std::make_unique<DataChannelObject>(channel, pc);
         m_mapDataChannels[channel] = std::move(dataChannelObj);
     }
 
-    DataChannelObject* Context::GetDataChannelObject(
-        const DataChannelInterface* channel)
+    DataChannelObject* Context::GetDataChannelObject(const DataChannelInterface* channel)
     {
         return m_mapDataChannels[channel].get();
     }
@@ -385,7 +363,9 @@ namespace webrtc
         }
     }
 
-    void Context::AddObserver(const webrtc::PeerConnectionInterface* connection, const rtc::scoped_refptr<SetSessionDescriptionObserver>& observer)
+    void Context::AddObserver(
+        const webrtc::PeerConnectionInterface* connection,
+        const rtc::scoped_refptr<SetSessionDescriptionObserver>& observer)
     {
         m_mapSetSessionDescriptionObserver[connection] = observer;
     }
@@ -395,14 +375,11 @@ namespace webrtc
         m_mapSetSessionDescriptionObserver.erase(connection);
     }
 
-    PeerConnectionObject* Context::CreatePeerConnection(
-            const webrtc::PeerConnectionInterface::RTCConfiguration& config)
+    PeerConnectionObject* Context::CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
-        rtc::scoped_refptr<PeerConnectionObject> obj =
-                new rtc::RefCountedObject<PeerConnectionObject>(*this);
+        rtc::scoped_refptr<PeerConnectionObject> obj = new rtc::RefCountedObject<PeerConnectionObject>(*this);
         PeerConnectionDependencies dependencies(obj);
-        auto connection = m_peerConnectionFactory->CreatePeerConnectionOrError(
-                config, std::move(dependencies));
+        auto connection = m_peerConnectionFactory->CreatePeerConnectionOrError(config, std::move(dependencies));
         if (!connection.ok())
         {
             RTC_LOG(LS_ERROR) << connection.error().message();
@@ -414,10 +391,7 @@ namespace webrtc
         return m_mapClients[ptr].get();
     }
 
-    void Context::DeletePeerConnection(PeerConnectionObject *obj)
-    {
-        m_mapClients.erase(obj);
-    }
+    void Context::DeletePeerConnection(PeerConnectionObject* obj) { m_mapClients.erase(obj); }
 
     SetSessionDescriptionObserver* Context::GetObserver(webrtc::PeerConnectionInterface* connection)
     {
@@ -427,20 +401,15 @@ namespace webrtc
     uint32_t Context::s_rendererId = 0;
     uint32_t Context::GenerateRendererId() { return s_rendererId++; }
 
-    UnityVideoRenderer* Context::CreateVideoRenderer(
-        DelegateVideoFrameResize callback, bool needFlipVertical)
+    UnityVideoRenderer* Context::CreateVideoRenderer(DelegateVideoFrameResize callback, bool needFlipVertical)
     {
         auto rendererId = GenerateRendererId();
-        auto renderer = std::make_shared<UnityVideoRenderer>(
-            rendererId, callback, needFlipVertical);
+        auto renderer = std::make_shared<UnityVideoRenderer>(rendererId, callback, needFlipVertical);
         m_mapVideoRenderer[rendererId] = renderer;
         return m_mapVideoRenderer[rendererId].get();
     }
 
-    std::shared_ptr<UnityVideoRenderer> Context::GetVideoRenderer(uint32_t id)
-    {
-        return m_mapVideoRenderer[id];
-    }
+    std::shared_ptr<UnityVideoRenderer> Context::GetVideoRenderer(uint32_t id) { return m_mapVideoRenderer[id]; }
 
     void Context::DeleteVideoRenderer(UnityVideoRenderer* renderer)
     {
@@ -448,14 +417,12 @@ namespace webrtc
         renderer = nullptr;
     }
 
-    void Context::GetRtpSenderCapabilities(
-        cricket::MediaType kind, RtpCapabilities* capabilities) const
+    void Context::GetRtpSenderCapabilities(cricket::MediaType kind, RtpCapabilities* capabilities) const
     {
         *capabilities = m_peerConnectionFactory->GetRtpSenderCapabilities(kind);
     }
 
-    void Context::GetRtpReceiverCapabilities(
-        cricket::MediaType kind, RtpCapabilities* capabilities) const
+    void Context::GetRtpReceiverCapabilities(cricket::MediaType kind, RtpCapabilities* capabilities) const
     {
         *capabilities = m_peerConnectionFactory->GetRtpReceiverCapabilities(kind);
     }

@@ -35,13 +35,14 @@ namespace webrtc
             rtc::scoped_refptr<GpuMemoryBufferInterface> gpu_memory_buffer,
             ReturnBufferToPoolCallback returnBufferToPoolCallback,
             TimeDelta timestamp);
+
     protected:
         VideoFrame(
             const Size& size,
             rtc::scoped_refptr<GpuMemoryBufferInterface> buffer,
             ReturnBufferToPoolCallback returnBufferToPoolCallback,
             TimeDelta timestamp);
-        virtual ~VideoFrame();
+        virtual ~VideoFrame() override;
 
     private:
         Size size_;

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "api/video_codecs/sdp_video_format.h"
+#include "api/video_codecs/video_decoder_factory.h"
+
 namespace unity
 {
 namespace webrtc
@@ -15,7 +18,8 @@ namespace webrtc
         virtual std::unique_ptr<webrtc::VideoDecoder> CreateVideoDecoder(const webrtc::SdpVideoFormat& format) override;
 
         UnityVideoDecoderFactory(IGraphicsDevice* gfxDevice);
-        ~UnityVideoDecoderFactory();
+        ~UnityVideoDecoderFactory() override;
+
     private:
         const std::unique_ptr<VideoDecoderFactory> internal_decoder_factory_;
         const std::unique_ptr<VideoDecoderFactory> native_decoder_factory_;

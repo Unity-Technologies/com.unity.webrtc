@@ -1,12 +1,14 @@
 #pragma once
+
 #include "WebRTCPlugin.h"
+#include "api/jsep.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-    class SetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver
+    class SetSessionDescriptionObserver : public ::webrtc::SetSessionDescriptionObserver
     {
     public:
         static rtc::scoped_refptr<SetSessionDescriptionObserver> Create(PeerConnectionObject* connection);
@@ -15,9 +17,11 @@ namespace webrtc
 
         void OnSuccess() override;
         void OnFailure(webrtc::RTCError error) override;
+
     protected:
-        explicit SetSessionDescriptionObserver(PeerConnectionObject * connection);
-        ~SetSessionDescriptionObserver() = default;
+        explicit SetSessionDescriptionObserver(PeerConnectionObject* connection);
+        ~SetSessionDescriptionObserver() override = default;
+
     private:
         PeerConnectionObject* m_connection;
         std::vector<DelegateSetSessionDescSuccess> m_vectorDelegateSetSDSuccess;

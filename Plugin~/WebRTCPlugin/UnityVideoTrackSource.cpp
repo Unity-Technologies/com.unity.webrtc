@@ -40,26 +40,17 @@ UnityVideoTrackSource::~UnityVideoTrackSource()
     scheduler_ = nullptr;
 }
 
-UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
-{
-    // TODO(nisse): What's supposed to change this state?
-    return MediaSourceInterface::SourceState::kLive;
-}
+    UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
+    {
+        // TODO(nisse): What's supposed to change this state?
+        return MediaSourceInterface::SourceState::kLive;
+    }
 
-bool UnityVideoTrackSource::remote() const
-{
-    return false;
-}
+    bool UnityVideoTrackSource::remote() const { return false; }
 
-bool UnityVideoTrackSource::is_screencast() const
-{
-    return is_screencast_;
-}
+    bool UnityVideoTrackSource::is_screencast() const { return is_screencast_; }
 
-absl::optional<bool> UnityVideoTrackSource::needs_denoising() const
-{
-    return needs_denoising_;
-}
+    absl::optional<bool> UnityVideoTrackSource::needs_denoising() const { return needs_denoising_; }
 
 void UnityVideoTrackSource::CaptureNextFrame()
 {
@@ -80,18 +71,16 @@ void UnityVideoTrackSource::OnFrameCaptured(
 {
     SendFeedback();
 
-    const int64_t now_us = rtc::TimeMicros();
-    const int64_t translated_camera_time_us =
-        timestamp_aligner_.TranslateTimestamp(frame->timestamp().us(),
-            now_us);
+        const int64_t now_us = rtc::TimeMicros();
+        const int64_t translated_camera_time_us =
+            timestamp_aligner_.TranslateTimestamp(frame->timestamp().us(), now_us);
 
-    rtc::scoped_refptr<VideoFrameAdapter> frame_adapter(
-        new rtc::RefCountedObject<VideoFrameAdapter>(std::move(frame)));
+        rtc::scoped_refptr<VideoFrameAdapter> frame_adapter(
+            new rtc::RefCountedObject<VideoFrameAdapter>(std::move(frame)));
 
-    ::webrtc::VideoFrame::Builder builder =
-        ::webrtc::VideoFrame::Builder()
-        .set_video_frame_buffer(frame_adapter)
-        .set_timestamp_us(translated_camera_time_us);
+        ::webrtc::VideoFrame::Builder builder = ::webrtc::VideoFrame::Builder()
+                                                    .set_video_frame_buffer(frame_adapter)
+                                                    .set_timestamp_us(translated_camera_time_us);
 
     const std::unique_lock<std::mutex> lock(mutex_);
     videoFrame_ = builder.build();

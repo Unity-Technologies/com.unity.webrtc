@@ -1,17 +1,21 @@
 #pragma once
+
 #include "WebRTCPlugin.h"
+#include "pc/media_stream_observer.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-    class MediaStreamObserver : public webrtc::MediaStreamObserver, public sigslot::has_slots<>
+    class Context;
+    class MediaStreamObserver : public ::webrtc::MediaStreamObserver, public sigslot::has_slots<>
     {
     public:
         explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream, Context* context);
         void RegisterOnAddTrack(DelegateMediaStreamOnAddTrack callback);
         void RegisterOnRemoveTrack(DelegateMediaStreamOnRemoveTrack callback);
+
     private:
         void OnVideoTrackAdded(webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream);
         void OnAudioTrackAdded(webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream);

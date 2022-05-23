@@ -1,8 +1,10 @@
 #include "pch.h"
 
 #include <cuda.h>
-#include <cudaD3D11.h>
+#include <d3d11.h>
 #include <wrl/client.h>
+
+#include <cudaD3D11.h>
 
 #include "third_party/libyuv/include/libyuv.h"
 
@@ -13,6 +15,9 @@
 #include "GraphicsDevice/D3D11/D3D11Texture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "NvCodecUtils.h"
+
+// nonstandard extension used : class rvalue used as lvalue
+#pragma clang diagnostic ignored "-Wlanguage-extension-token"
 
 using namespace Microsoft::WRL;
 
@@ -27,9 +32,9 @@ namespace webrtc
         ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer)
         : IGraphicsDevice(renderer)
         , m_d3d12Device(nativeDevice)
+        , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
         , m_d3d11Device(nullptr)
         , m_d3d11Context(nullptr)
-        , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
         , m_copyResourceFence(nullptr)
         , m_copyResourceEventHandle(nullptr)
     {
@@ -39,9 +44,9 @@ namespace webrtc
         ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer)
         : IGraphicsDevice(renderer)
         , m_d3d12Device(nativeDevice)
+        , m_d3d12CommandQueue(commandQueue)
         , m_d3d11Device(nullptr)
         , m_d3d11Context(nullptr)
-        , m_d3d12CommandQueue(commandQueue)
         , m_copyResourceFence(nullptr)
         , m_copyResourceEventHandle(nullptr)
     {
@@ -90,7 +95,7 @@ namespace webrtc
         {
             ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
         }
-        m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d12Device);
+        m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d12Device.Get());
         return true;
     }
 
@@ -98,10 +103,7 @@ namespace webrtc
     void D3D12GraphicsDevice::ShutdownV()
     {
         m_cudaContext.Shutdown();
-        SAFE_RELEASE(m_d3d11Device);
-        SAFE_RELEASE(m_d3d11Context);
-        SAFE_RELEASE(m_copyResourceFence);
-        SAFE_CLOSE_HANDLE(m_copyResourceEventHandle);
+        SAFE_CLOSE_HANDLE(m_copyResourceEventHandle)
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -164,7 +166,7 @@ namespace webrtc
         ID3D12CommandList* cmdList[] = { m_commandList };
         m_d3d12CommandQueue->ExecuteCommandLists(_countof(cmdList), cmdList);
 
-        WaitForFence(m_copyResourceFence, m_copyResourceEventHandle, &m_copyResourceFenceValue);
+        WaitForFence(m_copyResourceFence.Get(), m_copyResourceEventHandle, &m_copyResourceFenceValue);
 
         return true;
     }
@@ -262,7 +264,7 @@ namespace webrtc
     D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
         D3D12Texture2D* tex = CreateSharedD3D12Texture(w, h);
-        const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device);
+        const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device.Get());
         if (FAILED(hr))
         {
             delete tex;
@@ -285,10 +287,10 @@ namespace webrtc
         if (nullptr == readbackResource) // the texture has to be prepared for CPU access
             return nullptr;
 
-        const uint32_t width = tex->GetWidth();
-        const uint32_t height = tex->GetHeight();
+        const int width = static_cast<int>(tex->GetWidth());
+        const int height = static_cast<int>(tex->GetHeight());
         const D3D12ResourceFootprint* footprint = tex->GetNativeTextureFootprint();
-        const uint32_t rowPitch = static_cast<uint32_t>(footprint->Footprint.Footprint.RowPitch);
+        const int rowPitch = static_cast<int>(footprint->Footprint.Footprint.RowPitch);
 
         // Map to read from CPU
         uint8* data {};
@@ -385,13 +387,13 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
             throw;
         }
-        cuCtxPopCurrent(NULL);
+        cuCtxPopCurrent(nullptr);
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
         handle->context = GetCUcontext();
         handle->mappedArray = array;
         handle->externalMemory = externalMemory;
-        return handle;
+        return std::move(handle);
     }
 
 } // end namespace webrtc

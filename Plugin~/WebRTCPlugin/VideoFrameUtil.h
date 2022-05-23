@@ -1,4 +1,5 @@
 #pragma once
+
 #include "VideoFrame.h"
 
 namespace unity

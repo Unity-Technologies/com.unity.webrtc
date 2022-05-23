@@ -1,4 +1,5 @@
 #pragma once
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -24,6 +25,7 @@ namespace webrtc
         virtual ~GraphicsDeviceTestBase();
         IGraphicsDevice* device();
         UnityRenderingExtTextureFormat format();
+
     private:
         UnityGfxRenderer m_unityGfxRenderer;
         UnityRenderingExtTextureFormat m_textureFormat;

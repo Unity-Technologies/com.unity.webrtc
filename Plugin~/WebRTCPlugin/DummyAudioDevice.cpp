@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "DummyAudioDevice.h"
 #include "UnityAudioTrackSource.h"
 #include "system_wrappers/include/sleep.h"
@@ -8,7 +9,7 @@ namespace unity
 namespace webrtc
 {
     DummyAudioDevice::DummyAudioDevice(TaskQueueFactory* taskQueueFactory)
-        : audio_data(kChannels* kSamplesPerFrame)
+        : audio_data(kChannels * kSamplesPerFrame)
         , tackQueueFactory_(taskQueueFactory)
     {
     }
@@ -16,11 +17,13 @@ namespace webrtc
     int32_t DummyAudioDevice::Init()
     {
         taskQueue_ = std::make_unique<rtc::TaskQueue>(
-            tackQueueFactory_->CreateTaskQueue(
-                "AudioDevice", TaskQueueFactory::Priority::NORMAL));
-        task_ = RepeatingTaskHandle::Start(taskQueue_->Get(), [this]() {
-            ProcessAudio();
-            return TimeDelta::Millis(kFrameLengthMs);
+            tackQueueFactory_->CreateTaskQueue("AudioDevice", TaskQueueFactory::Priority::NORMAL));
+        task_ = RepeatingTaskHandle::Start(
+            taskQueue_->Get(),
+            [this]()
+            {
+                ProcessAudio();
+                return TimeDelta::Millis(kFrameLengthMs);
             });
         initialized_ = true;
         return 0;
@@ -33,9 +36,7 @@ namespace webrtc
 
         initialized_ = false;
 
-        taskQueue_->PostTask([this] {
-          task_.Stop();
-        });
+        taskQueue_->PostTask([this] { task_.Stop(); });
 
         StopRecording();
         StopPlayout();
@@ -59,32 +60,35 @@ namespace webrtc
             // The original function of the method is getting final audio data that resampling
             // and mixing multiple audio stream. But we want each audio streams, not final
             // result.
-            audio_transport_->PullRenderData(kBytesPerSample * 8, kSamplingRate,
-                kChannels, kSamplesPerFrame, data,
-                &elapsed_time_ms, &ntp_time_ms);
+            audio_transport_->PullRenderData(
+                kBytesPerSample * 8, kSamplingRate, kChannels, kSamplesPerFrame, data, &elapsed_time_ms, &ntp_time_ms);
         }
 
         if (recording_)
         {
-            for (const auto& pair : callbacks_) {
+            for (const auto& pair : callbacks_)
+            {
                 pair.second();
             }
         }
     }
 
-    void DummyAudioDevice::RegisterSendAudioCallback(
-        UnityAudioTrackSource* source, int sampleRate, int channels) {
+    void DummyAudioDevice::RegisterSendAudioCallback(UnityAudioTrackSource* source, int sampleRate, int channels)
+    {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (callbacks_.find(source) == callbacks_.end()) {
-            callbacks_.emplace(source, [source, sampleRate, channels]() {
-                source->SendAudioData(sampleRate, channels); });
+        if (callbacks_.find(source) == callbacks_.end())
+        {
+            callbacks_.emplace(
+                source,
+                [source, sampleRate, channels]() { source->SendAudioData(sampleRate, static_cast<size_t>(channels)); });
         }
     }
 
-    void DummyAudioDevice::UnregisterSendAudioCallback(
-        UnityAudioTrackSource* source) {
+    void DummyAudioDevice::UnregisterSendAudioCallback(UnityAudioTrackSource* source)
+    {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (callbacks_.find(source) != callbacks_.end()) {
+        if (callbacks_.find(source) != callbacks_.end())
+        {
             callbacks_.erase(source);
         }
     }

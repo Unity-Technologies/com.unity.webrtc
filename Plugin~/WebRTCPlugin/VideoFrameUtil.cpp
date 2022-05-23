@@ -3,6 +3,7 @@
 #include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/ITexture2D.h"
 #include "VideoFrameUtil.h"
+#include "system_wrappers/include/clock.h"
 
 namespace unity
 {
@@ -12,9 +13,8 @@ namespace webrtc
     rtc::scoped_refptr<VideoFrame>
     CreateTestFrame(IGraphicsDevice* device, const ITexture2D* texture, UnityRenderingExtTextureFormat format)
     {
-
         NativeTexPtr ptr = NativeTexPtr(texture->GetNativeTexturePtrV());
-        Size size = Size(texture->GetWidth(), texture->GetHeight());
+        Size size = Size(static_cast<int>(texture->GetWidth()), static_cast<int>(texture->GetHeight()));
 
         rtc::scoped_refptr<GpuMemoryBufferInterface> gmb =
             new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(device, ptr, size, format);

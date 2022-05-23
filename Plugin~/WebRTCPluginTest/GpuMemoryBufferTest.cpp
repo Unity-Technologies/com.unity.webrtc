@@ -37,15 +37,15 @@ namespace webrtc
         IGraphicsDevice* device_;
         const uint32_t kWidth = 256;
         const uint32_t kHeight = 256;
+        const Size kSize = { static_cast<int>(kWidth), static_cast<int>(kHeight) };
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
     };
 
     TEST_P(GpuMemoryBufferTest, WidthAndHeight)
     {
-        const Size kSize(kWidth, kHeight);
         IGraphicsDevice* device = container_->device();
         std::unique_ptr<const ITexture2D> texture(
-            device->CreateDefaultTextureV(kSize.width(), kSize.height(), kFormat));
+            device->CreateDefaultTextureV(kWidth, kHeight, kFormat));
         auto testFrame = CreateTestFrame(device, texture.get(), kFormat);
 
         auto frame = VideoFrameAdapter::CreateVideoFrame(testFrame);
@@ -57,10 +57,9 @@ namespace webrtc
 
     TEST_P(GpuMemoryBufferTest, Scale)
     {
-        const Size kSize(kWidth * 2, kHeight * 2);
-        const Size kSize2(kWidth, kHeight);
+        const Size kSize2(static_cast<int>(kWidth * 2), static_cast<int>(kHeight * 2));
         std::unique_ptr<const ITexture2D> texture(
-            device_->CreateDefaultTextureV(kSize.width(), kSize.height(), kFormat));
+            device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
         auto testFrame = CreateTestFrame(device_, texture.get(), kFormat);
         auto frame = VideoFrameAdapter::CreateVideoFrame(testFrame);
         auto buffer = frame.video_frame_buffer();
@@ -80,7 +79,7 @@ namespace webrtc
             EXPECT_EQ(i420Buffer->width(), kSize2.width());
             EXPECT_EQ(i420Buffer->height(), kSize2.height());
         }
-        
+
         // check ScaledBuffer::GetI420()
         {
             auto i420Buffer = buffer2->GetI420();

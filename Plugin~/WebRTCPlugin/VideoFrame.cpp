@@ -34,8 +34,7 @@ namespace webrtc
         ReturnBufferToPoolCallback returnBufferToPoolCallback,
         TimeDelta timestamp)
     {
-        return new rtc::RefCountedObject<VideoFrame>(
-            size, std::move(buffer), returnBufferToPoolCallback, timestamp);
+        return new rtc::RefCountedObject<VideoFrame>(size, std::move(buffer), returnBufferToPoolCallback, timestamp);
     }
 
     bool VideoFrame::HasGpuMemoryBuffer() const { return gpu_memory_buffer_ != nullptr; }

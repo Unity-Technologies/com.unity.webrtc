@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "DataChannelObject.h"
 
 namespace unity
@@ -44,7 +45,8 @@ namespace webrtc
                 onClose(this->dataChannel);
             }
             break;
-        default:
+        case webrtc::DataChannelInterface::kConnecting:
+        case webrtc::DataChannelInterface::kClosing:
             break;
         }
     }

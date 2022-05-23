@@ -4,9 +4,7 @@ target_sources(WebRTCLib
     GraphicsDevice.h
     GraphicsUtility.cpp
     GraphicsUtility.h
-    IGraphicsDevice.cpp
     IGraphicsDevice.h
-    ITexture2D.cpp
     ITexture2D.h
 )
 

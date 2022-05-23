@@ -1,27 +1,28 @@
 #include "pch.h"
 
+#include "GraphicsDevice/GraphicsUtility.h"
 #include "UnityVideoDecoderFactory.h"
+#include "media/engine/internal_decoder_factory.h"
 
 #if CUDA_PLATFORM
 #include <cuda.h>
+
 #include "Codec/NvCodec/NvCodec.h"
 #endif
-
-#include "GraphicsDevice/GraphicsUtility.h"
 
 #if UNITY_OSX || UNITY_IOS
 #import "sdk/objc/components/video_codec/RTCDefaultVideoDecoderFactory.h"
 #import "sdk/objc/native/api/video_decoder_factory.h"
 #elif UNITY_ANDROID
-#include "Android/Jni.h"
 #include "Android/AndroidCodecFactoryHelper.h"
+#include "Android/Jni.h"
 #endif
 
 namespace unity
 {
 namespace webrtc
 {
-    webrtc::VideoDecoderFactory* CreateNativeDecoderFactory(IGraphicsDevice* gfxDevice)
+    static webrtc::VideoDecoderFactory* CreateNativeDecoderFactory(IGraphicsDevice* gfxDevice)
     {
 #if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoDecoderFactory([[RTCDefaultVideoDecoderFactory alloc] init]).release();
@@ -29,7 +30,7 @@ namespace webrtc
         if (IsVMInitialized())
             return CreateAndroidDecoderFactory().release();
 #elif CUDA_PLATFORM
-        if(gfxDevice->IsCudaSupport())
+        if (gfxDevice->IsCudaSupport())
         {
             CUcontext context = gfxDevice->GetCUcontext();
             return new NvDecoderFactory(context);
@@ -49,7 +50,7 @@ namespace webrtc
     std::vector<webrtc::SdpVideoFormat> UnityVideoDecoderFactory::GetSupportedFormats() const
     {
         std::vector<SdpVideoFormat> supported_codecs;
-        if(native_decoder_factory_)
+        if (native_decoder_factory_)
             for (const webrtc::SdpVideoFormat& format : native_decoder_factory_->GetSupportedFormats())
                 supported_codecs.push_back(format);
         for (const webrtc::SdpVideoFormat& format : internal_decoder_factory_->GetSupportedFormats())
