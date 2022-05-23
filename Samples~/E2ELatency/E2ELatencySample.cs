@@ -189,6 +189,10 @@ class E2ELatencySample : MonoBehaviour
         if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
         {
             StartCoroutine(CheckStats(pc));
+            foreach(var sender in _pc1.GetSenders())
+            {
+                ChangeFramerate(sender, (uint)Application.targetFrameRate);
+            }
         }
     }
 
@@ -281,7 +285,6 @@ class E2ELatencySample : MonoBehaviour
                 if (pc1VideoSenders.Contains(transceiver.Sender))
                 {
                     transceiver.SetCodecPreferences(codecs);
-                    ChangeFramerate(transceiver.Sender, (uint)Application.targetFrameRate);
                 }
             }
         }
