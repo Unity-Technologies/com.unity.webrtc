@@ -289,7 +289,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
         UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
         void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
-        Size size(encodeData->width, encodeData->height);
+        unity::webrtc::Size size(encodeData->width, encodeData->height);
         {
             ScopedProfiler profiler(*s_MarkerEncode);
 

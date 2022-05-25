@@ -181,6 +181,8 @@ elseif(macOS)
   set_target_properties(WebRTCLib
     PROPERTIES 
       LINK_FLAGS "-ObjC"
+      CXX_VISIBILITY_PRESET hidden
+      VISIBILITY_INLINES_HIDDEN ON
   )  
 elseif(Linux)
   set(PROJECT_BINARY_DIR
@@ -377,6 +379,8 @@ if(macOS)
   set_target_properties(WebRTCPlugin
   PROPERTIES 
     LINK_FLAGS "-ObjC"
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
   )
 endif()
 
