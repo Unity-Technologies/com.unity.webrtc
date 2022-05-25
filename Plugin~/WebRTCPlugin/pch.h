@@ -25,7 +25,7 @@
 #include "PlatformBase.h"
 
 #pragma region Platform headers
-#if UNITY_LINUX
+#if UNITY_LINUX || UNITY_ANDROID
 #include <dlfcn.h>
 #endif
 
