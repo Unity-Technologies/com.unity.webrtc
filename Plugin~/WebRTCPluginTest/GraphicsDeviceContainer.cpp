@@ -9,7 +9,6 @@
 
 #if SUPPORT_METAL
 #include "GraphicsDevice/Metal/MetalDevice.h"
-#import <Metal/Metal.h>
 #endif
 
 #if SUPPORT_OPENGL_CORE

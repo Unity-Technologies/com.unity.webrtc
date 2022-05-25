@@ -5,8 +5,6 @@
 #include "MetalGraphicsDevice.h"
 #include "MetalTexture2D.h"
 
-#import <Metal/Metal.h>
-
 namespace unity
 {
 namespace webrtc

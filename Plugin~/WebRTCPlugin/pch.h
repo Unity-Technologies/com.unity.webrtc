@@ -65,6 +65,8 @@
 #endif
 
 #if SUPPORT_METAL
+#import <Metal/Metal.h>
+
 #include <IUnityGraphicsMetal.h>
 #endif
 

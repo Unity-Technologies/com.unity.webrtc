@@ -2,8 +2,6 @@
 
 #include "MetalDevice.h"
 
-#import <Metal/Metal.h>
-
 namespace unity
 {
 namespace webrtc
