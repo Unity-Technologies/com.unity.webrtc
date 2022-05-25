@@ -50,10 +50,12 @@
 #endif
 
 #if SUPPORT_OPENGL_CORE
-#include "X11.h"
+#include <X11/Xlib.h>
 
 #include <glad/gl.h>
 #include <glad/glx.h>
+#undef CurrentTime // Defined by X11/X.h
+#undef Status // Defined by X11/Xutil.h
 #endif
 
 // Android platform
