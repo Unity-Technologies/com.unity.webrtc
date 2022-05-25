@@ -19,11 +19,11 @@ namespace webrtc
 {
     constexpr TimeDelta kTimeout = TimeDelta::Millis(1000);
 
-    class MockVideoSink : public rtc::VideoSinkInterface<webrtc::VideoFrame>
+    class MockVideoSink : public rtc::VideoSinkInterface<::webrtc::VideoFrame>
     {
     public:
         ~MockVideoSink() override = default;
-        MOCK_METHOD(void, OnFrame, (const webrtc::VideoFrame&), (override));
+        MOCK_METHOD(void, OnFrame, (const ::webrtc::VideoFrame&), (override));
     };
 
     const int kWidth = 1280;
@@ -60,12 +60,12 @@ namespace webrtc
         MockVideoSink sink_;
         rtc::scoped_refptr<UnityVideoTrackSource> m_trackSource;
 
-        webrtc::VideoFrame::Builder CreateBlackFrameBuilder(int width, int height)
+        ::webrtc::VideoFrame::Builder CreateBlackFrameBuilder(int width, int height)
         {
             rtc::scoped_refptr<webrtc::I420Buffer> buffer = webrtc::I420Buffer::Create(width, height);
 
             webrtc::I420Buffer::SetBlack(buffer);
-            return webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer);
+            return ::webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer);
         }
 
         void SendTestFrame()
@@ -79,7 +79,7 @@ namespace webrtc
     {
         rtc::Event done;
         SendTestFrame();
-        EXPECT_CALL(sink_, OnFrame(_)).WillOnce(Invoke([&done](const webrtc::VideoFrame& frame) { done.Set(); }));
+        EXPECT_CALL(sink_, OnFrame(_)).WillOnce(Invoke([&done](const ::webrtc::VideoFrame& frame) { done.Set(); }));
         EXPECT_TRUE(done.Wait(kTimeout.ms()));
     }
 
