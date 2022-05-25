@@ -99,30 +99,30 @@ namespace webrtc
         EXPECT_EQ(2u, bufferPool_->bufferCount());
     }
 
-     TEST_P(GpuMemoryBufferPoolTest, StaleFramesAreExpired)
+    TEST_P(GpuMemoryBufferPoolTest, StaleFramesAreExpired)
     {
-         const Size kSize1(kWidth, kHeight);
-         auto tex1 = CreateTexture(kSize1, kFormat);
-         void* ptr1 = tex1->GetNativeTexturePtrV();
+        const Size kSize1(kWidth, kHeight);
+        auto tex1 = CreateTexture(kSize1, kFormat);
+        void* ptr1 = tex1->GetNativeTexturePtrV();
 
-         auto frame1 = bufferPool_->CreateFrame(ptr1, kSize1, kFormat, clock_.CurrentTime());
-         EXPECT_EQ(1u, bufferPool_->bufferCount());
+        auto frame1 = bufferPool_->CreateFrame(ptr1, kSize1, kFormat, clock_.CurrentTime());
+        EXPECT_EQ(1u, bufferPool_->bufferCount());
 
-         // The buffer is not older.
-         ReleaseStaleBuffers(clock_.CurrentTime());
-         EXPECT_EQ(1u, bufferPool_->bufferCount());
+        // The buffer is not older.
+        ReleaseStaleBuffers(clock_.CurrentTime());
+        EXPECT_EQ(1u, bufferPool_->bufferCount());
 
-         clock_.AdvanceTime(TimeDelta::Seconds(60));
+        clock_.AdvanceTime(TimeDelta::Seconds(60));
 
-         // The buffer is older, but using yet.
-         ReleaseStaleBuffers(clock_.CurrentTime());
-         EXPECT_EQ(1u, bufferPool_->bufferCount());
+        // The buffer is older, but using yet.
+        ReleaseStaleBuffers(clock_.CurrentTime());
+        EXPECT_EQ(1u, bufferPool_->bufferCount());
 
-         frame1 = nullptr;
+        frame1 = nullptr;
 
-         // Refreshed the timestamp when releasing the buffer.
-         ReleaseStaleBuffers(clock_.CurrentTime());
-         EXPECT_EQ(1u, bufferPool_->bufferCount());
+        // Refreshed the timestamp when releasing the buffer.
+        ReleaseStaleBuffers(clock_.CurrentTime());
+        EXPECT_EQ(1u, bufferPool_->bufferCount());
 
         clock_.AdvanceTime(TimeDelta::Seconds(60));
 

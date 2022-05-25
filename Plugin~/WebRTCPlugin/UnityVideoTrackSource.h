@@ -1,6 +1,11 @@
 #pragma once
 
 #include <mutex>
+
+#include "absl/types/optional.h"
+#include "api/media_stream_interface.h"
+#include "api/task_queue/task_queue_factory.h"
+#include "media/base/adapted_video_track_source.h"
 #include "VideoFrame.h"
 
 namespace unity {
@@ -12,8 +17,8 @@ using namespace ::webrtc;
 // the webrtc video pipeline, each received a media::VideoFrame is converted to
 // a webrtc::VideoFrame, taking any adaptation requested by downstream classes
 // into account.
-class UnityVideoTrackSource :
-    public rtc::AdaptedVideoTrackSource
+class VideoFrameScheduler;
+class UnityVideoTrackSource : public rtc::AdaptedVideoTrackSource
 {
     public:
         //struct FrameAdaptationParams
@@ -29,7 +34,8 @@ class UnityVideoTrackSource :
 
     UnityVideoTrackSource(
         bool is_screencast,
-        absl::optional<bool> needs_denoising);
+        absl::optional<bool> needs_denoising,
+        TaskQueueFactory* taskQueueFactory);
     ~UnityVideoTrackSource() override;
 
     SourceState state() const override;
@@ -39,13 +45,13 @@ class UnityVideoTrackSource :
     absl::optional<bool> needs_denoising() const override;
     void OnFrameCaptured(rtc::scoped_refptr<VideoFrame> frame);
 
-    using ::webrtc::VideoTrackSourceInterface::AddOrUpdateSink;
-    using ::webrtc::VideoTrackSourceInterface::RemoveSink;
+    using VideoTrackSourceInterface::AddOrUpdateSink;
+    using VideoTrackSourceInterface::RemoveSink;
     
-    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast,
-                                                            absl::optional<bool> needs_denoising);
+    static rtc::scoped_refptr<UnityVideoTrackSource> Create(bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory);
 
 private:
+    void CaptureNextFrame();
     void SendFeedback();
     //FrameAdaptationParams ComputeAdaptationParams(int width,
     //                                            int height,
@@ -68,7 +74,11 @@ private:
 
     const bool is_screencast_;
     const absl::optional<bool> needs_denoising_;
-    std::mutex m_mutex;
+    std::mutex mutex_;
+
+    std::unique_ptr<rtc::TaskQueue> taskQueue_; 
+    std::unique_ptr<VideoFrameScheduler> scheduler_;
+    ::webrtc::VideoFrame videoFrame_;
 };
 
 } // end namespace webrtc

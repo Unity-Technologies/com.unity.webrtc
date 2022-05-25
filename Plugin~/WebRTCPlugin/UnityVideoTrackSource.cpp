@@ -2,31 +2,42 @@
 
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
+#include "VideoFrameScheduler.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(bool is_screencast, absl::optional<bool> needs_denoising)
+rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(
+        bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory)
 {
-    return new rtc::RefCountedObject<UnityVideoTrackSource>(is_screencast, needs_denoising);
+    return new rtc::RefCountedObject<UnityVideoTrackSource>(is_screencast, needs_denoising, taskQueueFactory);
+}
+
+::webrtc::VideoFrame BlackFrame(int width, int height)
+{
+    rtc::scoped_refptr<webrtc::I420Buffer> buffer = webrtc::I420Buffer::Create(width, height);
+    webrtc::I420Buffer::SetBlack(buffer.get());
+    return ::webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer).build();
 }
 
 UnityVideoTrackSource::UnityVideoTrackSource(
     bool is_screencast,
-    absl::optional<bool> needs_denoising)
+    absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory)
     : AdaptedVideoTrackSource(/*required_alignment=*/1)
     , is_screencast_(is_screencast)
-    , needs_denoising_(needs_denoising)
+    , videoFrame_(BlackFrame(128, 128))
 {
+    taskQueue_ = std::make_unique<rtc::TaskQueue>(
+        taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
+    scheduler_ = std::make_unique<VideoFrameScheduler>(taskQueue_->Get());
+    scheduler_->Start(std::bind(&UnityVideoTrackSource::CaptureNextFrame, this));
 }
 
 UnityVideoTrackSource::~UnityVideoTrackSource()
 {
-    {
-        std::unique_lock<std::mutex> lock(m_mutex);
-    }
+    scheduler_ = nullptr;
 }
 
 UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
@@ -50,22 +61,23 @@ absl::optional<bool> UnityVideoTrackSource::needs_denoising() const
     return needs_denoising_;
 }
 
+void UnityVideoTrackSource::CaptureNextFrame()
+{
+    const std::unique_lock<std::mutex> lock(mutex_);
+    OnFrame(videoFrame_);
+}
+
 void UnityVideoTrackSource::SendFeedback()
 {
-    //float maxFramerate = video_adapter()->GetMaxFramerate();
-    // todo(kazuki):
+    float maxFramerate = video_adapter()->GetMaxFramerate();
+    if (maxFramerate == std::numeric_limits<float>::infinity())
+        return;
+    scheduler_->SetMaxFramerateFps(static_cast<int>(maxFramerate));
 }
 
 void UnityVideoTrackSource::OnFrameCaptured(
     rtc::scoped_refptr<VideoFrame> frame)
 {
-    const std::unique_lock<std::mutex> lock(m_mutex, std::try_to_lock);
-    if (!lock)
-    {
-        // currently encoding
-        return;
-    }
-
     SendFeedback();
 
     const int64_t now_us = rtc::TimeMicros();
@@ -81,7 +93,8 @@ void UnityVideoTrackSource::OnFrameCaptured(
         .set_video_frame_buffer(frame_adapter)
         .set_timestamp_us(translated_camera_time_us);
 
-    OnFrame(builder.build());
+    const std::unique_lock<std::mutex> lock(mutex_);
+    videoFrame_ = builder.build();
 }
 
 } // end namespace webrtc

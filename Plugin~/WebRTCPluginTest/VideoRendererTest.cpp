@@ -6,6 +6,7 @@
 #include "GraphicsDeviceTestBase.h"
 #include "UnityVideoRenderer.h"
 #include "UnityVideoTrackSource.h"
+#include "api/task_queue/default_task_queue_factory.h"
 
 using testing::_;
 using testing::Invoke;
@@ -22,15 +23,12 @@ namespace webrtc
     {
     public:
         VideoRendererTest()
+            : m_taskQueueFactory(CreateDefaultTaskQueueFactory())
         {
-            m_trackSource = UnityVideoTrackSource::Create(
-                /*is_screencast=*/false,
-                /*needs_denoising=*/absl::nullopt);
             m_callback = &OnFrameSizeChange;
             m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
-            m_trackSource->AddOrUpdateSink(m_renderer.get(), rtc::VideoSinkWants());
         }
-        ~VideoRendererTest() override { m_trackSource->RemoveSink(m_renderer.get()); }
+        ~VideoRendererTest() override = default;
 
     protected:
         void SetUp() override
@@ -43,8 +41,8 @@ namespace webrtc
         std::unique_ptr<Context> context;
         std::unique_ptr<ITexture2D> m_texture;
 
+        std::unique_ptr<TaskQueueFactory> m_taskQueueFactory;
         std::unique_ptr<UnityVideoRenderer> m_renderer;
-        rtc::scoped_refptr<UnityVideoTrackSource> m_trackSource;
         DelegateVideoFrameResize m_callback;
 
         webrtc::VideoFrame::Builder CreateBlackFrameBuilder(int width, int height)
@@ -57,12 +55,6 @@ namespace webrtc
         }
 
         static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height) { }
-
-        void SendTestFrame(int width, int height)
-        {
-            // auto builder = CreateBlackFrameBuilder(width, height);
-            m_trackSource->OnFrameCaptured(0);
-        }
     };
 
     TEST_P(VideoRendererTest, SetAndGetFrameBuffer)
@@ -72,16 +64,6 @@ namespace webrtc
         EXPECT_EQ(nullptr, m_renderer->GetFrameBuffer());
         auto builder = CreateBlackFrameBuilder(width, height);
         m_renderer->OnFrame(builder.build());
-        EXPECT_NE(nullptr, m_renderer->GetFrameBuffer());
-    }
-
-    // todo(kazuki)
-    TEST_P(VideoRendererTest, DISABLED_SendTestFrame)
-    {
-        int width = 256;
-        int height = 256;
-        EXPECT_EQ(nullptr, m_renderer->GetFrameBuffer());
-        SendTestFrame(width, height);
         EXPECT_NE(nullptr, m_renderer->GetFrameBuffer());
     }
 

@@ -119,9 +119,6 @@ namespace webrtc
 
         m_codec = *codec;
 
-        // todo(kazuki): Not supported framerate adjusting
-        m_codec.maxFramerate = 30;
-
         // Check required level.
         auto requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
         if (!requiredLevel)
@@ -483,9 +480,6 @@ namespace webrtc
 
         m_codec.maxFramerate = static_cast<uint32_t>(parameters.framerate_fps);
         m_codec.maxBitrate = bitrate;
-
-        // todo(kazuki): Not supported framerate adjusting
-        m_codec.maxFramerate = 30;
 
         auto requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
         if (!requiredLevel)

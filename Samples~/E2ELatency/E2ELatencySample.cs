@@ -84,6 +84,7 @@ class E2ELatencySample : MonoBehaviour
             listFramerate.Select(_ => new Dropdown.OptionData($"{_}")).ToList();
         dropDownFramerate.value = 1;
         dropDownFramerate.onValueChanged.AddListener(OnFramerateChanged);
+        OnFramerateChanged(dropDownFramerate.value);
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -189,6 +190,10 @@ class E2ELatencySample : MonoBehaviour
         if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
         {
             StartCoroutine(CheckStats(pc));
+            foreach(var sender in _pc1.GetSenders())
+            {
+                ChangeFramerate(sender, (uint)Application.targetFrameRate);
+            }
         }
     }
 
@@ -283,6 +288,17 @@ class E2ELatencySample : MonoBehaviour
                     transceiver.SetCodecPreferences(codecs);
                 }
             }
+        }
+    }
+
+    private void ChangeFramerate(RTCRtpSender sender, uint framerate)
+    {
+        RTCRtpSendParameters parameters = sender.GetParameters();
+        parameters.encodings[0].maxFramerate = framerate;
+        RTCError error = sender.SetParameters(parameters);
+        if (error.errorType != RTCErrorType.None)
+        {
+            Debug.LogErrorFormat("RTCRtpSender.SetParameters failed {0}", error.errorType);
         }
     }
 

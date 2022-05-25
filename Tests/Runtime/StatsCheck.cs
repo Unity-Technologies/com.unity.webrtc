@@ -104,9 +104,9 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.NotNull(inboundRtpStreamStats);
                     Assert.AreEqual(55, inboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(inboundRtpStreamStats.ssrc);
-                    Assert.IsNotEmpty(inboundRtpStreamStats.mediaType);
+                    // Obsolete: Assert.IsNotEmpty(inboundRtpStreamStats.mediaType);
                     Assert.IsNotEmpty(inboundRtpStreamStats.kind);
-                    Ignore.Pass(inboundRtpStreamStats.trackId);
+                    // Obsolete:  Ignore.Pass(inboundRtpStreamStats.trackId);
                     Assert.IsNotEmpty(inboundRtpStreamStats.transportId);
                     Ignore.Pass(inboundRtpStreamStats.codecId);
                     Ignore.Pass(inboundRtpStreamStats.packetsReceived);
@@ -156,7 +156,7 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.RemoteInboundRtp:
                     var remoteInboundRtpStreamStats = stats as RTCRemoteInboundRtpStreamStats;
                     Assert.NotNull(remoteInboundRtpStreamStats);
-                    Assert.AreEqual(8, remoteInboundRtpStreamStats.Dict.Count);
+                    Assert.AreEqual(13, remoteInboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(remoteInboundRtpStreamStats.ssrc);
                     Assert.IsNotEmpty(remoteInboundRtpStreamStats.kind);
                     Assert.IsNotEmpty(remoteInboundRtpStreamStats.transportId);
@@ -165,6 +165,27 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(remoteInboundRtpStreamStats.jitter);
                     Assert.IsNotEmpty(remoteInboundRtpStreamStats.localId);
                     Ignore.Pass(remoteInboundRtpStreamStats.roundTripTime);
+                    Ignore.Pass(remoteInboundRtpStreamStats.fractionLost);
+                    Ignore.Pass(remoteInboundRtpStreamStats.totalRoundTripTime);
+                    Ignore.Pass(remoteInboundRtpStreamStats.roundTripTimeMeasurements);
+                    // Obsolete: Assert.IsNotEmpty(remoteInboundRtpStreamStats.trackId);
+                    // Obsolete: Assert.IsNotEmpty(remoteInboundRtpStreamStats.mediaType);
+                    break;
+                case RTCStatsType.RemoteOutboundRtp:
+                    var remoteOutboundRtpStreamStats = stats as RTCRemoteOutboundRtpStreamStats;
+                    Assert.NotNull(remoteOutboundRtpStreamStats);
+                    Assert.AreEqual(11, remoteOutboundRtpStreamStats.Dict.Count);
+                    Assert.IsNotEmpty(remoteOutboundRtpStreamStats.localId);
+                    Ignore.Pass(remoteOutboundRtpStreamStats.remoteTimestamp);
+                    Ignore.Pass(remoteOutboundRtpStreamStats.reportsSent);
+                    Ignore.Pass(remoteOutboundRtpStreamStats.packetsSent);
+                    Ignore.Pass(remoteOutboundRtpStreamStats.bytesSent);
+                    Ignore.Pass(remoteOutboundRtpStreamStats.ssrc);
+                    Assert.IsNotEmpty(remoteOutboundRtpStreamStats.kind);
+                    Assert.IsNotEmpty(remoteOutboundRtpStreamStats.transportId);
+                    Assert.IsNotEmpty(remoteOutboundRtpStreamStats.codecId);
+                    // Obsolete: Assert.IsNotEmpty(remoteOutboundRtpStreamStats.trackId);
+                    // Obsolete: Assert.IsNotEmpty(remoteOutboundRtpStreamStats.mediaType);
                     break;
                 case RTCStatsType.Transport:
                     var transportStats = stats as RTCTransportStats;
@@ -184,15 +205,14 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(transportStats.srtpCipher);
                     Ignore.Pass(transportStats.selectedCandidatePairChanges);
                     break;
-                case RTCStatsType.RemoteOutboundRtp:
                 case RTCStatsType.OutboundRtp:
                     var outboundRtpStreamStats = stats as RTCOutboundRTPStreamStats;
                     Assert.NotNull(outboundRtpStreamStats);
                     Assert.AreEqual(33, outboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(outboundRtpStreamStats.ssrc);
-                    Assert.IsNotEmpty(outboundRtpStreamStats.mediaType);
+                    // Obsolete: Assert.IsNotEmpty(outboundRtpStreamStats.mediaType);
                     Assert.IsNotEmpty(outboundRtpStreamStats.kind);
-                    Ignore.Pass(outboundRtpStreamStats.trackId);
+                    // Obsolete: Ignore.Pass(outboundRtpStreamStats.trackId);
                     Assert.IsNotEmpty(outboundRtpStreamStats.transportId);
                     Ignore.Pass(outboundRtpStreamStats.codecId);
                     Ignore.Pass(outboundRtpStreamStats.mediaSourceId);

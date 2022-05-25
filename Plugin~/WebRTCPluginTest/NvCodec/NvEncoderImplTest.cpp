@@ -61,6 +61,7 @@ namespace webrtc
         SetDefaultSettings(&codec_settings);
         codec_settings.width = 3840;
         codec_settings.height = 2160;
+        codec_settings.maxFramerate = 30;
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder.InitEncode(&codec_settings, kSettings()));
     }
 

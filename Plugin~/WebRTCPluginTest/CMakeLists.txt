@@ -21,6 +21,7 @@ target_sources(WebRTCLibTest
     UnityVideoDecoderFactoryTest.cpp
     VideoCodecTest.cpp
     VideoCodecTest.h
+    VideoFrameSchedulerTest.cpp
     VideoFrameTest.cpp
     VideoRendererTest.cpp
     VideoTrackSourceTest.cpp
@@ -42,7 +43,7 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.10.0
+  GIT_TAG        release-1.11.0
 )
 
 FetchContent_GetProperties(googletest)
