@@ -1,7 +1,12 @@
 #pragma once
 
-#pragma region webRTC related
+#pragma region std headers
+#include <array>
+#include <memory>
+#include <mutex>
+#pragma endregion
 
+#pragma region webrtc headers
 #include "rtc_base/logging.h"
 
 #ifdef _WIN32
@@ -9,10 +14,47 @@
 #include "rtc_base/win32_socket_init.h"
 #include "rtc_base/win32_socket_server.h"
 #endif
+#pragma endregion
 
+#pragma region Unity headers
+#include <IUnityGraphics.h>
+#include <IUnityProfiler.h>
+#include <IUnityRenderingExtensions.h>
 #pragma endregion
 
 #include "PlatformBase.h"
+
+#pragma region Platform headers
+#if UNITY_LINUX
+#include <dlfcn.h>
+#endif
+
+#if UNITY_WIN
+#include <Windows.h>
+#endif
+
+#if CUDA_PLATFORM
+#include <cuda.h>
+#endif
+
+#if SUPPORT_D3D11 && SUPPORT_D3D12
+#include <comdef.h>
+#include <d3d11.h>
+#include <d3d11_4.h>
+#include <d3d12.h>
+#include <wrl/client.h>
+#include <cudaD3D11.h>
+
+#include <IUnityGraphicsD3D11.h>
+#include <IUnityGraphicsD3D12.h>
+#endif
+
+#if SUPPORT_OPENGL_CORE
+#include "X11.h"
+
+#include <glad/gl.h>
+#include <glad/glx.h>
+#endif
 
 // Android platform
 #if SUPPORT_OPENGL_ES
@@ -23,13 +65,21 @@
 #endif
 
 #if SUPPORT_METAL
-#include "IUnityGraphicsMetal.h"
+#include <IUnityGraphicsMetal.h>
 #endif
 
 #if SUPPORT_VULKAN
+#include <vulkan/vulkan.h>
+
+#include <IUnityGraphicsVulkan.h>
+
 #include "GraphicsDevice/Vulkan/LoadVulkanFunctions.h"
 
+#if _WIN32
+#include <vulkan/vulkan_win32.h>
 #endif
+#endif
+#pragma endregion
 
 // #pragma clang diagnostic push
 // #pragma clang diagnostic ignored "-Wkeyword-macro"

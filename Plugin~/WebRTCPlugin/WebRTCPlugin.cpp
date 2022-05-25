@@ -17,6 +17,9 @@ namespace unity
 {
 namespace webrtc
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
     DelegateSetResolution delegateSetResolution = nullptr;
 
     void SetResolution(int32* width, int32* length)
@@ -1148,7 +1151,7 @@ extern "C"
         RTCRtpExtension& operator=(const RtpExtension& src)
         {
             uri = ConvertString(src.uri);
-            id = src.id;
+            id = static_cast<uint16_t>(src.id);
             encrypted = src.encrypt;
             return *this;
         }
@@ -1327,9 +1330,9 @@ extern "C"
         channel->Send(webrtc::DataBuffer(std::string(data)));
     }
 
-    UNITY_INTERFACE_EXPORT void DataChannelSendBinary(DataChannelInterface* channel, const byte* data, int len)
+    UNITY_INTERFACE_EXPORT void DataChannelSendBinary(DataChannelInterface* channel, const byte* data, int length)
     {
-        rtc::CopyOnWriteBuffer buf(data, len);
+        rtc::CopyOnWriteBuffer buf(data, static_cast<size_t>(length));
         channel->Send(webrtc::DataBuffer(buf, true));
     }
 
@@ -1386,7 +1389,11 @@ extern "C"
     {
         if (source != nullptr)
         {
-            source->PushAudioData(audio_data, sample_rate, number_of_channels, number_of_frames);
+            source->PushAudioData(
+                audio_data,
+                sample_rate,
+                static_cast<size_t>(number_of_channels),
+                static_cast<size_t>(number_of_frames));
         }
     }
 
@@ -1413,6 +1420,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT void
     AudioTrackSinkProcessAudio(AudioTrackSinkAdapter* sink, float* data, size_t length, int channels, int sampleRate)
     {
-        sink->ProcessAudio(data, length, channels, sampleRate);
+        sink->ProcessAudio(data, length, static_cast<size_t>(channels), sampleRate);
     }
+#pragma clang diagnostic pop
 }

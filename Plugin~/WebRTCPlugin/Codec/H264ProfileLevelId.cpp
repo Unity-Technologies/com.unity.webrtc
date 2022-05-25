@@ -1,7 +1,8 @@
 #include "pch.h"
 
+#include <rtc_base/arraysize.h>
+
 #include "H264ProfileLevelId.h"
-#include "rtc_base/arraysize.h"
 
 using namespace ::webrtc;
 

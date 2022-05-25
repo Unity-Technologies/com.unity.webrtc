@@ -1,5 +1,12 @@
 #include "pch.h"
 
+#include <absl/strings/match.h>
+#include <api/video/video_codec_constants.h>
+#include <api/video/video_codec_type.h>
+#include <common_video/h264/h264_common.h>
+#include <media/base/media_constants.h>
+#include <modules/video_coding/include/video_codec_interface.h>
+
 #include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
@@ -9,12 +16,6 @@
 #include "NvEncoderImpl.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
-#include "absl/strings/match.h"
-#include "api/video/video_codec_constants.h"
-#include "api/video/video_codec_type.h"
-#include "common_video/h264/h264_common.h"
-#include "media/base/media_constants.h"
-#include "modules/video_coding/include/video_codec_interface.h"
 
 namespace unity
 {

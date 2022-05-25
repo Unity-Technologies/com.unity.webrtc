@@ -3,12 +3,12 @@
 #include <IUnityGraphics.h>
 
 #include "api/test/frame_generator_interface.h"
-#include "api/video_codecs/h264_profile_level_id.h"
-#include "api/video_codecs/video_codec.h"
-#include "api/video_codecs/video_decoder.h"
-#include "api/video_codecs/video_encoder.h"
-#include "media/base/codec.h"
-#include "modules/video_coding/include/video_codec_interface.h"
+#include <api/video_codecs/h264_profile_level_id.h>
+#include <api/video_codecs/video_codec.h>
+#include <api/video_codecs/video_decoder.h>
+#include <api/video_codecs/video_encoder.h>
+#include <media/base/codec.h>
+#include <modules/video_coding/include/video_codec_interface.h>
 #include "rtc_base/checks.h"
 #include "rtc_base/event.h"
 #include "rtc_base/synchronization/mutex.h"

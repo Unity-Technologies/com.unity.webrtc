@@ -4,9 +4,6 @@
 #include "GraphicsDeviceContainer.h"
 
 #if SUPPORT_D3D11
-#include <d3d11.h>
-#include <wrl/client.h>
-
 #include "GraphicsDevice/D3D12/D3D12GraphicsDevice.h"
 #endif
 
@@ -28,15 +25,10 @@
 #if SUPPORT_VULKAN
 
 #if CUDA_PLATFORM
-#include <cuda.h>
-
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #include "NvCodecUtils.h"
 #endif
 
-#if _WIN32
-#include <vulkan/vulkan_win32.h>
-#endif
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 #endif
 

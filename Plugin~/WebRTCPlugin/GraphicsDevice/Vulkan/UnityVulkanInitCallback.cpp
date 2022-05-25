@@ -2,10 +2,6 @@
 
 #include "UnityVulkanInitCallback.h"
 
-#if defined(_WIN32)
-#include <vulkan/vulkan_win32.h>
-#endif
-
 namespace unity
 {
 namespace webrtc

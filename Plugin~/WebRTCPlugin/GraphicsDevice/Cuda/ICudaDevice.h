@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cuda.h>
-#include <nvEncodeAPI.h>
+
+#include "nvEncodeAPI.h"
 
 namespace unity
 {

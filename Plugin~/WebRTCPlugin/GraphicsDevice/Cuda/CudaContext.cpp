@@ -1,13 +1,6 @@
 #include "pch.h"
 
-#include <array>
-
 #include "CudaContext.h"
-
-#if SUPPORT_D3D11
-#include <cudaD3D11.h>
-#include <wrl/client.h>
-#endif
 
 #if SUPPORT_VULKAN
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
@@ -15,10 +8,6 @@
 
 #if SUPPORT_D3D11
 using namespace Microsoft::WRL;
-#endif
-
-#if UNITY_LINUX
-#include <dlfcn.h>
 #endif
 
 namespace unity

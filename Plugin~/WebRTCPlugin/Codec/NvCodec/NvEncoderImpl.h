@@ -2,15 +2,16 @@
 
 #include <cuda.h>
 
+#include <api/video_codecs/video_codec.h>
+#include <api/video_codecs/video_encoder.h>
+#include <common_video/h264/h264_bitstream_parser.h>
+#include <common_video/include/bitrate_adjuster.h>
+#include <media/base/codec.h>
+#include <system_wrappers/include/clock.h>
+
 #include "NvCodec.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "Size.h"
-#include "api/video_codecs/video_codec.h"
-#include "api/video_codecs/video_encoder.h"
-#include "common_video/h264/h264_bitstream_parser.h"
-#include "common_video/include/bitrate_adjuster.h"
-#include "media/base/codec.h"
-#include "system_wrappers/include/clock.h"
 
 namespace unity
 {

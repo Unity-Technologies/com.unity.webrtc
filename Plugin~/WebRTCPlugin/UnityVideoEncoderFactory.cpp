@@ -1,18 +1,17 @@
 #include "pch.h"
 
+#include <media/engine/internal_encoder_factory.h>
+
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "UnityVideoEncoderFactory.h"
-#include "media/engine/internal_encoder_factory.h"
 
 #if CUDA_PLATFORM
-#include <cuda.h>
-
 #include "Codec/NvCodec/NvCodec.h"
 #endif
 
 #if UNITY_OSX || UNITY_IOS
-#import "sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h"
-#import "sdk/objc/native/api/video_encoder_factory.h"
+#import <sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h>
+#import <sdk/objc/native/api/video_encoder_factory.h>
 #elif UNITY_ANDROID
 #include "Android/AndroidCodecFactoryHelper.h"
 #include "Android/Jni.h"

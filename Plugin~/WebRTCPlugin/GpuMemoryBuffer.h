@@ -2,12 +2,13 @@
 
 #include <shared_mutex>
 
+#include <common_video/include/video_frame_buffer.h>
+#include <rtc_base/ref_counted_object.h>
+
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "IUnityRenderingExtensions.h"
 #include "PlatformBase.h"
 #include "Size.h"
-#include "common_video/include/video_frame_buffer.h"
-#include "rtc_base/ref_counted_object.h"
 
 #if CUDA_PLATFORM
 #include <cuda.h>

@@ -1,12 +1,6 @@
 #include "pch.h"
 
-#include <cuda.h>
-#include <d3d11.h>
-#include <wrl/client.h>
-
-#include <cudaD3D11.h>
-
-#include "third_party/libyuv/include/libyuv.h"
+#include <third_party/libyuv/include/libyuv.h>
 
 #include "D3D12Constants.h"
 #include "D3D12GraphicsDevice.h"

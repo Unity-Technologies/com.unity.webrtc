@@ -1,5 +1,10 @@
 #include "pch.h"
 
+#include <api/create_peerconnection_factory.h>
+#include <api/task_queue/default_task_queue_factory.h>
+#include <rtc_base/ssl_adapter.h>
+#include <rtc_base/strings/json.h>
+
 #include "AudioTrackSinkAdapter.h"
 #include "Context.h"
 #include "GraphicsDevice/GraphicsUtility.h"
@@ -13,10 +18,6 @@
 #include "UnityVideoEncoderFactory.h"
 #include "UnityVideoTrackSource.h"
 #include "WebRTCPlugin.h"
-#include "api/create_peerconnection_factory.h"
-#include "api/task_queue/default_task_queue_factory.h"
-#include "rtc_base/ssl_adapter.h"
-#include "rtc_base/strings/json.h"
 
 #if CUDA_PLATFORM
 #include "Logger.h"

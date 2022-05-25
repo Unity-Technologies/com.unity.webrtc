@@ -3,12 +3,6 @@
 #include "GraphicsDevice.h"
 
 #if SUPPORT_D3D11 && SUPPORT_D3D12
-#include <d3d11.h>
-#include <d3d12.h>
-
-#include <IUnityGraphicsD3D11.h>
-#include <IUnityGraphicsD3D12.h>
-
 #include "D3D11/D3D11GraphicsDevice.h"
 #include "D3D12/D3D12GraphicsDevice.h"
 #endif

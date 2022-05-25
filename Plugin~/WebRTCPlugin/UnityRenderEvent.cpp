@@ -1,9 +1,5 @@
 #include "pch.h"
 
-#include <IUnityGraphics.h>
-#include <IUnityProfiler.h>
-#include <IUnityRenderingExtensions.h>
-
 #include "Context.h"
 #include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
@@ -31,16 +27,16 @@ namespace unity
 {
 namespace webrtc
 {
-    IUnityInterfaces* s_UnityInterfaces = nullptr;
-    IUnityGraphics* s_Graphics = nullptr;
-    Context* s_context = nullptr;
-    std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
-    std::unique_ptr<Clock> s_clock;
+    static IUnityInterfaces* s_UnityInterfaces = nullptr;
+    static IUnityGraphics* s_Graphics = nullptr;
+    static Context* s_context = nullptr;
+    static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
+    static std::unique_ptr<Clock> s_clock;
 
-    const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
-    const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
-    std::unique_ptr<IGraphicsDevice> s_gfxDevice;
-    std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
+    static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
+    static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
+    static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
+    static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
 
     IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
     {
@@ -83,9 +79,9 @@ namespace webrtc
 using namespace unity::webrtc;
 
 #if defined(SUPPORT_VULKAN)
-LIBRARY_TYPE s_vulkanLibrary = nullptr;
+static LIBRARY_TYPE s_vulkanLibrary = nullptr;
 
-bool LoadVulkanFunctions(UnityVulkanInstance& instance)
+static bool LoadVulkanFunctions(UnityVulkanInstance& instance)
 {
     if (!LoadVulkanLibrary(s_vulkanLibrary))
     {
@@ -171,7 +167,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
         break;
     }
-    };
+    }
 }
 
 // forward declaration for plugin load event
@@ -338,10 +334,13 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
         if (renderer == nullptr)
             return;
         s_mapVideoRenderer[params->userData] = renderer;
+        int width = static_cast<int>(params->width);
+        int height = static_cast<int>(params->height);
+
         {
             ScopedProfiler profiler(*s_MarkerDecode);
             params->texData = renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
-                params->width, params->height, ConvertTextureFormat(params->format));
+                width, height, ConvertTextureFormat(params->format));
         }
     }
     if (event == kUnityRenderingExtEventUpdateTextureEndV2)

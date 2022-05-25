@@ -1,10 +1,11 @@
 #include "pch.h"
 
+#include <rtc_base/thread.h>
+
 #include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
 #include "GraphicsDeviceTestBase.h"
-#include "rtc_base/thread.h"
 
 namespace unity
 {

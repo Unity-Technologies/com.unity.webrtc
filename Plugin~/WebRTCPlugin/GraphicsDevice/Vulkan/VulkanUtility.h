@@ -1,8 +1,9 @@
 #pragma once
 
-#include <IUnityRenderingExtensions.h>
-#include <IUnityGraphicsVulkan.h>
 #include <array>
+
+#include <IUnityGraphicsVulkan.h>
+#include <IUnityRenderingExtensions.h>
 #include <vulkan/vulkan.h>
 
 namespace unity

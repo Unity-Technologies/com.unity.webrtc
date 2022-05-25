@@ -1,8 +1,9 @@
 #include "pch.h"
 
+#include <system_wrappers/include/sleep.h>
+
 #include "DummyAudioDevice.h"
 #include "UnityAudioTrackSource.h"
-#include "system_wrappers/include/sleep.h"
 
 namespace unity
 {

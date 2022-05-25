@@ -1,9 +1,10 @@
 #pragma once
 
+#include <api/peer_connection_interface.h>
+
 #include "DataChannelObject.h"
 #include "PeerConnectionStatsCollectorCallback.h"
 #include "WebRTCPlugin.h"
-#include "api/peer_connection_interface.h"
 
 namespace unity
 {
@@ -33,8 +34,7 @@ namespace webrtc
         void Close();
         RTCErrorType SetLocalDescription(
             const RTCSessionDescription& desc, SetSessionDescriptionObserver* observer, std::string& error);
-        RTCErrorType
-        SetLocalDescriptionWithoutDescription(SetSessionDescriptionObserver* observer, std::string& error);
+        RTCErrorType SetLocalDescriptionWithoutDescription(SetSessionDescriptionObserver* observer, std::string& error);
         RTCErrorType SetRemoteDescription(
             const RTCSessionDescription& desc, SetSessionDescriptionObserver* observer, std::string& error);
 

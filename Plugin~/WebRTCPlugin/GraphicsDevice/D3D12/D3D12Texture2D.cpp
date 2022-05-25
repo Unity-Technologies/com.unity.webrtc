@@ -1,10 +1,5 @@
 #include "pch.h"
 
-#include <cuda.h>
-#include <d3d11.h>
-
-#include <cudaD3D11.h>
-
 #include "D3D12Constants.h"
 #include "D3D12Texture2D.h"
 

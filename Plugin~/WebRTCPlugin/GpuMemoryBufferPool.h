@@ -1,11 +1,11 @@
 #pragma once
 
 #include <list>
+#include <system_wrappers/include/clock.h>
 
 #include "GpuMemoryBuffer.h"
 #include "Size.h"
 #include "VideoFrame.h"
-#include "system_wrappers/include/clock.h"
 
 namespace unity
 {

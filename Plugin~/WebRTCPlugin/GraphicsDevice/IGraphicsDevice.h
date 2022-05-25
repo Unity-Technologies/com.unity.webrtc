@@ -1,10 +1,11 @@
 #pragma once
 
-#include <IUnityRenderingExtensions.h>
 #include <memory>
 
+#include <IUnityRenderingExtensions.h>
+#include <api/video/i420_buffer.h>
+
 #include "PlatformBase.h"
-#include "api/video/i420_buffer.h"
 
 #if CUDA_PLATFORM
 #include "Cuda/ICudaDevice.h"

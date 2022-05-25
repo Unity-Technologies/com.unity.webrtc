@@ -1,8 +1,9 @@
 #pragma once
 
+#include <api/stats/rtc_stats_collector_callback.h>
+#include <api/stats/rtc_stats_report.h>
+
 #include "WebRTCPlugin.h"
-#include "api/stats/rtc_stats_collector_callback.h"
-#include "api/stats/rtc_stats_report.h"
 
 namespace unity
 {

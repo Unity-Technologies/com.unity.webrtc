@@ -1,9 +1,5 @@
 #include "pch.h"
 
-#if defined(__linux)
-#include <dlfcn.h>
-#endif
-
 namespace unity
 {
 namespace webrtc

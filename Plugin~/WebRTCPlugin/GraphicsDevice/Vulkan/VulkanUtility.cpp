@@ -3,11 +3,6 @@
 #include "VulkanUtility.h"
 #include "WebRTCMacros.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <vulkan/vulkan_win32.h>
-#endif
-
 #ifndef _WIN32
 #define EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR
 #else

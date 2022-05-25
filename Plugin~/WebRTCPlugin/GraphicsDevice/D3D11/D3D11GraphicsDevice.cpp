@@ -1,11 +1,5 @@
 #include "pch.h"
 
-#include <cuda.h>
-#include <d3d11.h>
-#include <d3d11_4.h>
-
-#include <cudaD3D11.h>
-
 #include "D3D11GraphicsDevice.h"
 #include "D3D11Texture2D.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"

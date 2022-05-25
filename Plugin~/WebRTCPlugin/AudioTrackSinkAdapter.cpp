@@ -1,8 +1,9 @@
 #include "pch.h"
 
+#include <audio/remix_resample.h>
+#include <common_audio/include/audio_util.h>
+
 #include "AudioTrackSinkAdapter.h"
-#include "audio/remix_resample.h"
-#include "common_audio/include/audio_util.h"
 
 namespace unity
 {
