@@ -53,4 +53,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Samples/E2ELatency/E2ELatency.unity
     guid: d85785bc886b68348b04331dab320a33
+  - enabled: 1
+    path: Assets/Samples/ReplaceTrack/ReplaceTrack.unity
+    guid: 9607119e15db6cb40a49916fb3a70f9f
   m_configObjects: {}
