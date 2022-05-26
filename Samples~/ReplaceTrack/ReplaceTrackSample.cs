@@ -102,8 +102,8 @@ class ReplaceTrackSample : MonoBehaviour
         private bool srdAnswerPending;
         private bool sldGetBackStable;
 
-        private const int width = 256;
-        private const int height = 256;
+        private const int minWidth = 320;
+        private const int minHeight = 240;
 
         public Peer(
             ReplaceTrackSample parent,
@@ -141,10 +141,12 @@ class ReplaceTrackSample : MonoBehaviour
                 this.parent.StartCoroutine(NegotiationProcess());
             };
 
+            int width = WebRTCSettings.StreamSize.x;
+            int height = WebRTCSettings.StreamSize.y;
             sourceVideoTrack1 = source1?.CaptureStreamTrack(width, height, 0);
 
-            int width2 = width * 2;
-            int height2 = height * 2;
+            int width2 = Mathf.Max(width / 2, minWidth);
+            int height2 = Mathf.Max(height / 2, minHeight);
             sourceVideoTrack2 = source2?.CaptureStreamTrack(width2, height2, 0);
         }
 
