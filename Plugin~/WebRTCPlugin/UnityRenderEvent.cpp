@@ -1,20 +1,16 @@
 #include "pch.h"
 
-#include <IUnityGraphics.h>
-#include <IUnityProfiler.h>
-#include <IUnityRenderingExtensions.h>
-
 #include "Context.h"
-#include "ScopedProfiler.h"
-#include "UnityVideoTrackSource.h"
+#include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "ScopedProfiler.h"
+#include "UnityVideoTrackSource.h"
 #include "VideoFrame.h"
-#include "GpuMemoryBufferPool.h"
 
 #if defined(SUPPORT_VULKAN)
-#include "UnityVulkanInterfaceFunctions.h"
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
+#include "UnityVulkanInterfaceFunctions.h"
 #endif
 
 enum class VideoStreamRenderEventID
@@ -31,16 +27,16 @@ namespace unity
 {
 namespace webrtc
 {
-    IUnityInterfaces* s_UnityInterfaces = nullptr;
-    IUnityGraphics* s_Graphics = nullptr;
-    Context* s_context = nullptr;
-    std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
-    std::unique_ptr <Clock> s_clock;
+    static IUnityInterfaces* s_UnityInterfaces = nullptr;
+    static IUnityGraphics* s_Graphics = nullptr;
+    static Context* s_context = nullptr;
+    static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
+    static std::unique_ptr<Clock> s_clock;
 
-    const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
-    const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
-    std::unique_ptr<IGraphicsDevice> s_gfxDevice;
-    std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
+    static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
+    static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
+    static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
+    static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
 
     IGraphicsDevice* GraphicsUtility::GetGraphicsDevice()
     {
@@ -83,9 +79,9 @@ namespace webrtc
 using namespace unity::webrtc;
 
 #if defined(SUPPORT_VULKAN)
-LIBRARY_TYPE s_vulkanLibrary = nullptr;
+static LIBRARY_TYPE s_vulkanLibrary = nullptr;
 
-bool LoadVulkanFunctions(UnityVulkanInstance& instance)
+static bool LoadVulkanFunctions(UnityVulkanInstance& instance)
 {
     if (!LoadVulkanLibrary(s_vulkanLibrary))
     {
@@ -125,8 +121,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 
         s_mapVideoRenderer.clear();
 
-        UnityGfxRenderer renderer =
-            s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
+        UnityGfxRenderer renderer = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
         if (renderer == kUnityGfxRendererNull)
             break;
 
@@ -143,7 +138,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces));
-        if(s_gfxDevice != nullptr)
+        if (s_gfxDevice != nullptr)
         {
             s_gfxDevice->InitV();
         }
@@ -160,7 +155,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             s_gfxDevice.reset();
         }
 
-        //UnityPluginUnload not called normally
+        // UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
         break;
     }
@@ -172,7 +167,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
         break;
     }
-    };
+    }
 }
 
 // forward declaration for plugin load event
@@ -192,22 +187,15 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginLoad
     PluginLoad(unityInterfaces);
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginUnload()
-{
-    PluginUnload();
-}
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityWebRTCPluginUnload() { PluginUnload(); }
 #else
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
 {
     PluginLoad(unityInterfaces);
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
-{
-    PluginUnload();
-}
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload() { PluginUnload(); }
 #endif
-
 
 // Unity plugin load event
 void PluginLoad(IUnityInterfaces* unityInterfaces)
@@ -236,12 +224,14 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
             &s_MarkerEncode,
             "UnityVideoTrackSource.OnFrameCaptured",
             kUnityProfilerCategoryRender,
-            kUnityProfilerMarkerFlagDefault, 0);
+            kUnityProfilerMarkerFlagDefault,
+            0);
         unityProfiler->CreateMarker(
             &s_MarkerDecode,
             "UnityVideoRenderer.ConvertVideoFrameToTextureAndWriteToBuffer",
             kUnityProfilerCategoryRender,
-            kUnityProfilerMarkerFlagDefault, 0);
+            kUnityProfilerMarkerFlagDefault,
+            0);
         ScopedProfiler::UnityProfiler = unityProfiler;
     }
 
@@ -255,7 +245,7 @@ void PluginUnload()
 }
 
 // Data format used by the managed code.
-// CommandBuffer.IssuePluginEventAndData method pass data packed by this format. 
+// CommandBuffer.IssuePluginEventAndData method pass data packed by this format.
 struct EncodeData
 {
     void* texture;
@@ -265,7 +255,7 @@ struct EncodeData
     UnityRenderingExtTextureFormat format;
 };
 
-// Notice: When DebugLog is used in a method called from RenderingThread, 
+// Notice: When DebugLog is used in a method called from RenderingThread,
 // it hangs when attempting to leave PlayMode and re-enter PlayMode.
 // So, we comment out `DebugLog`.
 
@@ -276,49 +266,45 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     if (!ContextManager::GetInstance()->Exists(s_context))
         return;
     std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
-    if(!lock.owns_lock())
+    if (!lock.owns_lock())
         return;
 
-    EncodeData* encodeData =
-        static_cast<EncodeData*>(data);
+    EncodeData* encodeData = static_cast<EncodeData*>(data);
 
     RTC_DCHECK(encodeData->texture);
     RTC_DCHECK(encodeData->source);
     RTC_DCHECK_GT(encodeData->width, 0);
     RTC_DCHECK_GT(encodeData->height, 0);
 
-    const VideoStreamRenderEventID event =
-        static_cast<VideoStreamRenderEventID>(eventID);
+    const VideoStreamRenderEventID event = static_cast<VideoStreamRenderEventID>(eventID);
 
-
-    switch(event)
+    switch (event)
     {
-        case VideoStreamRenderEventID::Encode:
-        {
-            UnityVideoTrackSource* source = encodeData->source;
-            if (!s_context->ExistsRefPtr(source))
-                return;
-            Timestamp timestamp = s_clock->CurrentTime();
-            IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
-            UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
-            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(
-                encodeData->texture, device, gfxRenderer);
-            Size size(encodeData->width, encodeData->height);
-            {
-                ScopedProfiler profiler(*s_MarkerEncode);
-
-                auto frame =
-                    s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
-                source->OnFrameCaptured(std::move(frame));
-            }
-
-            s_bufferPool->ReleaseStaleBuffers(timestamp);
-
+    case VideoStreamRenderEventID::Encode:
+    {
+        UnityVideoTrackSource* source = encodeData->source;
+        if (!s_context->ExistsRefPtr(source))
             return;
+        Timestamp timestamp = s_clock->CurrentTime();
+        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
+        UnityGfxRenderer gfxRenderer = GraphicsUtility::GetGfxRenderer();
+        void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
+        unity::webrtc::Size size(encodeData->width, encodeData->height);
+        {
+            ScopedProfiler profiler(*s_MarkerEncode);
+
+            auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
+            source->OnFrameCaptured(std::move(frame));
         }
-        default: {
-            RTC_DCHECK(0);
-        }
+
+        s_bufferPool->ReleaseStaleBuffers(timestamp);
+
+        return;
+    }
+    default:
+    {
+        RTC_DCHECK(0);
+    }
     }
 }
 
@@ -342,23 +328,24 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 
     if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
     {
-        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
+        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2*>(data);
 
         auto renderer = s_context->GetVideoRenderer(params->userData);
         if (renderer == nullptr)
             return;
         s_mapVideoRenderer[params->userData] = renderer;
+        int width = static_cast<int>(params->width);
+        int height = static_cast<int>(params->height);
+
         {
             ScopedProfiler profiler(*s_MarkerDecode);
-            params->texData =
-                renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
-                params->width, params->height, ConvertTextureFormat(params->format));
-
+            params->texData = renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
+                width, height, ConvertTextureFormat(params->format));
         }
     }
     if (event == kUnityRenderingExtEventUpdateTextureEndV2)
     {
-        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2 *>(data);
+        auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2*>(data);
         s_mapVideoRenderer.erase(params->userData);
     }
 }

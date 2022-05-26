@@ -1,15 +1,22 @@
 #pragma once
 
+#include <comdef.h>
+#include <d3d11_4.h>
+#include <d3d12.h>
+#include <stdexcept>
+#include <wrl/client.h>
+
+#include <IUnityGraphicsD3D12.h>
+
 #include "D3D12Texture2D.h"
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
-#include "WebRTCConstants.h"
 
 namespace unity
 {
 namespace webrtc
 {
-
+    using namespace Microsoft::WRL;
     namespace webrtc = ::webrtc;
 
 #define DefPtr(_a) _COM_SMARTPTR_TYPEDEF(_a, __uuidof(_a))
@@ -18,6 +25,7 @@ namespace webrtc
 
     inline std::string HrToString(HRESULT hr)
     {
+
         char s_str[64] = {};
         sprintf_s(s_str, "HRESULT of 0x%08X", static_cast<UINT>(hr));
         return std::string(s_str);
@@ -80,13 +88,13 @@ namespace webrtc
             const D3D12_RESOURCE_STATES stateAfter,
             const UINT subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
-        ID3D12Device* m_d3d12Device;
-        ID3D12CommandQueue* m_d3d12CommandQueue;
+        ComPtr<ID3D12Device> m_d3d12Device;
+        ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
 
         //[Note-sin: 2019-10-30] sharing res from d3d12 to d3d11 require d3d11.1. Fence is supported in d3d11.4 or
-        //newer.
-        ID3D11Device5* m_d3d11Device;
-        ID3D11DeviceContext4* m_d3d11Context;
+        // newer.
+        ComPtr<ID3D11Device5> m_d3d11Device;
+        ComPtr<ID3D11DeviceContext4> m_d3d11Context;
 
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
@@ -96,7 +104,7 @@ namespace webrtc
         ID3D12GraphicsCommandList4Ptr m_commandList;
 
         // Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
-        ID3D12Fence* m_copyResourceFence;
+        ComPtr<ID3D12Fence> m_copyResourceFence;
         HANDLE m_copyResourceEventHandle;
         uint64_t m_copyResourceFenceValue = 1;
 
@@ -107,7 +115,7 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
 
     // use D3D11. See notes below
-    void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device); }
+    void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device.Get()); }
 
 } // end namespace webrtc
 } // end namespace unity

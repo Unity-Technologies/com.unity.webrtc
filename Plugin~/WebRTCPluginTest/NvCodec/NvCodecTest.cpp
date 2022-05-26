@@ -6,6 +6,8 @@
 #include "GraphicsDeviceContainer.h"
 #include "NvCodecUtils.h"
 #include "VideoCodecTest.h"
+#include <common_video/h264/h264_bitstream_parser.h>
+#include <rtc_base/thread.h>
 
 namespace unity
 {

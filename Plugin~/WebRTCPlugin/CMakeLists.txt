@@ -39,7 +39,6 @@ target_sources(WebRTCLib
     UnityAudioEncoderFactory.h
     UnityAudioTrackSource.cpp
     UnityAudioTrackSource.h
-    WebRTCConstants.h
     WebRTCMacros.h
     WebRTCPlugin.h
     UnityLogStream.h
@@ -89,13 +88,6 @@ if(iOS OR macOS)
     PRIVATE
       ../libcxx/debug.cpp
   )
-endif()
-
-if(Linux)
-  target_sources(WebRTCLib
-    PRIVATE
-      X11.h
-    )
 endif()
 
 if(Android)
@@ -189,6 +181,8 @@ elseif(macOS)
   set_target_properties(WebRTCLib
     PROPERTIES 
       LINK_FLAGS "-ObjC"
+      CXX_VISIBILITY_PRESET hidden
+      VISIBILITY_INLINES_HIDDEN ON
   )  
 elseif(Linux)
   set(PROJECT_BINARY_DIR
@@ -385,6 +379,8 @@ if(macOS)
   set_target_properties(WebRTCPlugin
   PROPERTIES 
     LINK_FLAGS "-ObjC"
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
   )
 endif()
 

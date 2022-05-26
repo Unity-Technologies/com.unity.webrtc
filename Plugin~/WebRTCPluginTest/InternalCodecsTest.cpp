@@ -3,10 +3,10 @@
 #include "FrameGenerator.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDevice/ITexture2D.h"
-
 #include "GraphicsDeviceContainer.h"
 #include "VideoCodecTest.h"
-
+#include "media/engine/internal_decoder_factory.h"
+#include "media/engine/internal_encoder_factory.h"
 #include "modules/video_coding/utility/vp8_header_parser.h"
 #include "test/video_codec_settings.h"
 
@@ -27,7 +27,6 @@ namespace webrtc
             : container_(CreateGraphicsDeviceContainer(GetParam()))
             , device_(container_->device())
         {
-            
         }
         ~InternalCodecsTest() override
         {
@@ -46,7 +45,6 @@ namespace webrtc
 
             VideoCodecTest::SetUp();
         }
-
 
         SdpVideoFormat FindFormat(std::string name, const std::vector<SdpVideoFormat>& formats)
         {

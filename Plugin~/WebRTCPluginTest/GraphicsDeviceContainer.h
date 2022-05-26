@@ -1,8 +1,10 @@
 #pragma once
-#include "IUnityGraphics.h"
-#include "IUnityRenderingExtensions.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <IUnityGraphics.h>
+#include <IUnityRenderingExtensions.h>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
+#include "PlatformBase.h"
 
 namespace unity
 {

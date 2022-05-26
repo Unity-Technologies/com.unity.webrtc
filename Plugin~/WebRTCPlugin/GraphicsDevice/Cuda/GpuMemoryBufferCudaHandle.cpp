@@ -34,7 +34,7 @@ namespace webrtc
         }
         if (resource != nullptr)
         {
-            result = cuGraphicsUnmapResources(1, &resource, 0);
+            result = cuGraphicsUnmapResources(1, &resource, nullptr);
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "faild cuGraphicsUnmapResources CUresult: " << result;
@@ -54,7 +54,7 @@ namespace webrtc
             }
         }
 
-        cuCtxPopCurrent(NULL);
+        cuCtxPopCurrent(nullptr);
     }
 }
 }

@@ -1,6 +1,9 @@
 #pragma once
 
-#include "WebRTCConstants.h"
+#if SUPPORT_OPENGL_CORE
+#include <glad/gl.h>
+#endif
+
 #include "GraphicsDevice/IGraphicsDevice.h"
 
 #if CUDA_PLATFORM

@@ -2,6 +2,9 @@
 
 #include <mutex>
 
+#include <api/media_stream_interface.h>
+#include <pc/local_audio_source.h>
+
 namespace unity
 {
 namespace webrtc
@@ -18,9 +21,7 @@ namespace webrtc
         void AddSink(AudioTrackSinkInterface* sink) override;
         void RemoveSink(AudioTrackSinkInterface* sink) override;
 
-        void PushAudioData(
-            const float* pAudioData, int nSampleRate,
-            size_t nNumChannels, size_t nNumFrames);
+        void PushAudioData(const float* pAudioData, int nSampleRate, size_t nNumChannels, size_t nNumFrames);
         void SendAudioData(int nSampleRate, size_t nNumChannels);
 
     protected:

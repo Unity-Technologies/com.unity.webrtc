@@ -1,6 +1,9 @@
 #pragma once
 
+#include <queue>
+
 #include "api/test/frame_generator_interface.h"
+#include "rtc_base/synchronization/mutex.h"
 
 namespace unity
 {

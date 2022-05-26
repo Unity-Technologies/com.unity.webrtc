@@ -1,4 +1,7 @@
 #include "pch.h"
+
+#include <rtc_base/strings/json.h>
+
 #include "Context.h"
 #include "PeerConnectionObject.h"
 #include "SetSessionDescriptionObserver.h"
@@ -8,7 +11,8 @@ namespace unity
 namespace webrtc
 {
 
-    PeerConnectionObject::PeerConnectionObject(Context& context) : context(context)
+    PeerConnectionObject::PeerConnectionObject(Context& context)
+        : context(context)
     {
     }
 
@@ -46,18 +50,18 @@ namespace webrtc
     void PeerConnectionObject::OnFailure(webrtc::RTCError error)
     {
         //::TODO
-        //RTCError _error = { RTCErrorDetailType::IdpTimeout };
+        // RTCError _error = { RTCErrorDetailType::IdpTimeout };
         if (onCreateSDFailure != nullptr)
         {
             onCreateSDFailure(this, error.type(), error.message());
         }
     }
 
-    void PeerConnectionObject::OnDataChannel(
-        rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
+    void PeerConnectionObject::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
     {
         context.AddDataChannel(channel, *this);
-        if (onDataChannel != nullptr) {
+        if (onDataChannel != nullptr)
+        {
             onDataChannel(this, channel);
         }
     }
@@ -104,7 +108,6 @@ namespace webrtc
         }
     }
 
-
     // Called any time the IceConnectionState changes.
     void PeerConnectionObject::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state)
     {
@@ -118,7 +121,7 @@ namespace webrtc
     void PeerConnectionObject::OnConnectionChange(PeerConnectionInterface::PeerConnectionState new_state)
     {
         DebugLog("OnConnectionChange %d", new_state);
-        if(onConnectionStateChange != nullptr)
+        if (onConnectionStateChange != nullptr)
         {
             onConnectionStateChange(this, new_state);
         }
@@ -151,9 +154,10 @@ namespace webrtc
 
     void PeerConnectionObject::Close()
     {
-        if (connection != nullptr && connection->peer_connection_state() != webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
+        if (connection != nullptr &&
+            connection->peer_connection_state() != webrtc::PeerConnectionInterface::PeerConnectionState::kClosed)
         {
-            //Cleanup delegates/callbacks
+            // Cleanup delegates/callbacks
             onCreateSDSuccess = nullptr;
             onCreateSDFailure = nullptr;
             onLocalSdpReady = nullptr;
@@ -168,7 +172,7 @@ namespace webrtc
     }
 
     RTCErrorType PeerConnectionObject::SetLocalDescription(
-        const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+        const RTCSessionDescription& desc, ::webrtc::SetSessionDescriptionObserver* observer, std::string& error)
     {
         SdpParseError error_;
         std::unique_ptr<SessionDescriptionInterface> _desc =
@@ -185,14 +189,15 @@ namespace webrtc
         return RTCErrorType::NONE;
     }
 
-    RTCErrorType PeerConnectionObject::SetLocalDescriptionWithoutDescription(webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+    RTCErrorType PeerConnectionObject::SetLocalDescriptionWithoutDescription(
+        ::webrtc::SetSessionDescriptionObserver* observer, std::string& error)
     {
         connection->SetLocalDescription(observer);
         return RTCErrorType::NONE;
     }
 
     RTCErrorType PeerConnectionObject::SetRemoteDescription(
-        const RTCSessionDescription& desc, webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+        const RTCSessionDescription& desc, ::webrtc::SetSessionDescriptionObserver* observer, std::string& error)
     {
         SdpParseError error_;
         std::unique_ptr<SessionDescriptionInterface> _desc =
@@ -253,7 +258,7 @@ namespace webrtc
         root["iceCandidatePoolSize"] = Json::Value(Json::objectValue);
         root["iceCandidatePoolSize"]["hasValue"] = true;
         root["iceCandidatePoolSize"]["value"] = _config.ice_candidate_pool_size;
-            
+
         root["bundlePolicy"] = Json::Value(Json::objectValue);
         root["bundlePolicy"]["hasValue"] = true;
         root["bundlePolicy"]["value"] = _config.bundle_policy;
@@ -262,7 +267,7 @@ namespace webrtc
         return Json::writeString(builder, root);
     }
 
-    void PeerConnectionObject::CreateOffer(const RTCOfferAnswerOptions & options)
+    void PeerConnectionObject::CreateOffer(const RTCOfferAnswerOptions& options)
     {
         webrtc::PeerConnectionInterface::RTCOfferAnswerOptions _options;
         _options.ice_restart = options.iceRestart;
@@ -283,7 +288,8 @@ namespace webrtc
         context.AddStatsReport(report);
     }
 
-    bool PeerConnectionObject::GetSessionDescription(const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
+    bool PeerConnectionObject::GetSessionDescription(
+        const webrtc::SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const
     {
         if (sdp == nullptr)
         {

@@ -32,6 +32,7 @@ namespace webrtc
 
             context_ = device_->GetCUcontext();
         }
+
     protected:
         CUcontext context_;
         std::unique_ptr<GraphicsDeviceContainer> container_;

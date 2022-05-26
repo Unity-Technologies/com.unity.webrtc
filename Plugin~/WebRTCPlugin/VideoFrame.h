@@ -1,10 +1,11 @@
 #pragma once
 
+#include <api/units/time_delta.h>
+#include <rtc_base/ref_counted_object.h>
+#include <rtc_base/timestamp_aligner.h>
+
 #include "GpuMemoryBuffer.h"
 #include "Size.h"
-#include "api/units/time_delta.h"
-#include "rtc_base/ref_counted_object.h"
-#include "rtc_base/timestamp_aligner.h"
 
 namespace unity
 {
@@ -35,13 +36,14 @@ namespace webrtc
             rtc::scoped_refptr<GpuMemoryBufferInterface> gpu_memory_buffer,
             ReturnBufferToPoolCallback returnBufferToPoolCallback,
             TimeDelta timestamp);
+
     protected:
         VideoFrame(
             const Size& size,
             rtc::scoped_refptr<GpuMemoryBufferInterface> buffer,
             ReturnBufferToPoolCallback returnBufferToPoolCallback,
             TimeDelta timestamp);
-        virtual ~VideoFrame();
+        virtual ~VideoFrame() override;
 
     private:
         Size size_;

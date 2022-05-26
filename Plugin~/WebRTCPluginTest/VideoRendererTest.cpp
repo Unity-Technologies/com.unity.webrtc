@@ -6,7 +6,7 @@
 #include "GraphicsDeviceTestBase.h"
 #include "UnityVideoRenderer.h"
 #include "UnityVideoTrackSource.h"
-#include "api/task_queue/default_task_queue_factory.h"
+#include <api/task_queue/default_task_queue_factory.h>
 
 using testing::_;
 using testing::Invoke;
@@ -16,8 +16,8 @@ namespace unity
 {
 namespace webrtc
 {
-    const int width = 256;
-    const int height = 256;
+    const int kWidth = 256;
+    const int kHeight = 256;
 
     class VideoRendererTest : public GraphicsDeviceTestBase
     {
@@ -35,7 +35,7 @@ namespace webrtc
         {
             if (!device())
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
-            m_texture.reset(device()->CreateDefaultTextureV(width, height, format()));
+            m_texture.reset(device()->CreateDefaultTextureV(kWidth, kHeight, format()));
             context = std::make_unique<Context>(device());
         }
         std::unique_ptr<Context> context;
@@ -45,12 +45,12 @@ namespace webrtc
         std::unique_ptr<UnityVideoRenderer> m_renderer;
         DelegateVideoFrameResize m_callback;
 
-        webrtc::VideoFrame::Builder CreateBlackFrameBuilder(int width, int height)
+        ::webrtc::VideoFrame::Builder CreateBlackFrameBuilder(int width, int height)
         {
             rtc::scoped_refptr<webrtc::I420Buffer> buffer = webrtc::I420Buffer::Create(width, height);
 
             webrtc::I420Buffer::SetBlack(buffer);
-            return webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer).set_timestamp_us(
+            return ::webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer).set_timestamp_us(
                 Clock::GetRealTimeClock()->TimeInMicroseconds());
         }
 
@@ -59,22 +59,18 @@ namespace webrtc
 
     TEST_P(VideoRendererTest, SetAndGetFrameBuffer)
     {
-        int width = 256;
-        int height = 256;
         EXPECT_EQ(nullptr, m_renderer->GetFrameBuffer());
-        auto builder = CreateBlackFrameBuilder(width, height);
+        auto builder = CreateBlackFrameBuilder(kWidth, kHeight);
         m_renderer->OnFrame(builder.build());
         EXPECT_NE(nullptr, m_renderer->GetFrameBuffer());
     }
 
     TEST_P(VideoRendererTest, ConvertVideoFrameToTexture)
     {
-        int width = 256;
-        int height = 256;
-        auto builder = CreateBlackFrameBuilder(width, height);
+        auto builder = CreateBlackFrameBuilder(kWidth, kHeight);
         m_renderer->OnFrame(builder.build());
 
-        void* data = m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(width, height, libyuv::FOURCC_ARGB);
+        void* data = m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(kWidth, kHeight, libyuv::FOURCC_ARGB);
         EXPECT_NE(nullptr, data);
     }
 

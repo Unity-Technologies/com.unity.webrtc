@@ -3,13 +3,12 @@
 #pragma clang diagnostic ignored "-Wunused-variable"
 
 #ifndef EXPORTED_VULKAN_FUNCTION
-#define EXPORTED_VULKAN_FUNCTION( function )
+#define EXPORTED_VULKAN_FUNCTION(function)
 #endif
 
 EXPORTED_VULKAN_FUNCTION(vkGetInstanceProcAddr)
 
 #undef EXPORTED_VULKAN_FUNCTION
-
 
 #ifndef GLOBAL_VULKAN_FUNCTION
 #define GLOBAL_VULKAN_FUNCTION(func)
@@ -35,7 +34,7 @@ INSTANCE_VULKAN_FUNCTION(vkDestroyInstance)
 #undef INSTANCE_VULKAN_FUNCTION
 
 #ifndef DEVICE_VULKAN_FUNCTION
-#define DEVICE_VULKAN_FUNCTION( function )
+#define DEVICE_VULKAN_FUNCTION(function)
 #endif
 
 DEVICE_VULKAN_FUNCTION(vkDestroyDevice)

@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#if SUPPORT_OPENGL_CORE
+#include <glad/gl.h>
+#endif
+
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
 

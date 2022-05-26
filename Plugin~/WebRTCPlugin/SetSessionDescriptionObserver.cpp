@@ -1,13 +1,15 @@
 #include "pch.h"
-#include "SetSessionDescriptionObserver.h"
+
 #include "PeerConnectionObject.h"
+#include "SetSessionDescriptionObserver.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-    rtc::scoped_refptr<SetSessionDescriptionObserver> SetSessionDescriptionObserver::Create(PeerConnectionObject* connection)
+    rtc::scoped_refptr<SetSessionDescriptionObserver>
+    SetSessionDescriptionObserver::Create(PeerConnectionObject* connection)
     {
         return new rtc::RefCountedObject<SetSessionDescriptionObserver>(connection);
     }
@@ -20,7 +22,7 @@ namespace webrtc
     void SetSessionDescriptionObserver::RegisterDelegateOnSuccess(DelegateSetSessionDescSuccess onSuccess)
     {
         m_vectorDelegateSetSDSuccess.push_back(onSuccess);
-	}
+    }
 
     void SetSessionDescriptionObserver::RegisterDelegateOnFailure(DelegateSetSessionDescFailure onFailure)
     {
@@ -29,7 +31,7 @@ namespace webrtc
 
     void SetSessionDescriptionObserver::OnSuccess()
     {
-        for (auto delegate: m_vectorDelegateSetSDSuccess)
+        for (auto delegate : m_vectorDelegateSetSDSuccess)
         {
             delegate(m_connection);
         }
@@ -42,6 +44,6 @@ namespace webrtc
             delegate(m_connection, error.type(), error.message());
         }
     }
-    
+
 } // end namespace webrtc
 } // end namespace unity

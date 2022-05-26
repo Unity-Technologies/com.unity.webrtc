@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "VideoCodecTest.h"
+#include "modules/rtp_rtcp/include/rtp_rtcp_defines.h"
 
 static const int kEncodeTimeoutMs = 100;
 static const int kDecodeTimeoutMs = 100;
@@ -11,19 +12,16 @@ namespace webrtc
 {
     VideoEncoder::Capabilities kCapabilities() { return VideoEncoder::Capabilities(false); }
     std::string kProfileLevelIdString() { return *H264ProfileLevelIdToString(kProfileLevelId); }
-    VideoEncoder::Settings kSettings()
-    {
-        return VideoEncoder::Settings(kCapabilities(), kNumCores, kMaxPayloadSize);
-    }
+    VideoEncoder::Settings kSettings() { return VideoEncoder::Settings(kCapabilities(), kNumCores, kMaxPayloadSize); }
 
     EncodedImageCallback::Result VideoCodecTest::FakeEncodedImageCallback::OnEncodedImage(
         const EncodedImage& frame, const CodecSpecificInfo* codec_specific_info)
     {
         MutexLock lock(&_test->encodedFrameSection_);
         _test->encodedFrames_.push_back(frame);
-         RTC_DCHECK(codec_specific_info);
+        RTC_DCHECK(codec_specific_info);
         _test->codecSpecificInfos_.push_back(*codec_specific_info);
-        //if (!_test->wait_for_encoded_frames_threshold_)
+        // if (!_test->wait_for_encoded_frames_threshold_)
         {
             _test->encodedFrameEvent_.Set();
             return Result(Result::OK);
@@ -34,7 +32,7 @@ namespace webrtc
         //    _test->wait_for_encoded_frames_threshold_ = 1;
         //    _test->encodedFrameEvent_.Set();
         //}
-        //return Result(Result::OK);
+        // return Result(Result::OK);
     }
 
     void VideoCodecTest::FakeDecodedImageCallback::Decoded(
@@ -54,11 +52,11 @@ namespace webrtc
                                      .set_update_rect(frame_data.update_rect)
                                      .build();
 
-         // I420Buffer::SetBlack(frame_data.buffer);
-         const uint32_t timestamp = lastInputFrameTimestamp_ + kVideoPayloadTypeFrequency / codecSettings_.maxFramerate;
-         input_frame.set_timestamp(timestamp);
+        // I420Buffer::SetBlack(frame_data.buffer);
+        const uint32_t timestamp = lastInputFrameTimestamp_ + kVideoPayloadTypeFrequency / codecSettings_.maxFramerate;
+        input_frame.set_timestamp(timestamp);
 
-         lastInputFrameTimestamp_ = timestamp;
+        lastInputFrameTimestamp_ = timestamp;
         return input_frame;
     }
 
@@ -78,13 +76,13 @@ namespace webrtc
     bool VideoCodecTest::WaitForEncodedFrames(
         std::vector<EncodedImage>* frames, std::vector<CodecSpecificInfo>* codec_specific_info)
     {
-         EXPECT_TRUE(encodedFrameEvent_.Wait(kEncodeTimeoutMs)) << "Timed out while waiting for encoded frame.";
+        EXPECT_TRUE(encodedFrameEvent_.Wait(kEncodeTimeoutMs)) << "Timed out while waiting for encoded frame.";
         // This becomes unsafe if there are multiple threads waiting for frames.
-         MutexLock lock(&encodedFrameSection_);
-         EXPECT_FALSE(encodedFrames_.empty());
-         EXPECT_FALSE(codecSpecificInfos_.empty());
-         EXPECT_EQ(encodedFrames_.size(), codecSpecificInfos_.size());
-         if (!encodedFrames_.empty())
+        MutexLock lock(&encodedFrameSection_);
+        EXPECT_FALSE(encodedFrames_.empty());
+        EXPECT_FALSE(codecSpecificInfos_.empty());
+        EXPECT_EQ(encodedFrames_.size(), codecSpecificInfos_.size());
+        if (!encodedFrames_.empty())
         {
             *frames = encodedFrames_;
             encodedFrames_.clear();
@@ -93,11 +91,7 @@ namespace webrtc
             codecSpecificInfos_.clear();
             return true;
         }
-         else
-        {
-            return false;
-        }
-        return true;
+        return false;
     }
 
     bool VideoCodecTest::WaitForDecodedFrame(std::unique_ptr<VideoFrame>* frame, absl::optional<uint8_t>* qp)
@@ -123,7 +117,7 @@ namespace webrtc
     {
         ModifyCodecSettings(&codecSettings_);
 
-         inputFrameGenerator_ = CreateFrameGenerator(
+        inputFrameGenerator_ = CreateFrameGenerator(
             codecSettings_.width,
             codecSettings_.height,
             test::FrameGeneratorInterface::OutputType::kI420,

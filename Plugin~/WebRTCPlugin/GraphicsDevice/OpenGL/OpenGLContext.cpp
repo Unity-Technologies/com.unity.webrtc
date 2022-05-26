@@ -1,10 +1,11 @@
 #include "pch.h"
 
-#include "OpenGLContext.h"
-
 #if SUPPORT_OPENGL_ES
 #include <EGL/egl.h>
 #endif
+
+
+#include "OpenGLContext.h"
 
 namespace unity
 {

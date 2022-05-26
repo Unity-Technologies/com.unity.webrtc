@@ -1,6 +1,7 @@
 #include "pch.h"
-#include "PeerConnectionStatsCollectorCallback.h"
+
 #include "PeerConnectionObject.h"
+#include "PeerConnectionStatsCollectorCallback.h"
 
 namespace unity
 {
@@ -12,7 +13,8 @@ namespace webrtc
     {
         return new rtc::RefCountedObject<PeerConnectionStatsCollectorCallback>(connection);
     }
-    void PeerConnectionStatsCollectorCallback::OnStatsDelivered(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
+    void PeerConnectionStatsCollectorCallback::OnStatsDelivered(
+        const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
     {
         m_owner->ReceiveStatsReport(report);
         s_collectStatsCallback(m_owner, report.get());

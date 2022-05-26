@@ -1,5 +1,12 @@
 #include "pch.h"
 
+#include <absl/strings/match.h>
+#include <api/video/video_codec_constants.h>
+#include <api/video/video_codec_type.h>
+#include <common_video/h264/h264_common.h>
+#include <media/base/media_constants.h>
+#include <modules/video_coding/include/video_codec_interface.h>
+
 #include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
@@ -9,11 +16,6 @@
 #include "NvEncoderImpl.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
-
-#include "absl/strings/match.h"
-#include "api/video/video_codec_constants.h"
-#include "api/video/video_codec_type.h"
-#include "media/base/media_constants.h"
 
 namespace unity
 {
@@ -209,7 +211,8 @@ namespace webrtc
         m_encodeConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
         m_encodeConfig.rcParams.averageBitRate = m_configurations[0].target_bps;
         m_encodeConfig.rcParams.vbvBufferSize = (m_encodeConfig.rcParams.averageBitRate *
-                                                 m_initializeParams.frameRateDen / m_initializeParams.frameRateNum) *  5;
+                                                 m_initializeParams.frameRateDen / m_initializeParams.frameRateNum) *
+            5;
         m_encodeConfig.rcParams.vbvInitialDelay = m_encodeConfig.rcParams.vbvBufferSize;
 
         m_encoder->CreateEncoder(&m_initializeParams);
@@ -517,7 +520,8 @@ namespace webrtc
         reInitCodecConfig.rcParams.averageBitRate = m_configurations[0].target_bps;
         reInitCodecConfig.rcParams.vbvBufferSize =
             (reInitCodecConfig.rcParams.averageBitRate * reconfigureParams.reInitEncodeParams.frameRateDen /
-             reconfigureParams.reInitEncodeParams.frameRateNum) * 5;
+             reconfigureParams.reInitEncodeParams.frameRateNum) *
+            5;
         reInitCodecConfig.rcParams.vbvInitialDelay = m_encodeConfig.rcParams.vbvBufferSize;
 
         m_encoder->Reconfigure(&reconfigureParams);

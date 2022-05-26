@@ -1,10 +1,9 @@
 #include "pch.h"
 
+#include <rtc_base/ref_counted_object.h>
+#include <system_wrappers/include/clock.h>
+
 #include "GpuMemoryBufferPool.h"
-
-#include "rtc_base/ref_counted_object.h"
-#include "system_wrappers/include/clock.h"
-
 
 namespace unity
 {
@@ -19,10 +18,7 @@ namespace webrtc
     GpuMemoryBufferPool::~GpuMemoryBufferPool() { }
 
     rtc::scoped_refptr<VideoFrame> GpuMemoryBufferPool::CreateFrame(
-        NativeTexPtr ptr,
-        const Size& size,
-        UnityRenderingExtTextureFormat format,
-        Timestamp timestamp)
+        NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp)
     {
         auto buffer = GetOrCreateFrameResources(ptr, size, format);
         VideoFrame::ReturnBufferToPoolCallback callback =
@@ -52,7 +48,7 @@ namespace webrtc
         std::unique_ptr<FrameResources> resources = std::make_unique<FrameResources>(buffer);
         resources->MarkUsed(clock_->CurrentTime());
         resourcesPool_.push_back(std::move(resources));
-        return buffer;
+        return std::move(buffer);
     }
 
     bool GpuMemoryBufferPool::AreFrameResourcesCompatible(
@@ -69,7 +65,7 @@ namespace webrtc
             resourcesPool_.end(),
             [ptr](std::unique_ptr<FrameResources>& x) { return x->buffer_.get() == ptr; });
         RTC_DCHECK(result != resourcesPool_.end());
-        
+
         (*result)->MarkUnused(clock_->CurrentTime());
     }
 

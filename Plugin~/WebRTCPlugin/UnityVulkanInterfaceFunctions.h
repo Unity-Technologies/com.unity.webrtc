@@ -11,7 +11,8 @@ namespace webrtc
     }
 
     template<>
-    inline bool AddInterceptInitialization(IUnityGraphicsVulkan* instance, UnityVulkanInitCallback func, void* userdata, int priority)
+    inline bool AddInterceptInitialization(
+        IUnityGraphicsVulkan* instance, UnityVulkanInitCallback func, void* userdata, int priority)
     {
         // IUnityGraphicsVulkan is not supported AddInterceptInitialization.
         return instance->InterceptInitialization(func, userdata);

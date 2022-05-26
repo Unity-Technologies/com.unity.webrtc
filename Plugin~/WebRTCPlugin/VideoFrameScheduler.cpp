@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include <functional>
+#include <rtc_base/event.h>
+#include <rtc_base/task_utils/to_queued_task.h>
 
 #include "VideoFrameScheduler.h"
 

@@ -1,14 +1,18 @@
 #pragma once
+
 #include <vulkan/vulkan.h>
 
 #ifdef _WIN32
+#include <windef.h>
 #define LIBRARY_TYPE HMODULE
 #elif defined __linux
 #define LIBRARY_TYPE void*
 #endif
 
-namespace unity {
-namespace webrtc {
+namespace unity
+{
+namespace webrtc
+{
 
 #define EXPORTED_VULKAN_FUNCTION(func) extern PFN_##func func;
 #define GLOBAL_VULKAN_FUNCTION(func) extern PFN_##func func;
@@ -17,11 +21,11 @@ namespace webrtc {
 
 #include "ListOfVulkanFunctions.inl"
 
-bool LoadVulkanLibrary(LIBRARY_TYPE& library);
-bool LoadExportedVulkanFunction(LIBRARY_TYPE const& library);
-bool LoadGlobalVulkanFunction();
-bool LoadInstanceVulkanFunction(VkInstance instance);
-bool LoadDeviceVulkanFunction(VkDevice device);
+    bool LoadVulkanLibrary(LIBRARY_TYPE& library);
+    bool LoadExportedVulkanFunction(LIBRARY_TYPE const& library);
+    bool LoadGlobalVulkanFunction();
+    bool LoadInstanceVulkanFunction(VkInstance instance);
+    bool LoadDeviceVulkanFunction(VkDevice device);
 
 } // namespace webrtc
 } // namespace unity

@@ -22,12 +22,14 @@ namespace webrtc
         , textureCpuRead_(nullptr)
         , handle_(nullptr)
     {
-        texture_.reset(device_->CreateDefaultTextureV(size.width(), size.height(), format));
-        textureCpuRead_.reset(device_->CreateCPUReadTextureV(size.width(), size.height(), format));
+        uint32_t width = static_cast<uint32_t>(size.width());
+        uint32_t height = static_cast<uint32_t>(size.height());
+        texture_.reset(device_->CreateDefaultTextureV(width, height, format));
+        textureCpuRead_.reset(device_->CreateCPUReadTextureV(width, height, format));
 
 // todo(kazuki): need to refactor
 #if CUDA_PLATFORM
-        if(device_->IsCudaSupport())
+        if (device_->IsCudaSupport())
         {
             // IGraphicsDevice::Map method is too heavy and stop the graphics process,
             // so must not call this method on the worker thread instead of the render thread.

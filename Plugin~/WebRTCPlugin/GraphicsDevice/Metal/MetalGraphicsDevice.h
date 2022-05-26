@@ -1,10 +1,9 @@
 #pragma once
 
+#include <Metal/Metal.h>
+
 #include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
-#include "WebRTCConstants.h"
-
-#include <Metal/Metal.h>
 
 namespace unity
 {

@@ -1,12 +1,17 @@
 #pragma once
 
+#include <IUnityGraphics.h>
+
 #include "api/test/frame_generator_interface.h"
-#include "api/video_codecs/h264_profile_level_id.h"
-#include "api/video_codecs/video_codec.h"
-#include "api/video_codecs/video_decoder.h"
-#include "api/video_codecs/video_encoder.h"
-#include "media/base/codec.h"
+#include <api/video_codecs/h264_profile_level_id.h>
+#include <api/video_codecs/video_codec.h>
+#include <api/video_codecs/video_decoder.h>
+#include <api/video_codecs/video_encoder.h>
+#include <media/base/codec.h>
+#include <modules/video_coding/include/video_codec_interface.h>
 #include "rtc_base/checks.h"
+#include "rtc_base/event.h"
+#include "rtc_base/synchronization/mutex.h"
 #include "gtest/gtest.h"
 
 namespace unity
@@ -16,7 +21,7 @@ namespace webrtc
     using namespace ::webrtc;
     using namespace ::webrtc::test;
 
-// todo(kazuki):: move another header for CUDA platform
+    // todo(kazuki):: move another header for CUDA platform
     constexpr int kNumCores = 1;
     constexpr size_t kMaxPayloadSize = 1440;
     const H264ProfileLevelId kProfileLevelId(H264Profile::kProfileBaseline, H264Level::kLevel3_1);
@@ -67,7 +72,8 @@ namespace webrtc
 
         // Helper method for waiting a single encoded frame.
         bool WaitForEncodedFrame(EncodedImage* frame, CodecSpecificInfo* codec_specific_info);
-        bool WaitForEncodedFrames(std::vector<EncodedImage>* frames, std::vector<CodecSpecificInfo>* codec_specific_info);
+        bool
+        WaitForEncodedFrames(std::vector<EncodedImage>* frames, std::vector<CodecSpecificInfo>* codec_specific_info);
 
         // Helper method for waiting a single decoded frame.
         bool WaitForDecodedFrame(std::unique_ptr<VideoFrame>* frame, absl::optional<uint8_t>* qp);

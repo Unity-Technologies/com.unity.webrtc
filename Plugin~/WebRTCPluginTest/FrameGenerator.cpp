@@ -24,13 +24,9 @@ namespace webrtc
     VideoFrameGenerator::VideoFrameGenerator(
         IGraphicsDevice* device, int width, int height, OutputType type, int num_squares)
         : device_(device)
+        , width_(width)
+        , height_(height)
     {
-
-        ChangeResolution(width, height);
-        for (int i = 0; i < num_squares; ++i)
-        {
-            // squares_.emplace_back(new Square(width, height, i + 1));
-        }
     }
 
     void VideoFrameGenerator::ChangeResolution(size_t width, size_t height)
@@ -48,10 +44,11 @@ namespace webrtc
 
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
 
-        ITexture2D* texture = device_->CreateCPUReadTextureV(width_, height_, kFormat);
+        ITexture2D* texture = device_->CreateCPUReadTextureV(
+            static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), kFormat);
         queue_.push(std::unique_ptr<ITexture2D>(texture));
         rtc::scoped_refptr<VideoFrame> frame = CreateTestFrame(device_, texture, kFormat);
-        
+
         ::webrtc::VideoFrame videoFrame = VideoFrameAdapter::CreateVideoFrame(frame);
         rtc::scoped_refptr<VideoFrameBuffer> buffer = videoFrame.video_frame_buffer();
         return VideoFrameData(buffer, absl::nullopt);

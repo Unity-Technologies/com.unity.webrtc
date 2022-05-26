@@ -77,7 +77,7 @@ namespace webrtc
         SetDefaultSettings(&codec_settings);
         codec_settings.width = 4000;
         codec_settings.height = 4000;
-      
+
         EXPECT_EQ(encoder.InitEncode(&codec_settings, kSettings()), WEBRTC_VIDEO_CODEC_ERR_PARAMETER);
     }
 

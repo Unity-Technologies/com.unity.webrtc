@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <api/video/video_frame.h>
+
 #include "VideoFrameAdapter.h"
 
 namespace unity
@@ -99,10 +101,10 @@ namespace webrtc
     {
         std::unique_lock<std::mutex> guard(scaleLock_);
 
-        for(auto scaledI420buffer : scaledI40Buffers_)
+        for (auto scaledI420buffer : scaledI40Buffers_)
         {
             Size bufferSize(scaledI420buffer->width(), scaledI420buffer->height());
-            if(size == bufferSize)
+            if (size == bufferSize)
             {
                 return scaledI420buffer;
             }

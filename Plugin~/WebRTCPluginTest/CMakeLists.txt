@@ -155,6 +155,8 @@ elseif(macOS)
   set_target_properties(WebRTCLibTest 
     PROPERTIES 
       LINK_FLAGS "-ObjC"
+      CXX_VISIBILITY_PRESET hidden
+      VISIBILITY_INLINES_HIDDEN ON
   )
   target_link_libraries(WebRTCLibTest
     PRIVATE

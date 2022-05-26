@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "GraphicsDeviceContainer.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDeviceContainer.h"
 #include "UnityVideoEncoderFactory.h"
 
 namespace unity
