@@ -7,35 +7,22 @@ using Unity.WebRTC.Samples;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
-class PerfectNegotiationSample : MonoBehaviour
+class ReplaceTrackSample : MonoBehaviour
 {
 #pragma warning disable 0649
-    [SerializeField] private Button politeSwapButton;
-    [SerializeField] private Button impoliteSwapButton;
-    [SerializeField] private Button swapPoliteFirstButton;
-    [SerializeField] private Button swapImpoliteFirstButton;
-    [SerializeField] private Camera politeSourceCamera1;
-    [SerializeField] private Camera politeSourceCamera2;
-    [SerializeField] private Camera impoliteSourceCamera1;
-    [SerializeField] private Camera impoliteSourceCamera2;
-    [SerializeField] private RawImage politeSourceImage1;
-    [SerializeField] private RawImage politeSourceImage2;
-    [SerializeField] private RawImage impoliteSourceImage1;
-    [SerializeField] private RawImage impoliteSourceImage2;
-    [SerializeField] private RawImage politeReceiveImage;
-    [SerializeField] private RawImage impoliteReceiveImage;
+    [SerializeField] private Button switchButton;
+    [SerializeField] private Camera camera1;
+    [SerializeField] private Camera camera2;
+    [SerializeField] private RawImage sourceImage1;
+    [SerializeField] private RawImage sourceImage2;
+    [SerializeField] private RawImage receiveImage;
+    [SerializeField] private Text textSourceImage1;
+    [SerializeField] private Text textSourceImage2;
+    [SerializeField] private Text textReceiveImage;
+    [SerializeField] private Transform[] rotateObjects;
 #pragma warning restore 0649
 
-    private Peer politePeer, impolitePeer;
-    private readonly Color red = Color.red;
-    private readonly Color magenta = Color.magenta;
-    private readonly Color blue = Color.blue;
-    private readonly Color cyan = Color.cyan;
-    private readonly Color green = Color.green;
-    private readonly Color yellow = Color.yellow;
-    private int count = 0;
-    private const int MAX = 120;
-    private float lerp = 0.0f;
+    private Peer peer1, peer2;
 
     private void Awake()
     {
@@ -44,51 +31,54 @@ class PerfectNegotiationSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        politePeer?.Dispose();
-        impolitePeer?.Dispose();
+        peer1?.Dispose();
+        peer2?.Dispose();
         WebRTC.Dispose();
     }
 
     private void Start()
     {
-        politePeer = new Peer(this, true, politeSourceCamera1, politeSourceCamera2, politeReceiveImage);
-        impolitePeer = new Peer(this, false, impoliteSourceCamera1, impoliteSourceCamera2, impoliteReceiveImage);
+        peer1 = new Peer(this, true, camera1, camera2, null);
+        peer2 = new Peer(this, false, null, null, receiveImage);
 
-        politeSourceImage1.texture = politeSourceCamera1.targetTexture;
-        politeSourceImage2.texture = politeSourceCamera2.targetTexture;
-        impoliteSourceImage1.texture = impoliteSourceCamera1.targetTexture;
-        impoliteSourceImage2.texture = impoliteSourceCamera2.targetTexture;
+        sourceImage1.texture = camera1.targetTexture;
+        sourceImage2.texture = camera2.targetTexture;
 
-        politeSwapButton.onClick.AddListener(politePeer.SwapTransceivers);
-        impoliteSwapButton.onClick.AddListener(impolitePeer.SwapTransceivers);
-        swapPoliteFirstButton.onClick.AddListener(() =>
-        {
-            politePeer.SwapTransceivers();
-            impolitePeer.SwapTransceivers();
-        });
-        swapImpoliteFirstButton.onClick.AddListener(() =>
-        {
-            impolitePeer.SwapTransceivers();
-            politePeer.SwapTransceivers();
-        });
+        sourceImage1.color = Color.white;
+        sourceImage2.color = Color.white;
+        receiveImage.color = Color.white;
+
+        switchButton.onClick.AddListener(peer1.SwitchTrack);
 
         StartCoroutine(WebRTC.Update());
     }
 
     private void Update()
     {
-        count++;
-        count %= MAX;
-        lerp = (float) count / MAX;
-        politeSourceCamera1.backgroundColor = Color.LerpUnclamped(red, magenta, lerp);
-        politeSourceCamera2.backgroundColor = Color.LerpUnclamped(magenta, yellow, lerp);
-        impoliteSourceCamera1.backgroundColor = Color.LerpUnclamped(blue, cyan, lerp);
-        impoliteSourceCamera2.backgroundColor = Color.LerpUnclamped(cyan, green, lerp);
+        if (rotateObjects != null)
+        {
+            foreach(var rotateObject in rotateObjects)
+            {
+                float t = Time.deltaTime;
+                rotateObject.Rotate(100 * t, 200 * t, 300 * t);
+            }
+        }
+
+        string TextureResolutionText(RawImage image)
+        {
+            if(image != null && image.texture != null)
+                return string.Format($"{image.texture.width}x{image.texture.height}");
+            return string.Empty;
+        }
+
+        textSourceImage1.text = TextureResolutionText(sourceImage1);
+        textSourceImage2.text = TextureResolutionText(sourceImage2);
+        textReceiveImage.text = TextureResolutionText(receiveImage);
     }
 
     void PostMessage(Peer from, Message message)
     {
-        var other = from == politePeer ? impolitePeer : politePeer;
+        var other = from == peer1 ? peer2 : peer1;
         other.OnMessage(message);
     }
 
@@ -100,23 +90,23 @@ class PerfectNegotiationSample : MonoBehaviour
 
     class Peer : IDisposable
     {
-        private readonly PerfectNegotiationSample parent;
+        private readonly ReplaceTrackSample parent;
         private readonly bool polite;
         private readonly RTCPeerConnection pc;
         private readonly VideoStreamTrack sourceVideoTrack1;
         private readonly VideoStreamTrack sourceVideoTrack2;
-        private readonly List<RTCRtpTransceiver> sendingTransceiverList = new List<RTCRtpTransceiver>();
+        RTCRtpTransceiver sendingTransceiver = null;
 
         private bool makingOffer;
         private bool ignoreOffer;
         private bool srdAnswerPending;
         private bool sldGetBackStable;
 
-        private const int width = 256;
-        private const int height = 256;
+        private const int minWidth = 320;
+        private const int minHeight = 240;
 
         public Peer(
-            PerfectNegotiationSample parent,
+            ReplaceTrackSample parent,
             bool polite,
             Camera source1,
             Camera source2,
@@ -131,7 +121,6 @@ class PerfectNegotiationSample : MonoBehaviour
 
             pc.OnTrack = e =>
             {
-                Debug.Log($"{this} OnTrack");
                 if (e.Track is VideoStreamTrack video)
                 {
                     video.OnVideoReceived += tex =>
@@ -152,8 +141,13 @@ class PerfectNegotiationSample : MonoBehaviour
                 this.parent.StartCoroutine(NegotiationProcess());
             };
 
-            sourceVideoTrack1 = source1.CaptureStreamTrack(width, height, 0);
-            sourceVideoTrack2 = source2.CaptureStreamTrack(width, height, 0);
+            int width = WebRTCSettings.StreamSize.x;
+            int height = WebRTCSettings.StreamSize.y;
+            sourceVideoTrack1 = source1?.CaptureStreamTrack(width, height, 0);
+
+            int width2 = Mathf.Max(width / 2, minWidth);
+            int height2 = Mathf.Max(height / 2, minHeight);
+            sourceVideoTrack2 = source2?.CaptureStreamTrack(width2, height2, 0);
         }
 
         private IEnumerator NegotiationProcess()
@@ -188,9 +182,9 @@ class PerfectNegotiationSample : MonoBehaviour
 
         public void Dispose()
         {
-            sendingTransceiverList.Clear();
-            sourceVideoTrack1.Dispose();
-            sourceVideoTrack2.Dispose();
+            //sendingTransceiverList.Clear();
+            sourceVideoTrack1?.Dispose();
+            sourceVideoTrack2?.Dispose();
             pc.Dispose();
         }
 
@@ -214,7 +208,7 @@ class PerfectNegotiationSample : MonoBehaviour
             {
                 if (!pc.AddIceCandidate(message.candidate) && !ignoreOffer)
                 {
-                    Debug.LogError($"{this} this candidate can't accept current signaling state {pc.SignalingState}.");
+                    Debug.LogError($"{this} this candidate can't accept current signaling state {pc.SignalingState}, ignoreOffer {ignoreOffer}.");
                 }
 
                 return;
@@ -271,42 +265,25 @@ class PerfectNegotiationSample : MonoBehaviour
             }
         }
 
-        public void SwapTransceivers()
+        public void SwitchTrack()
         {
-            Debug.Log($"{this} swapTransceivers");
-            if (sendingTransceiverList.Count == 0)
+            if (sendingTransceiver == null)
             {
-                var transceiver1 = pc.AddTransceiver(sourceVideoTrack1);
-                transceiver1.Direction = RTCRtpTransceiverDirection.SendOnly;
-                var transceiver2 = pc.AddTransceiver(sourceVideoTrack2);
-                transceiver2.Direction = RTCRtpTransceiverDirection.Inactive;
+                var transceiver = pc.AddTransceiver(sourceVideoTrack1);
+                transceiver.Direction = RTCRtpTransceiverDirection.SendRecv;
 
                 if (WebRTCSettings.UseVideoCodec != null)
                 {
                     var codecs = new[] { WebRTCSettings.UseVideoCodec };
-                    transceiver1.SetCodecPreferences(codecs);
-                    transceiver2.SetCodecPreferences(codecs);
+                    transceiver.SetCodecPreferences(codecs);
                 }
 
-                sendingTransceiverList.Add(transceiver1);
-                sendingTransceiverList.Add(transceiver2);
+                sendingTransceiver = transceiver;
                 return;
             }
 
-            if (sendingTransceiverList[0].CurrentDirection == RTCRtpTransceiverDirection.SendOnly)
-            {
-                sendingTransceiverList[0].Direction = RTCRtpTransceiverDirection.Inactive;
-                sendingTransceiverList[0].Sender.ReplaceTrack(null);
-                sendingTransceiverList[1].Direction = RTCRtpTransceiverDirection.SendOnly;
-                sendingTransceiverList[1].Sender.ReplaceTrack(sourceVideoTrack2);
-            }
-            else
-            {
-                sendingTransceiverList[1].Direction = RTCRtpTransceiverDirection.Inactive;
-                sendingTransceiverList[1].Sender.ReplaceTrack(null);
-                sendingTransceiverList[0].Direction = RTCRtpTransceiverDirection.SendOnly;
-                sendingTransceiverList[0].Sender.ReplaceTrack(sourceVideoTrack1);
-            }
+            var nextTrack = sendingTransceiver.Sender.Track == sourceVideoTrack1 ? sourceVideoTrack2 : sourceVideoTrack1;
+            sendingTransceiver.Sender.ReplaceTrack(nextTrack);
         }
     }
 }

@@ -56,6 +56,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonBandwidth;
         [SerializeField] private Button buttonPerfectNegotiation;
         [SerializeField] private Button buttonLatency;
+        [SerializeField] private Button buttonReplaceTrack;
 
         List<Vector2Int> streamSizeList = new List<Vector2Int>()
         {
@@ -142,6 +143,7 @@ namespace Unity.WebRTC.Samples
             buttonBandwidth.onClick.AddListener(OnPressedBandwidthButton);
             buttonPerfectNegotiation.onClick.AddListener(OnPressedPerfectNegotiationButton);
             buttonLatency.onClick.AddListener(OnPressedLatencyButton);
+            buttonReplaceTrack.onClick.AddListener(OnPressedReplaceTrackButton);
 
             // This sample uses Compute Shader, so almost Android devices don't work correctly.
             if (!SystemInfo.supportsComputeShaders)
@@ -262,10 +264,13 @@ namespace Unity.WebRTC.Samples
         {
             SceneManager.LoadScene("PerfectNegotiation", LoadSceneMode.Single);
         }
-
         private void OnPressedLatencyButton()
         {
             SceneManager.LoadScene("E2ELatency", LoadSceneMode.Single);
+        }
+        private void OnPressedReplaceTrackButton()
+        {
+            SceneManager.LoadScene("ReplaceTrack", LoadSceneMode.Single);
         }
     }
 }
