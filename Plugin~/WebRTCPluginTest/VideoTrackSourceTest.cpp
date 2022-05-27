@@ -38,13 +38,8 @@ namespace webrtc
         {
             m_trackSource = UnityVideoTrackSource::Create(false, absl::nullopt, m_taskQueueFactory.get());
             m_trackSource->AddOrUpdateSink(&sink_, rtc::VideoSinkWants());
-
-            EXPECT_NE(nullptr, device());
-
-            ContextDependencies dependencies;
-            dependencies.device = device();
-            context = std::make_unique<Context>(dependencies);
         }
+
         ~VideoTrackSourceTest() override { m_trackSource->RemoveSink(&sink_); }
 
     protected:
