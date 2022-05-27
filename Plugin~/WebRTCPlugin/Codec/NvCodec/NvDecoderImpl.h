@@ -17,6 +17,13 @@ namespace webrtc
 
     using NvDecoderInternal = ::NvDecoder;
 
+    class H264BitstreamParser : public ::webrtc::H264BitstreamParser
+    {
+    public:
+        absl::optional<SpsParser::SpsState> sps() { return sps_; }
+        absl::optional<PpsParser::PpsState> pps() { return pps_; }
+    };
+
     class NvDecoderImpl : public unity::webrtc::NvDecoder
     {
     public:
@@ -34,12 +41,13 @@ namespace webrtc
     private:
         CUcontext m_context;
         std::unique_ptr<NvDecoderInternal> m_decoder;
+        bool m_isConfiguredDecoder;
 
         VideoCodec m_codec;
 
         DecodedImageCallback* m_decodedCompleteCallback = nullptr;
         webrtc::VideoFrameBufferPool m_buffer_pool;
-        webrtc::H264BitstreamParser m_h264_bitstream_parser;
+        H264BitstreamParser m_h264_bitstream_parser;
     };
 
 } // end namespace webrtc

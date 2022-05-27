@@ -15,9 +15,19 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
+    ColorSpace ExtractH264ColorSpace(const CUVIDEOFORMAT& format)
+    {
+        return ColorSpace(
+            static_cast<ColorSpace::PrimaryID>(format.video_signal_description.color_primaries),
+            static_cast<ColorSpace::TransferID>(format.video_signal_description.transfer_characteristics),
+            static_cast<ColorSpace::MatrixID>(format.video_signal_description.matrix_coefficients),
+            static_cast<ColorSpace::RangeID>(format.video_signal_description.video_full_range_flag));
+    }
+
     NvDecoderImpl::NvDecoderImpl(CUcontext context)
         : m_context(context)
         , m_decoder(nullptr)
+        , m_isConfiguredDecoder(false)
         , m_decodedCompleteCallback(nullptr)
         , m_buffer_pool(false)
     {
@@ -61,8 +71,15 @@ namespace webrtc
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
         }
 
+        // todo(kazuki): Max resolution is differred each architecture.
+        // Refer to the table in Video Decoder Capabilities.
+        // https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide
+        int maxWidth = 4096;
+        int maxHeight = 4096;
+
         // bUseDeviceFrame: allocate in memory or cuda device memory
-        m_decoder = std::make_unique<NvDecoderInternal>(m_context, false, cudaVideoCodec_H264);
+        m_decoder = std::make_unique<NvDecoderInternal>(
+            m_context, false, cudaVideoCodec_H264, true, false, nullptr, nullptr, maxWidth, maxHeight);
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
@@ -104,13 +121,25 @@ namespace webrtc
 
         m_h264_bitstream_parser.ParseBitstream(input_image);
         absl::optional<int> qp = m_h264_bitstream_parser.GetLastSliceQp();
+        absl::optional<SpsParser::SpsState> sps = m_h264_bitstream_parser.sps();
+
+        if (m_isConfiguredDecoder)
+        {
+            if (!sps || sps.value().width != static_cast<uint32_t>(m_decoder->GetWidth()) ||
+                sps.value().height != static_cast<uint32_t>(m_decoder->GetHeight()))
+            {
+                m_decoder->setReconfigParams(nullptr, nullptr);
+            }
+        }
 
         int nFrameReturnd = 0;
         do
         {
-            nFrameReturnd =
-                m_decoder->Decode(input_image.data(), input_image.size(), CUVID_PKT_TIMESTAMP, input_image.Timestamp());
+            nFrameReturnd = m_decoder->Decode(
+                input_image.data(), static_cast<int>(input_image.size()), CUVID_PKT_TIMESTAMP, input_image.Timestamp());
         } while (nFrameReturnd == 0);
+
+        m_isConfiguredDecoder = true;
 
         // todo: support other output format
         // Chromium's H264 Encoder is output on NV12, so currently only NV12 is supported.
@@ -120,6 +149,11 @@ namespace webrtc
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
 
+        // Pass on color space from input frame if explicitly specified.
+        const ColorSpace& color_space = input_image.ColorSpace()
+            ? *input_image.ColorSpace()
+            : ExtractH264ColorSpace(m_decoder->GetVideoFormatInfo());
+
         for (int i = 0; i < nFrameReturnd; i++)
         {
             int64_t timeStamp;
@@ -128,7 +162,7 @@ namespace webrtc
             rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
                 m_buffer_pool.CreateI420Buffer(m_decoder->GetWidth(), m_decoder->GetHeight());
 
-            libyuv::NV12ToI420(
+            int result = libyuv::NV12ToI420(
                 pFrame,
                 m_decoder->GetDeviceFramePitch(),
                 pFrame + m_decoder->GetHeight() * m_decoder->GetDeviceFramePitch(),
@@ -142,8 +176,16 @@ namespace webrtc
                 m_decoder->GetWidth(),
                 m_decoder->GetHeight());
 
-            VideoFrame decoded_frame =
-                VideoFrame::Builder().set_video_frame_buffer(i420_buffer).set_timestamp_rtp(timeStamp).build();
+            if (result)
+            {
+                RTC_LOG(LS_INFO) << "libyuv::NV12ToI420 failed. error:" << result;
+            }
+
+            VideoFrame decoded_frame = VideoFrame::Builder()
+                                           .set_video_frame_buffer(i420_buffer)
+                                           .set_timestamp_rtp(static_cast<uint32_t>(timeStamp))
+                                           .set_color_space(color_space)
+                                           .build();
 
             // todo: measurement decoding time
             absl::optional<int32_t> decodetime;

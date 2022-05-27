@@ -69,6 +69,7 @@ namespace webrtc
         void TearDown() override;
 
         VideoFrame NextInputFrame();
+        void ChangeFrameResolution(size_t width, size_t height);
 
         // Helper method for waiting a single encoded frame.
         bool WaitForEncodedFrame(EncodedImage* frame, CodecSpecificInfo* codec_specific_info);
