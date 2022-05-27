@@ -281,7 +281,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         IGraphicsDevice* device = Plugin::GraphicsDevice();
         UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
         void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
-        Size size(encodeData->width, encodeData->height);
+        unity::webrtc::Size size(encodeData->width, encodeData->height);
         {
             std::unique_ptr<const ScopedProfiler> profiler;
             if (s_ProfilerMarkerFactory)

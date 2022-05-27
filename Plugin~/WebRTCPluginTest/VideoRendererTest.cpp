@@ -27,12 +27,6 @@ namespace webrtc
         {
             m_callback = &OnFrameSizeChange;
             m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
-
-            EXPECT_NE(nullptr, device());
-
-            ContextDependencies dependencies;
-            dependencies.device = device();
-            context = std::make_unique<Context>(dependencies);
         }
         ~VideoRendererTest() override = default;
 
