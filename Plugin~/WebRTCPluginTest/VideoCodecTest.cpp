@@ -60,6 +60,11 @@ namespace webrtc
         return input_frame;
     }
 
+    void VideoCodecTest::ChangeFrameResolution(size_t width, size_t height)
+    {
+        inputFrameGenerator_->ChangeResolution(width, height);
+    }
+
     bool VideoCodecTest::WaitForEncodedFrame(EncodedImage* frame, CodecSpecificInfo* codec_specific_info)
     {
         std::vector<EncodedImage> frames;

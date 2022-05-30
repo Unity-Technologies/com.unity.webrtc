@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,19 +11,33 @@ using UnityEngine.UI;
 class ReplaceTrackSample : MonoBehaviour
 {
 #pragma warning disable 0649
+    [SerializeField] private Button startButton;
+    [SerializeField] private Button stopButton;
     [SerializeField] private Button switchButton;
     [SerializeField] private Camera camera1;
     [SerializeField] private Camera camera2;
     [SerializeField] private RawImage sourceImage1;
     [SerializeField] private RawImage sourceImage2;
     [SerializeField] private RawImage receiveImage;
+    [SerializeField] private Dropdown dropdown1;
+    [SerializeField] private Dropdown dropdown2;
     [SerializeField] private Text textSourceImage1;
     [SerializeField] private Text textSourceImage2;
     [SerializeField] private Text textReceiveImage;
     [SerializeField] private Transform[] rotateObjects;
 #pragma warning restore 0649
 
+    List<Vector2Int> streamSizeList = new List<Vector2Int>()
+    {
+            new Vector2Int(640, 360),
+            new Vector2Int(1280, 720),
+            new Vector2Int(1920, 1080),
+            new Vector2Int(2560, 1440),
+            new Vector2Int(3840, 2160),
+    };
+
     private Peer peer1, peer2;
+    private Vector2Int size1, size2;
 
     private void Awake()
     {
@@ -38,8 +53,28 @@ class ReplaceTrackSample : MonoBehaviour
 
     private void Start()
     {
-        peer1 = new Peer(this, true, camera1, camera2, null);
-        peer2 = new Peer(this, false, null, null, receiveImage);
+        size1 = streamSizeList[dropdown1.value];
+        size2 = streamSizeList[dropdown2.value];
+
+        dropdown1.options = streamSizeList.Select(size => new Dropdown.OptionData($" {size.x} x {size.y} ")).ToList();
+        dropdown2.options = streamSizeList.Select(size => new Dropdown.OptionData($" {size.x} x {size.y} ")).ToList();
+        dropdown1.onValueChanged.AddListener(value => size1 = streamSizeList[value]);
+        dropdown2.onValueChanged.AddListener(value => size2 = streamSizeList[value]);
+
+        startButton.onClick.AddListener(OnStart);
+        startButton.gameObject.SetActive(true);
+        stopButton.onClick.AddListener(OnStop);
+        stopButton.gameObject.SetActive(false);
+        switchButton.onClick.AddListener(OnSwitchTrack);
+        switchButton.interactable = false;
+
+        StartCoroutine(WebRTC.Update());
+    }
+
+    private void OnStart()
+    {
+        peer1 = new Peer(this, true, camera1, size1, camera2, size2);
+        peer2 = new Peer(this, false, receiveImage);
 
         sourceImage1.texture = camera1.targetTexture;
         sourceImage2.texture = camera2.targetTexture;
@@ -48,16 +83,41 @@ class ReplaceTrackSample : MonoBehaviour
         sourceImage2.color = Color.white;
         receiveImage.color = Color.white;
 
-        switchButton.onClick.AddListener(peer1.SwitchTrack);
+        dropdown1.interactable = false;
+        dropdown2.interactable = false;
 
-        StartCoroutine(WebRTC.Update());
+        startButton.gameObject.SetActive(false);
+        stopButton.gameObject.SetActive(true);
+        switchButton.interactable = true;
+    }
+
+    private void OnStop()
+    {
+        peer1.Dispose();
+        peer2.Dispose();
+
+        sourceImage1.color = Color.black;
+        sourceImage2.color = Color.black;
+        receiveImage.color = Color.black;
+
+        dropdown1.interactable = true;
+        dropdown2.interactable = true;
+
+        startButton.gameObject.SetActive(true);
+        stopButton.gameObject.SetActive(false);
+        switchButton.interactable = false;
+    }
+
+    private void OnSwitchTrack()
+    {
+        peer1.SwitchTrack();
     }
 
     private void Update()
     {
         if (rotateObjects != null)
         {
-            foreach(var rotateObject in rotateObjects)
+            foreach (var rotateObject in rotateObjects)
             {
                 float t = Time.deltaTime;
                 rotateObject.Rotate(100 * t, 200 * t, 300 * t);
@@ -66,7 +126,7 @@ class ReplaceTrackSample : MonoBehaviour
 
         string TextureResolutionText(RawImage image)
         {
-            if(image != null && image.texture != null)
+            if (image != null && image.texture != null)
                 return string.Format($"{image.texture.width}x{image.texture.height}");
             return string.Empty;
         }
@@ -102,34 +162,13 @@ class ReplaceTrackSample : MonoBehaviour
         private bool srdAnswerPending;
         private bool sldGetBackStable;
 
-        private const int minWidth = 320;
-        private const int minHeight = 240;
-
-        public Peer(
-            ReplaceTrackSample parent,
-            bool polite,
-            Camera source1,
-            Camera source2,
-            RawImage receive)
+        Peer(ReplaceTrackSample parent, bool polite)
         {
             this.parent = parent;
             this.polite = polite;
 
-
             var config = GetSelectedSdpSemantics();
             pc = new RTCPeerConnection(ref config);
-
-            pc.OnTrack = e =>
-            {
-                if (e.Track is VideoStreamTrack video)
-                {
-                    video.OnVideoReceived += tex =>
-                    {
-                        receive.texture = tex;
-                    };
-                }
-            };
-
             pc.OnIceCandidate = candidate =>
             {
                 var message = new Message { candidate = candidate };
@@ -140,14 +179,34 @@ class ReplaceTrackSample : MonoBehaviour
             {
                 this.parent.StartCoroutine(NegotiationProcess());
             };
+        }
 
-            int width = WebRTCSettings.StreamSize.x;
-            int height = WebRTCSettings.StreamSize.y;
-            sourceVideoTrack1 = source1?.CaptureStreamTrack(width, height, 0);
+        public Peer(ReplaceTrackSample parent, bool polite, RawImage receive)
+            : this(parent, polite)
+        {
+            pc.OnTrack = e =>
+            {
+                if (e.Track is VideoStreamTrack video)
+                {
+                    video.OnVideoReceived += tex =>
+                    {
+                        receive.texture = tex;
+                    };
+                }
+            };
+        }
 
-            int width2 = Mathf.Max(width / 2, minWidth);
-            int height2 = Mathf.Max(height / 2, minHeight);
-            sourceVideoTrack2 = source2?.CaptureStreamTrack(width2, height2, 0);
+        public Peer(
+            ReplaceTrackSample parent,
+            bool polite,
+            Camera source1,
+            Vector2Int size1,
+            Camera source2,
+            Vector2Int size2)
+            : this(parent, polite)
+        {
+            sourceVideoTrack1 = source1?.CaptureStreamTrack(size1.x, size1.y, 0);
+            sourceVideoTrack2 = source2?.CaptureStreamTrack(size2.x, size2.y, 0);
         }
 
         private IEnumerator NegotiationProcess()
@@ -182,7 +241,6 @@ class ReplaceTrackSample : MonoBehaviour
 
         public void Dispose()
         {
-            //sendingTransceiverList.Clear();
             sourceVideoTrack1?.Dispose();
             sourceVideoTrack2?.Dispose();
             pc.Dispose();
