@@ -178,9 +178,7 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(inboundStats.Timestamp)}: {inboundStats.Timestamp}"));
                 container.Add(new Label($"{nameof(inboundStats.ssrc)}: {inboundStats.ssrc}"));
                 container.Add(new Label($"{nameof(inboundStats.estimatedPlayoutTimestamp)}: {inboundStats.estimatedPlayoutTimestamp}"));
-                container.Add(new Label($"{nameof(inboundStats.mediaType)}: {inboundStats.mediaType}"));
                 container.Add(new Label($"{nameof(inboundStats.kind)}: {inboundStats.kind}"));
-                container.Add(new Label($"{nameof(inboundStats.trackId)}: {inboundStats.trackId}"));
                 container.Add(new Label($"{nameof(inboundStats.transportId)}: {inboundStats.transportId}"));
                 container.Add(new Label($"{nameof(inboundStats.codecId)}: {inboundStats.codecId}"));
                 container.Add(new Label($"{nameof(inboundStats.firCount)}: {inboundStats.firCount}"));
@@ -248,9 +246,7 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(outboundStats.Id)}: {outboundStats.Id}"));
                 container.Add(new Label($"{nameof(outboundStats.Timestamp)}: {outboundStats.Timestamp}"));
                 container.Add(new Label($"{nameof(outboundStats.ssrc)}: {outboundStats.ssrc}"));
-                container.Add(new Label($"{nameof(outboundStats.mediaType)}: {outboundStats.mediaType}"));
                 container.Add(new Label($"{nameof(outboundStats.kind)}: {outboundStats.kind}"));
-                container.Add(new Label($"{nameof(outboundStats.trackId)}: {outboundStats.trackId}"));
                 container.Add(new Label($"{nameof(outboundStats.transportId)}: {outboundStats.transportId}"));
                 container.Add(new Label($"{nameof(outboundStats.codecId)}: {outboundStats.codecId}"));
                 container.Add(new Label($"{nameof(outboundStats.firCount)}: {outboundStats.firCount}"));
