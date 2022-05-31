@@ -201,7 +201,7 @@ namespace webrtc
             std::make_unique<UnityVideoEncoderFactory>(dependencies.device, dependencies.profiler);
 
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
-            std::make_unique<UnityVideoDecoderFactory>(dependencies.device);
+            std::make_unique<UnityVideoDecoderFactory>(dependencies.device, dependencies.profiler);
 
         rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
         rtc::scoped_refptr<AudioDecoderFactory> audioDecoderFactory = CreateAudioDecoderFactory();
