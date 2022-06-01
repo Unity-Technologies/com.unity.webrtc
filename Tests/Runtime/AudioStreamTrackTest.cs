@@ -134,7 +134,9 @@ namespace Unity.WebRTC.RuntimeTest
             UnityEngine.Object.DestroyImmediate(obj);
         }
 
+        //todo(kazuki): workaround ObjectDisposedException for Linux playmode test
         [Test]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor })]
         public void AudioStreamTrackPlayAudio()
         {
             GameObject obj = new GameObject("audio");
