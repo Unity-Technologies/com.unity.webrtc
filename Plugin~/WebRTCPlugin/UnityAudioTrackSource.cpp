@@ -50,7 +50,7 @@ namespace webrtc
         std::lock_guard<std::mutex> lock(_mutex);
 
         // eg.  80 for 8KHz and 160 for 16kHz
-        size_t nNumFramesFor10ms = nSampleRate / 100;
+        size_t nNumFramesFor10ms = static_cast<size_t>(nSampleRate / 100);
         size_t nNumSamplesFor10ms = nNumFramesFor10ms * nNumChannels;
         constexpr size_t nBitPerSample = sizeof(int16_t) * 8;
 
