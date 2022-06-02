@@ -120,7 +120,7 @@ namespace webrtc
         if (IsVMInitialized())
             return CreateAndroidEncoderFactory().release();
 #elif CUDA_PLATFORM
-        if (gfxDevice->IsCudaSupport())
+        if (gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
         {
             CUcontext context = gfxDevice->GetCUcontext();
             NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();

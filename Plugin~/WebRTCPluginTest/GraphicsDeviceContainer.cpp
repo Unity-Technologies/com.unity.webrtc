@@ -533,7 +533,7 @@ namespace webrtc
             device = GraphicsDevice::GetInstance().Init(renderer, nativeGfxDevice_, nullptr);
         }
         device_ = std::unique_ptr<IGraphicsDevice>(device);
-        device_->InitV();
+        EXPECT_TRUE(device_->InitV());
     }
 
     GraphicsDeviceContainer::~GraphicsDeviceContainer()

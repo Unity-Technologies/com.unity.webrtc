@@ -57,7 +57,7 @@ namespace webrtc
         ID3D11Device* legacyDevice;
         ID3D11DeviceContext* legacyContext;
 
-        ThrowIfFailed(D3D11CreateDevice(
+        HRESULT hr = D3D11CreateDevice(
             nullptr,
             D3D_DRIVER_TYPE_HARDWARE,
             nullptr,
@@ -67,27 +67,66 @@ namespace webrtc
             D3D11_SDK_VERSION,
             &legacyDevice,
             nullptr,
-            &legacyContext));
+            &legacyContext);
 
-        ThrowIfFailed(legacyDevice->QueryInterface(IID_PPV_ARGS(&m_d3d11Device)));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "D3D11CreateDevice is failed. " << HrToString(hr);
+            return false;
+        }
+
+        hr = legacyDevice->QueryInterface(IID_PPV_ARGS(&m_d3d11Device));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D11DeviceContext::QueryInterface is failed. " << HrToString(hr);
+            return false;
+        }
 
         legacyDevice->GetImmediateContext(&legacyContext);
-        ThrowIfFailed(legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context)));
+        hr = legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D11DeviceContext::QueryInterface is failed. " << HrToString(hr);
+            return false;
+        }
 
-        ThrowIfFailed(
-            m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
-        ThrowIfFailed(m_d3d12Device->CreateCommandList(
-            0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList)));
+        hr = m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandAllocator is failed. " << HrToString(hr);
+            return false;
+        }
+
+        hr = m_d3d12Device->CreateCommandList(
+            0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandList is failed. " << HrToString(hr);
+            return false;
+        }
 
         // Command lists are created in the recording state, but there is nothing
         // to record yet. The main loop expects it to be closed, so close it now.
-        ThrowIfFailed(m_commandList->Close());
+        hr = m_commandList->Close();
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
+            return false;
+        }
 
-        ThrowIfFailed(m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence)));
+        hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
+            return false;
+        }
+
         m_copyResourceEventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         if (m_copyResourceEventHandle == nullptr)
         {
-            ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
+            hr = HRESULT_FROM_WIN32(GetLastError());
+            RTC_LOG(LS_ERROR) << "CreateEvent is failed. " << HrToString(hr);
+            return false;
         }
         m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d12Device.Get());
         return true;

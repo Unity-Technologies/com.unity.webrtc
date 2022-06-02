@@ -28,6 +28,7 @@ namespace webrtc
     public:
         static std::unique_ptr<NvEncoder> Create(
             const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
+        static bool IsSupported();
         ~NvEncoder() override { }
     };
 

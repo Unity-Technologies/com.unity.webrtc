@@ -42,6 +42,23 @@ namespace webrtc
         return true;
     }
 
+    static CUresult CheckDriverVersion()
+    {
+        int driverVersion = 0;
+        CUresult result = cuDriverGetVersion(&driverVersion);
+        if (result != CUDA_SUCCESS)
+        {
+            return result;
+        }
+
+        if (kRequiredDriverVersion > driverVersion)
+        {
+            RTC_LOG(LS_ERROR) << "CUDA driver version is not higher than the required version. " << driverVersion;
+            return CUDA_ERROR_NO_DEVICE;
+        }
+        return CUDA_SUCCESS;
+    }
+
     CudaContext::CudaContext()
         : m_context(nullptr)
     {
@@ -97,8 +114,14 @@ namespace webrtc
             return CUDA_ERROR_NOT_FOUND;
         }
 
+        CUresult result = CheckDriverVersion();
+        if (result != CUDA_SUCCESS)
+        {
+            return result;
+        }
+
         CUdevice cuDevice = 0;
-        CUresult result = cuInit(0);
+        result = cuInit(0);
         if (result != CUDA_SUCCESS)
         {
             return result;
@@ -154,7 +177,13 @@ namespace webrtc
             return CUDA_ERROR_NOT_FOUND;
         }
 
-        CUresult result = cuInit(0);
+        CUresult result = CheckDriverVersion();
+        if (result != CUDA_SUCCESS)
+        {
+            return result;
+        }
+
+        result = cuInit(0);
         if (result != CUDA_SUCCESS)
         {
             return result;
@@ -198,11 +227,18 @@ namespace webrtc
             return CUDA_ERROR_NOT_FOUND;
         }
 
-        CUresult result = cuInit(0);
+        CUresult result = CheckDriverVersion();
         if (result != CUDA_SUCCESS)
         {
             return result;
         }
+
+        result = cuInit(0);
+        if (result != CUDA_SUCCESS)
+        {
+            return result;
+        }
+
         int numDevices = 0;
         result = cuDeviceGetCount(&numDevices);
         if (result != CUDA_SUCCESS)
@@ -255,7 +291,13 @@ namespace webrtc
             return CUDA_ERROR_NOT_FOUND;
         }
 
-        CUresult result = cuInit(0);
+        CUresult result = CheckDriverVersion();
+        if (result != CUDA_SUCCESS)
+        {
+            return result;
+        }
+
+        result = cuInit(0);
         if (result != CUDA_SUCCESS)
         {
             return result;
