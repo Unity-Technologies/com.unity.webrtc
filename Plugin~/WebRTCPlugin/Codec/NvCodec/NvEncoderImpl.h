@@ -61,6 +61,8 @@ namespace webrtc
         int32_t Encode(const ::webrtc::VideoFrame& frame, const std::vector<VideoFrameType>* frame_types) override;
         // Default fallback: Just use the sum of bitrates as the single target rate.
         void SetRates(const RateControlParameters& parameters) override;
+        // Returns meta-data about the encoder, such as implementation name.
+        EncoderInfo GetEncoderInfo() const override;
 
     protected:
         int32_t ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame);
