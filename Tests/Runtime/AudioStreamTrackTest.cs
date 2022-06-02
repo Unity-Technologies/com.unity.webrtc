@@ -49,7 +49,7 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
 
             var track = new AudioStreamTrack(source);
-            var sender = test.component.AddTrack(0, track);
+            test.component.AddTrack(0, track);
             yield return test;
             GC.Collect();
             var receivers = test.component.GetPeerReceivers(1);
