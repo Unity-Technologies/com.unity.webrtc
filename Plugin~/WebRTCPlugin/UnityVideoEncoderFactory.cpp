@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <media/engine/internal_encoder_factory.h>
+#include <modules/video_coding/include/video_error_codes.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
@@ -44,11 +45,37 @@ namespace webrtc
         }
         int32_t InitEncode(const VideoCodec* codec_settings, int32_t number_of_cores, size_t max_payload_size) override
         {
-            return encoder_->InitEncode(codec_settings, number_of_cores, max_payload_size);
+            int32_t result = encoder_->InitEncode(codec_settings, number_of_cores, max_payload_size);
+            if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
+            {
+                std::stringstream ss;
+                ss << "Encoder:";
+                ss
+                    << (encoder_->GetEncoderInfo().implementation_name.empty()
+                            ? "VideoEncoder"
+                            : encoder_->GetEncoderInfo().implementation_name);
+                ss << "(" << CodecTypeToPayloadString(codec_settings->codecType) << ")";
+                profilerThread_ = profiler_->CreateScopedProfilerThread("WebRTC", ss.str().c_str());
+            }
+
+            return result;
         }
         int InitEncode(const VideoCodec* codec_settings, const VideoEncoder::Settings& settings) override
         {
-            return encoder_->InitEncode(codec_settings, settings);
+            int result = encoder_->InitEncode(codec_settings, settings);
+            if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
+            {
+                std::stringstream ss;
+                ss << "Encoder:";
+                ss
+                    << (encoder_->GetEncoderInfo().implementation_name.empty()
+                            ? "VideoEncoder"
+                            : encoder_->GetEncoderInfo().implementation_name);
+                ss << "(" << CodecTypeToPayloadString(codec_settings->codecType) << ")";
+                profilerThread_ = profiler_->CreateScopedProfilerThread("WebRTC", ss.str().c_str());
+            }
+
+            return result;
         }
         int32_t RegisterEncodeCompleteCallback(EncodedImageCallback* callback) override
         {
@@ -57,9 +84,6 @@ namespace webrtc
         int32_t Release() override { return encoder_->Release(); }
         int32_t Encode(const VideoFrame& frame, const std::vector<VideoFrameType>* frame_types) override
         {
-            if (!profilerThread_)
-                profilerThread_ = profiler_->CreateScopedProfilerThread("WebRTC", "VideoEncoder");
-
             int32_t result;
             {
                 std::unique_ptr<const ScopedProfiler> profiler;

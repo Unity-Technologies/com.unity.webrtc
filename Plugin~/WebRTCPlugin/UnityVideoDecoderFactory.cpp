@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <media/engine/internal_decoder_factory.h>
+#include <modules/video_coding/include/video_error_codes.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
@@ -40,13 +41,23 @@ namespace webrtc
 
         int32_t InitDecode(const VideoCodec* codec_settings, int32_t number_of_cores) override
         {
-            return decoder_->InitDecode(codec_settings, number_of_cores);
+            int32_t result = decoder_->InitDecode(codec_settings, number_of_cores);
+            if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
+            {
+                std::stringstream ss;
+                ss << "Decoder:";
+                ss
+                    << (decoder_->GetDecoderInfo().implementation_name.empty()
+                            ? "VideoDecoder"
+                            : decoder_->GetDecoderInfo().implementation_name);
+                ss << "(" << CodecTypeToPayloadString(codec_settings->codecType) << ")";
+                profilerThread_ = profiler_->CreateScopedProfilerThread("WebRTC", ss.str().c_str());
+            }
+
+            return result;
         }
         int32_t Decode(const EncodedImage& input_image, bool missing_frames, int64_t render_time_ms) override
         {
-            if (!profilerThread_)
-                profilerThread_ = profiler_->CreateScopedProfilerThread("WebRTC", "VideoDecoder");
-
             int32_t result;
             {
                 std::unique_ptr<const ScopedProfiler> profiler;
