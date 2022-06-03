@@ -1361,25 +1361,6 @@ extern "C"
         ContextManager::GetInstance()->curContext = context;
     }
 
-    UNITY_INTERFACE_EXPORT void
-    ContextInitLocalAudio(Context* context, UnityAudioTrackSource* source, int32 sample_rate, int32 number_of_channels)
-    {
-        auto adm = context->GetAudioDevice();
-        if (source != nullptr && adm != nullptr)
-        {
-            adm->RegisterSendAudioCallback(source, sample_rate, number_of_channels);
-        }
-    }
-
-    UNITY_INTERFACE_EXPORT void ContextUninitLocalAudio(Context* context, UnityAudioTrackSource* source)
-    {
-        auto adm = context->GetAudioDevice();
-        if (source != nullptr && adm != nullptr)
-        {
-            adm->UnregisterSendAudioCallback(source);
-        }
-    }
-
     UNITY_INTERFACE_EXPORT void AudioSourceProcessLocalAudio(
         UnityAudioTrackSource* source,
         float* audio_data,
