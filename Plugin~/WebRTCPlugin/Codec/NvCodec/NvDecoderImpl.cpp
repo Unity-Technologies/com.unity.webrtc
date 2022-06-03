@@ -28,7 +28,7 @@ namespace webrtc
     VideoDecoder::DecoderInfo NvDecoderImpl::GetDecoderInfo() const
     {
         VideoDecoder::DecoderInfo info;
-        info.implementation_name = "UnityNvDecoder";
+        info.implementation_name = "NvCodec";
         info.is_hardware_accelerated = true;
         return info;
     }

@@ -107,7 +107,7 @@ namespace webrtc
     VideoEncoder::EncoderInfo NvEncoderImpl::GetEncoderInfo() const
     {
         VideoEncoder::EncoderInfo info;
-        info.implementation_name = "UnityNvEncoder";
+        info.implementation_name = "NvCodec";
         info.is_hardware_accelerated = true;
         return info;
     }

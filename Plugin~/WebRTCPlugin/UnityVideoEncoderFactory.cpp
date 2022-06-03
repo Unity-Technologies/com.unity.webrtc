@@ -49,7 +49,7 @@ namespace webrtc
             if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
             {
                 std::stringstream ss;
-                ss << "Encoder:";
+                ss << "Encoder ";
                 ss
                     << (encoder_->GetEncoderInfo().implementation_name.empty()
                             ? "VideoEncoder"
@@ -66,7 +66,7 @@ namespace webrtc
             if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
             {
                 std::stringstream ss;
-                ss << "Encoder:";
+                ss << "Encoder ";
                 ss
                     << (encoder_->GetEncoderInfo().implementation_name.empty()
                             ? "VideoEncoder"

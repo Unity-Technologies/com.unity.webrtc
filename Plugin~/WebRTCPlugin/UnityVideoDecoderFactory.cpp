@@ -45,7 +45,7 @@ namespace webrtc
             if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
             {
                 std::stringstream ss;
-                ss << "Decoder:";
+                ss << "Decoder ";
                 ss
                     << (decoder_->GetDecoderInfo().implementation_name.empty()
                             ? "VideoDecoder"
