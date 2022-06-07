@@ -42,6 +42,29 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        public IEnumerator GCCollect()
+        {
+            GameObject obj = new GameObject("audio");
+            AudioSource source = obj.AddComponent<AudioSource>();
+            var test = new MonoBehaviourTest<SignalingPeers>();
+
+            var track = new AudioStreamTrack(source);
+            test.component.AddTrack(0, track);
+            yield return test;
+            GC.Collect();
+            var receivers = test.component.GetPeerReceivers(1);
+            Assert.That(receivers.Count(), Is.EqualTo(1));
+            var receiver = receivers.First();
+            var audioTrack = receiver.Track as AudioStreamTrack;
+            Assert.That(audioTrack, Is.Not.Null);
+
+            test.component.Dispose();
+            UnityEngine.Object.DestroyImmediate(test.gameObject);
+            UnityEngine.Object.DestroyImmediate(obj);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
         public IEnumerator AddMultiAudioTrack()
         {
             GameObject obj = new GameObject("audio");

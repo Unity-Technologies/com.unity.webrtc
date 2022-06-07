@@ -726,8 +726,17 @@ namespace Unity.WebRTC
         {
             if (Context.table.ContainsKey(ptr))
             {
-                if(Context.table[ptr] is T value)
+                if (Context.table[ptr] == null)
+                {
+                    // The object has been garbage collected.
+                    // But the finalizer has not been called.
+                    Context.table.Remove(ptr);
+                    return constructor(ptr);
+                }
+                if (Context.table[ptr] is T value)
+                {
                     return value;
+                }
                 throw new InvalidCastException($"{ptr} is not {typeof(T).Name}");
             }
             else

@@ -59,5 +59,13 @@ namespace Unity.WebRTC
         {
             return m_table.ContainsKey(key);
         }
+        public bool TryGetValue(object key, out object value)
+        {
+            value = null;
+            if (!m_table.ContainsKey(key))
+                return false;
+            value = this[key];
+            return true;
+        }
     }
 }
