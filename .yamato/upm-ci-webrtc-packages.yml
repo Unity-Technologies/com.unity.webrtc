@@ -397,7 +397,7 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
       cp -rf upm-ci~/package/Runtime/Plugins Runtime/
 {% if target.name == "vulkan" -%}
       cp -f WebRTC~/ProjectSettings/ProjectSettings-android-vulkan.asset WebRTC~/ProjectSettings/ProjectSettings.asset
-{% endif %}
+{% endif -%}
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --fast -w
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
@@ -599,7 +599,7 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
 {% for gfx_type in target.gfx_types %}
 {% if target.is_gpu == "false" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-{% endif %}
+{% endif -%}
 {% endfor %}
 {% endfor %}
 {% endfor %}
@@ -622,7 +622,6 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% elsif target.is_gpu == "true" %}
 # workaround: avoid playmode linux glcore
 {% if target.name == "linux" and gfx_type.name == "glcore" and param.platform == "playmode" %}
-    -
 {% else %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif %}
@@ -689,7 +688,7 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
 
-{% endif %}
+{% endif -%}
 {% endfor %}
 
 push_plugin:
