@@ -83,8 +83,8 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
 
-    IGraphicsDevice*
-    GraphicsDevice::Init(const UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface, ProfilerMarkerFactory* profiler)
+    IGraphicsDevice* GraphicsDevice::Init(
+        const UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface, ProfilerMarkerFactory* profiler)
     {
         IGraphicsDevice* pDevice = nullptr;
         switch (renderer)
@@ -102,7 +102,10 @@ namespace webrtc
         {
             RTC_DCHECK(device);
             pDevice = new D3D12GraphicsDevice(
-                static_cast<ID3D12Device*>(device), reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface), renderer, profiler);
+                static_cast<ID3D12Device*>(device),
+                reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface),
+                renderer,
+                profiler);
             break;
         }
 #endif

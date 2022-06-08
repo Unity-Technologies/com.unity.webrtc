@@ -13,7 +13,8 @@ namespace webrtc
     public:
         static GraphicsDevice& GetInstance();
         IGraphicsDevice* Init(IUnityInterfaces* unityInterface, ProfilerMarkerFactory* profiler);
-        IGraphicsDevice* Init(UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface, ProfilerMarkerFactory* profiler);
+        IGraphicsDevice*
+        Init(UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface, ProfilerMarkerFactory* profiler);
 
     private:
         GraphicsDevice();
