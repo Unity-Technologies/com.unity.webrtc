@@ -24,10 +24,11 @@ namespace webrtc
         absl::optional<PpsParser::PpsState> pps() { return pps_; }
     };
 
+    class ProfilerMarkerFactory;
     class NvDecoderImpl : public unity::webrtc::NvDecoder
     {
     public:
-        NvDecoderImpl(CUcontext context);
+        NvDecoderImpl(CUcontext context, ProfilerMarkerFactory* profiler);
         NvDecoderImpl(const NvDecoderImpl&) = delete;
         NvDecoderImpl& operator=(const NvDecoderImpl&) = delete;
         ~NvDecoderImpl() override;
@@ -48,6 +49,9 @@ namespace webrtc
         DecodedImageCallback* m_decodedCompleteCallback = nullptr;
         webrtc::VideoFrameBufferPool m_buffer_pool;
         H264BitstreamParser m_h264_bitstream_parser;
+
+        ProfilerMarkerFactory* m_profiler;
+        const UnityProfilerMarkerDesc* m_marker;
     };
 
 } // end namespace webrtc

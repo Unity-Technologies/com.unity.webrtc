@@ -81,7 +81,7 @@ namespace webrtc
         std::unique_ptr<const ScopedProfilerThread> profilerThread_;
     };
 
-    static webrtc::VideoDecoderFactory* CreateNativeDecoderFactory(IGraphicsDevice* gfxDevice)
+    static webrtc::VideoDecoderFactory* CreateNativeDecoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
     {
 #if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoDecoderFactory([[RTCDefaultVideoDecoderFactory alloc] init]).release();
@@ -92,7 +92,7 @@ namespace webrtc
         if (gfxDevice->IsCudaSupport())
         {
             CUcontext context = gfxDevice->GetCUcontext();
-            return new NvDecoderFactory(context);
+            return new NvDecoderFactory(context, profiler);
         }
 #endif
         return nullptr;
@@ -101,7 +101,7 @@ namespace webrtc
     UnityVideoDecoderFactory::UnityVideoDecoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
         , internal_decoder_factory_(new webrtc::InternalDecoderFactory())
-        , native_decoder_factory_(CreateNativeDecoderFactory(gfxDevice))
+        , native_decoder_factory_(CreateNativeDecoderFactory(gfxDevice, profiler))
     {
     }
 

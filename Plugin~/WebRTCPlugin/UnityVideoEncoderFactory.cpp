@@ -112,7 +112,7 @@ namespace webrtc
         std::unique_ptr<const ScopedProfilerThread> profilerThread_;
     };
 
-    static webrtc::VideoEncoderFactory* CreateNativeEncoderFactory(IGraphicsDevice* gfxDevice)
+    static webrtc::VideoEncoderFactory* CreateNativeEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
     {
 #if UNITY_OSX || UNITY_IOS
         return webrtc::ObjCToNativeVideoEncoderFactory([[RTCDefaultVideoEncoderFactory alloc] init]).release();
@@ -124,7 +124,7 @@ namespace webrtc
         {
             CUcontext context = gfxDevice->GetCUcontext();
             NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
-            return new NvEncoderFactory(context, format);
+            return new NvEncoderFactory(context, format, profiler);
         }
 #endif
         return nullptr;
@@ -133,7 +133,7 @@ namespace webrtc
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
         , internal_encoder_factory_(new webrtc::InternalEncoderFactory())
-        , native_encoder_factory_(CreateNativeEncoderFactory(gfxDevice))
+        , native_encoder_factory_(CreateNativeEncoderFactory(gfxDevice, profiler))
     {
     }
 

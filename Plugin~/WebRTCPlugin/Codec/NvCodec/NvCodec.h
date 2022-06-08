@@ -23,11 +23,17 @@ namespace webrtc
     std::vector<SdpVideoFormat> SupportedNvEncoderCodecs(CUcontext context);
     std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context);
 
+    class ProfilerMarkerFactory;
+
     class NvEncoder : public VideoEncoder
     {
     public:
         static std::unique_ptr<NvEncoder> Create(
-            const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
+            const cricket::VideoCodec& codec,
+            CUcontext context,
+            CUmemorytype memoryType,
+            NV_ENC_BUFFER_FORMAT format,
+            ProfilerMarkerFactory* profiler);
         static bool IsSupported();
         ~NvEncoder() override { }
     };
@@ -35,7 +41,8 @@ namespace webrtc
     class NvDecoder : public VideoDecoder
     {
     public:
-        static std::unique_ptr<NvDecoder> Create(const cricket::VideoCodec& codec, CUcontext context);
+        static std::unique_ptr<NvDecoder>
+        Create(const cricket::VideoCodec& codec, CUcontext context, ProfilerMarkerFactory* profiler);
         static bool IsSupported();
 
         ~NvDecoder() override { }
@@ -44,7 +51,7 @@ namespace webrtc
     class NvEncoderFactory : public VideoEncoderFactory
     {
     public:
-        NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format);
+        NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format, ProfilerMarkerFactory* profiler);
         ~NvEncoderFactory() override;
 
         std::vector<SdpVideoFormat> GetSupportedFormats() const override;
@@ -54,6 +61,7 @@ namespace webrtc
     private:
         CUcontext context_;
         NV_ENC_BUFFER_FORMAT format_;
+        ProfilerMarkerFactory* profiler_;
 
         // Cache of capability to reduce calling SessionOpenAPI of NvEncoder
         std::vector<SdpVideoFormat> m_cachedSupportedFormats;
@@ -62,7 +70,7 @@ namespace webrtc
     class NvDecoderFactory : public VideoDecoderFactory
     {
     public:
-        NvDecoderFactory(CUcontext context);
+        NvDecoderFactory(CUcontext context, ProfilerMarkerFactory* profiler);
         ~NvDecoderFactory() override;
 
         std::vector<webrtc::SdpVideoFormat> GetSupportedFormats() const override;
@@ -70,6 +78,7 @@ namespace webrtc
 
     private:
         CUcontext context_;
+        ProfilerMarkerFactory* profiler_;
     };
 
 #ifndef _WIN32
