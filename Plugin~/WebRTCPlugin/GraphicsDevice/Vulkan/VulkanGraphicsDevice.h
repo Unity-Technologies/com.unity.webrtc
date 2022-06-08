@@ -74,6 +74,8 @@ namespace webrtc
         VkCommandPool m_commandPool;
         uint32_t m_queueFamilyIndex;
         VkAllocationCallbacks* m_allocator;
+        const UnityProfilerMarkerDesc* m_maker;
+
 #if CUDA_PLATFORM
         bool InitCudaContext();
         VkInstance m_instance;
