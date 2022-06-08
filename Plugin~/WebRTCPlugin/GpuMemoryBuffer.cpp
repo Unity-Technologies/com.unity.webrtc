@@ -27,6 +27,10 @@ namespace webrtc
         texture_.reset(device_->CreateDefaultTextureV(width, height, format));
         textureCpuRead_.reset(device_->CreateCPUReadTextureV(width, height, format));
 
+        if (device_->GetProfilerFactory())
+            marker_ = device_->GetProfilerFactory()->CreateMarker(
+                "GpuMemoryBufferFromUnity.CopyBuffer", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
+
 // todo(kazuki): need to refactor
 #if CUDA_PLATFORM
         if (device_->IsCudaSupport())
@@ -43,6 +47,10 @@ namespace webrtc
 
     void GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)
     {
+        std::unique_ptr<const ScopedProfiler> profiler;
+        if (device_->GetProfilerFactory())
+            profiler = device_->GetProfilerFactory()->CreateScopedProfiler(*marker_);
+
         // One texture cannot map CUDA memory and CPU memory simultaneously.
         // Believe there is still room for improvement.
         device_->CopyResourceFromNativeV(texture_.get(), ptr);
