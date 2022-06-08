@@ -30,7 +30,8 @@ namespace webrtc
             const VkDevice device,
             const VkQueue graphicsQueue,
             const uint32_t queueFamilyIndex,
-            UnityGfxRenderer renderer);
+            UnityGfxRenderer renderer,
+            ProfilerMarkerFactory* profiler);
 
         virtual ~VulkanGraphicsDevice() override = default;
         virtual bool InitV() override;

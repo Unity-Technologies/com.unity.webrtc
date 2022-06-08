@@ -24,8 +24,9 @@ namespace webrtc
         const VkDevice device,
         const VkQueue graphicsQueue,
         const uint32_t queueFamilyIndex,
-        UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+        UnityGfxRenderer renderer,
+        ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_unityVulkan(unityVulkan)
         , m_physicalDevice(physicalDevice)
         , m_device(device)

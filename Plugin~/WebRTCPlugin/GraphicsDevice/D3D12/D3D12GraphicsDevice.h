@@ -57,9 +57,9 @@ namespace webrtc
     {
     public:
         explicit D3D12GraphicsDevice(
-            ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer);
+            ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler);
         explicit D3D12GraphicsDevice(
-            ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer);
+            ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler);
         virtual ~D3D12GraphicsDevice();
         virtual bool InitV() override;
         virtual void ShutdownV() override;

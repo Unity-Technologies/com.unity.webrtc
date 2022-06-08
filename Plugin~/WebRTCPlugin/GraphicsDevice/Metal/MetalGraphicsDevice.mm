@@ -10,8 +10,8 @@ namespace unity
 namespace webrtc
 {
 
-    MetalGraphicsDevice::MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+    MetalGraphicsDevice::MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_device(device)
     {
     }

@@ -18,7 +18,7 @@ namespace webrtc
     class D3D11GraphicsDevice : public IGraphicsDevice
     {
     public:
-        D3D11GraphicsDevice(ID3D11Device* nativeDevice, UnityGfxRenderer renderer);
+        D3D11GraphicsDevice(ID3D11Device* nativeDevice, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler);
         virtual ~D3D11GraphicsDevice() override;
         virtual bool InitV() override;
         virtual void ShutdownV() override;

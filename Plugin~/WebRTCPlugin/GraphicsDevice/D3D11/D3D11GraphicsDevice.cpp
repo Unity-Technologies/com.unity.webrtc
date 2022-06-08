@@ -14,8 +14,9 @@ namespace unity
 namespace webrtc
 {
 
-    D3D11GraphicsDevice::D3D11GraphicsDevice(ID3D11Device* nativeDevice, UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+    D3D11GraphicsDevice::D3D11GraphicsDevice(
+        ID3D11Device* nativeDevice, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_d3d11Device(nativeDevice)
         , m_isCudaSupport(false)
     {

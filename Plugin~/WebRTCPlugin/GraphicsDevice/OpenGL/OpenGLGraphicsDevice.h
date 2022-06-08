@@ -22,7 +22,7 @@ struct OpenGLTexture2D;
 class OpenGLGraphicsDevice : public IGraphicsDevice
 {
 public:
-    OpenGLGraphicsDevice(UnityGfxRenderer renderer);
+    OpenGLGraphicsDevice(UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler);
     virtual ~OpenGLGraphicsDevice();
 
     virtual bool InitV() override;
