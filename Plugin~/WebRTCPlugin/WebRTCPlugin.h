@@ -3,6 +3,8 @@
 #include <api/media_stream_interface.h>
 #include <api/rtc_error.h>
 
+struct IUnityInterfaces;
+
 namespace unity
 {
 namespace webrtc
@@ -147,6 +149,15 @@ namespace webrtc
     {
         bool iceRestart;
         bool voiceActivityDetection;
+    };
+
+    class IGraphicsDevice;
+    class ProfilerMarkerFactory;
+    class Plugin
+    {
+    public:
+        static IGraphicsDevice* GraphicsDevice();
+        static ProfilerMarkerFactory* ProfilerMarkerFactory();
     };
 
 } // end namespace webrtc

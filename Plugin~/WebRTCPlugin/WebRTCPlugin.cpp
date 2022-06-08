@@ -9,10 +9,6 @@
 #include "UnityLogStream.h"
 #include "WebRTCPlugin.h"
 
-#if defined(SUPPORT_VULKAN)
-#include "GraphicsDevice/Vulkan/VulkanGraphicsDevice.h"
-#endif
-
 namespace unity
 {
 namespace webrtc
@@ -20,7 +16,7 @@ namespace webrtc
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 
-    DelegateSetResolution delegateSetResolution = nullptr;
+    static DelegateSetResolution delegateSetResolution = nullptr;
 
     void SetResolution(int32* width, int32* length)
     {
@@ -62,7 +58,7 @@ namespace webrtc
         template<typename U>
         MarshallArray& operator=(const std::vector<U>& src)
         {
-            length = static_cast<uint32_t>(src.size());
+            length = static_cast<int32_t>(src.size());
             values = static_cast<T*>(CoTaskMemAlloc(sizeof(T) * src.size()));
 
             for (size_t i = 0; i < src.size(); i++)
@@ -179,7 +175,7 @@ namespace webrtc
         {
             mediaType = cricket::MEDIA_TYPE_AUDIO;
         }
-        return { mediaType, name };
+        return std::make_tuple(mediaType, name);
     }
 
     std::map<std::string, std::string> ConvertSdp(const std::string& src)
@@ -415,8 +411,10 @@ extern "C"
             DebugLog("Already created context with ID %d", uid);
             return ctx;
         }
-        IGraphicsDevice* device = GraphicsUtility::GetGraphicsDevice();
-        ctx = ContextManager::GetInstance()->CreateContext(uid, device);
+        ContextDependencies dependencies;
+        dependencies.device = Plugin::GraphicsDevice();
+        dependencies.profiler = Plugin::ProfilerMarkerFactory();
+        ctx = ContextManager::GetInstance()->CreateContext(uid, dependencies);
         return ctx;
     }
 

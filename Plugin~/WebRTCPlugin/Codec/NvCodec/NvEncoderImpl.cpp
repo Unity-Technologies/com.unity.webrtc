@@ -104,6 +104,14 @@ namespace webrtc
 
     NvEncoderImpl::~NvEncoderImpl() { Release(); }
 
+    VideoEncoder::EncoderInfo NvEncoderImpl::GetEncoderInfo() const
+    {
+        VideoEncoder::EncoderInfo info;
+        info.implementation_name = "NvCodec";
+        info.is_hardware_accelerated = true;
+        return info;
+    }
+
     int NvEncoderImpl::InitEncode(const VideoCodec* codec, const VideoEncoder::Settings& settings)
     {
         if (!codec || codec->codecType != kVideoCodecH264)

@@ -20,6 +20,8 @@ target_sources(WebRTCLib
     PeerConnectionStatsCollectorCallback.cpp
     PeerConnectionStatsCollectorCallback.h
     PlatformBase.h
+    ProfilerMarkerFactory.cpp
+    ProfilerMarkerFactory.h
     SetSessionDescriptionObserver.cpp
     SetSessionDescriptionObserver.h
     ScopedProfiler.h
@@ -352,6 +354,7 @@ target_sources(WebRTCPlugin
     pch.cpp
     pch.h
     WebRTCPlugin.cpp
+    WebRTCPlugin.h
     UnityRenderEvent.cpp
     UnityVulkanInterfaceFunctions.h
 )

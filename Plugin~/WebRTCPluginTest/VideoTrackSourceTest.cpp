@@ -39,6 +39,7 @@ namespace webrtc
             m_trackSource = UnityVideoTrackSource::Create(false, absl::nullopt, m_taskQueueFactory.get());
             m_trackSource->AddOrUpdateSink(&sink_, rtc::VideoSinkWants());
         }
+
         ~VideoTrackSourceTest() override { m_trackSource->RemoveSink(&sink_); }
 
     protected:
@@ -51,8 +52,11 @@ namespace webrtc
             if (!m_texture)
                 GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
 
-            context = std::make_unique<Context>(device());
+            ContextDependencies dependencies;
+            dependencies.device = device();
+            context = std::make_unique<Context>(dependencies);
         }
+
         std::unique_ptr<Context> context;
         std::unique_ptr<ITexture2D> m_texture;
         std::unique_ptr<TaskQueueFactory> m_taskQueueFactory;

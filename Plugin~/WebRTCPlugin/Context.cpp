@@ -51,7 +51,7 @@ namespace webrtc
         return nullptr;
     }
 
-    Context* ContextManager::CreateContext(int uid, IGraphicsDevice* gfxDevice)
+    Context* ContextManager::CreateContext(int uid, ContextDependencies& dependencies)
     {
         auto it = s_instance->m_contexts.find(uid);
         if (it != s_instance->m_contexts.end())
@@ -59,7 +59,7 @@ namespace webrtc
             DebugLog("Using already created context with ID %d", uid);
             return nullptr;
         }
-        s_instance->m_contexts[uid] = std::make_unique<Context>(gfxDevice);
+        s_instance->m_contexts[uid] = std::make_unique<Context>(dependencies);
         return s_instance->m_contexts[uid].get();
     }
 
@@ -184,7 +184,7 @@ namespace webrtc
         throw std::invalid_argument("Unknown SdpType");
     }
 
-    Context::Context(IGraphicsDevice* gfxDevice)
+    Context::Context(ContextDependencies& dependencies)
         : m_workerThread(rtc::Thread::CreateWithSocketServer())
         , m_signalingThread(rtc::Thread::CreateWithSocketServer())
         , m_taskQueueFactory(CreateDefaultTaskQueueFactory())
@@ -198,10 +198,10 @@ namespace webrtc
             RTC_FROM_HERE, [&]() { return new rtc::RefCountedObject<DummyAudioDevice>(m_taskQueueFactory.get()); });
 
         std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
-            std::make_unique<UnityVideoEncoderFactory>(gfxDevice);
+            std::make_unique<UnityVideoEncoderFactory>(dependencies.device, dependencies.profiler);
 
         std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
-            std::make_unique<UnityVideoDecoderFactory>(gfxDevice);
+            std::make_unique<UnityVideoDecoderFactory>(dependencies.device, dependencies.profiler);
 
         rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
         rtc::scoped_refptr<AudioDecoderFactory> audioDecoderFactory = CreateAudioDecoderFactory();

@@ -6,21 +6,44 @@ namespace unity
 {
 namespace webrtc
 {
-    IUnityProfiler* ScopedProfiler::UnityProfiler = nullptr;
-
-    ScopedProfiler::ScopedProfiler(const UnityProfilerMarkerDesc& desc)
-        : m_desc(&desc)
+    ScopedProfiler::ScopedProfiler(IUnityProfiler* profiler, const UnityProfilerMarkerDesc& desc)
+        : profiler_(profiler)
+        , m_desc(&desc)
     {
-        if (UnityProfiler == nullptr || UnityProfiler->IsAvailable() == 0)
-            return;
-        UnityProfiler->BeginSample(m_desc);
+        RTC_DCHECK(profiler);
+
+        if (profiler_->IsAvailable())
+            profiler_->BeginSample(m_desc);
     }
 
     ScopedProfiler::~ScopedProfiler()
     {
-        if (UnityProfiler == nullptr || UnityProfiler->IsAvailable() == 0)
-            return;
-        UnityProfiler->EndSample(m_desc);
+        if (profiler_->IsAvailable())
+            profiler_->EndSample(m_desc);
     }
+
+    ScopedProfilerThread::ScopedProfilerThread(IUnityProfiler* profiler, const char* groupName, const char* name)
+        : profiler_(profiler)
+    {
+        RTC_DCHECK(profiler);
+        RTC_DCHECK(groupName);
+        RTC_DCHECK(name);
+
+        if (profiler_->IsAvailable())
+        {
+            int result = profiler_->RegisterThread(&threadId_, groupName, name);
+            if (result)
+            {
+                RTC_LOG(LS_INFO) << "IUnityProfiler::RegisterThread error:" << result;
+                throw;
+            }
+        }
+    }
+    ScopedProfilerThread ::~ScopedProfilerThread()
+    {
+        if (profiler_->IsAvailable())
+            profiler_->UnregisterThread(threadId_);
+    }
+
 } // end namespace webrtc
 } // end namespace unity
