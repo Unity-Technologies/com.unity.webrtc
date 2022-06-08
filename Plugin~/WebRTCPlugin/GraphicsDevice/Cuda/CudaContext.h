@@ -12,6 +12,8 @@ namespace unity
 {
 namespace webrtc
 {
+    // The minimum version of CUDA Toolkit 
+    const int kRequiredDriverVersion = 11000;
 
     // todo(kazuki):
     // This class manages only the context related on the render thread.

@@ -123,6 +123,18 @@ namespace webrtc
         return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format);
     }
 
+    bool NvEncoder::IsSupported()
+    {
+        uint32_t version = 0;
+        uint32_t currentVersion = (NVENCAPI_MAJOR_VERSION << 4) | NVENCAPI_MINOR_VERSION;
+        NVENC_API_CALL(NvEncodeAPIGetMaxSupportedVersion(&version));
+        if (currentVersion > version)
+        {
+            return false;
+        }
+        return true;
+    }
+
     std::unique_ptr<NvDecoder> NvDecoder::Create(const cricket::VideoCodec& codec, CUcontext context)
     {
         return std::make_unique<NvDecoderImpl>(context);
