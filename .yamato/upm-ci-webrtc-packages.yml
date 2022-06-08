@@ -622,7 +622,6 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% elsif target.is_gpu == "true" %}
 # workaround: avoid playmode linux glcore
 {% if target.name == "linux" and gfx_type.name == "glcore" and param.platform == "playmode" %}
-    -
 {% else %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif %}
