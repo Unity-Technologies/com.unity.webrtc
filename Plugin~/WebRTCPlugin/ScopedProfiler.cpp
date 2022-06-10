@@ -37,6 +37,7 @@ namespace webrtc
                 RTC_LOG(LS_INFO) << "IUnityProfiler::RegisterThread error:" << result;
                 throw;
             }
+            RTC_LOG(LS_INFO) << "IUnityProfiler::RegisterThread id:" << threadId_ << " thread groupe name:" << groupName << " name:" << name;
         }
     }
     ScopedProfilerThread ::~ScopedProfilerThread()
