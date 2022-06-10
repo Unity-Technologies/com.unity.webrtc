@@ -562,7 +562,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>
-        public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track)
+        public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track, RTCRtpTransceiverInit init = null)
         {
             IntPtr ptr = WebRTC.Context.PeerConnectionAddTransceiver(
                 GetSelfOrThrow(), track.GetSelfOrThrow());
@@ -574,7 +574,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
-        public RTCRtpTransceiver AddTransceiver(TrackKind kind)
+        public RTCRtpTransceiver AddTransceiver(TrackKind kind, RTCRtpTransceiverInit init = null)
         {
             IntPtr ptr = WebRTC.Context.PeerConnectionAddTransceiverWithType(
                 GetSelfOrThrow(), kind);

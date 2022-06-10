@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -11,6 +12,8 @@ namespace Unity.WebRTC
         public uint? maxFramerate;
         public double? scaleResolutionDownBy;
         public string rid;
+
+        public RTCRtpEncodingParameters() { }
 
         internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)
         {
@@ -31,6 +34,19 @@ namespace Unity.WebRTC
             instance.maxFramerate = maxFramerate;
             instance.scaleResolutionDownBy = scaleResolutionDownBy;
             instance.rid = string.IsNullOrEmpty(rid) ? IntPtr.Zero : Marshal.StringToCoTaskMemAnsi(rid);
+        }
+
+        internal RTCRtpEncodingParametersInternal Cast()
+        {
+            return new RTCRtpEncodingParametersInternal
+            {
+                active = this.active,
+                maxBitrate = this.maxBitrate,
+                minBitrate = this.minBitrate,
+                maxFramerate = this.maxFramerate,
+                scaleResolutionDownBy = this.scaleResolutionDownBy,
+                rid = string.IsNullOrEmpty(this.rid) ? IntPtr.Zero : Marshal.StringToCoTaskMemAnsi(this.rid)
+            };
         }
     }
 
@@ -202,6 +218,26 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class RTCRtpTransceiverInit
+    {
+        public RTCRtpTransceiverDirection direction;
+        public RTCRtpEncodingParameters[] sendEncodings;
+        public MediaStream[] streams;
+
+        internal RTCRtpTransceiverInitInternal Cast()
+        {
+            return new RTCRtpTransceiverInitInternal
+            {
+                direction = this.direction,
+                sendEncodings = this.sendEncodings.Select(_ => _.Cast()).ToArray(),
+                streams = streams.Select(_ => _.self).ToArray(),
+            };
+        }
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct RTCRtpCodecCapabilityInternal
     {
@@ -288,4 +324,19 @@ namespace Unity.WebRTC
         public OptionalDouble scaleResolutionDownBy;
         public IntPtr rid;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpTransceiverInitInternal
+    {
+        public RTCRtpTransceiverDirection direction;
+        public MarshallingArray<RTCRtpEncodingParametersInternal> sendEncodings;
+        public MarshallingArray<IntPtr> streams;
+
+        public void Dispose()
+        {
+            sendEncodings.Dispose();
+            streams.Dispose();
+        }
+    }
+
 }

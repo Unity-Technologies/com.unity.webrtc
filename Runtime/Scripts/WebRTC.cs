@@ -947,6 +947,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiverWithType(IntPtr context, IntPtr pc, TrackKind kind);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionAddTransceiverWithInit(IntPtr context, IntPtr pc, IntPtr track, ref RTCRtpTransceiverInitInternal init);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionAddTransceiverWithTypeAndInit(IntPtr context, IntPtr pc, TrackKind kind, ref RTCRtpTransceiverInitInternal init);
+        [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionRemoveTrack(IntPtr pc, IntPtr sender);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]

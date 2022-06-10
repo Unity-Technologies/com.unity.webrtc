@@ -69,7 +69,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             peer.Dispose();
-            Assert.That(() => {  var state = peer.ConnectionState; }, Throws.TypeOf<ObjectDisposedException>());
+            Assert.That(() => { var state = peer.ConnectionState; }, Throws.TypeOf<ObjectDisposedException>());
         }
 
         [Test]
@@ -235,6 +235,27 @@ namespace Unity.WebRTC.RuntimeTest
 
             peer.Dispose();
         }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void AddTransceiverWithInit()
+        {
+            var peer = new RTCPeerConnection();
+            var stream = new MediaStream();
+            var init = new RTCRtpTransceiverInit()
+            {
+                direction = RTCRtpTransceiverDirection.SendOnly,
+                sendEncodings = new RTCRtpEncodingParameters[] {
+                    new RTCRtpEncodingParameters { maxFramerate = 30 }
+                },
+                streams = new MediaStream[] { stream }
+            };
+            var transceiver = peer.AddTransceiver(TrackKind.Video, init);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
+            peer.Dispose();
+        }
+
 
         [Test]
         [Category("PeerConnection")]
@@ -666,7 +687,7 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator AddIceCandidate()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
 
@@ -821,9 +842,9 @@ namespace Unity.WebRTC.RuntimeTest
             var op6 = peer1.SetRemoteDescription(ref desc);
             yield return op6;
 
-            var op7 = new WaitUntilWithTimeout( () =>
-                    state1 == RTCPeerConnectionState.Connected &&
-                    state2 == RTCPeerConnectionState.Connected, 5000);
+            var op7 = new WaitUntilWithTimeout(() =>
+                   state1 == RTCPeerConnectionState.Connected &&
+                   state2 == RTCPeerConnectionState.Connected, 5000);
             yield return op7;
             Assert.That(op7.IsCompleted, Is.True);
 
@@ -908,7 +929,7 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator RestartIceInvokeOnNegotiationNeeded()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
 
@@ -951,7 +972,7 @@ namespace Unity.WebRTC.RuntimeTest
         public IEnumerator RemoteOnRemoveTrack()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer1 = new RTCPeerConnection(ref config);
             var peer2 = new RTCPeerConnection(ref config);
 
