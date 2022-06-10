@@ -993,7 +993,7 @@ namespace Unity.WebRTC
         public static extern void PeerConnectionRegisterOnRemoveTrack(IntPtr ptr, DelegateNativeOnRemoveTrack callback);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, ref RTCRtpTransceiverDirection direction);
+        public static extern bool TransceiverGetCurrentDirection(IntPtr transceiver, out RTCRtpTransceiverDirection direction);
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType TransceiverStop(IntPtr transceiver);
         [DllImport(WebRTC.Lib)]

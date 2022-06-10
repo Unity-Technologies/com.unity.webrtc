@@ -242,9 +242,10 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var peer = new RTCPeerConnection();
             var stream = new MediaStream();
+            var direction = RTCRtpTransceiverDirection.SendOnly;
             var init = new RTCRtpTransceiverInit()
             {
-                direction = RTCRtpTransceiverDirection.SendOnly,
+                direction = direction,
                 sendEncodings = new RTCRtpEncodingParameters[] {
                     new RTCRtpEncodingParameters { maxFramerate = 30 }
                 },
@@ -253,6 +254,12 @@ namespace Unity.WebRTC.RuntimeTest
             var transceiver = peer.AddTransceiver(TrackKind.Video, init);
             Assert.That(transceiver, Is.Not.Null);
             Assert.That(transceiver.CurrentDirection, Is.Null);
+            Assert.That(transceiver.Direction, Is.EqualTo(RTCRtpTransceiverDirection.SendOnly));
+            Assert.That(transceiver.Sender, Is.Not.Null);
+
+            var parameters = transceiver.Sender.GetParameters();
+            Assert.That(parameters, Is.Not.Null);
+            Assert.That(parameters.codecs, Is.Not.Null.And.Empty);
             peer.Dispose();
         }
 
@@ -334,16 +341,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.AreEqual(transceiver1.CurrentDirection, RTCRtpTransceiverDirection.RecvOnly);
             Assert.AreEqual(transceiver2.CurrentDirection, RTCRtpTransceiverDirection.SendOnly);
 
-            //Assert.That(transceiver2.Stop(), Is.EqualTo(RTCErrorType.None));
-            //Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-
-            // todo(kazuki):: Transceiver.CurrentDirection of Sender is not changed to "Stopped" even if waiting
-            // yield return new WaitUntil(() => transceiver2.CurrentDirection == RTCRtpTransceiverDirection.Stopped);
-            // Assert.That(transceiver2.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-
-            // todo(kazuki):: Transceiver.CurrentDirection of Receiver is not changed to "Stopped" even if waiting
-            // yield return new WaitUntil(() => transceiver1.Direction == RTCRtpTransceiverDirection.Stopped);
-            // Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
+            Assert.That(transceiver2.Stop(), Is.EqualTo(RTCErrorType.None));
+            Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
 
             audioTrack.Dispose();
             peer1.Close();
