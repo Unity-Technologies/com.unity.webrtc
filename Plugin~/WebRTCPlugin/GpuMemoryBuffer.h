@@ -66,8 +66,6 @@ namespace webrtc
         std::unique_ptr<ITexture2D> texture_;
         std::unique_ptr<ITexture2D> textureCpuRead_;
         std::unique_ptr<GpuMemoryBufferHandle> handle_;
-
-        const UnityProfilerMarkerDesc* marker_;
     };
 }
 }
