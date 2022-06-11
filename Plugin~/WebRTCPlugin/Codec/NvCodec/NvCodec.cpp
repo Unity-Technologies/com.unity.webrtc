@@ -4,6 +4,7 @@
 #include <api/video_codecs/video_encoder_factory.h>
 #include <modules/video_coding/codecs/h264/include/h264.h>
 
+#include "Codec/VideoCodecImpl.h"
 #include "NvCodec.h"
 #include "NvDecoder/NvDecoder.h"
 #include "NvDecoderImpl.h"
@@ -16,6 +17,8 @@ namespace unity
 namespace webrtc
 {
     using namespace ::webrtc;
+
+    constexpr char kCodecName[] = "NvCodec";
 
     class NvEncoderCudaCapability : public NvEncoderCuda
     {
@@ -75,7 +78,7 @@ namespace webrtc
         return supportedFormats;
     }
 
-    int GetCudaDeviceCapabilityMajorVersion(CUcontext context)
+    static int GetCudaDeviceCapabilityMajorVersion(CUcontext context)
     {
         cuCtxSetCurrent(context);
 
@@ -113,6 +116,11 @@ namespace webrtc
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel5_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel5_1, "1"),
             };
+        }
+
+        for (auto& format : supportedFormats)
+        {
+            format.parameters.emplace(kSdpKeyNameCodecImpl, kCodecName);
         }
 
         return supportedFormats;
