@@ -293,6 +293,18 @@ namespace Unity.WebRTC.RuntimeTest
             var parameters = transceiver.Sender.GetParameters();
             Assert.That(parameters, Is.Not.Null);
             Assert.That(parameters.codecs, Is.Not.Null.And.Empty);
+
+            var init2 = new RTCRtpTransceiverInit()
+            {
+                direction = null,
+                sendEncodings = null,
+                streams = null
+            };
+            var transceiver2 = peer.AddTransceiver(TrackKind.Video, init2);
+            Assert.That(transceiver2, Is.Not.Null);
+            Assert.That(transceiver2.CurrentDirection, Is.Null);
+            Assert.That(transceiver2.Direction, Is.EqualTo(RTCRtpTransceiverDirection.SendRecv));
+            Assert.That(transceiver2.Sender, Is.Not.Null);
             peer.Dispose();
         }
 

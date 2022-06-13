@@ -22,7 +22,7 @@ namespace Unity.WebRTC
             minBitrate = parameter.minBitrate;
             maxFramerate = parameter.maxFramerate;
             scaleResolutionDownBy = parameter.scaleResolutionDownBy;
-            if(parameter.rid != IntPtr.Zero)
+            if (parameter.rid != IntPtr.Zero)
                 rid = parameter.rid.AsAnsiStringWithFreeMem();
         }
 
@@ -135,7 +135,7 @@ namespace Unity.WebRTC
             instance = default;
             RTCRtpEncodingParametersInternal[] encodings =
                 new RTCRtpEncodingParametersInternal[this.encodings.Length];
-            for(int i = 0; i < this.encodings.Length; i++)
+            for (int i = 0; i < this.encodings.Length; i++)
             {
                 this.encodings[i].CopyInternal(ref encodings[i]);
             }
@@ -223,7 +223,7 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpTransceiverInit
     {
-        public RTCRtpTransceiverDirection direction;
+        public RTCRtpTransceiverDirection? direction;
         public RTCRtpEncodingParameters[] sendEncodings;
         public MediaStream[] streams;
 
@@ -231,9 +231,9 @@ namespace Unity.WebRTC
         {
             return new RTCRtpTransceiverInitInternal
             {
-                direction = this.direction,
-                sendEncodings = this.sendEncodings.Select(_ => _.Cast()).ToArray(),
-                streams = streams.Select(_ => _.self).ToArray(),
+                direction = direction.GetValueOrDefault(RTCRtpTransceiverDirection.SendRecv),
+                sendEncodings = sendEncodings == null ? default(MarshallingArray<RTCRtpEncodingParametersInternal>) : sendEncodings.Select(_ => _.Cast()).ToArray(),
+                streams = streams == null ? default(MarshallingArray<IntPtr>) : streams.Select(_ => _.self).ToArray(),
             };
         }
     }
