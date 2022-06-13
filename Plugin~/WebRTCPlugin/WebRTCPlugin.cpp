@@ -532,7 +532,7 @@ extern "C"
     };
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface*
-    PeerConnectionAddTransceiver(Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track)
+    PeerConnectionAddTransceiver(PeerConnectionObject* obj, MediaStreamTrackInterface* track)
     {
         auto result = obj->connection->AddTransceiver(track);
         if (!result.ok())
@@ -542,7 +542,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(
-        Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track, RTCRtpTransceiverInit* init)
+        PeerConnectionObject* obj, MediaStreamTrackInterface* track, const RTCRtpTransceiverInit* init)
     {
         auto result = obj->connection->AddTransceiver(track, *init);
         if (!result.ok())
@@ -552,7 +552,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface*
-    PeerConnectionAddTransceiverWithType(Context* context, PeerConnectionObject* obj, cricket::MediaType type)
+    PeerConnectionAddTransceiverWithType(PeerConnectionObject* obj, cricket::MediaType type)
     {
         auto result = obj->connection->AddTransceiver(type);
         if (!result.ok())
@@ -562,7 +562,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(
-        Context* context, PeerConnectionObject* obj, cricket::MediaType type, const RTCRtpTransceiverInit* init)
+        PeerConnectionObject* obj, cricket::MediaType type, const RTCRtpTransceiverInit* init)
     {
         auto result = obj->connection->AddTransceiver(type, *init);
         if (!result.ok())
