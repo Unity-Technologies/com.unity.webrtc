@@ -525,12 +525,12 @@ namespace webrtc
         {
 #if defined(SUPPORT_D3D12)
             device =
-                new D3D12GraphicsDevice(static_cast<ID3D12Device*>(nativeGfxDevice_), pCommandQueue.Get(), renderer);
+                new D3D12GraphicsDevice(static_cast<ID3D12Device*>(nativeGfxDevice_), pCommandQueue.Get(), renderer, nullptr);
 #endif
         }
         else
         {
-            device = GraphicsDevice::GetInstance().Init(renderer, nativeGfxDevice_, nullptr);
+            device = GraphicsDevice::GetInstance().Init(renderer, nativeGfxDevice_, nullptr, nullptr);
         }
         device_ = std::unique_ptr<IGraphicsDevice>(device);
         EXPECT_TRUE(device_->InitV());

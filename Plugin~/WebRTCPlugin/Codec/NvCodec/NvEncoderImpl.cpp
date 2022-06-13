@@ -14,6 +14,8 @@
 #include "NvEncoder/NvEncoder.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
+#include "ProfilerMarkerFactory.h"
+#include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
 
@@ -75,7 +77,11 @@ namespace webrtc
     std::vector<SdpVideoFormat> NvEncoderImpl::s_formats;
 
     NvEncoderImpl::NvEncoderImpl(
-        const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
+        const cricket::VideoCodec& codec,
+        CUcontext context,
+        CUmemorytype memoryType,
+        NV_ENC_BUFFER_FORMAT format,
+        ProfilerMarkerFactory* profiler)
         : m_context(context)
         , m_memoryType(memoryType)
         , m_scaledArray(nullptr)
@@ -84,6 +90,7 @@ namespace webrtc
         , m_encodedCompleteCallback(nullptr)
         , m_encode_fps(1000, 1000)
         , m_clock(Clock::GetRealTimeClock())
+        , m_profiler(profiler)
     {
         RTC_CHECK(absl::EqualsIgnoreCase(codec.name, cricket::kH264CodecName));
         // not implemented for host memory
@@ -95,6 +102,10 @@ namespace webrtc
         m_profileGuid = ProfileToGuid(profileLevelId.value().profile).value();
         m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
         m_configurations.reserve(kMaxSimulcastStreams);
+
+        if (profiler)
+            m_marker = profiler->CreateMarker(
+                "NvEncoderImpl.CopyResource", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
 
         // SupportedNvEncoderCodecs function consume the session of NvEnc and the number of the sessions is limited by
         // NVIDIA device. So it caches the return value here.
@@ -311,6 +322,10 @@ namespace webrtc
         CUcontext context,
         CUmemorytype memoryType)
     {
+        std::unique_ptr<const ScopedProfiler> profiler;
+        if (m_profiler)
+            profiler = m_profiler->CreateScopedProfiler(*m_marker);
+
         const GpuMemoryBufferCudaHandle* handle = static_cast<const GpuMemoryBufferCudaHandle*>(buffer->handle());
 
         if (memoryType == CU_MEMORYTYPE_DEVICE)

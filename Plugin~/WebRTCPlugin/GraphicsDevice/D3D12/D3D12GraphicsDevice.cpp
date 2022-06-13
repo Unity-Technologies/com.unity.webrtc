@@ -23,8 +23,11 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
 
     D3D12GraphicsDevice::D3D12GraphicsDevice(
-        ID3D12Device* nativeDevice, IUnityGraphicsD3D12v5* unityInterface, UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+        ID3D12Device* nativeDevice,
+        IUnityGraphicsD3D12v5* unityInterface,
+        UnityGfxRenderer renderer,
+        ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
         , m_d3d11Device(nullptr)
@@ -35,8 +38,11 @@ namespace webrtc
     }
     //---------------------------------------------------------------------------------------------------------------------
     D3D12GraphicsDevice::D3D12GraphicsDevice(
-        ID3D12Device* nativeDevice, ID3D12CommandQueue* commandQueue, UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+        ID3D12Device* nativeDevice,
+        ID3D12CommandQueue* commandQueue,
+        UnityGfxRenderer renderer,
+        ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(commandQueue)
         , m_d3d11Device(nullptr)

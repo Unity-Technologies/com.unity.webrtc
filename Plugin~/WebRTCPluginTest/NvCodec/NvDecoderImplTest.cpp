@@ -41,7 +41,7 @@ namespace webrtc
 
     TEST_P(NvDecoderImplTest, CanInitializeWithDefaultParameters)
     {
-        NvDecoderImpl decoder(context_);
+        NvDecoderImpl decoder(context_, nullptr);
 
         VideoCodec codec_settings;
         SetDefaultSettings(&codec_settings);

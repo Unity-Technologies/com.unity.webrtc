@@ -9,6 +9,7 @@
 #include "NvDecoderImpl.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
+#include "ProfilerMarkerFactory.h"
 
 namespace unity
 {
@@ -118,9 +119,13 @@ namespace webrtc
     }
 
     std::unique_ptr<NvEncoder> NvEncoder::Create(
-        const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format)
+        const cricket::VideoCodec& codec,
+        CUcontext context,
+        CUmemorytype memoryType,
+        NV_ENC_BUFFER_FORMAT format,
+        ProfilerMarkerFactory* profiler)
     {
-        return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format);
+        return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format, profiler);
     }
 
     bool NvEncoder::IsSupported()
@@ -135,14 +140,16 @@ namespace webrtc
         return true;
     }
 
-    std::unique_ptr<NvDecoder> NvDecoder::Create(const cricket::VideoCodec& codec, CUcontext context)
+    std::unique_ptr<NvDecoder>
+        NvDecoder::Create(const cricket::VideoCodec& codec, CUcontext context, ProfilerMarkerFactory* profiler)
     {
-        return std::make_unique<NvDecoderImpl>(context);
+        return std::make_unique<NvDecoderImpl>(context, profiler);
     }
 
-    NvEncoderFactory::NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format)
+    NvEncoderFactory::NvEncoderFactory(CUcontext context, NV_ENC_BUFFER_FORMAT format, ProfilerMarkerFactory* profiler)
         : context_(context)
         , format_(format)
+        , profiler_(profiler)
     {
         // Some NVIDIA GPUs have a limited Encode Session count.
         // refer: https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new
@@ -174,11 +181,12 @@ namespace webrtc
     std::unique_ptr<VideoEncoder> NvEncoderFactory::CreateVideoEncoder(const SdpVideoFormat& format)
     {
         // todo(kazuki):: add CUmemorytype::CU_MEMORYTYPE_DEVICE option
-        return NvEncoder::Create(cricket::VideoCodec(format), context_, CU_MEMORYTYPE_ARRAY, format_);
+        return NvEncoder::Create(cricket::VideoCodec(format), context_, CU_MEMORYTYPE_ARRAY, format_, profiler_);
     }
 
-    NvDecoderFactory::NvDecoderFactory(CUcontext context)
+    NvDecoderFactory::NvDecoderFactory(CUcontext context, ProfilerMarkerFactory* profiler)
         : context_(context)
+        , profiler_(profiler)
     {
     }
     NvDecoderFactory::~NvDecoderFactory() = default;
@@ -190,7 +198,7 @@ namespace webrtc
 
     std::unique_ptr<VideoDecoder> NvDecoderFactory::CreateVideoDecoder(const SdpVideoFormat& format)
     {
-        return NvDecoder::Create(cricket::VideoCodec(format), context_);
+        return NvDecoder::Create(cricket::VideoCodec(format), context_, profiler_);
     }
 }
 }

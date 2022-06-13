@@ -8,6 +8,8 @@
 #include "NvCodecUtils.h"
 #include "NvDecoder/NvDecoder.h"
 #include "NvDecoderImpl.h"
+#include "ProfilerMarkerFactory.h"
+#include "ScopedProfiler.h"
 
 namespace unity
 {
@@ -24,13 +26,17 @@ namespace webrtc
             static_cast<ColorSpace::RangeID>(format.video_signal_description.video_full_range_flag));
     }
 
-    NvDecoderImpl::NvDecoderImpl(CUcontext context)
+    NvDecoderImpl::NvDecoderImpl(CUcontext context, ProfilerMarkerFactory* profiler)
         : m_context(context)
         , m_decoder(nullptr)
         , m_isConfiguredDecoder(false)
         , m_decodedCompleteCallback(nullptr)
         , m_buffer_pool(false)
+        , m_profiler(profiler)
     {
+        if (profiler)
+            m_marker = profiler->CreateMarker(
+                "NvDecoderImpl.ConvertNV12ToI420", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
     }
 
     NvDecoderImpl::~NvDecoderImpl() { Release(); }
@@ -162,19 +168,26 @@ namespace webrtc
             rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
                 m_buffer_pool.CreateI420Buffer(m_decoder->GetWidth(), m_decoder->GetHeight());
 
-            int result = libyuv::NV12ToI420(
-                pFrame,
-                m_decoder->GetDeviceFramePitch(),
-                pFrame + m_decoder->GetHeight() * m_decoder->GetDeviceFramePitch(),
-                m_decoder->GetDeviceFramePitch(),
-                i420_buffer->MutableDataY(),
-                i420_buffer->StrideY(),
-                i420_buffer->MutableDataU(),
-                i420_buffer->StrideU(),
-                i420_buffer->MutableDataV(),
-                i420_buffer->StrideV(),
-                m_decoder->GetWidth(),
-                m_decoder->GetHeight());
+            int result;
+            {
+                std::unique_ptr<const ScopedProfiler> profiler;
+                if (m_profiler)
+                    profiler = m_profiler->CreateScopedProfiler(*m_marker);
+
+                result = libyuv::NV12ToI420(
+                    pFrame,
+                    m_decoder->GetDeviceFramePitch(),
+                    pFrame + m_decoder->GetHeight() * m_decoder->GetDeviceFramePitch(),
+                    m_decoder->GetDeviceFramePitch(),
+                    i420_buffer->MutableDataY(),
+                    i420_buffer->StrideY(),
+                    i420_buffer->MutableDataU(),
+                    i420_buffer->StrideU(),
+                    i420_buffer->MutableDataV(),
+                    i420_buffer->StrideV(),
+                    m_decoder->GetWidth(),
+                    m_decoder->GetHeight());
+            }
 
             if (result)
             {

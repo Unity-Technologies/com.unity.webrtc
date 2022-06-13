@@ -135,7 +135,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             }
         }
 #endif
-        s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces));
+        s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));
         if (s_gfxDevice != nullptr)
         {
             s_gfxDevice->InitV();

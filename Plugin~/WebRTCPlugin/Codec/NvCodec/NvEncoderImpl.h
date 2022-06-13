@@ -22,6 +22,7 @@ namespace webrtc
 
     class ITexture2D;
     class IGraphicsDevice;
+    class ProfilerMarkerFactory;
     struct GpuMemoryBufferHandle;
     class GpuMemoryBufferInterface;
     class NvEncoderImpl : public unity::webrtc::NvEncoder
@@ -44,7 +45,11 @@ namespace webrtc
             void SetStreamState(bool send_stream);
         };
         NvEncoderImpl(
-            const cricket::VideoCodec& codec, CUcontext context, CUmemorytype memoryType, NV_ENC_BUFFER_FORMAT format);
+            const cricket::VideoCodec& codec,
+            CUcontext context,
+            CUmemorytype memoryType,
+            NV_ENC_BUFFER_FORMAT format,
+            ProfilerMarkerFactory* profiler);
         NvEncoderImpl(const NvEncoderImpl&) = delete;
         NvEncoderImpl& operator=(const NvEncoderImpl&) = delete;
         ~NvEncoderImpl() override;
@@ -97,6 +102,8 @@ namespace webrtc
         Clock* const m_clock;
         GUID m_profileGuid;
         NV_ENC_LEVEL m_level;
+        ProfilerMarkerFactory* m_profiler;
+        const UnityProfilerMarkerDesc* m_marker;
 
         std::vector<LayerConfig> m_configurations;
 

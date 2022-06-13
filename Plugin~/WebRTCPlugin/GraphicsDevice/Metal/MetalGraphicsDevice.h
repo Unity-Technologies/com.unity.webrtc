@@ -14,7 +14,7 @@ namespace webrtc
     class MetalGraphicsDevice : public IGraphicsDevice
     {
     public:
-        MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer);
+        MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler);
         virtual ~MetalGraphicsDevice() = default;
 
         bool InitV() override;

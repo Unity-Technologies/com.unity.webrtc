@@ -37,8 +37,8 @@ Size glTexSize(GLenum target, GLuint texture, GLint mipLevel)
 
 
 OpenGLGraphicsDevice::OpenGLGraphicsDevice(
-    UnityGfxRenderer renderer)
-    : IGraphicsDevice(renderer)
+    UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
+    : IGraphicsDevice(renderer, profiler)
     , mainContext_(nullptr)
 {
     OpenGLContext::Init();

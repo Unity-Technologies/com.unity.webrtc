@@ -10,8 +10,9 @@ namespace unity
 namespace webrtc
 {
 
-    MetalGraphicsDevice::MetalGraphicsDevice(MetalDevice* device, UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+    MetalGraphicsDevice::MetalGraphicsDevice(
+        MetalDevice* device, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_device(device)
     {
     }
@@ -68,7 +69,7 @@ namespace webrtc
         RTC_DCHECK_EQ(src.height, dest.height);
 
         m_device->EndCurrentCommandEncoder();
-        
+
         id<MTLCommandBuffer> commandBuffer = [m_queue commandBuffer];
         id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         NSUInteger width = src.width;
@@ -92,13 +93,13 @@ namespace webrtc
         // must be explicitly synchronized if the storageMode is Managed.
         if (dest.storageMode == MTLStorageModeManaged)
             [blit synchronizeResource:dest];
-#endif            
+#endif
         [blit endEncoding];
-        
+
         // Commit the current command buffer and wait until the GPU process is completed.
         [commandBuffer commit];
         [commandBuffer waitUntilCompleted];
-        
+
         return true;
     }
 

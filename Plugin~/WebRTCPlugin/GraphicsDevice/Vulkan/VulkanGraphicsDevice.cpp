@@ -24,8 +24,9 @@ namespace webrtc
         const VkDevice device,
         const VkQueue graphicsQueue,
         const uint32_t queueFamilyIndex,
-        UnityGfxRenderer renderer)
-        : IGraphicsDevice(renderer)
+        UnityGfxRenderer renderer,
+        ProfilerMarkerFactory* profiler)
+        : IGraphicsDevice(renderer, profiler)
         , m_unityVulkan(unityVulkan)
         , m_physicalDevice(physicalDevice)
         , m_device(device)
@@ -38,6 +39,9 @@ namespace webrtc
         , m_isCudaSupport(false)
 #endif
     {
+        if (profiler)
+            m_maker = profiler->CreateMarker(
+                "VulkanGraphicsDevice.CopyImage", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -262,18 +266,24 @@ namespace webrtc
         if (destTexture->GetImage() == image)
             return false;
 
-        // The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        // so no transition for destTex
-        VULKAN_CHECK_FAILVALUE(
-            VulkanUtility::CopyImage(
-                m_device,
-                m_commandPool,
-                m_graphicsQueue,
-                image,
-                destTexture->GetImage(),
-                destTexture->GetWidth(),
-                destTexture->GetHeight()),
-            false)
+        {
+            std::unique_ptr<const ScopedProfiler> profiler;
+            if (m_profiler)
+                profiler = m_profiler->CreateScopedProfiler(*m_maker);
+
+            // The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            // so no transition for destTex
+            VULKAN_CHECK_FAILVALUE(
+                VulkanUtility::CopyImage(
+                    m_device,
+                    m_commandPool,
+                    m_graphicsQueue,
+                    image,
+                    destTexture->GetImage(),
+                    destTexture->GetWidth(),
+                    destTexture->GetHeight()),
+                false)
+        }
 
         return true;
     }

@@ -6,6 +6,8 @@
 #include <api/video/i420_buffer.h>
 
 #include "PlatformBase.h"
+#include "ProfilerMarkerFactory.h"
+#include "ScopedProfiler.h"
 
 #if CUDA_PLATFORM
 #include "Cuda/ICudaDevice.h"
@@ -18,14 +20,16 @@ namespace webrtc
     using NativeTexPtr = void*;
     class ITexture2D;
     struct GpuMemoryBufferHandle;
+    class ProfilerMarkerFactory;
     class IGraphicsDevice
 #if CUDA_PLATFORM
         : public ICudaDevice
 #endif
     {
     public:
-        IGraphicsDevice(UnityGfxRenderer renderer)
+        IGraphicsDevice(UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
             : m_gfxRenderer(renderer)
+            , m_profiler(profiler)
         {
         }
 #if CUDA_PLATFORM
@@ -51,6 +55,7 @@ namespace webrtc
 
     protected:
         UnityGfxRenderer m_gfxRenderer;
+        ProfilerMarkerFactory* m_profiler;
     };
 
 } // end namespace webrtc
