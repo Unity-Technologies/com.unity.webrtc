@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <third_party/libyuv/include/libyuv/convert.h>
+
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "MetalDevice.h"
 #include "MetalGraphicsDevice.h"
@@ -151,8 +153,19 @@ namespace webrtc
               fromRegion:MTLRegionMake2D(0, 0, width, height)
              mipmapLevel:0];
 
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
-            GraphicsUtility::ConvertRGBToI420Buffer(width, height, bytesPerRow, buffer.data());
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(
+            static_cast<int32_t>(width), static_cast<int32_t>(height));
+        libyuv::ARGBToI420(
+            buffer.data(),
+            static_cast<int32_t>(bytesPerRow),
+            i420_buffer->MutableDataY(),
+            i420_buffer->StrideY(),
+            i420_buffer->MutableDataU(),
+            i420_buffer->StrideU(),
+            i420_buffer->MutableDataV(),
+            i420_buffer->StrideV(),
+            static_cast<int32_t>(width),
+            static_cast<int32_t>(height));
         return i420_buffer;
     }
 

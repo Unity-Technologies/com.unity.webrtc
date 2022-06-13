@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <third_party/libyuv/include/libyuv/convert.h>
+
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
@@ -293,13 +295,13 @@ namespace webrtc
     rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
     {
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(tex);
-        const uint32_t width = tex->GetWidth();
-        const uint32_t height = tex->GetHeight();
+        const int32_t width = static_cast<int32_t>(tex->GetWidth());
+        const int32_t height = static_cast<int32_t>(tex->GetHeight());
         const VkDeviceMemory dstImageMemory = vulkanTexture->GetTextureImageMemory();
         VkImageSubresource subresource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
         VkSubresourceLayout subresourceLayout;
         vkGetImageSubresourceLayout(m_device, vulkanTexture->GetImage(), &subresource, &subresourceLayout);
-        const uint32_t rowPitch = static_cast<uint32_t>(subresourceLayout.rowPitch);
+        const int32_t rowPitch = static_cast<int32_t>(subresourceLayout.rowPitch);
 
         void* data;
         std::vector<uint8_t> dst;
@@ -314,8 +316,18 @@ namespace webrtc
         vkUnmapMemory(m_device, dstImageMemory);
 
         // convert format to i420
-        rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer =
-            GraphicsUtility::ConvertRGBToI420Buffer(width, height, rowPitch, dst.data());
+        rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer = webrtc::I420Buffer::Create(width, height);
+        libyuv::ARGBToI420(
+            dst.data(),
+            rowPitch,
+            i420Buffer->MutableDataY(),
+            i420Buffer->StrideY(),
+            i420Buffer->MutableDataU(),
+            i420Buffer->StrideU(),
+            i420Buffer->MutableDataV(),
+            i420Buffer->StrideV(),
+            width,
+            height);
 
         return i420Buffer;
     }
