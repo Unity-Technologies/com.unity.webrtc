@@ -6,6 +6,7 @@
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
+#include "UnityProfilerInterfaceFunctions.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrame.h"
 
@@ -31,6 +32,7 @@ namespace webrtc
     static IUnityInterfaces* s_UnityInterfaces = nullptr;
     static IUnityGraphics* s_Graphics = nullptr;
     static Context* s_context = nullptr;
+    static std::unique_ptr<UnityProfiler> s_UnityProfiler = nullptr;
     static std::unique_ptr<ProfilerMarkerFactory> s_ProfilerMarkerFactory = nullptr;
     static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     static std::unique_ptr<Clock> s_clock;
@@ -214,7 +216,8 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
         RTC_LOG(LS_INFO) << "AddInterceptInitialization failed.";
     }
 #endif
-    s_ProfilerMarkerFactory = ProfilerMarkerFactory::Create(unityInterfaces);
+    s_UnityProfiler = UnityProfiler::Get(unityInterfaces);
+    s_ProfilerMarkerFactory = ProfilerMarkerFactory::Create(s_UnityProfiler.get());
 
     if (s_ProfilerMarkerFactory)
     {

@@ -1,12 +1,13 @@
 #include "pch.h"
 
 #include "ScopedProfiler.h"
+#include "UnityProfilerInterfaceFunctions.h"
 
 namespace unity
 {
 namespace webrtc
 {
-    ScopedProfiler::ScopedProfiler(IUnityProfiler* profiler, const UnityProfilerMarkerDesc& desc)
+    ScopedProfiler::ScopedProfiler(UnityProfiler* profiler, const UnityProfilerMarkerDesc& desc)
         : profiler_(profiler)
         , m_desc(&desc)
     {
@@ -22,7 +23,7 @@ namespace webrtc
             profiler_->EndSample(m_desc);
     }
 
-    ScopedProfilerThread::ScopedProfilerThread(IUnityProfiler* profiler, const char* groupName, const char* name)
+    ScopedProfilerThread::ScopedProfilerThread(UnityProfiler* profiler, const char* groupName, const char* name)
         : profiler_(profiler)
     {
         RTC_DCHECK(profiler);
@@ -37,7 +38,6 @@ namespace webrtc
                 RTC_LOG(LS_INFO) << "IUnityProfiler::RegisterThread error:" << result;
                 throw;
             }
-            RTC_LOG(LS_INFO) << "IUnityProfiler::RegisterThread id:" << threadId_ << " thread groupe name:" << groupName << " name:" << name;
         }
     }
     ScopedProfilerThread ::~ScopedProfilerThread()

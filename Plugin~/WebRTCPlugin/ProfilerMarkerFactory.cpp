@@ -3,23 +3,22 @@
 #include "IUnityInterface.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
+#include "UnityProfilerInterfaceFunctions.h"
 
 namespace unity
 {
 namespace webrtc
 {
-    std::unique_ptr<ProfilerMarkerFactory> ProfilerMarkerFactory::Create(IUnityInterfaces* unityInterfaces)
+    std::unique_ptr<ProfilerMarkerFactory> ProfilerMarkerFactory::Create(UnityProfiler* profiler)
     {
-        IUnityProfiler* profiler = unityInterfaces->Get<IUnityProfiler>();
-        if (!profiler)
-            return nullptr;
         return std::unique_ptr<ProfilerMarkerFactory>(new ProfilerMarkerFactory(profiler));
     }
 
-    ProfilerMarkerFactory::ProfilerMarkerFactory(IUnityProfiler* profiler)
+    ProfilerMarkerFactory::ProfilerMarkerFactory(UnityProfiler* profiler)
         : profiler_(profiler)
     {
     }
+
     ProfilerMarkerFactory::~ProfilerMarkerFactory() { }
 
     const UnityProfilerMarkerDesc* ProfilerMarkerFactory::CreateMarker(
