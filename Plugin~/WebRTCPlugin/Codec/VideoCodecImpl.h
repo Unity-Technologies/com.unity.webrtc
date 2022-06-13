@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 namespace unity
 {
 namespace webrtc
@@ -12,5 +10,10 @@ namespace webrtc
     constexpr char kVideoToolboxImpl[] = "VideoToolbox";
 
     constexpr char kSdpKeyNameCodecImpl[] = "implementation_name";
+
+    class VideoEncoderFactory;
+    class IGraphicsDevice;
+    static VideoEncoderFactory* CreateEncoderFactory(const std::string& impl, IGraphicsDevice* gfxDevice);
+    static VideoDecoderFactory* CreateDecoderFactory(const std::string& impl, IGraphicsDevice* gfxDevice);
 }
 }
