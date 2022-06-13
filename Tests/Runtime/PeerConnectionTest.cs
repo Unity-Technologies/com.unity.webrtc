@@ -243,6 +243,39 @@ namespace Unity.WebRTC.RuntimeTest
             var peer = new RTCPeerConnection();
             var stream = new MediaStream();
             var direction = RTCRtpTransceiverDirection.SendOnly;
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack(rt);
+            var init = new RTCRtpTransceiverInit()
+            {
+                direction = direction,
+                sendEncodings = new RTCRtpEncodingParameters[] {
+                    new RTCRtpEncodingParameters { maxFramerate = 30 }
+                },
+                streams = new MediaStream[] { stream }
+            };
+            var transceiver = peer.AddTransceiver(track, init);
+            Assert.That(transceiver, Is.Not.Null);
+            Assert.That(transceiver.CurrentDirection, Is.Null);
+            Assert.That(transceiver.Direction, Is.EqualTo(RTCRtpTransceiverDirection.SendOnly));
+            Assert.That(transceiver.Sender, Is.Not.Null);
+
+            var parameters = transceiver.Sender.GetParameters();
+            Assert.That(parameters, Is.Not.Null);
+            Assert.That(parameters.codecs, Is.Not.Null.And.Empty);
+            peer.Dispose();
+        }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void AddTransceiverWithKindAndInit()
+        {
+            var peer = new RTCPeerConnection();
+            var stream = new MediaStream();
+            var direction = RTCRtpTransceiverDirection.SendOnly;
             var init = new RTCRtpTransceiverInit()
             {
                 direction = direction,

@@ -542,7 +542,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(
-        Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track, RtpTransceiverInit* init)
+        Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track, RTCRtpTransceiverInit* init)
     {
         auto result = obj->connection->AddTransceiver(track, *init);
         if (!result.ok())
