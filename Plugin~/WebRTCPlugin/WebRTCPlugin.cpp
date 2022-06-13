@@ -1225,7 +1225,16 @@ extern "C"
 
         for (size_t i = 0; i < dst.encodings.size(); i++)
         {
-            dst.encodings[i] = src->encodings[i];
+            dst.encodings[i].active = src->encodings[i].active;
+            dst.encodings[i].max_bitrate_bps =
+                static_cast<absl::optional<int>>(ConvertOptional(src->encodings[i].maxBitrate));
+            dst.encodings[i].min_bitrate_bps =
+                static_cast<absl::optional<int>>(ConvertOptional(src->encodings[i].minBitrate));
+            dst.encodings[i].max_framerate =
+                static_cast<absl::optional<double>>(ConvertOptional(src->encodings[i].maxFramerate));
+            dst.encodings[i].scale_resolution_down_by = ConvertOptional(src->encodings[i].scaleResolutionDownBy);
+            if (src->encodings[i].rid != nullptr)
+                dst.encodings[i].rid = std::string(src->encodings[i].rid);
         }
         const ::webrtc::RTCError error = sender->SetParameters(dst);
         return error.type();
