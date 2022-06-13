@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <third_party/libyuv/include/libyuv/convert.h>
+
 #include "D3D11GraphicsDevice.h"
 #include "D3D11Texture2D.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
@@ -177,12 +179,21 @@ namespace webrtc
         if (hr != S_OK)
             return nullptr;
 
-        const uint32_t width = tex->GetWidth();
-        const uint32_t height = tex->GetHeight();
+        const int32_t width = static_cast<int32_t>(tex->GetWidth());
+        const int32_t height = static_cast<int32_t>(tex->GetHeight());
 
-        // todo(kazuki) replace to using libyuv function
-        rtc::scoped_refptr<I420Buffer> i420_buffer = GraphicsUtility::ConvertRGBToI420Buffer(
-            width, height, pMappedResource.RowPitch, static_cast<uint8_t*>(pMappedResource.pData));
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
+        libyuv::ARGBToI420(
+            static_cast<uint8_t*>(pMappedResource.pData),
+            static_cast<int32_t>(pMappedResource.RowPitch),
+            i420_buffer->MutableDataY(),
+            i420_buffer->StrideY(),
+            i420_buffer->MutableDataU(),
+            i420_buffer->StrideU(),
+            i420_buffer->MutableDataV(),
+            i420_buffer->StrideV(),
+            width,
+            height);
 
         context->Unmap(pResource, 0);
         return i420_buffer;
