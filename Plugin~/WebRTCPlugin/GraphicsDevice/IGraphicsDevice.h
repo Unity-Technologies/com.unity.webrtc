@@ -44,7 +44,6 @@ namespace webrtc
         virtual void* GetEncodeDevicePtrV() = 0;
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;
-        virtual NativeTexPtr ConvertNativeFromUnityPtr(void* tex) { return tex; }
         virtual UnityGfxRenderer GetGfxRenderer() const { return m_gfxRenderer; }
         virtual std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) = 0;
 

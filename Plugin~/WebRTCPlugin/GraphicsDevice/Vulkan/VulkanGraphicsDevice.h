@@ -1,8 +1,8 @@
 #pragma once
 
+#include <api/video/i420_buffer.h>
 #include <memory>
 #include <vulkan/vulkan.h>
-#include <api/video/i420_buffer.h>
 
 #include "IUnityGraphicsVulkan.h"
 #include "IUnityRenderingExtensions.h"
@@ -46,8 +46,6 @@ namespace webrtc
 
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
 
-        virtual NativeTexPtr ConvertNativeFromUnityPtr(void* tex) override;
-
         /// <summary>
         ///
         /// </summary>
@@ -66,6 +64,7 @@ namespace webrtc
 #endif
     private:
         VkResult CreateCommandPool();
+        VkCommandBuffer GetCurrentCommandBuffer();
 
         IUnityGraphicsVulkan* m_unityVulkan;
         VkPhysicalDevice m_physicalDevice;

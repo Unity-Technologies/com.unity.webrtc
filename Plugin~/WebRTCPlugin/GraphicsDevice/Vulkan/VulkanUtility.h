@@ -76,6 +76,15 @@ namespace webrtc
             const VkImageLayout newLayout,
             const VkPipelineStageFlags newStage);
 
+        static VkResult DoImageLayoutTransition(
+            const VkCommandBuffer commandBuffer,
+            const VkImage image,
+            VkFormat format,
+            const VkImageLayout oldLayout,
+            const VkPipelineStageFlags oldStage,
+            const VkImageLayout newLayout,
+            const VkPipelineStageFlags newStage);
+
         static VkResult CopyImage(
             const VkDevice device,
             const VkCommandPool commandPool,
@@ -84,6 +93,14 @@ namespace webrtc
             const VkImage dstImage,
             const uint32_t width,
             const uint32_t height);
+
+        static VkResult CopyImage(
+            const VkCommandBuffer commandBuffer,
+            const VkImage srcImage,
+            const VkImage dstImage,
+            const uint32_t width,
+            const uint32_t height);
+
     };
 
 } // end namespace webrtc

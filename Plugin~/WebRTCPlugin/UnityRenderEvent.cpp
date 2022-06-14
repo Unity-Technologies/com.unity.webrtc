@@ -135,6 +135,14 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
                 RTC_LOG(LS_INFO) << "LoadVulkanFunctions failed";
                 return;
             }
+
+            UnityVulkanPluginEventConfig config;
+            config.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
+            config.renderPassPrecondition = kUnityVulkanRenderPass_EnsureInside;
+            config.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
+                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+
+            vulkan->ConfigureEvent(static_cast<int>(VideoStreamRenderEventID::Encode), &config);
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));

@@ -360,8 +360,6 @@ namespace webrtc
         return VK_SUCCESS;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
-
     VkResult VulkanUtility::DoImageLayoutTransition(
         const VkDevice device,
         const VkCommandPool commandPool,
@@ -376,6 +374,20 @@ namespace webrtc
         VkCommandBuffer commandBuffer = nullptr;
         VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer))
 
+        DoImageLayoutTransition(commandBuffer, image, format, oldLayout, oldStage, newLayout, newStage);
+
+        return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+    }
+
+    VkResult VulkanUtility::DoImageLayoutTransition(
+        const VkCommandBuffer commandBuffer,
+        const VkImage image,
+        VkFormat format,
+        const VkImageLayout oldLayout,
+        const VkPipelineStageFlags oldStage,
+        const VkImageLayout newLayout,
+        const VkPipelineStageFlags newStage)
+    {
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -479,11 +491,8 @@ namespace webrtc
         }
 
         vkCmdPipelineBarrier(commandBuffer, oldStage, newStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-
-        return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+        return VK_SUCCESS;
     }
-
-    //---------------------------------------------------------------------------------------------------------------------
 
     VkResult VulkanUtility::CopyImage(
         const VkDevice device,
@@ -496,6 +505,19 @@ namespace webrtc
     {
         VkCommandBuffer commandBuffer = nullptr;
         VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer))
+
+        CopyImage(commandBuffer, srcImage, dstImage, width, height);
+
+        return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+    }
+
+    VkResult VulkanUtility::CopyImage(
+        const VkCommandBuffer commandBuffer,
+        const VkImage srcImage,
+        const VkImage dstImage,
+        const uint32_t width,
+        const uint32_t height)
+    {
 
         // Start copy
         VkImageCopy copyRegion {};
@@ -513,7 +535,7 @@ namespace webrtc
             1,
             &copyRegion);
 
-        return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+        return VK_SUCCESS;
     }
 
 } // end namespace webrtc
