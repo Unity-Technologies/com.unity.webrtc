@@ -43,8 +43,6 @@ target_sources(WebRTCLib
     UnityVideoRenderer.h
     UnityVideoTrackSource.cpp
     UnityVideoTrackSource.h
-    UnityVulkanInterfaceFunctions.cpp
-    UnityVulkanInterfaceFunctions.h
     WebRTCMacros.h
     WebRTCPlugin.h
     UnityLogStream.h
@@ -93,6 +91,12 @@ if(iOS OR macOS)
   target_sources(WebRTCLib
     PRIVATE
       ../libcxx/debug.cpp
+  )
+else()
+  target_sources(WebRTCLib
+    PRIVATE
+    UnityVulkanInterfaceFunctions.cpp
+    UnityVulkanInterfaceFunctions.h
   )
 endif()
 
