@@ -1,3 +1,5 @@
+#pragma once
+
 #include <IUnityProfiler.h>
 #include <memory>
 
@@ -58,7 +60,7 @@ namespace webrtc
             : profiler_(profiler)
         {
         }
-        ~UnityProfilerImpl() = default;
+        ~UnityProfilerImpl() override = default;
 
         void BeginSample(const UnityProfilerMarkerDesc* markerDesc) override { profiler_->BeginSample(markerDesc); }
 
@@ -109,16 +111,5 @@ namespace webrtc
     private:
         T* profiler_;
     };
-
-    inline std::unique_ptr<UnityProfiler> UnityProfiler::Get(IUnityInterfaces* unityInterfaces)
-    {
-        IUnityProfilerV2* profilerV2 = unityInterfaces->Get<IUnityProfilerV2>();
-        if (profilerV2)
-            return std::make_unique<UnityProfilerImpl<IUnityProfilerV2>>(profilerV2);
-        IUnityProfiler* profiler = unityInterfaces->Get<IUnityProfiler>();
-        if (profiler)
-            return std::make_unique<UnityProfilerImpl<IUnityProfiler>>(profiler);
-        return nullptr;
-    }
 }
 }

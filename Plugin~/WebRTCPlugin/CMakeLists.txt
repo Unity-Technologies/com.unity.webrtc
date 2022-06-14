@@ -27,6 +27,14 @@ target_sources(WebRTCLib
     ScopedProfiler.h
     ScopedProfiler.cpp
     targetver.h
+    UnityAudioDecoderFactory.cpp
+    UnityAudioDecoderFactory.h
+    UnityAudioEncoderFactory.cpp
+    UnityAudioEncoderFactory.h
+    UnityAudioTrackSource.cpp
+    UnityAudioTrackSource.h
+    UnityProfilerInterfaceFunctions.cpp
+    UnityProfilerInterfaceFunctions.h
     UnityVideoDecoderFactory.cpp
     UnityVideoDecoderFactory.h
     UnityVideoEncoderFactory.cpp
@@ -35,12 +43,8 @@ target_sources(WebRTCLib
     UnityVideoRenderer.h
     UnityVideoTrackSource.cpp
     UnityVideoTrackSource.h
-    UnityAudioDecoderFactory.cpp
-    UnityAudioDecoderFactory.h
-    UnityAudioEncoderFactory.cpp
-    UnityAudioEncoderFactory.h
-    UnityAudioTrackSource.cpp
-    UnityAudioTrackSource.h
+    UnityVulkanInterfaceFunctions.cpp
+    UnityVulkanInterfaceFunctions.h
     WebRTCMacros.h
     WebRTCPlugin.h
     UnityLogStream.h
@@ -356,8 +360,6 @@ target_sources(WebRTCPlugin
     WebRTCPlugin.cpp
     WebRTCPlugin.h
     UnityRenderEvent.cpp
-    UnityVulkanInterfaceFunctions.h
-    UnityProfilerInterfaceFunctions.h
 )
 
 # rename dll/framework filename
