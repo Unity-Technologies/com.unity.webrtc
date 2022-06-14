@@ -71,8 +71,7 @@ namespace Unity.WebRTC
         {
             get
             {
-                var direction = RTCRtpTransceiverDirection.RecvOnly;
-                if (NativeMethods.TransceiverGetCurrentDirection(GetSelfOrThrow(), ref direction))
+                if (NativeMethods.TransceiverGetCurrentDirection(GetSelfOrThrow(), out var direction))
                 {
                     return direction;
                 }

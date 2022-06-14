@@ -127,16 +127,6 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
         }
 
-        public IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track)
-        {
-            return NativeMethods.PeerConnectionAddTransceiver(self, pc, track);
-        }
-
-        public IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind)
-        {
-            return NativeMethods.PeerConnectionAddTransceiverWithType(self, pc, kind);
-        }
-
         public IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length)
         {
             return NativeMethods.PeerConnectionGetReceivers(self, ptr, out length);

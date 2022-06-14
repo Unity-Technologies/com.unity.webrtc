@@ -50,7 +50,7 @@ namespace webrtc
     template<typename T>
     struct MarshallArray
     {
-        int32_t length;
+        size_t length;
         T* values;
 
         T& operator[](size_t i) const { return values[i]; }
@@ -473,8 +473,66 @@ extern "C"
         return result.error().type();
     }
 
+    struct RTCRtpEncodingParameters
+    {
+        bool active;
+        Optional<uint64_t> maxBitrate;
+        Optional<uint64_t> minBitrate;
+        Optional<uint32_t> maxFramerate;
+        Optional<double> scaleResolutionDownBy;
+        char* rid;
+
+        RTCRtpEncodingParameters& operator=(const RtpEncodingParameters& obj)
+        {
+            active = obj.active;
+            maxBitrate = obj.max_bitrate_bps;
+            minBitrate = obj.min_bitrate_bps;
+            maxFramerate = obj.max_framerate;
+            scaleResolutionDownBy = obj.scale_resolution_down_by;
+            rid = ConvertString(obj.rid);
+            return *this;
+        }
+
+        operator RtpEncodingParameters() const
+        {
+            RtpEncodingParameters dst = {};
+            dst.active = active;
+            dst.max_bitrate_bps = static_cast<absl::optional<int>>(ConvertOptional(maxBitrate));
+            dst.min_bitrate_bps = static_cast<absl::optional<int>>(ConvertOptional(minBitrate));
+            dst.max_framerate = static_cast<absl::optional<double>>(ConvertOptional(maxFramerate));
+            dst.scale_resolution_down_by = ConvertOptional(scaleResolutionDownBy);
+            if (rid != nullptr)
+                dst.rid = std::string(rid);
+            return dst;
+        }
+    };
+
+    struct RTCRtpTransceiverInit
+    {
+        RtpTransceiverDirection direction;
+        MarshallArray<RTCRtpEncodingParameters> sendEncodings;
+        MarshallArray<MediaStreamInterface*> streams;
+
+        operator RtpTransceiverInit() const
+        {
+            RtpTransceiverInit dst = {};
+            dst.direction = direction;
+            dst.send_encodings.resize(sendEncodings.length);
+            for (size_t i = 0; i < dst.send_encodings.size(); i++)
+            {
+                dst.send_encodings[i] = sendEncodings[i];
+            }
+            dst.stream_ids.resize(streams.length);
+            for (size_t i = 0; i < dst.stream_ids.size(); i++)
+            {
+                dst.stream_ids[i] = streams[i]->id();
+            }
+            return dst;
+        }
+    };
+
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface*
-    PeerConnectionAddTransceiver(Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track)
+    PeerConnectionAddTransceiver(PeerConnectionObject* obj, MediaStreamTrackInterface* track)
     {
         auto result = obj->connection->AddTransceiver(track);
         if (!result.ok())
@@ -484,7 +542,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithInit(
-        Context* context, PeerConnectionObject* obj, MediaStreamTrackInterface* track, RtpTransceiverInit* init)
+        PeerConnectionObject* obj, MediaStreamTrackInterface* track, const RTCRtpTransceiverInit* init)
     {
         auto result = obj->connection->AddTransceiver(track, *init);
         if (!result.ok())
@@ -494,7 +552,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface*
-    PeerConnectionAddTransceiverWithType(Context* context, PeerConnectionObject* obj, cricket::MediaType type)
+    PeerConnectionAddTransceiverWithType(PeerConnectionObject* obj, cricket::MediaType type)
     {
         auto result = obj->connection->AddTransceiver(type);
         if (!result.ok())
@@ -504,7 +562,7 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT RtpTransceiverInterface* PeerConnectionAddTransceiverWithTypeAndInit(
-        Context* context, PeerConnectionObject* obj, cricket::MediaType type, RtpTransceiverInit* init)
+        PeerConnectionObject* obj, cricket::MediaType type, const RTCRtpTransceiverInit* init)
     {
         auto result = obj->connection->AddTransceiver(type, *init);
         if (!result.ok())
@@ -1086,40 +1144,6 @@ extern "C"
     {
         return transceiver->sender().get();
     }
-
-    struct RTCRtpEncodingParameters
-    {
-        bool active;
-        Optional<uint64_t> maxBitrate;
-        Optional<uint64_t> minBitrate;
-        Optional<uint32_t> maxFramerate;
-        Optional<double> scaleResolutionDownBy;
-        char* rid;
-
-        RTCRtpEncodingParameters& operator=(const RtpEncodingParameters& obj)
-        {
-            active = obj.active;
-            maxBitrate = obj.max_bitrate_bps;
-            minBitrate = obj.min_bitrate_bps;
-            maxFramerate = obj.max_framerate;
-            scaleResolutionDownBy = obj.scale_resolution_down_by;
-            rid = ConvertString(obj.rid);
-            return *this;
-        }
-
-        operator RtpEncodingParameters() const
-        {
-            RtpEncodingParameters dst = {};
-            dst.active = active;
-            dst.max_bitrate_bps = static_cast<absl::optional<int>>(ConvertOptional(maxBitrate));
-            dst.min_bitrate_bps = static_cast<absl::optional<int>>(ConvertOptional(minBitrate));
-            dst.max_framerate = static_cast<absl::optional<double>>(ConvertOptional(maxFramerate));
-            dst.scale_resolution_down_by = ConvertOptional(scaleResolutionDownBy);
-            if (rid != nullptr)
-                dst.rid = std::string(rid);
-            return dst;
-        }
-    };
 
     struct RTCRtpCodecParameters
     {

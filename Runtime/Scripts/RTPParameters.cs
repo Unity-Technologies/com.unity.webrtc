@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -12,6 +13,8 @@ namespace Unity.WebRTC
         public double? scaleResolutionDownBy;
         public string rid;
 
+        public RTCRtpEncodingParameters() { }
+
         internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)
         {
             active = parameter.active;
@@ -19,7 +22,7 @@ namespace Unity.WebRTC
             minBitrate = parameter.minBitrate;
             maxFramerate = parameter.maxFramerate;
             scaleResolutionDownBy = parameter.scaleResolutionDownBy;
-            if(parameter.rid != IntPtr.Zero)
+            if (parameter.rid != IntPtr.Zero)
                 rid = parameter.rid.AsAnsiStringWithFreeMem();
         }
 
@@ -31,6 +34,19 @@ namespace Unity.WebRTC
             instance.maxFramerate = maxFramerate;
             instance.scaleResolutionDownBy = scaleResolutionDownBy;
             instance.rid = string.IsNullOrEmpty(rid) ? IntPtr.Zero : Marshal.StringToCoTaskMemAnsi(rid);
+        }
+
+        internal RTCRtpEncodingParametersInternal Cast()
+        {
+            return new RTCRtpEncodingParametersInternal
+            {
+                active = this.active,
+                maxBitrate = this.maxBitrate,
+                minBitrate = this.minBitrate,
+                maxFramerate = this.maxFramerate,
+                scaleResolutionDownBy = this.scaleResolutionDownBy,
+                rid = string.IsNullOrEmpty(this.rid) ? IntPtr.Zero : Marshal.StringToCoTaskMemAnsi(this.rid)
+            };
         }
     }
 
@@ -119,7 +135,7 @@ namespace Unity.WebRTC
             instance = default;
             RTCRtpEncodingParametersInternal[] encodings =
                 new RTCRtpEncodingParametersInternal[this.encodings.Length];
-            for(int i = 0; i < this.encodings.Length; i++)
+            for (int i = 0; i < this.encodings.Length; i++)
             {
                 this.encodings[i].CopyInternal(ref encodings[i]);
             }
@@ -199,6 +215,26 @@ namespace Unity.WebRTC
                 v => new RTCRtpCodecCapability(ref v));
             headerExtensions = Array.ConvertAll(capabilities.extensionHeaders.ToArray(),
                 v => new RTCRtpHeaderExtensionCapability(ref v));
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class RTCRtpTransceiverInit
+    {
+        public RTCRtpTransceiverDirection? direction;
+        public RTCRtpEncodingParameters[] sendEncodings;
+        public MediaStream[] streams;
+
+        internal RTCRtpTransceiverInitInternal Cast()
+        {
+            return new RTCRtpTransceiverInitInternal
+            {
+                direction = direction.GetValueOrDefault(RTCRtpTransceiverDirection.SendRecv),
+                sendEncodings = sendEncodings == null ? default(MarshallingArray<RTCRtpEncodingParametersInternal>) : sendEncodings.Select(_ => _.Cast()).ToArray(),
+                streams = streams == null ? default(MarshallingArray<IntPtr>) : streams.Select(_ => _.self).ToArray(),
+            };
         }
     }
 
@@ -288,4 +324,19 @@ namespace Unity.WebRTC
         public OptionalDouble scaleResolutionDownBy;
         public IntPtr rid;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpTransceiverInitInternal
+    {
+        public RTCRtpTransceiverDirection direction;
+        public MarshallingArray<RTCRtpEncodingParametersInternal> sendEncodings;
+        public MarshallingArray<IntPtr> streams;
+
+        public void Dispose()
+        {
+            sendEncodings.Dispose();
+            streams.Dispose();
+        }
+    }
+
 }
