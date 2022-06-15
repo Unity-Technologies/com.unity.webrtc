@@ -8,10 +8,11 @@ namespace webrtc
 {
     class ScopedProfiler;
     class ScopedProfilerThread;
+    class UnityProfiler;
     class ProfilerMarkerFactory
     {
     public:
-        static std::unique_ptr<ProfilerMarkerFactory> Create(IUnityInterfaces* unityInterfaces);
+        static std::unique_ptr<ProfilerMarkerFactory> Create(UnityProfiler* profiler);
 
         const UnityProfilerMarkerDesc* CreateMarker(
             const char* name, UnityProfilerCategoryId category, UnityProfilerMarkerFlags flags, int eventDataCount);
@@ -25,10 +26,10 @@ namespace webrtc
         virtual ~ProfilerMarkerFactory();
 
     protected:
-        ProfilerMarkerFactory(IUnityProfiler* profiler_);
+        ProfilerMarkerFactory(UnityProfiler* profiler);
 
     private:
-        IUnityProfiler* profiler_;
+        UnityProfiler* profiler_;
     };
 }
 }

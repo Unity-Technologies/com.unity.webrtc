@@ -27,6 +27,14 @@ target_sources(WebRTCLib
     ScopedProfiler.h
     ScopedProfiler.cpp
     targetver.h
+    UnityAudioDecoderFactory.cpp
+    UnityAudioDecoderFactory.h
+    UnityAudioEncoderFactory.cpp
+    UnityAudioEncoderFactory.h
+    UnityAudioTrackSource.cpp
+    UnityAudioTrackSource.h
+    UnityProfilerInterfaceFunctions.cpp
+    UnityProfilerInterfaceFunctions.h
     UnityVideoDecoderFactory.cpp
     UnityVideoDecoderFactory.h
     UnityVideoEncoderFactory.cpp
@@ -35,12 +43,6 @@ target_sources(WebRTCLib
     UnityVideoRenderer.h
     UnityVideoTrackSource.cpp
     UnityVideoTrackSource.h
-    UnityAudioDecoderFactory.cpp
-    UnityAudioDecoderFactory.h
-    UnityAudioEncoderFactory.cpp
-    UnityAudioEncoderFactory.h
-    UnityAudioTrackSource.cpp
-    UnityAudioTrackSource.h
     WebRTCMacros.h
     WebRTCPlugin.h
     UnityLogStream.h
@@ -89,6 +91,12 @@ if(iOS OR macOS)
   target_sources(WebRTCLib
     PRIVATE
       ../libcxx/debug.cpp
+  )
+else()
+  target_sources(WebRTCLib
+    PRIVATE
+    UnityVulkanInterfaceFunctions.cpp
+    UnityVulkanInterfaceFunctions.h
   )
 endif()
 
@@ -356,7 +364,6 @@ target_sources(WebRTCPlugin
     WebRTCPlugin.cpp
     WebRTCPlugin.h
     UnityRenderEvent.cpp
-    UnityVulkanInterfaceFunctions.h
 )
 
 # rename dll/framework filename
