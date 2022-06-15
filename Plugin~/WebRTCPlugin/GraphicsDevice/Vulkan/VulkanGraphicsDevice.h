@@ -4,8 +4,6 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
-#include "IUnityGraphicsVulkan.h"
-#include "IUnityRenderingExtensions.h"
 #include "PlatformBase.h"
 
 #if CUDA_PLATFORM
@@ -20,11 +18,12 @@ namespace webrtc
 
     using namespace ::webrtc;
 
+    class UnityGraphicsVulkan;
     class VulkanGraphicsDevice : public IGraphicsDevice
     {
     public:
         VulkanGraphicsDevice(
-            IUnityGraphicsVulkan* unityVulkan,
+            UnityGraphicsVulkan* unityVulkan,
             const VkInstance instance,
             const VkPhysicalDevice physicalDevice,
             const VkDevice device,
@@ -66,7 +65,7 @@ namespace webrtc
         VkResult CreateCommandPool();
         VkCommandBuffer GetCurrentCommandBuffer();
 
-        IUnityGraphicsVulkan* m_unityVulkan;
+        UnityGraphicsVulkan* m_unityVulkan;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         VkQueue m_graphicsQueue;

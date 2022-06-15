@@ -3,6 +3,7 @@
 #include <third_party/libyuv/include/libyuv/convert.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "UnityVulkanInterfaceFunctions.h"
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"
 #include "VulkanUtility.h"
@@ -20,7 +21,7 @@ namespace webrtc
 {
 
     VulkanGraphicsDevice::VulkanGraphicsDevice(
-        IUnityGraphicsVulkan* unityVulkan,
+        UnityGraphicsVulkan* unityVulkan,
         const VkInstance instance,
         const VkPhysicalDevice physicalDevice,
         const VkDevice device,

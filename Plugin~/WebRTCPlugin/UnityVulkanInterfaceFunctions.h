@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IUnityGraphics.h>
 #include <IUnityGraphicsVulkan.h>
 #include <memory>
 
@@ -24,6 +25,18 @@ namespace webrtc
     class UnityGraphicsVulkan
     {
     public:
+        virtual void EnsureOutsideRenderPass() = 0;
+        virtual void EnsureInsideRenderPass() = 0;
+        virtual bool AccessTexture(
+            void* nativeTexture,
+            const VkImageSubresource* subResource,
+            VkImageLayout layout,
+            VkPipelineStageFlags pipelineStageFlags,
+            VkAccessFlags accessFlags,
+            UnityVulkanResourceAccessMode accessMode,
+            UnityVulkanImage* outImage) = 0;
+        virtual bool CommandRecordingState(
+            UnityVulkanRecordingState* outCommandRecordingState, UnityVulkanGraphicsQueueAccess queueAccess) = 0;
         virtual bool InterceptInitialization(UnityVulkanInitCallback func, void* userdata) = 0;
         virtual PFN_vkVoidFunction InterceptVulkanAPI(const char* name, PFN_vkVoidFunction func) = 0;
         virtual bool AddInterceptInitialization(UnityVulkanInitCallback func, void* userdata, int priority) = 0;
@@ -45,6 +58,9 @@ namespace webrtc
         }
         ~UnityGraphicsVulkanImpl() = default;
 
+        void EnsureOutsideRenderPass() override { vulkanInterface_->EnsureOutsideRenderPass(); }
+        void EnsureInsideRenderPass() override { vulkanInterface_->EnsureInsideRenderPass(); }
+
         bool InterceptInitialization(UnityVulkanInitCallback func, void* userdata) override
         {
             return vulkanInterface_->InterceptInitialization(func, userdata);
@@ -58,6 +74,25 @@ namespace webrtc
         bool AddInterceptInitialization(UnityVulkanInitCallback func, void* userdata, int priority) override
         {
             return unity::webrtc::AddInterceptInitialization(vulkanInterface_, func, userdata, priority);
+        }
+
+        bool AccessTexture(
+            void* nativeTexture,
+            const VkImageSubresource* subResource,
+            VkImageLayout layout,
+            VkPipelineStageFlags pipelineStageFlags,
+            VkAccessFlags accessFlags,
+            UnityVulkanResourceAccessMode accessMode,
+            UnityVulkanImage* outImage) override
+        {
+            return vulkanInterface_->AccessTexture(
+                nativeTexture, subResource, layout, pipelineStageFlags, accessFlags, accessMode, outImage);
+        }
+
+        bool CommandRecordingState(
+            UnityVulkanRecordingState* outCommandRecordingState, UnityVulkanGraphicsQueueAccess queueAccess) override
+        {
+            return vulkanInterface_->CommandRecordingState(outCommandRecordingState, queueAccess);
         }
 
         void AccessQueue(UnityRenderingEventAndData callback, int eventId, void* userData, bool flush) override
