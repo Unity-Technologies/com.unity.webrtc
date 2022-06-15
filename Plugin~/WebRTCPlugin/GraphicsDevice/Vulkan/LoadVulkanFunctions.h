@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IUnityGraphicsVulkan.h>
 #include <vulkan/vulkan.h>
 
 #ifdef _WIN32
@@ -21,6 +22,7 @@ namespace webrtc
 
 #include "ListOfVulkanFunctions.inl"
 
+    bool LoadVulkanFunctions(UnityVulkanInstance& instance);
     bool LoadVulkanLibrary(LIBRARY_TYPE& library);
     bool LoadExportedVulkanFunction(LIBRARY_TYPE const& library);
     bool LoadGlobalVulkanFunction();

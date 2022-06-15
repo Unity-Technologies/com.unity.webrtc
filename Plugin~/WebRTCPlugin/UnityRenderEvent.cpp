@@ -17,9 +17,7 @@
 
 enum class VideoStreamRenderEventID
 {
-    Initialize = 0,
     Encode = 1,
-    Finalize = 2
 };
 
 using namespace unity::webrtc;
@@ -78,36 +76,6 @@ namespace webrtc
 
 using namespace unity::webrtc;
 
-#if defined(SUPPORT_VULKAN)
-static LIBRARY_TYPE s_vulkanLibrary = nullptr;
-
-static bool LoadVulkanFunctions(UnityVulkanInstance& instance)
-{
-    if (!LoadVulkanLibrary(s_vulkanLibrary))
-    {
-        RTC_LOG(LS_ERROR) << "Failed loading vulkan library";
-        return false;
-    }
-    if (!LoadExportedVulkanFunction(s_vulkanLibrary))
-    {
-        RTC_LOG(LS_ERROR) << "Failed loading vulkan exported function";
-        return false;
-    }
-
-    if (!LoadInstanceVulkanFunction(instance.instance))
-    {
-        RTC_LOG(LS_ERROR) << "Failed loading vulkan instance function";
-        return false;
-    }
-    if (!LoadDeviceVulkanFunction(instance.device))
-    {
-        RTC_LOG(LS_ERROR) << "Failed loading vulkan device function";
-        return false;
-    }
-    return true;
-}
-#endif
-
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch (eventType)
@@ -136,13 +104,13 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
                 return;
             }
 
-            UnityVulkanPluginEventConfig config;
-            config.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
-            config.renderPassPrecondition = kUnityVulkanRenderPass_EnsureInside;
-            config.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
+            UnityVulkanPluginEventConfig encodeEventConfig;
+            encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
+            encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureInside;
+            encodeEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
                 kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
 
-            vulkan->ConfigureEvent(static_cast<int>(VideoStreamRenderEventID::Encode), &config);
+            vulkan->ConfigureEvent(static_cast<int>(VideoStreamRenderEventID::Encode), &encodeEventConfig);
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));
