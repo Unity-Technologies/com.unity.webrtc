@@ -46,7 +46,9 @@ namespace webrtc
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;
         virtual UnityGfxRenderer GetGfxRenderer() const { return m_gfxRenderer; }
         virtual std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) = 0;
-
+        virtual bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) { return true; }
+        virtual bool ResetSync(const ITexture2D* texture) { return true; }
+        virtual bool WaitIdleForTest() { return true; }
         // Required for software encoding
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;

@@ -26,6 +26,8 @@ namespace webrtc
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
 
             std::unique_ptr<ITexture2D> texture(device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+            EXPECT_TRUE(device_->WaitIdleForTest());
+
             if (!texture)
                 GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
         }
@@ -40,8 +42,10 @@ namespace webrtc
     TEST_P(VideoFrameTest, WrapExternalGpuMemoryBuffer)
     {
         std::unique_ptr<ITexture2D> tex = std::unique_ptr<ITexture2D>(
-            container_->device()->CreateDefaultTextureV(kWidth, kHeight, kFormat));
-        rtc::scoped_refptr<VideoFrame> videoFrame = CreateTestFrame(container_->device(), tex.get(), kFormat);
+            device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+        EXPECT_TRUE(device_->WaitIdleForTest());
+        rtc::scoped_refptr<VideoFrame> videoFrame = CreateTestFrame(device_, tex.get(), kFormat);
+        EXPECT_TRUE(device_->WaitIdleForTest());
         ASSERT_NE(videoFrame, nullptr);
     }
 

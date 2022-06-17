@@ -104,12 +104,12 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
                 return;
             }
 
+            // Configure the event on the rendering thread called from Unity managed code.
             UnityVulkanPluginEventConfig encodeEventConfig;
             encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
             encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureInside;
             encodeEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
                 kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
-
             vulkan->ConfigureEvent(static_cast<int>(VideoStreamRenderEventID::Encode), &encodeEventConfig);
         }
 #endif

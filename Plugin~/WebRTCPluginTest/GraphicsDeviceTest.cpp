@@ -24,6 +24,7 @@ namespace webrtc
             if (!texture)
                 GTEST_SKIP() << "The graphics driver cannot create a texture resource.";
         }
+
         const uint32_t kWidth = 256;
         const uint32_t kHeight = 256;
     };
@@ -35,6 +36,7 @@ namespace webrtc
         const auto width = 256;
         const auto height = 256;
         const std::unique_ptr<ITexture2D> tex(device()->CreateDefaultTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(tex->IsSize(width, height));
         EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
         EXPECT_FALSE(tex->IsSize(0, 0));
@@ -45,6 +47,7 @@ namespace webrtc
         const auto width = 256;
         const auto height = 256;
         const std::unique_ptr<ITexture2D> tex(device()->CreateCPUReadTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(tex->IsSize(width, height));
         EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
         EXPECT_FALSE(tex->IsSize(0, 0));
@@ -58,7 +61,7 @@ namespace webrtc
         std::unique_ptr<rtc::Thread> thread = rtc::Thread::CreateWithSocketServer();
         thread->Start();
         std::unique_ptr<ITexture2D> texture(device()->CreateDefaultTextureV(width, height, format()));
-
+        EXPECT_TRUE(device()->WaitIdleForTest());
         thread->Invoke<void>(RTC_FROM_HERE, [&]() { texture = nullptr; });
         EXPECT_EQ(texture, nullptr);
     }
@@ -69,7 +72,9 @@ namespace webrtc
         const auto height = 256;
         const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
         const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(device()->CopyResourceV(dst.get(), src.get()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
     }
 
     TEST_P(GraphicsDeviceTest, CopyResourceVFromCPURead)
@@ -78,7 +83,9 @@ namespace webrtc
         const auto height = 256;
         const std::unique_ptr<ITexture2D> src(device()->CreateCPUReadTextureV(width, height, format()));
         const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(device()->CopyResourceV(dst.get(), src.get()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
     }
 
     TEST_P(GraphicsDeviceTest, CopyResourceNativeV)
@@ -87,7 +94,9 @@ namespace webrtc
         const auto height = 256;
         const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
         const std::unique_ptr<ITexture2D> dst(device()->CreateDefaultTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
     }
 
     TEST_P(GraphicsDeviceTest, ConvertRGBToI420)
@@ -96,7 +105,9 @@ namespace webrtc
         const uint32_t height = 256;
         const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
         const std::unique_ptr<ITexture2D> dst(device()->CreateCPUReadTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         const auto frameBuffer = device()->ConvertRGBToI420(dst.get());
         EXPECT_NE(nullptr, frameBuffer);
         EXPECT_EQ(width, frameBuffer->width());
@@ -108,8 +119,8 @@ namespace webrtc
         const uint32_t width = 256;
         const uint32_t height = 256;
         const std::unique_ptr<ITexture2D> src(device()->CreateDefaultTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         std::unique_ptr<GpuMemoryBufferHandle> handle = device()->Map(src.get());
-
 #if CUDA_PLATFORM
         if (device()->IsCudaSupport())
             EXPECT_NE(handle, nullptr);
@@ -131,6 +142,7 @@ namespace webrtc
         const uint32_t width = 256;
         const uint32_t height = 256;
         const std::unique_ptr<ITexture2D> src2(device()->CreateCPUReadTextureV(width, height, format()));
+        EXPECT_TRUE(device()->WaitIdleForTest());
         std::unique_ptr<GpuMemoryBufferHandle> handle2 = device()->Map(src2.get());
     }
 

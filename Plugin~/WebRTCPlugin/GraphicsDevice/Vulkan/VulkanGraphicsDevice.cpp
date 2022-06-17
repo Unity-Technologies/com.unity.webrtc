@@ -128,6 +128,25 @@ namespace webrtc
         }
     }
 
+    static VkResult BeginCommandBuffer(VkCommandBuffer commandBuffer)
+    {
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // used only once
+
+        return vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    }
+
+    static VkResult QueueSubmit(VkQueue queue, VkCommandBuffer commandBuffer, VkFence fence)
+    {
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+
+        return vkQueueSubmit(queue, 1, &submitInfo, fence);
+    }
+
     static VkResult CopyImage(
         const VkCommandBuffer commandBuffer,
         const VkDevice device,
@@ -163,16 +182,23 @@ namespace webrtc
     ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(
         const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
-        VkCommandBuffer commandBuffer = GetCurrentCommandBuffer();
         std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
-        if (!vulkanTexture->Init(m_physicalDevice, m_device))
+        if (!vulkanTexture->Init(m_physicalDevice, m_device, m_commandPool))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::Init failed.";
             return nullptr;
         }
 
+        VkCommandBuffer commandBuffer = vulkanTexture->GetCommandBuffer();
+        VkResult result = BeginCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "BeginCommandBuffer failed. result:" << result;
+            return nullptr;
+        }
+
         // Transition to dest
-        VkResult result = DoImageLayoutTransition(
+        result = DoImageLayoutTransition(
             commandBuffer,
             m_device,
             m_commandPool,
@@ -183,13 +209,24 @@ namespace webrtc
             VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_PIPELINE_STAGE_TRANSFER_BIT);
-
         if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
             return nullptr;
         }
-
+        result = vkEndCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkEndCommandBuffer failed. result:" << result;
+            return nullptr;
+        }
+        VkFence fence = vulkanTexture->GetFence();
+        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
+            return nullptr;
+        }
         return vulkanTexture.release();
     }
 
@@ -197,15 +234,22 @@ namespace webrtc
     ITexture2D*
     VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
-        VkCommandBuffer commandBuffer = GetCurrentCommandBuffer();
         std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
-        if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device))
+        if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device, m_commandPool))
         {
             return nullptr;
         }
 
+        VkCommandBuffer commandBuffer = vulkanTexture->GetCommandBuffer();
+        VkResult result = BeginCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "BeginCommandBuffer failed. result:" << result;
+            return nullptr;
+        }
+
         // Transition to dest
-        VkResult result = DoImageLayoutTransition(
+        result = DoImageLayoutTransition(
             commandBuffer,
             m_device,
             m_commandPool,
@@ -219,6 +263,19 @@ namespace webrtc
         if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
+            return nullptr;
+        }
+        result = vkEndCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkEndCommandBuffer failed. result:" << result;
+            return nullptr;
+        }
+        VkFence fence = vulkanTexture->GetFence();
+        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
             return nullptr;
         }
         return vulkanTexture.release();
@@ -227,7 +284,6 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src)
     {
-        VkCommandBuffer commandBuffer = GetCurrentCommandBuffer();
         VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
         VulkanTexture2D* srcTexture = reinterpret_cast<VulkanTexture2D*>(src);
         if (destTexture == srcTexture)
@@ -235,8 +291,16 @@ namespace webrtc
         if (destTexture == nullptr || srcTexture == nullptr)
             return false;
 
+        VkCommandBuffer commandBuffer = destTexture->GetCommandBuffer();
+        VkResult result = BeginCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "BeginCommandBuffer failed. result:" << result;
+            return false;
+        }
+
         // Transition the src texture layout.
-        VkResult result = DoImageLayoutTransition(
+        result = DoImageLayoutTransition(
             commandBuffer,
             m_device,
             m_commandPool,
@@ -267,7 +331,6 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "CopyImage failed. result:" << result;
             return false;
         }
-
         // transition the src texture layout back to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
         result = DoImageLayoutTransition(
             commandBuffer,
@@ -285,7 +348,19 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
             return false;
         }
-
+        result = vkEndCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkEndCommandBuffer failed. result:" << result;
+            return false;
+        }
+        VkFence fence = destTexture->GetFence();
+        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
+            return false;
+        }
         return true;
     }
 
@@ -295,12 +370,18 @@ namespace webrtc
         if (nullptr == dest || nullptr == nativeTexturePtr)
             return false;
 
-        VkCommandBuffer commandBuffer = GetCurrentCommandBuffer();
         VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
         UnityVulkanImage* unityVulkanImage = static_cast<UnityVulkanImage*>(nativeTexturePtr);
+        VkCommandBuffer commandBuffer = destTexture->GetCommandBuffer();
+        VkResult result = BeginCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "BeginCommandBuffer failed. result:" << result;
+            return false;
+        }
 
         // Transition the src texture layout.
-        VkResult result = DoImageLayoutTransition(
+        result = DoImageLayoutTransition(
             commandBuffer,
             m_device,
             m_commandPool,
@@ -316,7 +397,6 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
             return false;
         }
-
         VkImage image = unityVulkanImage->image;
         if (destTexture->GetImage() == image)
             return false;
@@ -343,11 +423,22 @@ namespace webrtc
                 return false;
             }
         }
-
+        result = vkEndCommandBuffer(commandBuffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkEndCommandBuffer failed. result:" << result;
+            return false;
+        }
+        VkFence fence = destTexture->GetFence();
+        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
+            return false;
+        }
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
     VkResult VulkanGraphicsDevice::CreateCommandPool()
     {
         VkCommandPoolCreateInfo poolInfo = {};
@@ -358,7 +449,6 @@ namespace webrtc
         return vkCreateCommandPool(m_device, &poolInfo, m_allocator, &m_commandPool);
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
     rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
     {
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(tex);
@@ -475,6 +565,50 @@ namespace webrtc
 #else
         return nullptr;
 #endif
+    }
+
+    bool VulkanGraphicsDevice::WaitIdleForTest()
+    {
+        VkResult result = vkQueueWaitIdle(m_graphicsQueue);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkQueueWaitIdle failed. result:" << result;
+            return false;
+        }
+        return true;
+    }
+
+    bool VulkanGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    {
+        const VulkanTexture2D* vulkanTexture = static_cast<const VulkanTexture2D*>(texture);
+        VkFence fence = vulkanTexture->GetFence();
+        VkResult result = vkWaitForFences(m_device, 1, &fence, true, nsTimeout);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkWaitForFences failed. result:" << result;
+            return false;
+        }
+        return ResetSync(texture);
+    }
+
+    bool VulkanGraphicsDevice::ResetSync(const ITexture2D* texture)
+    {
+        const VulkanTexture2D* vulkanTexture = static_cast<const VulkanTexture2D*>(texture);
+        VkCommandBuffer commandBuffer = vulkanTexture->GetCommandBuffer();
+        VkFence fence = vulkanTexture->GetFence();
+        VkResult result = vkResetFences(m_device, 1, &fence);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkResetFences failed. result:" << result;
+            return false;
+        }
+        result = vkResetCommandBuffer(commandBuffer, 0);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkResetCommandBuffer failed. result:" << result;
+            return false;
+        }
+        return true;
     }
 
 } // end namespace webrtc

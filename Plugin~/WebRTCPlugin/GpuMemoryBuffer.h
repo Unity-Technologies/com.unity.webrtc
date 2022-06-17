@@ -54,7 +54,7 @@ namespace webrtc
         UnityRenderingExtTextureFormat GetFormat() const override;
         Size GetSize() const override;
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;
-        const GpuMemoryBufferHandle* handle() const override { return handle_.get(); }
+        const GpuMemoryBufferHandle* handle() const override;
 
     protected:
         ~GpuMemoryBufferFromUnity() override;

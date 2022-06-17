@@ -353,7 +353,7 @@ namespace webrtc
         submitInfo.pCommandBuffers = &commandBuffer;
 
         RTC_CHECK_EQ(vkQueueSubmit(queue, 1, &submitInfo, nullptr), VK_SUCCESS);
-        RTC_CHECK_EQ(vkQueueWaitIdle(queue), VK_SUCCESS);
+//        RTC_CHECK_EQ(vkQueueWaitIdle(queue), VK_SUCCESS);
 
         vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 
