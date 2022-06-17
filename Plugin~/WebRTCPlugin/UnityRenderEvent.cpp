@@ -74,8 +74,6 @@ namespace webrtc
 } // end namespace webrtc
 } // end namespace unity
 
-using namespace unity::webrtc;
-
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch (eventType)
@@ -86,9 +84,6 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         /// kUnityGfxDeviceEventInitialize event is occurred twice on Unity Editor.
         /// First time, s_UnityInterfaces return UnityGfxRenderer as kUnityGfxRendererNull.
         /// The actual value of UnityGfxRenderer is returned on second time.
-
-        s_mapVideoRenderer.clear();
-
         UnityGfxRenderer renderer = s_UnityInterfaces->Get<IUnityGraphics>()->GetRenderer();
         if (renderer == kUnityGfxRendererNull)
             break;
@@ -98,13 +93,16 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             std::unique_ptr<UnityGraphicsVulkan> vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
             UnityVulkanInstance instance = vulkan->Instance();
+
+            // Load vulkan functions dynamically.
             if (!LoadVulkanFunctions(instance))
             {
                 RTC_LOG(LS_INFO) << "LoadVulkanFunctions failed";
                 return;
             }
-
-            // Configure the event on the rendering thread called from Unity managed code.
+            /// note::
+            /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
+            /// managed code.
             UnityVulkanPluginEventConfig encodeEventConfig;
             encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
             encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureInside;
@@ -114,7 +112,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));
-        if (s_gfxDevice != nullptr)
+        if (s_gfxDevice)
         {
             s_gfxDevice->InitV();
         }
@@ -125,14 +123,15 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     {
         s_mapVideoRenderer.clear();
 
-        if (s_gfxDevice != nullptr)
+        if (s_gfxDevice)
         {
             s_gfxDevice->ShutdownV();
-            s_gfxDevice.reset();
+            s_gfxDevice = nullptr;
         }
 
         // UnityPluginUnload not called normally
         s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
+        s_clock = nullptr;
         break;
     }
     case kUnityGfxDeviceEventBeforeReset:
@@ -186,6 +185,9 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     s_clock.reset(Clock::GetRealTimeClock());
 
 #if defined(SUPPORT_VULKAN)
+    /// note::
+    /// Intercept Vulkan initialization process to hook vulkan functions because vulkan extensions need adding when
+    /// initializing vulkan device. This process have to be run before graphics device initialization.
     auto vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
     if (!vulkan->AddInterceptInitialization(InterceptVulkanInitialization, nullptr, 0))
     {
@@ -209,11 +211,7 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
 }
 
-void PluginUnload()
-{
-    s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
-    s_clock.reset();
-}
+void PluginUnload() { OnGraphicsDeviceEvent(kUnityGfxDeviceEventShutdown); }
 
 // Data format used by the managed code.
 // CommandBuffer.IssuePluginEventAndData method pass data packed by this format.
@@ -232,7 +230,7 @@ struct EncodeData
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
-    if (s_context == nullptr)
+    if (!s_context)
         return;
     if (!ContextManager::GetInstance()->Exists(s_context))
         return;
@@ -289,7 +287,7 @@ extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {
-    if (s_context == nullptr)
+    if (!s_context)
         return;
     if (!ContextManager::GetInstance()->Exists(s_context))
         return;
