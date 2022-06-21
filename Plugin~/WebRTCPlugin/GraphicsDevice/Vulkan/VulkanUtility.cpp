@@ -319,7 +319,7 @@ namespace webrtc
     VkResult VulkanUtility::DoImageLayoutTransition(
         const VkCommandBuffer commandBuffer,
         const VkImage image,
-        VkFormat format,
+        const VkFormat format,
         const VkImageLayout oldLayout,
         const VkPipelineStageFlags oldStage,
         const VkImageLayout newLayout,

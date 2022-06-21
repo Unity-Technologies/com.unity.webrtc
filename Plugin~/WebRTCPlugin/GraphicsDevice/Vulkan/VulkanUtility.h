@@ -61,7 +61,7 @@ namespace webrtc
         static VkResult DoImageLayoutTransition(
             const VkCommandBuffer commandBuffer,
             const VkImage image,
-            VkFormat format,
+            const VkFormat format,
             const VkImageLayout oldLayout,
             const VkPipelineStageFlags oldStage,
             const VkImageLayout newLayout,
@@ -73,7 +73,6 @@ namespace webrtc
             const VkImage dstImage,
             const uint32_t width,
             const uint32_t height);
-
     };
 
 } // end namespace webrtc
