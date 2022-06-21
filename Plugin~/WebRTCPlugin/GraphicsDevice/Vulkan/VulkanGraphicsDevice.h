@@ -66,7 +66,6 @@ namespace webrtc
 #endif
     private:
         VkResult CreateCommandPool();
-        VkCommandBuffer GetCurrentCommandBuffer();
 
         UnityGraphicsVulkan* m_unityVulkan;
         VkPhysicalDevice m_physicalDevice;

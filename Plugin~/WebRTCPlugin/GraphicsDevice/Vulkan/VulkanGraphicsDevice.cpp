@@ -123,17 +123,6 @@ namespace webrtc
         return vkQueueSubmit(queue, 1, &submitInfo, fence);
     }
 
-    VkCommandBuffer VulkanGraphicsDevice::GetCurrentCommandBuffer()
-    {
-        if (!m_unityVulkan)
-            return nullptr;
-
-        UnityVulkanRecordingState recordingState;
-        if (!m_unityVulkan->CommandRecordingState(&recordingState, kUnityVulkanGraphicsQueueAccess_DontCare))
-            return nullptr;
-        return recordingState.commandBuffer;
-    }
-
     // Returns null if failed
     ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(
         const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat)
@@ -347,11 +336,7 @@ namespace webrtc
             // The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             // so no transition for destTex
             result = VulkanUtility::CopyImage(
-                commandBuffer,
-                image,
-                destTexture->GetImage(),
-                destTexture->GetWidth(),
-                destTexture->GetHeight());
+                commandBuffer, image, destTexture->GetImage(), destTexture->GetWidth(), destTexture->GetHeight());
             if (result != VK_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "CopyImage failed. result:" << result;
