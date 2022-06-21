@@ -71,7 +71,7 @@ namespace webrtc
 #if SUPPORT_METAL
         case kUnityGfxRendererMetal:
         {
-            std::unique_ptr<MetalDevice> device = MetalDevice::Create(unityInterface->Get<IUnityGraphicsMetal>());
+            std::unique_ptr<MetalDevice> device = MetalDevice::Create(unityInterfaces->Get<IUnityGraphicsMetal>());
             return Init(rendererType, device.release(), nullptr, profiler);
             break;
         }
