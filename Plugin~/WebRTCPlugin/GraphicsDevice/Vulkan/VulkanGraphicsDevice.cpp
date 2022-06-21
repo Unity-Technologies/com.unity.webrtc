@@ -104,30 +104,6 @@ namespace webrtc
         return unityVulkanImage;
     }
 
-    static VkResult DoImageLayoutTransition(
-        const VkCommandBuffer commandBuffer,
-        const VkDevice device,
-        const VkCommandPool commandPool,
-        const VkQueue queue,
-        const VkImage image,
-        VkFormat format,
-        const VkImageLayout oldLayout,
-        const VkPipelineStageFlags oldStage,
-        const VkImageLayout newLayout,
-        const VkPipelineStageFlags newStage)
-    {
-        if (commandBuffer)
-        {
-            return VulkanUtility::DoImageLayoutTransition(
-                commandBuffer, image, format, oldLayout, oldStage, newLayout, newStage);
-        }
-        else
-        {
-            return VulkanUtility::DoImageLayoutTransition(
-                device, commandPool, queue, image, format, oldLayout, oldStage, newLayout, newStage);
-        }
-    }
-
     static VkResult BeginCommandBuffer(VkCommandBuffer commandBuffer)
     {
         VkCommandBufferBeginInfo beginInfo = {};
@@ -145,26 +121,6 @@ namespace webrtc
         submitInfo.pCommandBuffers = &commandBuffer;
 
         return vkQueueSubmit(queue, 1, &submitInfo, fence);
-    }
-
-    static VkResult CopyImage(
-        const VkCommandBuffer commandBuffer,
-        const VkDevice device,
-        const VkCommandPool commandPool,
-        const VkQueue queue,
-        const VkImage srcImage,
-        const VkImage dstImage,
-        const uint32_t width,
-        const uint32_t height)
-    {
-        if (commandBuffer)
-        {
-            return VulkanUtility::CopyImage(commandBuffer, srcImage, dstImage, width, height);
-        }
-        else
-        {
-            return VulkanUtility::CopyImage(device, commandPool, queue, srcImage, dstImage, width, height);
-        }
     }
 
     VkCommandBuffer VulkanGraphicsDevice::GetCurrentCommandBuffer()
@@ -198,11 +154,8 @@ namespace webrtc
         }
 
         // Transition to dest
-        result = DoImageLayoutTransition(
+        result = VulkanUtility::DoImageLayoutTransition(
             commandBuffer,
-            m_device,
-            m_commandPool,
-            m_graphicsQueue,
             vulkanTexture->GetImage(),
             vulkanTexture->GetTextureFormat(),
             VK_IMAGE_LAYOUT_UNDEFINED,
@@ -249,11 +202,8 @@ namespace webrtc
         }
 
         // Transition to dest
-        result = DoImageLayoutTransition(
+        result = VulkanUtility::DoImageLayoutTransition(
             commandBuffer,
-            m_device,
-            m_commandPool,
-            m_graphicsQueue,
             vulkanTexture->GetImage(),
             vulkanTexture->GetTextureFormat(),
             VK_IMAGE_LAYOUT_UNDEFINED,
@@ -300,11 +250,8 @@ namespace webrtc
         }
 
         // Transition the src texture layout.
-        result = DoImageLayoutTransition(
+        result = VulkanUtility::DoImageLayoutTransition(
             commandBuffer,
-            m_device,
-            m_commandPool,
-            m_graphicsQueue,
             srcTexture->GetImage(),
             srcTexture->GetTextureFormat(),
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -317,11 +264,8 @@ namespace webrtc
             return false;
         }
 
-        result = CopyImage(
+        result = VulkanUtility::CopyImage(
             commandBuffer,
-            m_device,
-            m_commandPool,
-            m_graphicsQueue,
             srcTexture->GetImage(),
             destTexture->GetImage(),
             destTexture->GetWidth(),
@@ -332,11 +276,8 @@ namespace webrtc
             return false;
         }
         // transition the src texture layout back to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-        result = DoImageLayoutTransition(
+        result = VulkanUtility::DoImageLayoutTransition(
             commandBuffer,
-            m_device,
-            m_commandPool,
-            m_graphicsQueue,
             srcTexture->GetImage(),
             srcTexture->GetTextureFormat(),
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -381,11 +322,8 @@ namespace webrtc
         }
 
         // Transition the src texture layout.
-        result = DoImageLayoutTransition(
+        result = VulkanUtility::DoImageLayoutTransition(
             commandBuffer,
-            m_device,
-            m_commandPool,
-            m_graphicsQueue,
             unityVulkanImage->image,
             unityVulkanImage->format,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -408,11 +346,8 @@ namespace webrtc
 
             // The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             // so no transition for destTex
-            result = CopyImage(
+            result = VulkanUtility::CopyImage(
                 commandBuffer,
-                m_device,
-                m_commandPool,
-                m_graphicsQueue,
                 image,
                 destTexture->GetImage(),
                 destTexture->GetWidth(),

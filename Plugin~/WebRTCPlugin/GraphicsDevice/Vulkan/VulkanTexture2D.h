@@ -30,7 +30,6 @@ namespace webrtc
         inline VkDeviceSize GetTextureImageMemorySize() const;
         inline VkFormat GetTextureFormat() const;
 
-        void SetFence(VkFence& fence) { m_fence = fence; }
         VkFence GetFence() const { return m_fence; }
         VkCommandBuffer GetCommandBuffer() const { return m_commandBuffer; }
 
