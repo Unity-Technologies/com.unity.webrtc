@@ -315,7 +315,7 @@ namespace webrtc
         }
     }
 
-    void NvEncoderImpl::CopyResource(
+    bool NvEncoderImpl::CopyResource(
         const NvEncInputFrame* encoderInputFrame,
         GpuMemoryBufferInterface* buffer,
         Size& size,
@@ -327,6 +327,11 @@ namespace webrtc
             profiler = m_profiler->CreateScopedProfiler(*m_marker);
 
         const GpuMemoryBufferCudaHandle* handle = static_cast<const GpuMemoryBufferCudaHandle*>(buffer->handle());
+        if (!handle)
+        {
+            RTC_LOG(LS_INFO) << "GpuMemoryBufferCudaHandle is null";
+            return false;
+        }
 
         if (memoryType == CU_MEMORYTYPE_DEVICE)
         {
@@ -368,6 +373,7 @@ namespace webrtc
                 encoderInputFrame->chromaOffsets,
                 encoderInputFrame->numChromaPlanes);
         }
+        return true;
     }
 
     int32_t NvEncoderImpl::Encode(const ::webrtc::VideoFrame& frame, const std::vector<VideoFrameType>* frameTypes)
@@ -408,7 +414,8 @@ namespace webrtc
 
         // Copy CUDA buffer in VideoFrame to encoderInputFrame.
         auto buffer = video_frame->GetGpuMemoryBuffer();
-        CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType);
+        if(!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
+            return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
 
         NV_ENC_PIC_PARAMS picParams = NV_ENC_PIC_PARAMS();
         picParams.version = NV_ENC_PIC_PARAMS_VER;

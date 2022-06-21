@@ -588,7 +588,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "vkWaitForFences failed. result:" << result;
             return false;
         }
-        return ResetSync(texture);
+        return true;
     }
 
     bool VulkanGraphicsDevice::ResetSync(const ITexture2D* texture)
