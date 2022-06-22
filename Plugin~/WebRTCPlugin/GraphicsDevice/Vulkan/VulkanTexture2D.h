@@ -42,11 +42,8 @@ namespace webrtc
         VkCommandPool m_commandPool;
         VkFence m_fence;
         VkCommandBuffer m_commandBuffer;
-
         VkFormat m_textureFormat;
-
         UnityVulkanImage m_unityVulkanImage;
-
         const VkAllocationCallbacks* m_allocator = nullptr;
     };
 

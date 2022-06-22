@@ -108,8 +108,6 @@ namespace webrtc
     {
         VkCommandBufferBeginInfo beginInfo = {};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // used only once
-
         return vkBeginCommandBuffer(commandBuffer, &beginInfo);
     }
 
@@ -516,7 +514,14 @@ namespace webrtc
         const VulkanTexture2D* vulkanTexture = static_cast<const VulkanTexture2D*>(texture);
         VkCommandBuffer commandBuffer = vulkanTexture->GetCommandBuffer();
         VkFence fence = vulkanTexture->GetFence();
-        VkResult result = vkResetFences(m_device, 1, &fence);
+
+        VkResult result = vkGetFenceStatus(m_device, fence);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkGetFenceStatus failed. result:" << result;
+            return false;
+        }
+        result = vkResetFences(m_device, 1, &fence);
         if (result != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkResetFences failed. result:" << result;
