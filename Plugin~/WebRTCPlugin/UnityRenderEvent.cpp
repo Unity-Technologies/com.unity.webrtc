@@ -119,6 +119,9 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     }
     case kUnityGfxDeviceEventShutdown:
     {
+        // Release buffers before graphics device because buffers depends on the device.
+        s_bufferPool = nullptr;
+
         s_mapVideoRenderer.clear();
 
         if (s_gfxDevice)
