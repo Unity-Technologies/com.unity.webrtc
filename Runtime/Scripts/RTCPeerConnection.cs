@@ -533,7 +533,9 @@ namespace Unity.WebRTC
         public RTCRtpSender AddTrack(MediaStreamTrack track, MediaStream stream = null)
         {
             if (track == null)
-                throw new ArgumentNullException("track is null.");
+            {
+                throw new ArgumentNullException("");
+            }
 
             var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
             RTCErrorType error = NativeMethods.PeerConnectionAddTrack(
@@ -562,8 +564,6 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track, RTCRtpTransceiverInit init = null)
         {
-            if (track == null)
-                throw new ArgumentNullException("track is null.");
             IntPtr ptr = PeerConnectionAddTransceiver(
                 GetSelfOrThrow(), track.GetSelfOrThrow(), init);
             return CreateTransceiver(ptr);
