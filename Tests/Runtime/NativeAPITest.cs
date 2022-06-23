@@ -27,16 +27,9 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void Init()
         {
-            NativeMethods.RegisterDebugLog(DebugLog, true, NativeLoggingSeverity.LS_VERBOSE);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
-        }
-
-        [TearDown]
-        public void CleanUp()
-        {
-            NativeMethods.RegisterDebugLog(null, true, NativeLoggingSeverity.LS_VERBOSE);
         }
 
         [Test]

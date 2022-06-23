@@ -150,6 +150,13 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        public void AddTrackThrowException()
+        {
+            var peer = new RTCPeerConnection();
+            Assert.Throws<ArgumentNullException>(() => peer.AddTrack(null));
+        }
+
+        [Test]
         [Category("PeerConnection")]
         public void AddTransceiver()
         {
@@ -191,6 +198,15 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
             Object.DestroyImmediate(rt);
         }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void AddTransceiverThrowException()
+        {
+            var peer = new RTCPeerConnection();
+            Assert.Throws<ArgumentNullException>(() => peer.AddTransceiver(null));
+        }
+
 
         [Test]
         [Category("PeerConnection")]
