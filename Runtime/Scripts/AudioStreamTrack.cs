@@ -150,7 +150,7 @@ namespace Unity.WebRTC
 
                 if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
                 {
-                    if(WebRTC.Table.ContainsKey(_track.self))
+                    if(_track != null && WebRTC.Table.ContainsKey(_track.self))
                         _track.RemoveSink(this);
                     WebRTC.Table.Remove(self);
                     WebRTC.Context.DeleteAudioTrackSink(self);
