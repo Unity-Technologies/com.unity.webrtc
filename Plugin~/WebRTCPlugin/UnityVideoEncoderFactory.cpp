@@ -4,23 +4,11 @@
 #include <modules/video_coding/include/video_error_codes.h>
 #include <tuple>
 
-#include "Codec/VideoCodecImpl.h"
+#include "Codec/CreateVideoCodecFactory.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityVideoEncoderFactory.h"
-
-#if CUDA_PLATFORM
-#include "Codec/NvCodec/NvCodec.h"
-#endif
-
-#if UNITY_OSX || UNITY_IOS
-#import <sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h>
-#import <sdk/objc/native/api/video_encoder_factory.h>
-#elif UNITY_ANDROID
-#include "Android/AndroidCodecFactoryHelper.h"
-#include "Android/Jni.h"
-#endif
 
 namespace unity
 {
@@ -114,54 +102,6 @@ namespace webrtc
         std::unique_ptr<const ScopedProfilerThread> profilerThread_;
     };
 
-    static VideoEncoderFactory* CreateEncoderFactory(const std::string impl, IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
-    {
-        if (impl == kInternalImpl)
-        {
-            return new webrtc::InternalEncoderFactory();
-        }
-
-        if (impl == kVideoToolboxImpl)
-        {
-#if UNITY_OSX || UNITY_IOS
-            return webrtc::ObjCToNativeVideoEncoderFactory([[RTCDefaultVideoEncoderFactory alloc] init]).release();
-#endif
-        }
-
-        if (impl == kAndroidMediaCodecImpl)
-        {
-#if UNITY_ANDROID
-            if (IsVMInitialized())
-            {
-                return CreateAndroidEncoderFactory().release();
-            }
-#endif
-        }
-
-        if (impl == kNvCodecImpl)
-        {
-#if CUDA_PLATFORM
-            if (gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
-            {
-                CUcontext context = gfxDevice->GetCUcontext();
-                NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
-                return new NvEncoderFactory(context, format, profiler);
-            }
-#endif
-        }
-        return nullptr;
-    }
-
-    static VideoEncoderFactory* FindFactory(
-        const std::map<std::string, std::unique_ptr<VideoEncoderFactory>>& factories,
-        const webrtc::SdpVideoFormat& format)
-    {
-        auto it = format.parameters.find(kSdpKeyNameCodecImpl);
-        std::string impl = it == format.parameters.end() ? nullptr : it->second;
-
-        auto it2 = factories.find(impl);
-        return it2->second.get();
-    }
 
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
@@ -173,7 +113,7 @@ namespace webrtc
 
         for (auto impl : arrayImpl)
         {
-            auto factory = CreateEncoderFactory(impl, gfxDevice, profiler);
+            auto factory = CreateVideoEncoderFactory(impl, gfxDevice, profiler);
             if (factory)
                 factories_.emplace(impl, factory);
         }
@@ -183,18 +123,7 @@ namespace webrtc
 
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetSupportedFormats() const
     {
-        std::vector<SdpVideoFormat> supported_codecs;
-
-        for (const auto& pair : factories_)
-        {
-            for (const webrtc::SdpVideoFormat& format : pair.second->GetSupportedFormats())
-            {
-                webrtc::SdpVideoFormat newFormat = format;
-                if (!pair.first.empty())
-                    newFormat.parameters.emplace(kSdpKeyNameCodecImpl, pair.first);
-                supported_codecs.push_back(newFormat);
-            }
-        }
+        std::vector<SdpVideoFormat> supported_codecs = GetSupportedFormatsInFactories(factories_);
 
         // Set video codec order: default video codec is VP8
         auto findIndex = [&](webrtc::SdpVideoFormat& format) -> long
@@ -215,7 +144,7 @@ namespace webrtc
     webrtc::VideoEncoderFactory::CodecInfo
     UnityVideoEncoderFactory::QueryVideoEncoder(const webrtc::SdpVideoFormat& format) const
     {
-        VideoEncoderFactory* factory = FindFactory(factories_, format);
+        VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
         RTC_DCHECK(format.IsCodecInList(factory->GetSupportedFormats()));
         return factory->QueryVideoEncoder(format);
     }
@@ -223,9 +152,8 @@ namespace webrtc
     std::unique_ptr<webrtc::VideoEncoder>
     UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-        VideoEncoderFactory* factory = FindFactory(factories_, format);
+        VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
         auto encoder = factory->CreateVideoEncoder(format);
-
         if (!profiler_)
             return encoder;
 

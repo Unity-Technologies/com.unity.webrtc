@@ -4,7 +4,7 @@
 #include <api/video_codecs/video_encoder_factory.h>
 #include <modules/video_coding/codecs/h264/include/h264.h>
 
-#include "Codec/VideoCodecImpl.h"
+#include "Codec/CreateVideoCodecFactory.h"
 #include "NvCodec.h"
 #include "NvDecoder/NvDecoder.h"
 #include "NvDecoderImpl.h"
