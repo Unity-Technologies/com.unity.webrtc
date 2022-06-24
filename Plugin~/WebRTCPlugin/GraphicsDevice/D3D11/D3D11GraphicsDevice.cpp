@@ -63,10 +63,26 @@ namespace webrtc
         HRESULT result = m_d3d11Device->CreateTexture2D(&desc, nullptr, &texture);
         if (result != S_OK)
         {
-            RTC_LOG(LS_INFO) << "CreateTexture2D failed. error:" << result;
+            RTC_LOG(LS_INFO) << "ID3D11Device::CreateTexture2D failed. error:" << result;
             return nullptr;
         }
-        return new D3D11Texture2D(w, h, texture);
+
+        ID3D11Device5* d3d11Device5 = nullptr;
+        HRESULT hr = m_d3d11Device->QueryInterface<ID3D11Device5>(&d3d11Device5);
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "ID3D11Device::QueryInterface failed. error:" << hr;
+            return nullptr;
+        }
+        ID3D11Fence* fence = nullptr;
+        hr = d3d11Device5->CreateFence(
+            0, D3D11_FENCE_FLAG_NONE, __uuidof(ID3D11Fence), reinterpret_cast<void**>(&fence));
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
+            return nullptr;
+        }
+        return new D3D11Texture2D(w, h, texture, fence);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -88,14 +104,31 @@ namespace webrtc
         HRESULT hr = m_d3d11Device->CreateTexture2D(&desc, nullptr, &texture);
         if (hr != S_OK)
         {
+            RTC_LOG(LS_INFO) << "ID3D11Device::CreateTexture2D failed. error:" << hr;
             return nullptr;
         }
-        return new D3D11Texture2D(w, h, texture);
+        ID3D11Device5* d3d11Device5 = nullptr;
+        hr = m_d3d11Device->QueryInterface<ID3D11Device5>(&d3d11Device5);
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "ID3D11Device::QueryInterface failed. error:" << hr;
+            return nullptr;
+        }
+        ID3D11Fence* fence = nullptr;
+        hr = d3d11Device5->CreateFence(
+            0, D3D11_FENCE_FLAG_NONE, __uuidof(ID3D11Fence), reinterpret_cast<void**>(&fence));
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
+            return nullptr;
+        }
+        return new D3D11Texture2D(w, h, texture, fence);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
     bool D3D11GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src)
     {
+        D3D11Texture2D* texture = static_cast<D3D11Texture2D*>(dest);
         ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
         ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Texture2D*>(src->GetNativeTexturePtrV());
         if (nativeSrc == nativeDest)
@@ -106,13 +139,10 @@ namespace webrtc
         ComPtr<ID3D11DeviceContext> context;
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
         context->CopyResource(nativeDest, nativeSrc);
-
-        // todo(kazuki): Flush incurs a significant amount of overhead.
-        // Should run the process of copying texture asyncnously.
-        HRESULT hr = WaitFlush();
+        HRESULT hr = Signal(texture->GetFence());
         if (hr != S_OK)
         {
-            RTC_LOG(LS_INFO) << "WaitFlush failed. error:" << hr;
+            RTC_LOG(LS_INFO) << "Signal failed. error:" << hr;
             return false;
         }
         return true;
@@ -121,6 +151,7 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     bool D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
+        D3D11Texture2D* texture = static_cast<D3D11Texture2D*>(dest);
         ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
         ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Resource*>(nativeTexturePtr);
         if (nativeSrc == nativeDest)
@@ -132,34 +163,26 @@ namespace webrtc
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
         context->CopyResource(nativeDest, nativeSrc);
 
-        // todo(kazuki): Flush incurs a significant amount of overhead.
-        // Should run the process of copying texture asyncnously.
-        HRESULT hr = WaitFlush();
+        HRESULT hr = Signal(texture->GetFence());
         if (hr != S_OK)
         {
-            RTC_LOG(LS_INFO) << "WaitFlush failed. error:" << hr;
+            RTC_LOG(LS_INFO) << "Signal failed. error:" << hr;
             return false;
         }
         return true;
     }
 
-    HRESULT D3D11GraphicsDevice::WaitFlush()
+    HRESULT D3D11GraphicsDevice::Signal(ID3D11Fence* fence)
     {
         ComPtr<ID3D11DeviceContext> context;
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
-        context->Flush();
 
-        D3D11_QUERY_DESC queryDesc = { D3D11_QUERY_EVENT, 0 };
-        ComPtr<ID3D11Query> query;
-        HRESULT hr = m_d3d11Device->CreateQuery(&queryDesc, query.GetAddressOf());
+        ComPtr<ID3D11DeviceContext4> context4;
+        HRESULT hr = context.As(&context4);
         if (hr != S_OK)
-        {
             return hr;
-        }
-        context->End(query.Get());
-        while (S_OK != context->GetData(query.Get(), nullptr, 0, 0))
-            ;
-        return S_OK;
+        uint64_t value = fence->GetCompletedValue() + 1;
+        return context4->Signal(fence, value);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -238,6 +261,33 @@ namespace webrtc
         handle->mappedArray = mappedArray;
         handle->resource = resource;
         return std::move(handle);
+    }
+
+    bool D3D11GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    {
+        const D3D11Texture2D* d3d11Texture = static_cast<const D3D11Texture2D*>(texture);
+        ID3D11Fence* fence = d3d11Texture->GetFence();
+        HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+        uint64_t value = d3d11Texture->GetSyncCount() + 1;
+        HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
+            return false;
+        }
+        auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+        WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds));
+        CloseHandle(fenceEvent);
+        return true;
+    }
+
+    bool D3D11GraphicsDevice::ResetSync(const ITexture2D* texture)
+    {
+        const D3D11Texture2D* d3d11Texture = static_cast<const D3D11Texture2D*>(texture);
+        d3d11Texture->UpdateSyncCount();
+        return true;
     }
 
 } // end namespace webrtc
