@@ -34,6 +34,7 @@ namespace webrtc
         std::unique_ptr<ITexture2D> CreateTexture(const Size& size, UnityRenderingExtTextureFormat format)
         {
             ITexture2D* tex = device_->CreateDefaultTextureV(size.width(), size.height(), format);
+            EXPECT_TRUE(device_->WaitIdleForTest());
             return std::unique_ptr<ITexture2D>(tex);
         }
 
@@ -55,6 +56,7 @@ namespace webrtc
         void* ptr = tex->GetNativeTexturePtrV();
 
         auto frame = bufferPool_->CreateFrame(ptr, kSize, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_EQ(frame->size(), kSize);
         EXPECT_EQ(kFormat, frame->format());
         EXPECT_EQ(1u, bufferPool_->bufferCount());
@@ -67,16 +69,19 @@ namespace webrtc
         void* ptr = tex->GetNativeTexturePtrV();
 
         auto frame1 = bufferPool_->CreateFrame(ptr, kSize, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_NE(frame1, nullptr);
         EXPECT_EQ(1u, bufferPool_->bufferCount());
 
         auto frame2 = bufferPool_->CreateFrame(ptr, kSize, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_NE(frame2, nullptr);
         EXPECT_EQ(2u, bufferPool_->bufferCount());
 
         frame1 = nullptr;
         frame2 = nullptr;
         auto frame3 = bufferPool_->CreateFrame(ptr, kSize, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_EQ(2u, bufferPool_->bufferCount());
     }
 
@@ -87,6 +92,7 @@ namespace webrtc
         void* ptr1 = tex1->GetNativeTexturePtrV();
 
         auto frame1 = bufferPool_->CreateFrame(ptr1, kSize1, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_EQ(1u, bufferPool_->bufferCount());
 
         frame1 = nullptr;
@@ -96,6 +102,7 @@ namespace webrtc
         void* ptr2 = tex2->GetNativeTexturePtrV();
 
         auto frame2 = bufferPool_->CreateFrame(ptr2, kSize2, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_EQ(2u, bufferPool_->bufferCount());
     }
 
@@ -106,6 +113,7 @@ namespace webrtc
         void* ptr1 = tex1->GetNativeTexturePtrV();
 
         auto frame1 = bufferPool_->CreateFrame(ptr1, kSize1, kFormat, clock_.CurrentTime());
+        EXPECT_TRUE(device_->WaitIdleForTest());
         EXPECT_EQ(1u, bufferPool_->bufferCount());
 
         // The buffer is not older.

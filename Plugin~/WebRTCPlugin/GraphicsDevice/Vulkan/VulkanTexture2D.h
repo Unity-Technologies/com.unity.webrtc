@@ -16,8 +16,8 @@ namespace webrtc
         VulkanTexture2D(const uint32_t w, const uint32_t h);
         virtual ~VulkanTexture2D() override;
 
-        bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device);
-        bool InitCpuRead(const VkPhysicalDevice physicalDevice, const VkDevice device);
+        bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool);
+        bool InitCpuRead(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool);
         void Shutdown();
 
         inline virtual void* GetNativeTexturePtrV() override;
@@ -30,17 +30,20 @@ namespace webrtc
         inline VkDeviceSize GetTextureImageMemorySize() const;
         inline VkFormat GetTextureFormat() const;
 
+        VkFence GetFence() const { return m_fence; }
+        VkCommandBuffer GetCommandBuffer() const { return m_commandBuffer; }
+
     private:
         VkImage m_textureImage;
         VkDeviceMemory m_textureImageMemory;
         VkDeviceSize m_textureImageMemorySize;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
-
+        VkCommandPool m_commandPool;
+        VkFence m_fence;
+        VkCommandBuffer m_commandBuffer;
         VkFormat m_textureFormat;
-
         UnityVulkanImage m_unityVulkanImage;
-
         const VkAllocationCallbacks* m_allocator = nullptr;
     };
 

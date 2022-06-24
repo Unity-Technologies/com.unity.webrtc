@@ -316,56 +316,8 @@ namespace webrtc
     }
 #endif
 
-    //---------------------------------------------------------------------------------------------------------------------
-
-    VkResult VulkanUtility::BeginOneTimeCommandBufferInto(
-        const VkDevice device, const VkCommandPool commandPool, VkCommandBuffer* commandBuffer)
-    {
-        // Create a command buffer to copy
-        VkCommandBufferAllocateInfo allocInfo = {};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandPool = commandPool;
-        allocInfo.commandBufferCount = 1;
-
-        vkAllocateCommandBuffers(device, &allocInfo, commandBuffer);
-
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // used only once
-
-        VULKAN_CHECK(vkBeginCommandBuffer(*commandBuffer, &beginInfo))
-
-        return VK_SUCCESS;
-    }
-
-    //---------------------------------------------------------------------------------------------------------------------
-
-    // Uses vkQueueWaitIdle to synchronize
-    VkResult VulkanUtility::EndAndSubmitOneTimeCommandBuffer(
-        const VkDevice device, const VkCommandPool commandPool, const VkQueue queue, VkCommandBuffer commandBuffer)
-    {
-        RTC_CHECK_EQ(vkEndCommandBuffer(commandBuffer), VK_SUCCESS);
-
-        VkSubmitInfo submitInfo = {};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffer;
-
-        RTC_CHECK_EQ(vkQueueSubmit(queue, 1, &submitInfo, nullptr), VK_SUCCESS);
-        RTC_CHECK_EQ(vkQueueWaitIdle(queue), VK_SUCCESS);
-
-        vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
-
-        return VK_SUCCESS;
-    }
-
-    //---------------------------------------------------------------------------------------------------------------------
-
     VkResult VulkanUtility::DoImageLayoutTransition(
-        const VkDevice device,
-        const VkCommandPool commandPool,
-        const VkQueue queue,
+        const VkCommandBuffer commandBuffer,
         const VkImage image,
         const VkFormat format,
         const VkImageLayout oldLayout,
@@ -373,9 +325,6 @@ namespace webrtc
         const VkImageLayout newLayout,
         const VkPipelineStageFlags newStage)
     {
-        VkCommandBuffer commandBuffer = nullptr;
-        VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer))
-
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -479,23 +428,16 @@ namespace webrtc
         }
 
         vkCmdPipelineBarrier(commandBuffer, oldStage, newStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-
-        return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+        return VK_SUCCESS;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
-
     VkResult VulkanUtility::CopyImage(
-        const VkDevice device,
-        const VkCommandPool commandPool,
-        const VkQueue queue,
+        const VkCommandBuffer commandBuffer,
         const VkImage srcImage,
         const VkImage dstImage,
         const uint32_t width,
         const uint32_t height)
     {
-        VkCommandBuffer commandBuffer = nullptr;
-        VULKAN_CHECK(BeginOneTimeCommandBufferInto(device, commandPool, &commandBuffer))
 
         // Start copy
         VkImageCopy copyRegion {};
@@ -513,7 +455,7 @@ namespace webrtc
             1,
             &copyRegion);
 
-        return EndAndSubmitOneTimeCommandBuffer(device, commandPool, queue, commandBuffer);
+        return VK_SUCCESS;
     }
 
 } // end namespace webrtc

@@ -36,6 +36,7 @@ namespace webrtc
             if (!device())
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
             m_texture.reset(device()->CreateDefaultTextureV(kWidth, kHeight, format()));
+            EXPECT_TRUE(device()->WaitIdleForTest());
 
             ContextDependencies dependencies;
             dependencies.device = device();

@@ -38,7 +38,9 @@ namespace webrtc
             if (!resources->IsUsed() && AreFrameResourcesCompatible(resources, size, format))
             {
                 resources->MarkUsed(clock_->CurrentTime());
-                static_cast<GpuMemoryBufferFromUnity*>(resources->buffer_.get())->CopyBuffer(ptr);
+                GpuMemoryBufferFromUnity* buffer = static_cast<GpuMemoryBufferFromUnity*>(resources->buffer_.get());
+                buffer->ResetSync();
+                buffer->CopyBuffer(ptr);
                 return resources->buffer_;
             }
             it++;

@@ -12,6 +12,7 @@
 #endif
 
 #if SUPPORT_VULKAN
+#include "UnityVulkanInterfaceFunctions.h"
 #include "Vulkan/VulkanGraphicsDevice.h"
 #endif
 
@@ -31,22 +32,22 @@ namespace webrtc
         return device;
     }
 
-    IGraphicsDevice* GraphicsDevice::Init(IUnityInterfaces* unityInterface, ProfilerMarkerFactory* profiler)
+    IGraphicsDevice* GraphicsDevice::Init(IUnityInterfaces* unityInterfaces, ProfilerMarkerFactory* profiler)
     {
-        const UnityGfxRenderer rendererType = unityInterface->Get<IUnityGraphics>()->GetRenderer();
+        const UnityGfxRenderer rendererType = unityInterfaces->Get<IUnityGraphics>()->GetRenderer();
         switch (rendererType)
         {
 #if SUPPORT_D3D11
         case kUnityGfxRendererD3D11:
         {
-            IUnityGraphicsD3D11* deviceInterface = unityInterface->Get<IUnityGraphicsD3D11>();
+            IUnityGraphicsD3D11* deviceInterface = unityInterfaces->Get<IUnityGraphicsD3D11>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface, profiler);
         }
 #endif
 #if SUPPORT_D3D12
         case kUnityGfxRendererD3D12:
         {
-            IUnityGraphicsD3D12v5* deviceInterface = unityInterface->Get<IUnityGraphicsD3D12v5>();
+            IUnityGraphicsD3D12v5* deviceInterface = unityInterfaces->Get<IUnityGraphicsD3D12v5>();
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface, profiler);
         }
 #endif
@@ -61,15 +62,16 @@ namespace webrtc
 #if SUPPORT_VULKAN
         case kUnityGfxRendererVulkan:
         {
-            IUnityGraphicsVulkan* deviceInterface = unityInterface->Get<IUnityGraphicsVulkan>();
+            UnityGraphicsVulkan* deviceInterface = UnityGraphicsVulkan::Get(unityInterfaces).release();
             UnityVulkanInstance vulkan = deviceInterface->Instance();
-            return Init(rendererType, reinterpret_cast<void*>(&vulkan), deviceInterface, profiler);
+            return Init(
+                rendererType, reinterpret_cast<void*>(&vulkan), reinterpret_cast<void*>(deviceInterface), profiler);
         }
 #endif
 #if SUPPORT_METAL
         case kUnityGfxRendererMetal:
         {
-            std::unique_ptr<MetalDevice> device = MetalDevice::Create(unityInterface->Get<IUnityGraphicsMetal>());
+            std::unique_ptr<MetalDevice> device = MetalDevice::Create(unityInterfaces->Get<IUnityGraphicsMetal>());
             return Init(rendererType, device.release(), nullptr, profiler);
             break;
         }
@@ -84,7 +86,7 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
 
     IGraphicsDevice* GraphicsDevice::Init(
-        const UnityGfxRenderer renderer, void* device, IUnityInterface* unityInterface, ProfilerMarkerFactory* profiler)
+        const UnityGfxRenderer renderer, void* device, void* unityInterface, ProfilerMarkerFactory* profiler)
     {
         IGraphicsDevice* pDevice = nullptr;
         switch (renderer)
@@ -103,7 +105,7 @@ namespace webrtc
             RTC_DCHECK(device);
             pDevice = new D3D12GraphicsDevice(
                 static_cast<ID3D12Device*>(device),
-                reinterpret_cast<IUnityGraphicsD3D12v5*>(unityInterface),
+                static_cast<IUnityGraphicsD3D12v5*>(unityInterface),
                 renderer,
                 profiler);
             break;
@@ -124,7 +126,7 @@ namespace webrtc
             RTC_DCHECK(device);
             const UnityVulkanInstance* vulkan = static_cast<const UnityVulkanInstance*>(device);
             pDevice = new VulkanGraphicsDevice(
-                reinterpret_cast<IUnityGraphicsVulkan*>(unityInterface),
+                static_cast<UnityGraphicsVulkan*>(unityInterface),
                 vulkan->instance,
                 vulkan->physicalDevice,
                 vulkan->device,

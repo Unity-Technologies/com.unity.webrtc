@@ -73,7 +73,7 @@ namespace webrtc
         int32_t ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame);
 
     private:
-        void CopyResource(
+        bool CopyResource(
             const NvEncInputFrame* encoderInputFrame,
             GpuMemoryBufferInterface* buffer,
             Size& size,

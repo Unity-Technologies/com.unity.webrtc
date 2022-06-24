@@ -47,6 +47,7 @@ namespace webrtc
         std::unique_ptr<const ITexture2D> texture(
             device->CreateDefaultTextureV(kWidth, kHeight, kFormat));
         auto testFrame = CreateTestFrame(device, texture.get(), kFormat);
+        EXPECT_TRUE(device_->WaitIdleForTest());
 
         auto frame = VideoFrameAdapter::CreateVideoFrame(testFrame);
         auto buffer = frame.video_frame_buffer();
@@ -61,6 +62,8 @@ namespace webrtc
         std::unique_ptr<const ITexture2D> texture(
             device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
         auto testFrame = CreateTestFrame(device_, texture.get(), kFormat);
+        EXPECT_TRUE(device_->WaitIdleForTest());
+
         auto frame = VideoFrameAdapter::CreateVideoFrame(testFrame);
         auto buffer = frame.video_frame_buffer();
         auto buffer2 = buffer->Scale(kSize2.width(), kSize2.height());

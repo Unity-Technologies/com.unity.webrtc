@@ -41,6 +41,18 @@ namespace webrtc
 
     GpuMemoryBufferFromUnity::~GpuMemoryBufferFromUnity() { }
 
+    void GpuMemoryBufferFromUnity::ResetSync()
+    {
+        if (!device_->ResetSync(texture_.get()))
+        {
+            RTC_LOG(LS_INFO) << "ResetSync failed.";
+        }
+        if (!device_->ResetSync(textureCpuRead_.get()))
+        {
+            RTC_LOG(LS_INFO) << "ResetSync failed.";
+        }
+    }
+
     void GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)
     {
         // One texture cannot map CUDA memory and CPU memory simultaneously.
@@ -55,7 +67,26 @@ namespace webrtc
 
     rtc::scoped_refptr<I420BufferInterface> GpuMemoryBufferFromUnity::ToI420()
     {
+        using namespace std::chrono_literals;
+        const std::chrono::nanoseconds timeout(30ms); // 30ms
+        if (!device_->WaitSync(textureCpuRead_.get(), timeout.count()))
+        {
+            RTC_LOG(LS_INFO) << "WaitSync failed.";
+            return nullptr;
+        }
         return device_->ConvertRGBToI420(textureCpuRead_.get());
+    }
+
+    const GpuMemoryBufferHandle* GpuMemoryBufferFromUnity::handle() const
+    {
+        using namespace std::chrono_literals;
+        const std::chrono::nanoseconds timeout(30ms); // 30ms
+        if (!device_->WaitSync(texture_.get(), timeout.count()))
+        {
+            RTC_LOG(LS_INFO) << "WaitSync failed.";
+            return nullptr;
+        }
+        return handle_.get();
     }
 }
 }
