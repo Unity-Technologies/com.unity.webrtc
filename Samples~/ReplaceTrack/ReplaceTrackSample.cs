@@ -60,6 +60,8 @@ class ReplaceTrackSample : MonoBehaviour
         dropdown2.options = streamSizeList.Select(size => new Dropdown.OptionData($" {size.x} x {size.y} ")).ToList();
         dropdown1.onValueChanged.AddListener(value => size1 = streamSizeList[value]);
         dropdown2.onValueChanged.AddListener(value => size2 = streamSizeList[value]);
+        dropdown1.value = 0;
+        dropdown2.value = 1;
 
         startButton.onClick.AddListener(OnStart);
         startButton.gameObject.SetActive(true);

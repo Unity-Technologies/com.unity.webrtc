@@ -4,20 +4,23 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.4.0-exp.8] - 2022-06-28
+## [2.4.0-exp.8] - 2022-07-08
 
 ### Added
 
 - Supported video encoding framerate control.
-- Added the items in Profiler Window to show the CPU loads of encoding thread.
+- Added the items in Profiler Window to show the CPU loads of video encoding/decoding thread.
 - Add a new sample "ReplaceTrack" to demonstrate `RTCRtpSender.ReplaceTrack` method.
 
+### Changed
+
+- Changed arguments of `RTCPeerConnection.AddTransceiver` method to pass initial information of `RTCRtpTransceiver` when instanting it.
 
 ### Fixed 
 
 - Fixed the crash because of the old version of NVIDIA graphics driver.
-- Fixed the issue when garbage collected but the finalizer has not been called.
-
+- Fixed the issue when garbage collected but the finalizer hasn't been called.
+- Improved performance of video streaming when using Vulkan graphics API.
 
 ## [2.4.0-exp.7] - 2022-05-20
 
