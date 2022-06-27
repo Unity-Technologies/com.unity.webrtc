@@ -11,6 +11,7 @@ namespace webrtc
 {
     std::unique_ptr<ProfilerMarkerFactory> ProfilerMarkerFactory::Create(UnityProfiler* profiler)
     {
+        RTC_DCHECK(profiler);
         return std::unique_ptr<ProfilerMarkerFactory>(new ProfilerMarkerFactory(profiler));
     }
 

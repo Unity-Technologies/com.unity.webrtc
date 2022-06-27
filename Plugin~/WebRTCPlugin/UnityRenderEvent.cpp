@@ -196,10 +196,9 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     }
 #endif
     s_UnityProfiler = UnityProfiler::Get(unityInterfaces);
-    s_ProfilerMarkerFactory = ProfilerMarkerFactory::Create(s_UnityProfiler.get());
-
-    if (s_ProfilerMarkerFactory)
+    if (s_UnityProfiler)
     {
+        s_ProfilerMarkerFactory = ProfilerMarkerFactory::Create(s_UnityProfiler.get());
         s_MarkerEncode = s_ProfilerMarkerFactory->CreateMarker(
             "UnityVideoTrackSource.OnFrameCaptured", kUnityProfilerCategoryRender, kUnityProfilerMarkerFlagDefault, 0);
         s_MarkerDecode = s_ProfilerMarkerFactory->CreateMarker(
