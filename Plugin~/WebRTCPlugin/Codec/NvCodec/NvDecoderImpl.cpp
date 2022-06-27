@@ -202,7 +202,7 @@ namespace webrtc
 
             // todo: measurement decoding time
             absl::optional<int32_t> decodetime;
-            m_decodedCompleteCallback->Decoded(decoded_frame, decodetime, qp);
+            m_decodedCompleteCallback->Decoded(decoded_frame, absl::nullopt, qp);
         }
 
         return WEBRTC_VIDEO_CODEC_OK;

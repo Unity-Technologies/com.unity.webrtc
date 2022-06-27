@@ -164,12 +164,10 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* nativeTexturePtr)
     {
-
-        D3D12Texture2D* dest = reinterpret_cast<D3D12Texture2D*>(baseDest);
-        assert(nullptr != dest);
-        if (nullptr == dest)
+        if (!baseDest || !nativeTexturePtr)
             return false;
 
+        D3D12Texture2D* dest = reinterpret_cast<D3D12Texture2D*>(baseDest);
         ID3D12Resource* nativeDest = reinterpret_cast<ID3D12Resource*>(dest->GetNativeTexturePtrV());
         ID3D12Resource* nativeSrc = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
         if (nativeSrc == nativeDest)
@@ -177,8 +175,18 @@ namespace webrtc
         if (nativeSrc == nullptr || nativeDest == nullptr)
             return false;
 
-        ThrowIfFailed(m_commandAllocator->Reset());
-        ThrowIfFailed(m_commandList->Reset(m_commandAllocator, nullptr));
+        HRESULT hr = m_commandAllocator->Reset();
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12CommandAllocator::Reset failed. result:" << hr;
+            return false;
+        }
+        hr = m_commandList->Reset(m_commandAllocator, nullptr);
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Reset failed. result:" << hr;
+            return false;
+        }
 
         m_commandList->CopyResource(nativeDest, nativeSrc);
 
@@ -200,7 +208,12 @@ namespace webrtc
             Barrier(nativeDest, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST);
         }
 
-        ThrowIfFailed(m_commandList->Close());
+        hr = m_commandList->Close();
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close failed. result:" << hr;
+            return false;
+        }
 
         ID3D12CommandList* cmdList[] = { m_commandList };
         m_d3d12CommandQueue->ExecuteCommandLists(_countof(cmdList), cmdList);
@@ -434,6 +447,10 @@ namespace webrtc
         handle->externalMemory = externalMemory;
         return std::move(handle);
     }
+
+    bool D3D12GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout) { return true; }
+
+    bool D3D12GraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
 
 } // end namespace webrtc
 } // end namespace unity

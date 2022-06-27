@@ -295,7 +295,7 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     bool VulkanGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
-        if (nullptr == dest || nullptr == nativeTexturePtr)
+        if (!dest || !nativeTexturePtr)
             return false;
 
         VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
