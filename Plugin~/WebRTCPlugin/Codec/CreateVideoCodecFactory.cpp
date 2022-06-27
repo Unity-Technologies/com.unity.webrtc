@@ -1,0 +1,103 @@
+#include "pch.h"
+
+#include <media/engine/internal_decoder_factory.h>
+#include <media/engine/internal_encoder_factory.h>
+
+#include "CreateVideoCodecFactory.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
+#include "ProfilerMarkerFactory.h"
+
+#if CUDA_PLATFORM
+#include "Codec/NvCodec/NvCodec.h"
+#endif
+
+#if UNITY_OSX || UNITY_IOS
+#import <sdk/objc/components/video_codec/RTCDefaultVideoDecoderFactory.h>
+#import <sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h>
+#import <sdk/objc/native/api/video_decoder_factory.h>
+#import <sdk/objc/native/api/video_encoder_factory.h>
+#elif UNITY_ANDROID
+#include "Android/AndroidCodecFactoryHelper.h"
+#include "Android/Jni.h"
+#endif
+
+namespace unity
+{
+namespace webrtc
+{
+    VideoEncoderFactory*
+    CreateVideoEncoderFactory(const std::string& impl, IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
+    {
+        if (impl == kInternalImpl)
+        {
+            return new webrtc::InternalEncoderFactory();
+        }
+
+        if (impl == kVideoToolboxImpl)
+        {
+#if UNITY_OSX || UNITY_IOS
+            return webrtc::ObjCToNativeVideoEncoderFactory([[RTCDefaultVideoEncoderFactory alloc] init]).release();
+#endif
+        }
+
+        if (impl == kAndroidMediaCodecImpl)
+        {
+#if UNITY_ANDROID
+            if (IsVMInitialized())
+            {
+                return CreateAndroidEncoderFactory().release();
+            }
+#endif
+        }
+
+        if (impl == kNvCodecImpl)
+        {
+#if CUDA_PLATFORM
+            if (gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
+            {
+                CUcontext context = gfxDevice->GetCUcontext();
+                NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
+                return new NvEncoderFactory(context, format, profiler);
+            }
+#endif
+        }
+        return nullptr;
+    }
+
+    VideoDecoderFactory*
+    CreateVideoDecoderFactory(const std::string& impl, IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
+    {
+        if (impl == kInternalImpl)
+        {
+            return new webrtc::InternalDecoderFactory();
+        }
+
+        if (impl == kVideoToolboxImpl)
+        {
+#if UNITY_OSX || UNITY_IOS
+            return webrtc::ObjCToNativeVideoDecoderFactory([[RTCDefaultVideoDecoderFactory alloc] init]).release();
+#endif
+        }
+
+        if (impl == kAndroidMediaCodecImpl)
+        {
+#if UNITY_ANDROID
+            if (IsVMInitialized())
+                return CreateAndroidDecoderFactory().release();
+#endif
+        }
+
+        if (impl == kNvCodecImpl)
+        {
+#if CUDA_PLATFORM
+            if (gfxDevice->IsCudaSupport())
+            {
+                CUcontext context = gfxDevice->GetCUcontext();
+                return new NvDecoderFactory(context, profiler);
+            }
+#endif
+        }
+        return nullptr;
+    }
+}
+}

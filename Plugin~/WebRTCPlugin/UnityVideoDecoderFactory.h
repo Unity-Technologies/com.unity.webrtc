@@ -22,8 +22,7 @@ namespace webrtc
 
     private:
         ProfilerMarkerFactory* profiler_;
-        const std::unique_ptr<VideoDecoderFactory> internal_decoder_factory_;
-        const std::unique_ptr<VideoDecoderFactory> native_decoder_factory_;
+        std::map<std::string, std::unique_ptr<VideoDecoderFactory>> factories_;
     };
 }
 }
