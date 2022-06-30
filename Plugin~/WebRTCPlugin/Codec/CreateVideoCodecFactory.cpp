@@ -12,8 +12,8 @@
 #endif
 
 #if UNITY_OSX || UNITY_IOS
-#import <sdk/objc/components/video_codec/RTCDefaultVideoDecoderFactory.h>
-#import <sdk/objc/components/video_codec/RTCDefaultVideoEncoderFactory.h>
+#import <sdk/objc/components/video_codec/RTCVideoEncoderFactoryH264.h>
+#import <sdk/objc/components/video_codec/RTCVideoDecoderFactoryH264.h>
 #import <sdk/objc/native/api/video_decoder_factory.h>
 #import <sdk/objc/native/api/video_encoder_factory.h>
 #elif UNITY_ANDROID
@@ -36,7 +36,7 @@ namespace webrtc
         if (impl == kVideoToolboxImpl)
         {
 #if UNITY_OSX || UNITY_IOS
-            return webrtc::ObjCToNativeVideoEncoderFactory([[RTCDefaultVideoEncoderFactory alloc] init]).release();
+            return webrtc::ObjCToNativeVideoEncoderFactory([[RTCVideoEncoderFactoryH264 alloc] init]).release();
 #endif
         }
 
@@ -75,7 +75,7 @@ namespace webrtc
         if (impl == kVideoToolboxImpl)
         {
 #if UNITY_OSX || UNITY_IOS
-            return webrtc::ObjCToNativeVideoDecoderFactory([[RTCDefaultVideoDecoderFactory alloc] init]).release();
+            return webrtc::ObjCToNativeVideoDecoderFactory([[RTCVideoDecoderFactoryH264 alloc] init]).release();
 #endif
         }
 
