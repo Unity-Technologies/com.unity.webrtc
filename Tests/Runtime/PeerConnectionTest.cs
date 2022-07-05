@@ -163,7 +163,7 @@ namespace Unity.WebRTC.RuntimeTest
             var peer = new RTCPeerConnection();
             var width = 256;
             var height = 256;
-            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
 
@@ -198,6 +198,40 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
             Object.DestroyImmediate(rt);
         }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void GetTransceiversReturnsNotEmptyAfterDisposingTransceiver()
+        {
+            // `RTCPeerConnection.AddTransceiver` method is not intuitive. Moreover, we don't have the API to remove
+            // the transceiver from RTCPeerConnection directly.
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            transceiver.Dispose();
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            peer.Dispose();
+        }
+
+        [Test]
+        [Category("PeerConnection")]
+        public void GetTransceiversReturnsNotEmptyAfterCallingRemoveTrack()
+        {
+            // Also, `RTCPeerConnection.AddTrack` and `RTCPeerConnection.RemoveTrack` method is not intuitive.
+            var peer = new RTCPeerConnection();
+            var width = 256;
+            var height = 256;
+            var format = WebRTC.GetSupportedRenderTextureFormat(UnityEngine.SystemInfo.graphicsDeviceType);
+            var rt = new UnityEngine.RenderTexture(width, height, 0, format);
+            rt.Create();
+            var track = new VideoStreamTrack(rt);
+            var sender = peer.AddTrack(track);
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            Assert.That(peer.RemoveTrack(sender), Is.EqualTo(RTCErrorType.None));
+            Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
+            peer.Dispose();
+        }
+
 
         [Test]
         [Category("PeerConnection")]
@@ -649,8 +683,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.True(op2.IsDone);
             Assert.True(op2.IsError);
             Assert.IsNotEmpty(op2.Error.message);
-
-            peer.RemoveTrack(sender);
+            Assert.That(peer.RemoveTrack(sender), Is.EqualTo(RTCErrorType.None));
             track.Dispose();
             stream.Dispose();
             peer.Close();

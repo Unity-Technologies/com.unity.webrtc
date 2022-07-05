@@ -21,7 +21,8 @@ namespace Unity.WebRTC.Samples
 
         private RTCPeerConnection _pc1, _pc2;
         private List<RTCRtpSender> pc1Senders;
-        private MediaStream videoStream, receiveStream;
+        private MediaStream videoStream;
+        private MediaStreamTrack track;
         private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
         private DelegateOnIceConnectionChange pc2OnIceConnectionChange;
         private DelegateOnIceCandidate pc1OnIceCandidate;
@@ -121,14 +122,11 @@ namespace Unity.WebRTC.Samples
 
         private void AddTracks()
         {
-            foreach (var track in videoStream.GetTracks())
-            {
-                pc1Senders.Add(_pc1.AddTrack(track, videoStream));
-            }
+            pc1Senders.Add(_pc1.AddTrack(track));
 
             if (WebRTCSettings.UseVideoCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] { WebRTCSettings.UseVideoCodec };
                 foreach (var transceiver in _pc1.GetTransceivers())
                 {
                     if (pc1Senders.Contains(transceiver.Sender))
@@ -154,6 +152,10 @@ namespace Unity.WebRTC.Samples
             {
                 _pc1.RemoveTrack(sender);
             }
+            foreach(var transceiver in _pc1.GetTransceivers())
+            {
+                transceiver.Stop();
+            }
 
             pc1Senders.Clear();
             addTracksButton.interactable = true;
@@ -178,8 +180,8 @@ namespace Unity.WebRTC.Samples
             _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
             _pc2.OnTrack = pc2Ontrack;
 
-            _pc1.CreateDataChannel("data");
             videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
+            track = videoStream.GetTracks().First();
             RtImage.texture = cam.targetTexture;
         }
 
@@ -191,11 +193,6 @@ namespace Unity.WebRTC.Samples
 
         private void OnTrack(RTCPeerConnection pc, RTCTrackEvent e)
         {
-            receiveStream = e.Streams.First();
-            receiveStream.OnRemoveTrack = ev =>
-            {
-                ev.Track.Dispose();
-            };
             trackInfos.Append($"{GetName(pc)} receives remote track:\r\n");
             trackInfos.Append($"Track kind: {e.Track.Kind}\r\n");
             trackInfos.Append($"Track id: {e.Track.Id}\r\n");
