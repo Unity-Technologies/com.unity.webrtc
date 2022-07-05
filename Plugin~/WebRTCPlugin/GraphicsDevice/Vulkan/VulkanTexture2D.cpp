@@ -2,7 +2,6 @@
 
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
 #include "VulkanTexture2D.h"
-#include "WebRTCMacros.h"
 
 namespace unity
 {
@@ -27,12 +26,17 @@ namespace webrtc
 
     void VulkanTexture2D::Shutdown()
     {
-        //[TODO-sin: 2019-11-20] Create an explicit Shutdown(device) function
-        VULKAN_SAFE_DESTROY_IMAGE(m_device, m_textureImage, m_allocator)
-        VULKAN_SAFE_FREE_MEMORY(m_device, m_textureImageMemory, m_allocator)
+        if(m_textureImage)
+            vkDestroyImage(m_device, m_textureImage, m_allocator);
+        if(m_textureImageMemory)
+            vkFreeMemory(m_device, m_textureImageMemory, m_allocator);
+        if(m_commandBuffer)
+            vkFreeCommandBuffers(m_device, m_commandPool, 1, &m_commandBuffer);
+        if(m_fence)
+            vkDestroyFence(m_device, m_fence, nullptr);
 
-        vkFreeCommandBuffers(m_device, m_commandPool, 1, &m_commandBuffer);
-        vkDestroyFence(m_device, m_fence, nullptr);
+        m_textureImage = nullptr;
+        m_textureImageMemory = nullptr;
         m_textureImageMemorySize = 0;
         m_device = nullptr;
         m_commandPool = nullptr;

@@ -535,7 +535,7 @@ namespace Unity.WebRTC
             if (track == null)
                 throw new ArgumentNullException("track is null.");
 
-            var streamId = stream == null ? Guid.NewGuid().ToString() : stream.Id;
+            var streamId = stream?.Id;
             RTCErrorType error = NativeMethods.PeerConnectionAddTrack(
                 GetSelfOrThrow(), track.GetSelfOrThrow(), streamId, out var ptr);
             if (error != RTCErrorType.None)

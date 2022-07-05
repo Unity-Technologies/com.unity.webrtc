@@ -231,7 +231,7 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
     // Send PBO to main memory
     GLubyte* pboPtr = static_cast<GLubyte*>(glMapBufferRange(
         GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
-    if (pboPtr != nullptr)
+    if (pboPtr)
     {
         std::memcpy(data, pboPtr, bufferSize);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
