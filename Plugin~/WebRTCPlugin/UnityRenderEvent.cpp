@@ -246,36 +246,23 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     RTC_DCHECK_GT(encodeData->width, 0);
     RTC_DCHECK_GT(encodeData->height, 0);
 
-    const VideoStreamRenderEventID event = static_cast<VideoStreamRenderEventID>(eventID);
-
-    switch (event)
-    {
-    case VideoStreamRenderEventID::Encode:
-    {
-        UnityVideoTrackSource* source = encodeData->source;
-        if (!s_context->ExistsRefPtr(source))
-            return;
-        Timestamp timestamp = s_clock->CurrentTime();
-        IGraphicsDevice* device = Plugin::GraphicsDevice();
-        UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
-        void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
-        unity::webrtc::Size size(encodeData->width, encodeData->height);
-        {
-            std::unique_ptr<const ScopedProfiler> profiler;
-            if (s_ProfilerMarkerFactory)
-                profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
-
-            auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
-            source->OnFrameCaptured(std::move(frame));
-        }
-        s_bufferPool->ReleaseStaleBuffers(timestamp);
+    UnityVideoTrackSource* source = encodeData->source;
+    if (!s_context->ExistsRefPtr(source))
         return;
-    }
-    default:
+    Timestamp timestamp = s_clock->CurrentTime();
+    IGraphicsDevice* device = Plugin::GraphicsDevice();
+    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
+    void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
+    unity::webrtc::Size size(encodeData->width, encodeData->height);
     {
-        RTC_DCHECK(0);
+        std::unique_ptr<const ScopedProfiler> profiler;
+        if (s_ProfilerMarkerFactory)
+            profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
+
+        auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
+        source->OnFrameCaptured(std::move(frame));
     }
-    }
+    s_bufferPool->ReleaseStaleBuffers(timestamp);
 }
 
 static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)

@@ -1175,14 +1175,10 @@ namespace Unity.WebRTC
     internal static class VideoEncoderMethods
     {
         static CommandBuffer _command = new CommandBuffer();
-        enum VideoStreamRenderEventId
-        {
-            Encode = 1,
-        }
 
         public static void Encode(IntPtr callback, IntPtr data)
         {
-            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Encode, data);
+            _command.IssuePluginEventAndData(callback, 0, data);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }
