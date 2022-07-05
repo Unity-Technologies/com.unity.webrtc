@@ -25,21 +25,21 @@ namespace webrtc
     class UnityVideoTrackSource : public rtc::AdaptedVideoTrackSource
     {
     public:
-        // struct FrameAdaptationParams
-        //{
-        //    bool should_drop_frame;
-        //    int crop_x;
-        //    int crop_y;
-        //    int crop_width;
-        //    int crop_height;
-        //    int scale_to_width;
-        //    int scale_to_height;
-        //};
+        struct FrameAdaptationParams
+        {
+            bool should_drop_frame;
+            int crop_x;
+            int crop_y;
+            int crop_width;
+            int crop_height;
+            int scale_to_width;
+            int scale_to_height;
+        };
 
         UnityVideoTrackSource(
             bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory);
         ~UnityVideoTrackSource() override;
-
+        // void SetState(SourceState state);
         SourceState state() const override;
 
         bool remote() const override;
@@ -56,9 +56,9 @@ namespace webrtc
     private:
         void CaptureNextFrame();
         void SendFeedback();
-        // FrameAdaptationParams ComputeAdaptationParams(int width,
-        //                                            int height,
-        //                                            int64_t time_us);
+         FrameAdaptationParams ComputeAdaptationParams(int width,
+                                                    int height,
+                                                    int64_t time_us);
 
         // Delivers |frame| to base class method
         // rtc::AdaptedVideoTrackSource::OnFrame(). If the cropping (given via
@@ -81,7 +81,7 @@ namespace webrtc
 
         std::unique_ptr<rtc::TaskQueue> taskQueue_;
         std::unique_ptr<VideoFrameScheduler> scheduler_;
-        ::webrtc::VideoFrame videoFrame_;
+        rtc::scoped_refptr<unity::webrtc::VideoFrame> frame_;
     };
 
 } // end namespace webrtc

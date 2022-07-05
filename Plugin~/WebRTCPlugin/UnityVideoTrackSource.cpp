@@ -26,7 +26,7 @@ namespace webrtc
         bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory)
         : AdaptedVideoTrackSource(/*required_alignment=*/1)
         , is_screencast_(is_screencast)
-        , videoFrame_(BlackFrame(128, 128))
+        , frame_(nullptr)
     {
         taskQueue_ = std::make_unique<rtc::TaskQueue>(
             taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
@@ -36,11 +36,24 @@ namespace webrtc
 
     UnityVideoTrackSource::~UnityVideoTrackSource() { scheduler_ = nullptr; }
 
-    UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const
+    UnityVideoTrackSource::FrameAdaptationParams
+    UnityVideoTrackSource::ComputeAdaptationParams(int width, int height, int64_t time_us)
     {
-        // TODO(nisse): What's supposed to change this state?
-        return MediaSourceInterface::SourceState::kLive;
+        FrameAdaptationParams result { false, 0, 0, 0, 0, 0, 0 };
+        result.should_drop_frame = !AdaptFrame(
+            width,
+            height,
+            time_us,
+            &result.scale_to_width,
+            &result.scale_to_height,
+            &result.crop_width,
+            &result.crop_height,
+            &result.crop_x,
+            &result.crop_y);
+        return result;
     }
+
+    UnityVideoTrackSource::SourceState UnityVideoTrackSource::state() const { return kLive; }
 
     bool UnityVideoTrackSource::remote() const { return false; }
 
@@ -51,7 +64,28 @@ namespace webrtc
     void UnityVideoTrackSource::CaptureNextFrame()
     {
         const std::unique_lock<std::mutex> lock(mutex_);
-        OnFrame(videoFrame_);
+        if (!frame_)
+            return;
+
+        const int orig_width = frame_->size().width();
+        const int orig_height = frame_->size().height();
+        const int64_t now_us = rtc::TimeMicros();
+        FrameAdaptationParams frame_adaptation_params =
+            ComputeAdaptationParams(orig_width, orig_height, now_us);
+        if (frame_adaptation_params.should_drop_frame)
+        {
+            frame_ = nullptr;
+            return;
+        }
+
+        const webrtc::TimeDelta timestamp = frame_->timestamp();
+        rtc::scoped_refptr<VideoFrameAdapter> frame_adapter(
+            new rtc::RefCountedObject<VideoFrameAdapter>(std::move(frame_)));
+
+        ::webrtc::VideoFrame::Builder builder = ::webrtc::VideoFrame::Builder()
+                                                    .set_video_frame_buffer(std::move(frame_adapter))
+                                                    .set_timestamp_us(timestamp.us());
+        OnFrame(builder.build());
     }
 
     void UnityVideoTrackSource::SendFeedback()
@@ -66,19 +100,8 @@ namespace webrtc
     {
         SendFeedback();
 
-        const int64_t now_us = rtc::TimeMicros();
-        const int64_t translated_camera_time_us =
-            timestamp_aligner_.TranslateTimestamp(frame->timestamp().us(), now_us);
-
-        rtc::scoped_refptr<VideoFrameAdapter> frame_adapter(
-            new rtc::RefCountedObject<VideoFrameAdapter>(std::move(frame)));
-
-        ::webrtc::VideoFrame::Builder builder = ::webrtc::VideoFrame::Builder()
-                                                    .set_video_frame_buffer(frame_adapter)
-                                                    .set_timestamp_us(translated_camera_time_us);
-
         const std::unique_lock<std::mutex> lock(mutex_);
-        videoFrame_ = builder.build();
+        frame_ = frame;
     }
 
 } // end namespace webrtc
