@@ -229,7 +229,6 @@ struct EncodeData
 // Notice: When DebugLog is used in a method called from RenderingThread,
 // it hangs when attempting to leave PlayMode and re-enter PlayMode.
 // So, we comment out `DebugLog`.
-
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
     if (!s_context)
@@ -269,9 +268,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
             source->OnFrameCaptured(std::move(frame));
         }
-
         s_bufferPool->ReleaseStaleBuffers(timestamp);
-
         return;
     }
     default:
@@ -281,10 +278,21 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     }
 }
 
+static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
+{
+    // Release all buffers.
+    s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity());
+}
+
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
 {
     s_context = context;
     return OnRenderEvent;
+}
+
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersFunc(Context* context)
+{
+    return OnReleaseBuffers;
 }
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
