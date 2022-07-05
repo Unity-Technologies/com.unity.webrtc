@@ -21,5 +21,11 @@ namespace webrtc
         EXPECT_FALSE(H264SupportedLevel(3840 * 2160, 90, 50000 * 1200));
     }
 
+    TEST(H264ProfileLevelId, TestSupportedFramerate) 
+    { 
+        EXPECT_GE(SupportedMaxFramerate(2560 * 1440), 90);
+        EXPECT_GE(SupportedMaxFramerate(3840 * 2160), 60);
+    }
+
 }
 }
