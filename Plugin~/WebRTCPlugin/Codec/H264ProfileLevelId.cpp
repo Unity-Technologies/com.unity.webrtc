@@ -50,8 +50,7 @@ namespace webrtc
         {
             const LevelConstraint& level_constraint = kLevelConstraints[i];
             if (level_constraint.max_macroblock_frame_size * kPixelsPerMacroblock >= maxFramePixelCount &&
-                level_constraint.max_macroblocks_per_second >=
-                    maxFramerate * level_constraint.max_macroblock_frame_size &&
+                level_constraint.max_macroblocks_per_second >= maxFramerate * maxFramePixelCount / kPixelsPerMacroblock &&
                 level_constraint.max_video_bitrate * kUnitMaxBRWithNAL >= maxBitrate)
             {
                 return level_constraint.level;
