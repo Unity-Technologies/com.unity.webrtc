@@ -14,7 +14,7 @@ namespace webrtc
     absl::optional<H264Level> H264SupportedLevel(int maxFramePixelCount, int maxFramerate, int maxBitrate);
 
     // Returns the max framerate that calclated by maxFramePixelCount.
-    int SupportedMaxFramerate(int maxFramePixelCount);
+    int SupportedMaxFramerate(H264Level level, int maxFramePixelCount);
 
 } // end namespace webrtc
 } // end namespace unity

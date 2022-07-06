@@ -74,6 +74,7 @@ namespace webrtc
         return static_cast<NV_ENC_LEVEL>(requiredLevel.value());
     }
 
+    absl::optional<H264Level> NvEncoderImpl::s_maxSupportedH264Level;
     std::vector<SdpVideoFormat> NvEncoderImpl::s_formats;
 
     NvEncoderImpl::NvEncoderImpl(
@@ -107,10 +108,12 @@ namespace webrtc
             m_marker = profiler->CreateMarker(
                 "NvEncoderImpl.CopyResource", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
 
-        // SupportedNvEncoderCodecs function consume the session of NvEnc and the number of the sessions is limited by
-        // NVIDIA device. So it caches the return value here.
+        // SupportedNvEncoderCodecs and SupportedMaxH264Level function consume the session of NvEnc and the number of
+        // the sessions is limited by NVIDIA device. So it caches the return value here.
         if (s_formats.empty())
             s_formats = SupportedNvEncoderCodecs(m_context);
+        if (!s_maxSupportedH264Level.has_value())
+            s_maxSupportedH264Level = SupportedMaxH264Level(m_context);
     }
 
     NvEncoderImpl::~NvEncoderImpl() { Release(); }
@@ -140,19 +143,19 @@ namespace webrtc
 
         m_codec = *codec;
 
-        // workaround
-        // Use supported max framerate that calculated by h264 level define.
-        auto supportedMaxFramerate = static_cast<uint32_t>(SupportedMaxFramerate(m_codec.width * m_codec.height));
-        if (supportedMaxFramerate < m_codec.maxFramerate)
-        {
-            m_codec.maxFramerate = supportedMaxFramerate;
-        }
-
         // Check required level.
         auto requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
         if (!requiredLevel)
         {
-            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+            // workaround
+            // Use supported max framerate that calculated by h264 level define.
+            m_codec.maxFramerate = static_cast<uint32_t>(
+                SupportedMaxFramerate(s_maxSupportedH264Level.value(), m_codec.width * m_codec.height));
+            requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
+            if (!requiredLevel)
+            {
+                return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+            }
         }
 
         // workaround
@@ -422,7 +425,7 @@ namespace webrtc
 
         // Copy CUDA buffer in VideoFrame to encoderInputFrame.
         auto buffer = video_frame->GetGpuMemoryBuffer();
-        if(!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
+        if (!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
 
         NV_ENC_PIC_PARAMS picParams = NV_ENC_PIC_PARAMS();
@@ -522,24 +525,24 @@ namespace webrtc
         m_codec.maxFramerate = static_cast<uint32_t>(parameters.framerate_fps);
         m_codec.maxBitrate = bitrate;
 
-        // workaround
-        // Use supported max framerate that calculated by h264 level define.
-        auto supportedMaxFramerate = static_cast<uint32_t>(SupportedMaxFramerate(m_codec.width * m_codec.height));
-        if (supportedMaxFramerate < m_codec.maxFramerate)
-        {
-            m_codec.maxFramerate = supportedMaxFramerate;
-        }
-
+        // Check required level.
         auto requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
         if (!requiredLevel)
         {
-            RTC_LOG(LS_WARNING) << "Not supported codec parameter "
-                                << "width:" << m_codec.width << " "
-                                << "height:" << m_codec.height << " "
-                                << "maxFramerate:" << m_codec.maxFramerate;
-
-            m_configurations[0].SetStreamState(false);
-            return;
+            // workaround
+            // Use supported max framerate that calculated by h264 level define.
+            m_codec.maxFramerate = static_cast<uint32_t>(
+                SupportedMaxFramerate(s_maxSupportedH264Level.value(), m_codec.width * m_codec.height));
+            requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
+            if (!requiredLevel)
+            {
+                RTC_LOG(LS_WARNING) << "Not supported codec parameter "
+                                    << "width:" << m_codec.width << " "
+                                    << "height:" << m_codec.height << " "
+                                    << "maxFramerate:" << m_codec.maxFramerate;
+                m_configurations[0].SetStreamState(false);
+                return;
+            }
         }
 
         // workaround:

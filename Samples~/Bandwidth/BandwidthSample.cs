@@ -64,6 +64,7 @@ class BandwidthSample : MonoBehaviour
         new Dictionary<string, uint?>
     {
         { "undefined", null },
+        { "90", 90 },
         { "60", 60 },
         { "30", 30 },
         { "20", 20 },

@@ -61,10 +61,19 @@ namespace webrtc
         return absl::nullopt;
     }
 
-    int SupportedMaxFramerate(int maxFramePixelCount)
+    int SupportedMaxFramerate(H264Level level, int maxFramePixelCount)
     {
-        const LevelConstraint& level_constraint = kLevelConstraints[arraysize(kLevelConstraints) - 1];
-        return level_constraint.max_macroblocks_per_second * kPixelsPerMacroblock / maxFramePixelCount;
+        for (size_t i = 0; i < arraysize(kLevelConstraints); i++)
+        {
+            const LevelConstraint& level_constraint = kLevelConstraints[i];
+            if (level_constraint.level == level)
+            {
+                return level_constraint.max_macroblocks_per_second * kPixelsPerMacroblock / maxFramePixelCount;
+            }
+        }
+
+        // target level not found.
+        return 0;
     }
 }
 }

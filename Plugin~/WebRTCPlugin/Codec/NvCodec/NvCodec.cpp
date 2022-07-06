@@ -51,6 +51,16 @@ namespace webrtc
         return encoder->GetEncoderCount(NV_ENC_CODEC_H264_GUID);
     }
 
+    H264Level SupportedMaxH264Level(CUcontext context)
+    {
+        auto encoder = std::make_unique<NvEncoderCudaCapability>(context);
+
+        int maxLevel = encoder->GetLevelMax(NV_ENC_CODEC_H264_GUID);
+        // The max profile level supported by almost browsers is 5.2.
+        maxLevel = std::min(maxLevel, 52);
+        return static_cast<H264Level>(maxLevel);
+    }
+
     std::vector<SdpVideoFormat> SupportedNvEncoderCodecs(CUcontext context)
     {
         auto encoder = std::make_unique<NvEncoderCudaCapability>(context);
