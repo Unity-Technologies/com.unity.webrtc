@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 namespace Unity.WebRTC
 {
@@ -13,6 +10,7 @@ namespace Unity.WebRTC
         private int id;
         private bool disposed;
         private IntPtr renderFunction;
+        private IntPtr releaseBuffersFunction;
         private IntPtr textureUpdateFunction;
 
         public static Context Create(int id = 0)
@@ -54,6 +52,9 @@ namespace Unity.WebRTC
                     disposable?.Dispose();
                 }
                 table.Clear();
+
+                // Release buffers on the renedering thread.
+                ReleaseBuffers();
 
                 NativeMethods.ContextDestroy(id);
                 self = IntPtr.Zero;
@@ -205,6 +206,11 @@ namespace Unity.WebRTC
             return NativeMethods.GetRenderEventFunc(self);
         }
 
+        public IntPtr GetReleaseBufferFunc()
+        {
+            return NativeMethods.GetReleaseBuffersFunc(self);
+        }
+
         public IntPtr GetUpdateTextureFunc()
         {
             return NativeMethods.GetUpdateTextureFunc(self);
@@ -265,6 +271,12 @@ namespace Unity.WebRTC
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
             VideoEncoderMethods.Encode(renderFunction, ptr);
+        }
+
+        internal void ReleaseBuffers()
+        {
+            releaseBuffersFunction = releaseBuffersFunction == IntPtr.Zero ? GetReleaseBufferFunc() : releaseBuffersFunction;
+            VideoEncoderMethods.ReleaseBuffers(releaseBuffersFunction);
         }
 
         internal void UpdateRendererTexture(uint rendererId, UnityEngine.Texture texture)

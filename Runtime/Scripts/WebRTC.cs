@@ -398,10 +398,12 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public static IEnumerator Update()
         {
+            var instruction = new WaitForEndOfFrame();
+
             while (true)
             {
                 // Wait until all frame rendering is done
-                yield return new WaitForEndOfFrame();
+                yield return instruction;
                 {
                     var tempTextureActive = RenderTexture.active;
                     RenderTexture.active = null;
@@ -1115,6 +1117,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr GetReleaseBuffersFunc(IntPtr context);
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void AudioSourceProcessLocalAudio(IntPtr source, IntPtr array, int sampleRate, int channels, int frames);
@@ -1171,14 +1175,17 @@ namespace Unity.WebRTC
     internal static class VideoEncoderMethods
     {
         static CommandBuffer _command = new CommandBuffer();
-        enum VideoStreamRenderEventId
-        {
-            Encode = 1,
-        }
 
         public static void Encode(IntPtr callback, IntPtr data)
         {
-            _command.IssuePluginEventAndData(callback, (int)VideoStreamRenderEventId.Encode, data);
+            _command.IssuePluginEventAndData(callback, 0, data);
+            Graphics.ExecuteCommandBuffer(_command);
+            _command.Clear();
+        }
+
+        public static void ReleaseBuffers(IntPtr callback)
+        {
+            _command.IssuePluginEventAndData(callback, 0, IntPtr.Zero);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }
