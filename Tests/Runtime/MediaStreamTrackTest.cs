@@ -130,7 +130,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.False(track.Enabled);
 
             // ReadyState property
-            Assert.AreEqual(track.ReadyState, TrackState.Live);
+            Assert.That(track.ReadyState, Is.EqualTo(TrackState.Live));
 
             track.Dispose();
 
