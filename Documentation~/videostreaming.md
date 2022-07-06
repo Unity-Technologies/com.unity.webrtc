@@ -109,6 +109,9 @@ Developers can control properties about video streaming quality in real-time.
 - Frame rate
 - Video resolution
 
+> [!NOTE]
+> If you want to check these features, the **Bandwidth** scene in the package sample is good to learn.
+
 ### Bitrate control
 
 To control the bitrate of video streaming, use [`SetParameters`](../api/Unity.WebRTC.RTCRtpSender.html#Unity_WebRTC_RTCRtpSender_SetParameters_) method of [`RTCRtpSender`](../api/Unity.WebRTC.RTCRtpSender.html) instance. The instance of [`RTCRtpSender`](../api/Unity.WebRTC.RTCRtpSender.html) is obtained from [`RTCPeerConnection`](../api/Unity.WebRTC.RTCPeerConnection.html). Or, obtained from [`AddTrack`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_AddTrack_) method as its return value.
@@ -139,16 +142,36 @@ sender.SetParameters(parameters);
 
 ### Frame rate control
 
-Developers can also change the encoding frame rate using [`SetParameters`](../api/Unity.WebRTC.RTCRtpSender.html#Unity_WebRTC_RTCRtpSender_SetParameters_) method. The example code below shows how to change the frame rate of the video encoder. You should set this parameter lower than [Application.targetFramerate](https://docs.unity3d.com/ScriptReference/Application-targetFrameRate.html).
+Developers can also change the encoding frame rate using [`SetParameters`](../api/Unity.WebRTC.RTCRtpSender.html#Unity_WebRTC_RTCRtpSender_SetParameters_) method. The example code below shows how to change the frame rate of the video encoder. You should set this parameter lower than [`Application.targetFramerate`](https://docs.unity3d.com/ScriptReference/Application-targetFrameRate.html).
 
 ```CSharp
 // Get `RTCRtpSendParameters`
 var parameters = sender.GetParameters();
 
-// Changing bitrate of all encoders.
+// Changing framerate of all encoders.
 foreach (var encoding in parameters.Encodings)
 {
-    encoding.maxFramerate = framerate;
+    // Change encoding frequency 30 frame per second.
+    encoding.maxFramerate = 30;
+}
+
+// Set updated parameters.
+sender.SetParameters(parameters);
+```
+
+### Video resolution control
+
+You can also change the video resolution to reduce network traffic. The [`scaleResolutionDownBy`](../api/Unity.WebRTC.RTCRtpEncodingParameters.html#Unity_WebRTC_RTCRtpEncodingParameters_scaleResolutionDownBy) property in [`RTCRtpEncodingParameters`](../api/Unity.WebRTC.RTCRtpEncodingParameters.html) class can resize the video resolution. The type of property is **float** which represents the factor of the size. If you set **2.0** for this value, it reduces the size of the video, the result's resolution **25%** of the original one.
+
+```CSharp
+// Get `RTCRtpSendParameters`
+var parameters = sender.GetParameters();
+
+// Changing framerate of all encoders.
+foreach (var encoding in parameters.Encodings)
+{
+    // Change video size to half.
+    encoding.scaleResolutionDownBy = 2.0f;
 }
 
 // Set updated parameters.
