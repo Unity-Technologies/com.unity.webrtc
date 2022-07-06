@@ -38,11 +38,11 @@ namespace webrtc
         { 2073600, 36864, 240000, H264Level::kLevel5_2 },
     };
 
+    static const int kPixelsPerMacroblock = 16 * 16;
+    static const int kUnitMaxBRWithNAL = 1200;
+
     absl::optional<webrtc::H264Level> H264SupportedLevel(int maxFramePixelCount, int maxFramerate, int maxBitrate)
     {
-        static const int kPixelsPerMacroblock = 16 * 16;
-        static const int kUnitMaxBRWithNAL = 1200;
-
         if (maxFramePixelCount <= 0 || maxFramerate <= 0 || maxBitrate <= 0)
             return absl::nullopt;
 
@@ -50,8 +50,7 @@ namespace webrtc
         {
             const LevelConstraint& level_constraint = kLevelConstraints[i];
             if (level_constraint.max_macroblock_frame_size * kPixelsPerMacroblock >= maxFramePixelCount &&
-                level_constraint.max_macroblocks_per_second >=
-                    maxFramerate * level_constraint.max_macroblock_frame_size &&
+                level_constraint.max_macroblocks_per_second >= maxFramerate * maxFramePixelCount / kPixelsPerMacroblock &&
                 level_constraint.max_video_bitrate * kUnitMaxBRWithNAL >= maxBitrate)
             {
                 return level_constraint.level;
@@ -60,6 +59,21 @@ namespace webrtc
 
         // No level supported.
         return absl::nullopt;
+    }
+
+    int SupportedMaxFramerate(H264Level level, int maxFramePixelCount)
+    {
+        for (size_t i = 0; i < arraysize(kLevelConstraints); i++)
+        {
+            const LevelConstraint& level_constraint = kLevelConstraints[i];
+            if (level_constraint.level == level)
+            {
+                return level_constraint.max_macroblocks_per_second * kPixelsPerMacroblock / maxFramePixelCount;
+            }
+        }
+
+        // target level not found.
+        return 0;
     }
 }
 }

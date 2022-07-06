@@ -20,6 +20,7 @@ namespace webrtc
     using namespace ::webrtc;
 
     int SupportedEncoderCount(CUcontext context);
+    H264Level SupportedMaxH264Level(CUcontext context);
     std::vector<SdpVideoFormat> SupportedNvEncoderCodecs(CUcontext context);
     std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context);
 

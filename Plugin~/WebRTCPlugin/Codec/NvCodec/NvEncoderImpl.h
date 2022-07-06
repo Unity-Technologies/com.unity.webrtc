@@ -107,6 +107,7 @@ namespace webrtc
 
         std::vector<LayerConfig> m_configurations;
 
+        static absl::optional<webrtc::H264Level> s_maxSupportedH264Level;
         static std::vector<SdpVideoFormat> s_formats;
     };
 } // end namespace webrtc
