@@ -10,20 +10,6 @@
     } \
 }
 
-#define VULKAN_SAFE_DESTROY_IMAGE(device, obj, allocator) { \
-    if (VK_NULL_HANDLE!=obj) { \
-        vkDestroyImage(device, obj, allocator); \
-        obj = VK_NULL_HANDLE; \
-    } \
-}
-
-#define VULKAN_SAFE_FREE_MEMORY(device, obj, allocator) { \
-    if (VK_NULL_HANDLE!=obj) { \
-        vkFreeMemory(device, obj, allocator); \
-        obj = VK_NULL_HANDLE; \
-    } \
-}
-
 #define VULKAN_SAFE_DESTROY_COMMAND_POOL(device, obj, allocator) { \
     if (VK_NULL_HANDLE != obj) { \
         vkDestroyCommandPool(device, obj, allocator); \

@@ -465,7 +465,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionAddTrack(
         PeerConnectionObject* obj, MediaStreamTrackInterface* track, const char* streamId, RtpSenderInterface** sender)
     {
-        auto result = obj->connection->AddTrack(rtc::scoped_refptr<MediaStreamTrackInterface>(track), { streamId });
+        std::vector<std::string> streams;
+        if (streamId)
+            streams.push_back(streamId);
+
+        auto result = obj->connection->AddTrack(rtc::scoped_refptr<MediaStreamTrackInterface>(track), streams);
         if (result.ok())
         {
             *sender = result.value();
