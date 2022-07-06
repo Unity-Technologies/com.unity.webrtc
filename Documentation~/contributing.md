@@ -12,4 +12,4 @@ We open the [GitHub Issues](https://github.com/Unity-Technologies/com.unity.webr
 
 ## Discussion
 
-To ask questions or discuss this package, please join the [Unity forum](https://forum.unity.com/forums/unity-render-streaming.413). This is also the best place to post feature requests.
+To have questions or discuss this package, please join the [Unity forum](https://forum.unity.com/forums/unity-render-streaming.413). This is also the best place to post feature requests.

@@ -290,19 +290,6 @@ namespace Unity.WebRTC
         public OptionalBool enableDtlsSrtp;
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    public enum CodecInitializationResult
-    {
-        NotInitialized,
-        Success,
-        DriverNotInstalled,
-        DriverVersionDoesNotSupportAPI,
-        APINotFound,
-        EncoderInitializationFailed
-    }
-
     public enum NativeLoggingSeverity
     {
         LS_VERBOSE,
@@ -755,21 +742,6 @@ namespace Unity.WebRTC
 
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
-
-        /// <summary>
-        /// Not implement this property.
-        /// Please check each track about initialization. (VideoStreamTrack.IsInitialized)
-        /// This property will be removed next major version up.
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        [Obsolete("Use 'VideoStreamTrack.IsInitialized' instead.", true)]
-        public static CodecInitializationResult CodecInitializationResult
-        {
-            get
-            {
-                throw new NotImplementedException("This property is obsoleted. Please use VideoStreamTrack.IsInitialized instead of this");
-            }
-        }
 
         public static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
         {

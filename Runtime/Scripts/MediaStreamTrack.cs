@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class MediaStreamTrack : RefCountedObject
     {
         /// <summary>
@@ -48,6 +51,9 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -62,7 +68,9 @@ namespace Unity.WebRTC
             base.Dispose();
         }
 
-        //Disassociate track from its source(video or audio), not for destroying the track
+        /// <summary>
+        /// Disassociate track from its source(video or audio), not for destroying the track
+        /// </summary>
         public void Stop()
         {
             WebRTC.Context.StopMediaStreamTrack(GetSelfOrThrow());
@@ -79,22 +87,51 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum TrackKind
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Audio,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Video
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum TrackState
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Live,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Ended
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCTrackEvent
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpTransceiver Transceiver { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpReceiver Receiver
         {
             get
@@ -103,6 +140,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MediaStreamTrack Track
         {
             get
@@ -126,6 +166,9 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class MediaStreamTrackEvent
     {
         public MediaStreamTrack Track { get; }

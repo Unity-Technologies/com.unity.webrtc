@@ -98,10 +98,18 @@ peerConnection.AddTransceiver(TrackKind.Video);
 ```
 
 > [!NOTE]
-> - It is not possible to send and receive video in a single [`VideoStreamTrack`](../api/Unity.WebRTC.VideoStreamTrack.html) instance.
+> - It's impossible to send and receive video in a single [`VideoStreamTrack`](../api/Unity.WebRTC.VideoStreamTrack.html) instance.
 > - The [`VideoStreamTrack`](../api/Unity.WebRTC.VideoStreamTrack.html) used to receive the video should be the track received in the event of the [`RTCPeerConnection.OnTrack`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_OnTrack).
 
-## Bitrate control
+## Video configuration
+
+Developers can control properties about video streaming quality in real-time.
+
+- Bitrate
+- Frame rate
+- Video resolution
+
+### Bitrate control
 
 To control the bitrate of video streaming, use [`SetParameters`](../api/Unity.WebRTC.RTCRtpSender.html#Unity_WebRTC_RTCRtpSender_SetParameters_) method of [`RTCRtpSender`](../api/Unity.WebRTC.RTCRtpSender.html) instance. The instance of [`RTCRtpSender`](../api/Unity.WebRTC.RTCRtpSender.html) is obtained from [`RTCPeerConnection`](../api/Unity.WebRTC.RTCPeerConnection.html). Or, obtained from [`AddTrack`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_AddTrack_) method as its return value.
 
@@ -129,13 +137,27 @@ foreach (var encoding in parameters.Encodings)
 sender.SetParameters(parameters);
 ```
 
-> [!NOTE]
-> Currently not supported [`maxFramerate`](../api/Unity.WebRTC.RTCRtpEncodingParameters.html#Unity_WebRTC_RTCRtpEncodingParameters_maxFramerate) in values of the settings.
->
+### Frame rate control
+
+Developers can also change the encoding frame rate using [`SetParameters`](../api/Unity.WebRTC.RTCRtpSender.html#Unity_WebRTC_RTCRtpSender_SetParameters_) method. The example code below shows how to change the frame rate of the video encoder. You should set this parameter lower than [Application.targetFramerate](https://docs.unity3d.com/ScriptReference/Application-targetFrameRate.html).
+
+```CSharp
+// Get `RTCRtpSendParameters`
+var parameters = sender.GetParameters();
+
+// Changing bitrate of all encoders.
+foreach (var encoding in parameters.Encodings)
+{
+    encoding.maxFramerate = framerate;
+}
+
+// Set updated parameters.
+sender.SetParameters(parameters);
+```
 
 ### Checking bitrate
 
-It is possible to check the current bitrate on browsers. If using Google Chrome, shows statistics of WebRTC by accessing the URL `chrome://webrtc-internals`. Check the graph showing the received bytes per unit time in the category `RTCInboundRTPVideoStream` of statistics.
+It's possible to check the current bitrate on browsers. If using Google Chrome, shows statistics of WebRTC by accessing the address `chrome://webrtc-internals`. Check the graph showing the received bytes per unit time in the category `RTCInboundRTPVideoStream` of statistics.
 
 ![Chrome WebRTC Stats](images/chrome-webrtc-stats.png)
 
@@ -171,7 +193,7 @@ There are two types of encoder for video streaming, one is using hardware for en
 
 As with video encoders, we offer hardware-intensive `H.264` decoders and non-hardware-intensive `VP8`, `VP9`, and `AV1` decoders.
 
-### HWA Codec
+### Hardware acceleration codecs
 
 For codecs that support hardware acceleration, the following codecs are supported.
 

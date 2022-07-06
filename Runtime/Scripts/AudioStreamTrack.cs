@@ -14,25 +14,6 @@ namespace Unity.WebRTC
         }
     }
 
-    public static class AudioSettingsUtility
-    {
-        static Dictionary<AudioSpeakerMode, int> pairs =
-            new Dictionary<AudioSpeakerMode, int>()
-        {
-            {AudioSpeakerMode.Mono, 1},
-            {AudioSpeakerMode.Stereo, 2},
-            {AudioSpeakerMode.Quad, 4},
-            {AudioSpeakerMode.Surround, 5},
-            {AudioSpeakerMode.Mode5point1, 6},
-            {AudioSpeakerMode.Mode7point1, 8},
-            {AudioSpeakerMode.Prologic, 2},
-        };
-        public static int SpeakerModeToChannel(AudioSpeakerMode mode)
-        {
-            return pairs[mode];
-        }
-    }
-
     /// <summary>
     ///
     /// </summary>

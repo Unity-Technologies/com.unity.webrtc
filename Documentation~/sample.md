@@ -19,10 +19,11 @@ The package contains the following samples.
 | RestartIce | Checking do an ICE restart |
 | PerfectNegotiation | Demonstrating [Perfect Negotiation Pattern](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation) |
 | Latency | Measuring a latency of video streaming |
+| ReplaceTrack | Change another video track without stopping video streaming |
 
 ## Import samples in project
 
-To get these samples, Push the `Import into Project` button on Package Manager.
+To get these samples, Push the `Import into Project` button on the Package Manager.
 
 ![Download package sample](images/download_package_sample.png)
 
@@ -38,7 +39,7 @@ Open `Menu` scene and press `Play` button, as you can see the menu for sample sc
 
 ## Install samples into mobile devices 
 
-It is easy to try all samples on mobile devices if only you put sample scenes into `Scenes in Build` in Build Settings Window. `Menu` scene should be loaded as a first one so you need to rearrange scenes.
+It's easy to try all samples on mobile devices if only you put sample scenes into `Scenes in Build` in Build Settings Window. `Menu` scene should be loaded as a first one so you need to rearrange scenes.
 
 ![Build Settings](images/sample_buildsettings.png)
 
