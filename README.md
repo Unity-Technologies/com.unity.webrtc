@@ -2,6 +2,7 @@
 
 <img src="https://img.shields.io/badge/unity-2019.4-green.svg?style=flat-square" alt="unity 2019.4">
 <img src="https://img.shields.io/badge/unity-2020.3-green.svg?style=flat-square" alt="unity 2020.3">
+<img src="https://img.shields.io/badge/unity-2021.3-green.svg?style=flat-square" alt="unity 2021.3">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -45,7 +46,8 @@ Please read this if you have an interest to customize native code in this projec
 | `2.4.0-exp.5` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix audio streaming issues | Feb 2022 |
 | `2.4.0-exp.6` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Feb 2022 |
 | `2.4.0-exp.7` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix video streaming issues | May 2022 |
-| `2.4.0-exp.8` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Jun 2022 |
+| `2.4.0-exp.8` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix bugs | Jul 2022 |
+| `2.4.0-exp.9` | [M104](https://groups.google.com/g/discuss-webrtc/c/PZxgk-aUFhw) | - Fix bugs | Oct 2022 |
 
 ## Licenses
 
