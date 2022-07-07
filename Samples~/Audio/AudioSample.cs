@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Unity.WebRTC
 {
-    public class AudioSample : MonoBehaviour
+    class AudioSample : MonoBehaviour
     {
         [SerializeField] private AudioSource inputAudioSource;
         [SerializeField] private AudioSource outputAudioSource;
