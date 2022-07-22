@@ -59,6 +59,10 @@ namespace Unity.WebRTC
             m_renderer?.Update();
         }
 
+        // Blit parameter to flip vertically
+        static Vector2 s_scale = new Vector2(1f, -1f);
+        static Vector2 s_offset = new Vector2(0, 1f);
+
         internal void UpdateSendTexture()
         {
             if (m_source == null)
@@ -71,7 +75,7 @@ namespace Unity.WebRTC
             //  - it might be better to implement this if possible
             if (m_needFlip)
             {
-                Graphics.Blit(m_sourceTexture, m_destTexture, WebRTC.flipMat);
+                Graphics.Blit(m_sourceTexture, m_destTexture, s_scale, s_offset);
             }
             else
             {
