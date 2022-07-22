@@ -21,10 +21,6 @@ namespace Unity.WebRTC
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
 
-        bool m_needFlip = false;
-        Texture m_sourceTexture;
-        RenderTexture m_destTexture;
-
         UnityVideoRenderer m_renderer;
         VideoTrackSource m_source;
 
@@ -45,7 +41,7 @@ namespace Unity.WebRTC
             {
                 if (m_renderer != null)
                     return m_renderer.Texture;
-                return m_destTexture;
+                return m_source.destTexture_;
             }
         }
 
@@ -59,29 +55,9 @@ namespace Unity.WebRTC
             m_renderer?.Update();
         }
 
-        // Blit parameter to flip vertically
-        static Vector2 s_scale = new Vector2(1f, -1f);
-        static Vector2 s_offset = new Vector2(0, 1f);
-
         internal void UpdateSendTexture()
         {
-            if (m_source == null)
-                return;
-
-            // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
-            // note: streamed video is flipped vertical if no action was taken:
-            //  - duplicate RenderTexture from its source texture
-            //  - call Graphics.Blit command with flip material every frame
-            //  - it might be better to implement this if possible
-            if (m_needFlip)
-            {
-                Graphics.Blit(m_sourceTexture, m_destTexture, s_scale, s_offset);
-            }
-            else
-            {
-                Graphics.Blit(m_sourceTexture, m_destTexture);
-            }
-            m_source.Update(m_destTexture);
+            m_source?.Update();
         }
 
         /// <summary>
@@ -112,10 +88,10 @@ namespace Unity.WebRTC
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
                 throw new InvalidOperationException();
 
-            m_sourceTexture = texture;
-            m_destTexture = dest;
-            m_needFlip = needFlip;
             m_source = source;
+            m_source.sourceTexture_ = texture;
+            m_source.destTexture_ = dest;
+            m_source.needFlip_ = needFlip;
         }
 
         /// <summary>
@@ -141,17 +117,9 @@ namespace Unity.WebRTC
             {
                 if (m_source != null)
                 {
-                    if (RenderTexture.active == m_destTexture)
+                    if (RenderTexture.active == m_source.destTexture_)
                         RenderTexture.active = null;
                 }
-
-                m_sourceTexture = null;
-
-                // Unity API must be called from main thread.
-                // This texture is referred from the rendering thread,
-                // so set the delay 100ms to wait the task of another thread.
-                WebRTC.DestroyOnMainThread(m_destTexture, 0.1f);
-
                 m_renderer?.Dispose();
                 m_source?.Dispose();
 
@@ -226,6 +194,14 @@ namespace Unity.WebRTC
             }
         }
 
+        // Blit parameter to flip vertically
+        static Vector2 s_scale = new Vector2(1f, -1f);
+        static Vector2 s_offset = new Vector2(0, 1f);
+
+        internal bool needFlip_ = false;
+        internal Texture sourceTexture_;
+        internal RenderTexture destTexture_;
+
         IntPtr ptr_ = IntPtr.Zero;
         EncodeData data_;
         Texture prevTexture_;
@@ -242,18 +218,29 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
-        public void Update(Texture texture)
+        public void Update()
         {
-            if (texture == null)
-                Debug.LogError("texture is null");
+            // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
+            // note: streamed video is flipped vertical if no action was taken:
+            //  - duplicate RenderTexture from its source texture
+            //  - call Graphics.Blit command with flip material every frame
+            //  - it might be better to implement this if possible
+            if (needFlip_)
+            {
+                Graphics.Blit(sourceTexture_, destTexture_, s_scale, s_offset);
+            }
+            else
+            {
+                Graphics.Blit(sourceTexture_, destTexture_);
+            }
 
             // todo:: This comparison is not sufficiency but it is for workaround of freeze bug.
             // Texture.GetNativeTexturePtr method freezes Unity Editor on apple silicon.
-            if (prevTexture_ != texture)
+            if (prevTexture_ != destTexture_)
             {
-                data_ = new EncodeData(texture, self);
+                data_ = new EncodeData(destTexture_, self);
                 Marshal.StructureToPtr(data_, ptr_, true);
-                prevTexture_ = texture;
+                prevTexture_ = destTexture_;
             }
             WebRTC.Context.Encode(ptr_);
         }
@@ -264,6 +251,13 @@ namespace Unity.WebRTC
             {
                 return;
             }
+
+            sourceTexture_ = null;
+
+            // Unity API must be called from main thread.
+            // This texture is referred from the rendering thread,
+            // so set the delay 100ms to wait the task of another thread.
+            WebRTC.DestroyOnMainThread(destTexture_, 0.1f);
 
             if (ptr_ != IntPtr.Zero)
             {
