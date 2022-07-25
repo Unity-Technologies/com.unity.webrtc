@@ -2,11 +2,13 @@ using System;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RefCountedObject : IDisposable
     {
         internal IntPtr self;
-
-        protected bool disposed;
+        internal protected bool disposed;
 
         internal RefCountedObject(IntPtr ptr)
         {
@@ -24,6 +26,9 @@ namespace Unity.WebRTC
             return self;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public virtual void Dispose()
         {
             if (this.disposed)

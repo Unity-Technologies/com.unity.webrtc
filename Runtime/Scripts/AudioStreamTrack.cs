@@ -8,6 +8,11 @@ namespace Unity.WebRTC
 {
     public static class AudioSourceExtension
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="track"></param>
         public static void SetTrack(this AudioSource source, AudioStreamTrack track)
         {
             track._streamRenderer.Source = source;
@@ -272,10 +277,11 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="nativeSlice"></param>
         /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
         public void SetData(ref NativeSlice<float> nativeSlice, int channels, int sampleRate)
         {
             unsafe
@@ -296,10 +302,11 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="array"></param>
         /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
         public void SetData(float[] array, int channels, int sampleRate)
         {
             if (array == null)

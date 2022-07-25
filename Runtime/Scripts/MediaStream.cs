@@ -4,9 +4,21 @@ using System.Collections.Generic;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class MediaStream : RefCountedObject
     {
         private DelegateOnAddTrack onAddTrack;
@@ -20,11 +32,17 @@ namespace Unity.WebRTC
         public string Id =>
             NativeMethods.MediaStreamGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~MediaStream()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -39,6 +57,11 @@ namespace Unity.WebRTC
             base.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// todo:(kazuki) Rename to "onAddTrack"
+        /// todo:(kazuki) Should we change the API to use UnityEvent or Action class?
         public DelegateOnAddTrack OnAddTrack
         {
             get => onAddTrack;
@@ -48,6 +71,11 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// todo:(kazuki) Rename to "onAddTrack"
+        /// todo:(kazuki) Should we change the API to use UnityEvent or Action class?
         public DelegateOnRemoveTrack OnRemoveTrack
         {
             get => onRemoveTrack;
@@ -57,33 +85,51 @@ namespace Unity.WebRTC
             }
         }
 
-        private void StopTrack(MediaStreamTrack track)
-        {
-            WebRTC.Context.StopMediaStreamTrack(track.GetSelfOrThrow());
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<VideoStreamTrack> GetVideoTracks()
         {
             var buf = NativeMethods.MediaStreamGetVideoTracks(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new VideoStreamTrack(ptr));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<AudioStreamTrack> GetAudioTracks()
         {
             var buf = NativeMethods.MediaStreamGetAudioTracks(GetSelfOrThrow(), out ulong length);
             return WebRTC.Deserialize(buf, (int)length, ptr => new AudioStreamTrack(ptr));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<MediaStreamTrack> GetTracks()
         {
             return GetAudioTracks().Cast<MediaStreamTrack>().Concat(GetVideoTracks());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
         public bool AddTrack(MediaStreamTrack track)
         {
             cacheTracks.Add(track);
             return NativeMethods.MediaStreamAddTrack(GetSelfOrThrow(), track.GetSelfOrThrow());
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
         public bool RemoveTrack(MediaStreamTrack track)
         {
             cacheTracks.Remove(track);
@@ -94,6 +140,10 @@ namespace Unity.WebRTC
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ptr"></param>
         internal MediaStream(IntPtr ptr) :base(ptr)
         {
             WebRTC.Table.Add(self, this);
