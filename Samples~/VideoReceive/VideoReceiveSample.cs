@@ -279,7 +279,7 @@ namespace Unity.WebRTC.Samples
         {
             if (!useWebCamToggle.isOn)
             {
-                videoStreamTrack = cam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 0);
+                videoStreamTrack = cam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y);
                 sourceImage.texture = cam.targetTexture;
                 yield break;
             }

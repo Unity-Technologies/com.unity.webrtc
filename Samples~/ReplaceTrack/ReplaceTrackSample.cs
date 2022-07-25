@@ -207,8 +207,8 @@ class ReplaceTrackSample : MonoBehaviour
             Vector2Int size2)
             : this(parent, polite)
         {
-            sourceVideoTrack1 = source1?.CaptureStreamTrack(size1.x, size1.y, 0);
-            sourceVideoTrack2 = source2?.CaptureStreamTrack(size2.x, size2.y, 0);
+            sourceVideoTrack1 = source1?.CaptureStreamTrack(size1.x, size1.y);
+            sourceVideoTrack2 = source2?.CaptureStreamTrack(size2.x, size2.y);
         }
 
         private IEnumerator NegotiationProcess()

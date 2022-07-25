@@ -152,8 +152,8 @@ class PerfectNegotiationSample : MonoBehaviour
                 this.parent.StartCoroutine(NegotiationProcess());
             };
 
-            sourceVideoTrack1 = source1.CaptureStreamTrack(width, height, 0);
-            sourceVideoTrack2 = source2.CaptureStreamTrack(width, height, 0);
+            sourceVideoTrack1 = source1.CaptureStreamTrack(width, height);
+            sourceVideoTrack2 = source2.CaptureStreamTrack(width, height);
         }
 
         private IEnumerator NegotiationProcess()

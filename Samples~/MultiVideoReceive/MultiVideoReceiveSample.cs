@@ -165,7 +165,7 @@ namespace Unity.WebRTC.Samples
 
             try
             {
-                videoStreamTrackList.Add(newCam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 0));
+                videoStreamTrackList.Add(newCam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y));
                 newSource.texture = newCam.targetTexture;
             }
             catch (Exception e)
