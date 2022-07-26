@@ -230,7 +230,7 @@ class ChangeCodecsSample : MonoBehaviour
 
         if (videoStream == null)
         {
-            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
+            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y);
         }
         sourceImage.texture = cam.targetTexture;
         sourceImage.color = Color.white;

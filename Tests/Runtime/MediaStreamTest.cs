@@ -138,7 +138,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
             Assert.That(videoStream.GetVideoTracks(), Has.Count.EqualTo(1));
             Assert.That(videoStream.GetAudioTracks(), Has.Count.EqualTo(0));
             Assert.That(videoStream.GetTracks().ToList(), Has.Count.EqualTo(1).And.All.InstanceOf<VideoStreamTrack>());
@@ -159,7 +159,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
@@ -188,7 +188,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
@@ -231,7 +231,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
@@ -273,7 +273,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
@@ -316,7 +316,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
@@ -364,7 +364,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var stream1 = cam.CaptureStream(1280, 720, 1000000);
+            var stream1 = cam.CaptureStream(1280, 720);
             var stream2 = new MediaStream();
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, stream1);
@@ -401,7 +401,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var camObj = new GameObject("Camera");
             var cam = camObj.AddComponent<Camera>();
-            var videoStream = cam.CaptureStream(1280, 720, 1000000);
+            var videoStream = cam.CaptureStream(1280, 720);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);

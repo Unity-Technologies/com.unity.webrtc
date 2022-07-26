@@ -66,7 +66,7 @@ namespace Unity.WebRTC.Samples
             Debug.Log("Set up source/receive streams");
             sourceStream = new MediaStream();
 
-            var videoTrack = cam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 0);
+            var videoTrack = cam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y);
             sourceStream.AddTrack(videoTrack);
             sourceImage.texture = cam.targetTexture;
 
