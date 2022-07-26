@@ -314,7 +314,6 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
-        internal static Material flipMat;
         private static bool s_limitTextureSize;
 
 #if UNITY_EDITOR
@@ -369,13 +368,6 @@ namespace Unity.WebRTC
 
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
-
-            var flipShader = Resources.Load<Shader>("Flip");
-            if (flipShader != null)
-            {
-                flipMat = new Material(flipShader);
-            }
-
             s_limitTextureSize = limitTextureSize;
         }
 
