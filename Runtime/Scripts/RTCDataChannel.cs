@@ -71,9 +71,23 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public delegate void DelegateOnOpen();
+    /// <summary>
+    /// 
+    /// </summary>
     public delegate void DelegateOnClose();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="bytes"></param>
     public delegate void DelegateOnMessage(byte[] bytes);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="channel"></param>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
     /// <summary>
