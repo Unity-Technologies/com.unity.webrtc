@@ -70,7 +70,7 @@ class MungeSDPSample : MonoBehaviour
     {
         Debug.Log("Set up source/receive streams");
 
-        sourceVideoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
+        sourceVideoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y);
         sourceImage.texture = cam.targetTexture;
         updateCoroutine = StartCoroutine(WebRTC.Update());
 
