@@ -1,5 +1,11 @@
 {
-    "ErrorExceptions": [],
+    "ErrorExceptions": [
+        {
+            "ValidationTest": "API Validation",
+            "ExceptionMessage": "Breaking changes require a new major version.",
+            "PackageVersion": "2.4.0-pre.1"
+        }        
+    ],
     "WarningExceptions": [
         {
             "ValidationTest": "Restricted File Type Validation",
