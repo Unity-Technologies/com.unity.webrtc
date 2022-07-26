@@ -151,11 +151,13 @@ namespace webrtc
 
     class IGraphicsDevice;
     class ProfilerMarkerFactory;
+    class VideoFrameBufferPool;
     class Plugin
     {
     public:
         static IGraphicsDevice* GraphicsDevice();
         static ProfilerMarkerFactory* ProfilerMarkerFactory();
+        static VideoFrameBufferPool* VideoFrameBufferPool();
     };
 
 } // end namespace webrtc

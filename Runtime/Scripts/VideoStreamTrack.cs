@@ -206,7 +206,7 @@ namespace Unity.WebRTC
             }
 
             int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
@@ -236,19 +236,19 @@ namespace Unity.WebRTC
         [StructLayout(LayoutKind.Sequential)]
         internal struct EncodeData
         {
-            public IntPtr ptrTexture;
+            public IntPtr ptrBuffer;
             public IntPtr ptrTrackSource;
             public int width;
             public int height;
             public GraphicsFormat format;
 
-            public EncodeData(Texture texture, IntPtr ptrSource)
+            public EncodeData(VideoFrameBuffer buffer, IntPtr ptrSource)
             {
-                ptrTexture = texture.GetNativeTexturePtr();
+                ptrBuffer = buffer.DangerousGetHandle();
                 ptrTrackSource = ptrSource;
-                width = texture.width;
-                height = texture.height;
-                format = texture.graphicsFormat;
+                width = buffer.texture.width;
+                height = buffer.texture.height;
+                format = buffer.texture.graphicsFormat;
             }
         }
 
@@ -260,6 +260,7 @@ namespace Unity.WebRTC
         internal Texture sourceTexture_;
         internal RenderTexture destTexture_;
 
+        VideoFrameBufferPool pool_ = new VideoFrameBufferPool();
         IntPtr ptr_ = IntPtr.Zero;
         EncodeData data_;
         Texture prevTexture_;
@@ -278,27 +279,44 @@ namespace Unity.WebRTC
 
         public void Update()
         {
+            var buffer = pool_.Create(sourceTexture_.width, sourceTexture_.height, sourceTexture_.graphicsFormat);
+
+            if(!buffer.Reserve())
+            {
+                return;
+            }
+
+            // todo:: This comparison is not sufficiency but it is for workaround of freeze bug.
+            // Texture.GetNativeTexturePtr method freezes Unity Editor on apple silicon.
+            //if (prevTexture_ != destTexture_)
+            //{
+            //    data_ = new EncodeData(destTexture_, self);
+            //    Marshal.StructureToPtr(data_, ptr_, true);
+            //    prevTexture_ = destTexture_;
+
+
             // [Note-kazuki: 2020-03-09] Flip vertically RenderTexture
             // note: streamed video is flipped vertical if no action was taken:
             //  - duplicate RenderTexture from its source texture
             //  - call Graphics.Blit command with flip material every frame
             //  - it might be better to implement this if possible
-            if (needFlip_)
-            {
-                Graphics.Blit(sourceTexture_, destTexture_, s_scale, s_offset);
-            }
-            else
-            {
-                Graphics.Blit(sourceTexture_, destTexture_);
-            }
+            //if (needFlip_)
+            //{
+            //    Graphics.Blit(sourceTexture_, buffer.texture, s_scale, s_offset);
+            //}
+            //else
+            //{
+            //    Graphics.Blit(sourceTexture_, destTexture_);
+            //}
+            Graphics.CopyTexture(sourceTexture_, buffer.texture);
 
             // todo:: This comparison is not sufficiency but it is for workaround of freeze bug.
             // Texture.GetNativeTexturePtr method freezes Unity Editor on apple silicon.
-            if (prevTexture_ != destTexture_)
+            if (prevTexture_ != buffer.texture)
             {
-                data_ = new EncodeData(destTexture_, self);
+                data_ = new EncodeData(buffer, self);
                 Marshal.StructureToPtr(data_, ptr_, true);
-                prevTexture_ = destTexture_;
+                prevTexture_ = buffer.texture;
             }
             WebRTC.Context.Encode(ptr_);
         }

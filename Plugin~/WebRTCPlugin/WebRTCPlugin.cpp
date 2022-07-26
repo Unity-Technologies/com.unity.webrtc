@@ -3,12 +3,14 @@
 #include "Context.h"
 #include "CreateSessionDescriptionObserver.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/ITexture2D.h"
 #include "MediaStreamObserver.h"
 #include "PeerConnectionObject.h"
 #include "SetLocalDescriptionObserver.h"
 #include "SetRemoteDescriptionObserver.h"
 #include "UnityAudioTrackSource.h"
 #include "UnityLogStream.h"
+#include "VideoFrameBufferPool.h"
 #include "WebRTCPlugin.h"
 
 namespace unity
@@ -1427,5 +1429,31 @@ extern "C"
     {
         sink->ProcessAudio(data, length, static_cast<size_t>(channels), sampleRate);
     }
+
+    UNITY_INTERFACE_EXPORT void* CreateExternalTexture(int width, int height, UnityRenderingExtTextureFormat format)
+    {
+        return Plugin::GraphicsDevice()->CreateTexture(width, height, format);
+    }
+
+    UNITY_INTERFACE_EXPORT VideoFrameBuffer* ExternalTextureVideoFrameBufferCreate(void* texture)
+    {
+        return Plugin::VideoFrameBufferPool()->Create(texture);
+    }
+
+    UNITY_INTERFACE_EXPORT bool VideoFrameBufferDelete(const VideoFrameBuffer* buffer)
+    {
+        return Plugin::VideoFrameBufferPool()->Delete(buffer);
+    }
+
+    UNITY_INTERFACE_EXPORT bool VideoFrameBufferReserve(const VideoFrameBuffer* buffer)
+    {
+        return Plugin::VideoFrameBufferPool()->Reserve(buffer);
+    }
+
+    UNITY_INTERFACE_EXPORT VideoFrameBufferState VideoFrameBufferGetState(const VideoFrameBuffer* buffer)
+    {
+        return Plugin::VideoFrameBufferPool()->GetState(buffer);
+    }
+
 #pragma clang diagnostic pop
 }

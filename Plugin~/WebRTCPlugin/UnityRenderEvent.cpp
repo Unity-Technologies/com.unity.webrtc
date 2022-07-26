@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include "Context.h"
-#include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
@@ -9,6 +8,7 @@
 #include "UnityProfilerInterfaceFunctions.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrame.h"
+#include "VideoFrameBufferPool.h"
 
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
@@ -19,9 +19,6 @@ enum class VideoStreamRenderEventID
 {
     Encode = 1,
 };
-
-using namespace unity::webrtc;
-using namespace ::webrtc;
 
 namespace unity
 {
@@ -38,9 +35,11 @@ namespace webrtc
     static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
-    static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
+    static std::unique_ptr<VideoFrameBufferPool> s_bufferPool;
 
     IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
+
+    VideoFrameBufferPool* Plugin::VideoFrameBufferPool() { return s_bufferPool.get(); }
 
     ProfilerMarkerFactory* Plugin::ProfilerMarkerFactory() { return s_ProfilerMarkerFactory.get(); }
 
@@ -69,6 +68,9 @@ namespace webrtc
     }
 } // end namespace webrtc
 } // end namespace unity
+
+using namespace ::webrtc;
+using namespace unity::webrtc;
 
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
@@ -112,7 +114,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             s_gfxDevice->InitV();
         }
-        s_bufferPool = std::make_unique<GpuMemoryBufferPool>(s_gfxDevice.get(), s_clock.get());
+        s_bufferPool = std::make_unique<VideoFrameBufferPool>(s_gfxDevice.get(), s_clock.get());
         break;
     }
     case kUnityGfxDeviceEventShutdown:
@@ -248,17 +250,17 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     Timestamp timestamp = s_clock->CurrentTime();
     IGraphicsDevice* device = Plugin::GraphicsDevice();
     UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
-    void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
+    // void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
     unity::webrtc::Size size(encodeData->width, encodeData->height);
     {
         std::unique_ptr<const ScopedProfiler> profiler;
         if (s_ProfilerMarkerFactory)
             profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
-        auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
-        source->OnFrameCaptured(std::move(frame));
+        VideoFrameBuffer* buffer = static_cast<VideoFrameBuffer*>(encodeData->texture);
+        source->OnFrameCaptured(std::move(s_bufferPool->Retain(buffer)));
     }
-    s_bufferPool->ReleaseStaleBuffers(timestamp);
+    // s_bufferPool->ReleaseStaleBuffers(timestamp);
 }
 
 static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)

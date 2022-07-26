@@ -74,8 +74,8 @@ namespace webrtc
 
         void SendTestFrame()
         {
-            auto frame = CreateTestFrame(device(), m_texture.get(), format());
-            m_trackSource->OnFrameCaptured(std::move(frame));
+            //auto frame = CreateTestFrame(device(), m_texture.get(), format());
+            //m_trackSource->OnFrameCaptured(std::move(frame));
         }
     };
 

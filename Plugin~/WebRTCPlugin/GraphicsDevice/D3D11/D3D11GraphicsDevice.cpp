@@ -69,6 +69,38 @@ namespace webrtc
         return new D3D11Texture2D(w, h, texture);
     }
 
+    void* D3D11GraphicsDevice::CreateTexture(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    {
+        ID3D11Texture2D* texture = nullptr;
+        D3D11_TEXTURE2D_DESC desc = {};
+        desc.Width = w;
+        desc.Height = h;
+        desc.MipLevels = 1;
+        desc.ArraySize = 1;
+        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        desc.SampleDesc.Count = 1;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.CPUAccessFlags = 0;
+        desc.MiscFlags = 0;
+        HRESULT result = m_d3d11Device->CreateTexture2D(&desc, nullptr, &texture);
+        if (result != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "CreateTexture2D failed. error:" << result;
+            return nullptr;
+        }
+        return texture;
+    }
+
+    ITexture2D* D3D11GraphicsDevice::BindTexture(void* texture)
+    {
+        ID3D11Texture2D* d3dTexture = reinterpret_cast<ID3D11Texture2D*>(texture);
+        D3D11_TEXTURE2D_DESC desc = {};
+        d3dTexture->GetDesc(&desc);
+        return new D3D11Texture2D(desc.Width, desc.Height, d3dTexture, true);
+
+    }
+
     //---------------------------------------------------------------------------------------------------------------------
     ITexture2D*
     D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
