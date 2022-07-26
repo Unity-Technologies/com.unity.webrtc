@@ -49,7 +49,7 @@ namespace Unity.WebRTC
             {
                 return;
             }
-            if(self != IntPtr.Zero && !WebRTC.Context.IsNull)
+            if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
                 WebRTC.Context.UnRegisterMediaStreamObserver(this);
                 WebRTC.Table.Remove(self);
@@ -136,6 +136,9 @@ namespace Unity.WebRTC
             return NativeMethods.MediaStreamRemoveTrack(GetSelfOrThrow(), track.GetSelfOrThrow());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
         {
         }
@@ -144,7 +147,7 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         /// <param name="ptr"></param>
-        internal MediaStream(IntPtr ptr) :base(ptr)
+        internal MediaStream(IntPtr ptr) : base(ptr)
         {
             WebRTC.Table.Add(self, this);
             WebRTC.Context.RegisterMediaStreamObserver(this);
@@ -174,7 +177,7 @@ namespace Unity.WebRTC
             {
                 if (WebRTC.Table[ptr] is MediaStream stream)
                 {
-                    if(WebRTC.Table.ContainsKey(ptrTrack))
+                    if (WebRTC.Table.ContainsKey(ptrTrack))
                     {
                         var track = WebRTC.Table[ptrTrack] as MediaStreamTrack;
                         var e = new MediaStreamTrackEvent(track);

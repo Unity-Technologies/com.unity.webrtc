@@ -187,7 +187,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        Max =7
+        Max = 7
     }
 
     /// <summary>
@@ -395,7 +395,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCDataChannel.ReadyState"> in the <see cref="RTCDataChannel"/> class.
+    /// Please check the <see cref="RTCDataChannel.ReadyState"/> in the <see cref="RTCDataChannel"/> class.
     /// </summary>
     /// <seealso cref="RTCDataChannel.ReadyState"/>
     public enum RTCDataChannelState
@@ -447,7 +447,7 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public static RTCOfferAnswerOptions Default =
-            new RTCOfferAnswerOptions {iceRestart = false, voiceActivityDetection = true};
+            new RTCOfferAnswerOptions { iceRestart = false, voiceActivityDetection = true };
 
         /// <summary>
         ///
@@ -466,7 +466,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCIceServer.credentialType"> in the <see cref="RTCIceServer"/> struct.
+    /// Please check the <see cref="RTCIceServer.credentialType"/> in the <see cref="RTCIceServer"/> struct.
     /// </summary>
     /// <seealso cref="RTCIceServer.credentialType"/>
     public enum RTCIceCredentialType
@@ -515,7 +515,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCConfiguration.iceTransportPolicy"> in the <see cref="RTCConfiguration"/> class.
+    /// Please check the <see cref="RTCConfiguration.iceTransportPolicy"/> in the <see cref="RTCConfiguration"/> class.
     /// </summary>
     /// <seealso cref="RTCConfiguration.iceTransportPolicy"/>
     public enum RTCIceTransportPolicy : int
@@ -596,16 +596,35 @@ namespace Unity.WebRTC
         public OptionalBool enableDtlsSrtp;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum NativeLoggingSeverity
     {
-        LS_VERBOSE,
-        LS_INFO,
-        LS_WARNING,
-        LS_ERROR,
-        LS_NONE,
-        INFO = LS_INFO,
-        WARNING = LS_WARNING,
-        LERROR = LS_ERROR
+        /// <summary>
+        /// 
+        /// </summary>
+        Verbose,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Info,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Warning,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Error,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        None,
     };
 
     /// <summary>
@@ -630,12 +649,13 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
-        /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
+        /// <param name="enableNativeLog"></param>
+        /// <param name="nativeLoggingSeverity"></param>
         public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
-            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.LS_INFO)
+            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
         {
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
@@ -735,26 +755,18 @@ namespace Unity.WebRTC
                 s_context = null;
             }
             s_syncContext = null;
-            NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.LS_INFO);
+            NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.Info);
 
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
 #endif
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="platform"></param>
-        /// <param name="encoderType"></param>
-        /// <returns></returns>
-        public static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
+        internal static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
         {
             if (!s_limitTextureSize)
             {
-                return new RTCError {errorType = RTCErrorType.None};
+                return new RTCError { errorType = RTCErrorType.None };
             }
 
             const int maxPixelCount = 3840 * 2160;
@@ -813,7 +825,7 @@ namespace Unity.WebRTC
                 }
             }
 
-            return new RTCError {errorType = RTCErrorType.None};
+            return new RTCError { errorType = RTCErrorType.None };
         }
 
         /// <summary>
@@ -825,7 +837,7 @@ namespace Unity.WebRTC
             // can't recognize legacy format
             const int LegacyARGB32_sRGB = 87;
             const int LegacyARGB32_UNorm = 88;
-            if ((int) format == LegacyARGB32_sRGB || (int) format == LegacyARGB32_UNorm)
+            if ((int)format == LegacyARGB32_sRGB || (int)format == LegacyARGB32_UNorm)
             {
                 return;
             }
@@ -933,7 +945,7 @@ namespace Unity.WebRTC
         {
             if (delay < 0f)
                 throw new ArgumentException($"The delay value is smaller than zero. delay:{delay}");
-            if(Mathf.Approximately(delay, 0f))
+            if (Mathf.Approximately(delay, 0f))
                 s_syncContext.Post(DestroyImmediate, obj);
             else
                 s_syncContext.Post(Destroy, Tuple.Create(obj, delay));
@@ -983,7 +995,7 @@ namespace Unity.WebRTC
 
         static void DelayAction(object state)
         {
-            (Action callback, float delay)  = state as Tuple<Action, float>;
+            (Action callback, float delay) = state as Tuple<Action, float>;
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 int milliseconds = (int)(delay * 1000f);
@@ -1041,7 +1053,7 @@ namespace Unity.WebRTC
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
-        public static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
+        internal static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
         {
             get
             {
@@ -1056,10 +1068,8 @@ namespace Unity.WebRTC
                             list.Add(new WeakReference<RTCPeerConnection>(peer));
                         }
                     }
-
                     return list;
                 }
-
                 return null;
             }
         }
@@ -1314,7 +1324,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCDataChannelState DataChannelGetReadyState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void DataChannelSend(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string msg);
+        public static extern void DataChannelSend(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string msg);
         [DllImport(WebRTC.Lib, EntryPoint = "DataChannelSendBinary")]
         public static extern void DataChannelSendPtr(IntPtr ptr, IntPtr dataPtr, int size);
         [DllImport(WebRTC.Lib)]

@@ -64,6 +64,9 @@ namespace Unity.WebRTC
 
         private bool disposed;
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCPeerConnection()
         {
             this.Dispose();
@@ -386,7 +389,7 @@ namespace Unity.WebRTC
                 {
                     var receiver = WebRTC.FindOrCreate(
                         receiverPtr, _ptr => new RTCRtpReceiver(_ptr, connection));
-                    if(receiver != null)
+                    if (receiver != null)
                         connection.cacheTracks.Remove(receiver.Track);
                 }
             });
@@ -509,6 +512,9 @@ namespace Unity.WebRTC
                 self, OnSetSessionDescFailure);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void RestartIce()
         {
             NativeMethods.PeerConnectionRestartIce(GetSelfOrThrow());
@@ -545,9 +551,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="sender"></param>
+        /// <returns></returns>
         /// <seealso cref="AddTrack"/>
         public RTCErrorType RemoveTrack(RTCRtpSender sender)
         {
@@ -556,9 +563,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="track"></param>
+        /// <param name="init"></param>
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track, RTCRtpTransceiverInit init = null)
         {
@@ -570,9 +578,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="kind"></param>
+        /// <param name="init"></param>
         /// <returns></returns>
         public RTCRtpTransceiver AddTransceiver(TrackKind kind, RTCRtpTransceiverInit init = null)
         {
@@ -582,9 +591,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="candidate"></param>
+        /// <returns></returns>
         public bool AddIceCandidate(RTCIceCandidate candidate)
         {
             return NativeMethods.PeerConnectionAddIceCandidate(
@@ -605,6 +615,10 @@ namespace Unity.WebRTC
             return m_opSessionDesc;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCSessionDescriptionAsyncOperation CreateOffer()
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
@@ -625,6 +639,10 @@ namespace Unity.WebRTC
             return m_opSessionDesc;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCSessionDescriptionAsyncOperation CreateAnswer()
         {
             m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
@@ -671,7 +689,7 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     connection.m_opSessionDesc.IsError = true;
-                    connection.m_opSessionDesc.Error = new RTCError{errorType = type, message = message};
+                    connection.m_opSessionDesc.Error = new RTCError { errorType = type, message = message };
                     connection.m_opSessionDesc.Done();
                 }
             });
@@ -698,7 +716,7 @@ namespace Unity.WebRTC
         public RTCSetSessionDescriptionAsyncOperation SetLocalDescription(
             ref RTCSessionDescription desc)
         {
-            if(string.IsNullOrEmpty(desc.sdp))
+            if (string.IsNullOrEmpty(desc.sdp))
                 throw new ArgumentException("sdp is null or empty");
 
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
@@ -711,6 +729,10 @@ namespace Unity.WebRTC
             throw new RTCErrorException(ref error);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCSetSessionDescriptionAsyncOperation SetLocalDescription()
         {
             var op = new RTCSetSessionDescriptionAsyncOperation(this);
@@ -842,6 +864,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSessionDescription CurrentRemoteDescription
         {
             get

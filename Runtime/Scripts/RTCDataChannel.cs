@@ -231,11 +231,17 @@ namespace Unity.WebRTC
             WebRTC.Context.DataChannelRegisterOnClose(self, DataChannelNativeOnClose);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCDataChannel()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -287,6 +293,11 @@ namespace Unity.WebRTC
             NativeMethods.DataChannelSendBinary(GetSelfOrThrow(), msg, msg.Length);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg"></param>
         public unsafe void Send<T>(NativeArray<T> msg)
             where T : struct
         {
@@ -301,6 +312,11 @@ namespace Unity.WebRTC
             NativeMethods.DataChannelSendPtr(GetSelfOrThrow(), new IntPtr(msg.GetUnsafeReadOnlyPtr()), msg.Length * UnsafeUtility.SizeOf<T>());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg"></param>
         public unsafe void Send<T>(NativeSlice<T> msg)
             where T : struct
         {
@@ -312,6 +328,12 @@ namespace Unity.WebRTC
         }
 
 #if UNITY_2020_1_OR_NEWER // ReadOnly support was introduced in 2020.1
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg"></param>
         public unsafe void Send<T>(NativeArray<T>.ReadOnly msg)
             where T : struct
         {
@@ -323,6 +345,11 @@ namespace Unity.WebRTC
         }
 #endif
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msgPtr"></param>
+        /// <param name="length"></param>
         public unsafe void Send(void* msgPtr, int length)
         {
             if (ReadyState != RTCDataChannelState.Open)
@@ -332,6 +359,11 @@ namespace Unity.WebRTC
             NativeMethods.DataChannelSendPtr(GetSelfOrThrow(), new IntPtr(msgPtr), length);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msgPtr"></param>
+        /// <param name="length"></param>
         public void Send(IntPtr msgPtr, int length)
         {
             if (ReadyState != RTCDataChannelState.Open)
@@ -344,6 +376,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Close()
         {
             NativeMethods.DataChannelClose(GetSelfOrThrow());
