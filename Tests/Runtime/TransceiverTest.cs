@@ -190,7 +190,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             var go = new GameObject("Test");
             var cam = go.AddComponent<Camera>();
-            var track = cam.CaptureStreamTrack(1280, 720, 0);
+            var track = cam.CaptureStreamTrack(1280, 720);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddTransceiver(0, track);

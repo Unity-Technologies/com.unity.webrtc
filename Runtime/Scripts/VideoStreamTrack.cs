@@ -164,7 +164,16 @@ namespace Unity.WebRTC
 
     public static class CameraExtension
     {
-        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height, int bitrate,
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="depth"></param>
+        /// <param name="needFlip"></param>
+        /// <returns></returns>
+        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24, bool needFlip = true)
         {
             switch (depth)
@@ -177,7 +186,7 @@ namespace Unity.WebRTC
                     throw new InvalidEnumArgumentException(nameof(depth), (int)depth, typeof(RenderTextureDepth));
             }
 
-            if (width == 0 || height == 0)
+            if (width <= 0 || height <= 0)
             {
                 throw new ArgumentException("width and height are should be greater than zero.");
             }
@@ -191,11 +200,11 @@ namespace Unity.WebRTC
         }
 
 
-        public static MediaStream CaptureStream(this Camera cam, int width, int height, int bitrate,
+        public static MediaStream CaptureStream(this Camera cam, int width, int height,
             RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
         {
             var stream = new MediaStream();
-            var track = cam.CaptureStreamTrack(width, height, bitrate, depth);
+            var track = cam.CaptureStreamTrack(width, height, depth);
             stream.AddTrack(track);
             return stream;
         }

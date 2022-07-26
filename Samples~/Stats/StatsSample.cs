@@ -135,7 +135,7 @@ class StatsSample : MonoBehaviour
         dataChannel.OnOpen = onDataChannelOpen;
 
         var audioTrack = new AudioStreamTrack(source);
-        var videoTrack = cam.CaptureStreamTrack(1280, 720, 0);
+        var videoTrack = cam.CaptureStreamTrack(1280, 720);
         yield return 0;
 
         pc1.AddTrack(audioTrack);

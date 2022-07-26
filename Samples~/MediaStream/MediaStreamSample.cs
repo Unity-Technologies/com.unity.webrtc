@@ -180,7 +180,7 @@ namespace Unity.WebRTC.Samples
             _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
             _pc2.OnTrack = pc2Ontrack;
 
-            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 1000000);
+            videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y);
             track = videoStream.GetTracks().First();
             RtImage.texture = cam.targetTexture;
         }

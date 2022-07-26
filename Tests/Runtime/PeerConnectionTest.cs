@@ -981,7 +981,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             var go = new GameObject("Test");
             var cam = go.AddComponent<Camera>();
-            stream.AddTrack(cam.CaptureStreamTrack(1280, 720, 0));
+            stream.AddTrack(cam.CaptureStreamTrack(1280, 720));
 
             var source = go.AddComponent<AudioSource>();
             source.clip = AudioClip.Create("test", 480, 2, 48000, false);

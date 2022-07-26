@@ -178,7 +178,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
         public void CreateVideoStreamTrack()
         {
-            SendVideoTrack = cam.CaptureStreamTrack(width, height, 1000000);
+            SendVideoTrack = cam.CaptureStreamTrack(width, height);
             SendTexture = cam.targetTexture;
         }
 
