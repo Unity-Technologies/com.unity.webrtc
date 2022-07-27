@@ -1,9 +1,23 @@
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum RenderTextureDepth
     {
-        DEPTH_16 = 16,
-        DEPTH_24 = 24,
-        DEPTH_32 = 32,
+        /// <summary>
+        /// 
+        /// </summary>
+        Depth16 = 16,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Depth24 = 24,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Depth32 = 32,
     }
 }

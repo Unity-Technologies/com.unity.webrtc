@@ -106,6 +106,9 @@ namespace Unity.WebRTC
             m_renderer = new UnityVideoRenderer(this, true);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -134,6 +137,9 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class CameraExtension
     {
         /// <summary>
@@ -146,13 +152,13 @@ namespace Unity.WebRTC
         /// <param name="needFlip"></param>
         /// <returns></returns>
         public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height,
-            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24, bool needFlip = true)
+            RenderTextureDepth depth = RenderTextureDepth.Depth24, bool needFlip = true)
         {
             switch (depth)
             {
-                case RenderTextureDepth.DEPTH_16:
-                case RenderTextureDepth.DEPTH_24:
-                case RenderTextureDepth.DEPTH_32:
+                case RenderTextureDepth.Depth16:
+                case RenderTextureDepth.Depth24:
+                case RenderTextureDepth.Depth32:
                     break;
                 default:
                     throw new InvalidEnumArgumentException(nameof(depth), (int)depth, typeof(RenderTextureDepth));
@@ -171,9 +177,16 @@ namespace Unity.WebRTC
             return new VideoStreamTrack(rt, needFlip);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="depth"></param>
+        /// <returns></returns>
         public static MediaStream CaptureStream(this Camera cam, int width, int height,
-            RenderTextureDepth depth = RenderTextureDepth.DEPTH_24)
+            RenderTextureDepth depth = RenderTextureDepth.Depth24)
         {
             var stream = new MediaStream();
             var track = cam.CaptureStreamTrack(width, height, depth);

@@ -6,7 +6,6 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC
 {
@@ -15,26 +14,95 @@ namespace Unity.WebRTC
     /// </summary>
     public enum RTCErrorDetailType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         DataChannelFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         DtlsFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         FingerprintFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpBadScriptFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpExecutionFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpLoadFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpNeedLogin,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpTimeout,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpTlsFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpTokenExpired,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IdpTokenInvalid,
+
+        /// <summary>
+        /// 
+        /// </summary>
         SctpFailure,
+
+        /// <summary>
+        /// 
+        /// </summary>
         SdpSyntaxError,
+
+        /// <summary>
+        /// 
+        /// </summary>
         HardwareEncoderNotAvailable,
+
+        /// <summary>
+        /// 
+        /// </summary>
         HardwareEncoderError
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public struct RTCError
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCErrorType errorType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string message;
     }
 
@@ -44,11 +112,34 @@ namespace Unity.WebRTC
     /// <seealso cref="RTCPeerConnection.ConnectionState"/>
     public enum RTCPeerConnectionState : int
     {
+        /// <summary>
+        /// 
+        /// </summary>
         New = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Connecting = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Connected = 2,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Disconnected = 3,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Failed = 4,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Closed = 5
     }
 
@@ -58,14 +149,45 @@ namespace Unity.WebRTC
     /// <seealso cref="RTCPeerConnection.IceConnectionState"/>
     public enum RTCIceConnectionState : int
     {
+        /// <summary>
+        /// 
+        /// </summary>
         New = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Checking = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Connected = 2,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Completed = 3,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Failed = 4,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Disconnected = 5,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Closed = 6,
-        Max =7
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Max = 7
     }
 
     /// <summary>
@@ -74,8 +196,19 @@ namespace Unity.WebRTC
     /// <seealso cref="RTCPeerConnection.GatheringState"/>
     public enum RTCIceGatheringState : int
     {
+        /// <summary>
+        /// 
+        /// </summary>
         New = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Gathering = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Complete = 2
     }
 
@@ -85,11 +218,34 @@ namespace Unity.WebRTC
     /// <seealso cref="RTCPeerConnection.SignalingState"/>
     public enum RTCSignalingState : int
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Stable = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
         HaveLocalOffer = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
         HaveLocalPrAnswer = 2,
+
+        /// <summary>
+        /// 
+        /// </summary>
         HaveRemoteOffer = 3,
+
+        /// <summary>
+        /// 
+        /// </summary>
         HaveRemotePrAnswer = 4,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Closed = 5,
     }
 
@@ -98,34 +254,121 @@ namespace Unity.WebRTC
     /// </summary>
     public enum RTCErrorType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         None,
+
+        /// <summary>
+        /// 
+        /// </summary>
         UnsupportedOperation,
+
+        /// <summary>
+        /// 
+        /// </summary>
         UnsupportedParameter,
+
+        /// <summary>
+        /// 
+        /// </summary>
         InvalidParameter,
+
+        /// <summary>
+        /// 
+        /// </summary>
         InvalidRange,
+
+        /// <summary>
+        /// 
+        /// </summary>
         SyntaxError,
+
+        /// <summary>
+        /// 
+        /// </summary>
         InvalidState,
+
+        /// <summary>
+        /// 
+        /// </summary>
         InvalidModification,
+
+        /// <summary>
+        /// 
+        /// </summary>
         NetworkError,
+
+        /// <summary>
+        /// 
+        /// </summary>
         ResourceExhausted,
+
+        /// <summary>
+        /// 
+        /// </summary>
         InternalError,
+
+        /// <summary>
+        /// 
+        /// </summary>
         OperationErrorWithData
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum RTCPeerConnectionEventType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         ConnectionStateChange,
+
+        /// <summary>
+        /// 
+        /// </summary>
         DataChannel,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IceCandidate,
+
+        /// <summary>
+        /// 
+        /// </summary>
         IceConnectionStateChange,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Track
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum RTCSdpType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Offer,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Pranswer,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Answer,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Rollback
     }
 
@@ -135,20 +378,46 @@ namespace Unity.WebRTC
     /// <seealso cref="RTCConfiguration.bundlePolicy"/>
     public enum RTCBundlePolicy : int
     {
+        /// <summary>
+        /// 
+        /// </summary>
         BundlePolicyBalanced = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
         BundlePolicyMaxBundle = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
         BundlePolicyMaxCompat = 2
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCDataChannel.ReadyState"> in the <see cref="RTCDataChannel"/> class.
+    /// Please check the <see cref="RTCDataChannel.ReadyState"/> in the <see cref="RTCDataChannel"/> class.
     /// </summary>
     /// <seealso cref="RTCDataChannel.ReadyState"/>
     public enum RTCDataChannelState
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Connecting,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Open,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Closing,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Closed
     }
 
@@ -157,7 +426,14 @@ namespace Unity.WebRTC
     /// </summary>
     public struct RTCSessionDescription
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCSdpType type;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [MarshalAs(UnmanagedType.LPStr)]
         public string sdp;
     }
@@ -167,14 +443,18 @@ namespace Unity.WebRTC
     /// </summary>
     public struct RTCOfferAnswerOptions
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static RTCOfferAnswerOptions Default =
-            new RTCOfferAnswerOptions {iceRestart = false, voiceActivityDetection = true};
+            new RTCOfferAnswerOptions { iceRestart = false, voiceActivityDetection = true };
 
         /// <summary>
         ///
         /// </summary>
         [MarshalAs(UnmanagedType.U1)]
         public bool iceRestart;
+
         /// <summary>
         ///
         /// </summary>
@@ -186,12 +466,19 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCIceServer.credentialType"> in the <see cref="RTCIceServer"/> struct.
+    /// Please check the <see cref="RTCIceServer.credentialType"/> in the <see cref="RTCIceServer"/> struct.
     /// </summary>
     /// <seealso cref="RTCIceServer.credentialType"/>
     public enum RTCIceCredentialType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Password,
+
+        /// <summary>
+        /// 
+        /// </summary>
         OAuth
     }
 
@@ -202,18 +489,33 @@ namespace Unity.WebRTC
     [Serializable]
     public struct RTCIceServer
     {
+        /// <summary>
+        /// 
+        /// </summary>
         [Tooltip("Optional: specifies the password to use when authenticating with the ICE server")]
         public string credential;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [Tooltip("What type of credential the `password` value")]
         public RTCIceCredentialType credentialType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [Tooltip("Array to set URLs of your STUN/TURN servers")]
         public string[] urls;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [Tooltip("Optional: specifies the username to use when authenticating with the ICE server")]
         public string username;
     }
 
     /// <summary>
-    /// Please check the <see cref="RTCConfiguration.iceTransportPolicy"> in the <see cref="RTCConfiguration"/> class.
+    /// Please check the <see cref="RTCConfiguration.iceTransportPolicy"/> in the <see cref="RTCConfiguration"/> class.
     /// </summary>
     /// <seealso cref="RTCConfiguration.iceTransportPolicy"/>
     public enum RTCIceTransportPolicy : int
@@ -240,18 +542,22 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         public RTCIceServer[] iceServers;
+
         /// <summary>
         ///
         /// </summary>
         public RTCIceTransportPolicy? iceTransportPolicy;
+
         /// <summary>
         ///
         /// </summary>
         public RTCBundlePolicy? bundlePolicy;
+
         /// <summary>
         ///
         /// </summary>
         public int? iceCandidatePoolSize;
+
         /// <summary>
         ///
         /// </summary>
@@ -290,16 +596,35 @@ namespace Unity.WebRTC
         public OptionalBool enableDtlsSrtp;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum NativeLoggingSeverity
     {
-        LS_VERBOSE,
-        LS_INFO,
-        LS_WARNING,
-        LS_ERROR,
-        LS_NONE,
-        INFO = LS_INFO,
-        WARNING = LS_WARNING,
-        LERROR = LS_ERROR
+        /// <summary>
+        /// 
+        /// </summary>
+        Verbose,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Info,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Warning,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Error,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        None,
     };
 
     /// <summary>
@@ -317,19 +642,20 @@ namespace Unity.WebRTC
         private static bool s_limitTextureSize;
 
 #if UNITY_EDITOR
-        public static void OnBeforeAssemblyReload()
+        internal static void OnBeforeAssemblyReload()
         {
             Dispose();
         }
 #endif
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
-        /// <param name="type"></param>
         /// <param name="limitTextureSize"></param>
+        /// <param name="enableNativeLog"></param>
+        /// <param name="nativeLoggingSeverity"></param>
         public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
-            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.LS_INFO)
+            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
         {
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
@@ -429,26 +755,18 @@ namespace Unity.WebRTC
                 s_context = null;
             }
             s_syncContext = null;
-            NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.LS_INFO);
+            NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.Info);
 
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
 #endif
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="platform"></param>
-        /// <param name="encoderType"></param>
-        /// <returns></returns>
-        public static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
+        internal static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
         {
             if (!s_limitTextureSize)
             {
-                return new RTCError {errorType = RTCErrorType.None};
+                return new RTCError { errorType = RTCErrorType.None };
             }
 
             const int maxPixelCount = 3840 * 2160;
@@ -507,7 +825,7 @@ namespace Unity.WebRTC
                 }
             }
 
-            return new RTCError {errorType = RTCErrorType.None};
+            return new RTCError { errorType = RTCErrorType.None };
         }
 
         /// <summary>
@@ -519,7 +837,7 @@ namespace Unity.WebRTC
             // can't recognize legacy format
             const int LegacyARGB32_sRGB = 87;
             const int LegacyARGB32_UNorm = 88;
-            if ((int) format == LegacyARGB32_sRGB || (int) format == LegacyARGB32_UNorm)
+            if ((int)format == LegacyARGB32_sRGB || (int)format == LegacyARGB32_UNorm)
             {
                 return;
             }
@@ -627,7 +945,7 @@ namespace Unity.WebRTC
         {
             if (delay < 0f)
                 throw new ArgumentException($"The delay value is smaller than zero. delay:{delay}");
-            if(Mathf.Approximately(delay, 0f))
+            if (Mathf.Approximately(delay, 0f))
                 s_syncContext.Post(DestroyImmediate, obj);
             else
                 s_syncContext.Post(Destroy, Tuple.Create(obj, delay));
@@ -677,7 +995,7 @@ namespace Unity.WebRTC
 
         static void DelayAction(object state)
         {
-            (Action callback, float delay)  = state as Tuple<Action, float>;
+            (Action callback, float delay) = state as Tuple<Action, float>;
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 int milliseconds = (int)(delay * 1000f);
@@ -735,7 +1053,7 @@ namespace Unity.WebRTC
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
-        public static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
+        internal static IReadOnlyList<WeakReference<RTCPeerConnection>> PeerList
         {
             get
             {
@@ -750,10 +1068,8 @@ namespace Unity.WebRTC
                             list.Add(new WeakReference<RTCPeerConnection>(peer));
                         }
                     }
-
                     return list;
                 }
-
                 return null;
             }
         }
@@ -1008,7 +1324,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCDataChannelState DataChannelGetReadyState(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void DataChannelSend(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string msg);
+        public static extern void DataChannelSend(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)] string msg);
         [DllImport(WebRTC.Lib, EntryPoint = "DataChannelSendBinary")]
         public static extern void DataChannelSendPtr(IntPtr ptr, IntPtr dataPtr, int size);
         [DllImport(WebRTC.Lib)]

@@ -213,6 +213,9 @@ namespace Unity.WebRTC
         private CandidateInternal _candidate;
         private bool disposed;
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCIceCandidate()
         {
             this.Dispose();

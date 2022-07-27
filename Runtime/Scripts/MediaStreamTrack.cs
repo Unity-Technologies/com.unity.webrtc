@@ -46,6 +46,9 @@ namespace Unity.WebRTC
             WebRTC.Table.Add(self, this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~MediaStreamTrack()
         {
             this.Dispose();
@@ -151,6 +154,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<MediaStream> Streams
         {
             get
@@ -171,6 +177,9 @@ namespace Unity.WebRTC
     /// </summary>
     public class MediaStreamTrackEvent
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public MediaStreamTrack Track { get; }
 
         internal MediaStreamTrackEvent(MediaStreamTrack track)
