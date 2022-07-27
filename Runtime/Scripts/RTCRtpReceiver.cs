@@ -17,11 +17,17 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCRtpReceiver()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -53,11 +59,18 @@ namespace Unity.WebRTC
             return capabilities;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
         {
             return peer.GetStats(this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MediaStreamTrack Track
         {
             get
@@ -69,6 +82,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<MediaStream> Streams
         {
             get

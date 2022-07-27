@@ -6,6 +6,8 @@ editors:
   - version: 2021.3
   - version: 2022.1
 
+editor_version_for_validate: 2019.4
+
 platforms:
   - name: win
     type: Unity::VM
@@ -580,8 +582,13 @@ trigger_pullrequest:
   triggers:
     expression: pull_request.target eq "develop" OR pull_request.target match "feat/.*"
 
-{% for editor in editors %}
+trigger_package_validate:
+  name : Trigger test for package validation
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor_version_for_validate }}_d3d11
 
+
+{% for editor in editors %}
 trigger_test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Trigger test {{ package.packagename }} {{ editor.version }} all platforms with GPU
   dependencies:

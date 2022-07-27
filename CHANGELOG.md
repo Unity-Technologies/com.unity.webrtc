@@ -4,11 +4,14 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.4.0-pre.1] - 2022-08-31
 
 ### Changed
 
-- Removed the shader file and `Resource` folder.
+- Add **ValidationExceptions.json** to suppress warnings about the package validation.
+- Promote pre-release version **2.4.0-pre.1**.
+- Stop to use flip shader so that removing `Resources` folder.
+- Change parameter of `VideoStraamTrack.CaptureStreamTrack` method.
 
 ## [2.4.0-exp.8] - 2022-07-08
 
