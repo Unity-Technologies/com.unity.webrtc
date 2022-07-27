@@ -17,11 +17,17 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCRtpSender()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)

@@ -2,6 +2,9 @@ using System;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtpTransceiver : RefCountedObject
     {
         private RTCPeerConnection peer;
@@ -12,11 +15,17 @@ namespace Unity.WebRTC
             this.peer = peer;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCRtpTransceiver()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -104,6 +113,11 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="codecs"></param>
+        /// <returns></returns>
         public RTCErrorType SetCodecPreferences(RTCRtpCodecCapability[] codecs)
         {
             RTCRtpCodecCapabilityInternal[] array = Array.ConvertAll(codecs, v => v.Cast());
@@ -117,6 +131,10 @@ namespace Unity.WebRTC
             return error;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public RTCErrorType Stop()
         {
             return NativeMethods.TransceiverStop(self);

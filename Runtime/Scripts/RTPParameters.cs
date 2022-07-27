@@ -4,15 +4,44 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtpEncodingParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public bool active;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ulong? maxBitrate;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ulong? minBitrate;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public uint? maxFramerate;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public double? scaleResolutionDownBy;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string rid;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpEncodingParameters() { }
 
         internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)
@@ -50,13 +79,36 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtpCodecParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly int payloadType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly string mimeType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly ulong? clockRate;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly ushort? channels;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly string sdpFmtpLine;
+
         internal RTCRtpCodecParameters(ref RTCRtpCodecParametersInternal src)
         {
             payloadType = src.payloadType;
@@ -69,11 +121,26 @@ namespace Unity.WebRTC
         }
     };
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtpHeaderExtensionParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly string uri;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly ushort id;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly bool encrypted;
+
         internal RTCRtpHeaderExtensionParameters(ref RTCRtpHeaderExtensionParametersInternal src)
         {
             if (src.uri != IntPtr.Zero)
@@ -83,10 +150,21 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtcpParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly string cname;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly bool reducedSize;
+
         internal RTCRtcpParameters(ref RTCRtcpParametersInternal src)
         {
             if (src.cname != IntPtr.Zero)
@@ -100,8 +178,19 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly RTCRtpHeaderExtensionParameters[] headerExtensions;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly RTCRtcpParameters rtcp;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly RTCRtpCodecParameters[] codecs;
 
         internal RTCRtpParameters(ref RTCRtpSendParametersInternal src)
@@ -119,7 +208,14 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpSendParameters : RTCRtpParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpEncodingParameters[] encodings;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly string transactionId;
 
         internal RTCRtpSendParameters(ref RTCRtpSendParametersInternal src)
@@ -149,10 +245,29 @@ namespace Unity.WebRTC
     /// </summary>
     public enum RTCRtpTransceiverDirection
     {
+        /// <summary>
+        /// 
+        /// </summary>
         SendRecv = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
         SendOnly = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
         RecvOnly = 2,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Inactive = 3,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Stopped = 4
     }
 
@@ -161,9 +276,24 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpCodecCapability
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public int? channels;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int? clockRate;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string mimeType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string sdpFmtpLine;
 
         internal RTCRtpCodecCapability(ref RTCRtpCodecCapabilityInternal v)
@@ -193,6 +323,9 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpHeaderExtensionCapability
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public string uri;
 
         internal RTCRtpHeaderExtensionCapability(ref RTCRtpHeaderExtensionCapabilityInternal v)
@@ -206,7 +339,14 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpCapabilities
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly RTCRtpCodecCapability[] codecs;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly RTCRtpHeaderExtensionCapability[] headerExtensions;
 
         internal RTCRtpCapabilities(RTCRtpCapabilitiesInternal capabilities)
@@ -223,8 +363,19 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCRtpTransceiverInit
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpTransceiverDirection? direction;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public RTCRtpEncodingParameters[] sendEncodings;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public MediaStream[] streams;
 
         internal RTCRtpTransceiverInitInternal Cast()

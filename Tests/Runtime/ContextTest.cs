@@ -13,13 +13,13 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            NativeMethods.RegisterDebugLog(DebugLog, true, NativeLoggingSeverity.LS_VERBOSE);
+            NativeMethods.RegisterDebugLog(DebugLog, true, NativeLoggingSeverity.Verbose);
         }
 
         [TearDown]
         public void TearDown()
         {
-            NativeMethods.RegisterDebugLog(null, true, NativeLoggingSeverity.LS_VERBOSE);
+            NativeMethods.RegisterDebugLog(null, true, NativeLoggingSeverity.Verbose);
         }
 
         [Test]
