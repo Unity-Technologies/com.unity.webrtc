@@ -281,7 +281,6 @@ namespace webrtc
             return false;
         }
 
-        RTC_LOG(LS_INFO) << "CopyResourceFromNativeV 1";
         VkImage image = unityVulkanImage->image;
         if (destTexture->GetImage() == image)
             return false;
