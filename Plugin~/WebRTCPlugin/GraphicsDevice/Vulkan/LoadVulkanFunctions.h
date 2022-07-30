@@ -10,6 +10,10 @@
 #define LIBRARY_TYPE void*
 #endif
 
+#if __ANDROID__
+#include <vulkan/vulkan_android.h>
+#endif
+
 namespace unity
 {
 namespace webrtc

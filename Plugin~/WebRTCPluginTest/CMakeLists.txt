@@ -32,6 +32,10 @@ if(Windows OR Linux)
   add_subdirectory(NvCodec)
 endif()
 
+if(Android)
+  add_subdirectory(MediaCodec)
+endif()
+
 if(Linux OR Android)
   target_sources(WebRTCLibTest
     PRIVATE

@@ -2,6 +2,11 @@
 
 #include <third_party/libyuv/include/libyuv/convert.h>
 
+#if __ANDROID__
+#include <vulkan/vulkan_android.h>
+#include <android/hardware_buffer_jni.h>
+#endif
+
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "UnityVulkanInterfaceFunctions.h"
 #include "VulkanGraphicsDevice.h"
@@ -439,6 +444,32 @@ namespace webrtc
         handle->mappedArray = array;
         handle->externalMemory = externalMemory;
         return std::move(handle);
+#elif __ANDROID__
+        VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
+        VkDeviceMemory memory = vulkanTexture->GetTextureImageMemory();
+
+//        VkAndroidHardwareBufferFormatPropertiesANDROID ahb_format_props = {};
+//        VkAndroidHardwareBufferPropertiesANDROID ahb_props = {};
+//
+//        VkExternalFormatANDROID external_format;
+//        external_format.sType = VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_ANDROID;
+//        external_format.pNext = nullptr;
+
+        AHardwareBuffer* buffer = nullptr;
+//        AHardwareBuffer_Desc ahb_desc = {};
+
+        VkMemoryGetAndroidHardwareBufferInfoANDROID bufferInfo = {};
+        bufferInfo.sType  = VK_STRUCTURE_TYPE_MEMORY_GET_ANDROID_HARDWARE_BUFFER_INFO_ANDROID;
+        bufferInfo.pNext  = nullptr;
+        bufferInfo.memory = memory;
+
+        VkResult result = vkGetMemoryAndroidHardwareBufferANDROID(m_device, &bufferInfo, &buffer);
+        if (result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "vkGetMemoryAndroidHardwareBufferANDROID failed. result=" << result;
+            return nullptr;
+        }
+        return nullptr;
 #else
         return nullptr;
 #endif

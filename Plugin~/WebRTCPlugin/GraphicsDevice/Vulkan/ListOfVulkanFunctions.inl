@@ -84,6 +84,10 @@ DEVICE_VULKAN_FUNCTION(vkDestroyFence)
 DEVICE_VULKAN_FUNCTION(vkResetFences)
 DEVICE_VULKAN_FUNCTION(vkGetFenceStatus)
 
+#if __ANDROID__
+DEVICE_VULKAN_FUNCTION(vkGetMemoryAndroidHardwareBufferANDROID)
+#endif
+
 #undef DEVICE_LEVEL_VULKAN_FUNCTION
 
 #pragma clang diagnostic pop

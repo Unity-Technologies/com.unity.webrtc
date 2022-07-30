@@ -43,17 +43,22 @@ namespace webrtc
 
     TEST_P(GpuMemoryBufferTest, WidthAndHeight)
     {
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest";
         IGraphicsDevice* device = container_->device();
         std::unique_ptr<const ITexture2D> texture(
             device->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest 0";
         auto testFrame = CreateTestFrame(device, texture.get(), kFormat);
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest 1";
         EXPECT_TRUE(device_->WaitIdleForTest());
-
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest 2";
         auto frame = VideoFrameAdapter::CreateVideoFrame(testFrame);
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest 3";
         auto buffer = frame.video_frame_buffer();
-
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest 4";
         EXPECT_EQ(buffer->width(), kSize.width());
         EXPECT_EQ(buffer->height(), kSize.height());
+        RTC_LOG(LS_INFO) << "GpuMemoryBufferTest end";
     }
 
     TEST_P(GpuMemoryBufferTest, Scale)

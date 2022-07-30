@@ -27,8 +27,12 @@
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #include "NvCodecUtils.h"
 #endif
-
 #include "GraphicsDevice/Vulkan/VulkanUtility.h"
+
+#if __ANDROID__
+#include <vulkan/vulkan_android.h>
+#endif
+
 #endif
 
 #if _WIN32
@@ -202,11 +206,13 @@ namespace webrtc
 
         std::vector<const char*> deviceExtensions = {
 
-#ifndef _WIN32
-            VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME, VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
-#else
+#ifdef _WIN32
             VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME, // vkGetMemoryWin32HandleKHR()
             VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME
+#elif __ANDROID__
+            VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME
+#else
+            VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME, VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
 #endif
         };
 
