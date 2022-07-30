@@ -43,8 +43,6 @@ namespace webrtc
         return s_gfxDevice.get();
     }
 
-    VideoFrameBufferPool* Plugin::VideoFrameBufferPool() { return s_bufferPool.get(); }
-
     ProfilerMarkerFactory* Plugin::ProfilerMarkerFactory() { return s_ProfilerMarkerFactory.get(); }
 
     static libyuv::FourCC ConvertTextureFormat(UnityRenderingExtTextureFormat type)
@@ -254,15 +252,19 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     Timestamp timestamp = s_clock->CurrentTime();
     IGraphicsDevice* device = Plugin::GraphicsDevice();
     UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
-    // void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
     unity::webrtc::Size size(encodeData->width, encodeData->height);
     {
         std::unique_ptr<const ScopedProfiler> profiler;
         if (s_ProfilerMarkerFactory)
             profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
-        VideoFrameBuffer* buffer = static_cast<VideoFrameBuffer*>(encodeData->texture);
-        source->OnFrameCaptured(std::move(s_bufferPool->Retain(buffer)));
+        auto buffer = s_bufferPool->Create(encodeData->width, encodeData->height, encodeData->format);
+        if (!device->CopyToVideoFrameBuffer(buffer, encodeData->texture))
+        {
+            RTC_LOG(LS_INFO) << "IGraphicsDevice::CopyToVideoFrameBuffer failed.";
+            return;
+        }
+        source->OnFrameCaptured(std::move(buffer));
     }
     // s_bufferPool->ReleaseStaleBuffers(timestamp);
 }

@@ -10,8 +10,8 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
 
-    VulkanTexture2D::VulkanTexture2D(const uint32_t w, const uint32_t h)
-        : ITexture2D(w, h)
+    VulkanTexture2D::VulkanTexture2D(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
+        : ITexture2D(width, height, format)
         , m_textureImage(nullptr)
         , m_textureImageMemory(nullptr)
         , m_textureImageMemorySize(0)

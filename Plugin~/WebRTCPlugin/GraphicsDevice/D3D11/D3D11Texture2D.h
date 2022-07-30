@@ -13,7 +13,13 @@ namespace webrtc
     struct D3D11Texture2D : ITexture2D
     {
     public:
-        D3D11Texture2D(uint32_t w, uint32_t h, ID3D11Texture2D* tex, bool externalTexture = false);
+        D3D11Texture2D(
+            uint32_t width,
+            uint32_t height,
+            UnityRenderingExtTextureFormat format,
+            ID3D11Texture2D* tex,
+            bool externalTexture = false);
+
         virtual ~D3D11Texture2D() override
         {
             if (!m_externalTexture)

@@ -15,7 +15,13 @@ namespace webrtc
     class D3D12Texture2D : public ITexture2D
     {
     public:
-        D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle, ID3D11Texture2D* sharedTex);
+        D3D12Texture2D(
+            uint32_t weight,
+            uint32_t height,
+            UnityRenderingExtTextureFormat format,
+            ID3D12Resource* nativeTex,
+            HANDLE handle,
+            ID3D11Texture2D* sharedTex);
 
         virtual ~D3D12Texture2D() override
         {
@@ -53,7 +59,10 @@ namespace webrtc
     void* D3D12Texture2D::GetEncodeTexturePtrV() { return m_sharedTexture; }
     const void* D3D12Texture2D::GetEncodeTexturePtrV() const { return m_sharedTexture; }
     ID3D12Resource* D3D12Texture2D::GetReadbackResource() const { return m_readbackResource; }
-    const D3D12ResourceFootprint* D3D12Texture2D::GetNativeTextureFootprint() const { return &m_nativeTextureFootprint; }
+    const D3D12ResourceFootprint* D3D12Texture2D::GetNativeTextureFootprint() const
+    {
+        return &m_nativeTextureFootprint;
+    }
 
 } // end namespace webrtc
 } // end namespace unity

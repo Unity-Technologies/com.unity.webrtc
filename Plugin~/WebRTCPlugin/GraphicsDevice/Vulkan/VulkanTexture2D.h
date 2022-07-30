@@ -13,7 +13,7 @@ namespace webrtc
     class VulkanTexture2D : public ITexture2D
     {
     public:
-        VulkanTexture2D(const uint32_t w, const uint32_t h);
+        VulkanTexture2D(uint32_t weight, uint32_t height, UnityRenderingExtTextureFormat format);
         virtual ~VulkanTexture2D() override;
 
         bool Init(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool);
