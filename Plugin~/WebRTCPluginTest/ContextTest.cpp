@@ -145,29 +145,29 @@ namespace webrtc
         context->DeletePeerConnection(connection);
     }
 
-    TEST_P(ContextTest, AddTrackAndRemoveTrack)
-    {
-        const webrtc::PeerConnectionInterface::RTCConfiguration config;
-        const auto connection = context->CreatePeerConnection(config);
-        EXPECT_NE(nullptr, connection);
-        const auto source = static_cast<UnityVideoTrackSource*>(context->CreateVideoSource());
-        EXPECT_NE(nullptr, source);
-        const auto track = context->CreateVideoTrack("video", source);
-        EXPECT_NE(nullptr, track);
-        std::vector<std::string> streamIds;
-        const auto result = connection->connection->AddTrack(track, streamIds);
-        EXPECT_TRUE(result.ok());
+    //TEST_P(ContextTest, AddTrackAndRemoveTrack)
+    //{
+    //    const webrtc::PeerConnectionInterface::RTCConfiguration config;
+    //    const auto connection = context->CreatePeerConnection(config);
+    //    EXPECT_NE(nullptr, connection);
+    //    const auto source = static_cast<UnityVideoTrackSource*>(context->CreateVideoSource());
+    //    EXPECT_NE(nullptr, source);
+    //    const auto track = context->CreateVideoTrack("video", source);
+    //    EXPECT_NE(nullptr, track);
+    //    std::vector<std::string> streamIds;
+    //    const auto result = connection->connection->AddTrack(track, streamIds);
+    //    EXPECT_TRUE(result.ok());
 
-        auto frame = CreateTestFrame(device_, texture_.get(), kFormat);
-        source->OnFrameCaptured(frame);
+    //    auto frame = CreateTestFrame(device_, texture_.get(), kFormat);
+    //    source->OnFrameCaptured(frame);
 
-        const auto sender = result.value();
-        const auto result2 = connection->connection->RemoveTrackNew(sender);
-        EXPECT_TRUE(result2.ok());
-        context->DeletePeerConnection(connection);
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
-    }
+    //    const auto sender = result.value();
+    //    const auto result2 = connection->connection->RemoveTrackNew(sender);
+    //    EXPECT_TRUE(result2.ok());
+    //    context->DeletePeerConnection(connection);
+    //    context->RemoveRefPtr(track);
+    //    context->RemoveRefPtr(source);
+    //}
 
     TEST_P(ContextTest, CreateAndDeleteVideoRenderer)
     {

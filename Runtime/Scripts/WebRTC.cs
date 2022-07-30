@@ -869,7 +869,7 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
         {
-            if (QualitySettings.activeColorSpace == ColorSpace.Linear)
+            if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
             {
                 switch (type)
                 {

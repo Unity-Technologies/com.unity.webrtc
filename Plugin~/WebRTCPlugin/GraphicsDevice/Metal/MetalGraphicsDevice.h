@@ -23,6 +23,7 @@ namespace webrtc
 
         ITexture2D*
         CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
+        void* CreateTexture(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
         ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
         ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;

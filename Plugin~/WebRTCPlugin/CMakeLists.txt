@@ -51,6 +51,8 @@ target_sources(WebRTCLib
     VideoFrame.h
     VideoFrameAdapter.cpp
     VideoFrameAdapter.h
+    VideoFrameBufferPool.cpp
+    VideoFrameBufferPool.h
     VideoFrameScheduler.cpp
     VideoFrameScheduler.h
     VideoFrameUtil.cpp

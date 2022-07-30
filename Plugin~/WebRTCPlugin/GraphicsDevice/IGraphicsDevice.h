@@ -41,6 +41,8 @@ namespace webrtc
         virtual void ShutdownV() = 0;
         virtual ITexture2D*
         CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;
+        virtual void* CreateTexture(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) { return nullptr; }
+        virtual ITexture2D* BindTexture(void* ptr) { return nullptr; }
         virtual void* GetEncodeDevicePtrV() = 0;
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;

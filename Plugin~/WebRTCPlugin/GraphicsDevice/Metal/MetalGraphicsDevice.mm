@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include <third_party/libyuv/include/libyuv/convert.h>
+#import <sdk/objc/native/src/objc_frame_buffer.h>
+#import <components/video_frame_buffer/RTCCVPixelBuffer.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "MetalDevice.h"
@@ -37,6 +39,27 @@ namespace webrtc
         textureDescriptor.height = h;
         id<MTLTexture> texture = [device newTextureWithDescriptor:textureDescriptor];
         return new MetalTexture2D(w, h, texture);
+    }
+
+    void* MetalGraphicsDevice::CreateTexture(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
+    {
+        id<MTLDevice> device = m_device->Device();
+
+        NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSNumber numberWithInt:width], kIOSurfaceWidth,
+                               [NSNumber numberWithInt:height], kIOSurfaceHeight,
+                               [NSNumber numberWithInt:4], kIOSurfaceBytesPerElement,
+                               [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kIOSurfacePixelFormat,
+                               nil];
+        
+        IOSurfaceRef surface = IOSurfaceCreate((CFDictionaryRef)dict);
+
+        MTLTextureDescriptor* textureDescriptor = [[MTLTextureDescriptor alloc] init];
+        textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
+        textureDescriptor.width = width;
+        textureDescriptor.height = height;
+        return [device newTextureWithDescriptor:textureDescriptor iosurface:surface plane:0];
+        //return [device newTextureWithDescriptor:textureDescriptor];
     }
 
     ITexture2D* MetalGraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr)
