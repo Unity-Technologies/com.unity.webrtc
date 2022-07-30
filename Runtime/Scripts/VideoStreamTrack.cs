@@ -170,7 +170,7 @@ namespace Unity.WebRTC
             }
 
             int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;

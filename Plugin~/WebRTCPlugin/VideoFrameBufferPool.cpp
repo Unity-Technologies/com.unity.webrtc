@@ -3,6 +3,7 @@
 #include "GraphicsDevice/ITexture2D.h"
 #include "PlatformBase.h"
 #include "VideoFrameBufferPool.h"
+#include "NativeFrameBuffer.h"
 
 namespace unity
 {

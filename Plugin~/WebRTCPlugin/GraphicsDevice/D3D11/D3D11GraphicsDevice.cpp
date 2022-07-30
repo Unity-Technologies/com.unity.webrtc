@@ -7,7 +7,7 @@
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "NvCodecUtils.h"
-#include "VideoFrameBufferPool.h"
+#include "NativeFrameBuffer.h"
 
 using namespace ::webrtc;
 using namespace Microsoft::WRL;

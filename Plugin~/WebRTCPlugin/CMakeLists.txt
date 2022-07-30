@@ -13,6 +13,8 @@ target_sources(WebRTCLib
     Logger.cpp
     MediaStreamObserver.cpp
     MediaStreamObserver.h
+    NativeFrameBuffer.cpp
+    NativeFrameBuffer.h
     pch.cpp
     pch.h
     PeerConnectionObject.cpp
