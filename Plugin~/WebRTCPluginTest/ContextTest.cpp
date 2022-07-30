@@ -149,9 +149,6 @@ namespace webrtc
         const auto result = connection->connection->AddTrack(track, streamIds);
         EXPECT_TRUE(result.ok());
 
-        auto frame = CreateTestFrame(device_, texture_.get(), kFormat);
-        source->OnFrameCaptured(frame);
-
         const auto sender = result.value();
         const auto result2 = connection->connection->RemoveTrackOrError(sender);
         EXPECT_TRUE(result2.ok());

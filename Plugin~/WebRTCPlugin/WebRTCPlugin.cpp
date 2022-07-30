@@ -391,7 +391,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT UnityVideoRenderer*
     CreateVideoRenderer(Context* context, DelegateVideoFrameResize callback, bool needFlipVertical)
     {
-        return context->CreateVideoRenderer(callback, needFlipVertical);
+        return context->CreateVideoRenderer(callback, needFlipVertical, Plugin::GraphicsDevice());
     }
 
     UNITY_INTERFACE_EXPORT uint32_t GetVideoRendererId(UnityVideoRenderer* sink) { return sink->GetId(); }
@@ -399,6 +399,11 @@ extern "C"
     UNITY_INTERFACE_EXPORT void DeleteVideoRenderer(Context* context, UnityVideoRenderer* sink)
     {
         context->DeleteVideoRenderer(sink);
+    }
+
+    UNITY_INTERFACE_EXPORT void VideoRendererSetTexture(UnityVideoRenderer* sink, void* texture)
+    {
+        sink->SetTexture(texture);
     }
 
     UNITY_INTERFACE_EXPORT void VideoTrackAddOrUpdateSink(VideoTrackInterface* track, UnityVideoRenderer* sink)

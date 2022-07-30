@@ -3,18 +3,21 @@
 #include <api/video/i420_buffer.h>
 
 #include "UnityVideoRenderer.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
 namespace webrtc
 {
 
-    UnityVideoRenderer::UnityVideoRenderer(uint32_t id, DelegateVideoFrameResize callback, bool needFlipVertical)
+    UnityVideoRenderer::UnityVideoRenderer(uint32_t id, DelegateVideoFrameResize callback, bool needFlipVertical, IGraphicsDevice* device)
         : m_id(id)
         , m_last_renderered_timestamp(0)
         , m_timestamp(0)
         , m_callback(callback)
         , m_needFlipVertical(needFlipVertical)
+        , m_device(device)
+        , m_texture(nullptr)
     {
         DebugLog("Create UnityVideoRenderer Id:%d", id);
     }
@@ -27,14 +30,10 @@ namespace webrtc
         }
     }
 
+    void UnityVideoRenderer::SetTexture(void* texture) { m_texture = texture; }
     void UnityVideoRenderer::OnFrame(const webrtc::VideoFrame& frame)
     {
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> frame_buffer = frame.video_frame_buffer();
-
-        if (frame_buffer->type() == webrtc::VideoFrameBuffer::Type::kNative)
-        {
-            frame_buffer = frame_buffer->ToI420();
-        }
         SetFrameBuffer(frame_buffer, frame.timestamp_us());
     }
 
@@ -60,41 +59,51 @@ namespace webrtc
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (!lock.owns_lock())
-        {
             return;
-        }
 
         if (m_frameBuffer == nullptr || m_frameBuffer->width() != buffer->width() ||
             m_frameBuffer->height() != buffer->height())
         {
             m_callback(this, buffer->width(), buffer->height());
         }
-
         m_frameBuffer = buffer;
         m_timestamp = timestamp;
     }
 
     void* UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format)
     {
-        auto frame = GetFrameBuffer();
+        auto buffer = GetFrameBuffer();
 
         size_t size = static_cast<size_t>(width * height * 4);
         if (tempBuffer.size() != size)
             tempBuffer.resize(size);
 
         // return a previous texture buffer when framebuffer is returned null.
-        if (frame == nullptr)
-            return tempBuffer.data();
+        if (!buffer)
+            return nullptr;
 
-        rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer;
-        if (width == frame->width() && height == frame->height())
+        if (buffer->type() == webrtc::VideoFrameBuffer::Type::kNative)
         {
-            i420_buffer = frame->ToI420();
+            if(!m_texture)
+                return nullptr;
+            bool result = m_device->CopyResourceFromBuffer(m_texture, buffer);
+            if(!result)
+            {
+                RTC_LOG(LS_INFO) << "CopyResourceFromBuffer failed.";
+                return nullptr;
+            }
+            return nullptr;
+        }
+        
+        rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer;
+        if (width == buffer->width() && height == buffer->height())
+        {
+            i420_buffer = buffer->ToI420();
         }
         else
         {
             auto temp = webrtc::I420Buffer::Create(width, height);
-            temp->ScaleFrom(*frame->ToI420());
+            temp->ScaleFrom(*buffer->ToI420());
             i420_buffer = temp;
         }
 

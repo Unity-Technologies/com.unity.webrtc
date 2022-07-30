@@ -865,7 +865,7 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
         {
-            if (QualitySettings.activeColorSpace == ColorSpace.Linear)
+            if (QualitySettings.activeColorSpace == ColorSpace.Gamma)
             {
                 switch (type)
                 {
@@ -1456,6 +1456,8 @@ namespace Unity.WebRTC
         public static extern uint GetVideoRendererId(IntPtr sink);
         [DllImport(WebRTC.Lib)]
         public static extern void DeleteVideoRenderer(IntPtr context, IntPtr sink);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoRendererSetTexture(IntPtr renderer, IntPtr texture);
         [DllImport(WebRTC.Lib)]
         public static extern void VideoTrackAddOrUpdateSink(IntPtr track, IntPtr sink);
         [DllImport(WebRTC.Lib)]

@@ -10,6 +10,7 @@
 #include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
+#include "NativeFrameBuffer.h"
 #include "NvCodecUtils.h"
 #include "NvEncoder/NvEncoder.h"
 #include "NvEncoder/NvEncoderCuda.h"
@@ -17,7 +18,6 @@
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
-#include "VideoFrameAdapter.h"
 
 namespace unity
 {
@@ -327,7 +327,7 @@ namespace webrtc
 
     bool NvEncoderImpl::CopyResource(
         const NvEncInputFrame* encoderInputFrame,
-        GpuMemoryBufferInterface* buffer,
+        const GpuMemoryBufferHandle* handle,
         Size& size,
         CUcontext context,
         CUmemorytype memoryType)
@@ -336,7 +336,7 @@ namespace webrtc
         if (m_profiler)
             profiler = m_profiler->CreateScopedProfiler(*m_marker);
 
-        const GpuMemoryBufferCudaHandle* handle = static_cast<const GpuMemoryBufferCudaHandle*>(buffer->handle());
+        const GpuMemoryBufferCudaHandle* cudaHandle = static_cast<const GpuMemoryBufferCudaHandle*>(handle);
         if (!handle)
         {
             RTC_LOG(LS_INFO) << "GpuMemoryBufferCudaHandle is null";
@@ -347,7 +347,7 @@ namespace webrtc
         {
             NvEncoderCuda::CopyToDeviceFrame(
                 context,
-                reinterpret_cast<void*>(handle->mappedPtr),
+                reinterpret_cast<void*>(cudaHandle->mappedPtr),
                 0,
                 reinterpret_cast<CUdeviceptr>(encoderInputFrame->inputPtr),
                 encoderInputFrame->pitch,
@@ -360,15 +360,15 @@ namespace webrtc
         }
         else if (memoryType == CU_MEMORYTYPE_ARRAY)
         {
-            void* pSrcArray = static_cast<void*>(handle->mappedArray);
+            void* pSrcArray = static_cast<void*>(cudaHandle->mappedArray);
 
             // Resize cuda array when the resolution of input buffer is different from output one.
             // The output buffer named m_scaledArray is reused while the resolution is matched.
-            if (buffer->GetSize() != size)
-            {
-                Resize(handle->mappedArray, m_scaledArray, size);
-                pSrcArray = static_cast<void*>(m_scaledArray);
-            }
+            // if (buffer->GetSize() != size)
+            //{
+            //    Resize(handle->mappedArray, m_scaledArray, size);
+            //    pSrcArray = static_cast<void*>(m_scaledArray);
+            //}
 
             NvEncoderCudaWithCUarray::CopyToDeviceFrame(
                 context,
@@ -406,10 +406,13 @@ namespace webrtc
             ? static_cast<VideoFrameAdapter::ScaledBuffer*>(videoFrameBuffer)->GetVideoFrame()
             : static_cast<VideoFrameAdapter*>(videoFrameBuffer)->GetVideoFrame();
 
-        if (!video_frame)
+        // todo(kazuki):: fix
+        if (videoFrameBuffer->scaled())
         {
+            RTC_LOG(LS_INFO) << "ScaledBuffer is not supported.";
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
         }
+        auto nativeBuffer = static_cast<NativeFrameBuffer*>(videoFrameBuffer);
 
         bool send_key_frame = false;
         if (m_configurations[0].key_frame_request && m_configurations[0].sending)
@@ -428,8 +431,8 @@ namespace webrtc
         const NvEncInputFrame* encoderInputFrame = m_encoder->GetNextInputFrame();
 
         // Copy CUDA buffer in VideoFrame to encoderInputFrame.
-        auto buffer = video_frame->GetGpuMemoryBuffer();
-        if (!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
+        auto handle = nativeBuffer->handle();
+        if (!CopyResource(encoderInputFrame, handle, encodeSize, m_context, m_memoryType))
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
 
         NV_ENC_PIC_PARAMS picParams = NV_ENC_PIC_PARAMS();

@@ -147,10 +147,9 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
     ITexture2D*
-    D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
-
-        return CreateSharedD3D12Texture(w, h);
+        return CreateSharedD3D12Texture(width, height, format);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -212,7 +211,8 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
 
-    D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h)
+    D3D12Texture2D*
+    D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
         //[Note-sin: 2019-10-30] Taken from RaytracedHardShadow
         // note: sharing textures with d3d11 requires some flags and restrictions:
@@ -224,8 +224,8 @@ namespace webrtc
         D3D12_RESOURCE_DESC desc {};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         desc.Alignment = 0;
-        desc.Width = w;
-        desc.Height = h;
+        desc.Width = width;
+        desc.Height = height;
         desc.DepthOrArraySize = 1;
         desc.MipLevels = 1;
         desc.Format =
@@ -267,7 +267,7 @@ namespace webrtc
             return nullptr;
         }
 
-        return new D3D12Texture2D(w, h, resource, handle, sharedTex);
+        return new D3D12Texture2D(width, height, format, resource, handle, sharedTex);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -300,9 +300,9 @@ namespace webrtc
     //----------------------------------------------------------------------------------------------------------------------
 
     ITexture2D*
-    D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
-        D3D12Texture2D* tex = CreateSharedD3D12Texture(w, h);
+        D3D12Texture2D* tex = CreateSharedD3D12Texture(width, height, format);
         const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device.Get());
         if (FAILED(hr))
         {

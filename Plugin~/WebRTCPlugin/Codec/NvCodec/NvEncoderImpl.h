@@ -74,7 +74,7 @@ namespace webrtc
     private:
         bool CopyResource(
             const NvEncInputFrame* encoderInputFrame,
-            GpuMemoryBufferInterface* buffer,
+            const GpuMemoryBufferHandle* handle,
             Size& size,
             CUcontext context,
             CUmemorytype memoryType);

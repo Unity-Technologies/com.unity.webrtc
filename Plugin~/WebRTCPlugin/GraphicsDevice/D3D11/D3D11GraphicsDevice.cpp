@@ -7,6 +7,7 @@
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "NvCodecUtils.h"
+#include "NativeFrameBuffer.h"
 
 using namespace ::webrtc;
 using namespace Microsoft::WRL;
@@ -46,13 +47,13 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
     ITexture2D*
-    D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
 
         ID3D11Texture2D* texture = nullptr;
         D3D11_TEXTURE2D_DESC desc = {};
-        desc.Width = w;
-        desc.Height = h;
+        desc.Width = width;
+        desc.Height = height;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -66,18 +67,17 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "CreateTexture2D failed. error:" << result;
             return nullptr;
         }
-        return new D3D11Texture2D(w, h, texture);
+        return new D3D11Texture2D(width, height, format, texture);
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
     ITexture2D*
-    D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
 
         ID3D11Texture2D* texture = nullptr;
         D3D11_TEXTURE2D_DESC desc = {};
-        desc.Width = w;
-        desc.Height = h;
+        desc.Width = width;
+        desc.Height = height;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -90,7 +90,7 @@ namespace webrtc
         {
             return nullptr;
         }
-        return new D3D11Texture2D(w, h, texture);
+        return new D3D11Texture2D(width, height, format, texture);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -118,7 +118,6 @@ namespace webrtc
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
     bool D3D11GraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
         ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
@@ -141,6 +140,13 @@ namespace webrtc
             return false;
         }
         return true;
+    }
+
+    bool D3D11GraphicsDevice::CopyToVideoFrameBuffer(
+        rtc::scoped_refptr<VideoFrameBuffer>& buffer, void* texture)
+    {
+        NativeFrameBuffer* nativeBuffer = static_cast<NativeFrameBuffer*>(buffer.get());
+        return CopyResourceFromNativeV(nativeBuffer->texture(), texture);
     }
 
     HRESULT D3D11GraphicsDevice::WaitFlush()

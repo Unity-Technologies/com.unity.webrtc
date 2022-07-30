@@ -5,6 +5,7 @@
 #include <absl/types/optional.h>
 #include <api/media_stream_interface.h>
 #include <api/task_queue/task_queue_factory.h>
+#include <api/units/timestamp.h>
 #include <media/base/adapted_video_track_source.h>
 #include <rtc_base/task_queue.h>
 
@@ -45,7 +46,7 @@ namespace webrtc
         bool remote() const override;
         bool is_screencast() const override;
         absl::optional<bool> needs_denoising() const override;
-        void OnFrameCaptured(rtc::scoped_refptr<VideoFrame> frame);
+        void OnFrameCaptured(rtc::scoped_refptr<VideoFrameBuffer> buffer, const Timestamp& timestamp);
 
         using VideoTrackSourceInterface::AddOrUpdateSink;
         using VideoTrackSourceInterface::RemoveSink;
@@ -79,7 +80,8 @@ namespace webrtc
 
         std::unique_ptr<rtc::TaskQueue> taskQueue_;
         std::unique_ptr<VideoFrameScheduler> scheduler_;
-        rtc::scoped_refptr<unity::webrtc::VideoFrame> frame_;
+        rtc::scoped_refptr<VideoFrameBuffer> buffer_;
+        Timestamp timestamp_;
     };
 
 } // end namespace webrtc

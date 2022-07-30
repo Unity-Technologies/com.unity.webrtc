@@ -15,6 +15,8 @@ target_sources(
           Logger.cpp
           MediaStreamObserver.cpp
           MediaStreamObserver.h
+          NativeFrameBuffer.cpp
+          NativeFrameBuffer.h      
           pch.cpp
           pch.h
           PeerConnectionObject.cpp
@@ -55,6 +57,8 @@ target_sources(
           VideoFrame.h
           VideoFrameAdapter.cpp
           VideoFrameAdapter.h
+          VideoFrameBufferPool.cpp
+          VideoFrameBufferPool.h      
           VideoFrameScheduler.cpp
           VideoFrameScheduler.h
           VideoFrameUtil.cpp

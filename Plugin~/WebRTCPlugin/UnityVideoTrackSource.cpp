@@ -19,7 +19,8 @@ namespace webrtc
         bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory)
         : AdaptedVideoTrackSource(/*required_alignment=*/1)
         , is_screencast_(is_screencast)
-        , frame_(nullptr)
+        , buffer_(nullptr)
+        , timestamp_(Timestamp::Zero())
     {
         taskQueue_ = std::make_unique<rtc::TaskQueue>(
             taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
@@ -57,26 +58,26 @@ namespace webrtc
     void UnityVideoTrackSource::CaptureNextFrame()
     {
         const std::unique_lock<std::mutex> lock(mutex_);
-        if (!frame_)
+        if (!buffer_)
             return;
 
-        const int orig_width = frame_->size().width();
-        const int orig_height = frame_->size().height();
+        const int orig_width = buffer_->width();
+        const int orig_height = buffer_->height();
         const int64_t now_us = rtc::TimeMicros();
         FrameAdaptationParams frame_adaptation_params = ComputeAdaptationParams(orig_width, orig_height, now_us);
         if (frame_adaptation_params.should_drop_frame)
         {
-            frame_ = nullptr;
+            buffer_ = nullptr;
             return;
         }
 
-        const webrtc::TimeDelta timestamp = frame_->timestamp();
-        rtc::scoped_refptr<VideoFrameAdapter> frame_adapter(
-            new rtc::RefCountedObject<VideoFrameAdapter>(std::move(frame_)));
+        // const webrtc::TimeDelta timestamp = buffer_->timestamp();
+        // rtc::scoped_refptr<VideoFrameAdapter> frame_adapter(
+        //    new rtc::RefCountedObject<VideoFrameAdapter>(std::move(buffer_)));
 
-        ::webrtc::VideoFrame::Builder builder = ::webrtc::VideoFrame::Builder()
-                                                    .set_video_frame_buffer(std::move(frame_adapter))
-                                                    .set_timestamp_us(timestamp.us());
+        ::webrtc::VideoFrame::Builder builder =
+            ::webrtc::VideoFrame::Builder().set_video_frame_buffer(std::move(buffer_))
+            .set_timestamp_us(timestamp_.us());
         OnFrame(builder.build());
     }
 
@@ -88,12 +89,13 @@ namespace webrtc
         scheduler_->SetMaxFramerateFps(static_cast<int>(maxFramerate));
     }
 
-    void UnityVideoTrackSource::OnFrameCaptured(rtc::scoped_refptr<VideoFrame> frame)
+    void UnityVideoTrackSource::OnFrameCaptured(rtc::scoped_refptr<VideoFrameBuffer> buffer, const Timestamp& timestamp)
     {
         SendFeedback();
 
         const std::unique_lock<std::mutex> lock(mutex_);
-        frame_ = frame;
+        buffer_ = buffer;
+        timestamp_ = timestamp;
     }
 
 } // end namespace webrtc

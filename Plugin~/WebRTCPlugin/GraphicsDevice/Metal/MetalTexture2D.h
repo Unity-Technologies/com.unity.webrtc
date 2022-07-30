@@ -11,7 +11,7 @@ namespace webrtc
     struct MetalTexture2D : ITexture2D
     {
     public:
-        MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex);
+        MetalTexture2D(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format, id<MTLTexture> tex);
         virtual ~MetalTexture2D() override;
 
         inline void* GetNativeTexturePtrV() override;

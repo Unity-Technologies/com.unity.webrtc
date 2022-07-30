@@ -123,9 +123,9 @@ namespace webrtc
 
     // Returns null if failed
     ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(
-        const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+        const uint32_t width, const uint32_t height, UnityRenderingExtTextureFormat format)
     {
-        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
+        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(width, height, format);
         if (!vulkanTexture->Init(m_physicalDevice, m_device, m_commandPool))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::Init failed.";
@@ -135,9 +135,9 @@ namespace webrtc
     }
 
     ITexture2D*
-    VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
-        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
+        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(width, height, format);
         if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device, m_commandPool))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::InitCpuRead failed.";

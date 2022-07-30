@@ -25,6 +25,8 @@ namespace webrtc
         inline virtual void* GetEncodeDevicePtrV() override;
         virtual ITexture2D*
         CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
+        bool
+        CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture) override;
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
