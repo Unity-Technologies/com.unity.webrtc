@@ -5,6 +5,7 @@ target_sources(WebRTCLibTest
     pch.cpp
     pch.h
     ContextTest.cpp
+    CreateVideoCodecFactoryTest.cpp
     FrameGenerator.cpp
     FrameGenerator.h
     GpuMemoryBufferTest.cpp
