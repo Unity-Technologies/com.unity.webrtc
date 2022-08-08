@@ -28,10 +28,15 @@ namespace webrtc
     Factory* FindCodecFactory(
         const std::map<std::string, std::unique_ptr<Factory>>& factories, const webrtc::SdpVideoFormat& format)
     {
-        auto it = format.parameters.find(kSdpKeyNameCodecImpl);
-        std::string impl = it == format.parameters.end() ? nullptr : it->second;
-        auto it2 = factories.find(impl);
-        return it2->second.get();
+        for (const auto& pair : factories)
+        {
+            for (const webrtc::SdpVideoFormat& other : pair.second->GetSupportedFormats())
+            {
+                if (format.IsSameCodec(other))
+                    return pair.second.get();
+            }
+        }
+        return nullptr;
     }
 
     template<typename Factory>
