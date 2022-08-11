@@ -15,7 +15,7 @@ namespace webrtc
 
     class IGraphicsDevice;
     class ITexture2D;
-    class GpuMemoryBufferHandle;
+    struct GpuMemoryBufferHandle;
     class NativeFrameBuffer : public ScalableBufferInterface
     {
     public:

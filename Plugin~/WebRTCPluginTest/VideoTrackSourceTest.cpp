@@ -74,8 +74,9 @@ namespace webrtc
 
         void SendTestFrame()
         {
-            //auto frame = CreateTestFrame(device(), m_texture.get(), format());
-            //m_trackSource->OnFrameCaptured(std::move(frame));
+            auto buffer = device()->CreateVideoFrameBuffer(m_texture->GetWidth(), m_texture->GetHeight(), m_texture->GetFormat());
+            device()->CopyToVideoFrameBuffer(buffer, m_texture->GetNativeTexturePtrV());
+            m_trackSource->OnFrameCaptured(std::move(buffer), webrtc::Clock::GetRealTimeClock()->CurrentTime());
         }
     };
 

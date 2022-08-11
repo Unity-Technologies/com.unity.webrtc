@@ -251,7 +251,6 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         return;
     Timestamp timestamp = s_clock->CurrentTime();
     IGraphicsDevice* device = Plugin::GraphicsDevice();
-    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
     unity::webrtc::Size size(encodeData->width, encodeData->height);
     {
         std::unique_ptr<const ScopedProfiler> profiler;
@@ -264,7 +263,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
             RTC_LOG(LS_INFO) << "IGraphicsDevice::CopyToVideoFrameBuffer failed.";
             return;
         }
-        source->OnFrameCaptured(std::move(buffer));
+        source->OnFrameCaptured(std::move(buffer), timestamp);
     }
     // s_bufferPool->ReleaseStaleBuffers(timestamp);
 }

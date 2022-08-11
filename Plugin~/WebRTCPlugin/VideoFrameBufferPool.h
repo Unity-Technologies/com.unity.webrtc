@@ -27,7 +27,6 @@ namespace webrtc
 
     private:
         IGraphicsDevice* device_;
-        Clock* clock_;
         std::list<rtc::scoped_refptr<VideoFrameBuffer>> pool_;
     };
 }

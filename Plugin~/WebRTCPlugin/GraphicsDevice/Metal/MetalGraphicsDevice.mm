@@ -29,6 +29,32 @@ namespace webrtc
 
     void MetalGraphicsDevice::ShutdownV() { }
 
+    rtc::scoped_refptr<VideoFrameBuffer>
+    MetalGraphicsDevice::CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
+    {
+        CVImageBufferRef buffer = nullptr;
+        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],
+                                                                           kCVPixelBufferMetalCompatibilityKey,
+                                                                           @ {},
+                                                                           kCVPixelBufferIOSurfacePropertiesKey,
+                                                                           nil];
+        CVReturn result = CVPixelBufferCreate(
+            kCFAllocatorDefault,
+            width,
+            height,
+            kCVPixelFormatType_32BGRA,
+            (CFDictionaryRef)options,
+            &buffer);
+        if (result != kCVReturnSuccess)
+        {
+            RTC_LOG(LS_INFO) << "CVPixelBufferCreateWithIOSurface failed. result=" << result;
+            return nullptr;
+        }
+        return rtc::make_ref_counted<ObjCFrameBuffer>(
+            [[RTC_OBJC_TYPE(RTCCVPixelBuffer) alloc] initWithPixelBuffer:buffer]);
+    }
+
+
     ITexture2D*
     MetalGraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
@@ -38,34 +64,7 @@ namespace webrtc
         textureDescriptor.width = w;
         textureDescriptor.height = h;
         id<MTLTexture> texture = [device newTextureWithDescriptor:textureDescriptor];
-        return new MetalTexture2D(w, h, texture);
-    }
-
-    void* MetalGraphicsDevice::CreateTexture(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
-    {
-        id<MTLDevice> device = m_device->Device();
-
-        NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               [NSNumber numberWithInt:width], kIOSurfaceWidth,
-                               [NSNumber numberWithInt:height], kIOSurfaceHeight,
-                               [NSNumber numberWithInt:4], kIOSurfaceBytesPerElement,
-                               [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kIOSurfacePixelFormat,
-                               nil];
-        
-        IOSurfaceRef surface = IOSurfaceCreate((CFDictionaryRef)dict);
-
-        MTLTextureDescriptor* textureDescriptor = [[MTLTextureDescriptor alloc] init];
-        textureDescriptor.pixelFormat = ConvertFormat(textureFormat);
-        textureDescriptor.width = width;
-        textureDescriptor.height = height;
-        return [device newTextureWithDescriptor:textureDescriptor iosurface:surface plane:0];
-        //return [device newTextureWithDescriptor:textureDescriptor];
-    }
-
-    ITexture2D* MetalGraphicsDevice::CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr)
-    {
-        id<MTLTexture> texture = (__bridge id<MTLTexture>)nativeTexturePtr;
-        return new MetalTexture2D(w, h, texture);
+        return new MetalTexture2D(w, h, textureFormat, texture);
     }
 
     bool MetalGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src)
@@ -128,7 +127,75 @@ namespace webrtc
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
+    static CVPixelBufferRef GetPixelBuffer(rtc::scoped_refptr<VideoFrameBuffer>& buffer)
+    {
+        webrtc::ObjCFrameBuffer* objcBuffer = static_cast<webrtc::ObjCFrameBuffer*>(buffer.get());
+        RTC_DCHECK(objcBuffer);
+        if ([objcBuffer->wrapped_frame_buffer() isKindOfClass:[RTC_OBJC_TYPE(RTCCVPixelBuffer) class]])
+        {
+            RTC_OBJC_TYPE(RTCCVPixelBuffer)* bufferWrapper =
+                (RTC_OBJC_TYPE(RTCCVPixelBuffer)*)objcBuffer->wrapped_frame_buffer();
+            return bufferWrapper.pixelBuffer;
+        }
+        return nullptr;
+    }
+
+//    static CGColorSpaceRef ColorSpace(IOSurfaceRef surface)
+//    {
+//        CFTypeRef type = IOSurfaceCopyValue(surface, kIOSurfaceColorSpace);
+//        RTC_DCHECK(type);
+//        CFStringRef str = (RTC_OBJC_TYPE(CFStringRef))type;
+//        return CGColorSpaceCreateWithName(str);
+//    }
+
+
+    bool MetalGraphicsDevice::CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
+    {
+        id<MTLDevice> metalDevice = (__bridge id<MTLDevice>)m_device->Device();
+        
+        CVPixelBufferRef pixelBuffer = GetPixelBuffer(buffer);
+        const MTLPixelFormat metalPixelFormat = MTLPixelFormatBGRA8Unorm;
+        CVMetalTextureCacheRef metalTextureCache = nullptr;
+        CVReturn result =
+            CVMetalTextureCacheCreate(kCFAllocatorDefault, nullptr, metalDevice, nullptr, &metalTextureCache);
+        if (result != kCVReturnSuccess)
+        {
+            RTC_LOG(LS_INFO) << "CVMetalTextureCacheCreate failed. result=" << result;
+            return false;
+        }
+
+        CVMetalTextureRef cvTexture;
+        result = CVMetalTextureCacheCreateTextureFromImage(
+            kCFAllocatorDefault,
+            metalTextureCache,
+            pixelBuffer,
+            nullptr,
+            metalPixelFormat,
+            CVPixelBufferGetWidth(pixelBuffer),
+            CVPixelBufferGetHeight(pixelBuffer),
+            0,
+            &cvTexture);
+
+        if (result != kCVReturnSuccess)
+        {
+            RTC_LOG(LS_INFO) << "CVMetalTextureCacheCreateTextureFromImage failed. result=" << result;
+            return false;
+        }
+
+        id<MTLTexture> srcTexture = (__bridge id<MTLTexture>)texture;
+//        RTC_DCHECK(srcTexture.iosurface);
+//        RTC_DCHECK(srcTexture.iosurfacePlane);
+//        RTC_LOG(LS_INFO) << ColorSpace(srcTexture.iosurface);
+        id<MTLTexture> dstTexture = CVMetalTextureGetTexture(cvTexture);
+
+        bool ret = CopyTexture(dstTexture, srcTexture);
+
+        CFRelease(cvTexture);
+        CVMetalTextureCacheFlush(metalTextureCache, 0);
+
+        return ret;
+    }
+
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(
         uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
@@ -152,7 +219,7 @@ namespace webrtc
         textureDescriptor.storageMode = MTLStorageMode(MTLStorageModeShared);
 #endif
         id<MTLTexture> texture = [device newTextureWithDescriptor:textureDescriptor];
-        return new MetalTexture2D(width, height, texture);
+        return new MetalTexture2D(width, height, textureFormat, texture);
     }
 
     rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)

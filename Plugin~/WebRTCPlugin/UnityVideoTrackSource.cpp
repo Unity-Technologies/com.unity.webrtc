@@ -20,6 +20,7 @@ namespace webrtc
         : AdaptedVideoTrackSource(/*required_alignment=*/1)
         , is_screencast_(is_screencast)
         , buffer_(nullptr)
+        , timestamp_(Timestamp::Zero())
     {
         taskQueue_ = std::make_unique<rtc::TaskQueue>(
             taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
@@ -75,8 +76,8 @@ namespace webrtc
         //    new rtc::RefCountedObject<VideoFrameAdapter>(std::move(buffer_)));
 
         ::webrtc::VideoFrame::Builder builder =
-            ::webrtc::VideoFrame::Builder().set_video_frame_buffer(std::move(buffer_));
-        // todo(kazuki):: .set_timestamp_us(timestamp.us()); 
+            ::webrtc::VideoFrame::Builder().set_video_frame_buffer(std::move(buffer_))
+            .set_timestamp_us(timestamp_.us());
         OnFrame(builder.build());
     }
 
@@ -88,12 +89,13 @@ namespace webrtc
         scheduler_->SetMaxFramerateFps(static_cast<int>(maxFramerate));
     }
 
-    void UnityVideoTrackSource::OnFrameCaptured(rtc::scoped_refptr<VideoFrameBuffer> buffer)
+    void UnityVideoTrackSource::OnFrameCaptured(rtc::scoped_refptr<VideoFrameBuffer> buffer, const Timestamp& timestamp)
     {
         SendFeedback();
 
         const std::unique_lock<std::mutex> lock(mutex_);
         buffer_ = buffer;
+        timestamp_ = timestamp;
     }
 
 } // end namespace webrtc

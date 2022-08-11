@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IUnityRenderingExtensions.h>
 #include <stdint.h>
 
 namespace unity
