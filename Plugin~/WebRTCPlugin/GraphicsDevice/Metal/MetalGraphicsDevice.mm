@@ -140,15 +140,6 @@ namespace webrtc
         return nullptr;
     }
 
-//    static CGColorSpaceRef ColorSpace(IOSurfaceRef surface)
-//    {
-//        CFTypeRef type = IOSurfaceCopyValue(surface, kIOSurfaceColorSpace);
-//        RTC_DCHECK(type);
-//        CFStringRef str = (RTC_OBJC_TYPE(CFStringRef))type;
-//        return CGColorSpaceCreateWithName(str);
-//    }
-
-
     bool MetalGraphicsDevice::CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
     {
         id<MTLDevice> metalDevice = (__bridge id<MTLDevice>)m_device->Device();
@@ -183,9 +174,6 @@ namespace webrtc
         }
 
         id<MTLTexture> srcTexture = (__bridge id<MTLTexture>)texture;
-//        RTC_DCHECK(srcTexture.iosurface);
-//        RTC_DCHECK(srcTexture.iosurfacePlane);
-//        RTC_LOG(LS_INFO) << ColorSpace(srcTexture.iosurface);
         id<MTLTexture> dstTexture = CVMetalTextureGetTexture(cvTexture);
 
         bool ret = CopyTexture(dstTexture, srcTexture);
@@ -195,6 +183,32 @@ namespace webrtc
 
         return ret;
     }
+
+    bool MetalGraphicsDevice::CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<VideoFrameBuffer> buffer)
+    {
+        CVPixelBufferRef pixelBuffer = GetPixelBuffer(buffer);
+        id<MTLDevice> metalDevice = (__bridge id<MTLDevice>)m_device->Device();
+        MTLPixelFormat metalPixelFormat = MTLPixelFormatBGRA8Unorm;
+        CVMetalTextureCacheRef metalTextureCache = nullptr;
+        CVReturn result = CVMetalTextureCacheCreate(kCFAllocatorDefault, nullptr, metalDevice, nullptr, &metalTextureCache);
+        if(result != kCVReturnSuccess)
+        {
+            RTC_LOG(LS_INFO) << "CVMetalTextureCacheCreate failed. result=" << result;
+            return false;
+        }
+        CVMetalTextureRef cvTexture;
+        result = CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, metalTextureCache, pixelBuffer, nullptr, metalPixelFormat, CVPixelBufferGetWidth(pixelBuffer), CVPixelBufferGetHeight(pixelBuffer), 0, &cvTexture);
+        if(result != kCVReturnSuccess)
+        {
+            RTC_LOG(LS_INFO) << "CVMetalTextureCacheCreateTextureFromImage failed. result=" << result;
+            return false;
+        }
+        id<MTLTexture> dstTexture = (__bridge id<MTLTexture>)dest;
+        id<MTLTexture> srcTexture = CVMetalTextureGetTexture(cvTexture);
+        CFRelease(cvTexture);
+        return CopyTexture(dstTexture, srcTexture);
+    }
+
 
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(
         uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)

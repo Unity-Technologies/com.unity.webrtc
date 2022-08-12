@@ -30,6 +30,7 @@ namespace webrtc
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
         bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+        bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<VideoFrameBuffer> buffer) override;
         bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture) override;
         rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }

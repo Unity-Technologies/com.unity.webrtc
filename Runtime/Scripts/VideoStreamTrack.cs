@@ -107,7 +107,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -138,12 +138,12 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static class CameraExtension
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="cam"></param>
         /// <param name="width"></param>
@@ -178,7 +178,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="cam"></param>
         /// <param name="width"></param>
@@ -370,6 +370,7 @@ namespace Unity.WebRTC
 
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             Texture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            NativeMethods.VideoRendererSetTexture(self, Texture.GetNativeTexturePtr());
             track.OnVideoFrameResize(Texture);
         }
 

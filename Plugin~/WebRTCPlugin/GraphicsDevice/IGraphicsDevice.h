@@ -45,6 +45,7 @@ namespace webrtc
         virtual void* GetEncodeDevicePtrV() = 0;
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;
+        virtual bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer) { return true; }
         virtual bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
         {
             return true;
