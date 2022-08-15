@@ -87,8 +87,8 @@
       "generator": "Unix Makefiles",
       "cacheVariables": {
         "CMAKE_SYSTEM_NAME": "Android",
-        "CMAKE_ANDROID_API_MIN": "24",
-        "CMAKE_ANDROID_NDK": "$env{ANDROID_SDK}",
+        "CMAKE_ANDROID_API_MIN": "26",
+        "CMAKE_ANDROID_NDK": "$env{ANDROID_NDK}",
         "CMAKE_ANDROID_STL_TYPE": "c++_static"
       }
     },

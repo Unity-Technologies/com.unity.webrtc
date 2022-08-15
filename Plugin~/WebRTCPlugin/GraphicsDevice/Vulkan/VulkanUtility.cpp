@@ -19,6 +19,7 @@ namespace webrtc
 #endif
     static PFN_vkGetMemoryFdKHR vkGetMemoryFdKHR = nullptr;
     static PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = nullptr;
+//    static PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHR = nullptr;
 
     bool VulkanUtility::FindMemoryTypeInto(
         const VkPhysicalDevice physicalDevice,
@@ -96,8 +97,8 @@ namespace webrtc
         VkExportMemoryAllocateInfoKHR exportInfo = {};
         if (exportHandle)
         {
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
-            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR;
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
             allocInfo.pNext = &exportInfo;
         }
 
@@ -159,8 +160,12 @@ namespace webrtc
         VkExportMemoryAllocateInfoKHR exportInfo = {};
         if (exportHandle)
         {
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
-            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR;
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+#if UNITY_WIN
+            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#elif UNITY_ANDROID
+            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID;
+#endif
             allocInfo.pNext = &exportInfo;
         }
 

@@ -13,6 +13,7 @@
 #include "VulkanTexture2D.h"
 #include "VulkanUtility.h"
 #include "WebRTCMacros.h"
+#include "NativeFrameBuffer.h"
 
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
@@ -42,8 +43,8 @@ namespace webrtc
         , m_commandPool(nullptr)
         , m_queueFamilyIndex(queueFamilyIndex)
         , m_allocator(nullptr)
-#if CUDA_PLATFORM
         , m_instance(instance)
+#if CUDA_PLATFORM
         , m_isCudaSupport(false)
 #endif
     {
@@ -137,6 +138,12 @@ namespace webrtc
             return nullptr;
         }
         return vulkanTexture.release();
+    }
+
+    rtc::scoped_refptr<::webrtc::VideoFrameBuffer>
+    VulkanGraphicsDevice::CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
+    {
+        return NativeFrameBuffer::Create(width, height, textureFormat, this);
     }
 
     ITexture2D*
@@ -448,6 +455,11 @@ namespace webrtc
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
         VkDeviceMemory memory = vulkanTexture->GetTextureImageMemory();
 
+
+        VkExportMemoryAllocateInfo exportMemoryInfo = {};
+        exportMemoryInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+        exportMemoryInfo.pNext = nullptr;
+        exportMemoryInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID;
 //        VkAndroidHardwareBufferFormatPropertiesANDROID ahb_format_props = {};
 //        VkAndroidHardwareBufferPropertiesANDROID ahb_props = {};
 //
@@ -469,7 +481,9 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "vkGetMemoryAndroidHardwareBufferANDROID failed. result=" << result;
             return nullptr;
         }
-        return nullptr;
+        std::unique_ptr<AHardwareBufferHandle> handle = std::make_unique<AHardwareBufferHandle>();
+        handle->buffer = buffer;
+        return std::move(handle);
 #else
         return nullptr;
 #endif
@@ -525,6 +539,25 @@ namespace webrtc
         }
         return true;
     }
+
+#if __ANDROID__
+    std::unique_ptr<Surface> VulkanGraphicsDevice::GetSurface(ANativeWindow* window)
+    {
+        VkSurfaceKHR surface;
+        VkAndroidSurfaceCreateInfoKHR createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+        createInfo.window = window;
+
+        VkResult result = vkCreateAndroidSurfaceKHR(m_instance, &createInfo, nullptr, &surface);
+        if(result != VK_SUCCESS)
+        {
+            RTC_LOG(LS_INFO) << "PFN_vkCreateAndroidSurfaceKHR failed. result:" << result;
+            return nullptr;
+        }
+        return CreateVulkanSurface(surface, m_device, m_physicalDevice);
+    }
+#endif
+
 
 } // end namespace webrtc
 } // end namespace unity

@@ -28,6 +28,16 @@ namespace webrtc
         virtual ~GpuMemoryBufferHandle();
     };
 
+    struct AHardwareBufferHandle : public GpuMemoryBufferHandle
+    {
+        AHardwareBufferHandle();
+        AHardwareBufferHandle(AHardwareBufferHandle&& other);
+        AHardwareBufferHandle& operator=(AHardwareBufferHandle&& other);
+        virtual ~AHardwareBufferHandle() override;
+
+        AHardwareBuffer* buffer;
+    };
+
     class ITexture2D;
     class GpuMemoryBufferInterface : public rtc::RefCountInterface
     {

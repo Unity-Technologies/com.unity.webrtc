@@ -42,6 +42,10 @@ public:
     NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ABGR; }
 #endif
 
+#if __ANDROID__
+    std::unique_ptr<Surface> GetSurface(ANativeWindow* window) override;
+#endif
+
 private:
     bool CopyResource(GLuint dstName, GLuint srcName);
     void ReleaseTexture(OpenGLTexture2D* texture);

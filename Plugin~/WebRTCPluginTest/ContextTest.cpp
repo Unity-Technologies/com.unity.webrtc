@@ -171,14 +171,14 @@ namespace webrtc
 
     TEST_P(ContextTest, CreateAndDeleteVideoRenderer)
     {
-        const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
+        const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true, device_);
         EXPECT_NE(nullptr, renderer);
         context->DeleteVideoRenderer(renderer);
     }
 
     TEST_P(ContextTest, EqualRendererGetById)
     {
-        const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
+        const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true, device_);
         EXPECT_NE(nullptr, renderer);
         const auto rendererId = renderer->GetId();
         const auto rendererGetById = context->GetVideoRenderer(rendererId);
@@ -192,7 +192,7 @@ namespace webrtc
         EXPECT_NE(nullptr, source);
         const auto track = context->CreateVideoTrack("video", source);
         EXPECT_NE(nullptr, track);
-        const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
+        const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true, device_);
         EXPECT_NE(nullptr, renderer);
         track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
         track->RemoveSink(renderer);

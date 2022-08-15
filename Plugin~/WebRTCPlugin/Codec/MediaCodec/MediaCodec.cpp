@@ -18,16 +18,18 @@ namespace webrtc
 
     std::unique_ptr<MediaCodecEncoder> MediaCodecEncoder::Create(
         const cricket::VideoCodec& codec,
+        IGraphicsDevice* device,
         ProfilerMarkerFactory* profiler)
     {
-        return std::make_unique<MediaCodecEncoderImpl>(codec, profiler);
+        return std::make_unique<MediaCodecEncoderImpl>(codec, device, profiler);
     }
 
     std::unique_ptr<MediaCodecDecoder> MediaCodecDecoder::Create(
         const cricket::VideoCodec& codec,
+        IGraphicsDevice* device,
         ProfilerMarkerFactory* profiler)
     {
-        return std::make_unique<MediaCodecDecoderImpl>(profiler);
+        return std::make_unique<MediaCodecDecoderImpl>(codec, device, profiler);
     }
 }
 }

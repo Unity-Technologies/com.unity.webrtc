@@ -7,6 +7,7 @@
 #include <api/video_codecs/video_encoder.h>
 #include <api/video_codecs/video_encoder_factory.h>
 #include <media/base/codec.h>
+//#include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
@@ -14,21 +15,24 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
+    class IGraphicsDevice;
     class ProfilerMarkerFactory;
-
     class MediaCodecEncoder : public VideoEncoder
     {
     public:
         static std::unique_ptr<MediaCodecEncoder> Create(
             const cricket::VideoCodec& codec,
+            IGraphicsDevice* device,
             ProfilerMarkerFactory* profiler);
     };
 
     class MediaCodecDecoder : public VideoDecoder
     {
     public:
-        static std::unique_ptr<MediaCodecDecoder>
-        Create(const cricket::VideoCodec& codec, ProfilerMarkerFactory* profiler);
+        static std::unique_ptr<MediaCodecDecoder> Create(
+            const cricket::VideoCodec& codec,
+            IGraphicsDevice* device,
+            ProfilerMarkerFactory* profiler);
     };
 
     class MedicCodecEncoderFactory : public VideoEncoderFactory

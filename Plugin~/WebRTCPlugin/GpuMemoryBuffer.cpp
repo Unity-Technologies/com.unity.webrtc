@@ -13,6 +13,13 @@ namespace webrtc
 
     GpuMemoryBufferHandle::~GpuMemoryBufferHandle() { }
 
+    AHardwareBufferHandle::AHardwareBufferHandle() : buffer(nullptr) { }
+    AHardwareBufferHandle::AHardwareBufferHandle(AHardwareBufferHandle&& other) = default;
+    AHardwareBufferHandle& AHardwareBufferHandle::operator=(AHardwareBufferHandle&& other) = default;
+
+    AHardwareBufferHandle::~AHardwareBufferHandle() { }
+
+
     GpuMemoryBufferFromUnity::GpuMemoryBufferFromUnity(
         IGraphicsDevice* device, NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format)
         : device_(device)

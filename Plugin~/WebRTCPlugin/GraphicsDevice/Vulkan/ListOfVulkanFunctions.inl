@@ -31,6 +31,14 @@ INSTANCE_VULKAN_FUNCTION(vkCreateDevice)
 INSTANCE_VULKAN_FUNCTION(vkGetDeviceProcAddr)
 INSTANCE_VULKAN_FUNCTION(vkDestroyInstance)
 
+#if __ANDROID__
+INSTANCE_VULKAN_FUNCTION(vkCreateAndroidSurfaceKHR)
+INSTANCE_VULKAN_FUNCTION(vkGetPhysicalDeviceSurfaceFormatsKHR)
+INSTANCE_VULKAN_FUNCTION(vkGetPhysicalDeviceSurfacePresentModesKHR)
+INSTANCE_VULKAN_FUNCTION(vkGetPhysicalDeviceSurfaceCapabilitiesKHR)
+INSTANCE_VULKAN_FUNCTION(vkGetPhysicalDeviceSurfaceSupportKHR)
+#endif
+
 #undef INSTANCE_VULKAN_FUNCTION
 
 #ifndef DEVICE_VULKAN_FUNCTION
@@ -39,7 +47,12 @@ INSTANCE_VULKAN_FUNCTION(vkDestroyInstance)
 
 DEVICE_VULKAN_FUNCTION(vkDestroyDevice)
 DEVICE_VULKAN_FUNCTION(vkCreateImage)
+DEVICE_VULKAN_FUNCTION(vkDestroyImageView)
+DEVICE_VULKAN_FUNCTION(vkCreateRenderPass)
+DEVICE_VULKAN_FUNCTION(vkDestroyRenderPass)
 DEVICE_VULKAN_FUNCTION(vkCmdBeginRenderPass)
+DEVICE_VULKAN_FUNCTION(vkCreateFramebuffer)
+DEVICE_VULKAN_FUNCTION(vkDestroyFramebuffer)
 DEVICE_VULKAN_FUNCTION(vkCreateBuffer)
 DEVICE_VULKAN_FUNCTION(vkGetBufferMemoryRequirements)
 DEVICE_VULKAN_FUNCTION(vkGetImageSubresourceLayout)
@@ -86,6 +99,9 @@ DEVICE_VULKAN_FUNCTION(vkGetFenceStatus)
 
 #if __ANDROID__
 DEVICE_VULKAN_FUNCTION(vkGetMemoryAndroidHardwareBufferANDROID)
+DEVICE_VULKAN_FUNCTION(vkCreateSwapchainKHR)
+DEVICE_VULKAN_FUNCTION(vkGetSwapchainImagesKHR)
+DEVICE_VULKAN_FUNCTION(vkDestroySwapchainKHR)
 #endif
 
 #undef DEVICE_LEVEL_VULKAN_FUNCTION

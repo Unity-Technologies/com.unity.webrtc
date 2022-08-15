@@ -1,6 +1,11 @@
 #include "pch.h"
 
-#include "third_party/libyuv/include/libyuv.h"
+#include <third_party/libyuv/include/libyuv.h>
+
+#if __ANDROID__
+#include <vulkan/vulkan_android.h>
+#include <EGL/egl.h>
+#endif
 
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
@@ -100,7 +105,7 @@ ITexture2D* OpenGLGraphicsDevice::CreateDefaultTextureV(
 
     OpenGLTexture2D::ReleaseOpenGLTextureCallback callback =
         std::bind(&OpenGLGraphicsDevice::ReleaseTexture, this, std::placeholders::_1);
-    return new OpenGLTexture2D(w, h, tex, callback);
+    return new OpenGLTexture2D(w, h, textureFormat, tex, callback);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -306,6 +311,16 @@ rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(IT
         return nullptr;
 #endif
     }
+
+#if __ANDROID__
+    std::unique_ptr<Surface> OpenGLGraphicsDevice::GetSurface(ANativeWindow* window)
+    {
+        //EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+        //eglChooseConfig(display, attribs, &config, 1, &numConfigs);
+
+        return CreateEGLSurface();
+    }
+#endif
 
 } // end namespace webrtc
 } // end namespace unity

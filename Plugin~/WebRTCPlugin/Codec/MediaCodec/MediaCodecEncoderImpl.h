@@ -9,6 +9,7 @@
 
 #include "MediaCodec.h"
 #include "Size.h"
+//#include "GraphicsDevice/IGraphicsDevice.h"
 
 struct AMediaCodec;
 
@@ -18,11 +19,14 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
+    class Surface;
+    //class IGraphicDevice;
     class MediaCodecEncoderImpl : public MediaCodecEncoder
     {
     public:
         MediaCodecEncoderImpl(
             const cricket::VideoCodec& codec,
+            IGraphicsDevice* device,
             ProfilerMarkerFactory* profiler);
         MediaCodecEncoderImpl(const MediaCodecEncoderImpl&) = delete;
         MediaCodecEncoderImpl& operator=(const MediaCodecEncoderImpl&) = delete;
@@ -42,7 +46,14 @@ namespace webrtc
         // Returns meta-data about the encoder, such as implementation name.
         EncoderInfo GetEncoderInfo() const override;
     private:
-        AMediaCodec* codec_;
+        IGraphicsDevice* device_;
+
+        VideoCodec codec_;
+        AMediaCodec* codecImpl_;
+        EncodedImageCallback* encodedCompleteCallback_;
+        EncodedImage encodedImage_;
+        std::unique_ptr<Surface> surface_;
+        std::unique_ptr<BitrateAdjuster> bitrateAdjuster_;
     };
 }
 }

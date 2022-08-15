@@ -26,7 +26,7 @@ namespace webrtc
             : m_taskQueueFactory(CreateDefaultTaskQueueFactory())
         {
             m_callback = &OnFrameSizeChange;
-            m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true);
+            m_renderer = std::make_unique<UnityVideoRenderer>(1, m_callback, true, device());
         }
         ~VideoRendererTest() override = default;
 

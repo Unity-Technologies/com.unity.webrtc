@@ -10,13 +10,13 @@
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #endif
+
 #include "GraphicsDevice/IGraphicsDevice.h"
 
 namespace unity
 {
 namespace webrtc
 {
-
     using namespace ::webrtc;
 
     class UnityGraphicsVulkan;
@@ -39,6 +39,8 @@ namespace webrtc
         inline void* GetEncodeDevicePtrV() override;
         ITexture2D* CreateDefaultTextureV(
             const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
+        rtc::scoped_refptr<::webrtc::VideoFrameBuffer>
+        CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
         ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
 
@@ -64,6 +66,10 @@ namespace webrtc
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 #endif
+
+#if __ANDROID__
+        std::unique_ptr<Surface> GetSurface(ANativeWindow* window) override;
+#endif
     private:
         VkResult CreateCommandPool();
 
@@ -74,11 +80,11 @@ namespace webrtc
         VkCommandPool m_commandPool;
         uint32_t m_queueFamilyIndex;
         VkAllocationCallbacks* m_allocator;
+        VkInstance m_instance;
         const UnityProfilerMarkerDesc* m_maker;
 
 #if CUDA_PLATFORM
         bool InitCudaContext();
-        VkInstance m_instance;
         CudaContext m_cudaContext;
         bool m_isCudaSupport;
 #endif
