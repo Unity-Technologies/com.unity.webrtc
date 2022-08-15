@@ -6,6 +6,7 @@
 #include <common_video/h264/h264_common.h>
 #include <media/base/media_constants.h>
 #include <modules/video_coding/include/video_codec_interface.h>
+#include <rtc_base/thread.h>
 
 #include <media/NdkMediaCodec.h>
 #include <media/NdkMediaFormat.h>
@@ -21,21 +22,6 @@ namespace unity
 {
 namespace webrtc
 {
-    const char VIDEO_H264[] = "video/avc";
-//    const char VIDEO_VP8[] = "video/x-vnd.on2.vp8";
-//    const char VIDEO_VP9[] = "video/x-vnd.on2.vp9";
-//    const char VIDEO_AV1[] = "video/av01";
-
-    // https://developer.android.com/reference/android/media/MediaCodecInfo.CodecCapabilities
-//    const int ColorFormatYUV420Planar = 0x00000013;
-    //const int ColorFormatYUV420SemiPlanar = 0x00000015;
-    const int ColorFormatSurface = 0x7f000789;
-
-    const int keyFrameIntervalSec = 5;
-    const int VIDEO_ControlRateConstant = 2;
-    const int VIDEO_AVC_PROFILE_HIGH = 8;
-    const int VIDEO_AVC_LEVEL_3 = 0x100;
-
     MediaCodecEncoderImpl::MediaCodecEncoderImpl(
         const cricket::VideoCodec& codec,
         IGraphicsDevice* device,
@@ -75,9 +61,6 @@ namespace webrtc
         codec_ = *codec;
 
         codecImpl_ = AMediaCodec_createEncoderByType(VIDEO_H264);
-        //const char qcom[] = "OMX.qcom.video.encoder.avc";
-        //const char qti[] = "c2.qti.avc.encoder";
-        //codecImpl_ = AMediaCodec_createCodecByName(qti);
         RTC_DCHECK(codecImpl_);
 
         AMediaFormat* format = AMediaFormat_new();
@@ -111,25 +94,6 @@ namespace webrtc
         surface_ = device_->GetSurface(window);
         RTC_DCHECK(surface_);
 
-//        AImageReader* reader;
-//        result = AImageReader_newWithUsage(codec_.width, codec_.height, AIMAGE_FORMAT_RGBA_8888, AHARDWAREBUFFER_USAGE_VIDEO_ENCODE, 1, &reader);
-//        if(result != AMEDIA_OK)
-//        {
-//            RTC_LOG(LS_INFO) << "AImageReader_newWithUsage failed. result=" << result;
-//            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
-//        }
-//        result = AImageReader_getWindow(reader, &surface_);
-//        if(result != AMEDIA_OK)
-//        {
-//            RTC_LOG(LS_INFO) << "AImageReader_getWindow failed. result=" << result;
-//            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
-//        }
-//        result = AMediaCodec_setInputSurface(codecImpl_, surface_);
-//        if(result != AMEDIA_OK)
-//        {
-//            RTC_LOG(LS_INFO) << "AMediaCodec_setInputSurface failed. result=" << result;
-//            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
-//        }
         result = AMediaCodec_start(codecImpl_);
         if(result != AMEDIA_OK)
         {
@@ -153,6 +117,7 @@ namespace webrtc
     // Register an encode complete m_encodedCompleteCallback object.
     int32_t MediaCodecEncoderImpl::RegisterEncodeCompleteCallback(EncodedImageCallback* callback)
     {
+        encodedCompleteCallback_ = callback;
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
@@ -181,11 +146,78 @@ namespace webrtc
             }
         }
 
-        RTC_LOG(LS_INFO) << "Encode";
         surface_->DrawFrame(nativeBuffer);
-        surface_->SwapBuffers();
-        RTC_LOG(LS_INFO) << "Encode end";
 
+        std::vector<uint8_t> packet;
+        for(;;)
+        {
+            AMediaCodecBufferInfo info = {};
+            ssize_t bufferIndex =
+                AMediaCodec_dequeueOutputBuffer(codecImpl_, &info, kDequeueOutputBufferTimeoutMicrosecond);
+            if (bufferIndex < 0)
+            {
+                if (bufferIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED)
+                {
+                    AMediaFormat *format = AMediaCodec_getOutputFormat(codecImpl_);
+                    AMediaFormat_delete(format);
+                }
+                else if (bufferIndex == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED)
+                {
+                    // outputBuffersBusyCount.waitForZero();
+                }
+                rtc::Thread::SleepMs(1);
+                continue;
+            }
+            size_t size = 0;
+            const uint8_t* buf = AMediaCodec_getOutputBuffer(codecImpl_, bufferIndex, &size);
+            if(!buf)
+            {
+                RTC_LOG(LS_INFO) << "AMediaCodec_getOutputBuffer returns nullptr.";
+                AMediaCodec_releaseOutputBuffer(codecImpl_, bufferIndex, false);
+                return WEBRTC_VIDEO_CODEC_NO_OUTPUT;
+            }
+            if(info.flags & AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG)
+            {
+                configBuffer_.resize(info.size);
+                std::memcpy(configBuffer_.data(), buf, info.size);
+                rtc::Thread::SleepMs(1);
+                continue;
+            }
+            packet.resize(configBuffer_.size() + info.size);
+            std::memcpy(packet.data(), configBuffer_.data(), configBuffer_.size());
+            std::memcpy(packet.data() + configBuffer_.size(), buf, info.size);
+            AMediaCodec_releaseOutputBuffer(codecImpl_, bufferIndex, false);
+            break;
+        }
+
+        encodedImage_.SetEncodedData(EncodedImageBuffer::Create(packet.data(), packet.size()));
+        encodedImage_.set_size(packet.size());
+
+        h264BitstreamParser_.ParseBitstream(encodedImage_);
+        encodedImage_.qp_ = h264BitstreamParser_.GetLastSliceQp().value_or(-1);
+
+        encodedImage_._encodedWidth = nativeBuffer->width();
+        encodedImage_._encodedHeight = nativeBuffer->height();
+        encodedImage_.SetTimestamp(frame.timestamp());
+        encodedImage_.SetSpatialIndex(0);
+        encodedImage_.ntp_time_ms_ = frame.ntp_time_ms();
+        encodedImage_.capture_time_ms_ = frame.render_time_ms();
+        encodedImage_.rotation_ = frame.rotation();
+        encodedImage_.content_type_ = VideoContentType::UNSPECIFIED;
+        encodedImage_.timing_.flags = VideoSendTiming::kInvalid;
+        encodedImage_._frameType = VideoFrameType::kVideoFrameDelta;
+        encodedImage_.SetColorSpace(frame.color_space());
+
+        CodecSpecificInfo codecInfo;
+        codecInfo.codecType = kVideoCodecH264;
+        codecInfo.codecSpecific.H264.packetization_mode = H264PacketizationMode::NonInterleaved;
+
+        const auto result = encodedCompleteCallback_->OnEncodedImage(encodedImage_, &codecInfo);
+        if (result.error != EncodedImageCallback::Result::OK)
+        {
+            RTC_LOG(LS_ERROR) << "Encode m_encodedCompleteCallback failed " << result.error;
+            return WEBRTC_VIDEO_CODEC_ERROR;
+        }
         return WEBRTC_VIDEO_CODEC_OK;
     }
 

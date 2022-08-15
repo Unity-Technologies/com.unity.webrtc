@@ -24,8 +24,12 @@ namespace webrtc
             SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice_);
             VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
             VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-            VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
+            swapchainExtent_ = ChooseSwapExtent(swapChainSupport.capabilities);
             uint32_t minImageCount = swapChainSupport.capabilities.minImageCount;
+
+            // get queue.
+            vkGetDeviceQueue(device_, indices.graphicsFamily.value(), 0, &graphicsQueue_);
+            vkGetDeviceQueue(device_, indices.presentFamily.value(), 0, &presentQueue_);
 
             // create swapchain.
             VkSwapchainCreateInfoKHR createInfo = {};
@@ -34,7 +38,7 @@ namespace webrtc
             createInfo.minImageCount = minImageCount;
             createInfo.imageFormat = surfaceFormat.format;
             createInfo.imageColorSpace = surfaceFormat.colorSpace;
-            createInfo.imageExtent = extent;
+            createInfo.imageExtent = swapchainExtent_;
             createInfo.imageArrayLayers = 1;
             createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -140,12 +144,22 @@ namespace webrtc
             subpass.colorAttachmentCount = 1;
             subpass.pColorAttachments = &colorAttachmentRef;
 
-            VkRenderPassCreateInfo renderPassInfo{};
+            VkRenderPassCreateInfo renderPassInfo = {};
             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
             renderPassInfo.attachmentCount = 1;
             renderPassInfo.pAttachments = &colorAttachment;
             renderPassInfo.subpassCount = 1;
             renderPassInfo.pSubpasses = &subpass;
+
+            VkSubpassDependency dependency = {};
+            dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+            dependency.dstSubpass = 0;
+            dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            dependency.srcAccessMask = 0;
+            dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            renderPassInfo.dependencyCount = 1;
+            renderPassInfo.pDependencies = &dependency;
 
             result = vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass_);
             if(result != VK_SUCCESS)
@@ -160,14 +174,13 @@ namespace webrtc
             {
                 std::array<VkImageView, 1> attachments = {imageViews_[i]};
 
-                VkExtent2D swapChainExtent = extent;
                 VkFramebufferCreateInfo framebufferInfo = {};
                 framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
                 framebufferInfo.renderPass = renderPass_;
                 framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
                 framebufferInfo.pAttachments = attachments.data();
-                framebufferInfo.width = swapChainExtent.width;
-                framebufferInfo.height = swapChainExtent.height;
+                framebufferInfo.width = swapchainExtent_.width;
+                framebufferInfo.height = swapchainExtent_.height;
                 framebufferInfo.layers = 1;
 
                 result = vkCreateFramebuffer(
@@ -208,6 +221,35 @@ namespace webrtc
                 RTC_LOG(LS_INFO) << "vkAllocateCommandBuffers failed. result=" << result;
                 return;
             }
+
+            // create two semaphores.
+            VkSemaphoreCreateInfo semaphoreInfo = {};
+            semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+            result = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore_);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkCreateSemaphore failed. result=" << result;
+                return;
+            }
+            result = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore_);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkCreateSemaphore failed. result=" << result;
+                return;
+            }
+
+            // create fence.
+            VkFenceCreateInfo fenceInfo{};
+            fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+            fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+            result = vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence_);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkCreateFence failed. result=" << result;
+                return;
+            }
         }
         ~VulkanSurface() override
         {
@@ -223,29 +265,102 @@ namespace webrtc
                 vkDestroyFramebuffer(device_, framebuffer, nullptr);
             }
             vkDestroyCommandPool(device_, commandPool_, nullptr);
+
+            vkDestroySemaphore(device_, imageAvailableSemaphore_, nullptr);
+            vkDestroySemaphore(device_, renderFinishedSemaphore_, nullptr);
+            vkDestroyFence(device_, inFlightFence_, nullptr);
         }
 
         void DrawFrame(const NativeFrameBuffer* buffer) override
         {
-            VkCommandBufferBeginInfo beginInfo = {};
-            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-            VkResult result = vkBeginCommandBuffer(commandBuffer_, &beginInfo);
+            // wait for fence.
+            VkResult result = vkWaitForFences(device_, 1, &inFlightFence_, VK_TRUE, UINT64_MAX);
             if(result != VK_SUCCESS)
             {
-                RTC_LOG(LS_INFO) << "vkBeginCommandBuffer failed. result=" << result;
+                RTC_LOG(LS_INFO) << "vkWaitForFences failed. result=" << result;
+                return;
+            }
+
+            // reset fence.
+            result = vkResetFences(device_, 1, &inFlightFence_);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkResetFences failed. result=" << result;
+                return;
+            }
+
+            // get next image index.
+            uint32_t imageIndex;
+            result = vkAcquireNextImageKHR(device_, swapchain_, UINT64_MAX, imageAvailableSemaphore_, VK_NULL_HANDLE, &imageIndex);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkAcquireNextImageKHR failed. result=" << result;
+                return;
+            }
+
+            // reset command buffer.
+            result = vkResetCommandBuffer(commandBuffer_, 0);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkResetCommandBuffer failed. result=" << result;
+                return;
+            }
+
+            // record command buffer.
+            result = RecordCommandBuffer(buffer, commandBuffer_, imageIndex);
+            if(result != VK_SUCCESS)
+                return;
+
+            // submit the command buffer.
+            VkSubmitInfo submitInfo{};
+            submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+            VkSemaphore waitSemaphores[] = {imageAvailableSemaphore_ };
+            VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+            submitInfo.waitSemaphoreCount = 1;
+            submitInfo.pWaitSemaphores = waitSemaphores;
+            submitInfo.pWaitDstStageMask = waitStages;
+            submitInfo.commandBufferCount = 1;
+            submitInfo.pCommandBuffers = &commandBuffer_;
+
+            VkSemaphore signalSemaphores[] = { renderFinishedSemaphore_ };
+            submitInfo.signalSemaphoreCount = 1;
+            submitInfo.pSignalSemaphores = signalSemaphores;
+
+            result = vkQueueSubmit(graphicsQueue_, 1, &submitInfo, inFlightFence_);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkQueueSubmit failed. result=" << result;
+                return;
+            }
+
+            // present queue
+            VkPresentInfoKHR presentInfo{};
+            presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+            presentInfo.waitSemaphoreCount = 1;
+            presentInfo.pWaitSemaphores = signalSemaphores;
+
+            VkSwapchainKHR swapChains[] = {swapchain_ };
+            presentInfo.swapchainCount = 1;
+            presentInfo.pSwapchains = swapChains;
+            presentInfo.pImageIndices = &imageIndex;
+
+            result = vkQueuePresentKHR(presentQueue_, &presentInfo);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkQueueSubmit failed. result=" << result;
                 return;
             }
         }
-        void SwapBuffers() override
-        {
-            RTC_LOG(LS_INFO) << surface_;
-        }
+
     private:
+        VkQueue graphicsQueue_;
+        VkQueue presentQueue_;
         VkSurfaceKHR surface_;
         VkDevice device_;
         VkPhysicalDevice physicalDevice_;
         VkSwapchainKHR swapchain_;
+        VkExtent2D swapchainExtent_;
         std::vector<VkImage> images_;
         std::vector<VkImageView> imageViews_;
         VkRenderPass renderPass_;
@@ -253,6 +368,9 @@ namespace webrtc
         std::vector<VkFramebuffer> framebuffers_;
         VkCommandPool commandPool_;
         VkCommandBuffer commandBuffer_;
+        VkSemaphore imageAvailableSemaphore_;
+        VkSemaphore renderFinishedSemaphore_;
+        VkFence inFlightFence_;
 
         struct SwapChainSupportDetails
         {
@@ -368,6 +486,47 @@ namespace webrtc
 //
 //            return actualExtent;
         }
+
+        VkResult RecordCommandBuffer(const NativeFrameBuffer* buffer, VkCommandBuffer commandBuffer, uint32_t imageIndex)
+        {
+            // begin recording command.
+            VkCommandBufferBeginInfo beginInfo = {};
+            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+            VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkBeginCommandBuffer failed. result=" << result;
+                return result;
+            }
+
+            // begin a render pass.
+            VkRenderPassBeginInfo renderPassInfo = {};
+            renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            renderPassInfo.renderPass = renderPass_;
+            renderPassInfo.framebuffer = framebuffers_[imageIndex];
+            renderPassInfo.renderArea.offset = {0, 0};
+            renderPassInfo.renderArea.extent = swapchainExtent_;
+            VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+            renderPassInfo.clearValueCount = 1;
+            renderPassInfo.pClearValues = &clearColor;
+            vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+            // todo: do something.
+            // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+            // end a render pass.
+            vkCmdEndRenderPass(commandBuffer);
+
+            // end recording command.
+            result = vkEndCommandBuffer(commandBuffer);
+            if(result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_INFO) << "vkEndCommandBuffer failed. result=" << result;
+                return result;
+            }
+            return VK_SUCCESS;
+        }
     };
 
     class EGLSurface : public Surface
@@ -377,10 +536,6 @@ namespace webrtc
         ~EGLSurface() {}
 
         void DrawFrame(const NativeFrameBuffer* buffer) override
-        {
-        }
-
-        void SwapBuffers() override
         {
         }
     };

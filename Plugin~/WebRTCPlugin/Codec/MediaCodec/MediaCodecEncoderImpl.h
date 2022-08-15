@@ -8,8 +8,6 @@
 #include <system_wrappers/include/clock.h>
 
 #include "MediaCodec.h"
-#include "Size.h"
-//#include "GraphicsDevice/IGraphicsDevice.h"
 
 struct AMediaCodec;
 
@@ -20,7 +18,6 @@ namespace webrtc
     using namespace ::webrtc;
 
     class Surface;
-    //class IGraphicDevice;
     class MediaCodecEncoderImpl : public MediaCodecEncoder
     {
     public:
@@ -47,13 +44,15 @@ namespace webrtc
         EncoderInfo GetEncoderInfo() const override;
     private:
         IGraphicsDevice* device_;
-
         VideoCodec codec_;
         AMediaCodec* codecImpl_;
         EncodedImageCallback* encodedCompleteCallback_;
         EncodedImage encodedImage_;
+        H264BitstreamParser h264BitstreamParser_;
+
         std::unique_ptr<Surface> surface_;
         std::unique_ptr<BitrateAdjuster> bitrateAdjuster_;
+        std::vector<uint8_t> configBuffer_;
     };
 }
 }

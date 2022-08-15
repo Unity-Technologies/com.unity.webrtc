@@ -168,6 +168,7 @@ namespace webrtc
         std::queue<VideoFrame> frames;
         while (count)
         {
+            rtc::Thread::SleepMs(33);
             frames.push(NextInputFrame());
             thread->PostTask(
                 RTC_FROM_HERE,

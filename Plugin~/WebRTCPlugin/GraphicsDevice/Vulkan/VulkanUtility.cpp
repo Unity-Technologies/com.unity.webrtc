@@ -443,7 +443,6 @@ namespace webrtc
         const uint32_t width,
         const uint32_t height)
     {
-        RTC_LOG(LS_INFO) << "CopyImage";
         // Start copy
         VkImageCopy copyRegion {};
         copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
@@ -457,8 +456,6 @@ namespace webrtc
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &copyRegion);
-
-        RTC_LOG(LS_INFO) << "CopyImage end";
         return VK_SUCCESS;
     }
 

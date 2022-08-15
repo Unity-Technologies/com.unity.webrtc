@@ -5,12 +5,15 @@
 
 #include "MediaCodec.h"
 
-using namespace webrtc;
+struct AMediaCodec;
+struct AImageReader;
 
 namespace unity
 {
 namespace webrtc
 {
+    using namespace ::webrtc;
+
     class ProfilerMarkerFactory;
     class MediaCodecDecoderImpl : public MediaCodecDecoder
     {
@@ -25,6 +28,14 @@ namespace webrtc
         int32_t RegisterDecodeCompleteCallback(DecodedImageCallback* callback) override;
         int32_t Release() override;
         DecoderInfo GetDecoderInfo() const override;
+    private:
+        IGraphicsDevice* device_;
+        VideoCodec codec_;
+        AMediaCodec* codecImpl_;
+        AImageReader* reader_;
+
+        DecodedImageCallback* decodedCompleteCallback_ = nullptr;
+
     };
 }
 }
