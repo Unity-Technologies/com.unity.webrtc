@@ -3,7 +3,7 @@
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M92/webrtc-android.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 export PLUGIN_DIR=$(pwd)/Runtime/Plugins/Android
-export ARCH_ABI=arm64-v8a
+export ARCH_ABI=x86_64
 
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
