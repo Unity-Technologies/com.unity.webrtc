@@ -27,7 +27,7 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-for target_cpu in "arm64"
+for target_cpu in "x64"
 do
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
 
