@@ -303,7 +303,7 @@ elseif(Android)
   )
   target_compile_options(WebRTCLib
     PUBLIC
-      -fno-lto -fno-rtti
+      -fno-lto -fno-rtti -fPIC
   )
 
   # Linker excludes unused symbols from the shared library
