@@ -20,6 +20,29 @@ cmake . \
   -D CMAKE_BUILD_TYPE=Release \
   -D CMAKE_ANDROID_STL_TYPE=c++_static
 
+# TODO: Find a better way to solve the issue with the unsupported flag.
+
+#------
+# START OF NASTY HACK - the first time cmake is called it will fail, given the
+# set up, due to an unsupported flag. The following removes the flag and reruns
+# cmake.
+#------
+
+sed -i 's/\-Wl,--no-rosegment //g' build/CMakeCache.txt
+
+cmake . \
+  -B build \
+  -D CMAKE_SYSTEM_NAME=Android \
+  -D CMAKE_ANDROID_API_MIN=29 \
+  -D CMAKE_ANDROID_API=29 \
+  -D CMAKE_ANDROID_ARCH_ABI=$ARCH_ABI \
+  -D CMAKE_BUILD_TYPE=Release \
+  -D CMAKE_ANDROID_STL_TYPE=c++_static
+
+#------
+# END OF NASTY HACK
+#------
+
 cmake \
   --build build \
   --target WebRTCPlugin
