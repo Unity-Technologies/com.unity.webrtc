@@ -6,54 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Samples/Menu/Menu.unity
-    guid: f74260b9867fa524a9677fe64004f4f9
-  - enabled: 1
-    path: Assets/Samples/VideoReceive/VideoReceive.unity
-    guid: 0ff78d93b95d29044b16be8c4cce1c6b
-  - enabled: 1
-    path: Assets/Samples/TrickleIce/TrickleIce.unity
-    guid: c30f333934a8e80499b6d8bd89593ae8
-  - enabled: 1
-    path: Assets/Samples/Stats/Stats.unity
-    guid: 3f6769738bc91f848b8242f87cc02275
-  - enabled: 1
-    path: Assets/Samples/DataChannel/DataChannel.unity
-    guid: 7bdf6556dbdb70946924a04ec1fac2df
-  - enabled: 1
-    path: Assets/Samples/MultiplePeerConnections/MultiplePeerConnections.unity
-    guid: ad11cc7c597c0e94d8cf4db5a3ebde11
-  - enabled: 1
-    path: Assets/Samples/MediaStream/MediaStream.unity
-    guid: 6a553b4932fd56b45ab503ea0f990e2d
-  - enabled: 1
-    path: Assets/Samples/ChangeCodecs/ChangeCodecs.unity
-    guid: e9c13f6cf7516b24495a3ed0779dcc70
-  - enabled: 1
-    path: Assets/Samples/MungeSDP/MungeSDP.unity
-    guid: b4115d77431845442867699b94fc0232
-  - enabled: 1
-    path: Assets/Samples/Bandwidth/Bandwidth.unity
-    guid: 7b937b0c9fd657748b097f42c131679c
-  - enabled: 1
-    path: Assets/Samples/MultiVideoReceive/MultiVideoReceive.unity
-    guid: 2849cfdf020a0464bac96e5c43bd6726
-  - enabled: 1
-    path: Assets/Samples/PeerConnection/PeerConnection.unity
-    guid: b6162a25306134a9ea9c9c7556e5f136
-  - enabled: 1
-    path: Assets/Samples/PerfectNegotiation/PerfectNegotiation.unity
-    guid: 230a6bb1d81354b0988a940b657c5674
-  - enabled: 1
-    path: Assets/Samples/Audio/Audio.unity
-    guid: 5367027ce2f25f54c87033bdf6604607
-  - enabled: 1
-    path: Assets/Samples/MultiAudioReceive/MultiAudioReceive.unity
-    guid: f2c574ba8fa6e413d80d51085132df4f
-  - enabled: 1
-    path: Assets/Samples/E2ELatency/E2ELatency.unity
-    guid: d85785bc886b68348b04331dab320a33
-  - enabled: 1
-    path: Assets/Samples/ReplaceTrack/ReplaceTrack.unity
-    guid: 9607119e15db6cb40a49916fb3a70f9f
+    path: Assets/Samples/CameraTest/CameraTest.unity
+    guid: b87104327f59244be9516def08531ef8
   m_configObjects: {}
