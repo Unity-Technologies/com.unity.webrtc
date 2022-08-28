@@ -7,3 +7,6 @@ attempting to enchance the Android X86_64 builds experience.
 Use [WebRTC for
 Unity](https://github.com/Unity-Technologies/com.unity.webrtc) unless you are
 specifically targeting Android (API level 29 and above) X86_64 builds.
+
+For information on developing the plugin, see: [Plugin
+Development](https://github.com/aaron-stafford/com.unity.webrtc/tree/develop/Plugin~)
