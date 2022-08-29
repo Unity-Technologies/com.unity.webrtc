@@ -2,7 +2,7 @@
 
 This is a fork of [WebRTC for
 Unity](https://github.com/Unity-Technologies/com.unity.webrtc) that is
-attempting to enchance the Android X86_64 builds experience.
+attempting to enchance the Android X86_64 build experience.
 
 Use [WebRTC for
 Unity](https://github.com/Unity-Technologies/com.unity.webrtc) unless you are
