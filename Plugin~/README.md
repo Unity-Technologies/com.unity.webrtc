@@ -1,10 +1,12 @@
-# Build Native Plugin
+This page has information on how to update this plugin. Conceptually, there are
+two parts. Building the Android x86_64 binaries and building the Android x86_64
+plugin.
 
-This guide will cover building and deploying the native plugin `com.unity.webrtc` depends on.
+# Building the Android x86_64 webrtc libraries
 
-## Developing the native library
-
-### Ubuntu 20.04
+Requirements:
+* Ubuntu 20.04
+* 50gig SSD
 
 ```powershell
 sudo apt-get install zip unzip pkg-config python-is-python3
@@ -12,9 +14,11 @@ git clone https://github.com/aaron-stafford/com.unity.webrtc.git
 cd com.unity.webrtc; bash BuildScripts~/build_libwebrtc_android.sh
 ```
 
-## Developing the native plugin
+# Building the Android x86_64 plugin
 
-### Ubuntu 20.04
+Requirements:
+* Ubuntu 20.04
+* 10gig SSD
 
 ```powershell
 sudo apt-get update
