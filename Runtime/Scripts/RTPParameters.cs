@@ -201,6 +201,14 @@ namespace Unity.WebRTC
             codecs = Array.ConvertAll(src.codecs.ToArray(),
                 v => new RTCRtpCodecParameters(ref v));
         }
+        internal RTCRtpParameters(ref RTCRtpReceiveParametersInternal src)
+        {
+            headerExtensions = Array.ConvertAll(src.headerExtensions.ToArray(),
+                v => new RTCRtpHeaderExtensionParameters(ref v));
+            rtcp = new RTCRtcpParameters(ref src.rtcp);
+            codecs = Array.ConvertAll(src.codecs.ToArray(),
+                v => new RTCRtpCodecParameters(ref v));
+        }
     }
 
     /// <summary>
@@ -237,6 +245,14 @@ namespace Unity.WebRTC
             }
             instance.encodings = encodings;
             instance.transactionId = Marshal.StringToCoTaskMemAnsi(transactionId);
+        }
+    }
+
+    public class RTCRtpReceiveParameters : RTCRtpParameters
+    {
+        internal RTCRtpReceiveParameters(ref RTCRtpReceiveParametersInternal src)
+            : base(ref src)
+        {
         }
     }
 
@@ -461,6 +477,22 @@ namespace Unity.WebRTC
             encodings.Dispose();
             Marshal.FreeCoTaskMem(transactionId);
             transactionId = IntPtr.Zero;
+            codecs.Dispose();
+            headerExtensions.Dispose();
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpReceiveParametersInternal
+    {
+        public MarshallingArray<RTCRtpCodecParametersInternal> codecs;
+        public MarshallingArray<RTCRtpHeaderExtensionParametersInternal> headerExtensions;
+        public RTCRtcpParametersInternal rtcp;
+
+        public void Dispose()
+        {
+            codecs.Dispose();
+            headerExtensions.Dispose();
         }
     }
 

@@ -25,9 +25,9 @@ namespace Unity.WebRTC.RuntimeTest
             }
         }
 
-        public RTCRtpTransceiver AddTransceiver(int indexPeer, MediaStreamTrack track)
+        public RTCRtpTransceiver AddTransceiver(int indexPeer, MediaStreamTrack track, RTCRtpTransceiverInit init = null)
         {
-            return peers[indexPeer].AddTransceiver(track);
+            return peers[indexPeer].AddTransceiver(track, init);
         }
 
         public RTCRtpTransceiver AddTransceiver(int indexPeer, TrackKind kind, RTCRtpTransceiverInit init = null)
@@ -137,12 +137,14 @@ namespace Unity.WebRTC.RuntimeTest
             };
             peers[0].OnNegotiationNeeded = () =>
             {
+                Debug.Log("OnNegotiationNeeded");
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[0], peers[1]));
             };
 
             peers[1].OnNegotiationNeeded = () =>
             {
+                Debug.Log("OnNegotiationNeeded");
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[1], peers[0]));
             };
@@ -155,28 +157,23 @@ namespace Unity.WebRTC.RuntimeTest
                 yield break;
             }
             negotiating = true;
-            var op1 = peer1.CreateOffer();
+            var op1 = peer1.SetLocalDescription();
             yield return op1;
             Assert.That(op1.IsError, Is.False, op1.Error.message);
-            var desc = op1.Desc;
-            var op2 = peer1.SetLocalDescription(ref desc);
+
+            var desc = peer1.LocalDescription;
+            var op2 = peer2.SetRemoteDescription(ref desc);
             yield return op2;
             Assert.That(op2.IsError, Is.False, op2.Error.message);
 
-            var op3 = peer2.SetRemoteDescription(ref desc);
+            var op3 = peer2.SetLocalDescription();
             yield return op3;
             Assert.That(op3.IsError, Is.False, op3.Error.message);
-            var op4 = peer2.CreateAnswer();
+
+            desc = peer2.LocalDescription;
+            var op4 = peer1.SetRemoteDescription(ref desc);
             yield return op4;
             Assert.That(op4.IsError, Is.False, op4.Error.message);
-            desc = op4.Desc;
-            var op5 = peer2.SetLocalDescription(ref desc);
-            yield return op5;
-            Assert.That(op5.IsError, Is.False, op5.Error.message);
-
-            var op6 = peer1.SetRemoteDescription(ref desc);
-            yield return op6;
-            Assert.That(op6.IsError, Is.False, op6.Error.message);
 
             var op7 = new WaitUntilWithTimeout(() =>
                 peers[0].SignalingState == RTCSignalingState.Stable &&

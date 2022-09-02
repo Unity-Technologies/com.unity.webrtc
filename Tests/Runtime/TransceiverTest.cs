@@ -208,6 +208,46 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(test.gameObject);
         }
 
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator TransceiverNegotiation()
+        {
+            if (SystemInfo.processorType == "Apple M1")
+                Assert.Ignore("todo:: This test will hang up on Apple M1");
+
+            var go = new GameObject("Test");
+            var cam = go.AddComponent<Camera>();
+            var track = cam.CaptureStreamTrack(1280, 720);
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var init = new RTCRtpTransceiverInit()
+            {
+                direction = RTCRtpTransceiverDirection.SendOnly
+            };
+            var transceiver1 = test.component.AddTransceiver(1, track, init);
+
+            yield return new WaitUntil(() => test.component.GetPeerTransceivers(0).Any());
+
+            var transceiver2 = test.component.GetPeerTransceivers(0).FirstOrDefault();
+            Assert.That(transceiver2, Is.Not.Null);
+            transceiver2.Direction = RTCRtpTransceiverDirection.RecvOnly;
+            //            Assert.That(transceiver2.SetCodecPreferences(RTCRtpReceiver.GetCapabilities(TrackKind.Video).codecs), Is.EqualTo(RTCErrorType.None));
+            var parameters = transceiver2.Receiver.GetParameters();
+            Debug.Log($"parameters.codecs.Length={parameters.codecs.Length}");
+
+            Debug.Log("renegotiate");
+            yield return test;
+            Debug.Log("renegotiate end");
+
+            parameters = transceiver2.Receiver.GetParameters();
+            Debug.Log($"parameters.codecs.Length={parameters.codecs.Length}");
+
+            test.component.Dispose();
+            track.Dispose();
+
+            Object.DestroyImmediate(go);
+            Object.DestroyImmediate(test.gameObject);
+        }
 
         [UnityTest]
         [Timeout(5000)]

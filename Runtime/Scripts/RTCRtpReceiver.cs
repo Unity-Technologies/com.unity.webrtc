@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpContributingSource
     {
@@ -15,17 +15,17 @@ namespace Unity.WebRTC
         public double? audioLevel { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public long? rtpTimestamp { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint? source { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public long? timestamp { get; private set; }
 
@@ -108,6 +108,19 @@ namespace Unity.WebRTC
             RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
             Marshal.FreeHGlobal(ptr);
             return capabilities;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public RTCRtpReceiveParameters GetParameters()
+        {
+            NativeMethods.ReceiverGetParameters(GetSelfOrThrow(), out var ptr);
+            RTCRtpReceiveParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpReceiveParametersInternal>(ptr);
+            RTCRtpReceiveParameters parameters = new RTCRtpReceiveParameters(ref parametersInternal);
+            Marshal.FreeHGlobal(ptr);
+            return parameters;
         }
 
         /// <summary>

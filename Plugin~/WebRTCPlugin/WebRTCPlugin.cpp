@@ -1213,6 +1213,21 @@ extern "C"
         }
     };
 
+    struct RTCRtpReceiveParameters
+    {
+        MarshallArray<RTCRtpCodecParameters> codecs;
+        MarshallArray<RTCRtpExtension> headerExtensions;
+        RTCRtcpParameters rtcp;
+
+        RTCRtpReceiveParameters& operator=(const RtpParameters& src)
+        {
+            codecs = src.codecs;
+            headerExtensions = src.header_extensions;
+            rtcp = src.rtcp;
+            return *this;
+        }
+    };
+
     UNITY_INTERFACE_EXPORT void SenderGetParameters(RtpSenderInterface* sender, RTCRtpSendParameters** parameters)
     {
         const RtpParameters src = sender->GetParameters();
@@ -1240,6 +1255,16 @@ extern "C"
         }
         const ::webrtc::RTCError error = sender->SetParameters(dst);
         return error.type();
+    }
+
+    UNITY_INTERFACE_EXPORT void
+    ReceiverGetParameters(RtpReceiverInterface* receiver, RTCRtpReceiveParameters** parameters)
+    {
+        const RtpParameters src = receiver->GetParameters();
+        RTCRtpReceiveParameters* dst =
+            static_cast<RTCRtpReceiveParameters*>(CoTaskMemAlloc(sizeof(RTCRtpReceiveParameters)));
+        *dst = src;
+        *parameters = dst;
     }
 
     struct RTCRtpHeaderExtensionCapability
