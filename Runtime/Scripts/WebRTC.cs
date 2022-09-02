@@ -1366,6 +1366,8 @@ namespace Unity.WebRTC
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool SenderReplaceTrack(IntPtr sender, IntPtr track);
         [DllImport(WebRTC.Lib)]
+        public static extern void ReceiverGetParameters(IntPtr sender, out IntPtr parameters);
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr ReceiverGetTrack(IntPtr receiver);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ReceiverGetStreams(IntPtr receiver, out ulong length);
