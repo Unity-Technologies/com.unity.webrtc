@@ -5,6 +5,7 @@ editors:
   - version: 2020.3
   - version: 2021.3
   - version: 2022.1
+  - version: trunk
 
 editor_version_for_validate: 2019.4
 
@@ -220,6 +221,30 @@ test_architectures_macos:
     target_name: macos-m1
     editor_version: 2021.3
     architecture: arm64
+  - name: x64
+    target_name: macos
+    editor_version: 2022.1
+    architecture: x64
+  - name: x64 (Rosetta 2)
+    target_name: macos-m1
+    editor_version: 2022.1
+    architecture: x64
+  - name: arm64 (Apple Silicon)
+    target_name: macos-m1
+    editor_version: 2022.1
+    architecture: arm64
+  - name: x64
+    target_name: macos
+    editor_version: trunk
+    architecture: x64
+  - name: x64 (Rosetta 2)
+    target_name: macos-m1
+    editor_version: trunk
+    architecture: x64
+  - name: arm64 (Apple Silicon)
+    target_name: macos-m1
+    editor_version: trunk
+    architecture: arm64    
 
 package:
   name: webrtc
@@ -577,12 +602,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endfor %}
 
 trigger_pullrequest:
-  name : Trigger by the Pull requests which directs to develop branch or feature branch
+  name : Trigger by the Pull requests which directs to main branch or feature branch
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_2020.3_gpu
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
   triggers:
-    expression: pull_request.target eq "develop" OR pull_request.target match "feat/.*"
+    expression: pull_request.target eq "main" OR pull_request.target match "feat/.*"
 
 trigger_package_validate:
   name : Trigger test for package validation
