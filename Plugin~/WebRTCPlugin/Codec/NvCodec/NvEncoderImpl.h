@@ -12,6 +12,7 @@
 #include "NvCodec.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "Size.h"
+#include "VideoFrameBufferPool.h"
 
 namespace unity
 {
@@ -74,7 +75,7 @@ namespace webrtc
     private:
         bool CopyResource(
             const NvEncInputFrame* encoderInputFrame,
-            GpuMemoryBufferInterface* buffer,
+            const NativeFrameBuffer* buffer,
             Size& size,
             CUcontext context,
             CUmemorytype memoryType);

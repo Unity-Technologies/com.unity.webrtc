@@ -327,7 +327,7 @@ namespace webrtc
 
     bool NvEncoderImpl::CopyResource(
         const NvEncInputFrame* encoderInputFrame,
-        GpuMemoryBufferInterface* buffer,
+        const NativeFrameBuffer* buffer,
         Size& size,
         CUcontext context,
         CUmemorytype memoryType)
@@ -364,7 +364,7 @@ namespace webrtc
 
             // Resize cuda array when the resolution of input buffer is different from output one.
             // The output buffer named m_scaledArray is reused while the resolution is matched.
-            if (buffer->GetSize() != size)
+            if (buffer->width() != size.width() || buffer->height() != size.height())
             {
                 Resize(handle->mappedArray, m_scaledArray, size);
                 pSrcArray = static_cast<void*>(m_scaledArray);
@@ -396,15 +396,16 @@ namespace webrtc
         if (!m_encodedCompleteCallback)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
 
-        auto videoFrameBuffer = static_cast<ScalableBufferInterface*>(frame.video_frame_buffer().get());
-        rtc::scoped_refptr<VideoFrame> video_frame = videoFrameBuffer->scaled()
-            ? static_cast<VideoFrameAdapter::ScaledBuffer*>(videoFrameBuffer)->GetVideoFrame()
-            : static_cast<VideoFrameAdapter*>(videoFrameBuffer)->GetVideoFrame();
+        //auto videoFrameBuffer = static_cast<ScalableBufferInterface*>(frame.video_frame_buffer().get());
+        //rtc::scoped_refptr<VideoFrame> video_frame = videoFrameBuffer->scaled()
+        //    ? static_cast<VideoFrameAdapter::ScaledBuffer*>(videoFrameBuffer)->GetVideoFrame()
+        //    : static_cast<VideoFrameAdapter*>(videoFrameBuffer)->GetVideoFrame();
 
-        if (!video_frame)
-        {
-            return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
-        }
+        //if (!video_frame)
+        //{
+        //    return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
+        //}
+        auto buffer = static_cast<NativeFrameBuffer*>(frame.video_frame_buffer().get());
 
         bool send_key_frame = false;
         if (m_configurations[0].key_frame_request && m_configurations[0].sending)
@@ -423,7 +424,7 @@ namespace webrtc
         const NvEncInputFrame* encoderInputFrame = m_encoder->GetNextInputFrame();
 
         // Copy CUDA buffer in VideoFrame to encoderInputFrame.
-        auto buffer = video_frame->GetGpuMemoryBuffer();
+        //auto buffer = video_frame->GetGpuMemoryBuffer();
         if (!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
 

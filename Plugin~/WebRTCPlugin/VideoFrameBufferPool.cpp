@@ -8,36 +8,36 @@ namespace unity
 {
 namespace webrtc
 {
-    class NativeFrameBuffer : public VideoFrameBuffer
-    {
-    public:
-        static rtc::scoped_refptr<NativeFrameBuffer> Create(void* texture, IGraphicsDevice* device)
-        {
-            return new rtc::RefCountedObject<NativeFrameBuffer>(texture, device);
-        }
-        VideoFrameBuffer::Type type() const override { return Type::kNative; }
-        int width() const override { return width_; }
-        int height() const override { return height_; }
-        rtc::scoped_refptr<I420BufferInterface> ToI420() override { return I420Buffer::Create(width_, height_); }
-        const webrtc::I420BufferInterface* GetI420() const override { return I420Buffer::Create(width_, height_); }
-        const GpuMemoryBufferHandle* handle() { return handle_.get(); }
+    //class NativeFrameBuffer : public VideoFrameBuffer
+    //{
+    //public:
+    //    static rtc::scoped_refptr<NativeFrameBuffer> Create(void* texture, IGraphicsDevice* device)
+    //    {
+    //        return new rtc::RefCountedObject<NativeFrameBuffer>(texture, device);
+    //    }
+    //    VideoFrameBuffer::Type type() const override { return Type::kNative; }
+    //    int width() const override { return width_; }
+    //    int height() const override { return height_; }
+    //    rtc::scoped_refptr<I420BufferInterface> ToI420() override { return I420Buffer::Create(width_, height_); }
+    //    const webrtc::I420BufferInterface* GetI420() const override { return I420Buffer::Create(width_, height_); }
+    //    const GpuMemoryBufferHandle* handle() { return handle_.get(); }
 
-    protected:
-        NativeFrameBuffer(void* texture, IGraphicsDevice* device)
-            : texture_(device->BindTexture(texture))
-            , handle_(device->Map(texture_.get()))
-            , width_(texture_->GetWidth())
-            , height_(texture_->GetHeight())
-        {
-        }
-        ~NativeFrameBuffer() override { }
+    //protected:
+    //    NativeFrameBuffer(void* texture, IGraphicsDevice* device)
+    //        : texture_(device->BindTexture(texture))
+    //        , handle_(device->Map(texture_.get()))
+    //        , width_(texture_->GetWidth())
+    //        , height_(texture_->GetHeight())
+    //    {
+    //    }
+    //    ~NativeFrameBuffer() override { }
 
-    private:
-        std::unique_ptr<ITexture2D> texture_;
-        std::unique_ptr<GpuMemoryBufferHandle> handle_;
-        const int width_;
-        const int height_;
-    };
+    //private:
+    //    std::unique_ptr<ITexture2D> texture_;
+    //    std::unique_ptr<GpuMemoryBufferHandle> handle_;
+    //    const int width_;
+    //    const int height_;
+    //};
 
     bool HasOneRef(const rtc::scoped_refptr<VideoFrameBuffer>& buffer)
     {
@@ -88,6 +88,7 @@ namespace webrtc
         pool_.erase(result);
         return true;
     }
+
     bool VideoFrameBufferPool::Reserve(const VideoFrameBuffer* buffer)
     {
         auto result = std::find_if(
@@ -109,6 +110,7 @@ namespace webrtc
         reservedPool_.emplace_back(*result);
         return true;
     }
+
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameBufferPool::Retain(const VideoFrameBuffer* buffer)
     {
         auto result = std::find_if(

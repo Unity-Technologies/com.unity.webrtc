@@ -105,13 +105,15 @@ namespace webrtc
                 : _test(test)
             {
             }
-            int32_t Decoded(VideoFrame& decodedImage) override
+            int32_t Decoded(::webrtc::VideoFrame& decodedImage) override
             {
                 RTC_DCHECK_NOTREACHED();
                 return -1;
             }
-            void
-            Decoded(VideoFrame& frame, absl::optional<int32_t> decode_time_ms, absl::optional<uint8_t> qp) override;
+            void Decoded(
+                ::webrtc::VideoFrame& frame,
+                absl::optional<int32_t> decode_time_ms,
+                absl::optional<uint8_t> qp) override;
 
         private:
             VideoCodecTest* _test;
@@ -129,7 +131,7 @@ namespace webrtc
         Mutex encodedFrameSection_;
         Mutex decodedFrameSection_;
         std::vector<EncodedImage> encodedFrames_;
-        absl::optional<VideoFrame> decodedFrame_;
+        absl::optional<::webrtc::VideoFrame> decodedFrame_;
         std::vector<CodecSpecificInfo> codecSpecificInfos_;
         absl::optional<uint8_t> decodedQp_;
         FakeEncodedImageCallback encodedImageCallback_;

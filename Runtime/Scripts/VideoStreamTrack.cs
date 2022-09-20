@@ -308,7 +308,8 @@ namespace Unity.WebRTC
             //{
             //    Graphics.Blit(sourceTexture_, destTexture_);
             //}
-            Graphics.CopyTexture(sourceTexture_, buffer.texture);
+            Graphics.Blit(sourceTexture_, destTexture_, s_scale, s_offset);
+            Graphics.CopyTexture(destTexture_, buffer.texture);
 
             // todo:: This comparison is not sufficiency but it is for workaround of freeze bug.
             // Texture.GetNativeTexturePtr method freezes Unity Editor on apple silicon.
