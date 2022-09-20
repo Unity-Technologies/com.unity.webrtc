@@ -325,11 +325,17 @@ namespace webrtc
 
     void Context::DeleteStatsReport(const webrtc::RTCStatsReport* report)
     {
-        auto found = std::find_if(
+        auto result = std::find_if(
             m_listStatsReport.begin(),
             m_listStatsReport.end(),
             [report](rtc::scoped_refptr<const webrtc::RTCStatsReport> it) { return it.get() == report; });
-        m_listStatsReport.erase(found);
+        
+        if (result == m_listStatsReport.end())
+        {
+            RTC_LOG(LS_INFO) << "Calling DeleteStatsReport is failed. The reference of RTCStatsReport is not found.";
+            return;
+        }
+        m_listStatsReport.erase(result);
     }
 
     DataChannelInterface*
