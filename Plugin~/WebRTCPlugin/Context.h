@@ -15,6 +15,28 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
+    const std::map<std::string, uint32_t> statsTypes = { { "codec", 0 },
+                                                         { "inbound-rtp", 1 },
+                                                         { "outbound-rtp", 2 },
+                                                         { "remote-inbound-rtp", 3 },
+                                                         { "remote-outbound-rtp", 4 },
+                                                         { "media-source", 5 },
+                                                         { "csrc", 6 },
+                                                         { "peer-connection", 7 },
+                                                         { "data-channel", 8 },
+                                                         { "stream", 9 },
+                                                         { "track", 10 },
+                                                         { "transceiver", 11 },
+                                                         { "sender", 12 },
+                                                         { "receiver", 13 },
+                                                         { "transport", 14 },
+                                                         { "sctp-transport", 15 },
+                                                         { "candidate-pair", 16 },
+                                                         { "local-candidate", 17 },
+                                                         { "remote-candidate", 18 },
+                                                         { "certificate", 19 },
+                                                         { "ice-server", 20 } };
+
     class IGraphicsDevice;
     class ProfilerMarkerFactory;
     struct ContextDependencies
@@ -106,7 +128,9 @@ namespace webrtc
         SetSessionDescriptionObserver* GetObserver(webrtc::PeerConnectionInterface* connection);
 
         // StatsReport
+        std::mutex mutexStatsReport;
         void AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report);
+        const RTCStats** GetStatsList(const RTCStatsReport* report, size_t* length, uint32_t** types);
         void DeleteStatsReport(const webrtc::RTCStatsReport* report);
 
         // DataChannel

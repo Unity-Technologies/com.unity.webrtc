@@ -1840,10 +1840,10 @@ namespace Unity.WebRTC
         internal RTCStatsReport(IntPtr ptr)
         {
             self = ptr;
-            WebRTC.Table.Add(self, this);
-
             IntPtr ptrStatsTypeArray = IntPtr.Zero;
-            IntPtr ptrStatsArray = NativeMethods.StatsReportGetStatsList(self, out ulong length, ref ptrStatsTypeArray);
+            IntPtr ptrStatsArray = WebRTC.Context.GetStatsList(self, out ulong length, ref ptrStatsTypeArray);
+            if (ptrStatsArray == IntPtr.Zero)
+                throw new ArgumentException("Invalid pointer.", "ptr");
 
             IntPtr[] array = ptrStatsArray.AsArray<IntPtr>((int)length);
             uint[] types = ptrStatsTypeArray.AsArray<uint>((int)length);
@@ -1855,6 +1855,8 @@ namespace Unity.WebRTC
                 RTCStats stats = StatsFactory.Create(type, array[i]);
                 m_dictStats[stats.Id] = stats;
             }
+
+            WebRTC.Table.Add(self, this);
         }
 
         /// <summary>

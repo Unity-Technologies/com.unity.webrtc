@@ -320,11 +320,49 @@ namespace webrtc
 
     void Context::AddStatsReport(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
     {
+        std::lock_guard<std::mutex> lock(mutexStatsReport);
         m_listStatsReport.push_back(report);
+    }
+
+    const RTCStats** Context::GetStatsList(const RTCStatsReport* report, size_t* length, uint32_t** types)
+    {
+        std::lock_guard<std::mutex> lock(mutexStatsReport);
+
+        auto result = std::find_if(
+            m_listStatsReport.begin(),
+            m_listStatsReport.end(),
+            [report](rtc::scoped_refptr<const webrtc::RTCStatsReport> it) { return it.get() == report; });
+
+        if (result == m_listStatsReport.end())
+        {
+            RTC_LOG(LS_INFO) << "Calling GetStatsList is failed. The reference of RTCStatsReport is not found.";
+            return nullptr;
+        }
+
+        const size_t size = report->size();
+        *length = size;
+        *types = static_cast<uint32_t*>(CoTaskMemAlloc(sizeof(uint32_t) * size));
+        void* buf = CoTaskMemAlloc(sizeof(RTCStats*) * size);
+        const RTCStats** ret = static_cast<const RTCStats**>(buf);
+        if (size == 0)
+        {
+            return ret;
+        }
+        int i = 0;
+        for (const auto& stats : *report)
+        {
+            ret[i] = &stats;
+            (*types)[i] = statsTypes.at(stats.type());
+            i++;
+        }
+        return ret;
+
     }
 
     void Context::DeleteStatsReport(const webrtc::RTCStatsReport* report)
     {
+        std::lock_guard<std::mutex> lock(mutexStatsReport);
+
         auto result = std::find_if(
             m_listStatsReport.begin(),
             m_listStatsReport.end(),

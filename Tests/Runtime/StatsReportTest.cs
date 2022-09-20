@@ -1,12 +1,32 @@
+using System;
 using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Unity.WebRTC.RuntimeTest
 {
+    class StatsReportTest
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            WebRTC.Initialize(true);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            WebRTC.Dispose();
+        }
+
+        [Test]
+        public void ConstructorThrowsException()
+        {
+            Assert.That(() => new RTCStatsReport(IntPtr.Zero), Throws.ArgumentException);
+        }
+    }
+    
+
+
     class StatsCheck
     {
         class Ignore
