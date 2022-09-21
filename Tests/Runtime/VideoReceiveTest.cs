@@ -19,7 +19,7 @@ namespace Unity.WebRTC.RuntimeTest
     }
 
     [TestFixture]
-    [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
     class VideoReceiveTestWithVP8Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
