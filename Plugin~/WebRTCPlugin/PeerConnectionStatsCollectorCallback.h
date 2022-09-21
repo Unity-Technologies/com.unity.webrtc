@@ -10,7 +10,9 @@ namespace unity
 namespace webrtc
 {
     class PeerConnectionObject;
-    using DelegateCollectStats = void (*)(PeerConnectionObject*, const RTCStatsReport*);
+    class PeerConnectionStatsCollectorCallback;
+    using DelegateCollectStats =
+        void (*)(PeerConnectionObject*, PeerConnectionStatsCollectorCallback*, const RTCStatsReport*);
     class PeerConnectionStatsCollectorCallback : public RTCStatsCollectorCallback
     {
     public:

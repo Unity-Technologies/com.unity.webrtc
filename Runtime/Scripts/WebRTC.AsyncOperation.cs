@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Unity.WebRTC
@@ -56,39 +57,16 @@ namespace Unity.WebRTC
         /// </summary>
         public RTCStatsReport Value { get; private set; }
 
-        internal RTCStatsReportAsyncOperation(RTCPeerConnection connection)
+        internal RTCStatsReportAsyncOperation(RTCStatsCollectorCallback callback)
         {
-            NativeMethods.PeerConnectionGetStats(connection.GetSelfOrThrow());
-
-            connection.OnStatsDelivered = ptr =>
-            {
-                Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
-                IsError = false;
-                this.Done();
-            };
+            callback.onStatsDelivered = OnStatsDelivered;
         }
 
-        internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpSender sender)
+        void OnStatsDelivered(IntPtr ptr)
         {
-            NativeMethods.PeerConnectionSenderGetStats(connection.GetSelfOrThrow(), sender.self);
-
-            connection.OnStatsDelivered = ptr =>
-            {
-                Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
-                IsError = false;
-                this.Done();
-            };
-        }
-        internal RTCStatsReportAsyncOperation(RTCPeerConnection connection, RTCRtpReceiver receiver)
-        {
-            NativeMethods.PeerConnectionReceiverGetStats(connection.GetSelfOrThrow(), receiver.self);
-
-            connection.OnStatsDelivered = ptr =>
-            {
-                Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
-                IsError = false;
-                this.Done();
-            };
+            Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
+            IsError = false;
+            this.Done();
         }
     }
 

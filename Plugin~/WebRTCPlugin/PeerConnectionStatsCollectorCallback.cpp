@@ -17,7 +17,7 @@ namespace webrtc
         const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report)
     {
         m_owner->ReceiveStatsReport(report);
-        s_collectStatsCallback(m_owner, report.get());
+        s_collectStatsCallback(m_owner, this, report.get());
     }
 } // end namespace webrtc
 } // end namespace unity

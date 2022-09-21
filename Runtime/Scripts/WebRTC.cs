@@ -1080,7 +1080,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateSDSuccess(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCollectStats(IntPtr ptr, IntPtr reportPtr);
+    internal delegate void DelegateCollectStats(IntPtr ptr, IntPtr ptrCallback, IntPtr reportPtr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateGetStats(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1197,15 +1197,15 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern RTCErrorType PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionGetStats(IntPtr ptr);
+        public static extern RTCStatsCollectorCallback PeerConnectionGetStats(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionSenderGetStats(IntPtr ptr, IntPtr sender);
+        public static extern RTCStatsCollectorCallback PeerConnectionSenderGetStats(IntPtr ptr, IntPtr sender);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextGetSenderCapabilities(IntPtr context, TrackKind kind, out IntPtr capabilities);
         [DllImport(WebRTC.Lib)]
         public static extern void ContextGetReceiverCapabilities(IntPtr context, TrackKind kind, out IntPtr capabilities);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionReceiverGetStats(IntPtr sender, IntPtr receiver);
+        public static extern RTCStatsCollectorCallback PeerConnectionReceiverGetStats(IntPtr sender, IntPtr receiver);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);

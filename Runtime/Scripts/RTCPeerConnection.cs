@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
@@ -804,16 +805,22 @@ namespace Unity.WebRTC
         /// <seealso cref="RTCStatsReport"/>
         public RTCStatsReportAsyncOperation GetStats()
         {
-            return new RTCStatsReportAsyncOperation(this);
+            RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionGetStats(GetSelfOrThrow());
+            listCollectStatsCallback.Add(callback);
+            return new RTCStatsReportAsyncOperation(callback);
         }
 
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpSender sender)
         {
-            return new RTCStatsReportAsyncOperation(this, sender);
+            RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionSenderGetStats(GetSelfOrThrow(), sender.self);
+            listCollectStatsCallback.Add(callback);
+            return new RTCStatsReportAsyncOperation(callback);
         }
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpReceiver receiver)
         {
-            return new RTCStatsReportAsyncOperation(this, receiver);
+            RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionReceiverGetStats(GetSelfOrThrow(), receiver.self);
+            listCollectStatsCallback.Add(callback);
+            return new RTCStatsReportAsyncOperation(callback);
         }
 
         /// <summary>
@@ -912,6 +919,23 @@ namespace Unity.WebRTC
             }
         }
 
+        HashSet<RTCStatsCollectorCallback> listCollectStatsCallback = new HashSet<RTCStatsCollectorCallback>();
+
+        internal RTCStatsCollectorCallback FindCollectStatsCallback(IntPtr ptr)
+        {
+            if (ptr == IntPtr.Zero)
+                throw new ArgumentException("The argument is IntPtr.Zero.", "ptr");
+            return listCollectStatsCallback.FirstOrDefault(x => x.DangerousGetHandle() == ptr);
+        }
+
+        internal void RemoveCollectStatsCallback(RTCStatsCollectorCallback callback)
+        {
+            if (callback == null)
+                throw new ArgumentNullException("callback");
+            listCollectStatsCallback.Remove(callback);
+        }
+
+
         [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
         static void OnSetSessionDescSuccess(IntPtr ptr)
         {
@@ -938,13 +962,15 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr report)
+        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr report)
         {
             WebRTC.Sync(ptr, () =>
             {
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnStatsDelivered(report);
+                    RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
+                    callback.Invoke(report);
+                    connection.RemoveCollectStatsCallback(callback);
                 }
             });
         }
