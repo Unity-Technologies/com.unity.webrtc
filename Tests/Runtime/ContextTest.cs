@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace Unity.WebRTC.RuntimeTest
@@ -92,5 +93,15 @@ namespace Unity.WebRTC.RuntimeTest
             context.DeleteAudioTrackSink(sink);
             context.Dispose();
         }
+
+        [Test]
+        [Category("Context")]
+        public void DeleteStatsReportIgnoreInvalidValue()
+        {
+            var context = Context.Create();
+            context.DeleteStatsReport(IntPtr.Zero);
+            context.Dispose();
+        }
+
     }
 }

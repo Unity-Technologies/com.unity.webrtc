@@ -608,48 +608,10 @@ extern "C"
         obj->connection->GetStats(receiver, PeerConnectionStatsCollectorCallback::Create(obj));
     }
 
-    const std::map<std::string, uint32_t> statsTypes = { { "codec", 0 },
-                                                         { "inbound-rtp", 1 },
-                                                         { "outbound-rtp", 2 },
-                                                         { "remote-inbound-rtp", 3 },
-                                                         { "remote-outbound-rtp", 4 },
-                                                         { "media-source", 5 },
-                                                         { "csrc", 6 },
-                                                         { "peer-connection", 7 },
-                                                         { "data-channel", 8 },
-                                                         { "stream", 9 },
-                                                         { "track", 10 },
-                                                         { "transceiver", 11 },
-                                                         { "sender", 12 },
-                                                         { "receiver", 13 },
-                                                         { "transport", 14 },
-                                                         { "sctp-transport", 15 },
-                                                         { "candidate-pair", 16 },
-                                                         { "local-candidate", 17 },
-                                                         { "remote-candidate", 18 },
-                                                         { "certificate", 19 },
-                                                         { "ice-server", 20 } };
-
     UNITY_INTERFACE_EXPORT const RTCStats**
-    StatsReportGetStatsList(const RTCStatsReport* report, size_t* length, uint32_t** types)
+    ContextGetStatsList(Context* context, const RTCStatsReport* report, size_t* length, uint32_t** types)
     {
-        const size_t size = report->size();
-        *length = size;
-        *types = static_cast<uint32_t*>(CoTaskMemAlloc(sizeof(uint32_t) * size));
-        void* buf = CoTaskMemAlloc(sizeof(RTCStats*) * size);
-        const RTCStats** ret = static_cast<const RTCStats**>(buf);
-        if (size == 0)
-        {
-            return ret;
-        }
-        int i = 0;
-        for (const auto& stats : *report)
-        {
-            ret[i] = &stats;
-            (*types)[i] = statsTypes.at(stats.type());
-            i++;
-        }
-        return ret;
+        return context->GetStatsList(report, length, types);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeleteStatsReport(Context* context, const RTCStatsReport* report)
