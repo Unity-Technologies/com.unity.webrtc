@@ -268,7 +268,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
 {
     // Release all buffers.
-    s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity());
+    if (s_bufferPool)
+        s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity());
 }
 
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
