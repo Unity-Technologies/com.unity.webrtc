@@ -368,7 +368,7 @@ namespace Unity.WebRTC.RuntimeTest
             instance.Dispose();
         }
 
-        [UnityTest]
+        [UnityTest, LongRunning]
         public IEnumerator CallVideoEncoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -414,7 +414,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.GetUpdateTextureFunc(IntPtr.Zero);
         }
 
-        [UnityTest]
+        [UnityTest, LongRunning]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoDecoderMethods.UpdateRendererTexture is not supported on Direct3D12.")]
         public IEnumerator CallVideoDecoderMethods()

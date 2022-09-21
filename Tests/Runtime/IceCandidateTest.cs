@@ -18,14 +18,12 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("IceCandidate")]
         public void Construct()
         {
             Assert.Throws<ArgumentException>(() => new RTCIceCandidate());
         }
 
         [Test]
-        [Category("IceCandidate")]
         public void ConstructWithOption()
         {
             var option = new RTCIceCandidateInit

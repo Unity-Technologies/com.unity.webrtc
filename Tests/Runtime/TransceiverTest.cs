@@ -21,7 +21,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpSender")]
         public void SenderGetVideoCapabilities()
         {
             RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
@@ -44,7 +43,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpSender")]
         public void SenderGetAudioCapabilities()
         {
             RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Audio);
@@ -67,7 +65,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpReceiver")]
         public void ReceiverGetVideoCapabilities()
         {
             RTCRtpCapabilities capabilities = RTCRtpReceiver.GetCapabilities(TrackKind.Video);
@@ -90,7 +87,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpReceiver")]
         public void ReceiverGetAudioCapabilities()
         {
             RTCRtpCapabilities capabilities = RTCRtpReceiver.GetCapabilities(TrackKind.Audio);
@@ -113,7 +109,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpTransceiver")]
         public void TransceiverSetVideoCodecPreferences()
         {
             var peer = new RTCPeerConnection();
@@ -124,7 +119,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpTransceiver")]
         public void TransceiverSetAudioCodecPreferences()
         {
             var peer = new RTCPeerConnection();
@@ -135,7 +129,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpReceiver")]
         public void ReceiverGetTrackReturnsVideoTrack()
         {
             var peer = new RTCPeerConnection();
@@ -158,7 +151,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpReceiver")]
         public void ReceiverGetTrackReturnsAudioTrack()
         {
             var peer = new RTCPeerConnection();

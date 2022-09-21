@@ -23,7 +23,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("MediaStream")]
         public void Construct()
         {
             var stream = new MediaStream();
@@ -32,7 +31,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("MediaStream")]
         public void EqualId()
         {
             var guid = Guid.NewGuid().ToString();
@@ -43,7 +41,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("MediaStream")]
         public void AccessAfterDisposed()
         {
             var stream = new MediaStream();
@@ -52,7 +49,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("MediaStream")]
         public void RegisterDelegate()
         {
             var stream = new MediaStream();
@@ -64,7 +60,6 @@ namespace Unity.WebRTC.RuntimeTest
         // todo(kazuki): Crash on Android and Linux standalone player
         [UnityTest]
         [Timeout(5000)]
-        [Category("MediaStream")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.Android })]
         public IEnumerator VideoStreamAddTrackAndRemoveTrack()
         {
