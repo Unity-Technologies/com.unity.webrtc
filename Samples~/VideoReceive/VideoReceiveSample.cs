@@ -82,12 +82,6 @@ namespace Unity.WebRTC.Samples
                     {
                         receiveImage.texture = tex;
                     };
-                    receiveVideoStream = e.Streams.First();
-                    receiveVideoStream.OnRemoveTrack = ev =>
-                    {
-                        receiveImage.texture = null;
-                        ev.Track.Dispose();
-                    };
                 }
 
                 if (e.Track is AudioStreamTrack audioTrack)
@@ -95,13 +89,6 @@ namespace Unity.WebRTC.Samples
                     receiveAudio.SetTrack(audioTrack);
                     receiveAudio.loop = true;
                     receiveAudio.Play();
-                    receiveAudioStream = e.Streams.First();
-                    receiveAudioStream.OnRemoveTrack = ev =>
-                    {
-                        receiveAudio.Stop();
-                        receiveAudio.clip = null;
-                        ev.Track.Dispose();
-                    };
                 }
             };
             pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
