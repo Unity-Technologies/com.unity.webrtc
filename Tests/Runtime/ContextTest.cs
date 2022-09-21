@@ -23,7 +23,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void CreateAndDelete()
         {
             var context = Context.Create();
@@ -31,7 +30,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void CreateAndDeletePeerConnection()
         {
             var context = Context.Create();
@@ -41,7 +39,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void CreateAndDeleteDataChannel()
         {
             var context = Context.Create();
@@ -54,7 +51,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void CreateAndDeleteAudioTrack()
         {
             var context = Context.Create();
@@ -66,7 +62,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void CreateAndDeleteVideoTrack()
         {
             var context = Context.Create();
@@ -84,7 +79,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void CreateAndDeleteAudioTrackSink()
         {
             var context = Context.Create();

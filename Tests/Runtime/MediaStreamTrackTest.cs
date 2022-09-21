@@ -106,7 +106,6 @@ namespace Unity.WebRTC.RuntimeTest
         // todo(kazuki): Crash on windows standalone player
         [UnityTest]
         [Timeout(5000)]
-        [Category("MediaStreamTrack")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.WindowsPlayer })]
         public IEnumerator VideoStreamTrackEnabled()
         {
@@ -143,7 +142,6 @@ namespace Unity.WebRTC.RuntimeTest
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
-        [Category("MediaStreamTrack")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator CaptureStreamTrack()
         {
@@ -160,7 +158,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("MediaStreamTrack")]
         public void CaptureStreamTrackThrowExeption()
         {
             var camObj = new GameObject("Camera");
@@ -172,7 +169,6 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
-        [Category("MediaStreamTrack")]
         public void AddAndRemoveAudioStreamTrack()
         {
             GameObject obj = new GameObject("audio");
@@ -194,7 +190,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("MediaStreamTrack")]
         public void VideoStreamTrackDisposeImmediately()
         {
             var width = 256;
@@ -208,9 +203,8 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(rt);
         }
 
-        [UnityTest]
+        [UnityTest, LongRunning]
         [Timeout(5000)]
-        [Category("MediaStreamTrack")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
         public IEnumerator VideoStreamTrackInstantiateMultiple()
         {

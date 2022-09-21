@@ -43,7 +43,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void Construct()
         {
             var peer = new RTCPeerConnection();
@@ -64,7 +63,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void AccessAfterDisposed()
         {
             var peer = new RTCPeerConnection();
@@ -73,7 +71,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void GetConfiguration()
         {
             var config = GetDefaultConfiguration();
@@ -98,7 +95,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void ConstructWithConfigThrowException()
         {
 
@@ -113,7 +109,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void SetConfiguration()
         {
             var peer = new RTCPeerConnection();
@@ -157,7 +152,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void AddTransceiver()
         {
             var peer = new RTCPeerConnection();
@@ -200,7 +194,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void GetTransceiversReturnsNotEmptyAfterDisposingTransceiver()
         {
             // `RTCPeerConnection.AddTransceiver` method is not intuitive. Moreover, we don't have the API to remove
@@ -214,7 +207,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void GetTransceiversReturnsNotEmptyAfterCallingRemoveTrack()
         {
             // Also, `RTCPeerConnection.AddTrack` and `RTCPeerConnection.RemoveTrack` method is not intuitive.
@@ -234,7 +226,6 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
-        [Category("PeerConnection")]
         public void AddTransceiverThrowException()
         {
             var peer = new RTCPeerConnection();
@@ -243,7 +234,6 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
-        [Category("PeerConnection")]
         public void AddTransceiverTrackKindAudio()
         {
             var peer = new RTCPeerConnection();
@@ -265,7 +255,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void AddTransceiverTrackKindVideo()
         {
             var peer = new RTCPeerConnection();
@@ -287,7 +276,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void AddTransceiverWithInit()
         {
             var peer = new RTCPeerConnection();
@@ -320,7 +308,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void AddTransceiverWithKindAndInit()
         {
             var peer = new RTCPeerConnection();
@@ -360,7 +347,6 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
-        [Category("PeerConnection")]
         public void GetAndSetDirectionTransceiver()
         {
             var peer = new RTCPeerConnection();
@@ -376,7 +362,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void GetTransceivers()
         {
             var peer = new RTCPeerConnection();
@@ -397,7 +382,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator CurrentDirection()
         {
@@ -501,7 +485,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         public IEnumerator CreateOffer()
         {
             var config = GetDefaultConfiguration();
@@ -518,7 +501,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         public IEnumerator CreateAnswerFailed()
         {
             var config = GetDefaultConfiguration();
@@ -538,7 +520,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         public IEnumerator CreateAnswer()
         {
             var config = GetDefaultConfiguration();
@@ -568,7 +549,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         public IEnumerator SetLocalDescription()
         {
             var peer = new RTCPeerConnection();
@@ -592,7 +572,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void SetLocalDescriptionThrowException()
         {
             var peer = new RTCPeerConnection();
@@ -607,7 +586,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
         public IEnumerator SetRemoteDescription()
         {
@@ -644,7 +622,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("PeerConnection")]
         public void SetRemoteDescriptionThrowException()
         {
             var peer = new RTCPeerConnection();
@@ -660,7 +637,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         public IEnumerator SetLocalDescriptionFailed()
         {
             var peer = new RTCPeerConnection();
@@ -694,7 +670,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("PeerConnection")]
         public IEnumerator SetRemoteDescriptionFailed()
         {
             var config = GetDefaultConfiguration();
