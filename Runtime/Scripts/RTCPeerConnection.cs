@@ -806,20 +806,20 @@ namespace Unity.WebRTC
         public RTCStatsReportAsyncOperation GetStats()
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionGetStats(GetSelfOrThrow());
-            listCollectStatsCallback.Add(callback);
+            dictCollectStatsCallback.Add(callback.DangerousGetHandle(), callback);
             return new RTCStatsReportAsyncOperation(callback);
         }
 
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpSender sender)
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionSenderGetStats(GetSelfOrThrow(), sender.self);
-            listCollectStatsCallback.Add(callback);
+            dictCollectStatsCallback.Add(callback.DangerousGetHandle(), callback);
             return new RTCStatsReportAsyncOperation(callback);
         }
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpReceiver receiver)
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionReceiverGetStats(GetSelfOrThrow(), receiver.self);
-            listCollectStatsCallback.Add(callback);
+            dictCollectStatsCallback.Add(callback.DangerousGetHandle(), callback);
             return new RTCStatsReportAsyncOperation(callback);
         }
 
@@ -919,20 +919,20 @@ namespace Unity.WebRTC
             }
         }
 
-        HashSet<RTCStatsCollectorCallback> listCollectStatsCallback = new HashSet<RTCStatsCollectorCallback>();
+        Dictionary<IntPtr, RTCStatsCollectorCallback> dictCollectStatsCallback = new Dictionary<IntPtr, RTCStatsCollectorCallback>();
 
         internal RTCStatsCollectorCallback FindCollectStatsCallback(IntPtr ptr)
         {
             if (ptr == IntPtr.Zero)
                 throw new ArgumentException("The argument is IntPtr.Zero.", "ptr");
-            return listCollectStatsCallback.FirstOrDefault(x => x.DangerousGetHandle() == ptr);
+            return dictCollectStatsCallback[ptr];
         }
 
         internal void RemoveCollectStatsCallback(RTCStatsCollectorCallback callback)
         {
             if (callback == null)
                 throw new ArgumentNullException("callback");
-            listCollectStatsCallback.Remove(callback);
+            dictCollectStatsCallback.Remove(callback.DangerousGetHandle());
         }
 
 
