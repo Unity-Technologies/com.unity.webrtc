@@ -969,8 +969,8 @@ namespace Unity.WebRTC
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
-                    callback.Invoke(report);
                     connection.RemoveCollectStatsCallback(callback);
+                    callback.Invoke(report);
                 }
             });
         }
