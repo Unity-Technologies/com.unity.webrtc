@@ -63,28 +63,6 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDestroy(0);
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
-        static void PeerConnectionSetSessionDescSuccess(IntPtr connection)
-        {
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
-        static void PeerConnectionSetSessionDescFailure(IntPtr connection, RTCErrorType type, string message)
-        {
-        }
-
-        [Test]
-        public void RegisterDelegateToPeerConnection()
-        {
-            var context = NativeMethods.ContextCreate(0);
-            var connection = NativeMethods.ContextCreatePeerConnection(context);
-
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(context, connection, PeerConnectionSetSessionDescSuccess);
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(context, connection, PeerConnectionSetSessionDescFailure);
-            NativeMethods.ContextDeletePeerConnection(context, connection);
-            NativeMethods.ContextDestroy(0);
-        }
-
         // todo(kazuki):: crash on iOS device
         [Test]
         [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]

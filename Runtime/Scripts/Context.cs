@@ -89,43 +89,36 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
-        public RTCError PeerConnectionSetLocalDescription(
-            IntPtr ptr, ref RTCSessionDescription desc)
+        public SetSessionDescriptionObserver PeerConnectionSetLocalDescription(
+            IntPtr ptr, ref RTCSessionDescription desc, out RTCError error)
         {
             IntPtr ptrError = IntPtr.Zero;
-            RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
-                self, ptr, ref desc, ref ptrError);
+            SetSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionSetLocalDescription(self, ptr, ref desc, out var errorType, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType = errorType, message = message };
+            error = new RTCError { errorType = errorType, message = message };
+            return observer;
         }
 
-        public RTCError PeerConnectionSetLocalDescription(IntPtr ptr)
+        public SetSessionDescriptionObserver PeerConnectionSetLocalDescription(IntPtr ptr, out RTCError error)
         {
             IntPtr ptrError = IntPtr.Zero;
-            RTCErrorType errorType =
-                NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr, ref ptrError);
+            SetSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr, out var errorType, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType = errorType, message = message };
+            error = new RTCError { errorType = errorType, message = message };
+            return observer;
         }
 
-        public RTCError PeerConnectionSetRemoteDescription(
-            IntPtr ptr, ref RTCSessionDescription desc)
+        public SetSessionDescriptionObserver PeerConnectionSetRemoteDescription(
+            IntPtr ptr, ref RTCSessionDescription desc, out RTCError error)
         {
             IntPtr ptrError = IntPtr.Zero;
-            RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
-                self, ptr, ref desc, ref ptrError);
+            SetSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, ref desc, out var errorType, ref ptrError);
             string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType = errorType, message = message };
-        }
-
-        public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
-        {
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self, ptr, callback);
-        }
-
-        public void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescFailure callback)
-        {
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
+            error = new RTCError { errorType = errorType, message = message };
+            return observer;
         }
 
         public IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length)

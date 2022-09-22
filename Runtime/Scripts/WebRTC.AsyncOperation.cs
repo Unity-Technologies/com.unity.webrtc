@@ -86,19 +86,16 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCSetSessionDescriptionAsyncOperation : AsyncOperationBase
     {
-        internal RTCSetSessionDescriptionAsyncOperation(RTCPeerConnection connection)
+        internal RTCSetSessionDescriptionAsyncOperation(SetSessionDescriptionObserver observer)
         {
-            connection.OnSetSessionDescriptionSuccess = () =>
-            {
-                IsError = false;
-                this.Done();
-            };
-            connection.OnSetSessionDescriptionFailure = (error) =>
-            {
-                IsError = true;
-                Error = error;
-                this.Done();
-            };
+            observer.onSetSessionDescription = OnSetSessionDescription;
+        }
+
+        void OnSetSessionDescription(RTCErrorType errorType, string error)
+        {
+            IsError = errorType != RTCErrorType.None;
+            Error = new RTCError() { errorType = errorType, message = error };
+            this.Done();
         }
     }
 }

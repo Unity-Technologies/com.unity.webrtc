@@ -24,8 +24,6 @@ namespace webrtc
     using DelegateSetResolution = void (*)(int32_t*, int32_t*);
     using DelegateMediaStreamOnAddTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
     using DelegateMediaStreamOnRemoveTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
-    using DelegateSetSessionDescSuccess = void (*)(PeerConnectionObject*);
-    using DelegateSetSessionDescFailure = void (*)(PeerConnectionObject*, RTCErrorType, const char*);
     using DelegateVideoFrameResize = void (*)(UnityVideoRenderer* renderer, int width, int height);
 
     void debugLog(const char* buf);

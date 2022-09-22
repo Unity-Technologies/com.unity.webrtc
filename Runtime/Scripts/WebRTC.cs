@@ -686,6 +686,8 @@ namespace Unity.WebRTC
             }
 
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
+            NativeMethods.StatsCollectorRegisterCallback(OnStatsDeliveredCallback);
+            NativeMethods.SetSessionDescriptionObserverRegisterCallback(OnSetSessionDesc);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
@@ -1050,6 +1052,32 @@ namespace Unity.WebRTC
             Debug.Log(str);
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeSetSessionDesc))]
+        static void OnSetSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, string message)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    var observer = connection.FindObserver(ptrObserver);
+                    connection.RemoveObserver(observer);
+                    observer.Invoke(type, message);
+                }
+            });
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
+        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr report)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                {
+                    connection.OnStatsDelivered(report);
+                }
+            });
+        }
+
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
@@ -1086,9 +1114,7 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateSDFailure(IntPtr ptr, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativePeerConnectionSetSessionDescSuccess(IntPtr ptr);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativePeerConnectionSetSessionDescFailure(IntPtr ptr, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
+    internal delegate void DelegateNativeSetSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1177,11 +1203,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterCallbackCreateSD(IntPtr ptr, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterCallbackCollectStats(IntPtr ptr, DelegateCollectStats onCollectStats);
+        public static extern void StatsCollectorRegisterCallback(DelegateCollectStats onCollectStats);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr context, IntPtr connection, DelegateNativePeerConnectionSetSessionDescSuccess onSuccess);
-        [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr context, IntPtr connection, DelegateNativePeerConnectionSetSessionDescFailure onFailure);
+        public static extern void SetSessionDescriptionObserverRegisterCallback(DelegateNativeSetSessionDesc callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
@@ -1191,11 +1215,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]
-        public static extern RTCErrorType PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, ref IntPtr error);
+        public static extern SetSessionDescriptionObserver PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, out RTCErrorType errorType, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
-        public static extern RTCErrorType PeerConnectionSetLocalDescriptionWithoutDescription(IntPtr context, IntPtr ptr, ref IntPtr error);
+        public static extern SetSessionDescriptionObserver PeerConnectionSetLocalDescriptionWithoutDescription(IntPtr context, IntPtr ptr, out RTCErrorType errorType, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
-        public static extern RTCErrorType PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, ref IntPtr error);
+        public static extern SetSessionDescriptionObserver PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, out RTCErrorType errorType, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
         public static extern RTCStatsCollectorCallback PeerConnectionGetStats(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
