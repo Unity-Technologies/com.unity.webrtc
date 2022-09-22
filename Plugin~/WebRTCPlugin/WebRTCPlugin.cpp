@@ -592,20 +592,27 @@ extern "C"
         return ConvertString(str);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionGetStats(PeerConnectionObject* obj)
+    UNITY_INTERFACE_EXPORT PeerConnectionStatsCollectorCallback* PeerConnectionGetStats(PeerConnectionObject* obj)
     {
-        obj->connection->GetStats(PeerConnectionStatsCollectorCallback::Create(obj));
+        PeerConnectionStatsCollectorCallback* callback = PeerConnectionStatsCollectorCallback::Create(obj);
+        obj->connection->GetStats(callback);
+        return callback;
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionSenderGetStats(PeerConnectionObject* obj, RtpSenderInterface* selector)
+    UNITY_INTERFACE_EXPORT PeerConnectionStatsCollectorCallback*
+    PeerConnectionSenderGetStats(PeerConnectionObject* obj, RtpSenderInterface* sender)
     {
-        obj->connection->GetStats(selector, PeerConnectionStatsCollectorCallback::Create(obj));
+        PeerConnectionStatsCollectorCallback* callback = PeerConnectionStatsCollectorCallback::Create(obj);
+        obj->connection->GetStats(sender, callback);
+        return callback;
     }
 
-    UNITY_INTERFACE_EXPORT void
+    UNITY_INTERFACE_EXPORT PeerConnectionStatsCollectorCallback*
     PeerConnectionReceiverGetStats(PeerConnectionObject* obj, RtpReceiverInterface* receiver)
     {
-        obj->connection->GetStats(receiver, PeerConnectionStatsCollectorCallback::Create(obj));
+        PeerConnectionStatsCollectorCallback* callback = PeerConnectionStatsCollectorCallback::Create(obj);
+        obj->connection->GetStats(receiver, callback);
+        return callback;
     }
 
     UNITY_INTERFACE_EXPORT const RTCStats**

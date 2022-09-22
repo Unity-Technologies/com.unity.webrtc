@@ -962,39 +962,36 @@ namespace Unity.WebRTC.RuntimeTest
             source.clip = AudioClip.Create("test", 480, 2, 48000, false);
             stream.AddTrack(new AudioStreamTrack(source));
 
-            yield return new WaitForSeconds(0.1f);
-
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, stream);
             yield return test;
             test.component.CoroutineUpdate();
-            yield return new WaitForSeconds(0.1f);
-            var op = test.component.GetPeerStats(0);
-            yield return op;
-            Assert.That(op.IsDone, Is.True);
-            Assert.That(op.Value.Stats, Is.Not.Empty);
-            Assert.That(op.Value.Stats.Keys, Is.Not.Empty);
-            Assert.That(op.Value.Stats.Values, Is.Not.Empty);
-            Assert.That(op.Value.Stats.Count, Is.GreaterThan(0));
 
-            foreach (RTCStats stats in op.Value.Stats.Values)
+            var op1 = test.component.GetSenderStats(0, 0);
+            var op2 = test.component.GetReceiverStats(0, 0);
+            var op3 = test.component.GetSenderStats(1, 0);
+            var op4 = test.component.GetReceiverStats(1, 0);
+
+            var ops = new[] { op1, op2, op3, op4 };
+            foreach (var op in ops)
             {
-                Assert.That(stats, Is.Not.Null);
-                Assert.That(stats.Timestamp, Is.GreaterThan(0));
-                Assert.That(stats.Id, Is.Not.Empty);
-                foreach (var pair in stats.Dict)
-                {
-                    Assert.That(pair.Key, Is.Not.Empty);
-                }
-                StatsCheck.Test(stats);
+                yield return op;
+                Assert.That(op.IsDone, Is.True);
+                Assert.That(op.Value, Is.Not.Null);
+                Assert.That(op.Value.Stats, Is.Not.Null);
             }
-            op.Value.Dispose();
+
+            op1.Value.Dispose();
+            op2.Value.Dispose();
+            op3.Value.Dispose();
+            op4.Value.Dispose();
 
             test.component.Dispose();
             foreach (var track in stream.GetTracks())
             {
                 track.Dispose();
             }
+
             stream.Dispose();
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(test.gameObject);
