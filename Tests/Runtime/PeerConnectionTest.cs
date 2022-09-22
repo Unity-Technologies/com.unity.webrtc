@@ -972,15 +972,14 @@ namespace Unity.WebRTC.RuntimeTest
             var op3 = test.component.GetSenderStats(1, 0);
             var op4 = test.component.GetReceiverStats(1, 0);
 
-            foreach (var op in new[] { op1, op2, op3, op4 })
+            var ops = new[] { op1, op2, op3, op4 };
+            foreach (var op in ops)
             {
                 yield return op;
+                Assert.That(op.IsDone, Is.True);
+                Assert.That(op.Value, Is.Not.Null);
+                Assert.That(op.Value.Stats, Is.Not.Null);
             }
-
-            Assert.That(op1.IsDone, Is.True);
-            Assert.That(op2.IsDone, Is.True);
-            Assert.That(op3.IsDone, Is.True);
-            Assert.That(op4.IsDone, Is.True);
 
             op1.Value.Dispose();
             op2.Value.Dispose();
