@@ -51,12 +51,13 @@ namespace webrtc
 
     bool NvDecoderImpl::Configure(const Settings& settings)
     {
-        if (settings.codec_type() != kVideoCodecH264)
-        {
-            RTC_LOG(LS_ERROR) << "initialization failed on codectype is not kVideoCodecH264";
-            return false;
-        }
         if (!settings.max_render_resolution().Valid())
+        {
+            RTC_LOG(LS_ERROR) << "initialization failed on codec_settings is null ";
+            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+        }
+
+        if (settings.width < 1 || settings.height < 1)
         {
             RTC_LOG(LS_ERROR) << "initialization failed on codec_settings width < 0 or height < 0";
             return false;
@@ -77,10 +78,30 @@ namespace webrtc
         int maxWidth = 4096;
         int maxHeight = 4096;
 
+        cudaVideoCodec_enum codec;
+        switch (codec_settings->codecType)
+        {
+        case kVideoCodecVP8:
+            codec = cudaVideoCodec_VP8;
+            break;
+        case kVideoCodecVP9:
+            codec = cudaVideoCodec_VP9;
+            break;
+        case kVideoCodecH264:
+            codec = cudaVideoCodec_H264;
+            break;
+        case kVideoCodecAV1:
+            codec = cudaVideoCodec_AV1;
+            break;
+        default:
+            RTC_LOG(LS_ERROR) << "Initialization failed on codectype is not supported codecs.";
+            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+        }
+
         // bUseDeviceFrame: allocate in memory or cuda device memory
         m_decoder = std::make_unique<NvDecoderInternal>(
-            m_context, false, cudaVideoCodec_H264, true, false, nullptr, nullptr, maxWidth, maxHeight);
-        return true;
+            m_context, false, codec, true, false, nullptr, nullptr, maxWidth, maxHeight);
+        return WEBRTC_VIDEO_CODEC_OK;
     }
 
     int32_t NvDecoderImpl::RegisterDecodeCompleteCallback(DecodedImageCallback* callback)

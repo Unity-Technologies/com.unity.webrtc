@@ -2,6 +2,7 @@
 
 #include <absl/strings/match.h>
 #include <api/video_codecs/video_encoder_factory.h>
+#include <api/video_codecs/vp9_profile.h>
 #include <modules/video_coding/codecs/h264/include/h264.h>
 
 #include "Codec/CreateVideoCodecFactory.h"
@@ -101,9 +102,9 @@ namespace webrtc
         return major;
     }
 
-    std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context)
+    std::vector<SdpVideoFormat> SupportedH264DecoderCodecs(CUcontext context)
     {
-        std::vector<SdpVideoFormat> supportedFormats;
+        std::vector<SdpVideoFormat> formats;
 
         // HardwareGeneration Kepler is 3.x
         // https://docs.nvidia.com/deploy/cuda-compatibility/index.html#faq
@@ -111,14 +112,14 @@ namespace webrtc
         // https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/index.html#video-decoder-capabilities__table_o3x_fms_3lb
         if (GetCudaDeviceCapabilityMajorVersion(context) <= 3)
         {
-            supportedFormats = {
+            formats = {
                 CreateH264Format(webrtc::H264Profile::kProfileHigh, webrtc::H264Level::kLevel4_1, "1"),
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel4_1, "1"),
             };
         }
         else
         {
-            supportedFormats = {
+            formats = {
                 // Constrained Baseline Profile does not support NvDecoder, but WebRTC uses this profile by default,
                 // so it must be returned in this method.
                 CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel5_1, "1"),
@@ -127,13 +128,29 @@ namespace webrtc
                 CreateH264Format(webrtc::H264Profile::kProfileMain, webrtc::H264Level::kLevel5_1, "1"),
             };
         }
+        return formats;
+    }
 
-        for (auto& format : supportedFormats)
-        {
+    std::vector<SdpVideoFormat> SupportedVP9DecoderCodecs(CUcontext context)
+    {
+        std::vector<SdpVideoFormat> formats;
+        formats.push_back(SdpVideoFormat(
+            cricket::kVp9CodecName, { { kVP9FmtpProfileId, VP9ProfileToString(VP9Profile::kProfile0) } }));
+        return formats;
+    }
+
+    std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context)
+    {
+        std::vector<SdpVideoFormat> formats;
+
+        formats.push_back(SdpVideoFormat(cricket::kVp8CodecName));
+        for (const SdpVideoFormat& format : SupportedVP9DecoderCodecs(context))
+            formats.push_back(format);
+        for (const SdpVideoFormat& format : SupportedH264DecoderCodecs(context))
+            formats.push_back(format);
+        for (auto& format : formats)
             format.parameters.emplace(kSdpKeyNameCodecImpl, kCodecName);
-        }
-
-        return supportedFormats;
+        return formats;
     }
 
     std::unique_ptr<NvEncoder> NvEncoder::Create(
