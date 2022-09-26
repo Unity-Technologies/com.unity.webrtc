@@ -2,7 +2,7 @@
 
 editors:
   - version: 2019.4
-  - version: 2020.3
+  - version: 2020.3.39f1
   - version: 2021.3
   - version: 2022.1
   - version: trunk
@@ -212,11 +212,11 @@ test_architectures_macos:
     architecture: x64
   - name: x64
     target_name: macos
-    editor_version: 2020.3
+    editor_version: 2020.3.39f1
     architecture: x64
   - name: x64 (Rosetta 2)
     target_name: macos-m1
-    editor_version: 2020.3
+    editor_version: 2020.3.39f1
     architecture: x64
   - name: x64
     target_name: macos
