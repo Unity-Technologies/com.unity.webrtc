@@ -685,6 +685,8 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
+    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package test -u {{ editor.version }} --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"
   artifacts:
