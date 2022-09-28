@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
-using System;
 using System.Linq;
 using Unity.WebRTC.Samples;
 
@@ -279,9 +278,11 @@ class StatsSample : MonoBehaviour
 
     IEnumerator LoopGetStats()
     {
+        var wait = new WaitForSeconds(1f);
+
         while (true)
         {
-            yield return new WaitForSeconds(1f);
+            yield return wait;
 
             if (callButton.interactable)
                 continue;
@@ -318,11 +319,12 @@ class StatsSample : MonoBehaviour
             text.text += "Timestamp:" + op1.Value.Stats[id].Timestamp + "\n";
             text.interactable = true;
 
-            if (!op1.Value.TryGetValue(id, out RTCStats stats))
-                continue;
+            if (op1.Value.TryGetValue(id, out RTCStats stats))
+                text.text += stats.Dict.Aggregate(string.Empty,(str, next) =>
+                    str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
 
-            text.text += stats.Dict.Aggregate(string.Empty,(str, next) =>
-                str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
+            op1.Value.Dispose();
+            op2.Value.Dispose();
         }
     }
 
