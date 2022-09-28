@@ -5,14 +5,14 @@ namespace Unity.WebRTC
 {
     internal class RTCStatsCollectorCallback : SafeHandle
     {
-        public Action<IntPtr> onStatsDelivered;
+        public Action<RTCStatsReport> onStatsDelivered;
 
         private RTCStatsCollectorCallback()
             : base(IntPtr.Zero, true)
         {
         }
 
-        public void Invoke(IntPtr report)
+        public void Invoke(RTCStatsReport report)
         {
             onStatsDelivered?.Invoke(report);
         }
@@ -21,6 +21,7 @@ namespace Unity.WebRTC
 
         protected override bool ReleaseHandle()
         {
+			onStatsDelivered = null;
             return true;
         }
     }

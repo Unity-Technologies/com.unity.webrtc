@@ -62,9 +62,9 @@ namespace Unity.WebRTC
             callback.onStatsDelivered = OnStatsDelivered;
         }
 
-        void OnStatsDelivered(IntPtr ptr)
+        void OnStatsDelivered(RTCStatsReport report)
         {
-            Value = WebRTC.FindOrCreate(ptr, ptr_ => new RTCStatsReport(ptr_));
+            Value = report;
             IsError = false;
             this.Done();
         }
