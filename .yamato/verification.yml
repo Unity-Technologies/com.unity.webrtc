@@ -27,7 +27,7 @@ platforms:
     type: Unity::VM
     image: katana-to-yamato/desktop-ubuntu-18.04-desktop-katana-git:v1.8-auto
     flavor: b1.large
-    npminstall: sudo apt install nodejs
+    npminstall: sudo apt update; sudo apt install -y npm
   - name: macOS 10.14
     agent: mac_test_10.14
     type: Unity::VM::osx
@@ -39,7 +39,7 @@ platforms:
     type: Unity::VM
     image: katana-to-yamato/test-platform-win10-katana-git:v1.9-auto
     flavor: b1.large
-    npminstall: choco install nodejs -y && refreshenv
+    npminstall: choco install -y nodejs && refreshenv
   - name: iOS
     agent: mac_iphone_se
     type: Unity::mobile::iPhone
@@ -51,7 +51,7 @@ platforms:
     type: Unity::VM
     image: katana-to-yamato/test-platform-ubuntu16.04-katana-git:v1.9-auto
     flavor: b1.large
-    npminstall: sudo apt install nodejs
+    npminstall: sudo apt update; sudo apt install -y npm
   - name: macOS 10.13
     agent: mac_test_10.13
     type: Unity::VM::osx
