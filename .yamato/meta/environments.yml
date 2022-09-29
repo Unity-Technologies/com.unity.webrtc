@@ -3,3 +3,10 @@ upm:
   package_version: stable
 webrtc_version:
   name: M92
+
+editors:
+  - version: 2019.4
+  - version: 2020.3
+  - version: 2021.3
+  - version: 2022.1
+  - version: trunk

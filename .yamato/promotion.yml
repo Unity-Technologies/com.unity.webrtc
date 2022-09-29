@@ -3,7 +3,7 @@
 yamato_name: webrtc
 test_editors:
   - version: 2019.4
-  - version: 2020.3.39f1
+  - version: 2020.3
 test_platforms:
   - name: win
     type: Unity::VM
