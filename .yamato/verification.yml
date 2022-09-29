@@ -1,0 +1,173 @@
+{% metadata_file .yamato/package.metafile -%}
+---
+
+# This job emulates a package verification.
+
+# UnityEditorTests.TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
+#   - lin_18.04_bokken
+# UnityEditorTests.TestEditorTestsMacEditorIsolatedPackagesVerified1014
+#   - mac_test_10.14
+# UnityEditorTests.TestEditorTestsWindowsEditorIsolatedPackagesVerified
+#   - win10_test
+# UnityIntegrationTests.TestIntegrationTestsiOSiPhoneSE
+#   - mac_iphone_se
+# UnityPlaymodeTests.TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+#   - lin_test_ubuntu16.04
+# UnityPlaymodeTests.TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
+#   - mac_test_10.14
+# UnityPlaymodeTests.TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+#   - win10_test
+# UnityEditorTests.TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+#   - lin_test_ubuntu16.04
+# UnityEditorTests.TestEditorTestsMacEditorIsolatedPackagesVerified
+#   - mac_test_10.13
+
+platforms:
+  - name: Ubuntu 18.04
+    agent: lin_18.04_bokken
+    type: Unity::VM
+    image: katana-to-yamato/desktop-ubuntu-18.04-desktop-katana-git:v1.8-auto
+    flavor: b1.large
+  - name: macOS 10.14
+    agent: mac_test_10.14
+    type: Unity::VM::osx
+    image: katana-to-yamato/automation-tooling-macos-10.14-katana-git:v1.9-auto
+    flavor: m1.mac
+  - name: Windows 10
+    agent: win10_test
+    type: Unity::VM
+    image: katana-to-yamato/test-platform-win10-katana-git:v1.9-auto
+    flavor: b1.large
+  - name: iOS
+    agent: mac_iphone_se
+    type: Unity::mobile::iPhone
+    image: katana-to-yamato/mobile-ios-macos-11-katana-se-git:v1.4-auto
+    flavor: m1.mac
+  - name: Ubuntu 16.04
+    agent: lin_test_ubuntu16.04
+    type: Unity::VM
+    image: katana-to-yamato/test-platform-ubuntu16.04-katana-git:v1.9-auto
+    flavor: b1.large
+  - name: macOS 10.13
+    agent: mac_test_10.13
+    type: Unity::VM::osx
+    image: katana-to-yamato/test-platform-macos-10.13-katana-git:v1.10-auto
+    flavor: m1.mac
+
+tests:
+  - name: Editor Tests on Ubuntu 18.04
+    id: TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
+    platform: editmode
+    agent: lin_18.04_bokken
+  - name: Editor Tests on macOS 10.14
+    id: TestEditorTestsMacEditorIsolatedPackagesVerified1014
+    platform: editmode
+    agent: mac_test_10.14
+  - name: Editor Tests on Windows 10
+    id: TestEditorTestsWindowsEditorIsolatedPackagesVerified
+    platform: editmode
+    agent: win10_test
+  - name: Integration Tests on iPhone SE
+    id: TestIntegrationTestsiOSiPhoneSE
+    platform: ios
+    agent: mac_iphone_se
+  - name: Playmode Tests on Ubuntu 16.04
+    id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+    platform: playmode
+    agent: lin_test_ubuntu16.04
+  - name: Playmode Tests on macOS 10.04
+    id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
+    platform: playmode
+    agent: mac_test_10.14
+  - name: Playmode Tests on Windows 10
+    id: TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+    platform: playmode
+    agent: win10_test
+  - name: Editor Tests on Ubuntu 16.04
+    id: TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+    platform: editmode
+    agent: lin_test_ubuntu16.04
+  - name: Editor Tests on macOS 10.13
+    id: TestEditorTestsMacEditorIsolatedPackagesVerified
+    platform: editmode
+    agent: mac_test_10.13
+  - name: Playmode Tests on macOS 10.13
+    id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+    platform: playmode
+    agent: mac_test_10.13
+
+editors:
+  - version: trunk
+    tests:
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
+      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
+      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
+      - TestIntegrationTestsiOSiPhoneSE
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
+      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+  - version: 2022.1
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
+      - TestIntegrationTestsiOSiPhoneSE
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+  - version: 2021.3
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
+      - TestIntegrationTestsiOSiPhoneSE
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+  - version: 2020.3
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
+      - TestIntegrationTestsiOSiPhoneSE
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+  - version: 2019.4
+    tests:
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
+
+
+{% for editor in test_editors %}
+verificationtest_{{ editor.version }}:
+  name : Verification Test on Unity Editor {{ editor.version }}
+  dependencies:
+{% for id in editor.tests %}
+    - .yamato/verification.yml#verificationtest_{{ id }}_{{ editor.version }}
+{% endfor %}    
+{% endfor %}
+
+
+{% for editor in test_editors %}
+{% for id in editor.tests %}
+{% assign test = tests | where: "id", id %}
+{% assign platform = platforms | where: "agent", test.agent %}
+verificationtest_{{ id }}_{{ editor.version }}:
+  name : Verification Test {{ test.name }} on Unity Editor {{ editor.version }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+    - upm-ci package test -u {{ editor.version }} --platform {{ test.platform }}
+  artifacts:
+    {{ yamato_name }}_promotion_test_results:
+      paths:
+        - "upm-ci~/test-results/**/*"
+  dependencies:
+    - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
+{% endfor %}    
+{% endfor %}
