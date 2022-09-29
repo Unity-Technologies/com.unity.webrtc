@@ -45,7 +45,7 @@ platforms:
     type: Unity::mobile::iPhone
     image: katana-to-yamato/mobile-ios-macos-11-katana-se-git:v1.4-auto
     flavor: m1.mac
-    group: macos
+    group: ios
   - name: Ubuntu 16.04
     agent: lin_test_ubuntu16.04
     type: Unity::VM
@@ -62,47 +62,47 @@ platforms:
 tests:
   - name: Editor Tests on Ubuntu 18.04
     id: TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-    platform: editmode
+    suite: editor
     agent: lin_18.04_bokken
   - name: Editor Tests on macOS 10.14
     id: TestEditorTestsMacEditorIsolatedPackagesVerified1014
-    platform: editmode
+    suite: editor
     agent: mac_test_10.14
   - name: Editor Tests on Windows 10
     id: TestEditorTestsWindowsEditorIsolatedPackagesVerified
-    platform: editmode
+    suite: editor
     agent: win10_test
   - name: Integration Tests on iPhone SE
     id: TestIntegrationTestsiOSiPhoneSE
-    platform: ios
+    suite: playmode
     agent: mac_iphone_se
   - name: Playmode Tests on Ubuntu 16.04
     id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
-    platform: playmode
+    suite: playmode
     agent: lin_test_ubuntu16.04
   - name: Playmode Tests on Ubuntu 18.04
     id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-    platform: playmode
+    suite: playmode
     agent: lin_18.04_bokken
   - name: Playmode Tests on macOS 10.04
     id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
-    platform: playmode
+    suite: playmode
     agent: mac_test_10.14
   - name: Playmode Tests on Windows 10
     id: TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
-    platform: playmode
+    suite: playmode
     agent: win10_test
   - name: Editor Tests on Ubuntu 16.04
     id: TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
-    platform: editmode
+    suite: editor
     agent: lin_test_ubuntu16.04
   - name: Editor Tests on macOS 10.13
     id: TestEditorTestsMacEditorIsolatedPackagesVerified
-    platform: editmode
+    suite: editor
     agent: mac_test_10.13
   - name: Playmode Tests on macOS 10.13
     id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified
-    platform: playmode
+    suite: playmode
     agent: mac_test_10.13
 
 # todo:: APV requires that the package works well on Ubuntu 16.04. However, 
@@ -189,7 +189,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - sudo apt install unity-downloader-cli -y
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
     # run utr
-    - ./utr --suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    - ./utr --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "macos" %}
     #install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
@@ -198,7 +198,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
     # run utr
-    - ./utr --suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    - ./utr --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "windows" %}
     #install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat > utr.bat
@@ -206,7 +206,16 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
     # run utr
-    - utr.bat --suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    - utr.bat --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+{% elsif platform.group == "ios" %}
+    #install utr
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
+    - chmod a+x ./utr
+    # install unity-downloader-cli
+    - pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -u {{ editor.version }} -c editor -c iOS --fast --wait
+    # run utr
+    - ./utr --suite={{ test.suite }} --platform=iOSPlayer --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% endif %}
   artifacts:
     {{ id }}_{{ editor.version }}_results:
