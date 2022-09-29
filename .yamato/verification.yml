@@ -97,6 +97,7 @@ tests:
 
 editors:
   - version: trunk
+    tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
       - TestEditorTestsMacEditorIsolatedPackagesVerified1014
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
@@ -105,6 +106,7 @@ editors:
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2022.1
+    tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
@@ -113,6 +115,7 @@ editors:
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2021.3
+    tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
@@ -121,6 +124,7 @@ editors:
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2020.3
+    tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
