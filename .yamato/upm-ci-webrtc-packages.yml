@@ -1,4 +1,5 @@
-{% metadata_file .yamato/meta/environments.yml %}
+{% metadata_file .yamato/package.metafile -%}
+---
 
 editor_version_for_validate: 2019.4
 editor_version_for_trigger: 2021.3
