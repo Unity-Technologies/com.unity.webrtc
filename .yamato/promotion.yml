@@ -1,5 +1,4 @@
 {% metadata_file .yamato/package.metafile -%}
----
 
 yamato_name: webrtc
 test_editors:

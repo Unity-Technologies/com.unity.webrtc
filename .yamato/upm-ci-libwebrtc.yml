@@ -1,5 +1,4 @@
 {% metadata_file .yamato/package.metafile -%}
----
 
 platforms:
   - name: win
@@ -30,6 +29,7 @@ platforms:
 projects:
   - name: libwebrtc
 ---
+
 {% for project in projects %}
 {% for platform in platforms %}
 build_{{ platform.name }}:

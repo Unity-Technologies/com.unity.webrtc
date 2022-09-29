@@ -1,5 +1,4 @@
 {% metadata_file .yamato/package.metafile -%}
----
 
 editor_version_for_validate: 2019.4
 editor_version_for_trigger: 2021.3
@@ -252,8 +251,8 @@ test_architectures_macos:
 package:
   name: webrtc
   packagename: com.unity.webrtc
-    
 ---
+
 {% for platform in platforms %}
 build_webrtc_plugin_{{ platform.name }}:
   name: Build webrtc plugin {{ platform.name }}

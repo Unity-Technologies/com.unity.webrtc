@@ -1,5 +1,4 @@
 {% metadata_file .yamato/package.metafile -%}
----
 
 platforms:
   - name: win
@@ -13,6 +12,7 @@ platforms:
   - name: android
     artifact_filename: webrtc-android.zip
 ---
+
 publish_com.unity.webrtc_github_release:
   name: Publish com.unity.webrtc to Github Release
   agent:
