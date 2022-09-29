@@ -166,7 +166,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package test -u {{ editor.version }} --platform {{ test.platform }}
   artifacts:
-    {{ yamato_name }}_promotion_test_results:
+    {{ id }}_{{ editor.version }}_results:
       paths:
         - "upm-ci~/test-results/**/*"
   dependencies:
