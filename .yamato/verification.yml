@@ -27,37 +27,37 @@ platforms:
     type: Unity::VM
     image: katana-to-yamato/desktop-ubuntu-18.04-desktop-katana-git:v1.8-auto
     flavor: b1.large
-    npminstall: sudo apt install node
+    npminstall: sudo apt install nodejs
   - name: macOS 10.14
     agent: mac_test_10.14
     type: Unity::VM::osx
     image: katana-to-yamato/automation-tooling-macos-10.14-katana-git:v1.9-auto
     flavor: m1.mac
-    npminstall: brew install node
+    npminstall: curl "https://nodejs.org/download/release/v15.14.0/node-v15.14.0.pkg" > "$HOME/Downloads/node-v15.14.0.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-v15.14.0.pkg" -target "/"
   - name: Windows 10
     agent: win10_test
     type: Unity::VM
     image: katana-to-yamato/test-platform-win10-katana-git:v1.9-auto
     flavor: b1.large
-    npminstall: winget install -e --id OpenJS.NodeJS
+    npminstall: choco install nodejs -y && refreshenv
   - name: iOS
     agent: mac_iphone_se
     type: Unity::mobile::iPhone
     image: katana-to-yamato/mobile-ios-macos-11-katana-se-git:v1.4-auto
     flavor: m1.mac
-    npminstall: brew install node
+    npminstall: curl "https://nodejs.org/download/release/v15.14.0/node-v15.14.0.pkg" > "$HOME/Downloads/node-v15.14.0.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-v15.14.0.pkg" -target "/"
   - name: Ubuntu 16.04
     agent: lin_test_ubuntu16.04
     type: Unity::VM
     image: katana-to-yamato/test-platform-ubuntu16.04-katana-git:v1.9-auto
     flavor: b1.large
-    npminstall: sudo apt install node
+    npminstall: sudo apt install nodejs
   - name: macOS 10.13
     agent: mac_test_10.13
     type: Unity::VM::osx
     image: katana-to-yamato/test-platform-macos-10.13-katana-git:v1.10-auto
     flavor: m1.mac
-    npminstall: brew install node
+    npminstall: curl "https://nodejs.org/download/release/v15.14.0/node-v15.14.0.pkg" > "$HOME/Downloads/node-v15.14.0.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-v15.14.0.pkg" -target "/"
 
 tests:
   - name: Editor Tests on Ubuntu 18.04
@@ -170,7 +170,11 @@ verificationtest_{{ id }}_{{ editor.version }}:
     flavor: {{ platform.flavor }}
   commands:
     - {{ platform.npminstall }}
+{% if platform.agent == "win10_test" %}
+    - sudo npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+{% else %}
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+{% endif %}
     - upm-ci package test -u {{ editor.version }} --platform {{ test.platform }}
   artifacts:
     {{ id }}_{{ editor.version }}_results:
