@@ -1,5 +1,4 @@
 {% metadata_file .yamato/package.metafile -%}
----
 
 # This job emulates a package verification.
 
@@ -138,7 +137,7 @@ editors:
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
-
+---
 
 {% for editor in test_editors %}
 verificationtest_{{ editor.version }}:
