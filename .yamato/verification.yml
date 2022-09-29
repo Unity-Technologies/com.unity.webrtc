@@ -97,7 +97,6 @@ tests:
 
 editors:
   - version: trunk
-    tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
       - TestEditorTestsMacEditorIsolatedPackagesVerified1014
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
