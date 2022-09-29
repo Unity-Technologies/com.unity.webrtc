@@ -80,6 +80,10 @@ tests:
     id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
     platform: playmode
     agent: lin_test_ubuntu16.04
+  - name: Playmode Tests on Ubuntu 18.04
+    id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
+    platform: playmode
+    agent: lin_18.04_bokken
   - name: Playmode Tests on macOS 10.04
     id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
     platform: playmode
@@ -101,6 +105,11 @@ tests:
     platform: playmode
     agent: mac_test_10.13
 
+# todo:: APV requires that the package works well on Ubuntu 16.04. However, 
+# unity-downloader-cli doesn't support Ubuntu 16.04. Therefore, there is no way 
+# to install Unity Editor to the test environments.
+# Added tests on Ubuntu 18.04 instead of Ubuntu 16.04 for the reasons above.
+
 test_editors:
   - version: trunk
     tests:
@@ -108,42 +117,42 @@ test_editors:
       - TestEditorTestsMacEditorIsolatedPackagesVerified1014
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2022.1
     tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2021.3
     tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2020.3
     tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2019.4
     tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
       - TestEditorTestsMacEditorIsolatedPackagesVerified
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
+      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
@@ -170,23 +179,34 @@ verificationtest_{{ id }}_{{ editor.version }}:
     flavor: {{ platform.flavor }}
   commands:
 {% if platform.group == "linux" %}
+    #install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
     - chmod a+x ./utr
-    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - export PATH=$PATH:$HOME/.local/bin
+    # install unity-downloader-cli
+    - curl -L https://artifactory.prd.it.unity3d.com/artifactory/api/gpg/key/public | sudo apt-key add -
+    - sudo sh -c "echo 'deb https://artifactory.prd.it.unity3d.com/artifactory/unity-apt-local bionic main' > /etc/apt/sources.list.d/unity.list"
+    - sudo apt update
+    - sudo apt install unity-downloader-cli -y
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
-    - ./utr suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    # run utr
+    - ./utr --suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "macos" %}
+    #install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
     - chmod a+x ./utr
+    # install unity-downloader-cli
     - pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
-    - ./utr suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    # run utr
+    - ./utr --suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "windows" %}
+    #install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat > utr.bat
+    # install unity-downloader-cli
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
-    - utr.bat suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    # run utr
+    - utr.bat --suite=editor --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% endif %}
   artifacts:
     {{ id }}_{{ editor.version }}_results:
