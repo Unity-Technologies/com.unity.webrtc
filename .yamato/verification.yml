@@ -95,7 +95,7 @@ tests:
     platform: playmode
     agent: mac_test_10.13
 
-editors:
+test_editors:
   - version: trunk
     tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
@@ -142,7 +142,7 @@ editors:
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
 
-{% for editor in editors %}
+{% for editor in test_editors %}
 verificationtest_{{ editor.version }}:
   name : Verification Test on Unity Editor {{ editor.version }}
   dependencies:
@@ -152,7 +152,7 @@ verificationtest_{{ editor.version }}:
 {% endfor %}
 
 
-{% for editor in editors %}
+{% for editor in test_editors %}
 {% for id in editor.tests %}
 {% assign test = tests | where: "id", id %}
 {% assign platform = platforms | where: "agent", test.agent %}
