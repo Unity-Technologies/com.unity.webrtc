@@ -142,7 +142,7 @@ editors:
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
 
-{% for editor in test_editors %}
+{% for editor in editors %}
 verificationtest_{{ editor.version }}:
   name : Verification Test on Unity Editor {{ editor.version }}
   dependencies:
@@ -152,7 +152,7 @@ verificationtest_{{ editor.version }}:
 {% endfor %}
 
 
-{% for editor in test_editors %}
+{% for editor in editors %}
 {% for id in editor.tests %}
 {% assign test = tests | where: "id", id %}
 {% assign platform = platforms | where: "agent", test.agent %}
