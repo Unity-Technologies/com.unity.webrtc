@@ -154,8 +154,8 @@ verificationtest_{{ editor.version }}:
 
 {% for editor in test_editors %}
 {% for id in editor.tests %}
-{% assign test = tests | where: "id", id %}
-{% assign platform = platforms | where: "agent", test.agent %}
+{% assign test = tests | where: "id", id | first %}
+{% assign platform = platforms | where: "agent", test.agent | first %}
 verificationtest_{{ id }}_{{ editor.version }}:
   name : Verification Test {{ test.name }} on Unity Editor {{ editor.version }}
   agent:
