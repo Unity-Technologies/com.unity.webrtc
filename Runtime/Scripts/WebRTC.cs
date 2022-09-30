@@ -1055,13 +1055,16 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeSetSessionDesc))]
         static void OnSetSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, string message)
         {
-            WebRTC.Sync(ptr, () =>
+            Sync(ptr, () =>
             {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                if (Table[ptr] is RTCPeerConnection connection)
                 {
                     var observer = connection.FindObserver(ptrObserver);
+                    if (observer == null)
+                        return;
                     connection.RemoveObserver(observer);
                     observer.Invoke(type, message);
+                    observer.Dispose();
                 }
             });
         }
@@ -1069,10 +1072,10 @@ namespace Unity.WebRTC
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
         static void OnCollectStatsCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr ptrReport)
         {
-            WebRTC.Sync(ptr, () =>
+            Sync(ptr, () =>
             {
                 RTCStatsReport report = WebRTC.FindOrCreate(ptrReport, ptr_ => new RTCStatsReport(ptr_));
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
+                if (Table[ptr] is RTCPeerConnection connection)
                 {
                     RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
                     if (callback == null)
@@ -1083,7 +1086,6 @@ namespace Unity.WebRTC
                 }
             });
         }
-
 
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }

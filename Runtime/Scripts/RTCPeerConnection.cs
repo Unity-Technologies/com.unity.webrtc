@@ -705,10 +705,7 @@ namespace Unity.WebRTC
 
             SetSessionDescriptionObserver observer =
                 WebRTC.Context.PeerConnectionSetLocalDescription(GetSelfOrThrow(), ref desc, out var error);
-            dictSetSessionDescriptionObserver.Add(observer.DangerousGetHandle(), observer);
-            if (error.errorType != RTCErrorType.None)
-                throw new RTCErrorException(ref error);
-            return new RTCSetSessionDescriptionAsyncOperation(observer);
+            return SetDescription(observer, error);
         }
 
         /// <summary>
@@ -719,10 +716,7 @@ namespace Unity.WebRTC
         {
             SetSessionDescriptionObserver observer =
                 WebRTC.Context.PeerConnectionSetLocalDescription(GetSelfOrThrow(), out var error);
-            dictSetSessionDescriptionObserver.Add(observer.DangerousGetHandle(), observer);
-            if (error.errorType != RTCErrorType.None)
-                throw new RTCErrorException(ref error);
-            return new RTCSetSessionDescriptionAsyncOperation(observer);
+            return SetDescription(observer, error);
         }
 
         /// <summary>
@@ -751,10 +745,7 @@ namespace Unity.WebRTC
 
             SetSessionDescriptionObserver observer =
                 WebRTC.Context.PeerConnectionSetRemoteDescription(GetSelfOrThrow(), ref desc, out var error);
-            dictSetSessionDescriptionObserver.Add(observer.DangerousGetHandle(), observer);
-            if (error.errorType != RTCErrorType.None)
-                throw new RTCErrorException(ref error);
-            return new RTCSetSessionDescriptionAsyncOperation(observer);
+            return SetDescription(observer, error);
         }
 
         /// <summary>
@@ -908,6 +899,17 @@ namespace Unity.WebRTC
         internal SetSessionDescriptionObserver FindObserver(IntPtr ptr)
         {
             return dictSetSessionDescriptionObserver[ptr];
+        }
+
+        RTCSetSessionDescriptionAsyncOperation SetDescription(SetSessionDescriptionObserver observer, RTCError error)
+        {
+            if (error.errorType != RTCErrorType.None)
+                throw new RTCErrorException(ref error);
+
+            IntPtr ptr = observer.DangerousGetHandle();
+            if (!dictSetSessionDescriptionObserver.ContainsKey(ptr))
+                dictSetSessionDescriptionObserver.Add(ptr, observer);
+            return new RTCSetSessionDescriptionAsyncOperation(observer);
         }
 
         Dictionary<IntPtr, RTCStatsCollectorCallback> dictCollectStatsCallback = new Dictionary<IntPtr, RTCStatsCollectorCallback>();

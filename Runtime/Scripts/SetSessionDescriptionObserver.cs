@@ -21,6 +21,7 @@ namespace Unity.WebRTC
 
         protected override bool ReleaseHandle()
         {
+            onSetSessionDescription = null;
             return true;
         }
     }
