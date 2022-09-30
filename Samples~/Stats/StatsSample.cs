@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
-using System;
 using System.Linq;
 using Unity.WebRTC.Samples;
 
@@ -14,6 +13,7 @@ class StatsSample : MonoBehaviour
     [SerializeField] private Button hangupButton;
     [SerializeField] private InputField text;
     [SerializeField] private Dropdown dropdown;
+    [SerializeField] private Dropdown dropdownFreq;
     [SerializeField] private AudioSource source;
     [SerializeField] private Camera cam;
 #pragma warning restore 0649
@@ -29,6 +29,14 @@ class StatsSample : MonoBehaviour
     private DelegateOnClose onDataChannelClose = null;
     private DelegateOnDataChannel onDataChannel = null;
     private int currentValue = -1;
+    private WaitForSeconds wait;
+    private Dictionary<string, float> dictFrequency = new Dictionary<string, float>()
+    {
+        { "60ms", 0.06f},
+        { "120ms", 0.12f},
+        { "300ms", 0.3f},
+        { "1000ms", 1f},
+    };
 
     private void Awake()
     {
@@ -70,7 +78,17 @@ class StatsSample : MonoBehaviour
         onDataChannelOpen = ()=> { };
         onDataChannelClose = () => { };
 
+        dropdownFreq.options = dictFrequency.Select(pair => new Dropdown.OptionData(pair.Key)).ToList();
+        dropdownFreq.value = 0;
+        dropdownFreq.onValueChanged.AddListener(OnValueChangedFreq);
+        OnValueChangedFreq(0);
+
         StartCoroutine(LoopGetStats());
+    }
+
+    void OnValueChangedFreq(int value)
+    {
+        wait = new WaitForSeconds(dictFrequency.ElementAt(value).Value);
     }
 
     RTCConfiguration GetSelectedSdpSemantics()
@@ -281,7 +299,7 @@ class StatsSample : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f);
+            yield return wait;
 
             if (callButton.interactable)
                 continue;
@@ -318,11 +336,12 @@ class StatsSample : MonoBehaviour
             text.text += "Timestamp:" + op1.Value.Stats[id].Timestamp + "\n";
             text.interactable = true;
 
-            if (!op1.Value.TryGetValue(id, out RTCStats stats))
-                continue;
+            if (op1.Value.TryGetValue(id, out RTCStats stats))
+                text.text += stats.Dict.Aggregate(string.Empty,(str, next) =>
+                    str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
 
-            text.text += stats.Dict.Aggregate(string.Empty,(str, next) =>
-                str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
+            op1.Value.Dispose();
+            op2.Value.Dispose();
         }
     }
 

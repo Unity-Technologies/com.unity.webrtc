@@ -1,8 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
@@ -35,15 +33,10 @@ namespace Unity.WebRTC
     /// </summary>
     /// <param name="e"></param>
     public delegate void DelegateOnTrack(RTCTrackEvent e);
-    /// <summary>
-    ///
-    /// </summary>
-    public delegate void DelegateSetSessionDescSuccess();
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="error"></param>
-    public delegate void DelegateSetSessionDescFailure(RTCError error);
+
+
+    internal delegate void DelegateSetSessionDescSuccess();
+    internal delegate void DelegateSetSessionDescFailure(RTCError error);
 
     /// <summary>
     /// Represents a WebRTC connection between the local peer and remote peer.
@@ -56,13 +49,8 @@ namespace Unity.WebRTC
     public class RTCPeerConnection : IDisposable
     {
         private IntPtr self;
-
-        internal Action<IntPtr> OnStatsDelivered = null;
-
         private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
-        private RTCSessionDescriptionAsyncOperation m_opSetRemoteDesc;
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
-
         private bool disposed;
 
         /// <summary>
@@ -806,22 +794,27 @@ namespace Unity.WebRTC
         public RTCStatsReportAsyncOperation GetStats()
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionGetStats(GetSelfOrThrow());
-            dictCollectStatsCallback.Add(callback.DangerousGetHandle(), callback);
-            return new RTCStatsReportAsyncOperation(callback);
+			return GetStats(callback);
         }
 
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpSender sender)
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionSenderGetStats(GetSelfOrThrow(), sender.self);
-            dictCollectStatsCallback.Add(callback.DangerousGetHandle(), callback);
-            return new RTCStatsReportAsyncOperation(callback);
+			return GetStats(callback);
         }
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpReceiver receiver)
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionReceiverGetStats(GetSelfOrThrow(), receiver.self);
-            dictCollectStatsCallback.Add(callback.DangerousGetHandle(), callback);
-            return new RTCStatsReportAsyncOperation(callback);
+			return GetStats(callback);
         }
+
+		RTCStatsReportAsyncOperation GetStats(RTCStatsCollectorCallback callback)
+		{
+			IntPtr ptr = callback.DangerousGetHandle();
+			if(!dictCollectStatsCallback.ContainsKey(ptr))
+	            dictCollectStatsCallback.Add(ptr, callback);
+            return new RTCStatsReportAsyncOperation(callback);
+		}
 
         /// <summary>
         ///
@@ -925,7 +918,9 @@ namespace Unity.WebRTC
         {
             if (ptr == IntPtr.Zero)
                 throw new ArgumentException("The argument is IntPtr.Zero.", "ptr");
-            return dictCollectStatsCallback[ptr];
+			if(dictCollectStatsCallback.TryGetValue(ptr, out var callback))
+				return callback;
+            return null;
         }
 
         internal void RemoveCollectStatsCallback(RTCStatsCollectorCallback callback)
@@ -962,17 +957,21 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr report)
+        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr ptrReport)
         {
             WebRTC.Sync(ptr, () =>
             {
+				RTCStatsReport report = WebRTC.FindOrCreate(ptrReport, ptr_ => new RTCStatsReport(ptr_));
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
                     RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
+					if(callback == null)
+						return;
                     connection.RemoveCollectStatsCallback(callback);
                     callback.Invoke(report);
+				    callback.Dispose();
                 }
-            });
+           });
         }
 
         static IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track, RTCRtpTransceiverInit init)
