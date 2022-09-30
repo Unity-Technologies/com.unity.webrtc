@@ -486,7 +486,6 @@ namespace Unity.WebRTC
         void InitCallback()
         {
             NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, OnSuccessCreateSessionDesc, OnFailureCreateSessionDesc);
-            NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, OnStatsDeliveredCallback);
             NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
             NativeMethods.PeerConnectionRegisterConnectionStateChange(self, PCOnConnectionStateChange);
             NativeMethods.PeerConnectionRegisterIceGatheringChange(self, PCOnIceGatheringChange);
@@ -495,10 +494,6 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);
             NativeMethods.PeerConnectionRegisterOnTrack(self, PCOnTrack);
             NativeMethods.PeerConnectionRegisterOnRemoveTrack(self, PCOnRemoveTrack);
-            WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(
-                self, OnSetSessionDescSuccess);
-            WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(
-                self, OnSetSessionDescFailure);
         }
 
         /// <summary>
@@ -933,28 +928,9 @@ namespace Unity.WebRTC
             dictCollectStatsCallback.Remove(callback.DangerousGetHandle());
         }
 
-        SetSessionDescriptionObserver FindObserver(IntPtr ptr)
-        {
-            return dictSetSessionDescriptionObserver[ptr];
-        }
-
         internal void RemoveObserver(SetSessionDescriptionObserver observer)
         {
             dictSetSessionDescriptionObserver.Remove(observer.DangerousGetHandle());
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr report)
-        {
-            WebRTC.Sync(ptr, () =>
-            {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                {
-                    RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
-                    connection.RemoveCollectStatsCallback(callback);
-                    callback.Invoke(report);
-                }
-            });
         }
 
         static IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track, RTCRtpTransceiverInit init)

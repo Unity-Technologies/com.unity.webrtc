@@ -686,7 +686,7 @@ namespace Unity.WebRTC
             }
 
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
-            NativeMethods.StatsCollectorRegisterCallback(OnStatsDeliveredCallback);
+            NativeMethods.StatsCollectorRegisterCallback(OnCollectStatsCallback);
             NativeMethods.SetSessionDescriptionObserverRegisterCallback(OnSetSessionDesc);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
@@ -1067,16 +1067,23 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr report)
+        static void OnCollectStatsCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr ptrReport)
         {
             WebRTC.Sync(ptr, () =>
             {
+                RTCStatsReport report = WebRTC.FindOrCreate(ptrReport, ptr_ => new RTCStatsReport(ptr_));
                 if (WebRTC.Table[ptr] is RTCPeerConnection connection)
                 {
-                    connection.OnStatsDelivered(report);
+                    RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
+                    if (callback == null)
+                        return;
+                    connection.RemoveCollectStatsCallback(callback);
+                    callback.Invoke(report);
+                    callback.Dispose();
                 }
             });
         }
+
 
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
