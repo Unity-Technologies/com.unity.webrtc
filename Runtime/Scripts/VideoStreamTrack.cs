@@ -107,7 +107,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -118,11 +118,6 @@ namespace Unity.WebRTC
 
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                if (m_source != null)
-                {
-                    if (RenderTexture.active == m_source.destTexture_)
-                        RenderTexture.active = null;
-                }
                 m_renderer?.Dispose();
                 m_source?.Dispose();
 
@@ -138,12 +133,12 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static class CameraExtension
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="cam"></param>
         /// <param name="width"></param>
@@ -178,7 +173,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="cam"></param>
         /// <param name="width"></param>

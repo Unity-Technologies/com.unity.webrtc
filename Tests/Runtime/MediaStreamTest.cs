@@ -101,9 +101,10 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
 
             track.Dispose();
-
             stream.Dispose();
             Object.DestroyImmediate(rt);
+
+            Assert.That(RenderTexture.active, Is.Null);
         }
 
         [Test]
