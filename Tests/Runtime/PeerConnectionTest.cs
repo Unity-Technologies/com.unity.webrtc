@@ -443,6 +443,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator TransceiverReturnsSender()
         {
             RTCConfiguration config = default;
@@ -709,6 +710,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator IceConnectionStateChange()
         {
             RTCConfiguration config = default;
@@ -760,6 +762,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator AddIceCandidate()
         {
             RTCConfiguration config = default;
@@ -843,6 +846,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator MediaStreamTrackThrowExceptionAfterPeerDisposed()
         {
             RTCConfiguration config = default;
@@ -875,6 +879,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator PeerConnectionStateChange()
         {
             RTCConfiguration config = default;
@@ -999,6 +1004,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator RestartIceInvokeOnNegotiationNeeded()
         {
             RTCConfiguration config = default;
@@ -1042,6 +1048,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator RemoteOnRemoveTrack()
         {
             RTCConfiguration config = default;
