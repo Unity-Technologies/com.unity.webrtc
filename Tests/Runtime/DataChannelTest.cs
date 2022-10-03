@@ -94,6 +94,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator SendThrowsExceptionAfterClose()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
@@ -116,6 +117,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator SendAndReceiveMessage()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
@@ -209,6 +211,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator SendAndReceiveMessageWithExecuteTasks()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
