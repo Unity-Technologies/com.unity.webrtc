@@ -665,26 +665,6 @@ namespace Unity.WebRTC
 #if UNITY_EDITOR
             UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
 #endif
-            // OpenGL APIs on windows/osx are not supported
-            if (Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.OSXEditor ||
-                Application.platform == RuntimePlatform.OSXPlayer)
-            {
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
-                    SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
-                {
-                    Debug.LogError($"Not Support OpenGL API on {Application.platform}.");
-#if UNITY_EDITOR
-                    UnityEditor.EditorApplication.isPlaying = false;
-                    return;
-#else
-                    throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
-#endif
-                }
-            }
-
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
