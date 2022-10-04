@@ -313,6 +313,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void AddTransceiverWithKindAndInit()
         {
             var peer = new RTCPeerConnection();
