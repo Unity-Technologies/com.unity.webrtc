@@ -758,9 +758,11 @@ publish_{{ package.name }}:
     type: Unity::VM
     image: package-ci/win10:v1.20.1-1032259
     flavor: b1.large
+  variables:
+    UPMCI_ENABLE_PACKAGE_SIGNING: 1
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package publish  
+    - upm-ci package publish
   artifacts:  
     {{ package.name }}_artifacts.zip:
       paths:
@@ -781,6 +783,8 @@ publish_dry_run_{{ package.name }}:
     type: Unity::VM
     image: package-ci/win10:v1.20.1-1032259
     flavor: b1.large
+  variables:
+    UPMCI_ENABLE_PACKAGE_SIGNING: 1
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package publish --dry-run
