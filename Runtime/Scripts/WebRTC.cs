@@ -1059,7 +1059,7 @@ namespace Unity.WebRTC
             {
                 if (Table[ptr] is RTCPeerConnection connection)
                 {
-                    var observer = connection.FindObserver(ptrObserver);
+                    var observer = connection.FindObserver<SetSessionDescriptionObserver>(ptrObserver);
                     if (observer == null)
                         return;
                     connection.RemoveObserver(observer);
@@ -1068,6 +1068,24 @@ namespace Unity.WebRTC
                 }
             });
         }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeCreateSessionDesc))]
+        static void OnCreateSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCSdpType type, string sdp, RTCErrorType errorType, string message)
+        {
+            Sync(ptr, () =>
+            {
+                if (Table[ptr] is RTCPeerConnection connection)
+                {
+                    var observer = connection.FindObserver<CreateSessionDescriptionObserver>(ptrObserver);
+                    if (observer == null)
+                        return;
+                    connection.RemoveObserver(observer);
+                    observer.Invoke(type, sdp, errorType, message);
+                    observer.Dispose();
+                }
+            });
+        }
+
 
         [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
         static void OnCollectStatsCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr ptrReport)
@@ -1115,13 +1133,11 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDSuccess(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCollectStats(IntPtr ptr, IntPtr ptrCallback, IntPtr reportPtr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCreateGetStats(IntPtr ptr, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateCreateSDFailure(IntPtr ptr, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
+    internal delegate void DelegateNativeCreateSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp, RTCErrorType errorType, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeSetSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1206,11 +1222,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options);
+        public static extern CreateSessionDescriptionObserver PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
-        [DllImport(WebRTC.Lib)]
-        public static extern void PeerConnectionRegisterCallbackCreateSD(IntPtr ptr, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure);
+        public static extern CreateSessionDescriptionObserver PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
         public static extern void StatsCollectorRegisterCallback(DelegateCollectStats onCollectStats);
         [DllImport(WebRTC.Lib)]

@@ -12,6 +12,9 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
+    extern webrtc::SdpType ConvertSdpType(RTCSdpType type);
+    extern RTCSdpType ConvertSdpType(webrtc::SdpType type);
+
     using DelegateCreateSDSuccess = void (*)(PeerConnectionObject*, RTCSdpType, const char*);
     using DelegateCreateSDFailure = void (*)(PeerConnectionObject*, RTCErrorType, const char*);
     using DelegateLocalSdpReady = void (*)(PeerConnectionObject*, const char*, const char*);
@@ -25,7 +28,7 @@ namespace webrtc
     using DelegateOnTrack = void (*)(PeerConnectionObject*, RtpTransceiverInterface*);
     using DelegateOnRemoveTrack = void (*)(PeerConnectionObject*, RtpReceiverInterface*);
 
-    class PeerConnectionObject : public CreateSessionDescriptionObserver, public PeerConnectionObserver
+    class PeerConnectionObject : public PeerConnectionObserver
     {
     public:
         PeerConnectionObject(Context& context);
@@ -41,8 +44,8 @@ namespace webrtc
         bool GetSessionDescription(const SessionDescriptionInterface* sdp, RTCSessionDescription& desc) const;
         RTCErrorType SetConfiguration(const std::string& config);
         std::string GetConfiguration() const;
-        void CreateOffer(const RTCOfferAnswerOptions& options);
-        void CreateAnswer(const RTCOfferAnswerOptions& options);
+        void CreateOffer(const RTCOfferAnswerOptions& options, CreateSessionDescriptionObserver* observer);
+        void CreateAnswer(const RTCOfferAnswerOptions& options, CreateSessionDescriptionObserver* observer);
         void ReceiveStatsReport(const rtc::scoped_refptr<const RTCStatsReport>& report);
 
         void RegisterCallbackCreateSD(DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)
@@ -64,12 +67,6 @@ namespace webrtc
         void RegisterOnTrack(DelegateOnTrack callback) { onTrack = callback; }
         void RegisterOnRemoveTrack(DelegateOnRemoveTrack callback) { onRemoveTrack = callback; }
 
-        // webrtc::CreateSessionDescriptionObserver
-        // This callback transfers the ownership of the |desc|.
-        void OnSuccess(SessionDescriptionInterface* desc) override;
-        // The OnFailure callback takes an RTCError, which consists of an
-        // error code and a string.
-        void OnFailure(RTCError error) override;
         // webrtc::PeerConnectionObserver
         // Triggered when the SignalingState changed.
         void OnSignalingChange(PeerConnectionInterface::SignalingState new_state) override;

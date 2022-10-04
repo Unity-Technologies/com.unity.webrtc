@@ -49,7 +49,6 @@ namespace Unity.WebRTC
     public class RTCPeerConnection : IDisposable
     {
         private IntPtr self;
-        private RTCSessionDescriptionAsyncOperation m_opSessionDesc;
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
         private bool disposed;
 
@@ -485,7 +484,6 @@ namespace Unity.WebRTC
 
         void InitCallback()
         {
-            NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, OnSuccessCreateSessionDesc, OnFailureCreateSessionDesc);
             NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
             NativeMethods.PeerConnectionRegisterConnectionStateChange(self, PCOnConnectionStateChange);
             NativeMethods.PeerConnectionRegisterIceGatheringChange(self, PCOnIceGatheringChange);
@@ -594,9 +592,9 @@ namespace Unity.WebRTC
         /// <seealso cref="CreateAnswer"/>
         public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferAnswerOptions options)
         {
-            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
-            return m_opSessionDesc;
+            CreateSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
+            return CreateDescription(observer);
         }
 
         /// <summary>
@@ -605,9 +603,9 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCSessionDescriptionAsyncOperation CreateOffer()
         {
-            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
-            NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
-            return m_opSessionDesc;
+            CreateSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+            return CreateDescription(observer);
         }
 
         /// <summary>
@@ -618,9 +616,9 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCOfferAnswerOptions options)
         {
-            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
-            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
-            return m_opSessionDesc;
+            CreateSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
+            return CreateDescription(observer);
         }
 
         /// <summary>
@@ -629,9 +627,9 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCSessionDescriptionAsyncOperation CreateAnswer()
         {
-            m_opSessionDesc = new RTCSessionDescriptionAsyncOperation();
-            NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
-            return m_opSessionDesc;
+            CreateSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+            return CreateDescription(observer);
         }
 
         /// <summary>
@@ -650,33 +648,6 @@ namespace Unity.WebRTC
             if (ptr == IntPtr.Zero)
                 throw new ArgumentException("RTCDataChannelInit object is incorrect.");
             return new RTCDataChannel(ptr, this);
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDSuccess))]
-        static void OnSuccessCreateSessionDesc(IntPtr ptr, RTCSdpType type, string sdp)
-        {
-            WebRTC.Sync(ptr, () =>
-            {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                {
-                    connection.m_opSessionDesc.Desc = new RTCSessionDescription { sdp = sdp, type = type };
-                    connection.m_opSessionDesc.Done();
-                }
-            });
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(DelegateCreateSDFailure))]
-        static void OnFailureCreateSessionDesc(IntPtr ptr, RTCErrorType type, string message)
-        {
-            WebRTC.Sync(ptr, () =>
-            {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                {
-                    connection.m_opSessionDesc.IsError = true;
-                    connection.m_opSessionDesc.Error = new RTCError { errorType = type, message = message };
-                    connection.m_opSessionDesc.Done();
-                }
-            });
         }
 
         /// <summary>
@@ -775,27 +746,27 @@ namespace Unity.WebRTC
         public RTCStatsReportAsyncOperation GetStats()
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionGetStats(GetSelfOrThrow());
-			return GetStats(callback);
+            return GetStats(callback);
         }
 
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpSender sender)
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionSenderGetStats(GetSelfOrThrow(), sender.self);
-			return GetStats(callback);
+            return GetStats(callback);
         }
         internal RTCStatsReportAsyncOperation GetStats(RTCRtpReceiver receiver)
         {
             RTCStatsCollectorCallback callback = NativeMethods.PeerConnectionReceiverGetStats(GetSelfOrThrow(), receiver.self);
-			return GetStats(callback);
+            return GetStats(callback);
         }
 
-		RTCStatsReportAsyncOperation GetStats(RTCStatsCollectorCallback callback)
-		{
-			IntPtr ptr = callback.DangerousGetHandle();
-			if(!dictCollectStatsCallback.ContainsKey(ptr))
-	            dictCollectStatsCallback.Add(ptr, callback);
+        RTCStatsReportAsyncOperation GetStats(RTCStatsCollectorCallback callback)
+        {
+            IntPtr ptr = callback.DangerousGetHandle();
+            if (!dictCollectStatsCallback.ContainsKey(ptr))
+                dictCollectStatsCallback.Add(ptr, callback);
             return new RTCStatsReportAsyncOperation(callback);
-		}
+        }
 
         /// <summary>
         ///
@@ -895,11 +866,35 @@ namespace Unity.WebRTC
 
         Dictionary<IntPtr, SetSessionDescriptionObserver> dictSetSessionDescriptionObserver =
             new Dictionary<IntPtr, SetSessionDescriptionObserver>();
+        Dictionary<IntPtr, CreateSessionDescriptionObserver> dictCreateSessionDescriptionObserver =
+            new Dictionary<IntPtr, CreateSessionDescriptionObserver>();
 
-        internal SetSessionDescriptionObserver FindObserver(IntPtr ptr)
+        internal T FindObserver<T>(IntPtr ptr) where T : class
         {
-            return dictSetSessionDescriptionObserver[ptr];
+            if (typeof(T) == typeof(SetSessionDescriptionObserver))
+                return dictSetSessionDescriptionObserver[ptr] as T;
+            if (typeof(T) == typeof(CreateSessionDescriptionObserver))
+                return dictCreateSessionDescriptionObserver[ptr] as T;
+            return null;
         }
+
+        internal void RemoveObserver<T>(T observer) where T : System.Runtime.InteropServices.SafeHandle
+        {
+            if (typeof(T) == typeof(SetSessionDescriptionObserver))
+                dictSetSessionDescriptionObserver.Remove(observer.DangerousGetHandle());
+            if (typeof(T) == typeof(CreateSessionDescriptionObserver))
+                dictCreateSessionDescriptionObserver.Remove(observer.DangerousGetHandle());
+
+        }
+
+        RTCSessionDescriptionAsyncOperation CreateDescription(CreateSessionDescriptionObserver observer)
+        {
+            IntPtr ptr = observer.DangerousGetHandle();
+            if (!dictCreateSessionDescriptionObserver.ContainsKey(ptr))
+                dictCreateSessionDescriptionObserver.Add(ptr, observer);
+            return new RTCSessionDescriptionAsyncOperation(observer);
+        }
+
 
         RTCSetSessionDescriptionAsyncOperation SetDescription(SetSessionDescriptionObserver observer, RTCError error)
         {
@@ -918,8 +913,8 @@ namespace Unity.WebRTC
         {
             if (ptr == IntPtr.Zero)
                 throw new ArgumentException("The argument is IntPtr.Zero.", "ptr");
-			if(dictCollectStatsCallback.TryGetValue(ptr, out var callback))
-				return callback;
+            if (dictCollectStatsCallback.TryGetValue(ptr, out var callback))
+                return callback;
             return null;
         }
 

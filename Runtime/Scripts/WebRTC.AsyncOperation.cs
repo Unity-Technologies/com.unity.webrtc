@@ -79,6 +79,19 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public RTCSessionDescription Desc { get; internal set; }
+
+        internal RTCSessionDescriptionAsyncOperation(CreateSessionDescriptionObserver observer)
+        {
+            observer.onCreateSessionDescription = OnCreateSessionDescription;
+        }
+
+        void OnCreateSessionDescription(RTCSdpType type, string sdp, RTCErrorType errorType, string error)
+        {
+            IsError = errorType != RTCErrorType.None;
+            Error = new RTCError() { errorType = errorType, message = error };
+            Desc = new RTCSessionDescription() { type = type, sdp = sdp};
+            this.Done();
+        }
     }
 
     /// <summary>

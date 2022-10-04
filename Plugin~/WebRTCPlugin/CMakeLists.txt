@@ -4,6 +4,8 @@ target_sources(WebRTCLib
   PRIVATE
     Context.cpp
     Context.h
+    CreateSessionDescriptionObserver.cpp
+    CreateSessionDescriptionObserver.h
     DataChannelObject.cpp
     DataChannelObject.h
     DummyAudioDevice.cpp

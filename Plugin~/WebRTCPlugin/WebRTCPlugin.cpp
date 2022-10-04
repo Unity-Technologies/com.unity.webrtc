@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "Context.h"
+#include "CreateSessionDescriptionObserver.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "MediaStreamObserver.h"
 #include "PeerConnectionObject.h"
@@ -811,16 +812,20 @@ extern "C"
         return ConvertPtrArrayFromRefPtrArray<RtpTransceiverInterface>(transceivers, length);
     }
 
-    UNITY_INTERFACE_EXPORT void
+    UNITY_INTERFACE_EXPORT unity::webrtc::CreateSessionDescriptionObserver*
     PeerConnectionCreateOffer(PeerConnectionObject* obj, const RTCOfferAnswerOptions* options)
     {
-        obj->CreateOffer(*options);
+        auto observer = unity::webrtc::CreateSessionDescriptionObserver::Create(obj);
+        obj->CreateOffer(*options, observer);
+        return observer;
     }
 
-    UNITY_INTERFACE_EXPORT void
+    UNITY_INTERFACE_EXPORT unity::webrtc::CreateSessionDescriptionObserver*
     PeerConnectionCreateAnswer(PeerConnectionObject* obj, const RTCOfferAnswerOptions* options)
     {
-        obj->CreateAnswer(*options);
+        auto observer = unity::webrtc::CreateSessionDescriptionObserver::Create(obj);
+        obj->CreateAnswer(*options, observer);
+        return observer;
     }
 
     struct RTCDataChannelInit
@@ -881,10 +886,9 @@ extern "C"
         PeerConnectionStatsCollectorCallback::RegisterOnGetStats(callback);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCreateSD(
-        PeerConnectionObject* obj, DelegateCreateSDSuccess onSuccess, DelegateCreateSDFailure onFailure)
+    UNITY_INTERFACE_EXPORT void CreateSessionDescriptionObserverRegisterCallback(DelegateCreateSessionDesc callback)
     {
-        obj->RegisterCallbackCreateSD(onSuccess, onFailure);
+        unity::webrtc::CreateSessionDescriptionObserver::RegisterCallback(callback);
     }
 
     UNITY_INTERFACE_EXPORT void SetSessionDescriptionObserverRegisterCallback(DelegateSetSessionDesc callback)
