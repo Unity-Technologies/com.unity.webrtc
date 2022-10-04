@@ -196,6 +196,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void GetTransceiversReturnsNotEmptyAfterDisposingTransceiver()
         {
             // `RTCPeerConnection.AddTransceiver` method is not intuitive. Moreover, we don't have the API to remove
