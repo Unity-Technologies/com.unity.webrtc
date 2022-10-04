@@ -12,7 +12,6 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
     internal class AudioCustomFilter : MonoBehaviour
     {
         public event AudioReadEventHandler onAudioRead;
