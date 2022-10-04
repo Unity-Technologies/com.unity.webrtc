@@ -60,6 +60,7 @@ namespace Unity.WebRTC.RuntimeTest
         // todo(kazuki): Crash on Android and Linux standalone player
         [UnityTest]
         [Timeout(5000)]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.Android })]
         public IEnumerator VideoStreamAddTrackAndRemoveTrack()
         {
@@ -130,6 +131,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CameraCaptureStream()
         {
             var camObj = new GameObject("Camera");
@@ -151,6 +153,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CaptureStream()
         {
             var camObj = new GameObject("Camera");
@@ -393,6 +396,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator OnAddTrackDelegatesWithEvent()
         {
             var camObj = new GameObject("Camera");

@@ -1,9 +1,23 @@
+using System;
 using UnityEngine;
 using UnityEngine.TestTools;
+
+#if !UNITY_2020_1_OR_NEWER
 using UnityEngine.Rendering;
+#endif
 
 namespace Unity.WebRTC.RuntimeTest
 {
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+    class ConditionalIgnoreMultipleAttribute : ConditionalIgnoreAttribute
+    {
+        public ConditionalIgnoreMultipleAttribute(string conditionKey, string ignoreReason)
+            : base(conditionKey, ignoreReason)
+        {
+        }
+    }
+
+
     internal class ConditionalIgnore
     {
         /// <summary>
@@ -24,13 +38,7 @@ namespace Unity.WebRTC.RuntimeTest
                 SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12);
 #endif
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedPlatformOpenGL,
-                (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES2 ||
-                SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3) &&
-                (Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.OSXEditor ||
-                Application.platform == RuntimePlatform.OSXPlayer));
+                !VideoStreamTrack.IsSupported(Application.platform, SystemInfo.graphicsDeviceType));
         }
     }
 }
