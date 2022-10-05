@@ -52,7 +52,7 @@ namespace Unity.WebRTC.RuntimeTest
 #if WEBRTC_TEST_PROJECT
         [Test]
         [UnityPlatform(exclude = new[] {RuntimePlatform.Android, RuntimePlatform.IPhonePlayer})]
-        [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
             "Not support VideoStreamTrack for OpenGL")]
         public void WebCamTextureFormat()
         {
