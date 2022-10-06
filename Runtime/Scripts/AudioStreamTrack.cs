@@ -77,7 +77,9 @@ namespace Unity.WebRTC
             private AudioCustomFilter _filter;
             private AudioStreamTrack _track;
 
-
+            /// <summary>
+            /// 
+            /// </summary>
             public AudioSource Source
             {
                 get
@@ -186,10 +188,22 @@ namespace Unity.WebRTC
             : this(Guid.NewGuid().ToString(), new AudioTrackSource())
         {
             if (source == null)
-                throw new ArgumentNullException("AudioSource argument is null.");
+                throw new ArgumentNullException("source", "AudioSource argument is null.");
             _source = source;
 
             _audioCapturer = source.gameObject.AddComponent<AudioCustomFilter>();
+            _audioCapturer.hideFlags = HideFlags.HideInInspector;
+            _audioCapturer.onAudioRead += SetData;
+            _audioCapturer.sender = true;
+        }
+
+        public AudioStreamTrack(AudioListener listener)
+            : this(Guid.NewGuid().ToString(), new AudioTrackSource())
+        {
+            if (listener == null)
+                throw new ArgumentNullException("listener", "AudioListener argument is null.");
+
+            _audioCapturer = listener.gameObject.AddComponent<AudioCustomFilter>();
             _audioCapturer.hideFlags = HideFlags.HideInInspector;
             _audioCapturer.onAudioRead += SetData;
             _audioCapturer.sender = true;

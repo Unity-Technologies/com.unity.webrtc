@@ -25,7 +25,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        public IEnumerator AddAndRemoveAudioTrack()
+        public IEnumerator ConstructorWithAudioSource()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
             var source = test.gameObject.AddComponent<AudioSource>();
@@ -37,6 +37,21 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             test.component.Dispose();
             UnityEngine.Object.DestroyImmediate(source.clip);
+            UnityEngine.Object.DestroyImmediate(test.gameObject);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator ConstructorWithAudioListener()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var listener = test.gameObject.AddComponent<AudioListener>();
+            var audioTrack = new AudioStreamTrack(listener);
+            var sender = test.component.AddTrack(0, audioTrack);
+            yield return test;
+            Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+            test.component.Dispose();
             UnityEngine.Object.DestroyImmediate(test.gameObject);
         }
 
