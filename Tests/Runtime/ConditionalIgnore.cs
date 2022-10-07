@@ -30,9 +30,15 @@ namespace Unity.WebRTC.RuntimeTest
         /// </summary>
         public const string UnsupportedPlatformOpenGL = "IgnoreUnsupportedPlatformOpenGL";
 
+        static bool s_loaded = false;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnLoad()
         {
+            if (s_loaded)
+                return;
+            s_loaded = true;
+
 #if !UNITY_2020_1_OR_NEWER
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedPlatformVideoDecoder,
                 SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12);

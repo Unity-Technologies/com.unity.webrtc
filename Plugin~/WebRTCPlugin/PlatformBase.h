@@ -50,7 +50,7 @@
 #define SUPPORT_D3D11 1 // comment this out if you don't have D3D11 header/library files
 #define SUPPORT_D3D12 1 // comment this out if you don't have D3D12 header/library files
 #define SUPPORT_OPENGL_UNIFIED 1
-#define SUPPORT_OPENGL_CORE 1
+// #define SUPPORT_OPENGL_CORE 1
 #define SUPPORT_VULKAN 1 // Requires Vulkan SDK to be installed
 #elif UNITY_ANDROID
 #ifndef SUPPORT_OPENGL_ES
@@ -62,9 +62,6 @@
 #define SUPPORT_OPENGL_UNIFIED 1
 #define SUPPORT_OPENGL_CORE 1
 #define SUPPORT_VULKAN 1
-#elif UNITY_OSX
-#define SUPPORT_OPENGL_UNIFIED 1
-#define SUPPORT_OPENGL_CORE 1
 #endif
 
 #if UNITY_IOS || UNITY_OSX || UNITY_IOS_SIMULATOR
