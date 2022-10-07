@@ -121,11 +121,6 @@ namespace webrtc
         // PeerConnection
         PeerConnectionObject* CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config);
         void DeletePeerConnection(PeerConnectionObject* obj);
-        void AddObserver(
-            const webrtc::PeerConnectionInterface* connection,
-            const rtc::scoped_refptr<SetSessionDescriptionObserver>& observer);
-        void RemoveObserver(const webrtc::PeerConnectionInterface* connection);
-        SetSessionDescriptionObserver* GetObserver(webrtc::PeerConnectionInterface* connection);
 
         // StatsReport
         std::mutex mutexStatsReport;

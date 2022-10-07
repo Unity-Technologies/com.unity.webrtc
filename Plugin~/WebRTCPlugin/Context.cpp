@@ -407,17 +407,6 @@ namespace webrtc
         }
     }
 
-    void Context::AddObserver(
-        const webrtc::PeerConnectionInterface* connection,
-        const rtc::scoped_refptr<SetSessionDescriptionObserver>& observer)
-    {
-        m_mapSetSessionDescriptionObserver[connection] = observer;
-    }
-
-    void Context::RemoveObserver(const webrtc::PeerConnectionInterface* connection)
-    {
-        m_mapSetSessionDescriptionObserver.erase(connection);
-    }
 
     PeerConnectionObject* Context::CreatePeerConnection(const webrtc::PeerConnectionInterface::RTCConfiguration& config)
     {
@@ -437,10 +426,6 @@ namespace webrtc
 
     void Context::DeletePeerConnection(PeerConnectionObject* obj) { m_mapClients.erase(obj); }
 
-    SetSessionDescriptionObserver* Context::GetObserver(webrtc::PeerConnectionInterface* connection)
-    {
-        return m_mapSetSessionDescriptionObserver[connection];
-    }
 
     uint32_t Context::s_rendererId = 0;
     uint32_t Context::GenerateRendererId() { return s_rendererId++; }

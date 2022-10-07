@@ -1224,11 +1224,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterOnIceCandidate(IntPtr ptr, DelegateNativeOnIceCandidate callback);
         [DllImport(WebRTC.Lib)]
-        public static extern SetSessionDescriptionObserver PeerConnectionSetLocalDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, out RTCErrorType errorType, ref IntPtr error);
+        public static extern SetSessionDescriptionObserver PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc, out RTCErrorType errorType, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
-        public static extern SetSessionDescriptionObserver PeerConnectionSetLocalDescriptionWithoutDescription(IntPtr context, IntPtr ptr, out RTCErrorType errorType, ref IntPtr error);
+        public static extern SetSessionDescriptionObserver PeerConnectionSetLocalDescriptionWithoutDescription(IntPtr ptr, out RTCErrorType errorType, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
-        public static extern SetSessionDescriptionObserver PeerConnectionSetRemoteDescription(IntPtr context, IntPtr ptr, ref RTCSessionDescription desc, out RTCErrorType errorType, ref IntPtr error);
+        public static extern SetSessionDescriptionObserver PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc, out RTCErrorType errorType, ref IntPtr error);
         [DllImport(WebRTC.Lib)]
         public static extern RTCStatsCollectorCallback PeerConnectionGetStats(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

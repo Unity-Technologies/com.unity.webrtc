@@ -89,38 +89,6 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
-        public SetSessionDescriptionObserver PeerConnectionSetLocalDescription(
-            IntPtr ptr, ref RTCSessionDescription desc, out RTCError error)
-        {
-            IntPtr ptrError = IntPtr.Zero;
-            SetSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionSetLocalDescription(self, ptr, ref desc, out var errorType, ref ptrError);
-            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            error = new RTCError { errorType = errorType, message = message };
-            return observer;
-        }
-
-        public SetSessionDescriptionObserver PeerConnectionSetLocalDescription(IntPtr ptr, out RTCError error)
-        {
-            IntPtr ptrError = IntPtr.Zero;
-            SetSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr, out var errorType, ref ptrError);
-            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            error = new RTCError { errorType = errorType, message = message };
-            return observer;
-        }
-
-        public SetSessionDescriptionObserver PeerConnectionSetRemoteDescription(
-            IntPtr ptr, ref RTCSessionDescription desc, out RTCError error)
-        {
-            IntPtr ptrError = IntPtr.Zero;
-            SetSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, ref desc, out var errorType, ref ptrError);
-            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            error = new RTCError { errorType = errorType, message = message };
-            return observer;
-        }
-
         public IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length)
         {
             return NativeMethods.PeerConnectionGetReceivers(self, ptr, out length);

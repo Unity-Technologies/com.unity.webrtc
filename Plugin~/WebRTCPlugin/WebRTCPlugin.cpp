@@ -443,7 +443,6 @@ extern "C"
     UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* context, PeerConnectionObject* obj)
     {
         obj->Close();
-        context->RemoveObserver(obj->connection);
         context->DeletePeerConnection(obj);
     }
 
@@ -719,7 +718,6 @@ extern "C"
     }
 
     UNITY_INTERFACE_EXPORT unity::webrtc::SetSessionDescriptionObserver* PeerConnectionSetLocalDescription(
-        Context* context,
         PeerConnectionObject* obj,
         const RTCSessionDescription* desc,
         RTCErrorType* errorType,
@@ -734,17 +732,16 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT unity::webrtc::SetSessionDescriptionObserver*
     PeerConnectionSetLocalDescriptionWithoutDescription(
-        Context* context, PeerConnectionObject* obj, RTCErrorType* errorType, char* error[])
+        PeerConnectionObject* obj, RTCErrorType* errorType, char* error[])
     {
         std::string error_;
         auto observer = unity::webrtc::SetSessionDescriptionObserver::Create(obj);
-        *errorType = obj->SetLocalDescriptionWithoutDescription(context->GetObserver(obj->connection), error_);
+        *errorType = obj->SetLocalDescriptionWithoutDescription(observer, error_);
         *error = ConvertString(error_);
         return observer.get();
     }
 
     UNITY_INTERFACE_EXPORT unity::webrtc::SetSessionDescriptionObserver* PeerConnectionSetRemoteDescription(
-        Context* context,
         PeerConnectionObject* obj,
         const RTCSessionDescription* desc,
         RTCErrorType* errorType,
