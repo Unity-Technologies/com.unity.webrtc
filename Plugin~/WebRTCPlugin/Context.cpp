@@ -233,7 +233,6 @@ namespace webrtc
 
             m_mapRefPtr.clear();
             m_mapMediaStreamObserver.clear();
-            m_mapSetSessionDescriptionObserver.clear();
             m_mapDataChannels.clear();
             m_mapVideoRenderer.clear();
 

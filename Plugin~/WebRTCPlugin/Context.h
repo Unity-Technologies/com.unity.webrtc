@@ -161,8 +161,6 @@ namespace webrtc
         std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;
         std::map<const PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
         std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;
-        std::map<const webrtc::PeerConnectionInterface*, rtc::scoped_refptr<SetSessionDescriptionObserver>>
-            m_mapSetSessionDescriptionObserver;
         std::map<const DataChannelInterface*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
         std::map<const AudioTrackSinkAdapter*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
