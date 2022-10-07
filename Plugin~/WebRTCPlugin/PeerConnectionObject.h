@@ -124,7 +124,6 @@ namespace webrtc
 
     private:
         Context& context;
-        PeerConnectionStatsCollectorCallback* m_statsCollectorCallback;
     };
 
 } // end namespace webrtc

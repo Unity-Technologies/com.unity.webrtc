@@ -89,45 +89,6 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
-        public RTCError PeerConnectionSetLocalDescription(
-            IntPtr ptr, ref RTCSessionDescription desc)
-        {
-            IntPtr ptrError = IntPtr.Zero;
-            RTCErrorType errorType = NativeMethods.PeerConnectionSetLocalDescription(
-                self, ptr, ref desc, ref ptrError);
-            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType = errorType, message = message };
-        }
-
-        public RTCError PeerConnectionSetLocalDescription(IntPtr ptr)
-        {
-            IntPtr ptrError = IntPtr.Zero;
-            RTCErrorType errorType =
-                NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr, ref ptrError);
-            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType = errorType, message = message };
-        }
-
-        public RTCError PeerConnectionSetRemoteDescription(
-            IntPtr ptr, ref RTCSessionDescription desc)
-        {
-            IntPtr ptrError = IntPtr.Zero;
-            RTCErrorType errorType = NativeMethods.PeerConnectionSetRemoteDescription(
-                self, ptr, ref desc, ref ptrError);
-            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
-            return new RTCError { errorType = errorType, message = message };
-        }
-
-        public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
-        {
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self, ptr, callback);
-        }
-
-        public void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescFailure callback)
-        {
-            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
-        }
-
         public IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length)
         {
             return NativeMethods.PeerConnectionGetReceivers(self, ptr, out length);

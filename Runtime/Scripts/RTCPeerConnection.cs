@@ -486,7 +486,6 @@ namespace Unity.WebRTC
         void InitCallback()
         {
             NativeMethods.PeerConnectionRegisterCallbackCreateSD(self, OnSuccessCreateSessionDesc, OnFailureCreateSessionDesc);
-            NativeMethods.PeerConnectionRegisterCallbackCollectStats(self, OnStatsDeliveredCallback);
             NativeMethods.PeerConnectionRegisterIceConnectionChange(self, PCOnIceConnectionChange);
             NativeMethods.PeerConnectionRegisterConnectionStateChange(self, PCOnConnectionStateChange);
             NativeMethods.PeerConnectionRegisterIceGatheringChange(self, PCOnIceGatheringChange);
@@ -495,10 +494,6 @@ namespace Unity.WebRTC
             NativeMethods.PeerConnectionRegisterOnRenegotiationNeeded(self, PCOnNegotiationNeeded);
             NativeMethods.PeerConnectionRegisterOnTrack(self, PCOnTrack);
             NativeMethods.PeerConnectionRegisterOnRemoveTrack(self, PCOnRemoveTrack);
-            WebRTC.Context.PeerConnectionRegisterOnSetSessionDescSuccess(
-                self, OnSetSessionDescSuccess);
-            WebRTC.Context.PeerConnectionRegisterOnSetSessionDescFailure(
-                self, OnSetSessionDescFailure);
         }
 
         /// <summary>
@@ -708,14 +703,9 @@ namespace Unity.WebRTC
             if (string.IsNullOrEmpty(desc.sdp))
                 throw new ArgumentException("sdp is null or empty");
 
-            var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            RTCError error = WebRTC.Context.PeerConnectionSetLocalDescription(
-                GetSelfOrThrow(), ref desc);
-            if (error.errorType == RTCErrorType.None)
-            {
-                return op;
-            }
-            throw new RTCErrorException(ref error);
+            SetSessionDescriptionObserver observer =
+                PeerConnectionSetLocalDescription(GetSelfOrThrow(), ref desc, out var error);
+            return SetDescription(observer, error);
         }
 
         /// <summary>
@@ -724,13 +714,9 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public RTCSetSessionDescriptionAsyncOperation SetLocalDescription()
         {
-            var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            RTCError error = WebRTC.Context.PeerConnectionSetLocalDescription(GetSelfOrThrow());
-            if (error.errorType == RTCErrorType.None)
-            {
-                return op;
-            }
-            throw new RTCErrorException(ref error);
+            SetSessionDescriptionObserver observer =
+                PeerConnectionSetLocalDescription(GetSelfOrThrow(), out var error);
+            return SetDescription(observer, error);
         }
 
         /// <summary>
@@ -757,14 +743,9 @@ namespace Unity.WebRTC
             if (string.IsNullOrEmpty(desc.sdp))
                 throw new ArgumentException("sdp is null or empty");
 
-            var op = new RTCSetSessionDescriptionAsyncOperation(this);
-            RTCError error = WebRTC.Context.PeerConnectionSetRemoteDescription(
-                GetSelfOrThrow(), ref desc);
-            if (error.errorType == RTCErrorType.None)
-            {
-                return op;
-            }
-            throw new RTCErrorException(ref error);
+            SetSessionDescriptionObserver observer =
+                PeerConnectionSetRemoteDescription(GetSelfOrThrow(), ref desc, out var error);
+            return SetDescription(observer, error);
         }
 
         /// <summary>
@@ -912,6 +893,25 @@ namespace Unity.WebRTC
             }
         }
 
+        Dictionary<IntPtr, SetSessionDescriptionObserver> dictSetSessionDescriptionObserver =
+            new Dictionary<IntPtr, SetSessionDescriptionObserver>();
+
+        internal SetSessionDescriptionObserver FindObserver(IntPtr ptr)
+        {
+            return dictSetSessionDescriptionObserver[ptr];
+        }
+
+        RTCSetSessionDescriptionAsyncOperation SetDescription(SetSessionDescriptionObserver observer, RTCError error)
+        {
+            if (error.errorType != RTCErrorType.None)
+                throw new RTCErrorException(ref error);
+
+            IntPtr ptr = observer.DangerousGetHandle();
+            if (!dictSetSessionDescriptionObserver.ContainsKey(ptr))
+                dictSetSessionDescriptionObserver.Add(ptr, observer);
+            return new RTCSetSessionDescriptionAsyncOperation(observer);
+        }
+
         Dictionary<IntPtr, RTCStatsCollectorCallback> dictCollectStatsCallback = new Dictionary<IntPtr, RTCStatsCollectorCallback>();
 
         internal RTCStatsCollectorCallback FindCollectStatsCallback(IntPtr ptr)
@@ -930,48 +930,41 @@ namespace Unity.WebRTC
             dictCollectStatsCallback.Remove(callback.DangerousGetHandle());
         }
 
-
-        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescSuccess))]
-        static void OnSetSessionDescSuccess(IntPtr ptr)
+        internal void RemoveObserver(SetSessionDescriptionObserver observer)
         {
-            WebRTC.Sync(ptr, () =>
-            {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                {
-                    connection.OnSetSessionDescriptionSuccess();
-                }
-            });
+            dictSetSessionDescriptionObserver.Remove(observer.DangerousGetHandle());
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateNativePeerConnectionSetSessionDescFailure))]
-        static void OnSetSessionDescFailure(IntPtr ptr, RTCErrorType type, string message)
+        static SetSessionDescriptionObserver PeerConnectionSetLocalDescription(
+            IntPtr ptr, ref RTCSessionDescription desc, out RTCError error)
         {
-            WebRTC.Sync(ptr, () =>
-            {
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                {
-                    RTCError error = new RTCError { errorType = type, message = message };
-                    connection.OnSetSessionDescriptionFailure(error);
-                }
-            });
+            IntPtr ptrError = IntPtr.Zero;
+            SetSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionSetLocalDescription(ptr, ref desc, out var errorType, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            error = new RTCError { errorType = errorType, message = message };
+            return observer;
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateCollectStats))]
-        static void OnStatsDeliveredCallback(IntPtr ptr, IntPtr ptrCallback, IntPtr ptrReport)
+        static SetSessionDescriptionObserver PeerConnectionSetLocalDescription(IntPtr ptr, out RTCError error)
         {
-            WebRTC.Sync(ptr, () =>
-            {
-				RTCStatsReport report = WebRTC.FindOrCreate(ptrReport, ptr_ => new RTCStatsReport(ptr_));
-                if (WebRTC.Table[ptr] is RTCPeerConnection connection)
-                {
-                    RTCStatsCollectorCallback callback = connection.FindCollectStatsCallback(ptrCallback);
-					if(callback == null)
-						return;
-                    connection.RemoveCollectStatsCallback(callback);
-                    callback.Invoke(report);
-				    callback.Dispose();
-                }
-           });
+            IntPtr ptrError = IntPtr.Zero;
+            SetSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(ptr, out var errorType, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            error = new RTCError { errorType = errorType, message = message };
+            return observer;
+        }
+
+        static SetSessionDescriptionObserver PeerConnectionSetRemoteDescription(
+            IntPtr ptr, ref RTCSessionDescription desc, out RTCError error)
+        {
+            IntPtr ptrError = IntPtr.Zero;
+            SetSessionDescriptionObserver observer =
+                NativeMethods.PeerConnectionSetRemoteDescription(ptr, ref desc, out var errorType, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            error = new RTCError { errorType = errorType, message = message };
+            return observer;
         }
 
         static IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track, RTCRtpTransceiverInit init)

@@ -420,23 +420,12 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void ContextDestroy(int uid) { ContextManager::GetInstance()->DestroyContext(uid); }
 
-    PeerConnectionObject*
-    _ContextCreatePeerConnection(Context* context, const PeerConnectionInterface::RTCConfiguration& config)
-    {
-        const auto obj = context->CreatePeerConnection(config);
-        if (obj == nullptr)
-            return nullptr;
-        const auto observer = unity::webrtc::SetSessionDescriptionObserver::Create(obj);
-        context->AddObserver(obj->connection, observer);
-        return obj;
-    }
-
     UNITY_INTERFACE_EXPORT PeerConnectionObject* ContextCreatePeerConnection(Context* context)
     {
         PeerConnectionInterface::RTCConfiguration config;
         config.sdp_semantics = SdpSemantics::kUnifiedPlan;
         config.enable_implicit_rollback = true;
-        return _ContextCreatePeerConnection(context, config);
+        return context->CreatePeerConnection(config);
     }
 
     UNITY_INTERFACE_EXPORT PeerConnectionObject*
@@ -448,13 +437,12 @@ extern "C"
 
         config.sdp_semantics = SdpSemantics::kUnifiedPlan;
         config.enable_implicit_rollback = true;
-        return _ContextCreatePeerConnection(context, config);
+        return context->CreatePeerConnection(config);
     }
 
     UNITY_INTERFACE_EXPORT void ContextDeletePeerConnection(Context* context, PeerConnectionObject* obj)
     {
         obj->Close();
-        context->RemoveObserver(obj->connection);
         context->DeletePeerConnection(obj);
     }
 
@@ -729,32 +717,41 @@ extern "C"
         return member->type();
     }
 
-    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetLocalDescription(
-        Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
+    UNITY_INTERFACE_EXPORT unity::webrtc::SetSessionDescriptionObserver* PeerConnectionSetLocalDescription(
+        PeerConnectionObject* obj,
+        const RTCSessionDescription* desc,
+        RTCErrorType* errorType,
+        char* error[])
     {
         std::string error_;
-        RTCErrorType errorType = obj->SetLocalDescription(*desc, context->GetObserver(obj->connection), error_);
+        auto observer = unity::webrtc::SetSessionDescriptionObserver::Create(obj);
+        *errorType = obj->SetLocalDescription(*desc, observer, error_);
         *error = ConvertString(error_);
-        return errorType;
+        return observer.get();
     }
 
-    UNITY_INTERFACE_EXPORT RTCErrorType
-    PeerConnectionSetLocalDescriptionWithoutDescription(Context* context, PeerConnectionObject* obj, char* error[])
+    UNITY_INTERFACE_EXPORT unity::webrtc::SetSessionDescriptionObserver*
+    PeerConnectionSetLocalDescriptionWithoutDescription(
+        PeerConnectionObject* obj, RTCErrorType* errorType, char* error[])
     {
         std::string error_;
-        RTCErrorType errorType =
-            obj->SetLocalDescriptionWithoutDescription(context->GetObserver(obj->connection), error_);
+        auto observer = unity::webrtc::SetSessionDescriptionObserver::Create(obj);
+        *errorType = obj->SetLocalDescriptionWithoutDescription(observer, error_);
         *error = ConvertString(error_);
-        return errorType;
+        return observer.get();
     }
 
-    UNITY_INTERFACE_EXPORT RTCErrorType PeerConnectionSetRemoteDescription(
-        Context* context, PeerConnectionObject* obj, const RTCSessionDescription* desc, char* error[])
+    UNITY_INTERFACE_EXPORT unity::webrtc::SetSessionDescriptionObserver* PeerConnectionSetRemoteDescription(
+        PeerConnectionObject* obj,
+        const RTCSessionDescription* desc,
+        RTCErrorType* errorType,
+        char* error[])
     {
         std::string error_;
-        RTCErrorType errorType = obj->SetRemoteDescription(*desc, context->GetObserver(obj->connection), error_);
+        auto observer = unity::webrtc::SetSessionDescriptionObserver::Create(obj);
+        *errorType = obj->SetRemoteDescription(*desc, observer, error_);
         *error = ConvertString(error_);
-        return errorType;
+        return observer.get();
     }
 
     UNITY_INTERFACE_EXPORT bool
@@ -879,10 +876,9 @@ extern "C"
         obj->RegisterIceCandidate(callback);
     }
 
-    UNITY_INTERFACE_EXPORT void
-    PeerConnectionRegisterCallbackCollectStats(Context* context, DelegateCollectStats onGetStats)
+    UNITY_INTERFACE_EXPORT void StatsCollectorRegisterCallback(DelegateCollectStats callback)
     {
-        PeerConnectionStatsCollectorCallback::RegisterOnGetStats(onGetStats);
+        PeerConnectionStatsCollectorCallback::RegisterOnGetStats(callback);
     }
 
     UNITY_INTERFACE_EXPORT void PeerConnectionRegisterCallbackCreateSD(
@@ -891,16 +887,9 @@ extern "C"
         obj->RegisterCallbackCreateSD(onSuccess, onFailure);
     }
 
-    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnSetSessionDescSuccess(
-        Context* context, PeerConnectionObject* obj, DelegateSetSessionDescSuccess onSuccess)
+    UNITY_INTERFACE_EXPORT void SetSessionDescriptionObserverRegisterCallback(DelegateSetSessionDesc callback)
     {
-        context->GetObserver(obj->connection)->RegisterDelegateOnSuccess(onSuccess);
-    }
-
-    UNITY_INTERFACE_EXPORT void PeerConnectionRegisterOnSetSessionDescFailure(
-        Context* context, PeerConnectionObject* obj, DelegateSetSessionDescFailure onFailure)
-    {
-        context->GetObserver(obj->connection)->RegisterDelegateOnFailure(onFailure);
+        unity::webrtc::SetSessionDescriptionObserver::RegisterCallback(callback);
     }
 
     UNITY_INTERFACE_EXPORT bool

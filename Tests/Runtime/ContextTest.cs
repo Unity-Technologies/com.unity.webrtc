@@ -89,7 +89,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("Context")]
         public void DeleteStatsReportIgnoreInvalidValue()
         {
             var context = Context.Create();

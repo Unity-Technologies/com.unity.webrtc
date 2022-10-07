@@ -8,13 +8,15 @@ namespace unity
 {
 namespace webrtc
 {
+    class SetSessionDescriptionObserver;
+    using DelegateSetSessionDesc =
+        void (*)(PeerConnectionObject*, SetSessionDescriptionObserver*, RTCErrorType, const char*);
 
     class SetSessionDescriptionObserver : public ::webrtc::SetSessionDescriptionObserver
     {
     public:
         static rtc::scoped_refptr<SetSessionDescriptionObserver> Create(PeerConnectionObject* connection);
-        void RegisterDelegateOnSuccess(DelegateSetSessionDescSuccess onSuccess);
-        void RegisterDelegateOnFailure(DelegateSetSessionDescFailure onFailure);
+        static void RegisterCallback(DelegateSetSessionDesc callback) { s_setSessionDescCallback = callback; }
 
         void OnSuccess() override;
         void OnFailure(webrtc::RTCError error) override;
@@ -25,8 +27,7 @@ namespace webrtc
 
     private:
         PeerConnectionObject* m_connection;
-        std::vector<DelegateSetSessionDescSuccess> m_vectorDelegateSetSDSuccess;
-        std::vector<DelegateSetSessionDescFailure> m_vectorDelegateSetSDFailure;
+        static DelegateSetSessionDesc s_setSessionDescCallback;
     };
 
 } // end namespace webrtc

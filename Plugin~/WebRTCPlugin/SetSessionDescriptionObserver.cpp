@@ -7,6 +7,7 @@ namespace unity
 {
 namespace webrtc
 {
+    DelegateSetSessionDesc SetSessionDescriptionObserver::s_setSessionDescCallback = nullptr;
 
     rtc::scoped_refptr<SetSessionDescriptionObserver>
     SetSessionDescriptionObserver::Create(PeerConnectionObject* connection)
@@ -19,30 +20,14 @@ namespace webrtc
         m_connection = connection;
     }
 
-    void SetSessionDescriptionObserver::RegisterDelegateOnSuccess(DelegateSetSessionDescSuccess onSuccess)
-    {
-        m_vectorDelegateSetSDSuccess.push_back(onSuccess);
-    }
-
-    void SetSessionDescriptionObserver::RegisterDelegateOnFailure(DelegateSetSessionDescFailure onFailure)
-    {
-        m_vectorDelegateSetSDFailure.push_back(onFailure);
-    }
-
     void SetSessionDescriptionObserver::OnSuccess()
     {
-        for (auto delegate : m_vectorDelegateSetSDSuccess)
-        {
-            delegate(m_connection);
-        }
+        s_setSessionDescCallback(m_connection, this, RTCErrorType::NONE, nullptr);
     }
 
     void SetSessionDescriptionObserver::OnFailure(webrtc::RTCError error)
     {
-        for (auto delegate : m_vectorDelegateSetSDFailure)
-        {
-            delegate(m_connection, error.type(), error.message());
-        }
+        s_setSessionDescCallback(m_connection, this, error.type(), error.message());
     }
 
 } // end namespace webrtc
