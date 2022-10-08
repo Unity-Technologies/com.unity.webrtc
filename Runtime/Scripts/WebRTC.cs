@@ -687,6 +687,7 @@ namespace Unity.WebRTC
 
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
             NativeMethods.StatsCollectorRegisterCallback(OnCollectStatsCallback);
+            NativeMethods.CreateSessionDescriptionObserverRegisterCallback(OnCreateSessionDesc);
             NativeMethods.SetSessionDescriptionObserverRegisterCallback(OnSetSessionDesc);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
@@ -1227,6 +1228,8 @@ namespace Unity.WebRTC
         public static extern CreateSessionDescriptionObserver PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
         public static extern void StatsCollectorRegisterCallback(DelegateCollectStats onCollectStats);
+        [DllImport(WebRTC.Lib)]
+        public static extern void CreateSessionDescriptionObserverRegisterCallback(DelegateNativeCreateSessionDesc callback);
         [DllImport(WebRTC.Lib)]
         public static extern void SetSessionDescriptionObserverRegisterCallback(DelegateNativeSetSessionDesc callback);
         [DllImport(WebRTC.Lib)]
