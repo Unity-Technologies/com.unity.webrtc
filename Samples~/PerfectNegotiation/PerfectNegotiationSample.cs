@@ -275,9 +275,9 @@ class PerfectNegotiationSample : MonoBehaviour
                 var transceiver2 = pc.AddTransceiver(sourceVideoTrack2);
                 transceiver2.Direction = RTCRtpTransceiverDirection.Inactive;
 
-                if (WebRTCSettings.UseVideoCodec != null)
+                if (WebRTCSettings.SenderCodec != null)
                 {
-                    var codecs = new[] { WebRTCSettings.UseVideoCodec };
+                    var codecs = new[] { WebRTCSettings.SenderCodec };
                     transceiver1.SetCodecPreferences(codecs);
                     transceiver2.SetCodecPreferences(codecs);
                 }

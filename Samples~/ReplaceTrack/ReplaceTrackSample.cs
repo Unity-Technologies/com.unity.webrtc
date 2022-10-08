@@ -326,9 +326,9 @@ class ReplaceTrackSample : MonoBehaviour
                 var transceiver = pc.AddTransceiver(sourceVideoTrack1);
                 transceiver.Direction = RTCRtpTransceiverDirection.SendRecv;
 
-                if (WebRTCSettings.UseVideoCodec != null)
+                if (WebRTCSettings.SenderCodec != null)
                 {
-                    var codecs = new[] { WebRTCSettings.UseVideoCodec };
+                    var codecs = new[] { WebRTCSettings.SenderCodec };
                     transceiver.SetCodecPreferences(codecs);
                 }
 

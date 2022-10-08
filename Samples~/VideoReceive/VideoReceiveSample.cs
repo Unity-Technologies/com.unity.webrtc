@@ -169,9 +169,9 @@ namespace Unity.WebRTC.Samples
             pc1Senders.Add(videoSender);
             pc1Senders.Add(_pc1.AddTrack(audioStreamTrack));
 
-            if (WebRTCSettings.UseVideoCodec != null)
+            if (WebRTCSettings.SenderCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] {WebRTCSettings.SenderCodec};
                 var transceiver = _pc1.GetTransceivers().First(t => t.Sender == videoSender);
                 transceiver.SetCodecPreferences(codecs);
             }

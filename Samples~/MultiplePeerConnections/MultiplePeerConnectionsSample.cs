@@ -134,9 +134,9 @@ namespace Unity.WebRTC.Samples
                 }
             }
 
-            if (WebRTCSettings.UseVideoCodec != null)
+            if (WebRTCSettings.SenderCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] {WebRTCSettings.SenderCodec};
                 foreach (var transceiver in pc1Local.GetTransceivers())
                 {
                     if (pc1VideoSenders.Contains(transceiver.Sender))

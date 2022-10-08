@@ -159,11 +159,13 @@ namespace webrtc
         m_audioDevice = m_workerThread->BlockingCall(
             [&]() { return rtc::make_ref_counted<DummyAudioDevice>(m_taskQueueFactory.get()); });
 
-        std::unique_ptr<webrtc::VideoEncoderFactory> videoEncoderFactory =
+        std::unique_ptr<UnityVideoEncoderFactory> videoEncoderFactory =
             std::make_unique<UnityVideoEncoderFactory>(dependencies.device, dependencies.profiler);
+        m_videoEncoderFactory = videoEncoderFactory.get();
 
-        std::unique_ptr<webrtc::VideoDecoderFactory> videoDecoderFactory =
+        std::unique_ptr<UnityVideoDecoderFactory> videoDecoderFactory =
             std::make_unique<UnityVideoDecoderFactory>(dependencies.device, dependencies.profiler);
+        m_videoDecoderFactory = videoDecoderFactory.get();
 
         rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
         rtc::scoped_refptr<AudioDecoderFactory> audioDecoderFactory = CreateAudioDecoderFactory();
@@ -398,11 +400,37 @@ namespace webrtc
     void Context::GetRtpSenderCapabilities(cricket::MediaType kind, RtpCapabilities* capabilities) const
     {
         *capabilities = m_peerConnectionFactory->GetRtpSenderCapabilities(kind);
+
+        // workaround:
+        if (kind == cricket::MediaType::MEDIA_TYPE_VIDEO)
+        {
+            std::vector<webrtc::RtpCodecCapability> codecs;
+            for (auto codec : capabilities->codecs)
+            {
+                webrtc::SdpVideoFormat format { codec.name, codec.parameters, codec.scalability_modes };
+                if (m_videoEncoderFactory->IsAvailableFormat(format))
+                    codecs.push_back(codec);
+            }
+            capabilities->codecs = codecs;
+        }
     }
 
     void Context::GetRtpReceiverCapabilities(cricket::MediaType kind, RtpCapabilities* capabilities) const
     {
         *capabilities = m_peerConnectionFactory->GetRtpReceiverCapabilities(kind);
+
+        // workaround:
+        if (kind == cricket::MediaType::MEDIA_TYPE_VIDEO)
+        {
+            std::vector<webrtc::RtpCodecCapability> codecs;
+            for (auto codec : capabilities->codecs)
+            {
+                webrtc::SdpVideoFormat format { codec.name, codec.parameters, codec.scalability_modes};
+                if (m_videoDecoderFactory->IsAvailableFormat(format))
+                    codecs.push_back(codec);
+            }
+            capabilities->codecs = codecs;
+        }
     }
 
 } // end namespace webrtc

@@ -52,9 +52,9 @@ namespace Unity.WebRTC.Samples
             pc2Ontrack = e => { OnTrack(_pc2, e); };
             pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
 
-            var codecName = WebRTCSettings.UseVideoCodec == null
+            var codecName = WebRTCSettings.SenderCodec == null
                 ? "Default"
-                : $"{WebRTCSettings.UseVideoCodec.mimeType} {WebRTCSettings.UseVideoCodec.sdpFmtpLine}";
+                : $"{WebRTCSettings.SenderCodec.mimeType} {WebRTCSettings.SenderCodec.sdpFmtpLine}";
             infoText.text = $"Currently selected video codec is {codecName}";
         }
 
@@ -118,9 +118,9 @@ namespace Unity.WebRTC.Samples
         {
             pc1Senders.Add(_pc1.AddTrack(track));
 
-            if (WebRTCSettings.UseVideoCodec != null)
+            if (WebRTCSettings.SenderCodec != null)
             {
-                var codecs = new[] { WebRTCSettings.UseVideoCodec };
+                var codecs = new[] { WebRTCSettings.SenderCodec };
                 foreach (var transceiver in _pc1.GetTransceivers())
                 {
                     if (pc1Senders.Contains(transceiver.Sender))

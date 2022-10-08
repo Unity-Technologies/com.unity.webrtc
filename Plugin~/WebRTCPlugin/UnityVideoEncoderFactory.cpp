@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <algorithm>
 #include <api/video_codecs/video_encoder.h>
 #include <media/engine/internal_encoder_factory.h>
 #include <modules/video_coding/include/video_error_codes.h>
@@ -105,7 +106,8 @@ namespace webrtc
 
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
-        , factories_()
+        , encoderFactories_()
+        , decoderFactories_()
     {
         const std::vector<std::string> arrayImpl = {
             kInternalImpl, kNvCodecImpl, kAndroidMediaCodecImpl, kVideoToolboxImpl
@@ -113,37 +115,52 @@ namespace webrtc
 
         for (auto impl : arrayImpl)
         {
-            auto factory = CreateVideoEncoderFactory(impl, gfxDevice, profiler);
-            if (factory)
-                factories_.emplace(impl, factory);
+            auto encoderFactory = CreateVideoEncoderFactory(impl, gfxDevice, profiler);
+            if (encoderFactory)
+                encoderFactories_.emplace(impl, encoderFactory);
+
+            auto decoderFactory = CreateVideoDecoderFactory(impl, gfxDevice, profiler);
+            if (decoderFactory)
+                decoderFactories_.emplace(impl, decoderFactory);
         }
     }
 
     UnityVideoEncoderFactory::~UnityVideoEncoderFactory() = default;
 
+
+    struct compare
+    {
+        bool operator()(const webrtc::SdpVideoFormat& lhs, const webrtc::SdpVideoFormat& rhs) const
+        {
+            return std::string(lhs.ToString()).compare(rhs.ToString()) > 0;
+        }
+    };
+
+    struct equal
+    {
+        bool operator()(const webrtc::SdpVideoFormat& lhs, const webrtc::SdpVideoFormat& rhs) const
+        {
+            return lhs.IsSameCodec(rhs);
+        }
+    };
+
     std::vector<webrtc::SdpVideoFormat> UnityVideoEncoderFactory::GetSupportedFormats() const
     {
-        std::vector<SdpVideoFormat> supported_codecs = GetSupportedFormatsInFactories(factories_);
+        // workaround
+        auto formats1 = GetSupportedFormatsInFactories(encoderFactories_);
+        auto formats2 = GetSupportedFormatsInFactories(decoderFactories_);
+        std::vector<webrtc::SdpVideoFormat> result(formats1);
 
-        // Set video codec order: default video codec is VP8
-        auto findIndex = [&](webrtc::SdpVideoFormat& format) -> long {
-            const std::string sortOrder[4] = { "VP8", "VP9", "H264", "AV1X" };
-            auto it = std::find(std::begin(sortOrder), std::end(sortOrder), format.name);
-            if (it == std::end(sortOrder))
-                return LONG_MAX;
-            return static_cast<long>(std::distance(std::begin(sortOrder), it));
-        };
-        std::sort(
-            supported_codecs.begin(),
-            supported_codecs.end(),
-            [&](webrtc::SdpVideoFormat& x, webrtc::SdpVideoFormat& y) -> int { return (findIndex(x) < findIndex(y)); });
-        return supported_codecs;
+        result.insert(result.end(), formats2.begin(), formats2.end());
+        std::sort(result.begin(), result.end(), compare());
+        result.erase(std::unique(result.begin(), result.end(), equal()), result.end());
+        return result;
     }
 
     webrtc::VideoEncoderFactory::CodecSupport UnityVideoEncoderFactory::QueryCodecSupport(
         const SdpVideoFormat& format, absl::optional<std::string> scalability_mode) const
     {
-        VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
+        VideoEncoderFactory* factory = FindCodecFactory(encoderFactories_, format);
         RTC_DCHECK(format.IsCodecInList(factory->GetSupportedFormats()));
         return factory->QueryCodecSupport(format, scalability_mode);
     }
@@ -151,13 +168,19 @@ namespace webrtc
     std::unique_ptr<webrtc::VideoEncoder>
     UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
     {
-        VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
+        VideoEncoderFactory* factory = FindCodecFactory(encoderFactories_, format);
         auto encoder = factory->CreateVideoEncoder(format);
         if (!profiler_)
             return encoder;
 
         // Use Unity Profiler for measuring encoding process.
         return std::make_unique<UnityVideoEncoder>(std::move(encoder), profiler_);
+    }
+
+    bool UnityVideoEncoderFactory::IsAvailableFormat(const SdpVideoFormat& format)
+    {
+        std::vector<SdpVideoFormat> formats = GetSupportedFormatsInFactories(encoderFactories_);
+        return format.IsCodecInList(formats);
     }
 }
 }

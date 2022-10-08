@@ -12,7 +12,8 @@ namespace Unity.WebRTC.Samples
         public const int DefaultStreamHeight = 720;
 
         private static Vector2Int s_StreamSize = new Vector2Int(DefaultStreamWidth, DefaultStreamHeight);
-        private static RTCRtpCodecCapability s_useVideoCodec = null;
+        private static RTCRtpCodecCapability s_senderVideoCodec = null;
+        private static RTCRtpCodecCapability s_receiverVideoCodec = null;
 
         public static Vector2Int StreamSize
         {
@@ -20,16 +21,22 @@ namespace Unity.WebRTC.Samples
             set { s_StreamSize = value; }
         }
 
-        public static RTCRtpCodecCapability UseVideoCodec
+        public static RTCRtpCodecCapability SenderCodec
         {
-            get { return s_useVideoCodec; }
-            set { s_useVideoCodec = value; }
+            get { return s_senderVideoCodec; }
+            set { s_senderVideoCodec = value; }
+        }
+        public static RTCRtpCodecCapability ReceiverCodec
+        {
+            get { return s_receiverVideoCodec; }
+            set { s_receiverVideoCodec = value; }
         }
     }
 
     internal class SceneSelectUI : MonoBehaviour
     {
-        [SerializeField] private Dropdown codecSelector;
+        [SerializeField] private Dropdown senderCodecSelector;
+        [SerializeField] private Dropdown receiverCodecSelector;
         [SerializeField] private Dropdown streamSizeSelector;
         [SerializeField] private InputField textureWidthInput;
         [SerializeField] private InputField textureHeightInput;
@@ -65,26 +72,50 @@ namespace Unity.WebRTC.Samples
             new Vector2Int(2160, 3840),
         };
 
-        private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
-        private List<RTCRtpCodecCapability> availableCodecs;
+        private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx", "video/flexfec-03" };
+        private List<RTCRtpCodecCapability> availableSenderCodecs;
+        private List<RTCRtpCodecCapability> availableReceiverCodecs;
+
+        enum Direction
+        {
+            Sender,
+            Receiver
+        }
+
+        static IEnumerable<RTCRtpCodecCapability> GetCodecCapabilities(Direction direction, TrackKind kind)
+        {
+            switch(direction)
+            {
+                case Direction.Sender:
+                    return RTCRtpSender.GetCapabilities(kind).codecs
+                        .Where(codec => !excludeCodecMimeType.Contains(codec.mimeType));
+                case Direction.Receiver:
+                    return RTCRtpReceiver.GetCapabilities(kind).codecs
+                        .Where(codec => !excludeCodecMimeType.Contains(codec.mimeType));
+            }
+            throw new System.ArgumentException();
+        }
+
 
         void Start()
         {
-            var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
-            availableCodecs = capabilities.codecs
-                .Where(codec => !excludeCodecMimeType.Contains(codec.mimeType))
-                .ToList();
-            var list = availableCodecs
-                .Select(codec => new Dropdown.OptionData {text = codec.mimeType + " " + codec.sdpFmtpLine})
-                .ToList();
+            var senderCodecs = GetCodecCapabilities(Direction.Sender, TrackKind.Video).ToList();
+            var receiverCodecs = GetCodecCapabilities(Direction.Receiver, TrackKind.Video).ToList();
 
-            codecSelector.options.AddRange(list);
-            var previewCodec = WebRTCSettings.UseVideoCodec;
-            codecSelector.value = previewCodec == null
+            senderCodecSelector.options.AddRange(senderCodecs
+                .Select(codec => new Dropdown.OptionData { text = codec.mimeType + " " + codec.sdpFmtpLine })
+                .ToList());
+            receiverCodecSelector.options.AddRange(receiverCodecs
+                .Select(codec => new Dropdown.OptionData { text = codec.mimeType + " " + codec.sdpFmtpLine })
+                .ToList());
+            var previewCodec = WebRTCSettings.SenderCodec;
+            senderCodecSelector.value = previewCodec == null
                 ? 0
-                : availableCodecs.FindIndex(x =>
+                : senderCodecs.FindIndex(x =>
                     x.mimeType == previewCodec.mimeType && x.sdpFmtpLine == previewCodec.sdpFmtpLine) + 1;
-            codecSelector.onValueChanged.AddListener(OnChangeCodecSelect);
+
+            senderCodecSelector.onValueChanged.AddListener(index => OnChangeCodec(index, Direction.Sender, TrackKind.Video));
+            receiverCodecSelector.onValueChanged.AddListener(index => OnChangeCodec(index, Direction.Receiver, TrackKind.Video));
 
             var optionList = streamSizeList.Select(size => new Dropdown.OptionData($" {size.x} x {size.y} ")).ToList();
             optionList.Add(new Dropdown.OptionData(" Custom "));
@@ -133,9 +164,19 @@ namespace Unity.WebRTC.Samples
                 buttonLatency.interactable = false;
         }
 
-        private void OnChangeCodecSelect(int index)
+        private void OnChangeCodec(int index, Direction direction, TrackKind kind)
         {
-            WebRTCSettings.UseVideoCodec = index == 0 ? null : availableCodecs[index - 1];
+            var codecs = GetCodecCapabilities(direction, kind).ToList();            
+            var codec = index == 0 ? null : codecs[index - 1];
+            switch(direction)
+            {
+                case Direction.Sender:
+                    WebRTCSettings.SenderCodec = codec;
+                    break;
+                case Direction.Receiver:
+                    WebRTCSettings.ReceiverCodec = codec;
+                    break;
+            }
         }
 
         private void OnChangeStreamSizeSelect(int index)

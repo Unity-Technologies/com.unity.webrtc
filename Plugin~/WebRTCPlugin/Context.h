@@ -68,6 +68,8 @@ namespace webrtc
         static std::unique_ptr<ContextManager> s_instance;
     };
 
+    class UnityVideoEncoderFactory;
+    class UnityVideoDecoderFactory;
     class Context
     {
     public:
@@ -160,6 +162,8 @@ namespace webrtc
         std::unique_ptr<TaskQueueFactory> m_taskQueueFactory;
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
+        UnityVideoEncoderFactory* m_videoEncoderFactory;
+        UnityVideoDecoderFactory* m_videoDecoderFactory;
         std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;
         std::map<const PeerConnectionObject*, std::unique_ptr<PeerConnectionObject>> m_mapClients;
         std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;

@@ -15,7 +15,7 @@ namespace webrtc
     constexpr char kAndroidMediaCodecImpl[] = "MediaCodec";
     constexpr char kVideoToolboxImpl[] = "VideoToolbox";
 
-    constexpr char kSdpKeyNameCodecImpl[] = "implementation_name";
+    constexpr char kSdpKeyNameCodecImpl[] = "implementation-name";
 
     class IGraphicsDevice;
     class ProfilerMarkerFactory;
@@ -30,8 +30,10 @@ namespace webrtc
     {
         for (const auto& pair : factories)
         {
-            for (const webrtc::SdpVideoFormat& other : pair.second->GetSupportedFormats())
+            for (webrtc::SdpVideoFormat& other : pair.second->GetSupportedFormats())
             {
+                // Add implementation-name to SdpVideoFormat::IsSameCodec checks all parameters
+                other.parameters.emplace(kSdpKeyNameCodecImpl, pair.first);
                 if (format.IsSameCodec(other))
                     return pair.second.get();
             }
@@ -54,6 +56,20 @@ namespace webrtc
                 supported_codecs.push_back(newFormat);
             }
         }
+
+        // Sort video codec order: default video codec is VP8
+        auto findIndex = [&](webrtc::SdpVideoFormat& format) -> long
+        {
+            const std::string sortOrder[4] = { "VP8", "VP9", "H264", "AV1X" };
+            auto it = std::find(std::begin(sortOrder), std::end(sortOrder), format.name);
+            if (it == std::end(sortOrder))
+                return LONG_MAX;
+            return static_cast<long>(std::distance(std::begin(sortOrder), it));
+        };
+        std::sort(
+            supported_codecs.begin(),
+            supported_codecs.end(),
+            [&](webrtc::SdpVideoFormat& x, webrtc::SdpVideoFormat& y) -> int { return (findIndex(x) < findIndex(y)); });
         return supported_codecs;
     }
 }

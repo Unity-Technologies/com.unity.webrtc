@@ -211,9 +211,9 @@ class BandwidthSample : MonoBehaviour
             pc1Senders.Add(_pc1.AddTrack(track, videoStream));
         }
 
-        if (WebRTCSettings.UseVideoCodec != null)
+        if (WebRTCSettings.SenderCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] {WebRTCSettings.SenderCodec};
             foreach (var transceiver in _pc1.GetTransceivers())
             {
                 if (pc1Senders.Contains(transceiver.Sender))

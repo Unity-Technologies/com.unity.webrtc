@@ -1,6 +1,7 @@
 #pragma once
 
 #include <api/video_codecs/sdp_video_format.h>
+#include <api/video_codecs/video_decoder_factory.h>
 #include <api/video_codecs/video_encoder_factory.h>
 
 namespace unity
@@ -25,12 +26,17 @@ namespace webrtc
         // Creates a VideoEncoder for the specified format.
         std::unique_ptr<VideoEncoder> CreateVideoEncoder(const SdpVideoFormat& format) override;
 
+        // workaround:
+        // 
+        bool IsAvailableFormat(const SdpVideoFormat& format);
+
         UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler);
         ~UnityVideoEncoderFactory() override;
 
     private:
         ProfilerMarkerFactory* profiler_;
-        std::map<std::string, std::unique_ptr<VideoEncoderFactory>> factories_;
+        std::map<std::string, std::unique_ptr<VideoEncoderFactory>> encoderFactories_;
+        std::map<std::string, std::unique_ptr<VideoDecoderFactory>> decoderFactories_;
     };
 }
 }

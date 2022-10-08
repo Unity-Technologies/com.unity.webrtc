@@ -73,7 +73,8 @@ namespace webrtc
 
     UnityVideoDecoderFactory::UnityVideoDecoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
-        , factories_()
+        , encoderFactories_()
+        , decoderFactories_()
     {
         const std::vector<std::string> arrayImpl = {
             kInternalImpl, kNvCodecImpl, kAndroidMediaCodecImpl, kVideoToolboxImpl
@@ -81,29 +82,63 @@ namespace webrtc
 
         for (auto impl : arrayImpl)
         {
-            auto factory = CreateVideoDecoderFactory(impl, gfxDevice, profiler);
-            if (factory)
-                factories_.emplace(impl, factory);
+            auto encoderFactory = CreateVideoEncoderFactory(impl, gfxDevice, profiler);
+            if (encoderFactory)
+                encoderFactories_.emplace(impl, encoderFactory);
+
+            auto decoderFactory = CreateVideoDecoderFactory(impl, gfxDevice, profiler);
+            if (decoderFactory)
+                decoderFactories_.emplace(impl, decoderFactory);
         }
     }
 
     UnityVideoDecoderFactory::~UnityVideoDecoderFactory() = default;
 
+    struct compare
+    {
+        bool operator()(const webrtc::SdpVideoFormat& lhs, const webrtc::SdpVideoFormat& rhs) const
+        {
+            return std::string(lhs.ToString()).compare(rhs.ToString()) > 0;
+        }
+    };
+
+    struct equal
+    {
+        bool operator()(const webrtc::SdpVideoFormat& lhs, const webrtc::SdpVideoFormat& rhs) const
+        {
+            return lhs.IsSameCodec(rhs);
+        }
+    };
+
     std::vector<webrtc::SdpVideoFormat> UnityVideoDecoderFactory::GetSupportedFormats() const
     {
-        return GetSupportedFormatsInFactories(factories_);
+        // workaround
+        auto formats1 = GetSupportedFormatsInFactories(encoderFactories_);
+        auto formats2 = GetSupportedFormatsInFactories(decoderFactories_);
+        std::vector<webrtc::SdpVideoFormat> result(formats1);
+
+        result.insert(result.end(), formats2.begin(), formats2.end());
+        std::sort(result.begin(), result.end(), compare());
+        result.erase(std::unique(result.begin(), result.end(), equal()), result.end());
+        return result;
     }
 
     std::unique_ptr<webrtc::VideoDecoder>
     UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat& format)
     {
-        VideoDecoderFactory* factory = FindCodecFactory(factories_, format);
+        VideoDecoderFactory* factory = FindCodecFactory(decoderFactories_, format);
         auto decoder = factory->CreateVideoDecoder(format);
         if (!profiler_)
             return decoder;
 
         // Use Unity Profiler for measuring decoding process.
         return std::make_unique<UnityVideoDecoder>(std::move(decoder), profiler_);
+    }
+
+    bool UnityVideoDecoderFactory::IsAvailableFormat(const SdpVideoFormat& format)
+    {
+        std::vector<SdpVideoFormat> formats = GetSupportedFormatsInFactories(decoderFactories_);
+        return format.IsCodecInList(formats);
     }
 
 } // namespace webrtc

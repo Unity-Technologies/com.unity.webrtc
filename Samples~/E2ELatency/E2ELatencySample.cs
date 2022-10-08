@@ -275,9 +275,9 @@ class E2ELatencySample : MonoBehaviour
             }
         }
 
-        if (WebRTCSettings.UseVideoCodec != null)
+        if (WebRTCSettings.SenderCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] {WebRTCSettings.SenderCodec};
             foreach (var transceiver in _pc1.GetTransceivers())
             {
                 if (pc1VideoSenders.Contains(transceiver.Sender))
