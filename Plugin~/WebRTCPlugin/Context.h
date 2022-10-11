@@ -159,7 +159,7 @@ namespace webrtc
         rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
         rtc::scoped_refptr<DummyAudioDevice> m_audioDevice;
         std::vector<rtc::scoped_refptr<const webrtc::RTCStatsReport>> m_listStatsReport;
-        std::map<const PeerConnectionObject*, rtc::scoped_refptr<PeerConnectionObject>> m_mapClients;
+        std::map<const PeerConnectionObject*, std::unique_ptr<PeerConnectionObject>> m_mapClients;
         std::map<const webrtc::MediaStreamInterface*, std::unique_ptr<MediaStreamObserver>> m_mapMediaStreamObserver;
         std::map<const DataChannelInterface*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
@@ -171,8 +171,5 @@ namespace webrtc
     };
 
     extern bool Convert(const std::string& str, webrtc::PeerConnectionInterface::RTCConfiguration& config);
-    extern webrtc::SdpType ConvertSdpType(RTCSdpType type);
-    extern RTCSdpType ConvertSdpType(webrtc::SdpType type);
-
 } // end namespace webrtc
 } // end namespace unity
