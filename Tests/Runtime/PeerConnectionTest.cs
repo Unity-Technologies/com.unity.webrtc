@@ -672,6 +672,58 @@ namespace Unity.WebRTC.RuntimeTest
             peer2.Close();
         }
 
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator CreateDescriptionInParallel()
+        {
+            RTCConfiguration config = default;
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+            var peer1 = new RTCPeerConnection(ref config);
+            var peer2 = new RTCPeerConnection(ref config);
+
+            var neededNegotiationPeer1 = false;
+            var neededNegotiationPeer2 = false;
+            peer1.OnIceCandidate = candidate => { peer2.AddIceCandidate(candidate); };
+            peer2.OnIceCandidate = candidate => { peer1.AddIceCandidate(candidate); };
+            peer1.OnNegotiationNeeded += () => neededNegotiationPeer1 = true;
+            peer2.OnNegotiationNeeded += () => neededNegotiationPeer2 = true;
+
+            peer1.AddTransceiver(TrackKind.Audio);
+
+            yield return new WaitUntil(() => neededNegotiationPeer1);
+
+            var op1 = peer1.SetLocalDescription();
+            yield return op1;
+            RTCSessionDescription desc = peer1.LocalDescription;
+            Assert.That(desc.type, Is.EqualTo(RTCSdpType.Offer));
+            Assert.That(peer1.SignalingState, Is.EqualTo(RTCSignalingState.HaveLocalOffer));
+
+            peer2.AddTransceiver(TrackKind.Audio);
+            yield return new WaitUntil(() => neededNegotiationPeer2);
+
+            var op2 = peer2.SetRemoteDescription(ref desc);
+            yield return op2;
+            Assert.That(peer2.RemoteDescription.type, Is.EqualTo(RTCSdpType.Offer));
+            Assert.That(peer2.SignalingState, Is.EqualTo(RTCSignalingState.HaveRemoteOffer));
+
+            var op3 = peer2.CreateOffer();
+            var op4 = peer2.CreateAnswer();
+            yield return op3;
+            yield return op4;
+            desc = op4.Desc;
+            var op5 = peer2.SetLocalDescription(ref desc);
+            yield return op5;
+            Assert.That(desc.type, Is.EqualTo(RTCSdpType.Answer));
+            Assert.That(peer2.SignalingState, Is.EqualTo(RTCSignalingState.Stable));
+
+            var op6 = peer1.SetRemoteDescription(ref desc);
+            yield return op6;
+
+            peer1.Close();
+            peer2.Close();
+        }
+
         [Test]
         public void SetRemoteDescriptionThrowException()
         {
