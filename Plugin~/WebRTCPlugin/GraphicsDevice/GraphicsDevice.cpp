@@ -59,8 +59,8 @@ namespace webrtc
 
 #if CUDA_PLATFORM
         bool IsCudaSupport() override { return false; }
-        CUcontext GetCUcontext() { return 0; }
-        NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() { return NV_ENC_BUFFER_FORMAT_UNDEFINED; }
+        CUcontext GetCUcontext() override { return 0; }
+        NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_UNDEFINED; }
 #endif
     };
 
