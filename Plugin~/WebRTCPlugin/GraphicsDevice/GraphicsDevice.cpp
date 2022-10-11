@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "GpuMemoryBuffer.h"
 #include "GraphicsDevice.h"
 
 #if SUPPORT_D3D11 && SUPPORT_D3D12
@@ -25,6 +26,85 @@ namespace unity
 {
 namespace webrtc
 {
+    class NullDevice : public IGraphicsDevice
+    {
+    public:
+        NullDevice(UnityGfxRenderer renderer)
+            : IGraphicsDevice(renderer, nullptr)
+        {
+        }
+        virtual ~NullDevice() override { }
+        bool InitV() override { return true; }
+        void ShutdownV() override { }
+        ITexture2D*
+        CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+        void* GetEncodeDevicePtrV() override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+        bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        UnityGfxRenderer GetGfxRenderer() const override { return m_gfxRenderer; }
+        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        bool ResetSync(const ITexture2D* texture) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        bool WaitIdleForTest() override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        // Required for software encoding
+        ITexture2D*
+        CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+        rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+
+#if CUDA_PLATFORM
+        bool IsCudaSupport() override { return false; }
+        CUcontext GetCUcontext() override
+        {
+            RTC_NOTREACHED();
+            return 0;
+        }
+        NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override
+        {
+            RTC_NOTREACHED();
+            return NV_ENC_BUFFER_FORMAT_UNDEFINED;
+        }
+#endif
+    };
 
     GraphicsDevice& GraphicsDevice::GetInstance()
     {
@@ -51,7 +131,7 @@ namespace webrtc
             return Init(rendererType, deviceInterface->GetDevice(), deviceInterface, profiler);
         }
 #endif
-#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
+#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES || UNITY_WIN || UNITY_OSX
         case kUnityGfxRendererOpenGLES20:
         case kUnityGfxRendererOpenGLES30:
         case kUnityGfxRendererOpenGLCore:
@@ -111,12 +191,16 @@ namespace webrtc
             break;
         }
 #endif
-#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES
+#if SUPPORT_OPENGL_CORE || SUPPORT_OPENGL_ES || UNITY_WIN || UNITY_OSX
         case kUnityGfxRendererOpenGLES20:
         case kUnityGfxRendererOpenGLES30:
         case kUnityGfxRendererOpenGLCore:
         {
+#if UNITY_WIN || UNITY_OSX
+            pDevice = new NullDevice(renderer);
+#else
             pDevice = new OpenGLGraphicsDevice(renderer, profiler);
+#endif
             break;
         }
 #endif

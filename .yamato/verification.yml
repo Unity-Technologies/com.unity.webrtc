@@ -206,7 +206,9 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
     # run utr
-    - utr.bat --suite={{ test.suite }} --editor-location=.Editor --testproject=C:\build\output\Unity-Technologies\com.unity.webrtc\WebRTC~ --reruncount=2 --timeout=3600
+    - git config --local core.symlinks true
+    - gsudo git checkout -f --detach FETCH_HEAD
+    - utr --suite={{ test.suite }} --editor-location=.Editor --testproject=./WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "ios" %}
     #install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr

@@ -66,27 +66,13 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="source"></param>
         /// <param name="needFlip"></param>
-        public VideoStreamTrack(Texture source, bool needFlip = true)
-            : this(source,
-                  CreateRenderTexture(source.width, source.height),
-                  Guid.NewGuid().ToString(),
-                  new VideoTrackSource(),
-                  needFlip)
+        public VideoStreamTrack(Texture texture, bool needFlip = true)
+            : base(CreateVideoTrack(texture, out var source))
         {
-        }
-
-        internal VideoStreamTrack(Texture texture, RenderTexture dest, string label, VideoTrackSource source, bool needFlip)
-            : base(WebRTC.Context.CreateVideoTrack(label, source.self))
-        {
-            var error = WebRTC.ValidateTextureSize(texture.width, texture.height, Application.platform);
-            if (error.errorType != RTCErrorType.None)
-            {
-                throw new ArgumentException(error.message);
-            }
-            WebRTC.ValidateGraphicsFormat(texture.graphicsFormat);
-
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
                 throw new InvalidOperationException();
+
+            var dest = CreateRenderTexture(texture.width, texture.height);
 
             m_source = source;
             m_source.sourceTexture_ = texture;
@@ -98,7 +84,8 @@ namespace Unity.WebRTC
         /// Video Receiver
         /// </summary>
         /// <param name="ptr"></param>
-        internal VideoStreamTrack(IntPtr ptr) : base(ptr)
+        internal VideoStreamTrack(IntPtr ptr)
+            : base(CreateVideoTrack(ptr))
         {
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
                 throw new InvalidOperationException();
@@ -129,6 +116,60 @@ namespace Unity.WebRTC
         internal void OnVideoFrameResize(Texture texture)
         {
             OnVideoReceived?.Invoke(texture);
+        }
+
+        /// <summary>
+        /// On Windows or macOS, VideoStreamTrack doesn't work with OpenGL.
+        /// </summary>
+        /// <param name="platform"></param>
+        /// <param name="graphicsDeviceType"></param>
+        /// <returns></returns>
+        internal static bool IsSupported(RuntimePlatform platform, UnityEngine.Rendering.GraphicsDeviceType graphicsDeviceType)
+        {
+            if (platform != RuntimePlatform.WindowsEditor &&
+                platform != RuntimePlatform.WindowsPlayer &&
+                platform != RuntimePlatform.OSXEditor &&
+                platform != RuntimePlatform.OSXPlayer)
+                return true;
+            if (graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore &&
+                graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2 &&
+                graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3)
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// for sender.
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        static IntPtr CreateVideoTrack(Texture texture, out VideoTrackSource source)
+        {
+            if (!IsSupported(Application.platform, SystemInfo.graphicsDeviceType))
+                throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
+
+            WebRTC.ValidateGraphicsFormat(texture.graphicsFormat);
+
+            var error = WebRTC.ValidateTextureSize(texture.width, texture.height, Application.platform);
+            if (error.errorType != RTCErrorType.None)
+                throw new ArgumentException(error.message);
+
+            var label = Guid.NewGuid().ToString();
+            source = new VideoTrackSource();
+            return WebRTC.Context.CreateVideoTrack(label, source.GetSelfOrThrow());
+        }
+
+        /// <summary>
+        /// for receiver.
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
+        static IntPtr CreateVideoTrack(IntPtr ptr)
+        {
+            if (!IsSupported(Application.platform, SystemInfo.graphicsDeviceType))
+                throw new NotSupportedException($"Not Support OpenGL API on {Application.platform} in Unity WebRTC.");
+            return ptr;
         }
     }
 

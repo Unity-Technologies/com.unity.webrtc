@@ -120,6 +120,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoTrack()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -137,6 +139,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoTrackToPeerConnection()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -164,6 +168,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public void SenderGetParameter()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -194,6 +200,8 @@ namespace Unity.WebRTC.RuntimeTest
         // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
         [Test]
         [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoTrackToMediaStream()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -294,6 +302,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoRendererToVideoTrack()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -347,6 +357,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest, LongRunning]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CallVideoEncoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);
@@ -393,8 +405,10 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest, LongRunning]
-        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
+        [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoDecoderMethods.UpdateRendererTexture is not supported on Direct3D12.")]
+        [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CallVideoDecoderMethods()
         {
             var context = NativeMethods.ContextCreate(0);

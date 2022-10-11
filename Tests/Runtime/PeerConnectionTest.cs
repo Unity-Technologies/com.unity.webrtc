@@ -120,6 +120,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void AddTrack()
         {
             var peer = new RTCPeerConnection();
@@ -152,6 +153,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void AddTransceiver()
         {
             var peer = new RTCPeerConnection();
@@ -194,6 +196,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void GetTransceiversReturnsNotEmptyAfterDisposingTransceiver()
         {
             // `RTCPeerConnection.AddTransceiver` method is not intuitive. Moreover, we don't have the API to remove
@@ -207,6 +210,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void GetTransceiversReturnsNotEmptyAfterCallingRemoveTrack()
         {
             // Also, `RTCPeerConnection.AddTrack` and `RTCPeerConnection.RemoveTrack` method is not intuitive.
@@ -255,6 +259,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void AddTransceiverTrackKindVideo()
         {
             var peer = new RTCPeerConnection();
@@ -276,6 +281,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void AddTransceiverWithInit()
         {
             var peer = new RTCPeerConnection();
@@ -308,6 +314,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void AddTransceiverWithKindAndInit()
         {
             var peer = new RTCPeerConnection();
@@ -347,6 +354,7 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [Test]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void GetAndSetDirectionTransceiver()
         {
             var peer = new RTCPeerConnection();
@@ -1002,6 +1010,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator GetStatsReturnsReport()
         {
             if (SystemInfo.processorType == "Apple M1")

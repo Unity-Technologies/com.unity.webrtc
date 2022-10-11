@@ -8,6 +8,7 @@ namespace Unity.WebRTC.RuntimeTest
 {
     [TestFixture]
     [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
     class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
@@ -20,6 +21,7 @@ namespace Unity.WebRTC.RuntimeTest
 
     [TestFixture]
     [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
     class VideoReceiveTestWithVP8Codec : VideoReceiveTestBase
     {
         protected override void SetUpCodecCapability()
@@ -80,8 +82,10 @@ namespace Unity.WebRTC.RuntimeTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest, LongRunning]
         [Timeout(15000)]
-        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
+        [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
+        [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
+            "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
         {
             if(SystemInfo.processorType == "Apple M1")
