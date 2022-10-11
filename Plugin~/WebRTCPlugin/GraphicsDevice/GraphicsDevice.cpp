@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "GraphicsDevice.h"
 #include "GpuMemoryBuffer.h"
+#include "GraphicsDevice.h"
 
 #if SUPPORT_D3D11 && SUPPORT_D3D12
 #include "D3D11/D3D11GraphicsDevice.h"
@@ -39,33 +39,74 @@ namespace webrtc
         ITexture2D*
         CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override
         {
+            RTC_NOTREACHED();
             return nullptr;
         }
-        void* GetEncodeDevicePtrV() override { return nullptr; }
-        bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override { return true; }
-        bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) override { return true; }
+        void* GetEncodeDevicePtrV() override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+        bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
         UnityGfxRenderer GetGfxRenderer() const override { return m_gfxRenderer; }
-        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }
-        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override { return true; }
-        bool ResetSync(const ITexture2D* texture) override { return true; }
-        bool WaitIdleForTest() override { return true; }
+        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
+        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        bool ResetSync(const ITexture2D* texture) override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
+        bool WaitIdleForTest() override
+        {
+            RTC_NOTREACHED();
+            return true;
+        }
         // Required for software encoding
         ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override
         {
+            RTC_NOTREACHED();
             return nullptr;
         }
-        rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override { return nullptr; }
+        rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override
+        {
+            RTC_NOTREACHED();
+            return nullptr;
+        }
 
 #if CUDA_PLATFORM
         bool IsCudaSupport() override { return false; }
-        CUcontext GetCUcontext() override { return 0; }
-        NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_UNDEFINED; }
+        CUcontext GetCUcontext() override
+        {
+            RTC_NOTREACHED();
+            return 0;
+        }
+        NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override
+        {
+            RTC_NOTREACHED();
+            return NV_ENC_BUFFER_FORMAT_UNDEFINED;
+        }
 #endif
     };
 
-    GraphicsDevice&
-    GraphicsDevice::GetInstance()
+    GraphicsDevice& GraphicsDevice::GetInstance()
     {
         static GraphicsDevice device;
         return device;
