@@ -27,8 +27,8 @@ platforms:
   - name: macos
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: package-ci/mac:v1.20.0-1079282
-    gpu_image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
+    gpu_image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_mac.sh
     test_command: BuildScripts~/test_plugin_mac.sh
@@ -36,8 +36,8 @@ platforms:
   - name: ios
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: package-ci/mac:v1.20.0-1079282
-    gpu_image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
+    gpu_image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
     build_command: BuildScripts~/build_plugin_ios.sh
     test_command: BuildScripts~/test_plugin_ios.sh
@@ -55,7 +55,7 @@ platforms:
 test_targets:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:v0.3.13-1084239
+    image: package-ci/win10:v1.21.0-1103459
     flavor: b1.large
     is_gpu: false
     gfx_types:
@@ -95,7 +95,7 @@ test_targets:
         platform: standalone
   - name: win-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.3.13-1084240
+    image: package-ci/win10:v4.0.0-1214578
     flavor: b1.large
     model: rtx2080
     is_gpu: true
@@ -137,7 +137,7 @@ test_targets:
         platform: standalone
   - name: macos
     type: Unity::metal::macmini
-    image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
     architecture: x64
     gfx_types:
@@ -162,7 +162,7 @@ test_targets:
         platform: standalone
   - name: macos-m1
     type: Unity::metal::devkit
-    image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
     architecture: arm64
     gfx_types:
@@ -303,7 +303,7 @@ test_webrtc_plugin_android:
   name: Test webrtc plugin Android
   agent:
     type: Unity::mobile::shield
-    image: mobile/android-execution-base:v0.0.2-791667
+    image: mobile/android-package-ci-win:v0.1.4-1212670
     flavor: b1.medium
   skip_checkout: true
   dependencies:
@@ -371,7 +371,7 @@ build_{{ package.name }}_{{ editor.version }}_ios:
   name : Build {{ package.packagename }} with {{ editor.version }} for ios device
   agent:
     type: Unity::VM::osx
-    image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
     flavor: b1.large
   commands:
     - |
@@ -396,7 +396,7 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
     type: Unity::mobile::iPhone
-    image: mobile/macos-10.15-testing:v0.0.7-909915
+    image: mobile/ios-macos-11:v0.1.2-1078219
     flavor: b1.medium
   skip_checkout: true
   dependencies:
@@ -418,7 +418,7 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   name : Build {{ package.packagename }} with {{ editor.version }} for android device {{ target.name }}
   agent:
     type: Unity::VM::osx
-    image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
     flavor: b1.xlarge
   commands:
     - |
@@ -446,7 +446,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   name: Test {{ package.packagename }} with {{ editor.version }} on android device {{ target.name }}
   agent:
     type: Unity::mobile::shield
-    image: mobile/android-execution-base:v0.0.2-791667
+    image: mobile/android-package-ci-win:v0.1.4-1212670
     flavor: b1.medium
   skip_checkout: true
   dependencies:
@@ -505,7 +505,7 @@ build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name
   name : Build {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
     type: Unity::VM::osx
-    image: package-ci/mac:v1.20.0-1079282
+    image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
   commands:
     - |
