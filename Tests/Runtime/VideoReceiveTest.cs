@@ -13,9 +13,10 @@ namespace Unity.WebRTC.RuntimeTest
     {
         protected override void SetUpCodecCapability()
         {
-            WebRTC.Initialize();
-            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains("H264"));
-            WebRTC.Dispose();
+            var mimetype = "H264";
+            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains(mimetype));
+            if (videoCodec == null)
+                Assert.Ignore($"{mimetype} codec is not supported this platform.");
         }
     }
 
@@ -26,9 +27,10 @@ namespace Unity.WebRTC.RuntimeTest
     {
         protected override void SetUpCodecCapability()
         {
-            WebRTC.Initialize();
-            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains("VP8"));
-            WebRTC.Dispose();
+            var mimetype = "VP8";
+            videoCodec = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs.FirstOrDefault(c => c.mimeType.Contains(mimetype));
+            if (videoCodec == null)
+                Assert.Ignore($"{mimetype} codec is not supported this platform.");
         }
     }
 
@@ -38,16 +40,11 @@ namespace Unity.WebRTC.RuntimeTest
 
         protected abstract void SetUpCodecCapability();
 
-        [OneTimeSetUp]
-        public void OneTimeInit()
-        {
-            SetUpCodecCapability();
-        }
-
         [SetUp]
         public void SetUp()
         {
             WebRTC.Initialize(true);
+            SetUpCodecCapability();
         }
 
         [TearDown]
@@ -109,16 +106,12 @@ namespace Unity.WebRTC.RuntimeTest
                 yield return new WaitUntilWithTimeout(() => receiveVideoTrack != null, 5000);
                 yield return new WaitUntilWithTimeout(() => receiveVideoTrack.Texture != null, 5000);
                 Assert.That(receiveVideoTrack.Texture, Is.Not.Null);
-
-                yield return new WaitForSeconds(0.1f);
-
                 test.component.Clear();
             }
 
             for (int i = 0; i < value.count; i++)
             {
                 yield return VideoReceive();
-                yield return new WaitForSeconds(0.5f);
             }
 
             Object.DestroyImmediate(test.gameObject);
