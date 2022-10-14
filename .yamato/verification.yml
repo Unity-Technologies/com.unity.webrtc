@@ -217,7 +217,8 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor -c iOS --fast --wait
     # run utr
-    - ./utr --suite={{ test.suite }} --platform=iOS --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
+    - ./utr --suite={{ test.suite }} --platform=iOS --build-only --editor-location=.Editor --testproject=WebRTC~ --player-save-path=players --reruncount=2 --timeout=3600
+    - ./utr --suite={{ test.suite }} --platform=iOS --platform=iOS --player-load-path=players --reruncount=2 --timeout=3600
 {% endif %}
   artifacts:
     {{ id }}_{{ editor.version }}_results:
