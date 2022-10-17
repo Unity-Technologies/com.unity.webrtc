@@ -14,7 +14,7 @@ cmake_policy(SET CMP0076 NEW)
 enable_testing()
 
 # Define flags to determine the build target platform
-# Windows, Linux, macOS, iOS
+# Windows, Linux, macOS, iOS, Android
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(Windows TRUE)
 endif()
@@ -32,6 +32,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(XCODE)
@@ -40,6 +41,21 @@ if(XCODE)
   )
     message(FATAL_ERROR 
       "The required Xcode version is 11.0 or higher and 12.0 or higher is not supported.")
+  endif()
+endif()
+
+if(Linux)
+  option(USE_CUSTOM_LIBCXX_STATIC "Use custom libc++" OFF)
+  option(CUSTOM_LIBCXX_DIR "Set filepath for custom libc++" "${CMAKE_SOURCE_DIR}")
+
+  if(USE_CUSTOM_LIBCXX_STATIC)
+    add_compile_options("-nostdinc++")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++")
+    include_directories("${CUSTOM_LIBCXX_DIR}/include/c++/v1/")
+    link_libraries(
+      "${CUSTOM_LIBCXX_DIR}/lib/libc++.a"
+      "${CUSTOM_LIBCXX_DIR}/lib/libc++abi.a"
+    )
   endif()
 endif()
 
