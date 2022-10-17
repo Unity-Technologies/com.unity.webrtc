@@ -17,7 +17,7 @@ sudo apt install -y libglfw3-dev
 pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad
 
 # Make libc++ static library
-apt install ninja-build
+sudo apt install ninja-build
 git clone --depth 1 --branch release/13.x https://github.com/llvm/llvm-project.git
 pushd llvm-project
 mkdir build
