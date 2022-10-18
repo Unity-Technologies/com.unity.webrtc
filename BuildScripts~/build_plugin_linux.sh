@@ -10,14 +10,9 @@ source ~/.profile
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install glfw3
-sudo apt install -y libglfw3-dev
-
 # Install glad2
 pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad
 
-# Make libc++ static library
-sudo apt install -y ninja-build
 git clone --depth 1 --branch release/13.x https://github.com/llvm/llvm-project.git
 pushd llvm-project
 mkdir build
