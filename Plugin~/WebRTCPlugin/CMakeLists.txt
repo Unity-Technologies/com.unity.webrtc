@@ -248,6 +248,8 @@ elseif(Linux)
       glad_glx_14
       ${WEBRTC_LIBRARY}
       ${GLIB_LIBRARIES}
+      ${CXX_LIBRARY}
+      ${CXXABI_LIBRARY}
   )
   target_include_directories(WebRTCLib
     SYSTEM
@@ -367,7 +369,8 @@ else()
     PRIVATE
       WebRTCLib
   )
-endif()  
+endif()
+
 target_sources(WebRTCPlugin 
   PRIVATE
     pch.cpp

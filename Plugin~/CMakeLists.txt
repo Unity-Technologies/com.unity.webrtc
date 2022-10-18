@@ -49,13 +49,11 @@ if(Linux)
   option(CUSTOM_LIBCXX_DIR "Set filepath for custom libc++" "${CMAKE_SOURCE_DIR}")
 
   if(USE_CUSTOM_LIBCXX_STATIC)
-    add_compile_options("-nostdinc++")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++")
+    add_compile_options(-nostdinc++)
+    add_link_options(-static-libstdc++)
     include_directories("${CUSTOM_LIBCXX_DIR}/include/c++/v1/")
-    link_libraries(
-      "${CUSTOM_LIBCXX_DIR}/lib/libc++.a"
-      "${CUSTOM_LIBCXX_DIR}/lib/libc++abi.a"
-    )
+    set(CXX_LIBRARY "${CUSTOM_LIBCXX_DIR}/lib/libc++.a")
+    set(CXXABI_LIBRARY "${CUSTOM_LIBCXX_DIR}/lib/libc++abi.a")
   endif()
 endif()
 
