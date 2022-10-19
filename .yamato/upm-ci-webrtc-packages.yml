@@ -633,7 +633,8 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "false" %}
+# vulkan gfx device is not supported on VMs without GPU
+{% if target.is_gpu == "false" and gfx_type.name != "vulkan" %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endif %}
 {% endfor %}
