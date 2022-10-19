@@ -1,5 +1,7 @@
 {% metadata_file .yamato/package.metafile %}
 
+---
+
 {% for editor in editors %}
 compile_test_{{ editor.version }}:
   name: Compilation Test {{ editor.version }}
