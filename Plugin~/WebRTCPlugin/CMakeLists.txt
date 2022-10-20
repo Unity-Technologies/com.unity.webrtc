@@ -89,6 +89,12 @@ target_compile_definitions(WebRTCLib
     $<$<CONFIG:Debug>:DEBUG>
 )
 
+set_target_properties(WebRTCLib
+  PROPERTIES 
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
+
 if(iOS OR macOS)
   target_sources(WebRTCLib
     PRIVATE
@@ -97,8 +103,8 @@ if(iOS OR macOS)
 else()
   target_sources(WebRTCLib
     PRIVATE
-    UnityVulkanInterfaceFunctions.cpp
-    UnityVulkanInterfaceFunctions.h
+      UnityVulkanInterfaceFunctions.cpp
+      UnityVulkanInterfaceFunctions.h
   )
 endif()
 
@@ -160,7 +166,8 @@ if(Windows)
 
   # Select runtime library (MT, MTD) on windows platform
   set_target_properties(WebRTCLib
-    PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    PROPERTIES 
+      MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
 
   # Creare precompiled header
@@ -193,13 +200,9 @@ elseif(macOS)
   set_target_properties(WebRTCLib
     PROPERTIES 
       LINK_FLAGS "-ObjC"
-      CXX_VISIBILITY_PRESET hidden
-      VISIBILITY_INLINES_HIDDEN ON
   )  
 elseif(Linux)
-  set(PROJECT_BINARY_DIR
-    "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
-
+  set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
   set(GLAD_SOURCES_DIR "${CMAKE_SOURCE_DIR}/glad")
   add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
 
@@ -236,6 +239,7 @@ elseif(Linux)
       WEBRTC_POSIX
       VK_NO_PROTOTYPES
   )
+
   target_link_libraries(WebRTCLib
     PUBLIC
       NvCodec
@@ -244,6 +248,8 @@ elseif(Linux)
       glad_glx_14
       ${WEBRTC_LIBRARY}
       ${GLIB_LIBRARIES}
+      ${CXX_LIBRARY}
+      ${CXXABI_LIBRARY}
   )
   target_include_directories(WebRTCLib
     SYSTEM
@@ -336,14 +342,19 @@ target_include_directories(WebRTCLib
     .
 )
 
+add_library(WebRTCPlugin SHARED)
+
+set_target_properties(WebRTCPlugin
+  PROPERTIES 
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
+
 if(iOS)
-  add_library(WebRTCPlugin SHARED)
   set_target_properties(WebRTCPlugin 
     PROPERTIES 
       FRAMEWORK TRUE
   )
-else()
-  add_library(WebRTCPlugin SHARED)
 endif()
 
 if(Windows)
@@ -358,7 +369,8 @@ else()
     PRIVATE
       WebRTCLib
   )
-endif()  
+endif()
+
 target_sources(WebRTCPlugin 
   PRIVATE
     pch.cpp
@@ -385,18 +397,12 @@ if(Windows)
       LINK_FLAGS "/SUBSYSTEM:WINDOWS -delayload:nvcuda.dll -delayload:nvEncodeAPI64.dll -delayload:nvcuvid.dll"
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
   )
-endif()
-
-if(macOS)
+elseif(macOS)
   set_target_properties(WebRTCPlugin
-  PROPERTIES 
-    LINK_FLAGS "-ObjC"
-    CXX_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN ON
+    PROPERTIES 
+      LINK_FLAGS "-ObjC"
   )
-endif()
-
-if(iOS)
+elseif(iOS)
   #
   # Build Setting Reference
   # https://developer.apple.com/library/archive/documentation/DeveloperTools/Reference/XcodeBuildSettingRef/1-Build_Setting_Reference/build_setting_ref.html

@@ -39,7 +39,7 @@ The below commands shows the build process developing environment on Ubuntu `20.
 
 ```bash
 #install packages
-sudo apt install -y libc++1 libc++abi1 vulkan-utils libvulkan1 libvulkan-dev libglib2.0-dev python3-venv lld clang-10 libc++-10-dev libc++abi-10-dev freeglut3-dev
+sudo apt install -y vulkan-utils libvulkan1 libvulkan-dev libglib2.0-dev python3-venv lld clang-10 freeglut3-dev ninja-build
 
 # Install CUDA SDK
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin

@@ -28,15 +28,6 @@ Please note that there are unsupported platforms below.
 - Building for **iOS Simulator** is not supported.
 - **WebGL** platform is not supported.
 
-### Build on Linux
-
-On Linux, `libc++1` `libc++abi1` packages should be installed.
-Please install like command below 
-
-``` 
-sudo apt install -y libc++1 libc++abi1 
-```
-
 ### Build on Android
 
 To build the apk file for **Android platform**, you need to configure player settings below.
