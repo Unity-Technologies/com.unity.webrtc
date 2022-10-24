@@ -18,7 +18,7 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 sudo apt install -y libglfw3-dev
 
 # Install glad2
-pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad
+pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad2
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"

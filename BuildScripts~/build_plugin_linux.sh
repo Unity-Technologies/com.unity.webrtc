@@ -11,7 +11,7 @@ curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
 # Install glad2
-pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad
+pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad2
 
 git clone --depth 1 --branch release/13.x https://github.com/llvm/llvm-project.git
 pushd llvm-project
