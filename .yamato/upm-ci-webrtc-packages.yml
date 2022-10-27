@@ -738,7 +738,7 @@ check_code_format_plugin:
     image: package-ci/ubuntu:v2.0.0-947481
     flavor: b1.large
   commands:
-    - BuildScripts~/format_plugin.sh
+    - BuildScripts~/format-plugin.sh
 
 push_plugin:
   name: Push to Github webrtc native plugin
