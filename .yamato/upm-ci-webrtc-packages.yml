@@ -731,6 +731,15 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
 {% endif %}
 {% endfor %}
 
+check_code_format_plugin:
+  name: Check code format for webrtc native plugin
+  agent:
+    type: Unity::VM
+    image: package-ci/ubuntu:v2.0.0-947481
+    flavor: b1.large
+  commands:
+    - BuildScripts~/format_plugin.sh
+
 push_plugin:
   name: Push to Github webrtc native plugin
   agent:

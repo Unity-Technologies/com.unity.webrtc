@@ -1,20 +1,24 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "10.0" CACHE STRING "Minimum iOS deployment version")
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
+set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
+    "10.0"
+    CACHE STRING "Minimum iOS deployment version")
+set(CMAKE_OSX_DEPLOYMENT_TARGET
+    "10.12"
+    CACHE STRING "Minimum OS X deployment version")
 
-project(webrtc
+project(
+  webrtc
   VERSION 2.4.0
-  LANGUAGES C CXX ASM
-)
+  LANGUAGES C CXX ASM)
 
 cmake_policy(SET CMP0076 NEW)
 
 # Enable unit testing
 enable_testing()
 
-# Define flags to determine the build target platform
-# Windows, Linux, macOS, iOS, Android
+# Define flags to determine the build target platform Windows, Linux, macOS,
+# iOS, Android
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(Windows TRUE)
 endif()
@@ -36,17 +40,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(XCODE)
- if(${XCODE_VERSION} VERSION_GREATER_EQUAL 12.0.0 AND
-    ${XCODE_VERSION} VERSION_LESS 11.0.0
-  )
-    message(FATAL_ERROR 
-      "The required Xcode version is 11.0 or higher and 12.0 or higher is not supported.")
+  if(${XCODE_VERSION} VERSION_GREATER_EQUAL 12.0.0 AND ${XCODE_VERSION}
+                                                       VERSION_LESS 11.0.0)
+    message(
+      FATAL_ERROR
+        "The required Xcode version is 11.0 or higher and 12.0 or higher is not supported."
+    )
   endif()
 endif()
 
 if(Linux)
   option(USE_CUSTOM_LIBCXX_STATIC "Use custom libc++" OFF)
-  option(CUSTOM_LIBCXX_DIR "Set filepath for custom libc++" "${CMAKE_SOURCE_DIR}")
+  option(CUSTOM_LIBCXX_DIR "Set filepath for custom libc++"
+         "${CMAKE_SOURCE_DIR}")
 
   if(USE_CUSTOM_LIBCXX_STATIC)
     add_compile_options(-nostdinc++)
@@ -57,20 +63,19 @@ if(Linux)
   endif()
 endif()
 
-# enable debug output 
+# enable debug output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # set iterator debug level
 if(Windows)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0 /Zi /Od")
+  set(CMAKE_CXX_FLAGS_DEBUG
+      "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0 /Zi /Od")
 endif()
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH 
-  "${CMAKE_SOURCE_DIR}/cmake"
-)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 find_package(WebRTC REQUIRED)
 
