@@ -50,8 +50,8 @@ Please read this if you have an interest to customize native code in this projec
 | `2.4.0-exp.9` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Aug 2022 |
 | `2.4.0-exp.10` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Aug 2022 |
 | `2.4.0-exp.11` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Sep 2022 |
-| `2.4.0-pre.2` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix bugs | Oct 2022 |
-| `2.4.0-pre.3` | [M104](https://groups.google.com/g/discuss-webrtc/c/PZxgk-aUFhw) | - Fix bugs | Jan 2023 |
+| `3.0.0-pre.1` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix bugs | Dec 2022 |
+| `3.0.0-pre.2` | [M104](https://groups.google.com/g/discuss-webrtc/c/PZxgk-aUFhw) | - Fix bugs | Jan 2023 |
 
 ## Licenses
 
