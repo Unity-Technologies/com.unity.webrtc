@@ -1,12 +1,6 @@
-target_sources(WebRTCLib
-  PRIVATE
-    GraphicsDevice.cpp
-    GraphicsDevice.h
-    GraphicsUtility.cpp
-    GraphicsUtility.h
-    IGraphicsDevice.h
-    ITexture2D.h
-)
+target_sources(
+  WebRTCLib PRIVATE GraphicsDevice.cpp GraphicsDevice.h GraphicsUtility.cpp
+                    GraphicsUtility.h IGraphicsDevice.h ITexture2D.h)
 
 if(Windows)
   add_subdirectory(Vulkan)
@@ -21,5 +15,5 @@ elseif(Linux)
   add_subdirectory(Cuda)
 elseif(Android)
   add_subdirectory(Vulkan)
-  add_subdirectory(OpenGL) 
+  add_subdirectory(OpenGL)
 endif()
