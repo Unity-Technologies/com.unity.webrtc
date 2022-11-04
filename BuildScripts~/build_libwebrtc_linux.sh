@@ -66,10 +66,6 @@ do
   done
 done
 
-# fix error when generate license
-patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
-  "$COMMAND_DIR/patches/generate_licenses.patch"
-
 "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
   --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
