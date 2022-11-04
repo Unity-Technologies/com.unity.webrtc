@@ -63,13 +63,9 @@ for %%i in (x64) do (
 
 endlocal
 
-rem fix error when generate license
-patch -N "%cd%\src\tools_webrtc\libs\generate_licenses.py" < ^
-  "%COMMAND_DIR%\patches\generate_licenses.patch"
-
 rem generate license
 call python.bat "%cd%\src\tools_webrtc\libs\generate_licenses.py" ^
-  --target //:default %OUTPUT_DIR% %OUTPUT_DIR%
+  --target :webrtc %OUTPUT_DIR% %OUTPUT_DIR%
 
 rem unescape license
 powershell -File "%COMMAND_DIR%\Unescape.ps1" "%OUTPUT_DIR%\LICENSE.md"
