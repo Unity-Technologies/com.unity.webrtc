@@ -26,6 +26,15 @@ fi
 # add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
+pushd src/buildtools
+patch -p1 add_visibility_libunwind.patch
+popd
+
+pushd src/build
+patch -p1 add_deps_libunwind.patch
+popd
+
+
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 for target_cpu in "arm64"
@@ -35,8 +44,10 @@ do
   for is_debug in "true" "false"
   do
     # generate ninja files
+    # use `treat_warnings_as_errors` option to avoid deprecation warnings
     gn gen "$OUTPUT_DIR" --root="src" \
       --args="is_debug=${is_debug} \
+      is_java_debug=${is_debug} \
       target_os=\"android\" \
       target_cpu=\"${target_cpu}\" \
       rtc_use_h264=false \
@@ -44,7 +55,8 @@ do
       rtc_build_examples=false \
       is_component_build=false \
       use_rtti=true \
-      use_custom_libcxx=false"
+      use_custom_libcxx=false \
+      treat_warnings_as_errors=false"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
@@ -63,17 +75,20 @@ pushd src
 
 for is_debug in "true" "false"
 do
-  python3 tools_webrtc/android/build_aar.py \
+  # use `treat_warnings_as_errors` option to avoid deprecation warnings
+  "$PYTHON3_BIN" tools_webrtc/android/build_aar.py \
     --build-dir $OUTPUT_DIR \
     --output $OUTPUT_DIR/libwebrtc.aar \
     --arch arm64-v8a \
     --extra-gn-args "is_debug=${is_debug} \
+      is_java_debug=${is_debug} \
       rtc_use_h264=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
       is_component_build=false \
       use_rtti=true \
-      use_custom_libcxx=false"
+      use_custom_libcxx=false \
+      treat_warnings_as_errors=false"
 
   filename="libwebrtc.aar"
   if [ $is_debug = "true" ]; then
