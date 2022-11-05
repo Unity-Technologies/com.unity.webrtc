@@ -27,11 +27,11 @@ fi
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 pushd src/buildtools
-patch -p1 add_visibility_libunwind.patch
+patch -p1 "$COMMAND_DIR/patches/add_visibility_libunwind.patch"
 popd
 
 pushd src/build
-patch -p1 add_deps_libunwind.patch
+patch -p1 "$COMMAND_DIR/patches/add_deps_libunwind.patch"
 popd
 
 
