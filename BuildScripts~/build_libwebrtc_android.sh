@@ -26,13 +26,11 @@ fi
 # add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
-pushd src/buildtools
-git apply "$COMMAND_DIR/patches/add_visibility_libunwind.patch"
-popd
+# add visibility libunwind
+patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches/add_visibility_libunwind.patch"
 
-pushd src/build
-git apply "$COMMAND_DIR/patches/add_deps_libunwind.patch"
-popd
+# add deps libunwind
+patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
 
 
 mkdir -p "$ARTIFACTS_DIR/lib"
