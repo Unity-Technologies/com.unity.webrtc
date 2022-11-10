@@ -36,6 +36,7 @@ do
     args="is_debug=${is_debug} \
       target_os=\"linux\" \
       target_cpu=\"${target_cpu}\" \
+      use_custom_libcxx=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
       rtc_use_h264=false \

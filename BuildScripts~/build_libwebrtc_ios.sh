@@ -46,13 +46,14 @@ do
     #       https://bugs.chromium.org/p/webrtc/issues/detail?id=11729
     #
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug}    \
-      target_os=\"ios\"               \
-      target_cpu=\"${target_cpu}\"    \
-      rtc_use_h264=false              \
-      treat_warnings_as_errors=false  \
-      ios_enable_code_signing=false   \
-      rtc_include_tests=false         \
+      --args="is_debug=${is_debug} \
+      target_os=\"ios\" \
+      target_cpu=\"${target_cpu}\" \
+      rtc_use_h264=false \
+      use_custom_libcxx=false \
+      treat_warnings_as_errors=false \
+      ios_enable_code_signing=false \
+      rtc_include_tests=false \
       rtc_build_examples=false"
 
     # build static library
