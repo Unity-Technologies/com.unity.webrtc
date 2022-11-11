@@ -30,6 +30,9 @@ if not exist src (
 rem add jsoncpp
 patch -N "src\BUILD.gn" < "%COMMAND_DIR%\patches\add_jsoncpp.patch"
 
+rem fix towupper
+patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc" < "%COMMAND_DIR%\patches\fix_towupper.patch"
+
 rem install pywin32
 call "%cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe" ^
   -m pip install pywin32 --index-url "%PYPI_URL%" --upgrade

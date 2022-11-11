@@ -1,0 +1,12 @@
+diff --git a/modules/desktop_capture/win/full_screen_win_application_handler.cc b/modules/desktop_capture/win/full_screen_win_application_handler.cc
+index f7047dba06..4222dfc01e 100644
+--- a/modules/desktop_capture/win/full_screen_win_application_handler.cc
++++ b/modules/desktop_capture/win/full_screen_win_application_handler.cc
+@@ -11,6 +11,7 @@
+ #include "modules/desktop_capture/win/full_screen_win_application_handler.h"
+ 
+ #include <algorithm>
++#include <cwctype>
+ #include <memory>
+ #include <string>
+ #include <vector>
