@@ -28,10 +28,7 @@ if not exist src (
 )
 
 rem add jsoncpp
-patch -N "src\BUILD.gn" < "%COMMAND_DIR%\patches\add_jsoncpp.patch"
-
-rem fix towupper
-patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc" < "%COMMAND_DIR%\patches\fix_towupper.patch"
+rem patch -N "src\BUILD.gn" < "%COMMAND_DIR%\patches\add_jsoncpp.patch"
 
 rem install pywin32
 call "%cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe" ^
@@ -50,7 +47,7 @@ for %%i in (x64) do (
       --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
     rem build
-    ninja.exe -C %OUTPUT_DIR%
+    ninja.exe -C %OUTPUT_DIR% webrtc
 
     set filename=
     if true==%%j (
