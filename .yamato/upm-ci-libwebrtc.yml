@@ -13,7 +13,7 @@ platforms:
     build_command: BuildScripts~/build_libwebrtc_macos.sh
   - name: linux
     type: Unity::VM
-    image: cds-ops/ubuntu-18.04-base:v1.6.0-546186
+    image: package-ci/ubuntu-20.04:v1.4.0-1235639
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_linux.sh
   - name: android
