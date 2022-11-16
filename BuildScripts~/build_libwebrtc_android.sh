@@ -52,6 +52,7 @@ do
       rtc_build_examples=false \
       is_component_build=false \
       use_rtti=true \
+      use_custom_libcxx=false \
       treat_warnings_as_errors=false"
 
     # build static library
@@ -82,6 +83,7 @@ do
       rtc_build_examples=false \
       is_component_build=false \
       use_rtti=true \
+      use_custom_libcxx=false \
       treat_warnings_as_errors=false"
 
   filename="libwebrtc.aar"
