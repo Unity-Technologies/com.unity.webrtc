@@ -51,6 +51,7 @@ do
     # use `treat_warnings_as_errors` option to avoid deprecation warnings
     gn gen "$OUTPUT_DIR" --root="src" \
       --args="is_debug=${is_debug} \
+      is_java_debug=${is_debug} \
       target_os=\"android\" \
       target_cpu=\"${target_cpu}\" \
       rtc_use_h264=false \
@@ -84,6 +85,7 @@ do
     --output $OUTPUT_DIR/libwebrtc.aar \
     --arch arm64-v8a \
     --extra-gn-args "is_debug=${is_debug} \
+      is_java_debug=${is_debug} \
       rtc_use_h264=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
