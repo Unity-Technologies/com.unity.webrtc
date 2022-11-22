@@ -20,17 +20,23 @@ then
   sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
-  gclient sync -f
+  gclient sync -D --force --reset
 fi
 
-# add jsoncpp
+# Add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
-# add visibility libunwind
+# Add visibility libunwind
 patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches/add_visibility_libunwind.patch"
 
-# add deps libunwind
+# Add deps libunwind
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
+
+# downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
+# https://docs.unity3d.com/Manual/android-sdksetup.html
+pushd "src/build"
+git apply "$COMMAND_DIR/patches/downgrade_JDK.patch"
+popd
 
 
 mkdir -p "$ARTIFACTS_DIR/lib"

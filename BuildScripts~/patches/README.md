@@ -1,7 +1,7 @@
 # Patch
 
 
-## Workaround for gn error for building android libwebrtc
+## Workaround for gn error for building Android libwebrtc
 
 Building libwebrtc for Android with `use_custom_libcxx=false` args for gn will get error. More details [here](https://bugs.chromium.org/p/webrtc/issues/detail?id=13535#c8).
 
@@ -20,7 +20,25 @@ patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
 ```
 
-## Workaround for gn error for building windows libwebrtc
+## Workaround for runtime error on Android
+
+Unity supports OpenJDK version 1.8 for building Android app. You can see [the table](https://docs.unity3d.com/Manual/android-sdksetup.html) shows the JDK version that each Unity version supports. However, JDK version for libwebrtc has been updated in [this commit](https://source.chromium.org/chromium/chromium/src/+/ff333588f945ab6438a98a8d5feabec2be60ccf1). We made a patch to downgrade the JDK.
+
+### Patch files
+
+- downgrade_JDK.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc. 
+
+pushd "src/build"
+git apply "BuildScripts~\patches\downgrade_JDK.patch"
+```
+
+
+## Workaround for gn error for building Windows libwebrtc
 
 Building libwebrtc for Windows with `use_custom_libcxx=false` args for gn will get error.
 
@@ -46,7 +64,7 @@ _Check_return_ _ACRTIMP wint_t __cdecl towupper(_In_ wint_t _C);
 patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc" < "BuildScripts~\patches\fix_towupper.patch"
 ```
 
-## Workaround for abseil library building windows libwebrtc 
+## Workaround for abseil library building Windows libwebrtc 
 
 Building libwebrtc for Windows with `use_custom_libcxx=false` args for gn will get error. Referenced [here](https://github.com/abseil/abseil-cpp/pull/1289) for the patch file.
 

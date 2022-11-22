@@ -20,7 +20,7 @@ then
   sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
-  gclient sync -f
+  gclient sync -D --force --reset
 fi
 
 # add jsoncpp

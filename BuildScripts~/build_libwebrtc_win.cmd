@@ -23,7 +23,7 @@ if not exist src (
   call git.bat config --system core.longpaths true
   call git.bat checkout  refs/remotes/branch-heads/%WEBRTC_VERSION%
   cd ..
-  call gclient.bat sync -f
+  call gclient.bat sync -D --force --reset
 )
 
 rem add jsoncpp
