@@ -86,12 +86,14 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
+        [Obsolete]
         [StringValue("stream")]
         Stream = 9,
 
         /// <summary>
         /// 
         /// </summary>
+        [Obsolete]
         [StringValue("track")]
         Track = 10,
 
@@ -154,6 +156,18 @@ namespace Unity.WebRTC
         /// </summary>
         [StringValue("ice-server")]
         IceServer = 20,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [StringValue("received-rtp")]
+        ReceivedRtp = 21,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [StringValue("sent-rtp")]
+        SentRtp = 22,
     }
 
     internal enum StatsMemberType
@@ -173,6 +187,9 @@ namespace Unity.WebRTC
         SequenceUint64, // std::vector<uint64_t>
         SequenceDouble, // std::vector<double>
         SequenceString, // std::vector<std::string>
+
+        MapStringUint64, // std::map<std::string, uint64_t>
+        MapStringDouble // std::map<std::string, double>
     }
 
     internal class RTCStatsMember
@@ -203,6 +220,7 @@ namespace Unity.WebRTC
                 return null;
             }
 
+            IntPtr values;
             ulong length = 0;
             switch (type)
             {
@@ -234,6 +252,10 @@ namespace Unity.WebRTC
                     return NativeMethods.StatsMemberGetDoubleArray(self, out length).AsArray<double>((int)length);
                 case StatsMemberType.SequenceString:
                     return NativeMethods.StatsMemberGetStringArray(self, out length).AsArray<string>((int)length);
+                case StatsMemberType.MapStringUint64:
+                    return NativeMethods.StatsMemberGetMapStringUint64(self, out values, out length).AsMap<ulong>(values, (int)length);
+                case StatsMemberType.MapStringDouble:
+                    return NativeMethods.StatsMemberGetMapStringDouble(self, out values, out length).AsMap<double>(values, (int)length);
                 default:
                     throw new ArgumentException();
             }
@@ -645,7 +667,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public bool readable { get { return GetBool("readable"); } }
+        public ulong packetsSent { get { return GetUnsignedLong("packetsSent"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ulong packetsReceived { get { return GetUnsignedLong("packetsReceived"); } }
 
         /// <summary>
         /// 
@@ -700,32 +727,17 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public ulong retransmissionsReceived { get { return GetUnsignedLong("retransmissionsReceived"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ulong retransmissionsSent { get { return GetUnsignedLong("retransmissionsSent"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ulong consentRequestsReceived { get { return GetUnsignedLong("consentRequestsReceived"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public ulong consentRequestsSent { get { return GetUnsignedLong("consentRequestsSent"); } }
 
         /// <summary>
         /// 
         /// </summary>
-        public ulong consentResponsesReceived { get { return GetUnsignedLong("consentResponsesReceived"); } }
+        public ulong packetsDiscardedOnSend { get { return GetUnsignedLong("packetsDiscardedOnSend"); } }
 
         /// <summary>
         /// 
         /// </summary>
-        public ulong consentResponsesSent { get { return GetUnsignedLong("consentResponsesSent"); } }
+        public ulong bytesDiscardedOnSend { get { return GetUnsignedLong("bytesDiscardedOnSend"); } }
 
         internal RTCIceCandidatePairStats(IntPtr ptr) : base(ptr)
         {
@@ -792,6 +804,17 @@ namespace Unity.WebRTC
         /// </summary>
         public string url { get { return GetString("url"); } }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool vpn { get { return GetBool("vpn"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string networkAdapterType { get { return GetString("networkAdapterType"); } }
+        
+        
         internal RTCIceCandidateStats(IntPtr ptr) : base(ptr)
         {
         }
@@ -800,6 +823,7 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
+    [Obsolete]
     public class RTCMediaStreamStats : RTCStats
     {
         /// <summary>
@@ -820,6 +844,7 @@ namespace Unity.WebRTC
     /// <summary>
     /// 
     /// </summary>
+    [Obsolete]
     public class RTCMediaStreamTrackStats : RTCStats
     {
 
@@ -1251,57 +1276,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// 
         /// </summary>
-        public double roundTripTime { get { return GetDouble("roundTripTime"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public uint packetsDiscarded { get { return GetUnsignedInt("packetsDiscarded"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public uint packetsRepaired { get { return GetUnsignedInt("packetsRepaired"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public uint burstPacketsLost { get { return GetUnsignedInt("burstPacketsLost"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public uint burstPacketsDiscarded { get { return GetUnsignedInt("burstPacketsDiscarded"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public uint burstLossCount { get { return GetUnsignedInt("burstLossCount"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public uint burstDiscardCount { get { return GetUnsignedInt("burstDiscardCount"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public double burstLossRate { get { return GetDouble("burstLossRate"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public double burstDiscardRate { get { return GetDouble("burstDiscardRate"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public double gapLossRate { get { return GetDouble("gapLossRate"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public double gapDiscardRate { get { return GetDouble("gapDiscardRate"); } }
 
         /// <summary>
         /// 
@@ -1312,11 +1287,6 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public uint frameHeight { get { return GetUnsignedInt("frameHeight"); } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public uint frameBitDepth { get { return GetUnsignedInt("frameBitDepth"); } }
 
         /// <summary>
         /// 
@@ -1337,6 +1307,21 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public double totalDecodeTime { get { return GetDouble("totalDecodeTime"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public double totalProcessingDelay { get { return GetDouble("totalProcessingDelay"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public double totalAssemblyTime { get { return GetDouble("totalAssemblyTime"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public uint framesAssembledFromMultiplePackets { get { return GetUnsignedInt("framesAssembledFromMultiplePackets"); } }
 
         /// <summary>
         /// 
@@ -1403,6 +1388,11 @@ namespace Unity.WebRTC
         /// 
         /// </summary>
         public string remoteId { get { return GetString("remoteId"); } }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public string mid { get { return GetString("mid"); } }
 
         /// <summary>
         /// 
@@ -1666,7 +1656,7 @@ namespace Unity.WebRTC
         /// RFC define double but chromium define uint32_t
         /// https://source.chromium.org/chromium/chromium/src/+/main:third_party/webrtc/api/stats/rtcstats_objects.h;l=645;bpv=0;bpt=1
         /// </remarks>
-        public uint framesPerSecond { get { return GetUnsignedInt("framesPerSecond"); } }
+        public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
 
         internal RTCVideoSourceStats(IntPtr ptr) : base(ptr)
         {
@@ -1778,6 +1768,44 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class RTCReceivedRtpStats :RTCStats
+    {
+        internal RTCReceivedRtpStats(IntPtr ptr) : base(ptr)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public double jitter { get { return GetDouble("jitter"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int packetsLost { get { return GetInt("packetsLost"); } }
+    }
+
+    public class RTCSentRtpStats : RTCStats
+    {
+        internal RTCSentRtpStats(IntPtr ptr) : base(ptr)
+        {
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
+    }
+
 
     internal class StatsFactory
     {
@@ -1807,8 +1835,10 @@ namespace Unity.WebRTC
                 {RTCStatsType.Csrc, ptr => new RTCCodecStats(ptr)},
                 {RTCStatsType.PeerConnection, ptr => new RTCPeerConnectionStats(ptr)},
                 {RTCStatsType.DataChannel, ptr => new RTCDataChannelStats(ptr)},
+#pragma warning disable 0612
                 {RTCStatsType.Stream, ptr => new RTCMediaStreamStats(ptr)},
                 {RTCStatsType.Track, ptr => new RTCMediaStreamTrackStats(ptr)},
+#pragma warning restore 0612
                 {RTCStatsType.Transceiver, ptr => new RTCTransceiverStats(ptr)},
                 {RTCStatsType.Sender, ptr => new RTCSenderStats(ptr)},
                 {RTCStatsType.Receiver, ptr => new RTCReceiverStats(ptr)},
@@ -1818,6 +1848,8 @@ namespace Unity.WebRTC
                 {RTCStatsType.LocalCandidate, ptr => new RTCIceCandidateStats(ptr)},
                 {RTCStatsType.RemoteCandidate, ptr => new RTCIceCandidateStats(ptr)},
                 {RTCStatsType.Certificate, ptr => new RTCCertificateStats(ptr)},
+                {RTCStatsType.ReceivedRtp, ptr => new RTCReceivedRtpStats(ptr)},
+                {RTCStatsType.SentRtp, ptr => new RTCSentRtpStats(ptr)},
             };
         }
 

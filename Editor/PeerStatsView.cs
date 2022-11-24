@@ -193,18 +193,7 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label(
                     $"{nameof(inboundStats.lastPacketReceivedTimestamp)}: {inboundStats.lastPacketReceivedTimestamp}"));
                 container.Add(new Label($"{nameof(inboundStats.jitter)}: {inboundStats.jitter}"));
-                container.Add(new Label($"{nameof(inboundStats.roundTripTime)}: {inboundStats.roundTripTime}"));
                 container.Add(new Label($"{nameof(inboundStats.packetsDiscarded)}: {inboundStats.packetsDiscarded}"));
-                container.Add(new Label($"{nameof(inboundStats.packetsRepaired)}: {inboundStats.packetsRepaired}"));
-                container.Add(new Label($"{nameof(inboundStats.burstPacketsLost)}: {inboundStats.burstPacketsLost}"));
-                container.Add(
-                    new Label($"{nameof(inboundStats.burstPacketsDiscarded)}: {inboundStats.burstPacketsDiscarded}"));
-                container.Add(new Label($"{nameof(inboundStats.burstLossCount)}: {inboundStats.burstLossCount}"));
-                container.Add(new Label($"{nameof(inboundStats.burstDiscardCount)}: {inboundStats.burstDiscardCount}"));
-                container.Add(new Label($"{nameof(inboundStats.burstLossRate)}: {inboundStats.burstLossRate}"));
-                container.Add(new Label($"{nameof(inboundStats.burstDiscardRate)}: {inboundStats.burstDiscardRate}"));
-                container.Add(new Label($"{nameof(inboundStats.gapLossRate)}: {inboundStats.gapLossRate}"));
-                container.Add(new Label($"{nameof(inboundStats.gapDiscardRate)}: {inboundStats.gapDiscardRate}"));
                 container.Add(new Label($"{nameof(inboundStats.framesDecoded)}: {inboundStats.framesDecoded}"));
                 container.Add(new Label($"{nameof(inboundStats.keyFramesDecoded)}: {inboundStats.keyFramesDecoded}"));
                 container.Add(new Label($"{nameof(inboundStats.totalDecodeTime)}: {inboundStats.totalDecodeTime}"));
@@ -820,7 +809,6 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidatePairStats.priority)}: {candidatePairStats.priority}"));
                 container.Add(new Label($"{nameof(candidatePairStats.nominated)}: {candidatePairStats.nominated}"));
                 container.Add(new Label($"{nameof(candidatePairStats.writable)}: {candidatePairStats.writable}"));
-                container.Add(new Label($"{nameof(candidatePairStats.readable)}: {candidatePairStats.readable}"));
                 container.Add(new Label($"{nameof(candidatePairStats.bytesSent)}: {candidatePairStats.bytesSent}"));
                 container.Add(
                     new Label($"{nameof(candidatePairStats.bytesReceived)}: {candidatePairStats.bytesReceived}"));
@@ -841,17 +829,11 @@ namespace Unity.WebRTC.Editor
                 container.Add(
                     new Label($"{nameof(candidatePairStats.responsesSent)}: {candidatePairStats.responsesSent}"));
                 container.Add(new Label(
-                    $"{nameof(candidatePairStats.retransmissionsReceived)}: {candidatePairStats.retransmissionsReceived}"));
-                container.Add(new Label(
-                    $"{nameof(candidatePairStats.retransmissionsSent)}: {candidatePairStats.retransmissionsSent}"));
-                container.Add(new Label(
-                    $"{nameof(candidatePairStats.consentRequestsReceived)}: {candidatePairStats.consentRequestsReceived}"));
-                container.Add(new Label(
                     $"{nameof(candidatePairStats.consentRequestsSent)}: {candidatePairStats.consentRequestsSent}"));
                 container.Add(new Label(
-                    $"{nameof(candidatePairStats.consentResponsesReceived)}: {candidatePairStats.consentResponsesReceived}"));
+                    $"{nameof(candidatePairStats.packetsDiscardedOnSend)}: {candidatePairStats.packetsDiscardedOnSend}"));
                 container.Add(new Label(
-                    $"{nameof(candidatePairStats.consentResponsesSent)}: {candidatePairStats.consentResponsesSent}"));
+                    $"{nameof(candidatePairStats.bytesDiscardedOnSend)}: {candidatePairStats.bytesDiscardedOnSend}"));
 
                 graphView.AddInput(candidatePairStats);
             };

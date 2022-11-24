@@ -177,7 +177,6 @@ namespace webrtc
         {
             frames.push(NextInputFrame());
             thread->PostTask(
-                RTC_FROM_HERE,
                 [&]()
                 {
                     VideoFrame frame = frames.front();
@@ -193,10 +192,13 @@ namespace webrtc
 
     TEST_P(NvCodecTest, EncodeDecode)
     {
+        decoderSettings_.set_codec_type(VideoCodecType::kVideoCodecH264);
+        decoderSettings_.set_max_render_resolution({ codecSettings_.width, codecSettings_.height });
+
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->Release());
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->InitEncode(&codecSettings_, kSettings()));
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->Release());
-        EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->InitDecode(&codecSettings_, 1));
+        EXPECT_TRUE(decoder_->Configure(decoderSettings_));
 
         EncodedImage encoded_frame;
         CodecSpecificInfo codec_specific_info;
@@ -222,10 +224,13 @@ namespace webrtc
 
     TEST_P(NvCodecTest, ReconfigureDecoder)
     {
+        decoderSettings_.set_codec_type(VideoCodecType::kVideoCodecH264);
+        decoderSettings_.set_max_render_resolution({ codecSettings_.width, codecSettings_.height });
+
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->Release());
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->InitEncode(&codecSettings_, kSettings()));
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->Release());
-        EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->InitDecode(&codecSettings_, 1));
+        EXPECT_TRUE(decoder_->Configure(decoderSettings_));
 
         EncodedImage encoded_frame;
         CodecSpecificInfo codec_specific_info;
@@ -267,16 +272,19 @@ namespace webrtc
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->Decode(encoded_frame, false, 66));
         ASSERT_TRUE(WaitForDecodedFrame(&decoded_frame, &decoded_qp));
 
-         EXPECT_EQ(decoded_frame->width(), frame2.width());
-         EXPECT_EQ(decoded_frame->height(), frame2.height());
+        EXPECT_EQ(decoded_frame->width(), frame2.width());
+        EXPECT_EQ(decoded_frame->height(), frame2.height());
     }
 
     TEST_P(NvCodecTest, DecodedQpEqualsEncodedQp)
     {
+        decoderSettings_.set_codec_type(VideoCodecType::kVideoCodecH264);
+        decoderSettings_.set_max_render_resolution({ codecSettings_.width, codecSettings_.height });
+
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->Release());
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->InitEncode(&codecSettings_, kSettings()));
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->Release());
-        EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->InitDecode(&codecSettings_, 1));
+        EXPECT_TRUE(decoder_->Configure(decoderSettings_));
 
         EncodedImage encoded_frame;
         CodecSpecificInfo codec_specific_info;
@@ -295,10 +303,13 @@ namespace webrtc
 
     TEST_P(NvCodecTest, DecodedTimeStampEqualsEncodedTimeStamp)
     {
+        decoderSettings_.set_codec_type(VideoCodecType::kVideoCodecH264);
+        decoderSettings_.set_max_render_resolution({ codecSettings_.width, codecSettings_.height });
+
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->Release());
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, encoder_->InitEncode(&codecSettings_, kSettings()));
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->Release());
-        EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->InitDecode(&codecSettings_, 1));
+        EXPECT_TRUE(decoder_->Configure(decoderSettings_));
 
         EncodedImage encoded_frame;
         CodecSpecificInfo codec_specific_info;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
@@ -104,6 +105,20 @@ namespace Unity.WebRTC
             if (freePtr)
             {
                 Marshal.FreeCoTaskMem(ptr);
+            }
+            return ret;
+        }
+
+        public static Dictionary<string, T> AsMap<T>(this IntPtr ptr, IntPtr valuesPtr, int length, bool freePtr = true)
+        {
+            Dictionary<string, T> ret = new Dictionary<string, T>();
+
+            string[] keys = ptr.AsArray<string>(length);
+            T[] values = valuesPtr.AsArray<T>(length);
+
+            for(int i = 0; i < length; i++)
+            {
+                ret[keys[i]] = values[i];
             }
             return ret;
         }

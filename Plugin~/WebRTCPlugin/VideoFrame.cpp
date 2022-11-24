@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <api/make_ref_counted.h>
+
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "VideoFrame.h"
 
@@ -34,7 +36,7 @@ namespace webrtc
         ReturnBufferToPoolCallback returnBufferToPoolCallback,
         TimeDelta timestamp)
     {
-        return new rtc::RefCountedObject<VideoFrame>(size, std::move(buffer), returnBufferToPoolCallback, timestamp);
+        return rtc::make_ref_counted<VideoFrame>(size, std::move(buffer), returnBufferToPoolCallback, timestamp);
     }
 
     bool VideoFrame::HasGpuMemoryBuffer() const { return gpu_memory_buffer_ != nullptr; }

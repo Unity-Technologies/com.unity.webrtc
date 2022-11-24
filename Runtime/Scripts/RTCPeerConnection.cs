@@ -593,7 +593,7 @@ namespace Unity.WebRTC
         public RTCSessionDescriptionAsyncOperation CreateOffer(ref RTCOfferAnswerOptions options)
         {
             CreateSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
+                WebRTC.Context.PeerConnectionCreateOffer(GetSelfOrThrow(), ref options);
             return CreateDescription(observer);
         }
 
@@ -604,7 +604,7 @@ namespace Unity.WebRTC
         public RTCSessionDescriptionAsyncOperation CreateOffer()
         {
             CreateSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+                WebRTC.Context.PeerConnectionCreateOffer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
             return CreateDescription(observer);
         }
 
@@ -617,7 +617,7 @@ namespace Unity.WebRTC
         public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCOfferAnswerOptions options)
         {
             CreateSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
+                WebRTC.Context.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref options);
             return CreateDescription(observer);
         }
 
@@ -628,7 +628,7 @@ namespace Unity.WebRTC
         public RTCSessionDescriptionAsyncOperation CreateAnswer()
         {
             CreateSessionDescriptionObserver observer =
-                NativeMethods.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
+                WebRTC.Context.PeerConnectionCreateAnswer(GetSelfOrThrow(), ref RTCOfferAnswerOptions.Default);
             return CreateDescription(observer);
         }
 

@@ -18,7 +18,7 @@ namespace webrtc
     public:
         PeerConnectionStatsCollectorCallback(const PeerConnectionStatsCollectorCallback&) = delete;
         PeerConnectionStatsCollectorCallback& operator=(const PeerConnectionStatsCollectorCallback&) = delete;
-        static PeerConnectionStatsCollectorCallback* Create(PeerConnectionObject* connection);
+        static rtc::scoped_refptr<PeerConnectionStatsCollectorCallback> Create(PeerConnectionObject* connection);
         void OnStatsDelivered(const rtc::scoped_refptr<const RTCStatsReport>& report) override;
 
         static void RegisterOnGetStats(DelegateCollectStats callback) { s_collectStatsCallback = callback; }

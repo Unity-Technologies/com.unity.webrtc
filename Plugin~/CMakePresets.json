@@ -46,7 +46,7 @@
       "displayName": "Default Linux Config",
       "hidden": true,
       "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "generator": "Unix Makefiles",
+      "generator": "Ninja Multi-Config",
       "environment": {
         "ASAN_OPTIONS": "protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0",
         "LSAN_OPTIONS": "suppressions=${sourceDir}/tools/sanitizer/lsan_suppressions.txt"
@@ -68,8 +68,7 @@
       "cacheVariables": {
         "CMAKE_SYSTEM_NAME": "iOS",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
-        "CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=": "NO",
-        "CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE": "YES"
+        "CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=": "NO"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -118,9 +117,8 @@
       "description": "Sets x86_64 arch, generator, compilers",
       "inherits": "default-linux",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang-10",
-        "CMAKE_CXX_COMPILER": "clang++-10",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++"
+        "CMAKE_C_COMPILER": "clang-11",
+        "CMAKE_CXX_COMPILER": "clang++-11"
       }
     },
     {

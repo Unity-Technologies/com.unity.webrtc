@@ -55,39 +55,30 @@ namespace webrtc
     {
         const auto source = context->CreateVideoSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateVideoTrack("video", source);
+        const auto track = context->CreateVideoTrack("video", source.get());
         EXPECT_NE(nullptr, track);
-
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
     }
 
     TEST_P(ContextTest, CreateAndDeleteMediaStream)
     {
         const auto stream = context->CreateMediaStream("test");
         EXPECT_NE(nullptr, stream);
-        context->RemoveRefPtr(stream);
     }
 
     TEST_P(ContextTest, CreateAndDeleteVideoTrack)
     {
         const auto source = context->CreateVideoSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateVideoTrack("video", source);
+        const auto track = context->CreateVideoTrack("video", source.get());
         EXPECT_NE(nullptr, track);
-
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
     }
 
     TEST_P(ContextTest, CreateAndDeleteAudioTrack)
     {
         const auto source = context->CreateAudioSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateAudioTrack("audio", source);
+        const auto track = context->CreateAudioTrack("audio", source.get());
         EXPECT_NE(nullptr, track);
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
     }
 
     TEST_P(ContextTest, AddAndRemoveAudioTrackToMediaStream)
@@ -96,15 +87,10 @@ namespace webrtc
         EXPECT_NE(nullptr, stream);
         const auto source = context->CreateAudioSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateAudioTrack("audio", source);
+        const auto track = context->CreateAudioTrack("audio", source.get());
         EXPECT_NE(nullptr, track);
-        const auto audioTrack = reinterpret_cast<webrtc::AudioTrackInterface*>(track);
-        EXPECT_NE(nullptr, audioTrack);
-        EXPECT_TRUE(stream->AddTrack(audioTrack));
-        EXPECT_TRUE(stream->RemoveTrack(audioTrack));
-        context->RemoveRefPtr(stream);
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
+        EXPECT_TRUE(stream->AddTrack(track));
+        EXPECT_TRUE(stream->RemoveTrack(track));
     }
 
     TEST_P(ContextTest, AddAndRemoveVideoTrackToMediaStream)
@@ -113,15 +99,10 @@ namespace webrtc
         EXPECT_NE(nullptr, stream);
         const auto source = context->CreateVideoSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateVideoTrack("video", source);
+        const auto track = context->CreateVideoTrack("video", source.get());
         EXPECT_NE(nullptr, track);
-        const auto videoTrack = reinterpret_cast<webrtc::VideoTrackInterface*>(track);
-        EXPECT_NE(nullptr, videoTrack);
-        EXPECT_TRUE(stream->AddTrack(videoTrack));
-        EXPECT_TRUE(stream->RemoveTrack(videoTrack));
-        context->RemoveRefPtr(stream);
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
+        EXPECT_TRUE(stream->AddTrack(track));
+        EXPECT_TRUE(stream->RemoveTrack(track));
     }
 
     TEST_P(ContextTest, CreateAndDeletePeerConnection)
@@ -150,9 +131,9 @@ namespace webrtc
         const webrtc::PeerConnectionInterface::RTCConfiguration config;
         const auto connection = context->CreatePeerConnection(config);
         EXPECT_NE(nullptr, connection);
-        const auto source = static_cast<UnityVideoTrackSource*>(context->CreateVideoSource());
+        auto source = context->CreateVideoSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateVideoTrack("video", source);
+        const auto track = context->CreateVideoTrack("video", source.get());
         EXPECT_NE(nullptr, track);
         std::vector<std::string> streamIds;
         const auto result = connection->connection->AddTrack(track, streamIds);
@@ -162,11 +143,9 @@ namespace webrtc
         source->OnFrameCaptured(frame);
 
         const auto sender = result.value();
-        const auto result2 = connection->connection->RemoveTrackNew(sender);
+        const auto result2 = connection->connection->RemoveTrackOrError(sender);
         EXPECT_TRUE(result2.ok());
         context->DeletePeerConnection(connection);
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
     }
 
     TEST_P(ContextTest, CreateAndDeleteVideoRenderer)
@@ -190,15 +169,13 @@ namespace webrtc
     {
         const auto source = context->CreateVideoSource();
         EXPECT_NE(nullptr, source);
-        const auto track = context->CreateVideoTrack("video", source);
+        const auto track = context->CreateVideoTrack("video", source.get());
         EXPECT_NE(nullptr, track);
         const auto renderer = context->CreateVideoRenderer(callback_videoframeresize, true);
         EXPECT_NE(nullptr, renderer);
         track->AddOrUpdateSink(renderer, rtc::VideoSinkWants());
         track->RemoveSink(renderer);
         context->DeleteVideoRenderer(renderer);
-        context->RemoveRefPtr(track);
-        context->RemoveRefPtr(source);
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDevice, ContextTest, testing::ValuesIn(supportedGfxDevices));

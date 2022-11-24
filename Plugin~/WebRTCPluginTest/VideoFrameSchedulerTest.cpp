@@ -16,49 +16,54 @@ namespace webrtc
         {
         }
 
-        void Delete() override {}
+        void Delete() override { }
 
-        void PostTask(std::unique_ptr<QueuedTask> task) override
+        void PostTask(absl::AnyInvocable<void() &&> task) override
         {
             last_task_ = std::move(task);
-            last_delay_ = 0;
+            last_precision_ = absl::nullopt;
+            last_delay_ = TimeDelta::Zero();
         }
 
-        void PostDelayedTask(std::unique_ptr<QueuedTask> task, uint32_t milliseconds) override
+        void PostDelayedTask(absl::AnyInvocable<void() &&> task, TimeDelta delay) override
         {
             last_task_ = std::move(task);
-            last_delay_ = milliseconds;
+            last_precision_ = TaskQueueBase::DelayPrecision::kLow;
+            last_delay_ = delay;
+        }
+
+        void PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task, TimeDelta delay) override
+        {
+            last_task_ = std::move(task);
+            last_precision_ = TaskQueueBase::DelayPrecision::kHigh;
+            last_delay_ = delay;
         }
 
         bool AdvanceTimeAndRunLastTask()
         {
             EXPECT_TRUE(last_task_);
-            EXPECT_TRUE(last_delay_);
-            clock_->AdvanceTimeMilliseconds(last_delay_.value_or(0));
-            last_delay_.reset();
+            EXPECT_TRUE(last_delay_.IsFinite());
+            clock_->AdvanceTime(last_delay_);
+            last_delay_ = TimeDelta::MinusInfinity();
             auto task = std::move(last_task_);
-            bool delete_task = task->Run();
-            if (!delete_task)
-            {
-                // If the task should not be deleted then just release it.
-                task.release();
-            }
-            return delete_task;
+            std::move(task)();
+            return last_task_ == nullptr;
         }
 
         bool IsTaskQueued() { return !!last_task_; }
 
-        uint32_t last_delay() const
+        TimeDelta last_delay() const
         {
-            EXPECT_TRUE(last_delay_.has_value());
-            return last_delay_.value_or(-1);
+            EXPECT_TRUE(last_delay_.IsFinite());
+            return last_delay_;
         }
 
     private:
         CurrentTaskQueueSetter task_queue_setter_;
         SimulatedClock* clock_;
-        std::unique_ptr<QueuedTask> last_task_;
-        absl::optional<uint32_t> last_delay_;
+        absl::AnyInvocable<void() &&> last_task_;
+        TimeDelta last_delay_ = TimeDelta::MinusInfinity();
+        absl::optional<TaskQueueBase::DelayPrecision> last_precision_;
     };
 
     class VideoFrameSchedulerTest : public ::testing::Test
@@ -78,10 +83,7 @@ namespace webrtc
             scheduler_->Start(std::bind(&VideoFrameSchedulerTest::CaptureCallback, this));
         }
 
-        void CaptureCallback()
-        {
-            count_++;
-        }
+        void CaptureCallback() { count_++; }
 
     protected:
         const int kMaxFramerate = 30;
@@ -127,12 +129,11 @@ namespace webrtc
 
         const int maxFramerate = 5;
         scheduler_->SetMaxFramerateFps(maxFramerate);
-        uint32_t delay = queue.last_delay();
-        EXPECT_GT(delay, 0u);
+        EXPECT_GT(queue.last_delay(), TimeDelta::Zero());
         EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(1, count_);
 
-        EXPECT_GT(queue.last_delay(), delay);
+        EXPECT_GT(queue.last_delay(), TimeDelta::Zero());
         EXPECT_FALSE(queue.AdvanceTimeAndRunLastTask());
         EXPECT_EQ(2, count_);
 

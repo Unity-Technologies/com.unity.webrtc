@@ -85,8 +85,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(config.iceServers[0].urls, Is.EqualTo(config2.iceServers[0].urls));
             Assert.That(config.iceTransportPolicy, Is.EqualTo(RTCIceTransportPolicy.All));
             Assert.That(config.iceTransportPolicy, Is.EqualTo(config2.iceTransportPolicy));
-            Assert.That(config.enableDtlsSrtp, Is.Null);
-            Assert.That(config.enableDtlsSrtp, Is.EqualTo(config2.enableDtlsSrtp));
             Assert.That(config.iceCandidatePoolSize, Is.EqualTo(config2.iceCandidatePoolSize));
             Assert.That(config.bundlePolicy, Is.EqualTo(config2.bundlePolicy));
 

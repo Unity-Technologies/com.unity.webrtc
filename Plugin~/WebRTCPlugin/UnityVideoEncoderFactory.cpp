@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <api/video_codecs/video_encoder.h>
 #include <media/engine/internal_encoder_factory.h>
 #include <modules/video_coding/include/video_error_codes.h>
 #include <tuple>
@@ -141,12 +142,12 @@ namespace webrtc
         return supported_codecs;
     }
 
-    webrtc::VideoEncoderFactory::CodecInfo
-    UnityVideoEncoderFactory::QueryVideoEncoder(const webrtc::SdpVideoFormat& format) const
+    webrtc::VideoEncoderFactory::CodecSupport UnityVideoEncoderFactory::QueryCodecSupport(
+        const SdpVideoFormat& format, absl::optional<std::string> scalability_mode) const
     {
         VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
         RTC_DCHECK(format.IsCodecInList(factory->GetSupportedFormats()));
-        return factory->QueryVideoEncoder(format);
+        return factory->QueryCodecSupport(format, scalability_mode);
     }
 
     std::unique_ptr<webrtc::VideoEncoder>

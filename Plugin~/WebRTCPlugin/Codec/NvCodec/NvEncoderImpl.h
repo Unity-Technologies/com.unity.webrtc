@@ -38,7 +38,6 @@ namespace webrtc
             float max_frame_rate = 0;
             uint32_t target_bps = 0;
             uint32_t max_bps = 0;
-            bool frame_dropping_on = false;
             int key_frame_interval = 0;
             int num_temporal_layers = 1;
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <api/make_ref_counted.h>
 #include <system_wrappers/include/clock.h>
 
 #include "GpuMemoryBuffer.h"
@@ -18,7 +19,7 @@ namespace webrtc
         Size size = Size(static_cast<int>(texture->GetWidth()), static_cast<int>(texture->GetHeight()));
 
         rtc::scoped_refptr<GpuMemoryBufferInterface> gmb =
-            new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(device, ptr, size, format);
+            rtc::make_ref_counted<GpuMemoryBufferFromUnity>(device, ptr, size, format);
 
         const int64_t timestamp_us = webrtc::Clock::GetRealTimeClock()->TimeInMicroseconds();
 

@@ -191,11 +191,6 @@ namespace webrtc
         return SupportedNvDecoderCodecs(context_);
     }
 
-    VideoEncoderFactory::CodecInfo NvEncoderFactory::QueryVideoEncoder(const SdpVideoFormat& format) const
-    {
-        return VideoEncoderFactory::CodecInfo();
-    }
-
     std::unique_ptr<VideoEncoder> NvEncoderFactory::CreateVideoEncoder(const SdpVideoFormat& format)
     {
         // todo(kazuki):: add CUmemorytype::CU_MEMORYTYPE_DEVICE option

@@ -561,6 +561,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
+        [Obsolete]
         public bool? enableDtlsSrtp;
 
         internal RTCConfiguration(ref RTCConfigurationInternal v)
@@ -569,7 +570,9 @@ namespace Unity.WebRTC
             iceTransportPolicy = v.iceTransportPolicy.AsEnum<RTCIceTransportPolicy>();
             bundlePolicy = v.bundlePolicy.AsEnum<RTCBundlePolicy>();
             iceCandidatePoolSize = v.iceCandidatePoolSize;
+#pragma warning disable 0612
             enableDtlsSrtp = v.enableDtlsSrtp;
+#pragma warning restore 0612
         }
 
         internal RTCConfigurationInternal Cast()
@@ -580,7 +583,9 @@ namespace Unity.WebRTC
                 iceTransportPolicy = OptionalInt.FromEnum(this.iceTransportPolicy),
                 bundlePolicy = OptionalInt.FromEnum(this.bundlePolicy),
                 iceCandidatePoolSize = this.iceCandidatePoolSize,
+#pragma warning disable 0612
                 enableDtlsSrtp = this.enableDtlsSrtp
+#pragma warning restore 0612
             };
             return instance;
         }
@@ -667,8 +672,9 @@ namespace Unity.WebRTC
 #endif
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
             NativeMethods.StatsCollectorRegisterCallback(OnCollectStatsCallback);
-            NativeMethods.CreateSessionDescriptionObserverRegisterCallback(OnCreateSessionDesc);
-            NativeMethods.SetSessionDescriptionObserverRegisterCallback(OnSetSessionDesc);
+            NativeMethods.CreateSessionDescriptionObserverRegisterCallback(OnCreateSessionDescription);
+            NativeMethods.SetLocalDescriptionObserverRegisterCallback(OnSetLocalDescription);
+            NativeMethods.SetRemoteDescriptionObserverRegisterCallback(OnSetRemoteDescription);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
@@ -1033,8 +1039,25 @@ namespace Unity.WebRTC
             Debug.Log(str);
         }
 
-        [AOT.MonoPInvokeCallback(typeof(DelegateNativeSetSessionDesc))]
-        static void OnSetSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, string message)
+        [AOT.MonoPInvokeCallback(typeof(DelegateSetLocalDescription))]
+        static void OnSetLocalDescription(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, string message)
+        {
+            Sync(ptr, () =>
+            {
+                if (Table[ptr] is RTCPeerConnection connection)
+                {
+                    var observer = connection.FindObserver<SetSessionDescriptionObserver>(ptrObserver);
+                    if (observer == null)
+                        return;
+                    connection.RemoveObserver(observer);
+                    observer.Invoke(type, message);
+                    observer.Dispose();
+                }
+            });
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(DelegateSetRemoteDescription))]
+        static void OnSetRemoteDescription(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, string message)
         {
             Sync(ptr, () =>
             {
@@ -1051,7 +1074,7 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeCreateSessionDesc))]
-        static void OnCreateSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCSdpType type, string sdp, RTCErrorType errorType, string message)
+        static void OnCreateSessionDescription(IntPtr ptr, IntPtr ptrObserver, RTCSdpType type, string sdp, RTCErrorType errorType, string message)
         {
             Sync(ptr, () =>
             {
@@ -1120,7 +1143,9 @@ namespace Unity.WebRTC
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeCreateSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCSdpType type, [MarshalAs(UnmanagedType.LPStr)] string sdp, RTCErrorType errorType, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateNativeSetSessionDesc(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
+    internal delegate void DelegateSetLocalDescription(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DelegateSetRemoteDescription(IntPtr ptr, IntPtr ptrObserver, RTCErrorType type, [MarshalAs(UnmanagedType.LPStr)] string message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateNativeOnIceConnectionChange(IntPtr ptr, RTCIceConnectionState state);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1203,15 +1228,17 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern CreateSessionDescriptionObserver PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options);
+        public static extern CreateSessionDescriptionObserver PeerConnectionCreateOffer(IntPtr context, IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
-        public static extern CreateSessionDescriptionObserver PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options);
+        public static extern CreateSessionDescriptionObserver PeerConnectionCreateAnswer(IntPtr context, IntPtr ptr, ref RTCOfferAnswerOptions options);
         [DllImport(WebRTC.Lib)]
         public static extern void StatsCollectorRegisterCallback(DelegateCollectStats onCollectStats);
         [DllImport(WebRTC.Lib)]
         public static extern void CreateSessionDescriptionObserverRegisterCallback(DelegateNativeCreateSessionDesc callback);
         [DllImport(WebRTC.Lib)]
-        public static extern void SetSessionDescriptionObserverRegisterCallback(DelegateNativeSetSessionDesc callback);
+        public static extern void SetLocalDescriptionObserverRegisterCallback(DelegateSetLocalDescription callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern void SetRemoteDescriptionObserverRegisterCallback(DelegateSetRemoteDescription callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
@@ -1259,9 +1286,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind);
-        [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiverWithInit(IntPtr pc, IntPtr track, ref RTCRtpTransceiverInitInternal init);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionAddTransceiverWithTypeAndInit(IntPtr pc, TrackKind kind, ref RTCRtpTransceiverInitInternal init);
         [DllImport(WebRTC.Lib)]
@@ -1480,6 +1507,10 @@ namespace Unity.WebRTC
         public static extern IntPtr StatsMemberGetDoubleArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr StatsMemberGetMapStringUint64(IntPtr member, out IntPtr values, out ulong length);
+        [DllImport(WebRTC.Lib)]
+        public static extern IntPtr StatsMemberGetMapStringDouble(IntPtr member, out IntPtr values, out ulong length);
     }
 
     internal static class VideoEncoderMethods

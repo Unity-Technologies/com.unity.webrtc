@@ -85,9 +85,12 @@ static const char * GetVideoChromaFormatString(cudaVideoChromaFormat eChromaForm
         { cudaVideoChromaFormat_444,        "YUV 444"              },
     };
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-constant-out-of-range-compare"
     if (eChromaFormat >= 0 && eChromaFormat < sizeof(aChromaFormatName) / sizeof(aChromaFormatName[0])) {
         return aChromaFormatName[eChromaFormat].name;
     }
+#pragma clang diagnostic pop
     return "Unknown";
 }
 

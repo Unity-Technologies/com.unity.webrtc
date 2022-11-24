@@ -43,7 +43,7 @@ publish_libwebrtc_github_release:
   name: Publish libwebrtc {{ webrtc_version.name }} to Github Release
   agent:
     type: Unity::VM
-    image: package-ci/ubuntu:v2.0.0-947481
+    image: package-ci/ubuntu-20.04:v1.4.0-1235639
     flavor: b1.large
   variables:
     GIT_TAG: You need to change this parameter on Yamato UI

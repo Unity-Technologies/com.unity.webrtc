@@ -1,10 +1,12 @@
 #include "pch.h"
 
+#include <api/units/time_delta.h>
+
 #include "VideoCodecTest.h"
 #include "modules/rtp_rtcp/include/rtp_rtcp_defines.h"
 
-static const int kEncodeTimeoutMs = 100;
-static const int kDecodeTimeoutMs = 100;
+static const webrtc::TimeDelta kEncodeTimeoutMs = webrtc::TimeDelta::Millis(100);
+static const webrtc::TimeDelta kDecodeTimeoutMs = webrtc::TimeDelta::Millis(100);
 
 namespace unity
 {
