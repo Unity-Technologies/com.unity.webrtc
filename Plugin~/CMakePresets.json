@@ -68,7 +68,8 @@
       "cacheVariables": {
         "CMAKE_SYSTEM_NAME": "iOS",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
-        "CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=": "NO"
+        "CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=": "NO",
+        "CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE": "YES"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
