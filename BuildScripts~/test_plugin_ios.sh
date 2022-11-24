@@ -20,6 +20,7 @@ cmake .                                        \
   -D CMAKE_SYSTEM_NAME=iOS                     \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64"    \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES  \
   -D CMAKE_IOS_INSTALL_COMBINED=YES            \
   -D CMAKE_INSTALL_PREFIX=.                    \
   -B build
@@ -33,6 +34,7 @@ cmake . \
   -D CMAKE_SYSTEM_NAME=iOS \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES \
   -B build
 
 xcodebuild build \
