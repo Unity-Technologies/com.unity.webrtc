@@ -7,24 +7,6 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class WebRTCTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            WebRTC.Initialize(true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
-        }
-
-        [Test]
-        public void InitializeTwiceThrowException()
-        {
-            Assert.That(() => WebRTC.Initialize(), Throws.InvalidOperationException);
-        }
-
         [Test]
         public void GraphicsFormat()
         {

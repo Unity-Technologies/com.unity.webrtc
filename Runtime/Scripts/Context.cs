@@ -1,7 +1,53 @@
 using System;
+using UnityEngine;
+using UnityEditor;
 
 namespace Unity.WebRTC
 {
+    // Ensure class initializer is called whenever scripts recompile
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
+    public class ContextManager
+    {
+#if UNITY_EDITOR
+        static ContextManager()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
+            Application.quitting += Quit;
+        }
+
+        static void OnBeforeAssemblyReload()
+        {
+            WebRTC.DisposeInternal();
+        }
+
+        static void OnAfterAssemblyReload()
+        {
+            WebRTC.InitializeInternal();
+        }
+
+        static void Quit()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+        }
+
+#else
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        Application.quitting += Quit;
+        WebRTC.InitializeInternal();
+    }
+    static void Quit()
+    {
+        WebRTC.DisposeInternal();
+    }
+#endif
+    }
+
     internal class Context : IDisposable
     {
         internal IntPtr self;
