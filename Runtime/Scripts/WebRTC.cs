@@ -741,7 +741,6 @@ namespace Unity.WebRTC
                 s_context.Dispose();
                 s_context = null;
             }
-            s_context.syncContext = null;
             NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.Info);
         }
 
