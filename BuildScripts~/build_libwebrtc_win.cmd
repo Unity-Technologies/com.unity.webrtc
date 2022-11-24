@@ -6,9 +6,8 @@ if not exist depot_tools (
 
 set COMMAND_DIR=%~dp0
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=4515
+set WEBRTC_VERSION=5304
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
-set CPPFLAGS=/WX-
 set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2019
 set OUTPUT_DIR=out
@@ -24,11 +23,17 @@ if not exist src (
   call git.bat config --system core.longpaths true
   call git.bat checkout  refs/remotes/branch-heads/%WEBRTC_VERSION%
   cd ..
-  call gclient.bat sync -f
+  call gclient.bat sync -D --force --reset
 )
 
 rem add jsoncpp
 patch -N "src\BUILD.gn" < "%COMMAND_DIR%\patches\add_jsoncpp.patch"
+
+rem fix towupper
+patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc" < "%COMMAND_DIR%\patches\fix_towupper.patch"
+
+rem fix abseil
+patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "%COMMAND_DIR%\patches\fix_abseil.patch"
 
 rem install pywin32
 call "%cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe" ^
@@ -44,10 +49,10 @@ for %%i in (x64) do (
 
     rem generate ninja for release
     call gn.bat gen %OUTPUT_DIR% --root="src" ^
-      --args="is_debug=%%j is_clang=false target_cpu=\"%%i\" rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
+      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
 
     rem build
-    ninja.exe -C %OUTPUT_DIR%
+    ninja.exe -C %OUTPUT_DIR% webrtc
 
     set filename=
     if true==%%j (
@@ -63,13 +68,9 @@ for %%i in (x64) do (
 
 endlocal
 
-rem fix error when generate license
-patch -N "%cd%\src\tools_webrtc\libs\generate_licenses.py" < ^
-  "%COMMAND_DIR%\patches\generate_licenses.patch"
-
 rem generate license
 call python.bat "%cd%\src\tools_webrtc\libs\generate_licenses.py" ^
-  --target //:default %OUTPUT_DIR% %OUTPUT_DIR%
+  --target :webrtc %OUTPUT_DIR% %OUTPUT_DIR%
 
 rem unescape license
 powershell -File "%COMMAND_DIR%\Unescape.ps1" "%OUTPUT_DIR%\LICENSE.md"

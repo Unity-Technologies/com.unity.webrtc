@@ -7,9 +7,10 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=4515
+export WEBRTC_VERSION=5304
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
+export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
@@ -19,7 +20,7 @@ then
   sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
-  gclient sync -f
+  gclient sync -D --force --reset
 fi
 
 # add jsoncpp
@@ -44,18 +45,15 @@ do
     #       See below for details.
     #       https://bugs.chromium.org/p/webrtc/issues/detail?id=11729
     #
-    # note: `use_xcode_clang=true` is for using bitcode.
-    #
     gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug}    \
-      target_os=\"ios\"               \
-      target_cpu=\"${target_cpu}\"    \
-      rtc_use_h264=false              \
-      treat_warnings_as_errors=false  \
-      use_xcode_clang=true            \
-      enable_ios_bitcode=true         \
-      ios_enable_code_signing=false   \
-      rtc_include_tests=false         \
+      --args="is_debug=${is_debug} \
+      target_os=\"ios\" \
+      target_cpu=\"${target_cpu}\" \
+      rtc_use_h264=false \
+      use_custom_libcxx=false \
+      treat_warnings_as_errors=false \
+      ios_enable_code_signing=false \
+      rtc_include_tests=false \
       rtc_build_examples=false"
 
     # build static library
@@ -81,12 +79,8 @@ do
   rm -r "$ARTIFACTS_DIR/lib/x64"
 done
 
-# fix error when generate license
-patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
-  "$COMMAND_DIR/patches/generate_licenses.patch"
-
-vpython "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
+"$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
+  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"

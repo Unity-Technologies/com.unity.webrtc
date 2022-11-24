@@ -1,0 +1,13 @@
+diff --git a/config/BUILD.gn b/config/BUILD.gn
+index 265d4bc07..71ec29437 100644
+--- a/config/BUILD.gn
++++ b/config/BUILD.gn
+@@ -241,6 +241,8 @@ group("common_deps") {
+ 
+   if (use_custom_libcxx) {
+     public_deps += [ "//buildtools/third_party/libc++" ]
++  } else {
++    public_deps += [ "//buildtools/third_party/libunwind" ]
+   }
+ 
+   if (use_afl) {

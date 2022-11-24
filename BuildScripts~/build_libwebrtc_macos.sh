@@ -7,9 +7,10 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=4515
+export WEBRTC_VERSION=5304
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
+export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
@@ -19,7 +20,7 @@ then
   sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
-  gclient sync -f
+  gclient sync -D --force --reset
 fi
 
 # add jsoncpp
@@ -44,6 +45,7 @@ do
       --args="is_debug=${is_debug} \
       target_os=\"mac\"  \
       target_cpu=\"${target_cpu}\" \
+      use_custom_libcxx=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
       rtc_use_h264=false \
@@ -51,8 +53,7 @@ do
       enable_iterator_debugging=false \
       is_component_build=false \
       use_rtti=true \
-      rtc_use_x11=false \
-      libcxx_abi_unstable=false"
+      rtc_use_x11=false"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
@@ -77,12 +78,8 @@ do
   rm -r "$ARTIFACTS_DIR/lib/x64"
 done
 
-# fix error when generate license
-patch -N "./src/tools_webrtc/libs/generate_licenses.py" < \
-  "$COMMAND_DIR/patches/generate_licenses.patch"
-
-vpython "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target //:default "$OUTPUT_DIR" "$OUTPUT_DIR"
+"$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
+  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"

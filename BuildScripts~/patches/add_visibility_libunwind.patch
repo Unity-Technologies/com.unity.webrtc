@@ -1,0 +1,13 @@
+diff --git a/third_party/libunwind/BUILD.gn b/third_party/libunwind/BUILD.gn
+index a8287bf..3ca6bc5 100644
+--- a/third_party/libunwind/BUILD.gn
++++ b/third_party/libunwind/BUILD.gn
+@@ -20,7 +20,7 @@ config("libunwind_config") {
+ }
+ 
+ source_set("libunwind") {
+-  visibility = []
++  visibility = [ "//build/config:common_deps"]
+   if (is_fuchsia) {
+     visibility += [ "//buildtools/third_party/libc++abi" ]
+   } else if (is_android) {
