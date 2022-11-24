@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using UnityEngine;
 using UnityEditor;
 
@@ -52,6 +53,9 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         internal WeakReferenceTable table;
+        internal SynchronizationContext syncContext;
+        internal bool limitTextureSize;
+
 
         private int id;
         private bool disposed;

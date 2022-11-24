@@ -638,8 +638,6 @@ namespace Unity.WebRTC
         internal const string Lib = "webrtc";
 #endif
         private static Context s_context = null;
-        private static SynchronizationContext s_syncContext;
-        private static bool s_limitTextureSize;
 
         /// <summary>
         /// 
@@ -667,11 +665,12 @@ namespace Unity.WebRTC
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create();
-            NativeMethods.SetCurrentContext(s_context.self);
 
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
-            s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
-            s_limitTextureSize = limitTextureSize;
+            s_context.syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+            s_context.limitTextureSize = limitTextureSize;
+
+            NativeMethods.SetCurrentContext(s_context.self);
         }
 
         /// <summary>
@@ -713,7 +712,7 @@ namespace Unity.WebRTC
         /// </returns>
         public static bool ExecutePendingTasks(int millisecondTimeout)
         {
-            if (s_syncContext is ExecutableUnitySynchronizationContext executableContext)
+            if (s_context.syncContext is ExecutableUnitySynchronizationContext executableContext)
             {
                 return executableContext.ExecutePendingTasks(millisecondTimeout);
             }
@@ -736,13 +735,13 @@ namespace Unity.WebRTC
                 s_context.Dispose();
                 s_context = null;
             }
-            s_syncContext = null;
+            s_context.syncContext = null;
             NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.Info);
         }
 
         internal static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
         {
-            if (!s_limitTextureSize)
+            if (!s_context.limitTextureSize)
             {
                 return new RTCError { errorType = RTCErrorType.None };
             }
@@ -924,19 +923,19 @@ namespace Unity.WebRTC
             if (delay < 0f)
                 throw new ArgumentException($"The delay value is smaller than zero. delay:{delay}");
             if (Mathf.Approximately(delay, 0f))
-                s_syncContext.Post(DestroyImmediate, obj);
+                s_context.syncContext.Post(DestroyImmediate, obj);
             else
-                s_syncContext.Post(Destroy, Tuple.Create(obj, delay));
+                s_context.syncContext.Post(Destroy, Tuple.Create(obj, delay));
         }
 
         internal static void DelayActionOnMainThread(Action callback, float delay)
         {
-            s_syncContext.Post(DelayAction, Tuple.Create(callback, delay));
+            s_context.syncContext.Post(DelayAction, Tuple.Create(callback, delay));
         }
 
         internal static void Sync(IntPtr ptr, Action callback)
         {
-            s_syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
+            s_context.syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
         }
         internal static string GetModuleName()
         {
