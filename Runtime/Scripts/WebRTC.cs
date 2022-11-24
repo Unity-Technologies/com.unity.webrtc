@@ -646,30 +646,24 @@ namespace Unity.WebRTC
         private static SynchronizationContext s_syncContext;
         private static bool s_limitTextureSize;
 
-#if UNITY_EDITOR
-        internal static void OnBeforeAssemblyReload()
-        {
-            Dispose();
-        }
-#endif
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="limitTextureSize"></param>
         /// <param name="enableNativeLog"></param>
         /// <param name="nativeLoggingSeverity"></param>
+        [Obsolete]
         public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
+            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
+        {
+        }
+
+        internal static void InitializeInternal(bool limitTextureSize = true, bool enableNativeLog = false,
             NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
         {
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
 
-            // todo(kazuki): Add this event to avoid crash caused by hot-reload.
-            // Dispose of all before reloading assembly.
-#if UNITY_EDITOR
-            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
-#endif
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
             NativeMethods.StatsCollectorRegisterCallback(OnCollectStatsCallback);
             NativeMethods.CreateSessionDescriptionObserverRegisterCallback(OnCreateSessionDescription);
@@ -736,7 +730,12 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
+        [Obsolete]
         public static void Dispose()
+        {
+        }
+
+        internal static void DisposeInternal()
         {
             if (s_context != null)
             {
@@ -745,10 +744,6 @@ namespace Unity.WebRTC
             }
             s_syncContext = null;
             NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.Info);
-
-#if UNITY_EDITOR
-            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
-#endif
         }
 
         internal static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
