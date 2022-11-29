@@ -12,21 +12,6 @@ using UnityEngine;
 using Unity.WebRTC;
 ```
 
-### Initialization
-
-Call the [`WebRTC.Initialize`](../api/Unity.WebRTC.WebRTC.html#Unity_WebRTC_WebRTC_Initialize_) method to initialize and use WebRTC.
-
-```CSharp
-public class MyPlayerScript : MonoBehaviour
-{
-    private void Awake()
-    {
-        // Initialize WebRTC
-        WebRTC.Initialize();
-    }
-}
-```
-
 ### Creating a local peer
 
 Create a local peer and get [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html). Use [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) to enable binary data transmission. Register [`OnOpen`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnOpen) and [`OnClose`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnClose) callbacks to run a process when [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) starts or finishes. Set the [`OnMessage`](../api/Unity.WebRTC.RTCDataChannel.html#Unity_WebRTC_RTCDataChannel_OnMessage) callback to receive messages.
@@ -138,7 +123,7 @@ void HandleReceiveMessage(byte[] bytes)
 
 ### The end process
 
-When finished, `Close` method must be called for [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) and [`RTCPeerConnection`](../api/Unity.WebRTC.RTCPeerConnection.html). Finally, after the object is discarded, call [`WebRTC.Dispose`](../api/Unity.WebRTC.WebRTC.html#Unity_WebRTC_WebRTC_Dispose).
+When finished, `Close` method must be called for [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChannel.html) and [`RTCPeerConnection`](../api/Unity.WebRTC.RTCPeerConnection.html).
 
 ```csharp
 private void OnDestroy()
@@ -148,8 +133,6 @@ private void OnDestroy()
   
   localConnection.Close();
   remoteConnection.Close();
-  
-  WebRTC.Dispose();
 }
 ```
 

@@ -40,7 +40,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.settings-manager": {
-      "version": "1.0.3",
+      "version": "1.0.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -82,7 +82,8 @@
       "source": "embedded",
       "dependencies": {
         "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.editorcoroutines": "1.0.0"
+        "com.unity.editorcoroutines": "1.0.0",
+        "com.unity.modules.audio": "1.0.0"
       }
     },
     "com.unity.modules.androidjni": {

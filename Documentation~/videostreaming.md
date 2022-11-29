@@ -5,6 +5,17 @@ WebRTC enables streaming video between peers. It can stream video rendered by Un
 > [!NOTE]
 > The [package samples](sample.md) contains the **PeerConnection** scene which demonstrates video streaming features of the package.
 
+## Invoke Update with [`StartCoroutine`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.StartCoroutine.html)
+
+First, you need to invoke [`WebRTC.Update`](../api/Unity.WebRTC.WebRTC.html#Unity_WebRTC_WebRTC_Update) method with [`StartCoroutine`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.StartCoroutine.html) because this method copies textures to video buffer per frame.
+
+```CSharp
+void Start()
+{
+    StartCoroutine(WebRTC.Update());
+}
+```
+
 ## Sending video
 
 To implement video streaming, create a [`VideoStreamTrack`](../api/Unity.WebRTC.VideoStreamTrack.html) instance.
