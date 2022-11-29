@@ -8,18 +8,6 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class TransceiverTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            WebRTC.Initialize(true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
-        }
-
         [Test]
         public void SenderGetVideoCapabilities()
         {
