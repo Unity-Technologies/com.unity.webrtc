@@ -4,6 +4,14 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-pre.2] - 2022-12-09
+
+### Changed
+
+- Upgraded libwebrtc [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8).
+- Change that invoking initialization process automatically just after launching Unity Editor.
+- Obsolete `WebRTC.Initialize` and `WebRTC.Initialize`.
+
 ## [3.0.0-pre.1] - 2022-10-28
 
 ### Changed
@@ -101,7 +109,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Upgraded libwebrtc [m92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ).
+- Upgraded libwebrtc [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo).
 - Changed compiler for native plugin on Windows (MSVC to Clang).
 - Changed to use `OnAudioFilterRead` method in `MonoBehaviour` for audio rendering.
 - Changed resizing texture dynamically on receiver side when using a property `scaleResolutionDownBy` in `RTCRtpEncodingParameters` class.

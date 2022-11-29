@@ -35,20 +35,34 @@ setx VULKAN_SDK "C:\VulkanSDK\1.2.182.0" /m
 
 ### Ubuntu
 
-The below commands shows the build process developing environment on Ubuntu `20.04`.
+The below commands shows the build process developing environment on **Ubuntu 16.04**.
 
 ```bash
-#install packages
-sudo apt install -y vulkan-utils libvulkan1 libvulkan-dev libglib2.0-dev python3-venv lld clang-10 freeglut3-dev ninja-build
+# Install clang 11
+wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-11 main"
+sudo apt update
+sudo apt install -y clang-11 lld-11
+
+# Install stdlibc++9 for support GLIBCXX_3.4.26
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt update
+sudo apt install -y g++-9
+sudo ln -sf g++-9 /usr/bin/g++
+
+# Install other packages
+sudo apt install -y vulkan-utils libvulkan1 libvulkan-dev libglfw3-dev ninja-build
+
+# Install glad2
+sudo pip install git+https://github.com/dav1dde/glad.git@glad2#egg=glad2
 
 # Install CUDA SDK
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
-sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-ubuntu1604.pin
+sudo mv cuda-ubuntu1604.pin /etc/apt/preferences.d/cuda-repository-pin-600
+sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/ /"
 sudo apt update
-sudo apt install -y nvidia-driver-510 libnvidia-gl-510 libnvidia-decode-510 libnvidia-encode-510
 sudo apt install -y cuda-toolkit-11-0
 
 # Install CMake 3.22.3
