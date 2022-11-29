@@ -43,14 +43,7 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void SetUp()
         {
-            WebRTC.Initialize(true);
             SetUpCodecCapability();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
         }
 
         internal class TestValue

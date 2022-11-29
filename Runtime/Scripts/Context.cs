@@ -9,7 +9,7 @@ namespace Unity.WebRTC
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif
-    public class ContextManager
+    class ContextManager
     {
 #if UNITY_EDITOR
         static ContextManager()

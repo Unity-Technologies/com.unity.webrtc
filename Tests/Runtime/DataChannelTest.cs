@@ -12,19 +12,6 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class DataChannelTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            WebRTC.Initialize(true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
-        }
-
-
         [Test]
         public void CreateDataChannel()
         {

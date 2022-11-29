@@ -1,28 +1,14 @@
 using System;
 using System.Collections;
 using System.Linq;
-
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Unity.Collections;
 
 namespace Unity.WebRTC.RuntimeTest
 {
     class AudioStreamTrackTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            WebRTC.Initialize(true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
-        }
-
         [UnityTest]
         [Timeout(5000)]
         public IEnumerator ConstructorWithAudioSource()

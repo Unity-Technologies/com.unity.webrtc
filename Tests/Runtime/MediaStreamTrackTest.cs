@@ -10,18 +10,6 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class MediaStreamTrackTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            WebRTC.Initialize(true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
-        }
-
         [Test]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public void Constructor()

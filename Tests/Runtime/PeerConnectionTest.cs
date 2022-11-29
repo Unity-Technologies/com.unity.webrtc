@@ -30,18 +30,6 @@ namespace Unity.WebRTC.RuntimeTest
             return config;
         }
 
-        [SetUp]
-        public void SetUp()
-        {
-            WebRTC.Initialize(true);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            WebRTC.Dispose();
-        }
-
         [Test]
         public void Construct()
         {
