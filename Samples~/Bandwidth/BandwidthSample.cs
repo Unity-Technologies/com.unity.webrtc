@@ -75,7 +75,6 @@ class BandwidthSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         bandwidthSelector.options = bandwidthOptions
             .Select(pair => new Dropdown.OptionData{text = pair.Key })
             .ToList();
@@ -94,11 +93,6 @@ class BandwidthSample : MonoBehaviour
         hangUpButton.onClick.AddListener(HangUp);
         copyClipboard.onClick.AddListener(CopyClipboard);
         receiveStream = new MediaStream();
-    }
-
-    private void OnDestroy()
-    {
-        WebRTC.Dispose();
     }
 
     private void Start()

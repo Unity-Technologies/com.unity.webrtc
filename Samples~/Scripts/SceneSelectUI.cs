@@ -11,15 +11,8 @@ namespace Unity.WebRTC.Samples
         public const int DefaultStreamWidth = 1280;
         public const int DefaultStreamHeight = 720;
 
-        private static bool s_limitTextureSize = true;
         private static Vector2Int s_StreamSize = new Vector2Int(DefaultStreamWidth, DefaultStreamHeight);
         private static RTCRtpCodecCapability s_useVideoCodec = null;
-
-        public static bool LimitTextureSize
-        {
-            get { return s_limitTextureSize; }
-            set { s_limitTextureSize = value; }
-        }
 
         public static Vector2Int StreamSize
         {
@@ -75,16 +68,6 @@ namespace Unity.WebRTC.Samples
         private static readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
         private List<RTCRtpCodecCapability> availableCodecs;
 
-        void Awake()
-        {
-            WebRTC.Initialize();
-        }
-
-        void OnDestroy()
-        {
-            WebRTC.Dispose();
-        }
-
         void Start()
         {
             var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
@@ -125,7 +108,7 @@ namespace Unity.WebRTC.Samples
             textureWidthInput.onValueChanged.AddListener(OnChangeTextureWidthInput);
             textureHeightInput.onValueChanged.AddListener(OnChangeTextureHeightInput);
 
-            toggleLimitTextureSize.isOn = WebRTCSettings.LimitTextureSize;
+            toggleLimitTextureSize.isOn = WebRTC.enableLimitTextureSize;
             toggleLimitTextureSize.onValueChanged.AddListener(OnChangeLimitTextureSize);
 
             buttonPeerConnection.onClick.AddListener(OnPressedPeerConnectionButton);
@@ -203,7 +186,7 @@ namespace Unity.WebRTC.Samples
 
         private void OnChangeLimitTextureSize(bool enable)
         {
-            WebRTCSettings.LimitTextureSize = enable;
+            WebRTC.enableLimitTextureSize = enable;
         }
 
         private void OnPressedPeerConnectionButton()

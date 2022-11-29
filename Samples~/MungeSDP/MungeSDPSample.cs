@@ -32,16 +32,6 @@ class MungeSDPSample : MonoBehaviour
     private MediaStream sourceVideoStream, receiveVideoStream;
     private Coroutine updateCoroutine;
 
-    private void Awake()
-    {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
-    }
-
-    private void OnDestroy()
-    {
-        WebRTC.Dispose();
-    }
-
     private void Start()
     {
         startButton.onClick.AddListener(Setup);
