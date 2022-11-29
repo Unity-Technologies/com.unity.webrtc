@@ -40,7 +40,6 @@ class StatsSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         callButton.onClick.AddListener(() =>
         {
             callButton.interactable = false;
@@ -53,11 +52,6 @@ class StatsSample : MonoBehaviour
             hangupButton.interactable = false;
             Dispose();
         });
-    }
-
-    private void OnDestroy()
-    {
-        WebRTC.Dispose();
     }
 
     private void Start()

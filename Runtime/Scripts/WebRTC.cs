@@ -727,6 +727,15 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public static bool enableLimitTextureSize
+        {
+            get { return s_context.limitTextureSize; }
+            set { s_context.limitTextureSize = value; }
+        }
+
+        /// <summary>
         ///
         /// </summary>
         [Obsolete]

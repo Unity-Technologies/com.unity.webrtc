@@ -44,17 +44,11 @@ class PeerConnectionSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(Call);
         restartButton.onClick.AddListener(RestartIce);
         hangUpButton.onClick.AddListener(HangUp);
         receiveStream = new MediaStream();
-    }
-
-    private void OnDestroy()
-    {
-        WebRTC.Dispose();
     }
 
     private void Start()

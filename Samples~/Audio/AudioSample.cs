@@ -60,7 +60,6 @@ namespace Unity.WebRTC
 
     void Start()
         {
-            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
             StartCoroutine(WebRTC.Update());
             StartCoroutine(LoopStatsCoroutine());
 
@@ -122,11 +121,6 @@ namespace Unity.WebRTC
             return string.Format($"{cap.mimeType} " +
                 $"{cap.clockRate} " +
                 $"channel={cap.channels}");
-        }
-
-        void OnDestroy()
-        {
-            WebRTC.Dispose();
         }
 
         void OnStart()
