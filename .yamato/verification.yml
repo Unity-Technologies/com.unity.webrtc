@@ -177,9 +177,15 @@ verificationtest_{{ id }}_{{ editor.version }}:
     type: {{ platform.type }}
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
+  interpreter: bash
   commands:
+    # overwrite package 
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      rm -rf WebRTC~/Packages/com.unity.webrtc
+      mv upm-ci~/package WebRTC~/Packages/com.unity.webrtc
 {% if platform.group == "linux" %}
-    #install utr
+    # install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
     - chmod a+x ./utr
     # install unity-downloader-cli
@@ -191,7 +197,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     # run utr
     - ./utr --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "macos" %}
-    #install utr
+    # install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
     - chmod a+x ./utr
     # install unity-downloader-cli
@@ -200,7 +206,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     # run utr
     - ./utr --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "windows" %}
-    #install utr
+    # install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat > utr.bat
     # install unity-downloader-cli
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
@@ -208,9 +214,9 @@ verificationtest_{{ id }}_{{ editor.version }}:
     # run utr
     - git config --local core.symlinks true
     - gsudo git checkout -f --detach FETCH_HEAD
-    - utr --suite={{ test.suite }} --editor-location=.Editor --testproject=./WebRTC~ --reruncount=2 --timeout=3600
+    - ./utr.bat --suite={{ test.suite }} --editor-location=.Editor --testproject=./WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "ios" %}
-    #install utr
+    # install utr
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
     - chmod a+x ./utr
     # install unity-downloader-cli
@@ -224,7 +230,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     {{ id }}_{{ editor.version }}_results:
       paths:
         - "upm-ci~/test-results/**/*"
-#  dependencies:
-#    - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
+  dependencies:
+    - .yamato/upm-ci-webrtc-packages.yml#pack_webrtc
 {% endfor %}    
 {% endfor %}

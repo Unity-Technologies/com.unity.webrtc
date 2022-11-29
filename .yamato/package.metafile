@@ -10,3 +10,10 @@ editors:
   - version: 2021.3
   - version: 2022.1
   - version: trunk
+
+plugin_platforms:
+  - win
+  - macos
+  - linux
+  - ios
+  - android
