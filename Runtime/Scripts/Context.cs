@@ -36,16 +36,16 @@ namespace Unity.WebRTC
         }
 
 #else
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
-    {
-        Application.quitting += Quit;
-        WebRTC.InitializeInternal();
-    }
-    static void Quit()
-    {
-        WebRTC.DisposeInternal();
-    }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            Application.quitting += Quit;
+            WebRTC.InitializeInternal();
+        }
+        static void Quit()
+        {
+            WebRTC.DisposeInternal();
+        }
 #endif
     }
 
@@ -55,7 +55,6 @@ namespace Unity.WebRTC
         internal WeakReferenceTable table;
         internal SynchronizationContext syncContext;
         internal bool limitTextureSize;
-
 
         private int id;
         private bool disposed;
