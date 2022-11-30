@@ -16,7 +16,7 @@ namespace Unity.WebRTC
         {
             AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
             AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
-            Application.quitting += Quit;
+            EditorApplication.quitting += Quit;
         }
 
         static void OnBeforeAssemblyReload()
@@ -33,8 +33,8 @@ namespace Unity.WebRTC
         {
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
             AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+            WebRTC.DisposeInternal();
         }
-
 #else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
