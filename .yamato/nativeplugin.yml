@@ -11,7 +11,7 @@ build_platforms:
   - name: linux
     type: Unity::VM
     flavor: b1.large
-    image: renderstreaming/ubuntu:v0.2.7-1238331
+    image: renderstreaming/ubuntu-16.04:v0.1.0-1257787
     build_command: BuildScripts~/build_plugin_linux.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
     test_runner_path:
@@ -51,8 +51,8 @@ test_platforms:
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.2.7-1238331
-    gpu_image: renderstreaming/ubuntu:v0.2.7-1238332
+    image: renderstreaming/ubuntu:v0.2.9-1258156
+    gpu_image: renderstreaming/ubuntu:v0.2.9-1258158
     flavor: b1.large
     model: rtx2080
     build_command: BuildScripts~/build_plugin_linux.sh
@@ -173,8 +173,9 @@ test_all_platform:
   name: Trigger native test on all platforms
   dependencies:
     {% for platform in test_platforms %}
-    # todo(kazuki) native plugin test is not supported on iOS
-    {% if platform.name != "ios" %}
+    # todo(kazuki): native plugin test is not supported on iOS
+    # todo(kazuki): native plugin test has error on Ubuntu 16.04
+    {% if platform.name != "ios" and platform.name != "linux" %}
     - .yamato/nativeplugin.yml#test_{{ platform.name }}
     {% endif %}
     {% if platform.name == "win" or platform.name == "linux" %}

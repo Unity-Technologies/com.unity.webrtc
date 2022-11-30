@@ -18,5 +18,5 @@ plugin_platforms:
   - ios
   - android
 
-editor_version_for_validate: 2019.4
+editor_version_for_validate: 2020.3
 editor_version_for_trigger: 2021.3
