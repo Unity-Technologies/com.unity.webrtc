@@ -1,8 +1,5 @@
 {% metadata_file .yamato/package.metafile %}
 
-editor_version_for_validate: 2019.4
-editor_version_for_trigger: 2021.3
-
 platforms:
   - name: win
     type: Unity::VM
@@ -253,101 +250,6 @@ package:
   packagename: com.unity.webrtc
 ---
 
-{% for platform in platforms %}
-build_webrtc_plugin_{{ platform.name }}:
-  name: Build webrtc plugin {{ platform.name }}
-  agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
-  commands:
-    - {{ platform.build_command }}
-  artifacts:
-    {{ platform.name }}_plugin:
-      paths:
-        - {{ platform.plugin_path }}
-{% endfor %}
-
-{% for platform in platforms %}
-{% if platform.name != "android" and platform.name != "ios" %}
-test_webrtc_plugin_{{ platform.name }}:
-  name: Test webrtc plugin {{ platform.name }}
-  agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
-  commands:
-    - {{ platform.test_command }}
-{% endif %}
-{% endfor %}
-
-{% for platform in platforms %}
-{% if platform.name == "win" or platform.name == "linux" %}
-test_webrtc_plugin_{{ platform.name }}_gpu:
-  name: Test webrtc plugin {{ platform.name }} with GPU
-  agent:
-    type: {{ platform.gpu_type }}
-    image: {{ platform.gpu_image }}
-    flavor: {{ platform.flavor }}
-{% if platform.model %}
-    model: {{ platform.model }}
-{% endif %}    
-  commands:
-    - {{ platform.test_command }}
-{% endif %}
-{% endfor %}
-
-
-#todo(kazuki): test it on Android mobile device
-test_webrtc_plugin_android:
-  name: Test webrtc plugin Android
-  agent:
-    type: Unity::mobile::shield
-    image: mobile/android-package-ci-win:v0.1.4-1212670
-    flavor: b1.medium
-  skip_checkout: true
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_test_android
-  commands:
-    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
-    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
-    - |
-       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
-       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
-       # Establish an ADB connection with the device
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-       # List the connected devices
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
-       NetSh Advfirewall set allprofiles state off
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push build/WebRTCLibTest /data/local/tmp
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
-
-build_webrtc_plugin_test_android:
-  name: Build webrtc plugin test runtime Android
-  agent:
-    type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084252
-    flavor: b1.large
-  commands:
-    - BuildScripts~/build_test_runtime_android.sh
-  artifacts:
-    runtime:
-      paths:
-        - "build/WebRTCLibTest"
-
-test_webrtc_plugin_all_platform:
-  name: Trigger test for webrtc plugin for all platforms
-  dependencies:
-    {% for platform in platforms %}
-    # todo(kazuki) native plugin test is not supported on iOS
-    {% if platform.name != "ios" %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}
-    {% endif %}
-    {% if platform.name == "win" or platform.name == "linux" %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_{{ platform.name }}_gpu
-    {% endif %}
-    {% endfor %}
-
 pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
   agent:
@@ -363,7 +265,7 @@ pack_{{ package.name }}:
         - "upm-ci~/packages/**/*"
   dependencies:
     {% for platform in platforms %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
+    - .yamato/nativeplugin.yml#build_{{ platform.name }}
     {% endfor %}
 
 {% for editor in editors %}
@@ -607,7 +509,7 @@ trigger_pullrequest:
   name : Trigger by the Pull requests which directs to main branch or feature branch
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor_version_for_trigger }}_gpu
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
+    - .yamato/nativeplugin.yml#test_all_platform
   triggers:
     expression: pull_request.target eq "main" OR pull_request.target match "feat/.*"
 
@@ -731,37 +633,6 @@ codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
 {% endif %}
 {% endfor %}
 
-check_code_format_plugin:
-  name: Check code format for webrtc native plugin
-  agent:
-    type: Unity::VM
-    image: package-ci/ubuntu:v2.0.0-947481
-    flavor: b1.large
-  commands:
-    - BuildScripts~/format-plugin.sh
-
-push_plugin:
-  name: Push to Github webrtc native plugin
-  agent:
-    type: Unity::VM
-    image: package-ci/ubuntu:v2.0.0-947481
-    flavor: b1.large
-  commands:
-    - git config --global user.email "kazuki@unity3d.com"
-    - git config --global user.name "Kazuki Matsumoto"
-    {% for platform in platforms %}
-    - git add {{ platform.plugin_path }}
-    {% endfor %}
-    - git commit -m "[skip ci] Update plugins"
-    - git push origin HEAD:$GIT_BRANCH
-  dependencies:
-    {% for platform in platforms %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#build_webrtc_plugin_{{ platform.name }}
-    {% endfor %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor_version_for_trigger }}_gpu
-#    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor_version_for_trigger }}_nogpu
-
 publish_{{ package.name }}:
   name: Publish {{ package.packagename }}
   agent:
@@ -783,7 +654,7 @@ publish_{{ package.name }}:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_linux_{{ editor.version }}_glcore
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_editmode_mono_win_{{ editor.version }}_d3d11
     {% endfor %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_webrtc_plugin_all_platform
+    - .yamato/nativeplugin.yml#test_all_platform
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor_version_for_trigger }}_gpu
 #    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor_version_for_trigger }}_nogpu
 
