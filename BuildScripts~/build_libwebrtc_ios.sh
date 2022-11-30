@@ -28,7 +28,7 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 # disable GCD taskqueue, use stdlib taskqueue instead
 # This is because GCD cannot measure with UnityProfiler
-patch -N "src/api/task_queu/BUILD.gn" < "$COMMAND_DIR/patches/disable_task_queue_gcd.patch"
+patch -N "src/api/task_queue/BUILD.gn" < "$COMMAND_DIR/patches/disable_task_queue_gcd.patch"
 
 # add objc library to use videotoolbox
 patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
