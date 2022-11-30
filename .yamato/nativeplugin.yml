@@ -175,10 +175,10 @@ test_all_platform:
     {% for platform in test_platforms %}
     # todo(kazuki) native plugin test is not supported on iOS
     {% if platform.name != "ios" %}
-    - .yamato/native_plugin.yml#test_{{ platform.name }}
+    - .yamato/nativeplugin.yml#test_{{ platform.name }}
     {% endif %}
     {% if platform.name == "win" or platform.name == "linux" %}
-    - .yamato/native_plugin.yml#test_{{ platform.name }}_gpu
+    - .yamato/nativeplugin.yml#test_{{ platform.name }}_gpu
     {% endif %}
     {% endfor %}
   
