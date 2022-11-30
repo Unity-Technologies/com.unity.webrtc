@@ -1,8 +1,8 @@
 # WebRTC for Unity
 
-<img src="https://img.shields.io/badge/unity-2019.4-green.svg?style=flat-square" alt="unity 2019.4">
 <img src="https://img.shields.io/badge/unity-2020.3-green.svg?style=flat-square" alt="unity 2020.3">
 <img src="https://img.shields.io/badge/unity-2021.3-green.svg?style=flat-square" alt="unity 2021.3">
+<img src="https://img.shields.io/badge/unity-2022.1-green.svg?style=flat-square" alt="unity 2022.1">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -33,25 +33,25 @@ Please read this if you have an interest to customize native code in this projec
 
 | Version | libwebrtc version | Focus | When | 
 | ------- | ----------------- | ----- | ---- |
-| `1.0.0-preview` | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - First release | Sep 2019 |    
-| `1.1.0-preview` | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg/j6G4dTVvCAAJ) | - IL2CPP Support<br> - Linux platform Support<br/> - Add software encoder | Feb 2020 |
-| `2.0.0-preview` | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ) | - Multi camera <br>- DirectX12 (DXR) Support | Apr 2020 |
-| `2.1.0-preview` | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0/m/A5X253_ZAQAJ) | - Profiler tool <br>- Bitrate control | Aug 2020 |
-| `2.2.0-preview` | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - Video decoder (VP8, VP9 only) <br>- Vulkan HW encoder support <br>- MacOS HW encoder support | Oct 2020 |
-| `2.3.0-preview` | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU/m/7WGLPscPBwAJ) | - iOS platform support | Dec 2020 |
-| `2.4.0-exp.1` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Android platform support | Apr 2021 |
-| `2.4.0-exp.2` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Fix bugs | May 2021 |
-| `2.4.0-exp.3` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Fix bugs | Jun 2021 |
-| `2.4.0-exp.4` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0/m/KIbn0EZPBQAJ) | - Audio renderer support <br>- Apple Silicon support | Aug 2021 |
-| `2.4.0-exp.5` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix audio streaming issues | Feb 2022 |
-| `2.4.0-exp.6` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Feb 2022 |
-| `2.4.0-exp.7` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix video streaming issues | May 2022 |
-| `2.4.0-exp.8` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix bugs | Jul 2022 |
-| `2.4.0-exp.9` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Aug 2022 |
-| `2.4.0-exp.10` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Aug 2022 |
-| `2.4.0-exp.11` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Hotfix | Sep 2022 |
-| `3.0.0-pre.1` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo/m/Z-p4AfCrCQAJ) | - Fix bugs | Dec 2022 |
-| `3.0.0-pre.2` | [M104](https://groups.google.com/g/discuss-webrtc/c/PZxgk-aUFhw) | - Fix bugs | Jan 2023 |
+| `1.0.0-preview` | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg) | - First release | Sep 2019 |    
+| `1.1.0-preview` | [M72](https://groups.google.com/d/msg/discuss-webrtc/3h4y0fimHwg) | - IL2CPP Support<br> - Linux platform Support<br/> - Add software encoder | Feb 2020 |
+| `2.0.0-preview` | [M79](https://groups.google.com/d/msg/discuss-webrtc/Ozvbd0p7Q1Y) | - Multi camera <br>- DirectX12 (DXR) Support | Apr 2020 |
+| `2.1.0-preview` | [M84](https://groups.google.com/g/discuss-webrtc/c/MRAV4jgHYV0) | - Profiler tool <br>- Bitrate control | Aug 2020 |
+| `2.2.0-preview` | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU) | - Video decoder (VP8, VP9 only) <br>- Vulkan HW encoder support <br>- MacOS HW encoder support | Oct 2020 |
+| `2.3.0-preview` | [M85](https://groups.google.com/g/discuss-webrtc/c/Qq3nsR2w2HU) | - iOS platform support | Dec 2020 |
+| `2.4.0-exp.1` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0) | - Android platform support | Apr 2021 |
+| `2.4.0-exp.2` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0) | - Fix bugs | May 2021 |
+| `2.4.0-exp.3` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0) | - Fix bugs | Jun 2021 |
+| `2.4.0-exp.4` | [M89](https://groups.google.com/g/discuss-webrtc/c/Zrsn2hi8FV0) | - Audio renderer support <br>- Apple Silicon support | Aug 2021 |
+| `2.4.0-exp.5` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Fix audio streaming issues | Feb 2022 |
+| `2.4.0-exp.6` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Hotfix | Feb 2022 |
+| `2.4.0-exp.7` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Fix video streaming issues | May 2022 |
+| `2.4.0-exp.8` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Fix bugs | Jul 2022 |
+| `2.4.0-exp.9` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Hotfix | Aug 2022 |
+| `2.4.0-exp.10` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Hotfix | Aug 2022 |
+| `2.4.0-exp.11` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo) | - Hotfix | Sep 2022 |
+| `3.0.0-pre.1` | [M92](https://groups.google.com/g/discuss-webrtc/c/hks5zneZJbo)  | - Fix bugs | Nov 2022 |
+| `3.0.0-pre.2` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Update libwebrtc M107 | Dec 2022 |
 
 ## Licenses
 

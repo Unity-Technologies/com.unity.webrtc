@@ -8,14 +8,14 @@ It is recommended to use the latest Long-Term Support (LTS) version of Unity, se
 
 This version of the package is compatible with the following versions of the Unity Editor:
 
-- **Unity 2019.4**
 - **Unity 2020.3**
 - **Unity 2021.3**
+- **Unity 2022.1**
 
 ## Support Platform
 
 - **Windows**
-- **Linux**
+- **Linux** (Ubuntu 16.04, 18.04, 20.04)
 - **macOS** (**Intel** and **Apple Slicon**)
 - **iOS**
 - **Android** (**ARM64** only. **ARMv7** is not supported)
