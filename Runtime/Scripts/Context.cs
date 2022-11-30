@@ -24,30 +24,40 @@ namespace Unity.WebRTC
 
         static void OnBeforeAssemblyReload()
         {
+            Debug.Log("ContextManager::OnBeforeAssemblyReload");
             WebRTC.DisposeInternal();
+            Debug.Log("ContextManager::OnBeforeAssemblyReload end");
         }
 
         static void OnAfterAssemblyReload()
         {
+            Debug.Log("ContextManager::OnAfterAssemblyReload");
             WebRTC.InitializeInternal();
+            Debug.Log("ContextManager::OnAfterAssemblyReload end");
         }
 
         static void Quit()
         {
+            Debug.Log("ContextManager::Quit");
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
             AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
             WebRTC.DisposeInternal();
+            Debug.Log("ContextManager::Quit end");
         }
 #else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
         {
+            Debug.Log("ContextManager::Init");
             Application.quitting += Quit;
-            WebRTC.InitializeInternal();
+//            WebRTC.InitializeInternal();
+            Debug.Log("ContextManager::Init end");
         }
         static void Quit()
         {
-            WebRTC.DisposeInternal();
+            Debug.Log("ContextManager::Quit");
+//            WebRTC.DisposeInternal();
+            Debug.Log("ContextManager::Quit end");
         }
 #endif
     }
