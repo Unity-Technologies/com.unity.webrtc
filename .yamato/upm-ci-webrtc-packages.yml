@@ -1,54 +1,5 @@
 {% metadata_file .yamato/package.metafile %}
 
-platforms:
-  - name: win
-    type: Unity::VM
-    gpu_type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.3.13-1084239
-    gpu_image: renderstreaming/win10:v0.3.13-1084240
-    flavor: b1.large
-    model: rtx2080
-    build_command: BuildScripts~/build_plugin_win.cmd
-    test_command: BuildScripts~/test_plugin_win.cmd
-    plugin_path: Runtime/Plugins/x86_64/webrtc.dll
-  - name: linux
-    type: Unity::VM
-    gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.2.7-1238331
-    gpu_image: renderstreaming/ubuntu:v0.2.7-1238332
-    flavor: b1.large
-    model: rtx2080
-    build_command: BuildScripts~/build_plugin_linux.sh
-    test_command: BuildScripts~/test_plugin_linux.sh
-    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
-  - name: macos
-    type: Unity::metal::macmini
-    gpu_type: Unity::metal::macmini
-    image: package-ci/mac:v1.21.1-1092905
-    gpu_image: package-ci/mac:v1.21.1-1092905
-    flavor: m1.mac
-    build_command: BuildScripts~/build_plugin_mac.sh
-    test_command: BuildScripts~/test_plugin_mac.sh
-    plugin_path: Runtime/Plugins/macOS/libwebrtc.dylib
-  - name: ios
-    type: Unity::metal::macmini
-    gpu_type: Unity::metal::macmini
-    image: package-ci/mac:v1.21.1-1092905
-    gpu_image: package-ci/mac:v1.21.1-1092905
-    flavor: m1.mac
-    build_command: BuildScripts~/build_plugin_ios.sh
-    test_command: BuildScripts~/test_plugin_ios.sh
-    plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
-  - name: android
-    type: Unity::VM
-    gpu_type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084252
-    gpu_image: renderstreaming/android-linux-build:v0.1.8-1084252
-    flavor: b1.large
-    build_command: BuildScripts~/build_plugin_android.sh
-    test_command: BuildScripts~/test_plugin_android.sh
-    plugin_path: Runtime/Plugins/Android/libwebrtc.aar
-
 test_targets:
   - name: win
     type: Unity::VM
@@ -264,8 +215,8 @@ pack_{{ package.name }}:
       paths:
         - "upm-ci~/packages/**/*"
   dependencies:
-    {% for platform in platforms %}
-    - .yamato/nativeplugin.yml#build_{{ platform.name }}
+    {% for platform in plugin_platforms %}
+    - .yamato/nativeplugin.yml#build_{{ platform }}
     {% endfor %}
 
 {% for editor in editors %}
@@ -569,68 +520,6 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% endfor %}
 {% endfor %}
 
-{% endfor %}
-
-{% for platform in platforms %}
-{% if platform.name != "macos" %}
-{% for editor in editors %}
-codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
-  name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
-  agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
-  commands:
-    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package test -u {{ editor.version }} --enable-code-coverage --code-coverage-options "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"
-  artifacts:
-    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
-      paths:
-        - "upm-ci~/test-results/**"
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% endfor %}
-
-{% else -%}
-
-{% for editor in editors %}
-codecoverage_{{ package.name }}_{{ platform.name }}_{{ editor.version }}:
-  name: Codecoverage {{ package.packagename }} {{ platform.name }} {{ editor.version }}
-  agent:
-    type: {{ platform.type }}
-    image: {{ platform.image }}
-    flavor: {{ platform.flavor }}
-  commands:
-    - |
-      cd ../
-      ls com.unity.webrtc/upm-ci~/packages/com.unity.webrtc-*.tgz | xargs tar xzvf
-      cp -rf package/ com.unity.webrtc
-      cd com.unity.webrtc
-    - brew install node
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - git clone git@github.cds.internal.unity3d.com:unity/utr.git
-    - rm -Rf ./utr/.git
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP "bash -lc 'pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade --user'" 
-    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r ../com.unity.webrtc/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
-    - scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -pr ./utr/ bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc/
-    - ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '$(/usr/local/bin/python3 -m site --user-base)/bin/unity-downloader-cli -u {{ editor.version }} -c editor --wait --published'
-    - |
-      ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP 'cd ~/com.unity.webrtc/WebRTC~ && ~/com.unity.webrtc/utr/utr --suite=editor --suite=playmode --testproject=/Users/bokken/com.unity.webrtc/WebRTC~ --editor-location=/Users/bokken/.Editor --artifacts_path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --extra-editor-arg="-enablePackageManagerTraces" --enable-code-coverage --coverage-results-path=/Users/bokken/com.unity.webrtc/WebRTC~/test-results --coverage-options="generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:-UnityEngine.*,+Unity.WebRTC"'
-      UTR_RESULT=$?
-      mkdir -p upm-ci~/test-results/
-      scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r bokken@$BOKKEN_DEVICE_IP:/Users/bokken/com.unity.webrtc/WebRTC~/test-results/ upm-ci~/test-results/
-      exit $UTR_RESULT
-  artifacts:
-    {{ package.name }}_{{ editor.version }}_{{ platform.name }}_coverage_results: 
-      paths:
-        - "upm-ci~/test-results/**"
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% endfor %}
-
-{% endif %}
 {% endfor %}
 
 publish_{{ package.name }}:
