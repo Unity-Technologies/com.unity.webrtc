@@ -89,7 +89,7 @@ test_platforms:
 
 {% for platform in build_platforms %}
 build_{{ platform.name }}:
-  name: Build webrtc plugin {{ platform.name }}
+  name: Build native plugin for {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
@@ -105,7 +105,7 @@ build_{{ platform.name }}:
 {% for platform in test_platforms %}
 {% if platform.name != "android" and platform.name != "ios" %}
 test_{{ platform.name }}:
-  name: Test native test runner {{ platform.name }}
+  name: Test native code on {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
@@ -118,7 +118,7 @@ test_{{ platform.name }}:
 {% for platform in test_platforms %}
 {% if platform.name == "win" or platform.name == "linux" %}
 test_{{ platform.name }}_gpu:
-  name: Test webrtc plugin {{ platform.name }} with GPU
+  name: Test native code on {{ platform.name }} with GPU
   agent:
     type: {{ platform.gpu_type }}
     image: {{ platform.gpu_image }}
@@ -134,7 +134,7 @@ test_{{ platform.name }}_gpu:
 
 #todo(kazuki): test it on Android mobile device
 test_android:
-  name: Test webrtc plugin Android
+  name: Test native code on Android
   agent:
     type: Unity::mobile::shield
     image: mobile/android-package-ci-win:v0.1.4-1212670
@@ -157,7 +157,7 @@ test_android:
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
 
 build_test_android:
-  name: Build webrtc plugin test runtime Android
+  name: Build native test runner for Android
   agent:
     type: Unity::VM
     image: renderstreaming/android-linux-build:v0.1.8-1084252
@@ -170,7 +170,7 @@ build_test_android:
         - "build/WebRTCLibTest"
 
 test_all_platform:
-  name: Trigger test for webrtc plugin for all platforms
+  name: Trigger native test on all platforms
   dependencies:
     {% for platform in test_platforms %}
     # todo(kazuki) native plugin test is not supported on iOS
@@ -183,7 +183,7 @@ test_all_platform:
     {% endfor %}
   
 push_plugin:
-  name: Push to Github webrtc native plugin
+  name: Push webrtc native plugin to Github Release
   agent:
     type: Unity::VM
     image: package-ci/ubuntu:v2.0.0-947481
