@@ -1,0 +1,205 @@
+{% metadata_file .yamato/package.metafile %}
+
+build_platforms:
+  - name: win
+    type: Unity::VM
+    flavor: b1.large
+    image: renderstreaming/win10:v0.3.13-1084239
+    build_command: BuildScripts~/build_plugin_win.cmd
+    plugin_path: Runtime/Plugins/x86_64/webrtc.dll
+    test_runner_path: 
+  - name: linux
+    type: Unity::VM
+    flavor: b1.large
+    image: renderstreaming/ubuntu:v0.2.7-1238331
+    build_command: BuildScripts~/build_plugin_linux.sh
+    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
+    test_runner_path:
+  - name: macos
+    type: Unity::metal::macmini
+    flavor: m1.mac
+    image: package-ci/mac:v1.21.1-1092905
+    build_command: BuildScripts~/build_plugin_mac.sh
+    plugin_path: Runtime/Plugins/macOS/libwebrtc.dylib
+    test_runner_path:
+  - name: ios
+    type: Unity::metal::macmini
+    flavor: m1.mac
+    image: package-ci/mac:v1.21.1-1092905
+    build_command: BuildScripts~/build_plugin_ios.sh
+    plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
+    test_runner_path:
+  - name: android
+    type: Unity::VM
+    flavor: b1.large
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
+    build_command: BuildScripts~/build_plugin_android.sh
+    plugin_path: Runtime/Plugins/Android/libwebrtc.aar
+    test_runner_path:
+
+test_platforms:
+  - name: win
+    type: Unity::VM
+    gpu_type: Unity::VM::GPU
+    image: renderstreaming/win10:v0.3.13-1084239
+    gpu_image: renderstreaming/win10:v0.3.13-1084240
+    flavor: b1.large
+    model: rtx2080
+    build_command: BuildScripts~/build_plugin_win.cmd
+    test_command: BuildScripts~/test_plugin_win.cmd
+    plugin_path: Runtime/Plugins/x86_64/webrtc.dll
+  - name: linux
+    type: Unity::VM
+    gpu_type: Unity::VM::GPU
+    image: renderstreaming/ubuntu:v0.2.7-1238331
+    gpu_image: renderstreaming/ubuntu:v0.2.7-1238332
+    flavor: b1.large
+    model: rtx2080
+    build_command: BuildScripts~/build_plugin_linux.sh
+    test_command: BuildScripts~/test_plugin_linux.sh
+    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
+  - name: macos
+    type: Unity::metal::macmini
+    gpu_type: Unity::metal::macmini
+    image: package-ci/mac:v1.21.1-1092905
+    gpu_image: package-ci/mac:v1.21.1-1092905
+    flavor: m1.mac
+    build_command: BuildScripts~/build_plugin_mac.sh
+    test_command: BuildScripts~/test_plugin_mac.sh
+    plugin_path: Runtime/Plugins/macOS/libwebrtc.dylib
+  - name: ios
+    type: Unity::metal::macmini
+    gpu_type: Unity::metal::macmini
+    image: package-ci/mac:v1.21.1-1092905
+    gpu_image: package-ci/mac:v1.21.1-1092905
+    flavor: m1.mac
+    build_command: BuildScripts~/build_plugin_ios.sh
+    test_command: BuildScripts~/test_plugin_ios.sh
+    plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
+  - name: android
+    type: Unity::VM
+    gpu_type: Unity::VM
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
+    gpu_image: renderstreaming/android-linux-build:v0.1.8-1084252
+    flavor: b1.large
+    build_command: BuildScripts~/build_plugin_android.sh
+    test_command: BuildScripts~/test_plugin_android.sh
+    plugin_path: Runtime/Plugins/Android/libwebrtc.aar
+---
+
+{% for platform in build_platforms %}
+build_{{ platform.name }}:
+  name: Build webrtc plugin {{ platform.name }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - {{ platform.build_command }}
+  artifacts:
+    {{ platform.name }}_plugin:
+      paths:
+        - {{ platform.plugin_path }}
+{% endfor %}
+
+{% for platform in test_platforms %}
+{% if platform.name != "android" and platform.name != "ios" %}
+test_{{ platform.name }}:
+  name: Build native test runner {{ platform.name }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - {{ platform.test_command }}
+{% endif %}
+{% endfor %}
+
+{% for platform in test_platforms %}
+{% if platform.name == "win" or platform.name == "linux" %}
+test_{{ platform.name }}_gpu:
+  name: Test webrtc plugin {{ platform.name }} with GPU
+  agent:
+    type: {{ platform.gpu_type }}
+    image: {{ platform.gpu_image }}
+    flavor: {{ platform.flavor }}
+{% if platform.model %}
+    model: {{ platform.model }}
+{% endif %}    
+  commands:
+    - {{ platform.test_command }}
+{% endif %}
+{% endfor %}
+
+
+#todo(kazuki): test it on Android mobile device
+test_android:
+  name: Test webrtc plugin Android
+  agent:
+    type: Unity::mobile::shield
+    image: mobile/android-package-ci-win:v0.1.4-1212670
+    flavor: b1.medium
+  skip_checkout: true
+  dependencies:
+    - .yamato/nativeplugin.yml#build_test_android
+  commands:
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
+    - |
+       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       # Establish an ADB connection with the device
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       # List the connected devices
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       NetSh Advfirewall set allprofiles state off
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push build/WebRTCLibTest /data/local/tmp
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
+
+build_test_android:
+  name: Build webrtc plugin test runtime Android
+  agent:
+    type: Unity::VM
+    image: renderstreaming/android-linux-build:v0.1.8-1084252
+    flavor: b1.large
+  commands:
+    - BuildScripts~/build_test_runtime_android.sh
+  artifacts:
+    runtime:
+      paths:
+        - "build/WebRTCLibTest"
+
+test_all_platform:
+  name: Trigger test for webrtc plugin for all platforms
+  dependencies:
+    {% for platform in test_platforms %}
+    # todo(kazuki) native plugin test is not supported on iOS
+    {% if platform.name != "ios" %}
+    - .yamato/native_plugin.yml#test_{{ platform.name }}
+    {% endif %}
+    {% if platform.name == "win" or platform.name == "linux" %}
+    - .yamato/native_plugin.yml#test_{{ platform.name }}_gpu
+    {% endif %}
+    {% endfor %}
+  
+push_plugin:
+  name: Push to Github webrtc native plugin
+  agent:
+    type: Unity::VM
+    image: package-ci/ubuntu:v2.0.0-947481
+    flavor: b1.large
+  commands:
+    - git config --global user.email "kazuki@unity3d.com"
+    - git config --global user.name "Kazuki Matsumoto"
+    {% for platform in platforms %}
+    - git add {{ platform.plugin_path }}
+    {% endfor %}
+    - git commit -m "[skip ci] Update plugins"
+    - git push origin HEAD:$GIT_BRANCH
+  dependencies:
+    {% for platform in platforms %}
+    - .yamato/nativeplugin.yml#build_{{ platform.name }}
+    {% endfor %}
+    - .yamato/nativeplugin.yml#test_all_platform
+    - .yamato/upm-ci-webrtc-packages.yml#test_webrtc_{{ editor_version_for_trigger }}_gpu
+#    - .yamato/upm-ci-webrtc-packages.yml#test_webrtc_{{ editor_version_for_trigger }}_nogpu
