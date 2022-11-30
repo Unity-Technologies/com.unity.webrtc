@@ -1,0 +1,15 @@
+--- BUILD.gn	2022-11-30 15:53:16.000000000 +0900
++++ BUILD.gn.patch	2022-11-30 14:19:37.000000000 +0900
+@@ -103,9 +103,9 @@
+       sources += [ "default_task_queue_factory_libevent.cc" ]
+       deps += [ "../../rtc_base:rtc_task_queue_libevent" ]
+     }
+-  } else if (is_mac || is_ios) {
+-    sources += [ "default_task_queue_factory_gcd.cc" ]
+-    deps += [ "../../rtc_base:rtc_task_queue_gcd" ]
++#  } else if (is_mac || is_ios) {
++#    sources += [ "default_task_queue_factory_gcd.cc" ]
++#    deps += [ "../../rtc_base:rtc_task_queue_gcd" ]
+   } else if (is_win && current_os != "winuwp") {
+     sources += [ "default_task_queue_factory_win.cc" ]
+     deps += [ "../../rtc_base:rtc_task_queue_win" ]
