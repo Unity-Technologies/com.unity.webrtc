@@ -105,7 +105,7 @@ build_{{ platform.name }}:
 {% for platform in test_platforms %}
 {% if platform.name != "android" and platform.name != "ios" %}
 test_{{ platform.name }}:
-  name: Build native test runner {{ platform.name }}
+  name: Test native test runner {{ platform.name }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
