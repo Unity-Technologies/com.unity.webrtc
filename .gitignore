@@ -209,6 +209,9 @@ _pkginfo.txt
 !?*.[Cc]ache/
 
 # Others
+.bin/
+.Editor/
+.download/
 ClientBin/
 Bin~/
 upm-ci~/

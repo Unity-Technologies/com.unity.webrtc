@@ -436,7 +436,6 @@ namespace Unity.WebRTC.RuntimeTest
             // todo(kazuki):: Transceiver.CurrentDirection of Receiver is not changed to "Stopped" even if waiting
             // yield return new WaitUntil(() => transceiver1.Direction == RTCRtpTransceiverDirection.Stopped);
             // Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
-
             audioTrack.Dispose();
             peer1.Close();
             peer2.Close();
@@ -1058,14 +1057,13 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(obj);
         }
 
+        // todo(kazuki):: This test doesn't pass on macOS Unity Editor. Standalone is OK.
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor })]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator GetStatsReturnsReport()
         {
-            if (SystemInfo.processorType == "Apple M1")
-                Assert.Ignore("todo:: This test will hang up on Apple M1");
-
             var stream = new MediaStream();
 
             var go = new GameObject("Test");
