@@ -196,7 +196,7 @@ namespace webrtc
             }
             else
             {
-                RTC_CHECK_NOTREACHED();
+                RTC_DCHECK_NOTREACHED();
             }
         }
         catch (const NVENCException& e)
@@ -211,7 +211,6 @@ namespace webrtc
         m_configurations[0].height = m_codec.height;
         m_configurations[0].sending = false;
         m_configurations[0].max_frame_rate = static_cast<float>(m_codec.maxFramerate);
-        m_configurations[0].frame_dropping_on = m_codec.H264()->frameDroppingOn;
         m_configurations[0].key_frame_interval = m_codec.H264()->keyFrameInterval;
         m_configurations[0].max_bps = m_codec.maxBitrate * 1000;
         m_configurations[0].target_bps = m_codec.startBitrate * 1000;

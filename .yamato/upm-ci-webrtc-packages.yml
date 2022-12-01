@@ -24,7 +24,7 @@ test_targets:
         platform: standalone
   - name: linux
     type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.7-1238331
+    image: package-ci/ubuntu-20.04:v1.4.0-1235639
     flavor: b1.large
     is_gpu: false
     gfx_types:
@@ -65,7 +65,7 @@ test_targets:
         platform: standalone
   - name: linux-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.2.7-1238332
+    image: renderstreaming/ubuntu:v0.2.8-1256878
     flavor: b1.large
     model: rtx2080
     is_gpu: true
@@ -205,7 +205,7 @@ pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
   agent:
     type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.7-1238331
+    image: package-ci/ubuntu-20.04:v4.4.0-1252344
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}

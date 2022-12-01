@@ -43,9 +43,9 @@ namespace webrtc
     {
         NvDecoderImpl decoder(context_, nullptr);
 
-        VideoCodec codec_settings;
-        SetDefaultSettings(&codec_settings);
-        EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder.InitDecode(&codec_settings, 1));
+        VideoDecoder::Settings codec_settings;
+        SetDefaultSettings(codec_settings);
+        EXPECT_TRUE(decoder.Configure(codec_settings));
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDevice, NvDecoderImplTest, testing::ValuesIn(supportedGfxDevices));

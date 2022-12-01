@@ -21,7 +21,8 @@ namespace Unity.WebRTC
 
         protected override bool ReleaseHandle()
         {
-			onStatsDelivered = null;
+            WebRTC.Context.DeleteRefPtr(handle);
+            onStatsDelivered = null;
             return true;
         }
     }

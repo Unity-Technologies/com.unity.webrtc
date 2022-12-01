@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.22)
 
 set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
     "10.0"
@@ -35,8 +35,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
   set(Android TRUE)
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(XCODE)
@@ -49,18 +51,12 @@ if(XCODE)
   endif()
 endif()
 
+# Use lld linker instead of GNU ld.
+# Link glibc++ statically because of compatibility of lower version of GLIBCXX.
+# This package must support Ubuntu version 16.04, 18.04, 20.04.
 if(Linux)
-  option(USE_CUSTOM_LIBCXX_STATIC "Use custom libc++" OFF)
-  option(CUSTOM_LIBCXX_DIR "Set filepath for custom libc++"
-         "${CMAKE_SOURCE_DIR}")
-
-  if(USE_CUSTOM_LIBCXX_STATIC)
-    add_compile_options(-nostdinc++)
-    add_link_options(-static-libstdc++)
-    include_directories("${CUSTOM_LIBCXX_DIR}/include/c++/v1/")
-    set(CXX_LIBRARY "${CUSTOM_LIBCXX_DIR}/lib/libc++.a")
-    set(CXXABI_LIBRARY "${CUSTOM_LIBCXX_DIR}/lib/libc++abi.a")
-  endif()
+  set(CMAKE_CXX_FLAG "${CMAKE_CXX_FLAG} -static-libstdc++")
+  add_link_options(-static-libstdc++ -fuse-ld=lld-11)
 endif()
 
 # enable debug output

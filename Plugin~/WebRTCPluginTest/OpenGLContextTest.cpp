@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "GraphicsDeviceContainer.h"
 #include "GraphicsDevice/OpenGL/OpenGLContext.h"
+#include "GraphicsDeviceContainer.h"
 #include "rtc_base/thread.h"
 
 namespace unity
@@ -25,12 +25,8 @@ namespace webrtc
         std::unique_ptr<rtc::Thread> thread = rtc::Thread::CreateWithSocketServer();
         thread->Start();
 
-        std::unique_ptr<OpenGLContext> context = thread->Invoke<std::unique_ptr<OpenGLContext>>(
-                RTC_FROM_HERE,
-                [&]()
-                {
-                    return OpenGLContext::CurrentContext();
-                });
+        std::unique_ptr<OpenGLContext> context =
+            thread->BlockingCall([&]() { return OpenGLContext::CurrentContext(); });
         ASSERT_EQ(context, nullptr);
     }
 
@@ -41,17 +37,12 @@ namespace webrtc
         thread->Start();
 
         std::unique_ptr<OpenGLContext> context = OpenGLContext::CurrentContext();
-        std::unique_ptr<OpenGLContext> context2 = thread->Invoke<std::unique_ptr<OpenGLContext>>(
-            RTC_FROM_HERE,
-            [&]()
-            {
-                return OpenGLContext::CreateGLContext(context.get());
-            });
+        std::unique_ptr<OpenGLContext> context2 =
+            thread->BlockingCall([&]() { return OpenGLContext::CreateGLContext(context.get()); });
         ASSERT_NE(context2, nullptr);
     }
 
-    static UnityGfxRenderer supportedOpenGL[] =
-    {
+    static UnityGfxRenderer supportedOpenGL[] = {
 #if SUPPORT_OPENGL_CORE & UNITY_LINUX
         kUnityGfxRendererOpenGLCore,
 #endif // SUPPORT_OPENGL_UNIFIED
@@ -63,4 +54,3 @@ namespace webrtc
 
 } // end namespace webrtc
 } // end namespace unity
-

@@ -38,11 +38,17 @@ namespace webrtc
         codec_settings->maxFramerate = 60;
         codec_settings->width = 1280;
         codec_settings->height = 720;
-        // If frame dropping is false, we get a warning that bitrate can't
-        // be controlled for RC_QUALITY_MODE; RC_BITRATE_MODE and RC_TIMESTAMP_MODE
-        codec_settings->H264()->frameDroppingOn = true;
+        codec_settings->SetFrameDropEnabled(true);
         codec_settings->startBitrate = 2000;
         codec_settings->maxBitrate = 4000;
+    }
+
+    static void SetDefaultSettings(VideoDecoder::Settings& codec_settings)
+    {
+        codec_settings.set_codec_type(kVideoCodecH264);
+        codec_settings.set_max_render_resolution({1280, 720});
+        // If frame dropping is false, we get a warning that bitrate can't
+        // be controlled for RC_QUALITY_MODE; RC_BITRATE_MODE and RC_TIMESTAMP_MODE
     }
 #pragma clang diagnostic pop
 
@@ -101,7 +107,7 @@ namespace webrtc
             }
             int32_t Decoded(VideoFrame& decodedImage) override
             {
-                RTC_CHECK_NOTREACHED();
+                RTC_DCHECK_NOTREACHED();
                 return -1;
             }
             void
@@ -112,6 +118,7 @@ namespace webrtc
         };
 
         VideoCodec codecSettings_;
+        VideoDecoder::Settings decoderSettings_;
         std::unique_ptr<VideoEncoder> encoder_;
         std::unique_ptr<VideoDecoder> decoder_;
         std::unique_ptr<test::FrameGeneratorInterface> inputFrameGenerator_;

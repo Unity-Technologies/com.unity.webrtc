@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M92/webrtc-ios.zip
+export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M107/webrtc-ios.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugins/iOS
 export WEBRTC_ARCHIVE_DIR=build/webrtc.xcarchive
@@ -21,7 +21,6 @@ cmake . \
   -D CMAKE_SYSTEM_NAME=iOS \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
-  -D CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE=YES \
   -B build
 
 xcodebuild \

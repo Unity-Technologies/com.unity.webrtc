@@ -24,8 +24,10 @@ target_sources(
           PlatformBase.h
           ProfilerMarkerFactory.cpp
           ProfilerMarkerFactory.h
-          SetSessionDescriptionObserver.cpp
-          SetSessionDescriptionObserver.h
+          SetLocalDescriptionObserver.cpp
+          SetLocalDescriptionObserver.h
+          SetRemoteDescriptionObserver.cpp
+          SetRemoteDescriptionObserver.h
           ScopedProfiler.h
           ScopedProfiler.cpp
           targetver.h
@@ -132,6 +134,7 @@ if(Windows)
             d3d11
             winmm
             Secur32
+            Iphlpapi
             Msdmo
             Dmoguids
             wmcodecdspuuid
@@ -175,7 +178,6 @@ elseif(Linux)
   target_link_libraries(glad_glx_14 PUBLIC glad_gl_core_46)
 
   find_package(PkgConfig REQUIRED)
-  pkg_check_modules(GLIB REQUIRED glib-2.0)
 
   target_compile_definitions(WebRTCLib PUBLIC WEBRTC_LINUX WEBRTC_POSIX
                                               VK_NO_PROTOTYPES)
@@ -187,9 +189,8 @@ elseif(Linux)
            glad_vulkan_11
            glad_glx_14
            ${WEBRTC_LIBRARY}
-           ${GLIB_LIBRARIES}
-           ${CXX_LIBRARY}
-           ${CXXABI_LIBRARY})
+           )
+
   target_include_directories(
     WebRTCLib SYSTEM PUBLIC ${CUDA_INCLUDE_DIRS} glad_gl_core_46 glad_vulkan_11
                             glad_glx_14 ${NVCODEC_INCLUDE_DIR})
@@ -197,8 +198,8 @@ elseif(Linux)
   # enable -fPIC option
   set_target_properties(WebRTCLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 elseif(iOS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -fembed-bitcode")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti -fembed-bitcode")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
   set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/iOS")
 
@@ -212,14 +213,13 @@ elseif(Android)
                                               VK_NO_PROTOTYPES)
   target_link_libraries(WebRTCLib PRIVATE ${WEBRTC_LIBRARY} log OpenSLES GLESv3
                                           EGL)
-  target_compile_options(WebRTCLib PUBLIC -fno-lto -fno-rtti)
+  target_compile_options(WebRTCLib PUBLIC -fno-lto -fno-rtti -fPIC)
 
   # Linker excludes unused symbols from the shared library when linking the
   # archive file (libwebrtc.a).
   file(READ "${CMAKE_SOURCE_DIR}/tools/android/jni_symbols.txt" JNI_SYMBOLS)
   string(REPLACE "\n" ";" JNI_SYMBOLS ${JNI_SYMBOLS})
-  list(TRANSFORM JNI_SYMBOLS PREPEND "-Wl,--require-defined=")
-
+  list(TRANSFORM JNI_SYMBOLS PREPEND "-Wl,--undefined=")
   target_link_options(WebRTCLib PUBLIC ${JNI_SYMBOLS})
 
   set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/Android")
@@ -280,6 +280,7 @@ elseif(iOS)
                MACOSX_FRAMEWORK_IDENTIFIER "com.unity.webrtc"
                MACOSX_FRAMEWORK_BUNDLE_VERSION ${CMAKE_PROJECT_VERSION}
                MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${CMAKE_PROJECT_VERSION}
+               XCODE_ATTRIBUTE_ENABLE_BITCODE "NO"
                XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
                XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
                XCODE_ATTRIBUTE_STRIP_STYLE non-global

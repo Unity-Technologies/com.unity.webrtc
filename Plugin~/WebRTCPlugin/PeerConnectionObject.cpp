@@ -4,7 +4,6 @@
 
 #include "Context.h"
 #include "PeerConnectionObject.h"
-#include "SetSessionDescriptionObserver.h"
 
 namespace unity
 {
@@ -56,7 +55,8 @@ namespace webrtc
         auto senders = connection->GetSenders();
         for (const auto& sender : senders)
         {
-            connection->RemoveTrack(sender);
+            // ignore error.
+            connection->RemoveTrackOrError(sender);
         }
 
         const auto state = connection->peer_connection_state();
@@ -72,7 +72,7 @@ namespace webrtc
         context.AddDataChannel(channel, *this);
         if (onDataChannel != nullptr)
         {
-            onDataChannel(this, channel);
+            onDataChannel(this, channel.get());
         }
     }
 
@@ -182,45 +182,43 @@ namespace webrtc
     }
 
     RTCErrorType PeerConnectionObject::SetLocalDescription(
-        const RTCSessionDescription& desc, ::webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+        const RTCSessionDescription& desc,
+        rtc::scoped_refptr<SetLocalDescriptionObserverInterface> observer,
+        std::string& error)
     {
         SdpParseError error_;
         std::unique_ptr<SessionDescriptionInterface> _desc =
             CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
-        if (!_desc.get())
+        if (!_desc)
         {
-            DebugLog("Can't parse received session description message.");
-            DebugLog("SdpParseError:\n%s", error_.description.c_str());
-
             error = error_.description;
             return RTCErrorType::SYNTAX_ERROR;
         }
-        connection->SetLocalDescription(observer, _desc.release());
+        connection->SetLocalDescription(std::move(_desc), observer);
         return RTCErrorType::NONE;
     }
 
     RTCErrorType PeerConnectionObject::SetLocalDescriptionWithoutDescription(
-        ::webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+        rtc::scoped_refptr<SetLocalDescriptionObserverInterface> observer, std::string& error)
     {
         connection->SetLocalDescription(observer);
         return RTCErrorType::NONE;
     }
 
     RTCErrorType PeerConnectionObject::SetRemoteDescription(
-        const RTCSessionDescription& desc, ::webrtc::SetSessionDescriptionObserver* observer, std::string& error)
+        const RTCSessionDescription& desc,
+        rtc::scoped_refptr<SetRemoteDescriptionObserverInterface> observer,
+        std::string& error)
     {
         SdpParseError error_;
         std::unique_ptr<SessionDescriptionInterface> _desc =
             CreateSessionDescription(ConvertSdpType(desc.type), desc.sdp, &error_);
-        if (!_desc.get())
+        if (!_desc)
         {
-            DebugLog("Can't parse received session description message.");
-            DebugLog("SdpParseError:\n%s", error_.description.c_str());
-
             error = error_.description;
             return RTCErrorType::SYNTAX_ERROR;
         }
-        connection->SetRemoteDescription(observer, _desc.release());
+        connection->SetRemoteDescription(std::move(_desc), observer);
         return RTCErrorType::NONE;
     }
 
@@ -260,10 +258,6 @@ namespace webrtc
         root["iceTransportPolicy"] = Json::Value(Json::objectValue);
         root["iceTransportPolicy"]["hasValue"] = true;
         root["iceTransportPolicy"]["value"] = _config.type;
-
-        root["enableDtlsSrtp"] = Json::Value(Json::objectValue);
-        root["enableDtlsSrtp"]["hasValue"] = _config.enable_dtls_srtp.has_value();
-        root["enableDtlsSrtp"]["value"] = _config.enable_dtls_srtp.value_or(false);
 
         root["iceCandidatePoolSize"] = Json::Value(Json::objectValue);
         root["iceCandidatePoolSize"]["hasValue"] = true;

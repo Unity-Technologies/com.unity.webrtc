@@ -68,7 +68,7 @@ namespace webrtc
         {
             rtc::scoped_refptr<webrtc::I420Buffer> buffer = webrtc::I420Buffer::Create(width, height);
 
-            webrtc::I420Buffer::SetBlack(buffer);
+            webrtc::I420Buffer::SetBlack(buffer.get());
             return ::webrtc::VideoFrame::Builder().set_video_frame_buffer(buffer);
         }
 
@@ -84,7 +84,7 @@ namespace webrtc
         rtc::Event done;
         SendTestFrame();
         EXPECT_CALL(sink_, OnFrame(_)).WillOnce(Invoke([&done](const ::webrtc::VideoFrame& frame) { done.Set(); }));
-        EXPECT_TRUE(done.Wait(kTimeout.ms()));
+        EXPECT_TRUE(done.Wait(kTimeout));
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece, VideoTrackSourceTest, testing::ValuesIn(VALUES_TEST_ENV));

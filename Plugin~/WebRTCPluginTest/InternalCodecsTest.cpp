@@ -55,7 +55,7 @@ namespace webrtc
 
         std::unique_ptr<VideoEncoder> CreateEncoder() override
         {
-            SdpVideoFormat format = FindFormat(codecName, encoderFactory.SupportedFormats());
+            SdpVideoFormat format = FindFormat(codecName, encoderFactory.GetSupportedFormats());
             return encoderFactory.CreateVideoEncoder(format);
         }
 
@@ -79,7 +79,7 @@ namespace webrtc
             webrtc::test::CodecSettings(kVideoCodecVP8, codec_settings);
             codec_settings->width = kWidth;
             codec_settings->height = kHeight;
-            codec_settings->VP8()->complexity = VideoCodecComplexity::kComplexityNormal;
+            codec_settings->SetVideoEncoderComplexity(VideoCodecComplexity::kComplexityNormal);
         }
 
         void VerifyQpParser(const EncodedImage& encoded_frame) const

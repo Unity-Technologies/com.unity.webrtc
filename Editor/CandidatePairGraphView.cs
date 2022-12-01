@@ -34,12 +34,9 @@ namespace Unity.WebRTC.Editor
             requestsSentGraph.AddInput(timestamp, input.requestsSent);
             responsesReceivedGraph.AddInput(timestamp, input.responsesReceived);
             responsesSentGraph.AddInput(timestamp, input.responsesSent);
-            retransmissionsReceivedGraph.AddInput(timestamp, input.retransmissionsReceived);
-            retransmissionsSentGraph.AddInput(timestamp, input.retransmissionsSent);
-            consentRequestsReceivedGraph.AddInput(timestamp, input.consentRequestsReceived);
-            consentRequestsSentGraph.AddInput(timestamp, input.consentRequestsSent);
-            consentResponsesReceivedGraph.AddInput(timestamp, input.consentResponsesReceived);
-            consentResponsesSentGraph.AddInput(timestamp, input.consentResponsesSent);
+            retransmissionsReceivedGraph.AddInput(timestamp, input.consentRequestsSent);
+            retransmissionsSentGraph.AddInput(timestamp, input.packetsDiscardedOnSend);
+            consentRequestsReceivedGraph.AddInput(timestamp, input.bytesDiscardedOnSend);
         }
 
         public VisualElement Create()

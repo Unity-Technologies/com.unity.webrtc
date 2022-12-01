@@ -62,7 +62,7 @@ namespace webrtc
         thread->Start();
         std::unique_ptr<ITexture2D> texture(device()->CreateDefaultTextureV(width, height, format()));
         EXPECT_TRUE(device()->WaitIdleForTest());
-        thread->Invoke<void>(RTC_FROM_HERE, [&]() { texture = nullptr; });
+        thread->BlockingCall([&]() { texture = nullptr; });
         EXPECT_EQ(texture, nullptr);
     }
 

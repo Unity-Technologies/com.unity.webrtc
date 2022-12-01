@@ -12,7 +12,7 @@ namespace webrtc
     rtc::scoped_refptr<UnityVideoTrackSource> UnityVideoTrackSource::Create(
         bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory)
     {
-        return new rtc::RefCountedObject<UnityVideoTrackSource>(is_screencast, needs_denoising, taskQueueFactory);
+        return rtc::make_ref_counted<UnityVideoTrackSource>(is_screencast, needs_denoising, taskQueueFactory);
     }
 
     UnityVideoTrackSource::UnityVideoTrackSource(

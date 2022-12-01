@@ -33,18 +33,18 @@ namespace webrtc
         NvDecoderImpl& operator=(const NvDecoderImpl&) = delete;
         ~NvDecoderImpl() override;
 
-        virtual int32_t InitDecode(const VideoCodec* codec_settings, int32_t number_of_cores) override;
-        virtual int32_t Decode(const EncodedImage& input_image, bool missing_frames, int64_t render_time_ms) override;
-        virtual int32_t RegisterDecodeCompleteCallback(DecodedImageCallback* callback) override;
-        virtual int32_t Release() override;
-        virtual DecoderInfo GetDecoderInfo() const override;
+        bool Configure(const Settings& settings) override;
+        int32_t Decode(const EncodedImage& input_image, bool missing_frames, int64_t render_time_ms) override;
+        int32_t RegisterDecodeCompleteCallback(DecodedImageCallback* callback) override;
+        int32_t Release() override;
+        DecoderInfo GetDecoderInfo() const override;
 
     private:
         CUcontext m_context;
         std::unique_ptr<NvDecoderInternal> m_decoder;
         bool m_isConfiguredDecoder;
 
-        VideoCodec m_codec;
+        Settings m_settings;
 
         DecodedImageCallback* m_decodedCompleteCallback = nullptr;
         webrtc::VideoFrameBufferPool m_buffer_pool;

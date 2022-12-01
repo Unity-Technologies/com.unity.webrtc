@@ -2,7 +2,6 @@
 
 #include <functional>
 #include <rtc_base/event.h>
-#include <rtc_base/task_utils/to_queued_task.h>
 
 #include "VideoFrameScheduler.h"
 
@@ -25,13 +24,13 @@ namespace webrtc
         rtc::Event done;
 
         // Waiting for stopping task.
-        queue_->PostTask(ToQueuedTask(
+        queue_->PostTask(
             [task = std::move(task_), &done]() mutable
             {
                 task.Stop();
                 done.Set();
-            }));
-        done.Wait(kTimeout.ms());
+            });
+        done.Wait(kTimeout);
     }
 
     void VideoFrameScheduler::Start(std::function<void()> callback)

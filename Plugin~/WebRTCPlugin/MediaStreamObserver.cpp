@@ -8,20 +8,23 @@ namespace unity
 namespace webrtc
 {
 
-    MediaStreamObserver::MediaStreamObserver(webrtc::MediaStreamInterface* stream, Context* context)
-        : ::webrtc::MediaStreamObserver(stream)
-        , m_context(context)
+    MediaStreamObserver::MediaStreamObserver(webrtc::MediaStreamInterface* stream)
+        : ::webrtc::MediaStreamObserver(
+              stream,
+              [this](webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
+              { this->OnAudioTrackAdded(track, stream); },
+              [this](webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
+              { this->OnAudioTrackRemoved(track, stream); },
+              [this](webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
+              { this->OnVideoTrackAdded(track, stream); },
+              [this](webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
+              { this->OnVideoTrackRemoved(track, stream); })
     {
-        this->SignalVideoTrackAdded.connect(this, &MediaStreamObserver::OnVideoTrackAdded);
-        this->SignalAudioTrackAdded.connect(this, &MediaStreamObserver::OnAudioTrackAdded);
-        this->SignalVideoTrackRemoved.connect(this, &MediaStreamObserver::OnVideoTrackRemoved);
-        this->SignalAudioTrackRemoved.connect(this, &MediaStreamObserver::OnAudioTrackRemoved);
     }
 
     void
     MediaStreamObserver::OnVideoTrackAdded(webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        m_context->AddRefPtr(track);
         for (auto callback : m_listOnAddTrack)
         {
             callback(stream, track);
@@ -31,7 +34,6 @@ namespace webrtc
     void
     MediaStreamObserver::OnAudioTrackAdded(webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
     {
-        m_context->AddRefPtr(track);
         for (auto callback : m_listOnAddTrack)
         {
             callback(stream, track);

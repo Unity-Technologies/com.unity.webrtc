@@ -104,6 +104,16 @@ namespace Unity.WebRTC
             return NativeMethods.PeerConnectionGetTransceivers(self, ptr, out length);
         }
 
+        public CreateSessionDescriptionObserver PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options)
+        {
+            return NativeMethods.PeerConnectionCreateOffer(self, ptr, ref options);
+        }
+
+        public CreateSessionDescriptionObserver PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options)
+        {
+            return NativeMethods.PeerConnectionCreateAnswer(self, ptr, ref options);
+        }
+
         public IntPtr CreateDataChannel(IntPtr ptr, string label, ref RTCDataChannelInitInternal options)
         {
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, ref options);

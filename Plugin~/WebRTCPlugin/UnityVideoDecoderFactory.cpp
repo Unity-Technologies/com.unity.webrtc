@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <api/video_codecs/video_codec.h>
 #include <media/engine/internal_decoder_factory.h>
 #include <modules/video_coding/include/video_error_codes.h>
 
@@ -28,10 +29,10 @@ namespace webrtc
         }
         ~UnityVideoDecoder() override { }
 
-        int32_t InitDecode(const VideoCodec* codec_settings, int32_t number_of_cores) override
+        bool Configure(const Settings& settings) override
         {
-            int32_t result = decoder_->InitDecode(codec_settings, number_of_cores);
-            if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
+            bool result = decoder_->Configure(settings);
+            if (result && !profilerThread_)
             {
                 std::stringstream ss;
                 ss << "Decoder ";
@@ -39,7 +40,7 @@ namespace webrtc
                     << (decoder_->GetDecoderInfo().implementation_name.empty()
                             ? "VideoDecoder"
                             : decoder_->GetDecoderInfo().implementation_name);
-                ss << "(" << CodecTypeToPayloadString(codec_settings->codecType) << ")";
+                ss << "(" << CodecTypeToPayloadString(settings.codec_type()) << ")";
                 profilerThread_ = profiler_->CreateScopedProfilerThread("WebRTC", ss.str().c_str());
             }
 

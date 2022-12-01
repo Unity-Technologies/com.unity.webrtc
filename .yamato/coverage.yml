@@ -5,12 +5,12 @@ editor_version: 2021.3
 platforms:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:v0.3.13-1084239
+    image: package-ci/win10:v1.21.0-1103459
     flavor: b1.large
     model: rtx2080
   - name: linux
     type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.7-1238331
+    image: package-ci/ubuntu-20.04:v1.4.0-1235639
     flavor: b1.large
     model: rtx2080
   - name: macos

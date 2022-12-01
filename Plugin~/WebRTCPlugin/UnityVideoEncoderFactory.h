@@ -17,12 +17,13 @@ namespace webrtc
         // VideoEncoderFactory
         // Returns a list of supported video formats in order of preference, to use
         // for signaling etc.
-        virtual std::vector<SdpVideoFormat> GetSupportedFormats() const override;
+        std::vector<SdpVideoFormat> GetSupportedFormats() const override;
         // Returns information about how this format will be encoded. The specified
         // format must be one of the supported formats by this factory.
-        virtual CodecInfo QueryVideoEncoder(const SdpVideoFormat& format) const override;
+        CodecSupport
+        QueryCodecSupport(const SdpVideoFormat& format, absl::optional<std::string> scalability_mode) const override;
         // Creates a VideoEncoder for the specified format.
-        virtual std::unique_ptr<VideoEncoder> CreateVideoEncoder(const SdpVideoFormat& format) override;
+        std::unique_ptr<VideoEncoder> CreateVideoEncoder(const SdpVideoFormat& format) override;
 
         UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler);
         ~UnityVideoEncoderFactory() override;

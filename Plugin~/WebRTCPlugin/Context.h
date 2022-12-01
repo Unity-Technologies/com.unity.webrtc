@@ -84,6 +84,7 @@ namespace webrtc
             m_mapRefPtr.emplace(refptr.get(), refptr);
         }
         void AddRefPtr(rtc::RefCountInterface* ptr) { m_mapRefPtr.emplace(ptr, ptr); }
+
         template<typename T>
         void RemoveRefPtr(rtc::scoped_refptr<T>& refptr)
         {
@@ -98,24 +99,25 @@ namespace webrtc
         }
 
         // MediaStream
-        webrtc::MediaStreamInterface* CreateMediaStream(const std::string& streamId);
+        rtc::scoped_refptr<MediaStreamInterface> CreateMediaStream(const std::string& streamId);
         void RegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream);
         void UnRegisterMediaStreamObserver(webrtc::MediaStreamInterface* stream);
         MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
 
         // Audio Source
-        webrtc::AudioSourceInterface* CreateAudioSource();
+        rtc::scoped_refptr<AudioSourceInterface> CreateAudioSource();
         // Audio Renderer
         AudioTrackSinkAdapter* CreateAudioTrackSinkAdapter();
         void DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink);
 
         // Video Source
-        webrtc::VideoTrackSourceInterface* CreateVideoSource();
+        rtc::scoped_refptr<UnityVideoTrackSource> CreateVideoSource();
 
         // MediaStreamTrack
-        webrtc::VideoTrackInterface*
+        rtc::scoped_refptr<VideoTrackInterface>
         CreateVideoTrack(const std::string& label, webrtc::VideoTrackSourceInterface* source);
-        webrtc::AudioTrackInterface* CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source);
+        rtc::scoped_refptr<AudioTrackInterface>
+        CreateAudioTrack(const std::string& label, webrtc::AudioSourceInterface* source);
         void StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track);
 
         // PeerConnection
@@ -131,7 +133,7 @@ namespace webrtc
         // DataChannel
         DataChannelInterface*
         CreateDataChannel(PeerConnectionObject* obj, const char* label, const DataChannelInit& options);
-        void AddDataChannel(DataChannelInterface* channel, PeerConnectionObject& pc);
+        void AddDataChannel(rtc::scoped_refptr<DataChannelInterface> channel, PeerConnectionObject& pc);
         DataChannelObject* GetDataChannelObject(const DataChannelInterface* channel);
         void DeleteDataChannel(DataChannelInterface* channel);
 

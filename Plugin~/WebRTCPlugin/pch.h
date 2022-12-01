@@ -12,7 +12,6 @@
 #ifdef _WIN32
 #include "rtc_base/win32.h"
 #include "rtc_base/win32_socket_init.h"
-#include "rtc_base/win32_socket_server.h"
 #endif
 #pragma endregion
 
@@ -55,7 +54,9 @@
 #include <glad/gl.h>
 #include <glad/glx.h>
 #undef CurrentTime // Defined by X11/X.h
+#undef Success // Defined by X11/X.h
 #undef Status // Defined by X11/Xutil.h
+#undef True // Defined by X11/Xlib.h
 #endif
 
 // Android platform

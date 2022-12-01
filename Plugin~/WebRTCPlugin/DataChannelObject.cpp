@@ -36,13 +36,13 @@ namespace webrtc
         case webrtc::DataChannelInterface::kOpen:
             if (onOpen != nullptr)
             {
-                onOpen(this->dataChannel);
+                onOpen(this->dataChannel.get());
             }
             break;
         case webrtc::DataChannelInterface::kClosed:
             if (onClose != nullptr)
             {
-                onClose(this->dataChannel);
+                onClose(this->dataChannel.get());
             }
             break;
         case webrtc::DataChannelInterface::kConnecting:
@@ -57,7 +57,7 @@ namespace webrtc
             size_t size = buffer.data.size();
             if (onMessage != nullptr)
             {
-                onMessage(this->dataChannel, buffer.data.data(), static_cast<int32_t>(size));
+                onMessage(this->dataChannel.get(), buffer.data.data(), static_cast<int32_t>(size));
             }
         }
     }

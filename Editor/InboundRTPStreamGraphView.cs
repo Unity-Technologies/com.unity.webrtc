@@ -40,15 +40,6 @@ namespace Unity.WebRTC.Editor
             packetsLostGraph.AddInput(timestamp, input.packetsLost);
             jitterGraph.AddInput(timestamp, (float)input.jitter);
             packetsDiscardedGraph.AddInput(timestamp, input.packetsDiscarded);
-            packetsRepairedGraph.AddInput(timestamp, input.packetsRepaired);
-            burstPacketsLostGraph.AddInput(timestamp, input.burstPacketsLost);
-            burstPacketsDiscardedGraph.AddInput(timestamp, input.burstPacketsDiscarded);
-            burstLossCountGraph.AddInput(timestamp, input.burstLossCount);
-            burstDiscardCountGraph.AddInput(timestamp, input.burstDiscardCount);
-            burstLossRateGraph.AddInput(timestamp, (float)input.burstLossRate);
-            burstDiscardRateGraph.AddInput(timestamp, (float)input.burstDiscardRate);
-            gapLossRateGraph.AddInput(timestamp, (float)input.gapLossRate);
-            gapDiscardRateGraph.AddInput(timestamp, (float)input.gapDiscardRate);
             framesDecodedGraph.AddInput(timestamp, input.framesDecoded);
             keyFramesDecodedGraph.AddInput(timestamp, input.keyFramesDecoded);
         }

@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <api/make_ref_counted.h>
 #include <rtc_base/ref_counted_object.h>
 #include <system_wrappers/include/clock.h>
 
@@ -46,7 +47,7 @@ namespace webrtc
             it++;
         }
         rtc::scoped_refptr<GpuMemoryBufferFromUnity> buffer =
-            new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(device_, ptr, size, format);
+            rtc::make_ref_counted<GpuMemoryBufferFromUnity>(device_, ptr, size, format);
         std::unique_ptr<FrameResources> resources = std::make_unique<FrameResources>(buffer);
         resources->MarkUsed(clock_->CurrentTime());
         resourcesPool_.push_back(std::move(resources));

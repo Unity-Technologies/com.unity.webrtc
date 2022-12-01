@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <pc/media_stream_observer.h>
 
 #include "WebRTCPlugin.h"
@@ -8,12 +9,11 @@ namespace unity
 {
 namespace webrtc
 {
-
     class Context;
-    class MediaStreamObserver : public ::webrtc::MediaStreamObserver, public sigslot::has_slots<>
+    class MediaStreamObserver : public ::webrtc::MediaStreamObserver
     {
     public:
-        explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream, Context* context);
+        explicit MediaStreamObserver(webrtc::MediaStreamInterface* stream);
         void RegisterOnAddTrack(DelegateMediaStreamOnAddTrack callback);
         void RegisterOnRemoveTrack(DelegateMediaStreamOnRemoveTrack callback);
 
@@ -25,7 +25,6 @@ namespace webrtc
 
         std::list<DelegateMediaStreamOnAddTrack> m_listOnAddTrack;
         std::list<DelegateMediaStreamOnRemoveTrack> m_listOnRemoveTrack;
-        Context* m_context;
     };
 
 } // end namespace webrtc

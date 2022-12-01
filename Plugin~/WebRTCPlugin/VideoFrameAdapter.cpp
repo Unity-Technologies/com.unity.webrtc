@@ -57,7 +57,7 @@ namespace webrtc
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::ScaledBuffer::CropAndScale(
         int offset_x, int offset_y, int crop_width, int crop_height, int scaled_width, int scaled_height)
     {
-        RTC_NOTREACHED();
+        RTC_DCHECK_NOTREACHED();
 
         return nullptr;
     }
@@ -93,8 +93,8 @@ namespace webrtc
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::CropAndScale(
         int offset_x, int offset_y, int crop_width, int crop_height, int scaled_width, int scaled_height)
     {
-        return rtc::scoped_refptr<VideoFrameBuffer>(
-            new rtc::RefCountedObject<ScaledBuffer>(this, scaled_width, scaled_height));
+        return rtc::make_ref_counted<ScaledBuffer>(
+            rtc::scoped_refptr<VideoFrameAdapter>(this), scaled_width, scaled_height);
     }
 
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::GetOrCreateFrameBufferForSize(const Size& size)

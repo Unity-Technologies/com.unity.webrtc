@@ -8,7 +8,6 @@
 #define JNIEXPORT __attribute__((visibility("default")))
 
 #include "sdk/android/native_api/base/init.h"
-#include "sdk/android/src/jni/class_reference_holder.h"
 #include "sdk/android/src/jni/jni_helpers.h"
 
 using namespace ::webrtc;

@@ -2,6 +2,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.WebRTC.Editor
 {
+    [System.Obsolete]
     internal class MediaStreamTrackGraphView
     {
         private GraphView jitterBufferDelayGraph = new GraphView("jitterBufferDelay");

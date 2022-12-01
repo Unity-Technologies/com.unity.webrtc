@@ -12,7 +12,7 @@ namespace webrtc
     rtc::scoped_refptr<CreateSessionDescriptionObserver>
     CreateSessionDescriptionObserver::Create(PeerConnectionObject* connection)
     {
-        return new rtc::RefCountedObject<CreateSessionDescriptionObserver>(connection);
+        return rtc::make_ref_counted<CreateSessionDescriptionObserver>(connection);
     }
 
     CreateSessionDescriptionObserver::CreateSessionDescriptionObserver(PeerConnectionObject* connection)
