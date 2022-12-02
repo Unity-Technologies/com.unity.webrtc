@@ -643,6 +643,7 @@ namespace Unity.WebRTC
         internal const string Lib = "webrtc";
 #endif
         private static Context s_context = null;
+        private static SynchronizationContext s_syncContext;
 
         /// <summary>
         /// 
@@ -654,6 +655,12 @@ namespace Unity.WebRTC
         public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
             NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
         {
+        }
+
+        [RuntimeInitializeOnLoadMethod]
+        static void RuntimeInitializeOnLoadMethod()
+        {
+            s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
         }
 
         internal static void InitializeInternal(bool limitTextureSize = true, bool enableNativeLog = false,
@@ -673,7 +680,6 @@ namespace Unity.WebRTC
             s_context = Context.Create();
 
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
-            s_context.syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
             s_context.limitTextureSize = limitTextureSize;
 
             NativeMethods.SetCurrentContext(s_context.self);
@@ -718,7 +724,7 @@ namespace Unity.WebRTC
         /// </returns>
         public static bool ExecutePendingTasks(int millisecondTimeout)
         {
-            if (s_context.syncContext is ExecutableUnitySynchronizationContext executableContext)
+            if (s_syncContext is ExecutableUnitySynchronizationContext executableContext)
             {
                 return executableContext.ExecutePendingTasks(millisecondTimeout);
             }
@@ -937,19 +943,19 @@ namespace Unity.WebRTC
             if (delay < 0f)
                 throw new ArgumentException($"The delay value is smaller than zero. delay:{delay}");
             if (Mathf.Approximately(delay, 0f))
-                s_context.syncContext.Post(DestroyImmediate, obj);
+                s_syncContext.Post(DestroyImmediate, obj);
             else
-                s_context.syncContext.Post(Destroy, Tuple.Create(obj, delay));
+                s_syncContext.Post(Destroy, Tuple.Create(obj, delay));
         }
 
         internal static void DelayActionOnMainThread(Action callback, float delay)
         {
-            s_context.syncContext.Post(DelayAction, Tuple.Create(callback, delay));
+            s_syncContext.Post(DelayAction, Tuple.Create(callback, delay));
         }
 
         internal static void Sync(IntPtr ptr, Action callback)
         {
-            s_context.syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
+            s_syncContext.Post(SendOrPostCallback, new CallbackObject(ptr, callback));
         }
         internal static string GetModuleName()
         {

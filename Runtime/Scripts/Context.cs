@@ -50,13 +50,13 @@ namespace Unity.WebRTC
         {
             Debug.Log("ContextManager::Init");
             Application.quitting += Quit;
-//            WebRTC.InitializeInternal();
+            WebRTC.InitializeInternal();
             Debug.Log("ContextManager::Init end");
         }
         static void Quit()
         {
             Debug.Log("ContextManager::Quit");
-//            WebRTC.DisposeInternal();
+            WebRTC.DisposeInternal();
             Debug.Log("ContextManager::Quit end");
         }
 #endif
@@ -66,7 +66,6 @@ namespace Unity.WebRTC
     {
         internal IntPtr self;
         internal WeakReferenceTable table;
-        internal SynchronizationContext syncContext;
         internal bool limitTextureSize;
 
         private int id;

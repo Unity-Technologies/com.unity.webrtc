@@ -174,7 +174,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Executes the current set of pending tasks and then (xref: System.Threading.SynchronizationContext.Post)s
+        /// Executes the current set of pending tasks and then (xref: System.Threading.SynchronizationContext.Post)
         /// another <see cref='CallbackObject'> with another ExecuteAndAppendNextExecute action to the (xref: UnityEngine.UnitySyncrhonizationContext)
         /// </summary>
         /// <remarks>
@@ -182,6 +182,10 @@ namespace Unity.WebRTC
         /// </remarks>
         void ExecuteAndAppendNextExecute()
         {
+            // Stop infinity loop when application is stopped.
+            if (!UnityEngine.Application.isPlaying)
+                return;
+
             Execute();
 
             // UnitySynchronizationContext works by performing work in batches so as not to stall the main thread
