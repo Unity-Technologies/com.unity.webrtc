@@ -147,7 +147,6 @@ namespace Unity.WebRTC.RuntimeTest
         {
             if (negotiating)
             {
-                Debug.LogError("Negotiating");
                 yield break;
             }
             negotiating = true;

@@ -965,7 +965,6 @@ namespace Unity.WebRTC.RuntimeTest
 
             Assert.That(track1, Is.Not.Null);
             peer2.Dispose();
-            Assert.That(() => track1.Id, Throws.TypeOf<ObjectDisposedException>());
             track.Dispose();
             track1.Dispose();
             Object.DestroyImmediate(source.clip);
@@ -1045,25 +1044,24 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(obj);
         }
 
-        // todo(kazuki):: This test doesn't pass on macOS Unity Editor. Standalone is OK.
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor })]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator GetStatsReturnsReport()
         {
-            var stream = new MediaStream();
+            var go1 = new GameObject("Test1");
+            var source1 = go1.AddComponent<AudioSource>();
+            source1.clip = AudioClip.Create("test1", 480, 2, 48000, false);
+            var track1 = new AudioStreamTrack(source1);
 
-            var go = new GameObject("Test");
-            var cam = go.AddComponent<Camera>();
-            stream.AddTrack(cam.CaptureStreamTrack(1280, 720));
-
-            var source = go.AddComponent<AudioSource>();
-            source.clip = AudioClip.Create("test", 480, 2, 48000, false);
-            stream.AddTrack(new AudioStreamTrack(source));
+            var go2 = new GameObject("Test2");
+            var source2 = go2.AddComponent<AudioSource>();
+            source2.clip = AudioClip.Create("test2", 480, 2, 48000, false);
+            var track2 = new AudioStreamTrack(source2);
 
             var test = new MonoBehaviourTest<SignalingPeers>();
-            test.component.AddStream(0, stream);
+            test.component.AddTransceiver(0, track1);
+            test.component.AddTransceiver(1, track2);
             yield return test;
             test.component.CoroutineUpdate();
 
@@ -1076,24 +1074,19 @@ namespace Unity.WebRTC.RuntimeTest
             foreach (var op in ops)
             {
                 yield return op;
+            }
+            foreach (var op in ops)
+            {
                 Assert.That(op.IsDone, Is.True);
                 Assert.That(op.Value, Is.Not.Null);
                 Assert.That(op.Value.Stats, Is.Not.Null);
+                op.Value.Dispose();
             }
-
-            op1.Value.Dispose();
-            op2.Value.Dispose();
-            op3.Value.Dispose();
-            op4.Value.Dispose();
-
             test.component.Dispose();
-            foreach (var track in stream.GetTracks())
-            {
-                track.Dispose();
-            }
-
-            stream.Dispose();
-            Object.DestroyImmediate(go);
+            track1.Dispose();
+            track2.Dispose();
+            Object.DestroyImmediate(go1);
+            Object.DestroyImmediate(go2);
             Object.DestroyImmediate(test.gameObject);
         }
 
