@@ -660,6 +660,7 @@ namespace Unity.WebRTC
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitializeOnLoadMethod()
         {
+            // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
         }
 
@@ -678,8 +679,6 @@ namespace Unity.WebRTC
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create();
-
-            // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_context.limitTextureSize = limitTextureSize;
 
             NativeMethods.SetCurrentContext(s_context.self);
