@@ -38,12 +38,12 @@
 
 #if SUPPORT_D3D11 && SUPPORT_D3D12
 #include <comdef.h>
-#include <cudaD3D11.h>
 #include <d3d11.h>
 #include <d3d11_4.h>
 #include <d3d12.h>
 #include <wrl/client.h>
 
+#include <cudaD3D11.h>
 #include <IUnityGraphicsD3D11.h>
 #include <IUnityGraphicsD3D12.h>
 #endif
