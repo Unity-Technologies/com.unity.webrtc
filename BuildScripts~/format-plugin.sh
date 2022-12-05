@@ -12,11 +12,12 @@ pushd $SOLUTION_DIR
 
 # Check native code format
 find . -type f \( -name "*.cpp" -or -name "*.h" \) \
-  ! -path "./Plugin~/libcxx/*" \
-  ! -path "./Plugin~/NvCodec/*" \
-  ! -path "./Plugin~/unity/*" \
-  ! -path "./Plugin~/gl3w/*" \
-  | xargs -I % clang-format-11 -style=file --dry-run --Werror %
+  ! -path "./libcxx/*" \
+  ! -path "./NvCodec/*" \
+  ! -path "./unity/*" \
+  ! -path "./gl3w/*" \
+  ! -path "./webrtc/*" \
+  | xargs -I % clang-format -style=file --dry-run --Werror %
 
 # Check CMakeLists.txt format
 find . -name CMakeLists.txt ! -path "*/glad/*" | \

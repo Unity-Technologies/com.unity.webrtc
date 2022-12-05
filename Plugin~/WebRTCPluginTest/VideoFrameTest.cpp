@@ -41,8 +41,8 @@ namespace webrtc
 
     TEST_P(VideoFrameTest, WrapExternalGpuMemoryBuffer)
     {
-        std::unique_ptr<ITexture2D> tex = std::unique_ptr<ITexture2D>(
-            device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
+        std::unique_ptr<ITexture2D> tex =
+            std::unique_ptr<ITexture2D>(device_->CreateDefaultTextureV(kWidth, kHeight, kFormat));
         EXPECT_TRUE(device_->WaitIdleForTest());
         rtc::scoped_refptr<VideoFrame> videoFrame = CreateTestFrame(device_, tex.get(), kFormat);
         EXPECT_TRUE(device_->WaitIdleForTest());

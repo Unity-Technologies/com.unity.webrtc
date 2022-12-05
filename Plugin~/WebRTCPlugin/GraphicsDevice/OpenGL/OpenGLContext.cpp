@@ -4,7 +4,6 @@
 #include <EGL/egl.h>
 #endif
 
-
 #include "OpenGLContext.h"
 
 namespace unity
@@ -16,32 +15,28 @@ namespace webrtc
     {
     public:
         EGLContextImpl(EGLContext sharedCtx = 0)
-        : created_(false)
+            : created_(false)
         {
             RTC_DCHECK(display);
 
             // Return if the context is already created.
             context_ = eglGetCurrentContext();
-            if(context_ != nullptr)
+            if (context_ != nullptr)
                 return;
 
             int count = 0;
-            if(!eglGetConfigs(display, 0, 0, &count))
+            if (!eglGetConfigs(display, 0, 0, &count))
             {
                 RTC_LOG(LS_ERROR) << "eglGetConfigs failed:" << eglGetError();
                 throw;
             }
             std::vector<EGLConfig> configs(count);
             eglGetConfigs(display, configs.data(), count, &count);
-            EGLint contextAttr[] =
-            {
-                EGL_CONTEXT_CLIENT_VERSION, 2,
-                EGL_NONE
-            };
+            EGLint contextAttr[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
             context_ = eglCreateContext(display, configs[0], sharedCtx, contextAttr);
             RTC_DCHECK(context_);
-            
-            if(!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context_))
+
+            if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context_))
             {
                 RTC_LOG(LS_ERROR) << "eglMakeCurrent failed:" << eglGetError();
                 throw;
@@ -50,7 +45,7 @@ namespace webrtc
         }
         ~EGLContextImpl()
         {
-            if(created_)
+            if (created_)
             {
                 eglDestroySurface(display, surface_);
                 eglDestroyContext(display, context_);
@@ -59,8 +54,9 @@ namespace webrtc
         EGLContext context() const { return context_; }
 
         static EGLDisplay display;
+
     private:
-        EGLContext  context_;
+        EGLContext context_;
         EGLSurface surface_;
         // In Unity, this flag is false because the context already created which rely on the render thread.
         bool created_;
@@ -73,39 +69,29 @@ namespace webrtc
     {
     public:
         GLXContextImpl(GLXContext sharedCtx = 0)
-        : created_(false)
+            : created_(false)
         {
             RTC_DCHECK(display);
 
             // Return if the context is already created.
             context_ = glXGetCurrentContext();
-            if(context_ != nullptr)
+            if (context_ != nullptr)
                 return;
 
-            static int dblBuf[]  =
-            {
-                GLX_RGBA,
-                GLX_DEPTH_SIZE, 16,
-                GLX_DOUBLEBUFFER,
-                None
-            };
-            XVisualInfo *vi = glXChooseVisual(display, DefaultScreen(display), dblBuf);
+            static int dblBuf[] = { GLX_RGBA, GLX_DEPTH_SIZE, 16, GLX_DOUBLEBUFFER, None };
+            XVisualInfo* vi = glXChooseVisual(display, DefaultScreen(display), dblBuf);
             context_ = glXCreateContext(display, vi, sharedCtx, GL_TRUE);
             RTC_DCHECK(context_);
             XFree(vi);
 
             const int visualAttrs[] = { None };
-            const int attrs[] = {
-                    GLX_PBUFFER_WIDTH, 1,
-                    GLX_PBUFFER_HEIGHT, 1,
-                    None
-            };
+            const int attrs[] = { GLX_PBUFFER_WIDTH, 1, GLX_PBUFFER_HEIGHT, 1, None };
 
             int returnedElements;
             GLXFBConfig* configs = glXChooseFBConfig(display, 0, visualAttrs, &returnedElements);
             pbuffer_ = glXCreatePbuffer(display, configs[0], attrs);
             RTC_DCHECK(pbuffer_);
-            if(!glXMakeContextCurrent(display, pbuffer_, pbuffer_, context_))
+            if (!glXMakeContextCurrent(display, pbuffer_, pbuffer_, context_))
             {
                 RTC_LOG(LS_ERROR) << "glXMakeContextCurrent failed";
                 throw;
@@ -123,6 +109,7 @@ namespace webrtc
         GLXContext context() const { return context_; }
 
         static Display* display;
+
     private:
         GLXPbuffer pbuffer_;
         GLXContext context_;
@@ -139,7 +126,7 @@ namespace webrtc
         EGLContextImpl::display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         RTC_DCHECK(EGLContextImpl::display);
         EGLint major, minor;
-        if(!eglInitialize(EGLContextImpl::display, &major, &minor))
+        if (!eglInitialize(EGLContextImpl::display, &major, &minor))
         {
             RTC_LOG(LS_ERROR) << "eglInitialize failed:" << eglGetError();
             throw;
@@ -148,7 +135,7 @@ namespace webrtc
         int version = gladLoaderLoadGL();
         RTC_DCHECK(version);
 
-        Display *display = XOpenDisplay(nullptr);
+        Display* display = XOpenDisplay(nullptr);
         RTC_DCHECK(display);
 
         int screen = DefaultScreen(display);
@@ -162,12 +149,12 @@ namespace webrtc
     std::unique_ptr<OpenGLContext> OpenGLContext::CurrentContext()
     {
 #if SUPPORT_OPENGL_ES
-        if(eglGetCurrentContext())
+        if (eglGetCurrentContext())
             return CreateGLContext();
         return nullptr;
 #endif
 #if SUPPORT_OPENGL_CORE && UNITY_LINUX
-        if(glXGetCurrentContext())
+        if (glXGetCurrentContext())
             return CreateGLContext();
         return nullptr;
 #endif

@@ -13,15 +13,14 @@ namespace webrtc
         VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME
     };
 
-    static std::vector<const char*> requestedDeviceExtensions = {
-        VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
-        VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
+    static std::vector<const char*> requestedDeviceExtensions = { VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                                                  VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
 #ifdef UNITY_LINUX
-        VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
-        VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
+                                                                  VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
+                                                                  VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
 #elif UNITY_WIN
-        VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
-        VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME
+                                                                  VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
+                                                                  VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME
 #endif
     };
 

@@ -103,7 +103,6 @@ namespace webrtc
         std::unique_ptr<const ScopedProfilerThread> profilerThread_;
     };
 
-
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
         , factories_()

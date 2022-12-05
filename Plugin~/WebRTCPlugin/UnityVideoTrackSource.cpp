@@ -63,8 +63,7 @@ namespace webrtc
         const int orig_width = frame_->size().width();
         const int orig_height = frame_->size().height();
         const int64_t now_us = rtc::TimeMicros();
-        FrameAdaptationParams frame_adaptation_params =
-            ComputeAdaptationParams(orig_width, orig_height, now_us);
+        FrameAdaptationParams frame_adaptation_params = ComputeAdaptationParams(orig_width, orig_height, now_us);
         if (frame_adaptation_params.should_drop_frame)
         {
             frame_ = nullptr;

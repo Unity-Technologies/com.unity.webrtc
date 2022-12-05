@@ -53,7 +53,10 @@ namespace webrtc
     void* D3D12Texture2D::GetEncodeTexturePtrV() { return m_sharedTexture; }
     const void* D3D12Texture2D::GetEncodeTexturePtrV() const { return m_sharedTexture; }
     ID3D12Resource* D3D12Texture2D::GetReadbackResource() const { return m_readbackResource; }
-    const D3D12ResourceFootprint* D3D12Texture2D::GetNativeTextureFootprint() const { return &m_nativeTextureFootprint; }
+    const D3D12ResourceFootprint* D3D12Texture2D::GetNativeTextureFootprint() const
+    {
+        return &m_nativeTextureFootprint;
+    }
 
 } // end namespace webrtc
 } // end namespace unity

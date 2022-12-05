@@ -14,9 +14,7 @@ namespace webrtc
             : container_(CreateGraphicsDeviceContainer(GetParam()))
             , device_(container_->device())
         {
-            arrayImpl_ = {
-                kInternalImpl, kNvCodecImpl, kAndroidMediaCodecImpl, kVideoToolboxImpl
-            };
+            arrayImpl_ = { kInternalImpl, kNvCodecImpl, kAndroidMediaCodecImpl, kVideoToolboxImpl };
         }
 
     protected:
@@ -26,7 +24,7 @@ namespace webrtc
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
         }
         std::unique_ptr<GraphicsDeviceContainer> container_;
-        std::vector<std::string> arrayImpl_; 
+        std::vector<std::string> arrayImpl_;
         IGraphicsDevice* device_;
     };
 
@@ -85,7 +83,7 @@ namespace webrtc
                 factories.emplace(impl, factory);
         }
 
-        std::vector <webrtc::SdpVideoFormat> formats = GetSupportedFormatsInFactories(factories);
+        std::vector<webrtc::SdpVideoFormat> formats = GetSupportedFormatsInFactories(factories);
         EXPECT_GT(formats.size(), 0);
     }
     INSTANTIATE_TEST_SUITE_P(GfxDevice, CreateVideoCodecFactoryTest, testing::ValuesIn(supportedGfxDevices));

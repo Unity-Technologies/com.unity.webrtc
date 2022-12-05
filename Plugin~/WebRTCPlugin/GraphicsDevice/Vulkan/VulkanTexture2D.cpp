@@ -26,13 +26,13 @@ namespace webrtc
 
     void VulkanTexture2D::Shutdown()
     {
-        if(m_textureImage)
+        if (m_textureImage)
             vkDestroyImage(m_device, m_textureImage, m_allocator);
-        if(m_textureImageMemory)
+        if (m_textureImageMemory)
             vkFreeMemory(m_device, m_textureImageMemory, m_allocator);
-        if(m_commandBuffer)
+        if (m_commandBuffer)
             vkFreeCommandBuffers(m_device, m_commandPool, 1, &m_commandBuffer);
-        if(m_fence)
+        if (m_fence)
             vkDestroyFence(m_device, m_fence, nullptr);
 
         m_textureImage = nullptr;
@@ -42,7 +42,8 @@ namespace webrtc
         m_commandPool = nullptr;
     }
 
-    bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool)
+    bool
+    VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool)
     {
         m_physicalDevice = physicalDevice;
         m_device = device;

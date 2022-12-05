@@ -12,7 +12,7 @@ namespace unity
 {
 namespace webrtc
 {
-    // The minimum version of CUDA Toolkit 
+    // The minimum version of CUDA Toolkit
     const int kRequiredDriverVersion = 11000;
 
     // todo(kazuki):

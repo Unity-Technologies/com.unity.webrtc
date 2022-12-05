@@ -2,11 +2,11 @@
 
 #include <mutex>
 
+#include <absl/types/optional.h>
+#include <api/media_stream_interface.h>
 #include <api/task_queue/task_queue_factory.h>
 #include <media/base/adapted_video_track_source.h>
 #include <rtc_base/task_queue.h>
-#include <absl/types/optional.h>
-#include <api/media_stream_interface.h>
 
 #include "VideoFrame.h"
 
@@ -56,9 +56,7 @@ namespace webrtc
     private:
         void CaptureNextFrame();
         void SendFeedback();
-         FrameAdaptationParams ComputeAdaptationParams(int width,
-                                                    int height,
-                                                    int64_t time_us);
+        FrameAdaptationParams ComputeAdaptationParams(int width, int height, int64_t time_us);
 
         // Delivers |frame| to base class method
         // rtc::AdaptedVideoTrackSource::OnFrame(). If the cropping (given via

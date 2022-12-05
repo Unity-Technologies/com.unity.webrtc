@@ -13,5 +13,5 @@ namespace webrtc
     std::unique_ptr<VideoEncoderFactory> CreateAndroidEncoderFactory();
     std::unique_ptr<VideoDecoderFactory> CreateAndroidDecoderFactory();
 
-}  // namespace test
-}  // namespace webrtc
+} // namespace test
+} // namespace webrtc

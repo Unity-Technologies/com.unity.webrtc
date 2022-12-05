@@ -12,8 +12,8 @@
 #endif
 
 #if UNITY_OSX || UNITY_IOS
-#import <sdk/objc/components/video_codec/RTCVideoEncoderFactoryH264.h>
 #import <sdk/objc/components/video_codec/RTCVideoDecoderFactoryH264.h>
+#import <sdk/objc/components/video_codec/RTCVideoEncoderFactoryH264.h>
 #import <sdk/objc/native/api/video_decoder_factory.h>
 #import <sdk/objc/native/api/video_encoder_factory.h>
 #elif UNITY_ANDROID

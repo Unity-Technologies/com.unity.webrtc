@@ -159,7 +159,7 @@ namespace webrtc
     }
 
     std::unique_ptr<NvDecoder>
-        NvDecoder::Create(const cricket::VideoCodec& codec, CUcontext context, ProfilerMarkerFactory* profiler)
+    NvDecoder::Create(const cricket::VideoCodec& codec, CUcontext context, ProfilerMarkerFactory* profiler)
     {
         return std::make_unique<NvDecoderImpl>(context, profiler);
     }

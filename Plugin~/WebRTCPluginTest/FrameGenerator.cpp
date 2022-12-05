@@ -44,8 +44,8 @@ namespace webrtc
 
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
 
-        ITexture2D* texture = device_->CreateCPUReadTextureV(
-            static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), kFormat);
+        ITexture2D* texture =
+            device_->CreateCPUReadTextureV(static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), kFormat);
 
         queue_.push(std::unique_ptr<ITexture2D>(texture));
         rtc::scoped_refptr<VideoFrame> frame = CreateTestFrame(device_, texture, kFormat);

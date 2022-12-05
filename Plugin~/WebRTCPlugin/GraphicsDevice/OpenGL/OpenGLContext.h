@@ -15,7 +15,7 @@ namespace webrtc
         static std::unique_ptr<OpenGLContext> CreateGLContext(const OpenGLContext* shared = nullptr);
 
         // Whether the context has been created on the thread.
-        static std::unique_ptr<OpenGLContext>  CurrentContext();
+        static std::unique_ptr<OpenGLContext> CurrentContext();
     };
 }
 }
