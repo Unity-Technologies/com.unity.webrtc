@@ -461,6 +461,7 @@ trigger_pullrequest:
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ editor_version_for_trigger }}_gpu
     - .yamato/nativeplugin.yml#test_all_platform
+    - .yamato/format.yml#check_code_format_nativeplugin
   triggers:
     expression: pull_request.target eq "main" OR pull_request.target match "feat/.*"
 
