@@ -6,7 +6,7 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 sudo apt install clang-format-11
 
 # Install cmake-lang
-sudo pip install --extra-index-url https://pypi.org/simple cmakelang
+sudo pip3 install cmakelang
 
 pushd $SOLUTION_DIR
 
@@ -17,7 +17,7 @@ find . -type f \( -name "*.cpp" -or -name "*.h" \) \
   ! -path "./unity/*" \
   ! -path "./gl3w/*" \
   ! -path "./webrtc/*" \
-  | xargs -I % clang-format -style=file --dry-run --Werror %
+  | xargs -I % clang-format-11 -style=file --dry-run --Werror %
 
 # Check CMakeLists.txt format
 find . -name CMakeLists.txt ! -path "*/glad/*" | \
