@@ -17,12 +17,5 @@ rm -rf "$DYLIB_FILE"
 
 # Build UnityRenderStreaming Plugin
 cd "$SOLUTION_DIR"
-cmake . \
-  -G Xcode \
-  -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-  -B build
-
-cmake \
-  --build build \
-  --config Release \
-  --target WebRTCPlugin
+cmake --preset=macos
+cmake --build --preset=release-macos --target=WebRTCPlugin

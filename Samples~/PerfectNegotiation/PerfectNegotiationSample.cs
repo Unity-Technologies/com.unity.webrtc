@@ -37,16 +37,10 @@ class PerfectNegotiationSample : MonoBehaviour
     private const int MAX = 120;
     private float lerp = 0.0f;
 
-    private void Awake()
-    {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
-    }
-
     private void OnDestroy()
     {
         politePeer?.Dispose();
         impolitePeer?.Dispose();
-        WebRTC.Dispose();
     }
 
     private void Start()

@@ -53,7 +53,6 @@ class E2ELatencySample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(OnCall);
         hangUpButton.onClick.AddListener(OnHangUp);
@@ -64,8 +63,6 @@ class E2ELatencySample : MonoBehaviour
         // Revert global settings
         QualitySettings.vSyncCount = vSyncCount;
         Application.targetFrameRate = targetFrameRate;
-
-        WebRTC.Dispose();
     }
 
     private void Start()

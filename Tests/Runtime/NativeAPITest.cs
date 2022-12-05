@@ -10,6 +10,8 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class NativeAPITest
     {
+        IntPtr context;
+
         private static RenderTexture CreateRenderTexture(int width, int height)
         {
             var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
@@ -30,6 +32,7 @@ namespace Unity.WebRTC.RuntimeTest
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
+            context = WebRTC.Context.self;
         }
 
         [Test]
@@ -38,29 +41,18 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CreateAndDestroyContext()
-        {
-            var context = NativeMethods.ContextCreate(0);
-            NativeMethods.ContextDestroy(0);
-        }
-
-        [Test]
         public void CreateAndDeletePeerConnection()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
         public void RestartIcePeerConnection()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             NativeMethods.PeerConnectionRestartIce(peer);
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
         }
 
         // todo(kazuki):: crash on iOS device
@@ -68,34 +60,28 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void PeerConnectionGetReceivers()
         {
-            var context = NativeMethods.ContextCreate(0);
             var connection = NativeMethods.ContextCreatePeerConnection(context);
             IntPtr buf = NativeMethods.PeerConnectionGetReceivers(context, connection, out ulong length);
             Assert.AreEqual(0, length);
             NativeMethods.ContextDeletePeerConnection(context, connection);
-            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
         public void CreateAndDeleteDataChannel()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
 
             var init = (RTCDataChannelInitInternal)new RTCDataChannelInit();
             var channel = NativeMethods.ContextCreateDataChannel(context, peer, "test", ref init);
             NativeMethods.ContextDeleteDataChannel(context, channel);
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
         public void CreateAndDeleteMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             NativeMethods.ContextDeleteRefPtr(context, stream);
-            NativeMethods.ContextDestroy(0);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeMediaStreamOnAddTrack))]
@@ -107,7 +93,6 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void RegisterDelegateToMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             NativeMethods.ContextRegisterMediaStreamObserver(context, stream);
 
@@ -116,7 +101,6 @@ namespace Unity.WebRTC.RuntimeTest
 
             NativeMethods.ContextUnRegisterMediaStreamObserver(context, stream);
             NativeMethods.ContextDeleteRefPtr(context, stream);
-            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
@@ -124,7 +108,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoTrack()
         {
-            var context = NativeMethods.ContextCreate(0);
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
@@ -133,8 +116,6 @@ namespace Unity.WebRTC.RuntimeTest
             var track = NativeMethods.ContextCreateVideoTrack(context, "video", source);
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, source);
-
-            NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
@@ -143,7 +124,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoTrackToPeerConnection()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -163,7 +143,6 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
@@ -172,7 +151,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public void SenderGetParameter()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             string streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -194,7 +172,6 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeleteRefPtr(context, source);
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
         }
 
         // todo(kazuki): Crash occurs when calling NativeMethods.MediaStreamRemoveTrack method on iOS device
@@ -204,7 +181,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoTrackToMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             const int width = 1280;
             const int height = 720;
@@ -230,7 +206,6 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeleteRefPtr(context, source);
-            NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
@@ -239,7 +214,6 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public void AddAndRemoveAudioTrackToMediaStream()
         {
-            var context = NativeMethods.ContextCreate(0);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var source = NativeMethods.ContextCreateAudioTrackSource(context);
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio", source);
@@ -265,13 +239,11 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeleteRefPtr(context, source);
-            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
         public void AddAndRemoveAudioTrack()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -286,7 +258,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, stream);
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateVideoFrameResize))]
@@ -295,10 +266,8 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateAndDeleteVideoRenderer()
         {
-            var context = NativeMethods.ContextCreate(0);
             var renderer = NativeMethods.CreateVideoRenderer(context, OnVideoFrameResize, true);
             NativeMethods.DeleteVideoRenderer(context, renderer);
-            NativeMethods.ContextDestroy(0);
         }
 
         [Test]
@@ -306,7 +275,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public void AddAndRemoveVideoRendererToVideoTrack()
         {
-            var context = NativeMethods.ContextCreate(0);
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
@@ -318,17 +286,14 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.DeleteVideoRenderer(context, renderer);
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, source);
-            NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
         [Test]
         public void CallGetRenderEventFunc()
         {
-            var context = NativeMethods.ContextCreate(0);
             var callback = NativeMethods.GetRenderEventFunc(context);
             Assert.AreNotEqual(callback, IntPtr.Zero);
-            NativeMethods.ContextDestroy(0);
             NativeMethods.GetRenderEventFunc(IntPtr.Zero);
         }
 
@@ -361,7 +326,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CallVideoEncoderMethods()
         {
-            var context = NativeMethods.ContextCreate(0);
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
@@ -390,17 +354,14 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.ContextDeleteRefPtr(context, source);
 
             NativeMethods.ContextDeletePeerConnection(context, peer);
-            NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
         }
 
         [Test]
         public void CallGetUpdateTextureFunc()
         {
-            var context = NativeMethods.ContextCreate(0);
             var callback = NativeMethods.GetUpdateTextureFunc(context);
             Assert.AreNotEqual(callback, IntPtr.Zero);
-            NativeMethods.ContextDestroy(0);
             NativeMethods.GetUpdateTextureFunc(IntPtr.Zero);
         }
 
@@ -411,7 +372,6 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CallVideoDecoderMethods()
         {
-            var context = NativeMethods.ContextCreate(0);
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
@@ -444,7 +404,6 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.DeleteVideoRenderer(context, renderer);
             NativeMethods.ContextDeleteRefPtr(context, track);
             NativeMethods.ContextDeleteRefPtr(context, source);
-            NativeMethods.ContextDestroy(0);
             UnityEngine.Object.DestroyImmediate(renderTexture);
             UnityEngine.Object.DestroyImmediate(receiveTexture);
         }

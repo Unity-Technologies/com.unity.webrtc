@@ -39,17 +39,11 @@ class TrickleIceSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         addServerButton.onClick.AddListener(OnAddServer);
         removeServerButton.onClick.AddListener(OnRemoveServer);
         resetToDefaultButton.onClick.AddListener(OnResetToDefault);
         gatherCandidatesButton.onClick.AddListener(OnGatherCandidate);
         candidatePoolSizeSlider.onValueChanged.AddListener(OnChangedCandidatePoolSize);
-    }
-
-    private void OnDestroy()
-    {
-        WebRTC.Dispose();
     }
 
     private void Start()

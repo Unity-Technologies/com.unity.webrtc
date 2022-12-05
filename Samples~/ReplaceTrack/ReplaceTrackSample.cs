@@ -39,16 +39,10 @@ class ReplaceTrackSample : MonoBehaviour
     private Peer peer1, peer2;
     private Vector2Int size1, size2;
 
-    private void Awake()
-    {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
-    }
-
     private void OnDestroy()
     {
         peer1?.Dispose();
         peer2?.Dispose();
-        WebRTC.Dispose();
     }
 
     private void Start()

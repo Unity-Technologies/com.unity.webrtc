@@ -40,16 +40,10 @@ namespace Unity.WebRTC.Samples
 
         private void Awake()
         {
-            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
             callButton.onClick.AddListener(Call);
             hangUpButton.onClick.AddListener(HangUp);
             addVideoObjectButton.onClick.AddListener(AddVideoObject);
             addTracksButton.onClick.AddListener(AddTracks);
-        }
-
-        private void OnDestroy()
-        {
-            WebRTC.Dispose();
         }
 
         private void Start()

@@ -39,16 +39,10 @@ class ChangeCodecsSample : MonoBehaviour
 
     private void Awake()
     {
-        WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
         startButton.onClick.AddListener(OnStart);
         callButton.onClick.AddListener(Call);
         hangUpButton.onClick.AddListener(HangUp);
         receiveStream = new MediaStream();
-    }
-
-    private void OnDestroy()
-    {
-        WebRTC.Dispose();
     }
 
     private void Start()

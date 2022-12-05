@@ -30,16 +30,6 @@ namespace Unity.WebRTC.Samples
         private RTCPeerConnection pc1Local, pc1Remote, pc2Local, pc2Remote;
         private MediaStream sourceStream;
 
-        private void Awake()
-        {
-            WebRTC.Initialize(WebRTCSettings.LimitTextureSize);
-        }
-
-        private void OnDestroy()
-        {
-            WebRTC.Dispose();
-        }
-
         private void Start()
         {
             StartCoroutine(WebRTC.Update());

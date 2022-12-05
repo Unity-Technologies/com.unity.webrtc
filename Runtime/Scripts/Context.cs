@@ -1,11 +1,62 @@
 using System;
+using System.Threading;
+using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Unity.WebRTC
 {
+    // Ensure class initializer is called whenever scripts recompile
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
+    class ContextManager
+    {
+#if UNITY_EDITOR
+        static ContextManager()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
+            EditorApplication.quitting += Quit;
+        }
+
+        static void OnBeforeAssemblyReload()
+        {
+            WebRTC.DisposeInternal();
+        }
+
+        static void OnAfterAssemblyReload()
+        {
+            WebRTC.InitializeInternal();
+        }
+
+        static void Quit()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+            WebRTC.DisposeInternal();
+        }
+#else
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            Application.quitting += Quit;
+            WebRTC.InitializeInternal();
+        }
+        static void Quit()
+        {
+            WebRTC.DisposeInternal();
+        }
+#endif
+    }
+
     internal class Context : IDisposable
     {
         internal IntPtr self;
         internal WeakReferenceTable table;
+        internal bool limitTextureSize;
 
         private int id;
         private bool disposed;

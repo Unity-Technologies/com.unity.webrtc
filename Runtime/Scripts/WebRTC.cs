@@ -644,14 +644,6 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
-        private static bool s_limitTextureSize;
-
-#if UNITY_EDITOR
-        internal static void OnBeforeAssemblyReload()
-        {
-            Dispose();
-        }
-#endif
 
         /// <summary>
         /// 
@@ -659,17 +651,25 @@ namespace Unity.WebRTC
         /// <param name="limitTextureSize"></param>
         /// <param name="enableNativeLog"></param>
         /// <param name="nativeLoggingSeverity"></param>
+        [Obsolete]
         public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
+            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
+        {
+        }
+
+        [RuntimeInitializeOnLoadMethod]
+        static void RuntimeInitializeOnLoadMethod()
+        {
+            // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
+            s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+        }
+
+        internal static void InitializeInternal(bool limitTextureSize = true, bool enableNativeLog = false,
             NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
         {
             if (s_context != null)
                 throw new InvalidOperationException("Already initialized WebRTC.");
 
-            // todo(kazuki): Add this event to avoid crash caused by hot-reload.
-            // Dispose of all before reloading assembly.
-#if UNITY_EDITOR
-            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
-#endif
             NativeMethods.RegisterDebugLog(DebugLog, enableNativeLog, nativeLoggingSeverity);
             NativeMethods.StatsCollectorRegisterCallback(OnCollectStatsCallback);
             NativeMethods.CreateSessionDescriptionObserverRegisterCallback(OnCreateSessionDescription);
@@ -679,11 +679,9 @@ namespace Unity.WebRTC
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create();
-            NativeMethods.SetCurrentContext(s_context.self);
+            s_context.limitTextureSize = limitTextureSize;
 
-            // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
-            s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
-            s_limitTextureSize = limitTextureSize;
+            NativeMethods.SetCurrentContext(s_context.self);
         }
 
         /// <summary>
@@ -734,26 +732,35 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public static bool enableLimitTextureSize
+        {
+            get { return s_context.limitTextureSize; }
+            set { s_context.limitTextureSize = value; }
+        }
+
+        /// <summary>
         ///
         /// </summary>
+        [Obsolete]
         public static void Dispose()
+        {
+        }
+
+        internal static void DisposeInternal()
         {
             if (s_context != null)
             {
                 s_context.Dispose();
                 s_context = null;
             }
-            s_syncContext = null;
             NativeMethods.RegisterDebugLog(null, false, NativeLoggingSeverity.Info);
-
-#if UNITY_EDITOR
-            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
-#endif
         }
 
         internal static RTCError ValidateTextureSize(int width, int height, RuntimePlatform platform)
         {
-            if (!s_limitTextureSize)
+            if (!s_context.limitTextureSize)
             {
                 return new RTCError { errorType = RTCErrorType.None };
             }
