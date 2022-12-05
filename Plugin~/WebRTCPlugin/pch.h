@@ -43,9 +43,9 @@
 #include <d3d12.h>
 #include <wrl/client.h>
 
-#include <cudaD3D11.h>
 #include <IUnityGraphicsD3D11.h>
 #include <IUnityGraphicsD3D12.h>
+#include <cudaD3D11.h>
 #endif
 
 #if SUPPORT_OPENGL_CORE
