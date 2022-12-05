@@ -137,14 +137,12 @@ namespace Unity.WebRTC.RuntimeTest
             };
             peers[0].OnNegotiationNeeded = () =>
             {
-                Debug.Log("OnNegotiationNeeded");
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[0], peers[1]));
             };
 
             peers[1].OnNegotiationNeeded = () =>
             {
-                Debug.Log("OnNegotiationNeeded");
                 IsTestFinished = false;
                 StartCoroutine(Negotiate(peers[1], peers[0]));
             };

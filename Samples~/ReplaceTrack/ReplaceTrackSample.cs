@@ -167,14 +167,12 @@ class ReplaceTrackSample : MonoBehaviour
             pc = new RTCPeerConnection(ref config);
             pc.OnIceCandidate = candidate =>
             {
-                Debug.Log("OnIceCandidate");
                 var message = new Message { candidate = candidate };
                 this.parent.PostMessage(this, message);
             };
 
             pc.OnNegotiationNeeded = () =>
             {
-                Debug.Log("OnNegotiationNeeded");
                 this.parent.StartCoroutine(NegotiationProcess());
             };
         }
@@ -339,7 +337,6 @@ class ReplaceTrackSample : MonoBehaviour
             }
 
             var nextTrack = sendingTransceiver.Sender.Track == sourceVideoTrack1 ? sourceVideoTrack2 : sourceVideoTrack1;
-            Debug.Log("ReplaceTrack");
             sendingTransceiver.Sender.ReplaceTrack(nextTrack);
         }
     }
