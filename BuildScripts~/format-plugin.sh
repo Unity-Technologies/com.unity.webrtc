@@ -6,7 +6,7 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 sudo apt install clang-format-11
 
 # Install cmake-lang
-sudo pip3 install cmakelang
+sudo pip install --extra-index-url https://pypi.org/simple cmakelang
 
 pushd $SOLUTION_DIR
 
