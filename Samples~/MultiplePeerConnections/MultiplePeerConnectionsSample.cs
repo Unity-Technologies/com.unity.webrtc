@@ -32,8 +32,6 @@ namespace Unity.WebRTC.Samples
 
         private void Start()
         {
-            StartCoroutine(WebRTC.Update());
-
             startButton.onClick.AddListener(Setup);
             callButton.onClick.AddListener(Call);
             hangUpButton.onClick.AddListener(HangUp);

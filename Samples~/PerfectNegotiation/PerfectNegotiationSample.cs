@@ -65,8 +65,6 @@ class PerfectNegotiationSample : MonoBehaviour
             impolitePeer.SwapTransceivers();
             politePeer.SwapTransceivers();
         });
-
-        StartCoroutine(WebRTC.Update());
     }
 
     private void Update()

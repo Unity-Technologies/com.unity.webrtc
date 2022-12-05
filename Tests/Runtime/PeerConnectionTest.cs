@@ -1073,7 +1073,6 @@ namespace Unity.WebRTC.RuntimeTest
             test.component.AddTransceiver(0, track1);
             test.component.AddTransceiver(1, track2);
             yield return test;
-            test.component.CoroutineUpdate();
 
             var op1 = test.component.GetSenderStats(0, 0);
             var op2 = test.component.GetReceiverStats(0, 0);

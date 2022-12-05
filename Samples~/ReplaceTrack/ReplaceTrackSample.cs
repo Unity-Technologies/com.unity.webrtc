@@ -63,8 +63,6 @@ class ReplaceTrackSample : MonoBehaviour
         stopButton.gameObject.SetActive(false);
         switchButton.onClick.AddListener(OnSwitchTrack);
         switchButton.interactable = false;
-
-        StartCoroutine(WebRTC.Update());
     }
 
     private void OnStart()

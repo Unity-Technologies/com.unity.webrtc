@@ -168,7 +168,6 @@ class ChangeCodecsSample : MonoBehaviour
 
         if (!videoUpdateStarted)
         {
-            StartCoroutine(WebRTC.Update());
             videoUpdateStarted = true;
         }
 

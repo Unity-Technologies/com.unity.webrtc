@@ -214,7 +214,6 @@ class PeerConnectionSample : MonoBehaviour
 
         if (!videoUpdateStarted)
         {
-            StartCoroutine(WebRTC.Update());
             videoUpdateStarted = true;
         }
     }

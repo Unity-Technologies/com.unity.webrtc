@@ -224,7 +224,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddTransceiver(0, track);
             yield return test;
-            test.component.CoroutineUpdate();
 
             var senderTransceivers = test.component.GetPeerTransceivers(0);
             Assert.That(senderTransceivers.Count(), Is.EqualTo(1));
