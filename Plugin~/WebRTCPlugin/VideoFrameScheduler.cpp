@@ -24,12 +24,10 @@ namespace webrtc
         rtc::Event done;
 
         // Waiting for stopping task.
-        queue_->PostTask(
-            [task = std::move(task_), &done]() mutable
-            {
-                task.Stop();
-                done.Set();
-            });
+        queue_->PostTask([task = std::move(task_), &done]() mutable {
+            task.Stop();
+            done.Set();
+        });
         done.Wait(kTimeout);
     }
 
@@ -94,17 +92,13 @@ namespace webrtc
         auto firstDelay = ScheduleNextFrame();
         RTC_DCHECK(firstDelay);
 
-        task_ = RepeatingTaskHandle::DelayedStart(
-            queue_,
-            firstDelay.value(),
-            [this]()
-            {
-                CaptureNextFrame();
-                auto delay = ScheduleNextFrame();
-                if (delay.has_value())
-                    return delay.value();
-                return TimeDelta::PlusInfinity();
-            });
+        task_ = RepeatingTaskHandle::DelayedStart(queue_, firstDelay.value(), [this]() {
+            CaptureNextFrame();
+            auto delay = ScheduleNextFrame();
+            if (delay.has_value())
+                return delay.value();
+            return TimeDelta::PlusInfinity();
+        });
     }
 
     void VideoFrameScheduler::StopTask()
