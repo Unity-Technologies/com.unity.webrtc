@@ -5,7 +5,6 @@ webrtc_version:
   name: M107
 
 editors:
-  - version: 2019.4
   - version: 2020.3
   - version: 2021.3
   - version: 2022.1
