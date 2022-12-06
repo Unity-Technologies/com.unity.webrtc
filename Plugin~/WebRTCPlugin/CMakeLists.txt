@@ -182,14 +182,8 @@ elseif(Linux)
   target_compile_definitions(WebRTCLib PUBLIC WEBRTC_LINUX WEBRTC_POSIX
                                               VK_NO_PROTOTYPES)
 
-  target_link_libraries(
-    WebRTCLib
-    PUBLIC NvCodec
-           glad_gl_core_46
-           glad_vulkan_11
-           glad_glx_14
-           ${WEBRTC_LIBRARY}
-           )
+  target_link_libraries(WebRTCLib PUBLIC NvCodec glad_gl_core_46 glad_vulkan_11
+                                         glad_glx_14 ${WEBRTC_LIBRARY})
 
   target_include_directories(
     WebRTCLib SYSTEM PUBLIC ${CUDA_INCLUDE_DIRS} glad_gl_core_46 glad_vulkan_11

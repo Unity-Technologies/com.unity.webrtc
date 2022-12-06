@@ -188,8 +188,7 @@ namespace webrtc
     static void* CreateDeviceVulkan()
     {
         // Extension
-        std::vector<const char*> instanceExtensions =
-        {
+        std::vector<const char*> instanceExtensions = {
             VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef _WIN32
             VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
@@ -524,8 +523,8 @@ namespace webrtc
         if (renderer == kUnityGfxRendererD3D12)
         {
 #if defined(SUPPORT_D3D12)
-            device =
-                new D3D12GraphicsDevice(static_cast<ID3D12Device*>(nativeGfxDevice_), pCommandQueue.Get(), renderer, nullptr);
+            device = new D3D12GraphicsDevice(
+                static_cast<ID3D12Device*>(nativeGfxDevice_), pCommandQueue.Get(), renderer, nullptr);
 #endif
         }
         else

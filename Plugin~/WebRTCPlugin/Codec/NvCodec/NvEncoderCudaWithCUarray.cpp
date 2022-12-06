@@ -9,7 +9,8 @@ namespace unity
 namespace webrtc
 {
 
-    static CUresult CreateCUarray(CUarray* pDstArray, uint32_t width, uint32_t height, CUarray_format format, int numChannels)
+    static CUresult
+    CreateCUarray(CUarray* pDstArray, uint32_t width, uint32_t height, CUarray_format format, int numChannels)
     {
         CUDA_ARRAY3D_DESCRIPTOR arrayDesc = CUDA_ARRAY3D_DESCRIPTOR();
         arrayDesc.Width = width;
@@ -154,7 +155,8 @@ namespace webrtc
 
         CUDA_DRVAPI_CALL(cuCtxPushCurrent(device));
 
-        uint32_t srcPitch = nSrcPitch ? nSrcPitch : NvEncoder::GetWidthInBytes(pixelFormat, static_cast<uint32_t>(width));
+        uint32_t srcPitch =
+            nSrcPitch ? nSrcPitch : NvEncoder::GetWidthInBytes(pixelFormat, static_cast<uint32_t>(width));
         CUDA_MEMCPY2D m = CUDA_MEMCPY2D();
         m.srcMemoryType = srcMemoryType;
         if (srcMemoryType == CU_MEMORYTYPE_HOST)

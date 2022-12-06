@@ -3,16 +3,16 @@
 #include <IUnityGraphics.h>
 
 #include "api/test/frame_generator_interface.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/event.h"
+#include "rtc_base/synchronization/mutex.h"
+#include "gtest/gtest.h"
 #include <api/video_codecs/h264_profile_level_id.h>
 #include <api/video_codecs/video_codec.h>
 #include <api/video_codecs/video_decoder.h>
 #include <api/video_codecs/video_encoder.h>
 #include <media/base/codec.h>
 #include <modules/video_coding/include/video_codec_interface.h>
-#include "rtc_base/checks.h"
-#include "rtc_base/event.h"
-#include "rtc_base/synchronization/mutex.h"
-#include "gtest/gtest.h"
 
 namespace unity
 {
@@ -46,7 +46,7 @@ namespace webrtc
     static void SetDefaultSettings(VideoDecoder::Settings& codec_settings)
     {
         codec_settings.set_codec_type(kVideoCodecH264);
-        codec_settings.set_max_render_resolution({1280, 720});
+        codec_settings.set_max_render_resolution({ 1280, 720 });
         // If frame dropping is false, we get a warning that bitrate can't
         // be controlled for RC_QUALITY_MODE; RC_BITRATE_MODE and RC_TIMESTAMP_MODE
     }

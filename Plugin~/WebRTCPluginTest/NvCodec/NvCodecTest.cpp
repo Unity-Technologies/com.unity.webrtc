@@ -176,13 +176,11 @@ namespace webrtc
         while (count)
         {
             frames.push(NextInputFrame());
-            thread->PostTask(
-                [&]()
-                {
-                    VideoFrame frame = frames.front();
-                    EncodeAndWaitForFrame(frame, &encoded_frame, &codec_specific_info);
-                    frames.pop();
-                });
+            thread->PostTask([&]() {
+                VideoFrame frame = frames.front();
+                EncodeAndWaitForFrame(frame, &encoded_frame, &codec_specific_info);
+                frames.pop();
+            });
             count--;
         }
 

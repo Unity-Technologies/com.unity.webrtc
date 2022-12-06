@@ -11,14 +11,18 @@ namespace webrtc
     MediaStreamObserver::MediaStreamObserver(webrtc::MediaStreamInterface* stream)
         : ::webrtc::MediaStreamObserver(
               stream,
-              [this](webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
-              { this->OnAudioTrackAdded(track, stream); },
-              [this](webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream)
-              { this->OnAudioTrackRemoved(track, stream); },
-              [this](webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
-              { this->OnVideoTrackAdded(track, stream); },
-              [this](webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream)
-              { this->OnVideoTrackRemoved(track, stream); })
+              [this](webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream) {
+                  this->OnAudioTrackAdded(track, stream);
+              },
+              [this](webrtc::AudioTrackInterface* track, webrtc::MediaStreamInterface* stream) {
+                  this->OnAudioTrackRemoved(track, stream);
+              },
+              [this](webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream) {
+                  this->OnVideoTrackAdded(track, stream);
+              },
+              [this](webrtc::VideoTrackInterface* track, webrtc::MediaStreamInterface* stream) {
+                  this->OnVideoTrackRemoved(track, stream);
+              })
     {
     }
 

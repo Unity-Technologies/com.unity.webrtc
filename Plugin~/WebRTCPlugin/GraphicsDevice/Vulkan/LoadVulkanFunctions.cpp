@@ -69,44 +69,48 @@ namespace webrtc
 #define LoadFunction dlsym
 #endif
 
-#define EXPORTED_VULKAN_FUNCTION( name ) \
-        name = (PFN_##name)LoadFunction( library, #name ); \
-        if (name == nullptr) { \
-            return false; \
-        }
+#define EXPORTED_VULKAN_FUNCTION(name)                                                                                 \
+    name = (PFN_##name)LoadFunction(library, #name);                                                                   \
+    if (name == nullptr)                                                                                               \
+    {                                                                                                                  \
+        return false;                                                                                                  \
+    }
 #include "ListOfVulkanFunctions.inl"
         return true;
     }
 
     bool LoadGlobalVulkanFunction()
     {
-#define GLOBAL_VULKAN_FUNCTION( name ) \
-        name = (PFN_##name)vkGetInstanceProcAddr( nullptr, #name ); \
-        if (name == nullptr) { \
-            return false; \
-        }
+#define GLOBAL_VULKAN_FUNCTION(name)                                                                                   \
+    name = (PFN_##name)vkGetInstanceProcAddr(nullptr, #name);                                                          \
+    if (name == nullptr)                                                                                               \
+    {                                                                                                                  \
+        return false;                                                                                                  \
+    }
 #include "ListOfVulkanFunctions.inl"
         return true;
     }
 
     bool LoadInstanceVulkanFunction(VkInstance instance)
     {
-#define INSTANCE_VULKAN_FUNCTION( name ) \
-        name = (PFN_##name)vkGetInstanceProcAddr( instance, #name ); \
-        if (name == nullptr) { \
-            return false; \
-        }
+#define INSTANCE_VULKAN_FUNCTION(name)                                                                                 \
+    name = (PFN_##name)vkGetInstanceProcAddr(instance, #name);                                                         \
+    if (name == nullptr)                                                                                               \
+    {                                                                                                                  \
+        return false;                                                                                                  \
+    }
 #include "ListOfVulkanFunctions.inl"
         return true;
     }
 
     bool LoadDeviceVulkanFunction(VkDevice device)
     {
-#define DEVICE_VULKAN_FUNCTION( name ) \
-        name = (PFN_##name)vkGetDeviceProcAddr( device, #name ); \
-        if (name == nullptr) { \
-            return false; \
-        }
+#define DEVICE_VULKAN_FUNCTION(name)                                                                                   \
+    name = (PFN_##name)vkGetDeviceProcAddr(device, #name);                                                             \
+    if (name == nullptr)                                                                                               \
+    {                                                                                                                  \
+        return false;                                                                                                  \
+    }
 #include "ListOfVulkanFunctions.inl"
         return true;
     }

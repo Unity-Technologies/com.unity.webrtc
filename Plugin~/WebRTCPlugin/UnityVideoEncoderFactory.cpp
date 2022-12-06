@@ -103,7 +103,6 @@ namespace webrtc
         std::unique_ptr<const ScopedProfilerThread> profilerThread_;
     };
 
-
     UnityVideoEncoderFactory::UnityVideoEncoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler)
         : profiler_(profiler)
         , factories_()
@@ -127,8 +126,7 @@ namespace webrtc
         std::vector<SdpVideoFormat> supported_codecs = GetSupportedFormatsInFactories(factories_);
 
         // Set video codec order: default video codec is VP8
-        auto findIndex = [&](webrtc::SdpVideoFormat& format) -> long
-        {
+        auto findIndex = [&](webrtc::SdpVideoFormat& format) -> long {
             const std::string sortOrder[4] = { "VP8", "VP9", "H264", "AV1X" };
             auto it = std::find(std::begin(sortOrder), std::end(sortOrder), format.name);
             if (it == std::end(sortOrder))

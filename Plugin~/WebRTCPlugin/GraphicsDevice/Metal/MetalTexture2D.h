@@ -18,6 +18,7 @@ namespace webrtc
         inline const void* GetNativeTexturePtrV() const override;
         inline void* GetEncodeTexturePtrV() override;
         inline const void* GetEncodeTexturePtrV() const override;
+
     private:
         id<MTLTexture> m_texture;
     };

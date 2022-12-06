@@ -12,34 +12,28 @@
 
 using namespace ::webrtc;
 
-namespace unity 
+namespace unity
 {
-namespace webrtc 
+namespace webrtc
 {
 
-static JavaVM* g_jvm = nullptr;
+    static JavaVM* g_jvm = nullptr;
 
-extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
-{
-    InitAndroid(jvm);
-    g_jvm = jvm;
+    extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
+    {
+        InitAndroid(jvm);
+        g_jvm = jvm;
 
-    JNIEnv* jni = nullptr;
-    if (jvm->GetEnv(reinterpret_cast<void**>(&jni), JNI_VERSION_1_6) != JNI_OK)
-        return -1;
+        JNIEnv* jni = nullptr;
+        if (jvm->GetEnv(reinterpret_cast<void**>(&jni), JNI_VERSION_1_6) != JNI_OK)
+            return -1;
 
-    return JNI_VERSION_1_6;
-}
+        return JNI_VERSION_1_6;
+    }
 
-extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM* jvm, void* reserved)
-{
-    g_jvm = nullptr;
-}
+    extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM* jvm, void* reserved) { g_jvm = nullptr; }
 
-bool IsVMInitialized()
-{
-    return g_jvm != nullptr;
-}
+    bool IsVMInitialized() { return g_jvm != nullptr; }
 
 }
 }
