@@ -23,6 +23,13 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.RegisterDebugLog(null, true, NativeLoggingSeverity.Verbose);
         }
 
+        [Test]
+        public void QuitAndInitContextManager()
+        {
+            // ContextManager.Init is already called when the process reaches here.
+            ContextManager.Quit();
+            ContextManager.Init();
+        }
 
         [Test]
         public void CreateAndDeletePeerConnection()

@@ -17,9 +17,7 @@ namespace Unity.WebRTC
 #if UNITY_EDITOR
         static ContextManager()
         {
-            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
-            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
-            EditorApplication.quitting += Quit;
+            Init();
         }
 
         static void OnBeforeAssemblyReload()
@@ -32,24 +30,28 @@ namespace Unity.WebRTC
             WebRTC.InitializeInternal();
         }
 
-        static void Quit()
+        internal static void Init()
         {
-            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
-            AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
-            WebRTC.DisposeInternal();
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
+            EditorApplication.quitting += Quit;
         }
 #else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
+        internal static void Init()
         {
             Application.quitting += Quit;
             WebRTC.InitializeInternal();
         }
-        static void Quit()
+#endif
+        internal static void Quit()
         {
+#if UNITY_EDITOR
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+#endif
             WebRTC.DisposeInternal();
         }
-#endif
     }
 
     internal class Context : IDisposable
