@@ -89,7 +89,7 @@ T data_;
 ^
 ```
 
-Patch file
+### Patch file
 
 - fix_abseil.patch
 
@@ -99,4 +99,36 @@ Patch file
 # `src` is a root directory of libwebrtc.
 
 patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "BuildScripts~\patches\fix_abseil.patch"
+```
+
+## Workaround for crash when encoding Full HD resolution or higher using VideoToolbox on macOS(Intel)
+
+Crash occurs when encoding FullHD or higher resolutions using VideoToolbox. This workaround referred from [here](https://groups.google.com/g/discuss-webrtc/c/AVeyMXnM0gY).
+
+### Patch file
+
+- avoid_crashusingvideoencoderh264.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc.
+
+patch -N "src/sdk/objc/components/video_codec/RTCVideoEncoderH264.mm" < "BuildScripts~/patches/avoid_crashusingvideoencoderh264.patch"
+```
+
+## Workaround for can't be profiled correctly encode/decode process on macOS/iOS
+
+Task queuing in libwebrtc is implemented differently on each platform. macOS/iOS is implemented using [GCD (Global Central Dispatch)](https://developer.apple.com/documentation/DISPATCH). GCD makes no guarantees about which thread it uses to execute a task. Referenced [here](https://developer.apple.com/documentation/dispatch/dispatchqueue). Since UnityProfiler is implemented assuming execution in the same thread, it was changed to use TaskQueue implementation by STDLIB which is executed in the same thread.
+
+### Patch file
+
+- disable_task_queue_gcd.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc.
+
+patch -N "src/api/task_queue/BUILD.gn" < "BuildScripts~/patches/disable_task_queue_gcd.patch"
 ```
