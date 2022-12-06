@@ -29,6 +29,9 @@ namespace Unity.WebRTC.RuntimeTest
             // ContextManager.Init is already called when the process reaches here.
             ContextManager.Quit();
             ContextManager.Init();
+
+            // Reinitialize
+            WebRTC.InitializeInternal();
         }
 
         [Test]
