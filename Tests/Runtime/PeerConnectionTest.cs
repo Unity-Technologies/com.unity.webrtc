@@ -483,7 +483,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             var config = GetDefaultConfiguration();
             var peer = new RTCPeerConnection(ref config);
-            var op = peer.CreateOffer();
+            var op = peer.CreateOffer(ref RTCOfferAnswerOptions.Default);
 
             yield return op;
             Assert.True(op.IsDone);
@@ -529,7 +529,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return op2;
             var op3 = peer2.SetRemoteDescription(ref desc);
             yield return op3;
-            var op4 = peer2.CreateAnswer();
+            var op4 = peer2.CreateAnswer(ref RTCOfferAnswerOptions.Default);
             yield return op4;
 
             Assert.True(op4.IsDone);

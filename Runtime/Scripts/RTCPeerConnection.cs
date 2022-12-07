@@ -270,10 +270,6 @@ namespace Unity.WebRTC
             return self;
         }
 
-        internal DelegateSetSessionDescSuccess OnSetSessionDescriptionSuccess { get; set; }
-
-        internal DelegateSetSessionDescFailure OnSetSessionDescriptionFailure { get; set; }
-
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnIceCandidate))]
         static void PCOnIceCandidate(IntPtr ptr, string sdp, string sdpMid, int sdpMlineIndex)
         {
