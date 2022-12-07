@@ -74,12 +74,14 @@ namespace Unity.WebRTC.Editor
                         case RTCStatsType.DataChannel:
                             container.Add(CreateDataChannelView(id));
                             break;
+#pragma warning disable 0612
                         case RTCStatsType.Stream:
                             container.Add(CreateStreamView(id));
                             break;
                         case RTCStatsType.Track:
                             container.Add(CreateTrackView(id));
                             break;
+#pragma warning restore 0612
                         case RTCStatsType.Transceiver:
                             container.Add(CreateTransceiverView(id));
                             break;
@@ -497,12 +499,15 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
+
+#pragma warning disable 0612
                 if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCMediaStreamStats streamStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Stream}"));
                     return;
                 }
+#pragma warning restore 0612
 
                 container.Add(new Label($"{nameof(streamStats.Id)}: {streamStats.Id}"));
                 container.Add(new Label($"{nameof(streamStats.Timestamp)}: {streamStats.Timestamp}"));
@@ -519,7 +524,9 @@ namespace Unity.WebRTC.Editor
             var container = new VisualElement();
             root.Add(container);
 
+#pragma warning disable 0612
             var trackGraph = new MediaStreamTrackGraphView();
+#pragma warning restore 0612
 
             m_parent.OnStats += (peer, report) =>
             {
@@ -529,12 +536,14 @@ namespace Unity.WebRTC.Editor
                 }
 
                 container.Clear();
+#pragma warning disable 0612
                 if (!report.TryGetValue(id, out var stats) ||
                     !(stats is RTCMediaStreamTrackStats trackStats))
                 {
                     container.Add(new Label($"no stats report about {RTCStatsType.Track}"));
                     return;
                 }
+#pragma warning restore 0612
 
                 container.Add(new Label($"{nameof(trackStats.Id)}: {trackStats.Id}"));
                 container.Add(new Label($"{nameof(trackStats.Timestamp)}: {trackStats.Timestamp}"));
