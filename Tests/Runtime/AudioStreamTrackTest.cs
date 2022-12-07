@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using NUnit.Framework;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -11,12 +12,30 @@ namespace Unity.WebRTC.RuntimeTest
     {
         [UnityTest]
         [Timeout(5000)]
+        public IEnumerator Constructor()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var audioTrack = new AudioStreamTrack();
+            Assert.That(audioTrack.Source, Is.Null);
+            Assert.That(audioTrack.Loopback, Is.False);
+            var sender = test.component.AddTrack(0, audioTrack);
+            yield return test;
+            Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+            test.component.Dispose();
+            UnityEngine.Object.DestroyImmediate(test.gameObject);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
         public IEnumerator ConstructorWithAudioSource()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();
             var source = test.gameObject.AddComponent<AudioSource>();
             source.clip = AudioClip.Create("test", 48000, 2, 48000, false);
             var audioTrack = new AudioStreamTrack(source);
+            Assert.That(audioTrack.Source, Is.EqualTo(source));
+            Assert.That(audioTrack.Loopback, Is.False);
             var sender = test.component.AddTrack(0, audioTrack);
             yield return test;
             Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
@@ -33,12 +52,37 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             var listener = test.gameObject.AddComponent<AudioListener>();
             var audioTrack = new AudioStreamTrack(listener);
+            Assert.That(audioTrack.Source, Is.Null);
+            Assert.That(audioTrack.Loopback, Is.False);
             var sender = test.component.AddTrack(0, audioTrack);
             yield return test;
             Assert.That(test.component.RemoveTrack(0, sender), Is.EqualTo(RTCErrorType.None));
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             test.component.Dispose();
             UnityEngine.Object.DestroyImmediate(test.gameObject);
+        }
+
+        [Test]
+        public void SetLoopback()
+        {
+            var obj = new GameObject("test");
+            var source = obj.AddComponent<AudioSource>();
+            source.clip = AudioClip.Create("test", 48000, 2, 48000, false);
+            var audioTrack = new AudioStreamTrack(source);
+            Assert.That(audioTrack.Loopback, Is.False);
+            audioTrack.Loopback = true;
+            Assert.That(audioTrack.Loopback, Is.True);
+            UnityEngine.Object.DestroyImmediate(obj);
+        }
+
+        [Test]
+        public void ConstructorThrowException()
+        {
+            AudioListener listener = null;
+            Assert.That(() => new AudioStreamTrack(listener), Throws.TypeOf<ArgumentNullException>());
+
+            AudioSource source = null;
+            Assert.That(() => new AudioStreamTrack(source), Throws.TypeOf<ArgumentNullException>());
         }
 
         [UnityTest]
@@ -148,11 +192,20 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => track.SetData(null, 0, 0), Throws.ArgumentNullException);
 
             float[] data = new float[2048];
+            NativeArray<float> nativeArray = new NativeArray<float>(data, Allocator.Temp);
             Assert.That(() => track.SetData(data, 0, 0), Throws.ArgumentException);
 
             Assert.That(() => track.SetData(data, 1, 0), Throws.ArgumentException);
             Assert.That(() => track.SetData(data, 0, 48000), Throws.ArgumentException);
             Assert.That(() => track.SetData(data, 1, 48000), Throws.Nothing);
+            Assert.That(() => track.SetData(ref nativeArray, 1, 48000), Throws.Nothing);
+
+            var array = nativeArray.AsReadOnly();
+            Assert.That(() => track.SetData(ref array, 1, 48000), Throws.Nothing);
+            var slice = nativeArray.Slice();
+            Assert.That(() => track.SetData(ref slice, 1, 48000), Throws.Nothing);
+
+            nativeArray.Dispose();
             track.Dispose();
             UnityEngine.Object.DestroyImmediate(source.clip);
             UnityEngine.Object.DestroyImmediate(obj);

@@ -35,8 +35,7 @@ namespace Unity.WebRTC
             {
                 if (_source != null)
                     return _source;
-                return _streamRenderer.Source;
-
+                return _streamRenderer?.Source;
             }
         }
 
