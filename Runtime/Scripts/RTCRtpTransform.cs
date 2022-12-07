@@ -10,20 +10,59 @@ namespace Unity.WebRTC
     /// </summary>
     public enum RTCEncodedVideoFrameType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Empty,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Key,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Delta
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCEncodedVideoFrameMetadata
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly long? frameId;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly ushort width;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly ushort height;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly int spatialIndex;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly long temporalIndex;
+
 //        public readonly long synchronizationSource;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly long[] dependencies;
+
 //        public readonly long[] contributingSources;
 
         internal RTCEncodedVideoFrameMetadata(
@@ -109,9 +148,12 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCEncodedAudioFrame : RTCEncodedFrame
     {
-        public RTCEncodedAudioFrame(IntPtr ptr) : base(ptr) { }
+        internal RTCEncodedAudioFrame(IntPtr ptr) : base(ptr) { }
     }
 
     /// <summary>
@@ -144,7 +186,7 @@ namespace Unity.WebRTC
             return new RTCEncodedVideoFrameMetadata(data);
         }
 
-        public RTCEncodedVideoFrame(IntPtr ptr) : base(ptr) {}
+        internal RTCEncodedVideoFrame(IntPtr ptr) : base(ptr) {}
     };
 
     /// <summary>
@@ -172,6 +214,9 @@ namespace Unity.WebRTC
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Dispose()
         {
             if (this.disposed)
@@ -219,8 +264,16 @@ namespace Unity.WebRTC
 
     public delegate void TransformedFrameCallback(RTCTransformEvent e);
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RTCRtpScriptTransform : RTCRtpTransform
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="callback"></param>
         public RTCRtpScriptTransform(TrackKind kind, TransformedFrameCallback callback)
             : base(kind, callback)
         {

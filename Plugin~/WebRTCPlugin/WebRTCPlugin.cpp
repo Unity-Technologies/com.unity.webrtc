@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include <api/make_ref_counted.h>
-
 #include "Context.h"
 #include "CreateSessionDescriptionObserver.h"
 #include "EncodedStreamTransformer.h"

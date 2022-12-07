@@ -1,5 +1,6 @@
-#include "EncodedStreamTransformer.h"
 #include "pch.h"
+
+#include "EncodedStreamTransformer.h"
 
 namespace unity
 {
