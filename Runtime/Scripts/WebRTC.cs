@@ -1529,11 +1529,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetStringArray(IntPtr member, out ulong length);
         [DllImport(WebRTC.Lib)]
-<<<<<<< HEAD
         public static extern IntPtr StatsMemberGetMapStringUint64(IntPtr member, out IntPtr values, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsMemberGetMapStringDouble(IntPtr member, out IntPtr values, out ulong length);
-=======
+        [DllImport(WebRTC.Lib)]
         public static extern uint FrameGetTimestamp(IntPtr frame);
         [DllImport(WebRTC.Lib)]
         public static extern uint FrameGetSsrc(IntPtr frame);
@@ -1546,7 +1545,6 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool VideoFrameIsKeyFrame(IntPtr frame, [MarshalAs(UnmanagedType.U1)] out bool isKeyFrame);
->>>>>>> 3b456d0c (implemented encoded transform API)
     }
 
     internal static class VideoEncoderMethods
