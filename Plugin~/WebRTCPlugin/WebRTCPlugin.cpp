@@ -1,8 +1,11 @@
 #include "pch.h"
 
+#include <api/make_ref_counted.h>
+
 #include "Context.h"
 #include "CreateSessionDescriptionObserver.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "EncodedStreamTransformer.h"
 #include "MediaStreamObserver.h"
 #include "PeerConnectionObject.h"
 #include "SetLocalDescriptionObserver.h"
@@ -312,10 +315,12 @@ extern "C"
         context->RemoveRefPtr(ptr);
     }
 
-    UNITY_INTERFACE_EXPORT FrameTransformerInterface* ContextCreateFrameTransformer(
-        Context* context, DelegateTransformedFrame callback)
+    UNITY_INTERFACE_EXPORT FrameTransformerInterface*
+    ContextCreateFrameTransformer(Context* context, DelegateTransformedFrame callback)
     {
-        return context->CreateFrameTransformer(callback);
+        rtc::scoped_refptr<FrameTransformerInterface> transformer = context->CreateFrameTransformer(callback);
+        context->AddRefPtr(transformer);
+        return transformer.get();
     }
 
 

@@ -1,4 +1,6 @@
 #pragma once
+#include <rtc_base/synchronization/mutex.h>
+
 #include "WebRTCPlugin.h"
 
 namespace webrtc {

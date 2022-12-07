@@ -1,5 +1,6 @@
 #pragma once
 
+#include <api/frame_transformer_interface.h>
 #include <api/media_stream_interface.h>
 #include <api/rtc_error.h>
 
@@ -25,7 +26,7 @@ namespace webrtc
     using DelegateMediaStreamOnAddTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
     using DelegateMediaStreamOnRemoveTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
     using DelegateVideoFrameResize = void (*)(UnityVideoRenderer* renderer, int width, int height);
-    using DelegateTransformedFrame = void(*)(webrtc::FrameTransformerInterface*, TransformableFrameInterface*);
+    using DelegateTransformedFrame = void(*)(FrameTransformerInterface*, TransformableFrameInterface*);
 
     void debugLog(const char* buf);
     extern DelegateDebugLog delegateDebugLog;
