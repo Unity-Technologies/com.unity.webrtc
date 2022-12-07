@@ -234,7 +234,7 @@ namespace webrtc
     rtc::scoped_refptr<VideoTrackInterface>
     Context::CreateVideoTrack(const std::string& label, VideoTrackSourceInterface* source)
     {
-         return m_peerConnectionFactory->CreateVideoTrack(label, source);
+        return m_peerConnectionFactory->CreateVideoTrack(label, source);
     }
 
     rtc::scoped_refptr<FrameTransformerInterface> Context::CreateFrameTransformer(DelegateTransformedFrame callback)

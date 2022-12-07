@@ -4,8 +4,8 @@
 
 #include "Context.h"
 #include "CreateSessionDescriptionObserver.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 #include "EncodedStreamTransformer.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 #include "MediaStreamObserver.h"
 #include "PeerConnectionObject.h"
 #include "SetLocalDescriptionObserver.h"
@@ -322,7 +322,6 @@ extern "C"
         context->AddRefPtr(transformer);
         return transformer.get();
     }
-
 
     UNITY_INTERFACE_EXPORT bool MediaStreamAddTrack(MediaStreamInterface* stream, MediaStreamTrackInterface* track)
     {
@@ -1320,14 +1319,12 @@ extern "C"
         return sender->SetTrack(track);
     }
 
-    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(
-        RtpSenderInterface* sender)
+    UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* SenderGetTrack(RtpSenderInterface* sender)
     {
         return sender->track().get();
     }
 
-    UNITY_INTERFACE_EXPORT void SenderSetTransform(
-        RtpSenderInterface* sender, FrameTransformerInterface* transformer)
+    UNITY_INTERFACE_EXPORT void SenderSetTransform(RtpSenderInterface* sender, FrameTransformerInterface* transformer)
     {
         sender->SetEncoderToPacketizerFrameTransformer(rtc::scoped_refptr<FrameTransformerInterface>(transformer));
     }
@@ -1337,8 +1334,7 @@ extern "C"
         return receiver->track().get();
     }
 
-    UNITY_INTERFACE_EXPORT MediaStreamInterface** ReceiverGetStreams(
-        RtpReceiverInterface* receiver, size_t* length)
+    UNITY_INTERFACE_EXPORT MediaStreamInterface** ReceiverGetStreams(RtpReceiverInterface* receiver, size_t* length)
     {
         return ConvertPtrArrayFromRefPtrArray<MediaStreamInterface>(receiver->streams(), length);
     }
@@ -1376,7 +1372,8 @@ extern "C"
         return ConvertArray(result, length);
     }
 
-    UNITY_INTERFACE_EXPORT void ReceiverSetTransform(RtpReceiverInterface* receiver, FrameTransformerInterface* transformer)
+    UNITY_INTERFACE_EXPORT void
+    ReceiverSetTransform(RtpReceiverInterface* receiver, FrameTransformerInterface* transformer)
     {
         receiver->SetDepacketizerToDecoderFrameTransformer(rtc::scoped_refptr<FrameTransformerInterface>(transformer));
     }
@@ -1502,10 +1499,7 @@ extern "C"
         return frame->GetTimestamp();
     }
 
-    UNITY_INTERFACE_EXPORT uint32_t FrameGetSsrc(TransformableFrameInterface* frame)
-    {
-        return frame->GetSsrc();
-    }
+    UNITY_INTERFACE_EXPORT uint32_t FrameGetSsrc(TransformableFrameInterface* frame) { return frame->GetSsrc(); }
 
     UNITY_INTERFACE_EXPORT bool VideoFrameIsKeyFrame(TransformableVideoFrameInterface* frame, bool* isKeyFrame)
     {
@@ -1521,14 +1515,13 @@ extern "C"
         int spacialIndex;
         int temporalIndex;
         MarshallArray<int64_t> dependencies;
-//        MarshallArray<const int64_t> dependencies;
+        //        MarshallArray<const int64_t> dependencies;
     };
 
-    UNITY_INTERFACE_EXPORT void VideoFrameGetMetadata(
-        TransformableVideoFrameInterface* frame, RTCVideoFrameMetadata** data)
+    UNITY_INTERFACE_EXPORT void
+    VideoFrameGetMetadata(TransformableVideoFrameInterface* frame, RTCVideoFrameMetadata** data)
     {
-        *data = static_cast<RTCVideoFrameMetadata*>(
-            CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
+        *data = static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
 
         auto metadata = frame->GetMetadata();
 
@@ -1539,28 +1532,25 @@ extern "C"
         data_->spacialIndex = metadata.GetSpatialIndex();
         data_->temporalIndex = metadata.GetTemporalIndex();
         data_->dependencies = metadata.GetFrameDependencies();
-//        data->dependencies = metadata.GetDecodeTargetIndications();
+        //        data->dependencies = metadata.GetDecodeTargetIndications();
     }
 
-    //UNITY_INTERFACE_EXPORT void AudioFrameGetMetadata(
+    // UNITY_INTERFACE_EXPORT void AudioFrameGetMetadata(
     //    TransformableAudioFrameInterface* frame, RTCVideoFrameMetadata** data)
     //{
     //    frame->GetHeader();
     //}
 
-    UNITY_INTERFACE_EXPORT void FrameGetData(
-        TransformableFrameInterface* frame, const uint8_t** data, size_t* size)
+    UNITY_INTERFACE_EXPORT void FrameGetData(TransformableFrameInterface* frame, const uint8_t** data, size_t* size)
     {
         auto data_ = frame->GetData();
         *data = data_.data();
         *size = data_.size();
     }
 
-    UNITY_INTERFACE_EXPORT void FrameSetData(
-        TransformableFrameInterface* frame, const uint8_t* data, size_t size)
+    UNITY_INTERFACE_EXPORT void FrameSetData(TransformableFrameInterface* frame, const uint8_t* data, size_t size)
     {
-        frame->SetData(rtc::ArrayView<const uint8_t>(
-            static_cast<const uint8_t*>(data), size));
+        frame->SetData(rtc::ArrayView<const uint8_t>(static_cast<const uint8_t*>(data), size));
     }
 #pragma clang diagnostic pop
 }
