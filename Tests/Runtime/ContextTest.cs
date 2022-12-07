@@ -30,8 +30,10 @@ namespace Unity.WebRTC.RuntimeTest
             ContextManager.Quit();
             ContextManager.Init();
 
+#if UNITY_EDITOR
             // Reinitialize
             WebRTC.InitializeInternal();
+#endif
         }
 
         [Test]
