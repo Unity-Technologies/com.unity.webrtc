@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.WebRTC;
 using System.Linq;
-using Unity.WebRTC.Samples;
 
 class StatsSample : MonoBehaviour
 {
@@ -18,6 +17,7 @@ class StatsSample : MonoBehaviour
     [SerializeField] private Camera cam;
 #pragma warning restore 0649
 
+    private RTCStatsReport report;
     private RTCPeerConnection pc1, pc2;
     private RTCDataChannel dataChannel, remoteDataChannel;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange = null;
@@ -25,10 +25,8 @@ class StatsSample : MonoBehaviour
     private DelegateOnIceCandidate pc1OnIceCandidate = null;
     private DelegateOnIceCandidate pc2OnIceCandidate = null;
     private DelegateOnMessage onDataChannelMessage = null;
-    private DelegateOnOpen onDataChannelOpen = null;
-    private DelegateOnClose onDataChannelClose = null;
     private DelegateOnDataChannel onDataChannel = null;
-    private int currentValue = -1;
+    private int currentValue = 0;
     private WaitForSeconds wait;
     private Dictionary<string, float> dictFrequency = new Dictionary<string, float>()
     {
@@ -57,6 +55,8 @@ class StatsSample : MonoBehaviour
     private void Start()
     {
         dropdown.interactable = false;
+        dropdown.onValueChanged.AddListener(OnValueChangedStats);
+
         callButton.interactable = true;
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(pc1, state); };
@@ -69,8 +69,6 @@ class StatsSample : MonoBehaviour
             remoteDataChannel = channel;
             remoteDataChannel.OnMessage = onDataChannelMessage;
         };
-        onDataChannelOpen = ()=> { };
-        onDataChannelClose = () => { };
 
         dropdownFreq.options = dictFrequency.Select(pair => new Dropdown.OptionData(pair.Key)).ToList();
         dropdownFreq.value = 0;
@@ -83,6 +81,11 @@ class StatsSample : MonoBehaviour
     void OnValueChangedFreq(int value)
     {
         wait = new WaitForSeconds(dictFrequency.ElementAt(value).Value);
+    }
+
+    void OnValueChangedStats(int value)
+    {
+        currentValue = value;
     }
 
     RTCConfiguration GetSelectedSdpSemantics()
@@ -144,7 +147,6 @@ class StatsSample : MonoBehaviour
         pc2.OnDataChannel = onDataChannel;
 
         dataChannel = pc1.CreateDataChannel("data");
-        dataChannel.OnOpen = onDataChannelOpen;
 
         var audioTrack = new AudioStreamTrack(source);
         var videoTrack = cam.CaptureStreamTrack(1280, 720);
@@ -299,43 +301,31 @@ class StatsSample : MonoBehaviour
                 continue;
 
             var op1 = pc1.GetStats();
-            var op2 = pc2.GetStats();
-
             yield return op1;
-            yield return op2;
 
-            if(op1.IsError || op2.IsError)
+            if(op1.IsError)
                 continue;
 
-            if(dropdown.options.Count == 0)
+            var report = op1.Value;
+            if(dropdown.options.Count != report.Stats.Count)
             {
-                List<string> options = new List<string>();
-                foreach (var stat in op1.Value.Stats.Keys)
-                {
-                    options.Add($"{stat}");
-                }
+                var options = report.Stats.Select(pair => $"{pair.Value.Type}:{pair.Key}").ToList();
                 dropdown.ClearOptions();
                 dropdown.AddOptions(options);
                 dropdown.interactable = true;
             }
+            if (currentValue >= report.Stats.Count)
+                continue;
 
-            if (currentValue != dropdown.value)
-            {
-                currentValue = dropdown.value;
-            }
+            var stats = report.Stats.ElementAt(currentValue).Value;
 
-            var id = dropdown.options[currentValue].text;
-
-            text.text = "Id:" + op1.Value.Stats[id].Id + "\n";
-            text.text += "Timestamp:" + op1.Value.Stats[id].Timestamp + "\n";
+            text.text = "Id:" + stats.Id + "\n";
+            text.text += "Timestamp:" + stats.Timestamp + "\n";
+            text.text += stats.Dict.Aggregate(string.Empty, (str, next) =>
+                    str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
             text.interactable = true;
 
-            if (op1.Value.TryGetValue(id, out RTCStats stats))
-                text.text += stats.Dict.Aggregate(string.Empty,(str, next) =>
-                    str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
-
-            op1.Value.Dispose();
-            op2.Value.Dispose();
+            report.Dispose();
         }
     }
 
