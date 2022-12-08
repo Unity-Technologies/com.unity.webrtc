@@ -113,8 +113,8 @@ namespace Unity.WebRTC
         {
             Dictionary<string, T> ret = new Dictionary<string, T>();
 
-            string[] keys = ptr.AsArray<string>(length);
-            T[] values = valuesPtr.AsArray<T>(length);
+            string[] keys = ptr.AsArray<string>(length, freePtr);
+            T[] values = valuesPtr.AsArray<T>(length, freePtr);
 
             for(int i = 0; i < length; i++)
             {

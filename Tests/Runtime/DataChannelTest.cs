@@ -82,22 +82,44 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
-        public IEnumerator SendThrowsExceptionAfterClose()
+        public IEnumerator SendThrowsException()
         {
-            var test = new MonoBehaviourTest<SignalingPeers>();
-            RTCDataChannel channel = test.component.CreateDataChannel(0, "test");
-            yield return test;
             byte[] message1 = { 1, 2, 3 };
             string message2 = "123";
+            NativeArray<byte> message3 = new NativeArray<byte>(message1, Allocator.Persistent);
+            NativeArray<byte>.ReadOnly message4 = message3.AsReadOnly();
+            NativeSlice<byte> message5 = message3.Slice();
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            RTCDataChannel channel = test.component.CreateDataChannel(0, "test");
+
+            // Throws exception before opening channel
+            Assert.That(() => channel.Send(message1), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message2), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message3), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message4), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message5), Throws.TypeOf<InvalidOperationException>());
+
+            yield return test;
 
             var op1 = new WaitUntilWithTimeout(() => channel.ReadyState == RTCDataChannelState.Open, 5000);
             yield return op1;
             Assert.That(op1.IsCompleted, Is.True);
             Assert.That(() => channel.Send(message1), Throws.Nothing);
             Assert.That(() => channel.Send(message2), Throws.Nothing);
+            Assert.That(() => channel.Send(message3), Throws.Nothing);
+            Assert.That(() => channel.Send(message4), Throws.Nothing);
+            Assert.That(() => channel.Send(message5), Throws.Nothing);
             channel.Close();
+
+            // Throws exception after closing
             Assert.That(() => channel.Send(message1), Throws.TypeOf<InvalidOperationException>());
             Assert.That(() => channel.Send(message2), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message3), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message4), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(() => channel.Send(message5), Throws.TypeOf<InvalidOperationException>());
+
+            message3.Dispose();
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
         }
