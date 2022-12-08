@@ -8,9 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Upgraded libwebrtc [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8).
+- Upgrade libwebrtc [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8).
 - Change that invoking initialization process automatically just after launching Unity Editor.
 - Obsolete `WebRTC.Initialize` and `WebRTC.Initialize`.
+
+### Fixed
+
+- Fix Profile results are displayed as different items on macOS.
+- Fix stopping at first received frame for seconds when using H264 codec.
+- Fix the crash when streaming video which resolution is small on macOS Apple Silicon.
+- Fix the freeze when using over WQHD (2560×1440) resolution on Ubuntu 20.04.
+
+### Removed
+
+- Finish Bitcode support.
+- Finish Unity 2019.4 support.
 
 ## [3.0.0-pre.1] - 2022-10-28
 

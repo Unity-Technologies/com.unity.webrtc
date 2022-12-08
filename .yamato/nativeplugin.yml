@@ -192,15 +192,12 @@ push_plugin:
   commands:
     - git config --global user.email "kazuki@unity3d.com"
     - git config --global user.name "Kazuki Matsumoto"
-    {% for platform in platforms %}
+    {% for platform in build_platforms %}
     - git add {{ platform.plugin_path }}
     {% endfor %}
     - git commit -m "[skip ci] Update plugins"
     - git push origin HEAD:$GIT_BRANCH
   dependencies:
-    {% for platform in platforms %}
+    {% for platform in build_platforms %}
     - .yamato/nativeplugin.yml#build_{{ platform.name }}
     {% endfor %}
-    - .yamato/nativeplugin.yml#test_all_platform
-    - .yamato/upm-ci-webrtc-packages.yml#test_webrtc_{{ editor_version_for_trigger }}_gpu
-#    - .yamato/upm-ci-webrtc-packages.yml#test_webrtc_{{ editor_version_for_trigger }}_nogpu
