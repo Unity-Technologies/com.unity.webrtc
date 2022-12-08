@@ -44,3 +44,5 @@ To build the apk file for **Android platform**, you need to configure player set
 You must disable the bitcode option in Xcode project exported from Unity.
 
 - On the Xcode **Build Settings** tab, in the **Build Options** group, set Enable Bitcode to **No**.
+
+Or refer to the Unity Support's answer. https://support.unity.com/hc/en-us/articles/207942813-How-can-I-disable-Bitcode-support-
