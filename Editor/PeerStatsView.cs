@@ -10,7 +10,7 @@ namespace Unity.WebRTC.Editor
     {
         private readonly WebRTCStats m_parent;
         private readonly RTCPeerConnection m_peerConnection;
-        private ICollection<string> m_lastUpdateKeys;
+        private int m_lastUpdateStatsCount = 0;
 
         public PeerStatsView(RTCPeerConnection peer, WebRTCStats parent)
         {
@@ -25,17 +25,19 @@ namespace Unity.WebRTC.Editor
 
             m_parent.OnStats += (peer, report) =>
             {
-                if (peer != m_peerConnection || report.Stats.Keys.Count == m_lastUpdateKeys?.Count)
+                if (peer != m_peerConnection || report.Stats.Keys.Count == m_lastUpdateStatsCount)
                 {
                     return;
                 }
 
-                m_lastUpdateKeys = report.Stats.Keys;
+                m_lastUpdateStatsCount = report.Stats.Count;
                 root.Clear();
 
                 var container = new VisualElement();
 
-                var popup = new PopupField<string>(m_lastUpdateKeys.ToList(), 0, id => $"{id}", id => $"{id}");
+                var popup = new PopupField<int>(Enumerable.Range(0, report.Stats.Count).ToList(), 0,
+                    index => $"{report.Stats.ElementAt(index).Value.Type}:{report.Stats.ElementAt(index).Value.Id}",
+                    index => $"{report.Stats.ElementAt(index).Value.Type}:{report.Stats.ElementAt(index).Value.Id}");
 
                 root.Add(popup);
                 root.Add(container);
@@ -43,7 +45,7 @@ namespace Unity.WebRTC.Editor
                 popup.RegisterValueChangedCallback(e =>
                 {
                     container.Clear();
-                    var id = e.newValue;
+                    var id = report.Stats.ElementAt(e.newValue).Key;
                     var type = report.Get(id).Type;
                     switch (type)
                     {
