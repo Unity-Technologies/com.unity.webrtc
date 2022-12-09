@@ -30,11 +30,11 @@ namespace Unity.WebRTC
         public long? timestamp { get; private set; }
 
 
-        internal RTCRtpContributingSource(ref RTCRtpContributingSourceInternal data)
+        internal RTCRtpContributingSource(ref RTCRtpContributingSourceInternal data, RtpSourceType sourceType)
         {
             audioLevel = data.audioLevel.hasValue ? data.audioLevel.value / byte.MaxValue : null;
             rtpTimestamp = data.rtpTimestamp;
-            source = data.sourceType == RtpSourceType.CSRC ? data.source : null;
+            source = data.sourceType == sourceType ? data.source : null;
             timestamp = data.timestamp;
         }
     }
@@ -129,7 +129,22 @@ namespace Unity.WebRTC
             RTCRtpContributingSource[] sources = new RTCRtpContributingSource[length];
             for (int i = 0; i < (int)length; i++)
             {
-                sources[i] = new RTCRtpContributingSource(ref array[i]);
+                sources[i] = new RTCRtpContributingSource(ref array[i], RtpSourceType.CSRC);
+            }
+            return sources;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public RTCRtpContributingSource[] GetSynchronizationSources()
+        {
+            RTCRtpContributingSourceInternal[] array = NativeMethods.ReceiverGetSources(self, out var length).AsArray<RTCRtpContributingSourceInternal>((int)length);
+
+            RTCRtpContributingSource[] sources = new RTCRtpContributingSource[length];
+            for (int i = 0; i < (int)length; i++)
+            {
+                sources[i] = new RTCRtpContributingSource(ref array[i], RtpSourceType.SSRC);
             }
             return sources;
         }

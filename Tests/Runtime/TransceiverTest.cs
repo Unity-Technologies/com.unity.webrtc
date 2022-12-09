@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.TestTools;
+using Unity.Collections;
 using NUnit.Framework;
 using System.Collections;
 using System.Linq;
@@ -166,18 +167,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Timeout(5000)]
         public IEnumerator ReceiverGetContributingSource()
         {
-            //var peer = new RTCPeerConnection();
-            //var transceiver = peer.AddTransceiver(TrackKind.Audio);
-            //RTCRtpReceiver receiver = transceiver.Receiver;
-            //var sources = receiver.GetContributingSources();
-            //Assert.That(sources, Is.Empty);
-
-            //peer.Dispose();
-
-            var go = new GameObject("Test");
-            var cam = go.AddComponent<Camera>();
-            var track = cam.CaptureStreamTrack(1280, 720);
-
+            var track = new AudioStreamTrack();
             var test = new MonoBehaviourTest<SignalingPeers>();
             var transceiver1 = test.component.AddTransceiver(0, track);
             RTCRtpReceiver receiver1 = transceiver1.Receiver;
@@ -193,21 +183,24 @@ namespace Unity.WebRTC.RuntimeTest
             var transceiver2 = test.component.GetPeerTransceivers(1).First();
             RTCRtpReceiver receiver2 = transceiver2.Receiver;
 
-            yield return new WaitUntil(() => receiver2.GetContributingSources().Length > 0);
+            // Send audio data manually.
+            var nativeArray = new NativeArray<float>(48000, Allocator.Temp);
+            track.SetData(ref nativeArray, 1, 48000);
 
+            yield return new WaitUntil(() => receiver2.GetContributingSources().Length > 0);
             var sources2 = receiver2.GetContributingSources();
             Assert.That(sources2, Is.Not.Empty);
             Assert.That(sources2.Length, Is.EqualTo(1));
             Assert.That(sources2[0], Is.Not.Null);
-            Assert.That(sources2[0].audioLevel, Is.Null);
+            Assert.That(sources2[0].audioLevel, Is.Not.Null);
             Assert.That(sources2[0].rtpTimestamp, Is.Not.Zero);
             Assert.That(sources2[0].source, Is.Null);
             Assert.That(sources2[0].timestamp, Is.Not.Zero);
 
+            nativeArray.Dispose();
             test.component.Dispose();
             track.Dispose();
 
-            Object.DestroyImmediate(go);
             Object.DestroyImmediate(test.gameObject);
         }
 
