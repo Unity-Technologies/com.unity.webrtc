@@ -197,7 +197,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(sources2[0].source, Is.Null);
             Assert.That(sources2[0].timestamp, Is.Not.Zero);
 
-            nativeArray.Dispose();
             test.component.Dispose();
             track.Dispose();
 
