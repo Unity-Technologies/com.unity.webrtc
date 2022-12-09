@@ -1320,30 +1320,28 @@ extern "C"
         uint32_t rtpTimestamp;
         int64_t timestamp;
 
-        RtpSource& operator=(const webrtc::RtpSource& src)
+        RtpSource(const webrtc::RtpSource& src)
         {
             audioLevel = src.audio_level();
             rtpTimestamp = src.rtp_timestamp();
             source = src.source_id();
             sourceType = static_cast<uint8_t>(src.source_type());
             timestamp = src.timestamp_ms();
-            return *this;
         }
     };
 
-    UNITY_INTERFACE_EXPORT unity::webrtc::RtpSource* ReceiverGetSources(RtpReceiverInterface* receiver, size_t* length)
+    UNITY_INTERFACE_EXPORT ::RtpSource* ReceiverGetSources(RtpReceiverInterface* receiver, size_t* length)
     {
         auto sources = receiver->GetSources();
         if (sources.empty())
             return nullptr;
 
-        std::vector<unity::webrtc::RtpSource> result;
+        std::vector<::RtpSource> result;
         std::transform(
             sources.begin(),
             sources.end(),
             std::back_inserter(result),
             [](webrtc::RtpSource source) { return source; });
-
         return ConvertArray(result, length);
     }
 

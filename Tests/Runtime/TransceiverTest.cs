@@ -201,7 +201,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(sources2[0], Is.Not.Null);
             Assert.That(sources2[0].audioLevel, Is.Null);
             Assert.That(sources2[0].rtpTimestamp, Is.Not.Zero);
-            Assert.That(sources2[0].source, Is.Zero);
+            Assert.That(sources2[0].source, Is.Null);
             Assert.That(sources2[0].timestamp, Is.Not.Zero);
 
             test.component.Dispose();
