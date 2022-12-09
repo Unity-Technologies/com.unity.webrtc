@@ -124,7 +124,7 @@ test_{{ platform.name }}:
 {% elsif platform.name == "macos" %}
     - | 
        chmod ./WebRTCLibTest
-       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/out/build/macos/WebRTCPluginTest/Debug" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
+       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "WebRTCPluginTest" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
        ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '~/com.unity.webrtc/WebRTCLibTest'
 {% elsif platform.name == "linux" %}
     - |
@@ -152,6 +152,10 @@ test_{{ platform.name }}_gpu:
     - WebRTCLibTest.exe
 {% elsif platform.name == "linux" %}
     - |
+       # See False positives
+       # https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
+       export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0
+       export LSAN_OPTIONS=suppressions=$(pwd)/Plugin~/tools/sanitizer/lsan_suppressions.txt
        chmod ./WebRTCLibTest
        ./WebRTCLibTest
 {% endif %}
@@ -191,7 +195,7 @@ test_all_platform:
     {% for platform in test_platforms %}
     # todo(kazuki): native plugin test is not supported on iOS
     # todo(kazuki): native plugin test has error on Ubuntu 16.04
-    {% if platform.name != "ios" and platform.name != "linux" %}
+    {% if platform.name != "ios" %}
     - .yamato/nativeplugin.yml#test_{{ platform.name }}
     {% endif %}
     {% if platform.name == "win" or platform.name == "linux" %}
