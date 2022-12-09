@@ -162,6 +162,55 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
         }
 
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator ReceiverGetContributingSource()
+        {
+            //var peer = new RTCPeerConnection();
+            //var transceiver = peer.AddTransceiver(TrackKind.Audio);
+            //RTCRtpReceiver receiver = transceiver.Receiver;
+            //var sources = receiver.GetContributingSources();
+            //Assert.That(sources, Is.Empty);
+
+            //peer.Dispose();
+
+            var go = new GameObject("Test");
+            var cam = go.AddComponent<Camera>();
+            var track = cam.CaptureStreamTrack(1280, 720);
+
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var transceiver1 = test.component.AddTransceiver(0, track);
+            RTCRtpReceiver receiver1 = transceiver1.Receiver;
+            var sources1 = receiver1.GetContributingSources();
+            Assert.That(sources1, Is.Empty);
+
+            yield return test;
+            test.component.CoroutineUpdate();
+
+            // wait for OnNegotiationNeeded callback in SignalingPeers class
+            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+
+            var transceiver2 = test.component.GetPeerTransceivers(1).First();
+            RTCRtpReceiver receiver2 = transceiver2.Receiver;
+
+            yield return new WaitUntil(() => receiver2.GetContributingSources().Length > 0);
+
+            var sources2 = receiver2.GetContributingSources();
+            Assert.That(sources2, Is.Not.Empty);
+            Assert.That(sources2.Length, Is.EqualTo(1));
+            Assert.That(sources2[0], Is.Not.Null);
+            Assert.That(sources2[0].audioLevel, Is.Null);
+            Assert.That(sources2[0].rtpTimestamp, Is.Not.Zero);
+            Assert.That(sources2[0].source, Is.Zero);
+            Assert.That(sources2[0].timestamp, Is.Not.Zero);
+
+            test.component.Dispose();
+            track.Dispose();
+
+            Object.DestroyImmediate(go);
+            Object.DestroyImmediate(test.gameObject);
+        }
+
 
         [UnityTest]
         [Timeout(5000)]
@@ -191,7 +240,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(transceiver1.Stop(), Is.EqualTo(RTCErrorType.None));
 
             // wait for OnNegotiationNeeded callback in SignalingPeers class
-            yield return 0;
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
 
             Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));

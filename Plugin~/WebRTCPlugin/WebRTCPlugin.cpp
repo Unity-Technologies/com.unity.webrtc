@@ -1315,8 +1315,9 @@ extern "C"
     struct RtpSource
     {
         Optional<uint8_t> audioLevel;
-        uint32_t rtpTimestamp;
+        uint8_t sourceType;
         uint32_t source;
+        uint32_t rtpTimestamp;
         int64_t timestamp;
 
         RtpSource& operator=(const webrtc::RtpSource& src)
@@ -1324,6 +1325,7 @@ extern "C"
             audioLevel = src.audio_level();
             rtpTimestamp = src.rtp_timestamp();
             source = src.source_id();
+            sourceType = static_cast<uint8_t>(src.source_type());
             timestamp = src.timestamp_ms();
             return *this;
         }

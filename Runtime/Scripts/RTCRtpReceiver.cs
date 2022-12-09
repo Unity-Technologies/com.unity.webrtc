@@ -34,16 +34,24 @@ namespace Unity.WebRTC
         {
             audioLevel = data.audioLevel;
             rtpTimestamp = data.rtpTimestamp;
-            source = data.source;
+            source = data.sourceType == RtpSourceType.CSRC ? data.source : null;
             timestamp = data.timestamp;
         }
     }
 
+    internal enum RtpSourceType : byte
+    {
+        SSRC,
+        CSRC
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     internal struct RTCRtpContributingSourceInternal
     {
         public OptionalByte audioLevel;
-        public uint rtpTimestamp;
+        public RtpSourceType sourceType;
         public uint source;
+        public uint rtpTimestamp;
         public long timestamp;
     }
 
