@@ -247,27 +247,21 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     UnityVideoTrackSource* source = encodeData->source;
     if (!s_context->ExistsRefPtr(source))
         return;
-    Timestamp timestamp = s_clock->CurrentTime();
-    IGraphicsDevice* device = Plugin::GraphicsDevice();
-    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
-    // void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
-    unity::webrtc::Size size(encodeData->width, encodeData->height);
     {
         std::unique_ptr<const ScopedProfiler> profiler;
         if (s_ProfilerMarkerFactory)
             profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
         VideoFrameBuffer* buffer = static_cast<VideoFrameBuffer*>(encodeData->texture);
-        source->OnFrameCaptured(std::move(s_bufferPool->Retain(buffer)));
+        source->OnFrameCaptured(s_bufferPool->Retain(buffer));
     }
-    // s_bufferPool->ReleaseStaleBuffers(timestamp);
 }
 
 static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
 {
     // Release all buffers.
     if (s_bufferPool)
-        s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity());
+        s_bufferPool = nullptr;
 }
 
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
