@@ -120,6 +120,8 @@ test_{{ platform.name }}:
     flavor: {{ platform.flavor }}
   commands:
     - {{ platform.test_command }}
+  dependencies:
+    - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endif %}
 {% endfor %}
 
@@ -136,6 +138,8 @@ test_{{ platform.name }}_gpu:
 {% endif %}    
   commands:
     - {{ platform.test_command }}
+  dependencies:
+    - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endif %}
 {% endfor %}
 
