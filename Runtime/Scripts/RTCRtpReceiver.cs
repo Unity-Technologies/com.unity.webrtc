@@ -5,6 +5,49 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public class RTCRtpContributingSource
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public float? audioLevel { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? rtpTimestamp { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public uint? source { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? timestamp { get; private set; }
+
+
+        internal RTCRtpContributingSource(ref RTCRtpContributingSourceInternal data)
+        {
+            audioLevel = data.audioLevel;
+            rtpTimestamp = data.rtpTimestamp;
+            source = data.source;
+            timestamp = data.timestamp;
+        }
+    }
+
+    internal struct RTCRtpContributingSourceInternal
+    {
+        public OptionalByte audioLevel;
+        public uint rtpTimestamp;
+        public uint source;
+        public long timestamp;
+    }
+
+    /// <summary>
     ///
     /// </summary>
     public class RTCRtpReceiver : RefCountedObject
@@ -71,9 +114,16 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public void GetContributingSources()
+        public RTCRtpContributingSource[] GetContributingSources()
         {
-            NativeMethods.ReceiverGetSources(self, out var length);
+            RTCRtpContributingSourceInternal[] array = NativeMethods.ReceiverGetSources(self, out var length).AsArray<RTCRtpContributingSourceInternal>((int)length);
+
+            RTCRtpContributingSource[] sources = new RTCRtpContributingSource[length];
+            for (int i = 0; i < (int)length; i++)
+            {
+                sources[i] = new RTCRtpContributingSource(ref array[i]);
+            }
+            return sources;
         }
 
         public MediaStreamTrack Track

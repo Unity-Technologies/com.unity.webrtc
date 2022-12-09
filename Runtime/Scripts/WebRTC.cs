@@ -1370,7 +1370,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ReceiverGetStreams(IntPtr receiver, out ulong length);
         [DllImport(WebRTC.Lib)]
-        public static extern void ReceiverGetSources(IntPtr receiver, out ulong length);
+        public static extern IntPtr ReceiverGetSources(IntPtr receiver, out ulong length);
         [DllImport(WebRTC.Lib)]
         public static extern int DataChannelGetID(IntPtr ptr);
         [DllImport(WebRTC.Lib)]

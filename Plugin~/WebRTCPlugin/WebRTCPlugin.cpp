@@ -1314,25 +1314,35 @@ extern "C"
 
     struct RtpSource
     {
+        Optional<uint8_t> audioLevel;
         uint32_t rtpTimestamp;
+        uint32_t source;
+        int64_t timestamp;
+
+        RtpSource& operator=(const webrtc::RtpSource& src)
+        {
+            audioLevel = src.audio_level();
+            rtpTimestamp = src.rtp_timestamp();
+            source = src.source_id();
+            timestamp = src.timestamp_ms();
+            return *this;
+        }
     };
 
-    UNITY_INTERFACE_EXPORT void ReceiverGetSources(RtpReceiverInterface* receiver, size_t* length)
+    UNITY_INTERFACE_EXPORT unity::webrtc::RtpSource* ReceiverGetSources(RtpReceiverInterface* receiver, size_t* length)
     {
         auto sources = receiver->GetSources();
-        *length = sources.size();
         if (sources.empty())
-            return;
-        RTC_LOG(LS_INFO) << "ReceiverGetSources rtp_timestamp:"
-            << sources[0].rtp_timestamp()
-            << " timestamp_ms:"
-            << sources[0].timestamp_ms();
+            return nullptr;
 
-        //CoTaskMemAlloc();
-        //for (auto& source : sources)
-        //{
-        //    = source.rtp_timestamp;
-        //}
+        std::vector<unity::webrtc::RtpSource> result;
+        std::transform(
+            sources.begin(),
+            sources.end(),
+            std::back_inserter(result),
+            [](webrtc::RtpSource source) { return source; });
+
+        return ConvertArray(result, length);
     }
 
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelInterface* channel)
