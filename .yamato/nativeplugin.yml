@@ -119,7 +119,18 @@ test_{{ platform.name }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
-    - {{ platform.test_command }}
+{% if platform.name == "win" %}
+    - WebRTCLibTest.exe
+{% elsif platform.name == "macos" %}
+    - | 
+       chmod ./WebRTCLibTest
+       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "$SOLUTION_DIR/out/build/macos/WebRTCPluginTest/Debug" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
+       ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '~/com.unity.webrtc/WebRTCLibTest'
+{% elsif platform.name == "linux" %}
+    - |
+       chmod ./WebRTCLibTest
+       ./WebRTCLibTest
+{% endif %}
   dependencies:
     - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endif %}
@@ -137,7 +148,13 @@ test_{{ platform.name }}_gpu:
     model: {{ platform.model }}
 {% endif %}    
   commands:
-    - {{ platform.test_command }}
+{% if platform.name == "win" %}
+    - WebRTCLibTest.exe
+{% elsif platform.name == "linux" %}
+    - |
+       chmod ./WebRTCLibTest
+       ./WebRTCLibTest
+{% endif %}
   dependencies:
     - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endif %}
