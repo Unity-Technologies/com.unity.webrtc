@@ -12,13 +12,12 @@ curl -L %LIBWEBRTC_DOWNLOAD_URL% > webrtc.zip
 echo -------------------
 echo Build com.unity.webrtc Plugin
 
-cd %SOLUTION_DIR%
+pushd %SOLUTION_DIR%
 cmake --preset=x64-windows-clang
 cmake --build --preset=debug-windows-clang --target=WebRTCLibTest
+popd
 
 echo -------------------
-echo Test com.unity.webrtc Plugin
+echo Copy test runner
 
-%SOLUTION_DIR%\out\build\x64-windows-clang\WebRTCPluginTest\Debug\WebRTCLibTest.exe
-if not %errorlevel% == 0 exit 1
-echo -------------------
+copy %SOLUTION_DIR%\out\build\x64-windows-clang\WebRTCPluginTest\Debug\WebRTCLibTest.exe .

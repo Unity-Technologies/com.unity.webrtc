@@ -14,16 +14,11 @@ source ~/.profile
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 
-# Install glfw3 ninja-build
-sudo apt install -y libglfw3-dev ninja-build
-
-# Install glad2
-pip3 install git+https://github.com/dav1dde/glad.git@glad2#egg=glad2
-
 # Build UnityRenderStreaming Plugin 
-cd "$SOLUTION_DIR"
+pushd "$SOLUTION_DIR"
 cmake --preset=x86_64-linux
 cmake --build --preset=debug-linux --target WebRTCLibTest
+popd
 
-# Run UnitTest
-"$SOLUTION_DIR/out/build/x86_64-linux/WebRTCPluginTest/Debug/WebRTCLibTest"
+# Copy test runner
+cp "$SOLUTION_DIR/out/build/x86_64-linux/WebRTCPluginTest/Debug/WebRTCLibTest" .
