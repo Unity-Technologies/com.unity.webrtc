@@ -147,14 +147,6 @@ test_editors:
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
-  - version: 2019.4
-    tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified
-      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
-      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
 
 {% for editor in test_editors %}
