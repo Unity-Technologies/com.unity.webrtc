@@ -32,7 +32,7 @@ build_platforms:
     build_command: BuildScripts~/build_plugin_ios.sh
     build_testrunner_command: BuildScripts~/build_testrunner_ios.sh
     plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
-    testrunner_path: 
+    testrunner_path: WebRTCLibTest
   - name: android
     type: Unity::VM
     flavor: b1.large
