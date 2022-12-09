@@ -123,12 +123,12 @@ test_{{ platform.name }}:
     - WebRTCLibTest.exe
 {% elsif platform.name == "macos" %}
     - | 
-       chmod ./WebRTCLibTest
-       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "WebRTCPluginTest" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
+       chmod a+x ./WebRTCLibTest
+       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" -r "./WebRTCPluginTest" bokken@$BOKKEN_DEVICE_IP:~/com.unity.webrtc
        ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '~/com.unity.webrtc/WebRTCLibTest'
 {% elsif platform.name == "linux" %}
     - |
-       chmod ./WebRTCLibTest
+       chmod a+x ./WebRTCLibTest
        ./WebRTCLibTest
 {% endif %}
   dependencies:
