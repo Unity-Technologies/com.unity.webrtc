@@ -50,7 +50,6 @@ test_platforms:
     gpu_image: renderstreaming/win10:v0.3.13-1084240
     flavor: b1.large
     model: rtx2080
-    test_command: WebRTCLibTest.exe
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
@@ -58,28 +57,25 @@ test_platforms:
     gpu_image: renderstreaming/ubuntu:v0.2.9-1258158
     flavor: b1.large
     model: rtx2080
-    test_command: WebRTCLibTest
   - name: macos
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
     image: package-ci/mac:v1.21.1-1092905
     gpu_image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
-    test_command: WebRTCLibTest
+# todo(kazuki): Need to support native test on iOS. 
 #  - name: ios
 #    type: Unity::metal::macmini
 #    gpu_type: Unity::metal::macmini
 #    image: package-ci/mac:v1.21.1-1092905
 #    gpu_image: package-ci/mac:v1.21.1-1092905
 #    flavor: m1.mac
-#    test_command: Runtime/Plugins/iOS/webrtc.framework/**
   - name: android
     type: Unity::VM
     gpu_type: Unity::VM
     image: renderstreaming/android-linux-build:v0.1.8-1084252
     gpu_image: renderstreaming/android-linux-build:v0.1.8-1084252
     flavor: b1.large
-    test_command: WebRTCLibTest
 ---
 
 {% for platform in build_platforms %}
