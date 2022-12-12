@@ -231,8 +231,9 @@ namespace Unity.WebRTC.RuntimeTest
 
             Assert.That(transceiver1.Stop(), Is.EqualTo(RTCErrorType.None));
 
-            // wait for OnNegotiationNeeded callback in SignalingPeers class
-            yield return new WaitUntil(() => test.component.NegotiationCompleted());
+            yield return new WaitUntil(() =>
+            transceiver1.CurrentDirection == RTCRtpTransceiverDirection.Stopped &&
+            transceiver2.CurrentDirection == RTCRtpTransceiverDirection.Stopped);
 
             Assert.That(transceiver1.Direction, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
             Assert.That(transceiver1.CurrentDirection, Is.EqualTo(RTCRtpTransceiverDirection.Stopped));
