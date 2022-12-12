@@ -71,10 +71,8 @@ test_platforms:
 #    gpu_image: package-ci/mac:v1.21.1-1092905
 #    flavor: m1.mac
   - name: android
-    type: Unity::VM
-    gpu_type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084252
-    gpu_image: renderstreaming/android-linux-build:v0.1.8-1084252
+    type: Unity::mobile::shield
+    image: mobile/android-package-ci-win:v0.1.4-1212670
     flavor: b1.large
 ---
 
@@ -107,7 +105,6 @@ build_testrunner_{{ platform.name }}:
 {% endfor %}
 
 {% for platform in test_platforms %}
-{% if platform.name != "android" and platform.name != "ios" %}
 test_{{ platform.name }}:
   name: Test native code on {{ platform.name }}
   agent:
@@ -126,10 +123,22 @@ test_{{ platform.name }}:
     - |
        chmod a+x ./WebRTCLibTest
        ./WebRTCLibTest
+{% elsif platform.name == "android" %}
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
+    - |
+       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       # Establish an ADB connection with the device
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       # List the connected devices
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       NetSh Advfirewall set allprofiles state off
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push WebRTCLibTest /data/local/tmp
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
 {% endif %}
   dependencies:
     - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
-{% endif %}
 {% endfor %}
 
 {% for platform in test_platforms %}
@@ -159,31 +168,6 @@ test_{{ platform.name }}_gpu:
     - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endif %}
 {% endfor %}
-
-
-#todo(kazuki): test it on Android mobile device
-test_android:
-  name: Test native code on Android
-  agent:
-    type: Unity::mobile::shield
-    image: mobile/android-package-ci-win:v0.1.4-1212670
-    flavor: b1.medium
-  skip_checkout: true
-  dependencies:
-    - .yamato/nativeplugin.yml#build_testrunner_android
-  commands:
-    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
-    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
-    - |
-       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
-       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
-       # Establish an ADB connection with the device
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-       # List the connected devices
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
-       NetSh Advfirewall set allprofiles state off
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push WebRTCLibTest /data/local/tmp
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
 
 test_all_platform:
   name: Trigger native test on all platforms
