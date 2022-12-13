@@ -1,0 +1,24 @@
+build:
+  name: Build
+  agent:
+    type: Unity::VM
+    image: documentation/packagedocs-cli-win10:latest
+    flavor: b1.large
+  commands:
+    - command: packagedocs-cli --version
+    - command: packagedocs-cli build --package %PACKAGE_NAME% --package-path --package-language %PACKAGE_LANGUAGE% --validate %VALIDATE% --path-to-pmdt-status-output %YAMATO_WORK_DIR%\pmdt_status.json --build-flare-project %FLARE_PROJECT%
+      retries: 2
+  variables:
+    PACKAGE_NAME: com.unity.webrtc
+    PACKAGE_LANGUAGE: ja
+    DOCTOOLS_DESTINATION: c:\temp\packagedocscli
+    DOCTOOLS_VERSION: git+https://github.cds.internal.unity3d.com/unity/com.unity.package-manager-doctools.git#master
+    FLARE_PROJECT: false
+    VALIDATE: true
+  artifacts:
+    documentation:
+      paths:
+        - packagedocs-cli/documentation/**
+    logs:
+      paths:
+        - packagedocs-cli/logs/**
