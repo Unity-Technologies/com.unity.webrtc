@@ -21,4 +21,5 @@ build:
         - packagedocs-cli/documentation/**
     logs:
       paths:
+        - UnityEditor.log
         - packagedocs-cli/logs/**
