@@ -53,8 +53,8 @@ test_platforms:
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.3.0-1259538
-    gpu_image: renderstreaming/ubuntu:v0.3.0-1259772
+    image: renderstreaming/ubuntu:v0.3.1-1262596
+    gpu_image: renderstreaming/ubuntu:v0.3.1-1262597
     flavor: b1.large
     model: rtx2080
   - name: macos
