@@ -20,10 +20,8 @@ cmake . \
   -D CMAKE_BUILD_TYPE=Debug \
   -D CMAKE_ANDROID_STL_TYPE=c++_static
 
-cmake \
-  --build build \
-  --target WebRTCLibTest
-
+cmake --build build --target WebRTCLibTest
 popd
-mkdir build
-cp $SOLUTION_DIR/build/WebRTCPluginTest/WebRTCLibTest build
+
+# Copy test runner
+cp $SOLUTION_DIR/build/WebRTCPluginTest/WebRTCLibTest .

@@ -6,36 +6,41 @@ build_platforms:
     flavor: b1.large
     image: renderstreaming/win10:v0.3.13-1084239
     build_command: BuildScripts~/build_plugin_win.cmd
+    build_testrunner_command: BuildScripts~/build_testrunner_win.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
-    test_runner_path: 
+    testrunner_path: WebRTCLibTest.exe
   - name: linux
     type: Unity::VM
     flavor: b1.large
     image: renderstreaming/ubuntu-16.04:v0.1.0-1257787
     build_command: BuildScripts~/build_plugin_linux.sh
+    build_testrunner_command: BuildScripts~/build_testrunner_linux.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
-    test_runner_path:
+    testrunner_path: WebRTCLibTest
   - name: macos
     type: Unity::metal::macmini
     flavor: m1.mac
     image: package-ci/mac:v1.21.1-1092905
     build_command: BuildScripts~/build_plugin_mac.sh
+    build_testrunner_command: BuildScripts~/build_testrunner_mac.sh
     plugin_path: Runtime/Plugins/macOS/libwebrtc.dylib
-    test_runner_path:
+    testrunner_path: WebRTCLibTest
   - name: ios
     type: Unity::metal::macmini
     flavor: m1.mac
     image: package-ci/mac:v1.21.1-1092905
     build_command: BuildScripts~/build_plugin_ios.sh
+    build_testrunner_command: BuildScripts~/build_testrunner_ios.sh
     plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
-    test_runner_path:
+    testrunner_path: WebRTCLibTest
   - name: android
     type: Unity::VM
     flavor: b1.large
     image: renderstreaming/android-linux-build:v0.1.8-1084252
     build_command: BuildScripts~/build_plugin_android.sh
+    build_testrunner_command: BuildScripts~/build_testrunner_android.sh
     plugin_path: Runtime/Plugins/Android/libwebrtc.aar
-    test_runner_path:
+    testrunner_path: WebRTCLibTest
 
 test_platforms:
   - name: win
@@ -45,9 +50,6 @@ test_platforms:
     gpu_image: renderstreaming/win10:v0.3.13-1084240
     flavor: b1.large
     model: rtx2080
-    build_command: BuildScripts~/build_plugin_win.cmd
-    test_command: BuildScripts~/test_plugin_win.cmd
-    plugin_path: Runtime/Plugins/x86_64/webrtc.dll
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
@@ -55,36 +57,23 @@ test_platforms:
     gpu_image: renderstreaming/ubuntu:v0.2.9-1258158
     flavor: b1.large
     model: rtx2080
-    build_command: BuildScripts~/build_plugin_linux.sh
-    test_command: BuildScripts~/test_plugin_linux.sh
-    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
   - name: macos
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
     image: package-ci/mac:v1.21.1-1092905
     gpu_image: package-ci/mac:v1.21.1-1092905
     flavor: m1.mac
-    build_command: BuildScripts~/build_plugin_mac.sh
-    test_command: BuildScripts~/test_plugin_mac.sh
-    plugin_path: Runtime/Plugins/macOS/libwebrtc.dylib
-  - name: ios
-    type: Unity::metal::macmini
-    gpu_type: Unity::metal::macmini
-    image: package-ci/mac:v1.21.1-1092905
-    gpu_image: package-ci/mac:v1.21.1-1092905
-    flavor: m1.mac
-    build_command: BuildScripts~/build_plugin_ios.sh
-    test_command: BuildScripts~/test_plugin_ios.sh
-    plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
+# todo(kazuki): Need to support native test on iOS. 
+#  - name: ios
+#    type: Unity::metal::macmini
+#    gpu_type: Unity::metal::macmini
+#    image: package-ci/mac:v1.21.1-1092905
+#    gpu_image: package-ci/mac:v1.21.1-1092905
+#    flavor: m1.mac
   - name: android
-    type: Unity::VM
-    gpu_type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084252
-    gpu_image: renderstreaming/android-linux-build:v0.1.8-1084252
+    type: Unity::mobile::shield
+    image: mobile/android-package-ci-win:v0.1.4-1212670
     flavor: b1.large
-    build_command: BuildScripts~/build_plugin_android.sh
-    test_command: BuildScripts~/test_plugin_android.sh
-    plugin_path: Runtime/Plugins/Android/libwebrtc.aar
 ---
 
 {% for platform in build_platforms %}
@@ -100,10 +89,22 @@ build_{{ platform.name }}:
     {{ platform.name }}_plugin:
       paths:
         - {{ platform.plugin_path }}
+
+build_testrunner_{{ platform.name }}:
+  name: Build test runner for native plugin {{ platform.name }}
+  agent:
+    type: {{ platform.type }}
+    image: {{ platform.image }}
+    flavor: {{ platform.flavor }}
+  commands:
+    - {{ platform.build_testrunner_command }}
+  artifacts:
+    {{ platform.name }}_testrunner:
+      paths:
+        - {{ platform.testrunner_path }}
 {% endfor %}
 
 {% for platform in test_platforms %}
-{% if platform.name != "android" and platform.name != "ios" %}
 test_{{ platform.name }}:
   name: Test native code on {{ platform.name }}
   agent:
@@ -111,8 +112,33 @@ test_{{ platform.name }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
-    - {{ platform.test_command }}
+{% if platform.name == "win" %}
+    - WebRTCLibTest.exe
+{% elsif platform.name == "macos" %}
+    - | 
+       chmod a+x ./WebRTCLibTest
+       scp -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" "./WebRTCLibTest" bokken@$BOKKEN_DEVICE_IP:~/
+       ssh -i ~/.ssh/id_rsa_macmini -o "StrictHostKeyChecking=no" bokken@$BOKKEN_DEVICE_IP '~/WebRTCLibTest'
+{% elsif platform.name == "linux" %}
+    - |
+       chmod a+x ./WebRTCLibTest
+       ./WebRTCLibTest
+{% elsif platform.name == "android" %}
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
+    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
+    - |
+       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       # Establish an ADB connection with the device
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       # List the connected devices
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
+       NetSh Advfirewall set allprofiles state off
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push WebRTCLibTest /data/local/tmp
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
 {% endif %}
+  dependencies:
+    - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endfor %}
 
 {% for platform in test_platforms %}
@@ -127,47 +153,21 @@ test_{{ platform.name }}_gpu:
     model: {{ platform.model }}
 {% endif %}    
   commands:
-    - {{ platform.test_command }}
+{% if platform.name == "win" %}
+    - WebRTCLibTest.exe
+{% elsif platform.name == "linux" %}
+    - |
+       # See False positives
+       # https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
+       export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0
+       export LSAN_OPTIONS=suppressions=$(pwd)/Plugin~/tools/sanitizer/lsan_suppressions.txt
+       chmod ./WebRTCLibTest
+       ./WebRTCLibTest
+{% endif %}
+  dependencies:
+    - .yamato/nativeplugin.yml#build_testrunner_{{ platform.name }}
 {% endif %}
 {% endfor %}
-
-
-#todo(kazuki): test it on Android mobile device
-test_android:
-  name: Test native code on Android
-  agent:
-    type: Unity::mobile::shield
-    image: mobile/android-package-ci-win:v0.1.4-1212670
-    flavor: b1.medium
-  skip_checkout: true
-  dependencies:
-    - .yamato/nativeplugin.yml#build_test_android
-  commands:
-    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey.pub -O %USERPROFILE%/.android/adbkey.pub
-    - wget http://artifactory-slo.bf.unity3d.com/artifactory/mobile-generic/android/ADBKeys.zip!/adbkey -O %USERPROFILE%/.android/adbkey
-    - |
-       # Set the IP of the device. In case device gets lost, UTR will try to recconect to ANDROID_DEVICE_CONNECTION
-       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
-       # Establish an ADB connection with the device
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-       # List the connected devices
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe devices
-       NetSh Advfirewall set allprofiles state off
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe push build/WebRTCLibTest /data/local/tmp
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe shell /data/local/tmp/WebRTCLibTest
-
-build_test_android:
-  name: Build native test runner for Android
-  agent:
-    type: Unity::VM
-    image: renderstreaming/android-linux-build:v0.1.8-1084252
-    flavor: b1.large
-  commands:
-    - BuildScripts~/build_test_runtime_android.sh
-  artifacts:
-    runtime:
-      paths:
-        - "build/WebRTCLibTest"
 
 test_all_platform:
   name: Trigger native test on all platforms
@@ -175,7 +175,7 @@ test_all_platform:
     {% for platform in test_platforms %}
     # todo(kazuki): native plugin test is not supported on iOS
     # todo(kazuki): native plugin test has error on Ubuntu 16.04
-    {% if platform.name != "ios" and platform.name != "linux" %}
+    {% if platform.name != "ios" %}
     - .yamato/nativeplugin.yml#test_{{ platform.name }}
     {% endif %}
     {% if platform.name == "win" or platform.name == "linux" %}
