@@ -159,7 +159,7 @@ test_{{ platform.name }}_gpu:
     - |
        # See False positives
        # https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
-       export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0
+       export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0:alloc_dealloc_mismatch=0
        export LSAN_OPTIONS=suppressions=$(pwd)/Plugin~/tools/sanitizer/lsan_suppressions.txt
        chmod ./WebRTCLibTest
        ./WebRTCLibTest
