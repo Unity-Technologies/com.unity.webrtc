@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2022 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -39,7 +39,7 @@ class NvEncoderCuda : public NvEncoder
 {
 public:
     NvEncoderCuda(CUcontext cuContext, uint32_t nWidth, uint32_t nHeight, NV_ENC_BUFFER_FORMAT eBufferFormat,
-        uint32_t nExtraOutputDelay = 3, bool bMotionEstimationOnly = false, bool bOPInVideoMemory = false);
+        uint32_t nExtraOutputDelay = 3, bool bMotionEstimationOnly = false, bool bOPInVideoMemory = false, bool bUseIVFContainer = true);
     virtual ~NvEncoderCuda();
 
     /**
@@ -62,7 +62,7 @@ public:
 
     /**
     *  @brief This is a static function to copy input data from host memory to device memory.
-    *  Application must pass a separate device pointer for each YUV plane.
+    *  Application must pass a seperate device pointer for each YUV plane.
     */
     static void CopyToDeviceFrame(CUcontext device,
         void* pSrcFrame,
