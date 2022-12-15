@@ -2,16 +2,15 @@ build:
   name: Build package documentation
   agent:
     type: Unity::VM
-    image: package-ci/ubuntu-20.04:v4.4.0-1252344
+    image: documentation/packagedocs-cli-win10:latest
     flavor: b1.large
   commands:
-    - command: npm i -g @docs-tools/packagedocs-cli --@docs-tools:registry=https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/docs-tools-npm/
     - command: packagedocs-cli --version
-    - command: packagedocs-cli build --package-path --package-language $PACKAGE_LANGUAGE --validate $VALIDATE --path-to-pmdt-status-output $YAMATO_WORK_DIR/pmdt_status.json --build-flare-project $FLARE_PROJECT
+    - command: packagedocs-cli build --package-path --package-language %PACKAGE_LANGUAGE% --validate %VALIDATE% --path-to-pmdt-status-output %YAMATO_WORK_DIR%\pmdt_status.json --build-flare-project %FLARE_PROJECT%
       retries: 2
   variables:
     PACKAGE_LANGUAGE: ja
-    DOCTOOLS_DESTINATION: /tmp/packagedocscli
+    DOCTOOLS_DESTINATION: c:\temp\packagedocscli
     DOCTOOLS_VERSION: git+https://github.cds.internal.unity3d.com/unity/com.unity.package-manager-doctools.git#master
     FLARE_PROJECT: false
     VALIDATE: true
