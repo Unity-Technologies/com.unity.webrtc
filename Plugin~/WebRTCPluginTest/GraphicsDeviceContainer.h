@@ -46,6 +46,7 @@ namespace webrtc
 #if SUPPORT_VULKAN
         kUnityGfxRendererVulkan,
 #endif // SUPPORT_VULKAN
+        kUnityGfxRendererNull
     };
 
 } // end namespace webrtc

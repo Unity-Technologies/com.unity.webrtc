@@ -42,7 +42,6 @@ namespace webrtc
 
     IGraphicsDevice* Plugin::GraphicsDevice()
     {
-        RTC_DCHECK(s_gfxDevice.get());
         return s_gfxDevice.get();
     }
 
