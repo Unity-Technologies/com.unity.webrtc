@@ -5,6 +5,57 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public class RTCRtpContributingSource
+    {
+        /// <summary>
+        /// This value is in the range 0.0 to 1.0
+        /// </summary>
+        public double? audioLevel { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? rtpTimestamp { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public uint? source { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? timestamp { get; private set; }
+
+
+        internal RTCRtpContributingSource(ref RTCRtpContributingSourceInternal data, RtpSourceType sourceType)
+        {
+            audioLevel = data.audioLevel.hasValue ? data.audioLevel.value / byte.MaxValue : (double?) null;
+            rtpTimestamp = data.rtpTimestamp;
+            source = data.sourceType == sourceType ? data.source : (uint?)null;
+            timestamp = data.timestamp;
+        }
+    }
+
+    internal enum RtpSourceType : byte
+    {
+        SSRC,
+        CSRC
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RTCRtpContributingSourceInternal
+    {
+        public OptionalByte audioLevel;
+        public RtpSourceType sourceType;
+        public uint source;
+        public uint rtpTimestamp;
+        public long timestamp;
+    }
+
+    /// <summary>
     ///
     /// </summary>
     public class RTCRtpReceiver : RefCountedObject
@@ -18,7 +69,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~RTCRtpReceiver()
         {
@@ -26,7 +77,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -60,7 +111,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCStatsReportAsyncOperation GetStats()
@@ -69,8 +120,35 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
+        public RTCRtpContributingSource[] GetContributingSources()
+        {
+            RTCRtpContributingSourceInternal[] array = NativeMethods.ReceiverGetSources(self, out var length).AsArray<RTCRtpContributingSourceInternal>((int)length);
+
+            RTCRtpContributingSource[] sources = new RTCRtpContributingSource[length];
+            for (int i = 0; i < (int)length; i++)
+            {
+                sources[i] = new RTCRtpContributingSource(ref array[i], RtpSourceType.CSRC);
+            }
+            return sources;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public RTCRtpContributingSource[] GetSynchronizationSources()
+        {
+            RTCRtpContributingSourceInternal[] array = NativeMethods.ReceiverGetSources(self, out var length).AsArray<RTCRtpContributingSourceInternal>((int)length);
+
+            RTCRtpContributingSource[] sources = new RTCRtpContributingSource[length];
+            for (int i = 0; i < (int)length; i++)
+            {
+                sources[i] = new RTCRtpContributingSource(ref array[i], RtpSourceType.SSRC);
+            }
+            return sources;
+        }
+
         public MediaStreamTrack Track
         {
             get
@@ -83,7 +161,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public IEnumerable<MediaStream> Streams
         {

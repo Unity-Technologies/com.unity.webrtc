@@ -1312,6 +1312,37 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT int DataChannelGetID(DataChannelInterface* channel) { return channel->id(); }
 
+    struct RtpSource
+    {
+        Optional<uint8_t> audioLevel;
+        uint8_t sourceType;
+        uint32_t source;
+        uint32_t rtpTimestamp;
+        int64_t timestamp;
+
+        RtpSource(const webrtc::RtpSource& src)
+        {
+            audioLevel = src.audio_level();
+            rtpTimestamp = src.rtp_timestamp();
+            source = src.source_id();
+            sourceType = static_cast<uint8_t>(src.source_type());
+            timestamp = src.timestamp_ms();
+        }
+    };
+
+    UNITY_INTERFACE_EXPORT ::RtpSource* ReceiverGetSources(RtpReceiverInterface* receiver, size_t* length)
+    {
+        auto sources = receiver->GetSources();
+        if (sources.empty())
+            return nullptr;
+
+        std::vector<::RtpSource> result;
+        std::transform(sources.begin(), sources.end(), std::back_inserter(result), [](webrtc::RtpSource source) {
+            return source;
+        });
+        return ConvertArray(result, length);
+    }
+
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelInterface* channel)
     {
         return ConvertString(channel->label());

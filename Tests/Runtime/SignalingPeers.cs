@@ -30,6 +30,11 @@ namespace Unity.WebRTC.RuntimeTest
             return peers[indexPeer].AddTransceiver(track);
         }
 
+        public RTCRtpTransceiver AddTransceiver(int indexPeer, TrackKind kind, RTCRtpTransceiverInit init = null)
+        {
+            return peers[indexPeer].AddTransceiver(kind, init);
+        }
+
         public RTCRtpSender AddTrack(int indexPeer, MediaStreamTrack track)
         {
             return peers[indexPeer].AddTrack(track);
