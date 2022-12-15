@@ -151,6 +151,24 @@ namespace Unity.WebRTC
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    internal struct OptionalByte
+    {
+        [MarshalAs(UnmanagedType.U1)]
+        public bool hasValue;
+        public byte value;
+
+        public static implicit operator byte?(OptionalByte a)
+        {
+            return a.hasValue ? a.value : (byte?)null;
+        }
+        public static implicit operator OptionalByte(byte? a)
+        {
+            return new OptionalByte { hasValue = a.HasValue, value = a.GetValueOrDefault() };
+        }
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct MarshallingArray<T> where T : struct
     {
         public int length;
