@@ -40,11 +40,7 @@ namespace webrtc
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
     static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
 
-    IGraphicsDevice* Plugin::GraphicsDevice()
-    {
-        RTC_DCHECK(s_gfxDevice.get());
-        return s_gfxDevice.get();
-    }
+    IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
 
     ProfilerMarkerFactory* Plugin::ProfilerMarkerFactory() { return s_ProfilerMarkerFactory.get(); }
 

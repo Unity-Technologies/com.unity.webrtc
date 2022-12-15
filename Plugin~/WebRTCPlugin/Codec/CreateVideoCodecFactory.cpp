@@ -53,7 +53,7 @@ namespace webrtc
         if (impl == kNvCodecImpl)
         {
 #if CUDA_PLATFORM
-            if (gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
+            if (gfxDevice && gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
             {
                 CUcontext context = gfxDevice->GetCUcontext();
                 NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
@@ -90,7 +90,7 @@ namespace webrtc
         if (impl == kNvCodecImpl)
         {
 #if CUDA_PLATFORM
-            if (gfxDevice->IsCudaSupport())
+            if (gfxDevice && gfxDevice->IsCudaSupport())
             {
                 CUcontext context = gfxDevice->GetCUcontext();
                 return new NvDecoderFactory(context, profiler);

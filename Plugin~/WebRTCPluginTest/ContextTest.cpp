@@ -51,6 +51,16 @@ namespace webrtc
 
         static void OnFrameSizeChange(UnityVideoRenderer* renderer, int width, int height) { }
     };
+
+    TEST_P(ContextTest, Constructor)
+    {
+        context = nullptr;
+
+        ContextDependencies dependencies;
+        dependencies.device = nullptr;
+        context = std::make_unique<Context>(dependencies);
+    }
+
     TEST_P(ContextTest, InitializeAndFinalizeEncoder)
     {
         const auto source = context->CreateVideoSource();
