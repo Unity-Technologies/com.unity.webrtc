@@ -61,7 +61,6 @@ namespace webrtc
         context = std::make_unique<Context>(dependencies);
     }
 
-
     TEST_P(ContextTest, InitializeAndFinalizeEncoder)
     {
         const auto source = context->CreateVideoSource();
