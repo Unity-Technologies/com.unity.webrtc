@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2022 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -14,6 +14,10 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
 #include <libavcodec/avcodec.h>
+/* Explicitly include bsf.h when building against FFmpeg 4.3 (libavcodec 58.45.100) or later for backward compatibility */
+#if LIBAVCODEC_VERSION_INT >= 3824484
+#include <libavcodec/bsf.h>
+#endif
 }
 #include "NvCodecUtils.h"
 
@@ -31,7 +35,8 @@ class FFmpegDemuxer {
 private:
     AVFormatContext *fmtc = NULL;
     AVIOContext *avioc = NULL;
-    AVPacket pkt, pktFiltered; /*!< AVPacket stores compressed data typically exported by demuxers and then passed as input to decoders */
+    AVPacket* pkt = NULL; /*!< AVPacket stores compressed data typically exported by demuxers and then passed as input to decoders */
+    AVPacket* pktFiltered = NULL;
     AVBSFContext *bsfc = NULL;
 
     int iVideoStream;
@@ -54,7 +59,6 @@ public:
     };
 
 private:
-
     /**
     *   @brief  Private constructor to initialize libavformat resources.
     *   @param  fmtc - Pointer to AVFormatContext allocated inside avformat_open_input()
@@ -65,12 +69,22 @@ private:
             return;
         }
 
+        // Allocate the AVPackets and initialize to default values
+        pkt = av_packet_alloc();
+        pktFiltered = av_packet_alloc();
+        if (!pkt || !pktFiltered) {
+            LOG(ERROR) << "AVPacket allocation failed";
+            return;
+        }
+
         LOG(INFO) << "Media format: " << fmtc->iformat->long_name << " (" << fmtc->iformat->name << ")";
 
         ck(avformat_find_stream_info(fmtc, NULL));
         iVideoStream = av_find_best_stream(fmtc, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
         if (iVideoStream < 0) {
             LOG(ERROR) << "FFmpeg error: " << __FILE__ << " " << __LINE__ << " " << "Could not find stream in input file";
+            av_packet_free(&pkt);
+            av_packet_free(&pktFiltered);
             return;
         }
 
@@ -146,19 +160,13 @@ private:
                 || !strcmp(fmtc->iformat->long_name, "Matroska / WebM")
             );
 
-        //Initialize packet fields with default values
-        av_init_packet(&pkt);
-        pkt.data = NULL;
-        pkt.size = 0;
-        av_init_packet(&pktFiltered);
-        pktFiltered.data = NULL;
-        pktFiltered.size = 0;
-
         // Initialize bitstream filter and its required resources
         if (bMp4H264) {
             const AVBitStreamFilter *bsf = av_bsf_get_by_name("h264_mp4toannexb");
             if (!bsf) {
                 LOG(ERROR) << "FFmpeg error: " << __FILE__ << " " << __LINE__ << " " << "av_bsf_get_by_name() failed";
+                av_packet_free(&pkt);
+                av_packet_free(&pktFiltered);
                 return;
             }
             ck(av_bsf_alloc(bsf, &bsfc));
@@ -169,6 +177,8 @@ private:
             const AVBitStreamFilter *bsf = av_bsf_get_by_name("hevc_mp4toannexb");
             if (!bsf) {
                 LOG(ERROR) << "FFmpeg error: " << __FILE__ << " " << __LINE__ << " " << "av_bsf_get_by_name() failed";
+                av_packet_free(&pkt);
+                av_packet_free(&pktFiltered);
                 return;
             }
             ck(av_bsf_alloc(bsf, &bsfc));
@@ -226,11 +236,11 @@ public:
             return;
         }
 
-        if (pkt.data) {
-            av_packet_unref(&pkt);
+        if (pkt) {
+            av_packet_free(&pkt);
         }
-        if (pktFiltered.data) {
-            av_packet_unref(&pktFiltered);
+        if (pktFiltered) {
+            av_packet_free(&pktFiltered);
         }
 
         if (bsfc) {
@@ -273,28 +283,28 @@ public:
 
         *pnVideoBytes = 0;
 
-        if (pkt.data) {
-            av_packet_unref(&pkt);
+        if (pkt->data) {
+            av_packet_unref(pkt);
         }
 
         int e = 0;
-        while ((e = av_read_frame(fmtc, &pkt)) >= 0 && pkt.stream_index != iVideoStream) {
-            av_packet_unref(&pkt);
+        while ((e = av_read_frame(fmtc, pkt)) >= 0 && pkt->stream_index != iVideoStream) {
+            av_packet_unref(pkt);
         }
         if (e < 0) {
             return false;
         }
 
         if (bMp4H264 || bMp4HEVC) {
-            if (pktFiltered.data) {
-                av_packet_unref(&pktFiltered);
+            if (pktFiltered->data) {
+                av_packet_unref(pktFiltered);
             }
-            ck(av_bsf_send_packet(bsfc, &pkt));
-            ck(av_bsf_receive_packet(bsfc, &pktFiltered));
-            *ppVideo = pktFiltered.data;
-            *pnVideoBytes = pktFiltered.size;
+            ck(av_bsf_send_packet(bsfc, pkt));
+            ck(av_bsf_receive_packet(bsfc, pktFiltered));
+            *ppVideo = pktFiltered->data;
+            *pnVideoBytes = pktFiltered->size;
             if (pts)
-                *pts = (int64_t) (pktFiltered.pts * userTimeScale * timeBase);
+                *pts = (int64_t) (pktFiltered->pts * userTimeScale * timeBase);
         } else {
 
             if (bMp4MPEG4 && (frameCount == 0)) {
@@ -304,7 +314,7 @@ public:
                 if (extraDataSize > 0) {
 
                     // extradata contains start codes 00 00 01. Subtract its size
-                    pDataWithHeader = (uint8_t *)av_malloc(extraDataSize + pkt.size - 3*sizeof(uint8_t));
+                    pDataWithHeader = (uint8_t *)av_malloc(extraDataSize + pkt->size - 3*sizeof(uint8_t));
 
                     if (!pDataWithHeader) {
                         LOG(ERROR) << "FFmpeg error: " << __FILE__ << " " << __LINE__;
@@ -312,19 +322,19 @@ public:
                     }
 
                     memcpy(pDataWithHeader, fmtc->streams[iVideoStream]->codecpar->extradata, extraDataSize);
-                    memcpy(pDataWithHeader+extraDataSize, pkt.data+3, pkt.size - 3*sizeof(uint8_t));
+                    memcpy(pDataWithHeader+extraDataSize, pkt->data+3, pkt->size - 3*sizeof(uint8_t));
 
                     *ppVideo = pDataWithHeader;
-                    *pnVideoBytes = extraDataSize + pkt.size - 3*sizeof(uint8_t);
+                    *pnVideoBytes = extraDataSize + pkt->size - 3*sizeof(uint8_t);
                 }
 
             } else {
-                *ppVideo = pkt.data;
-                *pnVideoBytes = pkt.size;
+                *ppVideo = pkt->data;
+                *pnVideoBytes = pkt->size;
             }
 
             if (pts)
-                *pts = (int64_t)(pkt.pts * userTimeScale * timeBase);
+                *pts = (int64_t)(pkt->pts * userTimeScale * timeBase);
         }
 
         frameCount++;

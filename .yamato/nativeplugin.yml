@@ -4,7 +4,7 @@ build_platforms:
   - name: win
     type: Unity::VM
     flavor: b1.large
-    image: renderstreaming/win10:v0.3.13-1084239
+    image: renderstreaming/win10:v0.5.0-1259536
     build_command: BuildScripts~/build_plugin_win.cmd
     build_testrunner_command: BuildScripts~/build_testrunner_win.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
@@ -46,15 +46,15 @@ test_platforms:
   - name: win
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.3.13-1084239
-    gpu_image: renderstreaming/win10:v0.3.13-1084240
+    image: renderstreaming/win10:v0.5.0-1259536
+    gpu_image: renderstreaming/win10:v0.5.0-1259773
     flavor: b1.large
     model: rtx2080
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.2.9-1258156
-    gpu_image: renderstreaming/ubuntu:v0.2.9-1258158
+    image: renderstreaming/ubuntu:v0.3.1-1262596
+    gpu_image: renderstreaming/ubuntu:v0.3.1-1262597
     flavor: b1.large
     model: rtx2080
   - name: macos
@@ -159,7 +159,7 @@ test_{{ platform.name }}_gpu:
     - |
        # See False positives
        # https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
-       export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0
+       export ASAN_OPTIONS=protect_shadow_gap=0:detect_leaks=1:detect_container_overflow=0:alloc_dealloc_mismatch=0
        export LSAN_OPTIONS=suppressions=$(pwd)/Plugin~/tools/sanitizer/lsan_suppressions.txt
        chmod ./WebRTCLibTest
        ./WebRTCLibTest

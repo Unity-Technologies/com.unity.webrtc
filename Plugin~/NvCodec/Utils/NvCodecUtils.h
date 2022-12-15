@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2022 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -28,6 +28,7 @@
 #include <sstream>
 #include <thread>
 #include <list>
+#include <vector>
 #include <condition_variable>
 
 extern simplelogger::Logger *logger;
@@ -123,6 +124,9 @@ inline bool check(int e, int iLine, const char *szFile) {
 }
 
 #define ck(call) check(call, __LINE__, __FILE__)
+#define MAKE_FOURCC( ch0, ch1, ch2, ch3 )                               \
+                ( (uint32_t)(uint8_t)(ch0) | ( (uint32_t)(uint8_t)(ch1) << 8 ) |    \
+                ( (uint32_t)(uint8_t)(ch2) << 16 ) | ( (uint32_t)(uint8_t)(ch3) << 24 ) )
 
 /**
 * @brief Wrapper class around std::thread
@@ -308,6 +312,61 @@ private:
     int nWidth, nHeight;
 };
 
+/**
+* @brief Class for writing IVF format header for AV1 codec
+*/
+class IVFUtils {
+public:
+    void WriteFileHeader(std::vector<uint8_t> &vPacket, uint32_t nFourCC, uint32_t nWidth, uint32_t nHeight, uint32_t nFrameRateNum, uint32_t nFrameRateDen, uint32_t nFrameCnt)
+    {
+        char header[32];
+
+        header[0] = 'D';
+        header[1] = 'K';
+        header[2] = 'I';
+        header[3] = 'F';
+        mem_put_le16(header + 4, 0);                    // version
+        mem_put_le16(header + 6, 32);                   // header size
+        mem_put_le32(header + 8, nFourCC);              // fourcc
+        mem_put_le16(header + 12, nWidth);              // width
+        mem_put_le16(header + 14, nHeight);             // height
+        mem_put_le32(header + 16, nFrameRateNum);       // rate
+        mem_put_le32(header + 20, nFrameRateDen);       // scale
+        mem_put_le32(header + 24, nFrameCnt);           // length
+        mem_put_le32(header + 28, 0);                   // unused
+
+        vPacket.insert(vPacket.end(), &header[0], &header[32]);
+    }
+    
+    void WriteFrameHeader(std::vector<uint8_t> &vPacket,  size_t nFrameSize, int64_t pts)
+    {
+        char header[12];
+        mem_put_le32(header, (int)nFrameSize);
+        mem_put_le32(header + 4, (int)(pts & 0xFFFFFFFF));
+        mem_put_le32(header + 8, (int)(pts >> 32));
+        
+        vPacket.insert(vPacket.end(), &header[0], &header[12]);
+    }
+    
+private:
+    static inline void mem_put_le32(void *vmem, int val)
+    {
+        unsigned char *mem = (unsigned char *)vmem;
+        mem[0] = (unsigned char)((val >>  0) & 0xff);
+        mem[1] = (unsigned char)((val >>  8) & 0xff);
+        mem[2] = (unsigned char)((val >> 16) & 0xff);
+        mem[3] = (unsigned char)((val >> 24) & 0xff);
+    }
+
+    static inline void mem_put_le16(void *vmem, int val)
+    {
+        unsigned char *mem = (unsigned char *)vmem;
+        mem[0] = (unsigned char)((val >>  0) & 0xff);
+        mem[1] = (unsigned char)((val >>  8) & 0xff);
+    }
+
+};
+    
 /**
 * @brief Utility class to measure elapsed time in seconds between the block of executed code
 */

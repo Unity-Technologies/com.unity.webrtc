@@ -3,7 +3,7 @@
 platforms:
   - name: win
     type: Unity::VM
-    image: renderstreaming/win10:v0.4.0-1250406
+    image: renderstreaming/win10:v0.5.0-1259536
     flavor: b1.xlarge
     build_command: BuildScripts~/build_libwebrtc_win.cmd
   - name: macos

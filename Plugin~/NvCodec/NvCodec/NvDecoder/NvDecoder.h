@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2022 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -21,6 +21,14 @@
 #include <string.h>
 #include "nvcuvid.h"
 #include "../Utils/NvCodecUtils.h"
+#include <map>
+
+#define MAX_FRM_CNT 32
+
+typedef enum{
+    SEI_TYPE_TIME_CODE = 136,
+    SEI_TYPE_USER_DATA_UNREGISTERED = 5
+}SEI_H264_HEVC_PAYLOAD_TYPE;
 
 /**
 * @brief Exception class for error reporting from the decode API.
@@ -91,7 +99,8 @@ public:
     */
     NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency = false,
               bool bDeviceFramePitched = false, const Rect *pCropRect = NULL, const Dim *pResizeDim = NULL,
-              int maxWidth = 0, int maxHeight = 0, unsigned int clkRate = 1000);
+              bool extract_user_SEI_Message = false, int maxWidth = 0, int maxHeight = 0, unsigned int clkRate = 1000,
+              bool force_zero_latency = false);
     ~NvDecoder();
 
     /**
@@ -227,7 +236,18 @@ public:
 
     // stop the timer
     double stopTimer() { return m_stDecode_time.Stop(); }
+
+    void setDecoderSessionID(int sessionID) { decoderSessionID = sessionID; }
+    int getDecoderSessionID() { return decoderSessionID; }
+
+    // Session overhead refers to decoder initialization and deinitialization time
+    static void addDecoderSessionOverHead(int sessionID, int64_t duration) { sessionOverHead[sessionID] += duration; }
+    static int64_t getDecoderSessionOverHead(int sessionID) { return sessionOverHead[sessionID]; }
+
 private:
+    int decoderSessionID; // Decoder session identifier. Used to gather session level stats.
+    static std::map<int, int64_t> sessionOverHead; // Records session overhead of initialization+deinitialization time. Format is (thread id, duration)
+
     /**
     *   @brief  Callback function to be registered for getting a callback when decoding of sequence starts
     */
@@ -247,6 +267,11 @@ private:
     *   @brief  Callback function to be registered for getting a callback to get operating point when AV1 SVC sequence header start.
     */
     static int CUDAAPI HandleOperatingPointProc(void *pUserData, CUVIDOPERATINGPOINTINFO *pOPInfo) { return ((NvDecoder *)pUserData)->GetOperatingPoint(pOPInfo); }
+
+    /**
+    *   @brief  Callback function to be registered for getting a callback when all the unregistered user SEI Messages are parsed for a frame.
+    */
+    static int CUDAAPI HandleSEIMessagesProc(void *pUserData, CUVIDSEIMESSAGEINFO *pSEIMessageInfo) { return ((NvDecoder *)pUserData)->GetSEIMessage(pSEIMessageInfo); } 
 
     /**
     *   @brief  This function gets called when a sequence is ready to be decoded. The function also gets called
@@ -270,6 +295,12 @@ private:
     *   @brief  This function gets called when AV1 sequence encounter more than one operating points
     */
     int GetOperatingPoint(CUVIDOPERATINGPOINTINFO *pOPInfo);
+
+    /**
+    *   @brief  This function gets called when all unregistered user SEI messages are parsed for a frame
+    */
+    int GetSEIMessage(CUVIDSEIMESSAGEINFO *pSEIMessageInfo);
+ 
     /**
     *   @brief  This function reconfigure decoder if there is a change in sequence params.
     */
@@ -299,7 +330,10 @@ private:
     // timestamps of decoded frames
     std::vector<int64_t> m_vTimestamp;
     int m_nDecodedFrame = 0, m_nDecodedFrameReturned = 0;
-    int m_nDecodePicCnt = 0, m_nPicNumInDecodeOrder[32];
+    int m_nDecodePicCnt = 0, m_nPicNumInDecodeOrder[MAX_FRM_CNT];
+    CUVIDSEIMESSAGEINFO *m_pCurrSEIMessage = NULL;
+    CUVIDSEIMESSAGEINFO m_SEIMessagesDisplayOrder[MAX_FRM_CNT];
+    FILE *m_fpSEI = NULL;
     bool m_bEndDecodeDone = false;
     std::mutex m_mtxVPFrame;
     int m_nFrameAlloc = 0;
@@ -317,4 +351,11 @@ private:
 
     unsigned int m_nOperatingPoint = 0;
     bool  m_bDispAllLayers = false;
+    // In H.264, there is an inherent display latency for video contents
+    // which do not have num_reorder_frames=0 in the VUI. This applies to
+    // All-Intra and IPPP sequences as well. If the user wants zero display
+    // latency for All-Intra and IPPP sequences, the below flag will enable
+    // the display callback immediately after the decode callback.
+    bool m_bForce_zero_latency = false;
+    bool m_bExtractSEIMessage = false;
 };

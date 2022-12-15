@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2020 NVIDIA Corporation.  All rights reserved.
+* Copyright 2017-2022 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -19,7 +19,28 @@ extern "C" {
 };
 #include "Logger.h"
 
+using namespace std;
+
 extern simplelogger::Logger *logger;
+
+static string AvErrorToString(int av_error_code) {
+    const auto buf_size = 1024U;
+    char *err_string = (char *)calloc(buf_size, sizeof(*err_string));
+    if (!err_string) {
+        return string();
+    }
+
+    if (0 != av_strerror(av_error_code, err_string, buf_size - 1)) {
+        free(err_string);
+        stringstream ss;
+        ss << "Unknown error with code " << av_error_code;
+        return ss.str();
+    }
+
+    string str(err_string);
+    free(err_string);
+    return str;
+}
 
 class FFmpegStreamer {
 private:
@@ -30,21 +51,20 @@ private:
 public:
     FFmpegStreamer(AVCodecID eCodecId, int nWidth, int nHeight, int nFps, const char *szInFilePath) : nFps(nFps) {
         avformat_network_init();
-        oc = avformat_alloc_context();
-        if (!oc) {
-            LOG(ERROR) << "FFMPEG: avformat_alloc_context error";
+
+        int ret = 0;
+
+        if ((eCodecId == AV_CODEC_ID_H264) || (eCodecId == AV_CODEC_ID_HEVC))
+            ret = avformat_alloc_output_context2(&oc, NULL, "mpegts", NULL);
+        else if (eCodecId == AV_CODEC_ID_AV1)
+            ret = avformat_alloc_output_context2(&oc, NULL, "ivf", NULL);
+
+        if (ret < 0) {
+            LOG(ERROR) << "FFmpeg: failed to allocate an AVFormatContext. Error message: "
+                       << AvErrorToString(ret);
             return;
         }
 
-        // Set format on oc
-        AVOutputFormat *fmt = av_guess_format("mpegts", NULL, NULL);
-        if (!fmt) {
-            LOG(ERROR) << "Invalid format";
-            return;
-        }
-        fmt->video_codec = eCodecId;
-
-        oc->oformat = fmt;
         oc->url = av_strdup(szInFilePath);
         LOG(INFO) << "Streaming destination: " << oc->url;
 
@@ -58,7 +78,7 @@ public:
 
         // Set video parameters
         AVCodecParameters *vpar = vs->codecpar;
-        vpar->codec_id = fmt->video_codec;
+        vpar->codec_id = eCodecId;
         vpar->codec_type = AVMEDIA_TYPE_VIDEO;
         vpar->width = nWidth;
         vpar->height = nHeight;
@@ -84,26 +104,30 @@ public:
     }
 
     bool Stream(uint8_t *pData, int nBytes, int nPts) {
-        AVPacket pkt = {0};
-        av_init_packet(&pkt);
-        pkt.pts = av_rescale_q(nPts++, AVRational {1, nFps}, vs->time_base);
+        AVPacket *pkt = av_packet_alloc();
+        if (!pkt) {
+            LOG(ERROR) << "AVPacket allocation failed !";
+            return false;
+        }
+        pkt->pts = av_rescale_q(nPts++, AVRational {1, nFps}, vs->time_base);
         // No B-frames
-        pkt.dts = pkt.pts;
-        pkt.stream_index = vs->index;
-        pkt.data = pData;
-        pkt.size = nBytes;
+        pkt->dts = pkt->pts;
+        pkt->stream_index = vs->index;
+        pkt->data = pData;
+        pkt->size = nBytes;
 
         if(!memcmp(pData, "\x00\x00\x00\x01\x67", 5)) {
-            pkt.flags |= AV_PKT_FLAG_KEY;
+            pkt->flags |= AV_PKT_FLAG_KEY;
         }
 
         // Write the compressed frame into the output
-        int ret = av_write_frame(oc, &pkt);
+        int ret = av_write_frame(oc, pkt);
         av_write_frame(oc, NULL);
         if (ret < 0) {
             LOG(ERROR) << "FFMPEG: Error while writing video frame";
         }
 
+        av_packet_free(&pkt);
         return true;
     }
 };
