@@ -867,9 +867,15 @@ namespace Unity.WebRTC
         internal T FindObserver<T>(IntPtr ptr) where T : class
         {
             if (typeof(T) == typeof(SetSessionDescriptionObserver))
-                return dictSetSessionDescriptionObserver[ptr] as T;
-            if (typeof(T) == typeof(CreateSessionDescriptionObserver))
-                return dictCreateSessionDescriptionObserver[ptr] as T;
+            {
+                if (dictSetSessionDescriptionObserver.TryGetValue(ptr, out var value))
+                    return value as T;
+            }
+            else if (typeof(T) == typeof(CreateSessionDescriptionObserver))
+            {
+                if (dictCreateSessionDescriptionObserver.TryGetValue(ptr, out var value))
+                    return value as T;
+            }
             return null;
         }
 
