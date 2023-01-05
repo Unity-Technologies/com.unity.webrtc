@@ -39,12 +39,18 @@ namespace webrtc
 
     rtc::scoped_refptr<webrtc::I420BufferInterface> VideoFrameAdapter::ScaledBuffer::ToI420()
     {
-        return parent_->GetOrCreateFrameBufferForSize(Size(width_, height_))->ToI420();
+        auto buffer = parent_->GetOrCreateFrameBufferForSize(Size(width_, height_));
+        if(!buffer)
+            return nullptr;
+        return buffer->ToI420();
     }
 
     const I420BufferInterface* VideoFrameAdapter::ScaledBuffer::GetI420() const
     {
-        return parent_->GetOrCreateFrameBufferForSize(Size(width_, height_))->GetI420();
+        auto buffer = parent_->GetOrCreateFrameBufferForSize(Size(width_, height_));
+        if(!buffer)
+            return nullptr;
+        return buffer->GetI420();
     }
 
     rtc::scoped_refptr<VideoFrameBuffer>
