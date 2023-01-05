@@ -25,37 +25,37 @@ platforms:
   - name: Ubuntu 18.04
     agent: lin_18.04_bokken
     type: Unity::VM
-    image: katana-to-yamato/desktop-ubuntu-18.04-desktop-katana-git:v1.10-auto
+    image: desktop/ubuntu-18.04-desktop-workstation:v1.9.0
     flavor: b1.large
     group: linux
   - name: macOS 10.14
     agent: mac_test_10.14
     type: Unity::VM::osx
-    image: katana-to-yamato/automation-tooling-macos-10.14-katana-git:v1.12-auto
+    image: automation-tooling/macos-10.14:v0.1.2-1059229
     flavor: m1.mac
     group: macos
   - name: Windows 10
     agent: win10_test
     type: Unity::VM
-    image: katana-to-yamato/test-platform-win10-katana-git:v1.9-auto
+    image: test-platform/win10:v1.0.0-1094330
     flavor: b1.large
     group: windows
   - name: iOS
     agent: mac_iphone_se
     type: Unity::mobile::iPhone
-    image: katana-to-yamato/mobile-ios-macos-11-katana-se-git:v1.6-auto
+    image: mobile/ios-macos-11:v0.1.3-1255777
     flavor: m1.mac
     group: ios
   - name: Ubuntu 16.04
     agent: lin_test_ubuntu16.04
     type: Unity::VM
-    image: katana-to-yamato/test-platform-ubuntu16.04-katana-git:v1.11-auto
+    image: test-platform/ubuntu16.04:v0.4-1006434
     flavor: b1.large
     group: linux
   - name: macOS 10.13
     agent: mac_test_10.13
     type: Unity::VM::osx
-    image: katana-to-yamato/test-platform-macos-10.13-katana-git:v1.10-auto
+    image: test-platform/macos-10.13:v0.3-615368
     flavor: m1.mac
     group: macos
 
