@@ -2,63 +2,7 @@ add_library(WebRTCLib STATIC)
 
 target_sources(WebRTCLib
   PRIVATE
-    Context.cpp
-    Context.h
-    DataChannelObject.cpp
-    DataChannelObject.h
-    DummyAudioDevice.cpp
-    DummyAudioDevice.h
-    AudioTrackSinkAdapter.h
-    AudioTrackSinkAdapter.cpp
-    Logger.cpp
-    MediaStreamObserver.cpp
-    MediaStreamObserver.h
-    pch.cpp
-    pch.h
-    PeerConnectionObject.cpp
-    PeerConnectionObject.h
-    PeerConnectionStatsCollectorCallback.cpp
-    PeerConnectionStatsCollectorCallback.h
-    PlatformBase.h
-    ProfilerMarkerFactory.cpp
-    ProfilerMarkerFactory.h
-    SetSessionDescriptionObserver.cpp
-    SetSessionDescriptionObserver.h
-    ScopedProfiler.h
-    ScopedProfiler.cpp
-    targetver.h
-    UnityAudioDecoderFactory.cpp
-    UnityAudioDecoderFactory.h
-    UnityAudioEncoderFactory.cpp
-    UnityAudioEncoderFactory.h
-    UnityAudioTrackSource.cpp
-    UnityAudioTrackSource.h
-    UnityProfilerInterfaceFunctions.cpp
-    UnityProfilerInterfaceFunctions.h
-    UnityVideoDecoderFactory.cpp
-    UnityVideoDecoderFactory.h
-    UnityVideoEncoderFactory.cpp
-    UnityVideoEncoderFactory.h
-    UnityVideoRenderer.cpp
-    UnityVideoRenderer.h
-    UnityVideoTrackSource.cpp
-    UnityVideoTrackSource.h
-    WebRTCMacros.h
-    WebRTCPlugin.h
-    UnityLogStream.h
-    UnityLogStream.cpp
-    VideoFrame.cpp
-    VideoFrame.h
-    VideoFrameAdapter.cpp
-    VideoFrameAdapter.h
-    VideoFrameScheduler.cpp
-    VideoFrameScheduler.h
-    VideoFrameUtil.cpp
-    VideoFrameUtil.h
-    GpuMemoryBuffer.cpp
-    GpuMemoryBuffer.h
-    GpuMemoryBufferPool.cpp
-    GpuMemoryBufferPool.h
+     apm.cpp apm.h Debug.h Debug.cpp
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
