@@ -12,7 +12,7 @@ namespace webrtc
     {
     public:
         MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex);
-        virtual ~MetalTexture2D();
+        virtual ~MetalTexture2D() override;
 
         inline void* GetNativeTexturePtrV() override;
         inline const void* GetNativeTexturePtrV() const override;
