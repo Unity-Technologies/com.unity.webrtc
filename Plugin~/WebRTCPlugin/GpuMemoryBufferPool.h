@@ -22,7 +22,7 @@ namespace webrtc
 
         rtc::scoped_refptr<VideoFrame>
         CreateFrame(NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp);
-        void ReleaseStaleBuffers(Timestamp timestamp);
+        void ReleaseStaleBuffers(Timestamp timestamp, TimeDelta timeLimit);
 
         size_t bufferCount() { return resourcesPool_.size(); }
 
