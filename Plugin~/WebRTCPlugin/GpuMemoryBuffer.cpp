@@ -41,16 +41,19 @@ namespace webrtc
 
     GpuMemoryBufferFromUnity::~GpuMemoryBufferFromUnity() { }
 
-    void GpuMemoryBufferFromUnity::ResetSync()
+    bool GpuMemoryBufferFromUnity::ResetSync()
     {
         if (!device_->ResetSync(texture_.get()))
         {
             RTC_LOG(LS_INFO) << "ResetSync failed.";
+            return false;
         }
         if (!device_->ResetSync(textureCpuRead_.get()))
         {
             RTC_LOG(LS_INFO) << "ResetSync failed.";
+            return false;
         }
+        return true;
     }
 
     void GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)

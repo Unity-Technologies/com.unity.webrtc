@@ -50,7 +50,7 @@ namespace webrtc
         GpuMemoryBufferFromUnity(const GpuMemoryBufferFromUnity&) = delete;
         GpuMemoryBufferFromUnity& operator=(const GpuMemoryBufferFromUnity&) = delete;
 
-        void ResetSync();
+        bool ResetSync();
         void CopyBuffer(NativeTexPtr ptr);
         UnityRenderingExtTextureFormat GetFormat() const override;
         Size GetSize() const override;
