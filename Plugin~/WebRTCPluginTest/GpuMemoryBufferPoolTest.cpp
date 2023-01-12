@@ -38,7 +38,10 @@ namespace webrtc
             return std::unique_ptr<ITexture2D>(tex);
         }
 
-        void ReleaseStaleBuffers(Timestamp timestamp) { bufferPool_->ReleaseStaleBuffers(timestamp); }
+        void ReleaseStaleBuffers(Timestamp timestamp)
+        {
+            bufferPool_->ReleaseStaleBuffers(timestamp, TimeDelta::Seconds(10));
+        }
 
         std::unique_ptr<GraphicsDeviceContainer> container_;
         IGraphicsDevice* device_;

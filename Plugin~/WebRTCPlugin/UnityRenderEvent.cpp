@@ -35,6 +35,8 @@ namespace webrtc
     static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     static std::unique_ptr<Clock> s_clock;
 
+    static const size_t kLimitBufferCount = 10;
+    static constexpr TimeDelta kStaleFrameLimit = TimeDelta::Seconds(10);
     static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
@@ -250,6 +252,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
     void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
     unity::webrtc::Size size(encodeData->width, encodeData->height);
+
+    if (s_bufferPool->bufferCount() < kLimitBufferCount)
     {
         std::unique_ptr<const ScopedProfiler> profiler;
         if (s_ProfilerMarkerFactory)
@@ -258,14 +262,14 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
         auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
         source->OnFrameCaptured(std::move(frame));
     }
-    s_bufferPool->ReleaseStaleBuffers(timestamp);
+    s_bufferPool->ReleaseStaleBuffers(timestamp, kStaleFrameLimit);
 }
 
 static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
 {
     // Release all buffers.
     if (s_bufferPool)
-        s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity());
+        s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
 }
 
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)

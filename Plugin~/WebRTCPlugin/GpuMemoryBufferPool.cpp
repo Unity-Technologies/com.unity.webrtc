@@ -72,15 +72,14 @@ namespace webrtc
         (*result)->MarkUnused(clock_->CurrentTime());
     }
 
-    void GpuMemoryBufferPool::ReleaseStaleBuffers(Timestamp now)
+    void GpuMemoryBufferPool::ReleaseStaleBuffers(Timestamp now, TimeDelta timeLimit)
     {
         auto it = resourcesPool_.begin();
         while (it != resourcesPool_.end())
         {
             FrameResources* resources = (*it).get();
 
-            constexpr TimeDelta kStaleFrameLimit = TimeDelta::Seconds(10);
-            if (!resources->IsUsed() && now - resources->lastUseTime() > kStaleFrameLimit)
+            if (!resources->IsUsed() && now - resources->lastUseTime() > timeLimit)
             {
                 resourcesPool_.erase(it++);
             }

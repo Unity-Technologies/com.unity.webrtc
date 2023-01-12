@@ -15,7 +15,7 @@ namespace webrtc
 
     MetalTexture2D::~MetalTexture2D()
     {
-        m_texture = nullptr;
+        [m_texture release];
     }
     
 } // end namespace webrtc
