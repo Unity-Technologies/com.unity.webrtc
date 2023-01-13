@@ -290,9 +290,6 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(sentRtpStats.packetsSent);
                     Ignore.Pass(sentRtpStats.bytesSent);
                     break;
-                default:
-                    Debug.LogWarning(stats.Type);
-                    break;
             }
         }
     }
