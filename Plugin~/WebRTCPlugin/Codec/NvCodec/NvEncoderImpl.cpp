@@ -396,7 +396,12 @@ namespace webrtc
         if (!m_encodedCompleteCallback)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
 
-        auto videoFrameBuffer = static_cast<ScalableBufferInterface*>(frame.video_frame_buffer().get());
+        auto frameBuffer = frame.video_frame_buffer();
+        if (frameBuffer->type() != VideoFrameBuffer::Type::kNative || frameBuffer->width() != m_codec.width ||
+            frameBuffer->height() != m_codec.height)
+            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+
+        auto videoFrameBuffer = static_cast<ScalableBufferInterface*>(frameBuffer.get());
         rtc::scoped_refptr<VideoFrame> video_frame = videoFrameBuffer->scaled()
             ? static_cast<VideoFrameAdapter::ScaledBuffer*>(videoFrameBuffer)->GetVideoFrame()
             : static_cast<VideoFrameAdapter*>(videoFrameBuffer)->GetVideoFrame();
