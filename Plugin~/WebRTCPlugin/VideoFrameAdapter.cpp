@@ -109,7 +109,7 @@ namespace webrtc
                 return scaledI420buffer;
             }
         }
-        auto buffer = VideoFrameAdapter::CropAndScale(0, 0, width(), height(), size.width(), size.height());
+        auto buffer = VideoFrameBuffer::CropAndScale(0, 0, width(), height(), size.width(), size.height());
         scaledI40Buffers_.push_back(buffer);
         return buffer;
     }
