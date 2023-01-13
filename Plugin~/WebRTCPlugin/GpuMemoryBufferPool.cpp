@@ -39,7 +39,7 @@ namespace webrtc
             if (!resources->IsUsed() && AreFrameResourcesCompatible(resources, size, format))
             {
                 GpuMemoryBufferFromUnity* buffer = static_cast<GpuMemoryBufferFromUnity*>(resources->buffer_.get());
-                if(!buffer->ResetSync())
+                if (!buffer->ResetSync())
                 {
                     RTC_LOG(LS_INFO) << "It has not signaled yet";
                     continue;
