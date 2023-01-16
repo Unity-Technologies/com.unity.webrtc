@@ -98,7 +98,7 @@ namespace Unity.WebRTC.RuntimeTest
                 var receiveVideoTrack = test.component.RecvVideoTrack;
                 Assert.That(receiveVideoTrack, Is.Not.Null);
 
-                yield return new WaitUntilWithTimeout(() => receiveVideoTrack.Texture != null, 5000);
+                yield return new WaitUntilWithTimeout(() => receiveVideoTrack.Texture != null, 15000);
                 Assert.That(receiveVideoTrack.Texture, Is.Not.Null);
                 test.component.Clear();
             }

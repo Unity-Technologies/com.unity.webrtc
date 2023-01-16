@@ -38,9 +38,13 @@ namespace webrtc
             FrameResources* resources = it->get();
             if (!resources->IsUsed() && AreFrameResourcesCompatible(resources, size, format))
             {
-                resources->MarkUsed(clock_->CurrentTime());
                 GpuMemoryBufferFromUnity* buffer = static_cast<GpuMemoryBufferFromUnity*>(resources->buffer_.get());
-                buffer->ResetSync();
+                if (!buffer->ResetSync())
+                {
+                    RTC_LOG(LS_INFO) << "It has not signaled yet";
+                    continue;
+                }
+                resources->MarkUsed(clock_->CurrentTime());
                 buffer->CopyBuffer(ptr);
                 return resources->buffer_;
             }
