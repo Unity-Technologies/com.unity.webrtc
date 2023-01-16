@@ -53,13 +53,7 @@ namespace webrtc
     {
         if (!settings.max_render_resolution().Valid())
         {
-            RTC_LOG(LS_ERROR) << "initialization failed on codec_settings is null ";
-            return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
-        }
-
-        if (settings.width < 1 || settings.height < 1)
-        {
-            RTC_LOG(LS_ERROR) << "initialization failed on codec_settings width < 0 or height < 0";
+            RTC_LOG(LS_ERROR) << "initialization failed on settings.max_render_resolution().Valid()";
             return false;
         }
 
@@ -79,7 +73,7 @@ namespace webrtc
         int maxHeight = 4096;
 
         cudaVideoCodec_enum codec;
-        switch (codec_settings->codecType)
+        switch (settings.codec_type())
         {
         case kVideoCodecVP8:
             codec = cudaVideoCodec_VP8;
