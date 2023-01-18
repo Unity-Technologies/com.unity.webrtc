@@ -763,6 +763,15 @@ namespace Unity.WebRTC
             return new RTCStatsReportAsyncOperation(callback);
         }
 
+        public bool? CanTrickleIceCandidates
+        {
+            get
+            {
+                bool hasValue = NativeMethods.PeerConnectionCanTrickleIceCandidates(GetSelfOrThrow(), out var value);
+                return hasValue ? value : (bool?)null;
+            }
+        }
+
         /// <summary>
         ///
         /// </summary>

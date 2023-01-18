@@ -375,6 +375,15 @@ namespace Unity.WebRTC.RuntimeTest
             Object.DestroyImmediate(obj);
         }
 
+        [Test]
+        public void CanTrickleIceCandidates()
+        {
+            var config = GetDefaultConfiguration();
+            var peer = new RTCPeerConnection(ref config);
+
+            Assert.That(peer.CanTrickleIceCandidates, Is.Null);
+        }
+
         [UnityTest]
         [Timeout(1000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.OSXPlayer })]
