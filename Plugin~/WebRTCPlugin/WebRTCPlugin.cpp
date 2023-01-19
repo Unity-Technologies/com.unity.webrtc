@@ -808,10 +808,10 @@ extern "C"
         return observer.get();
     }
 
-    UNITY_INTERFACE_EXPORT bool PeerConnectionCanTrickleIceCandidates(PeerConnectionObject* obj, bool value)
+    UNITY_INTERFACE_EXPORT bool PeerConnectionCanTrickleIceCandidates(PeerConnectionObject* obj, bool* value)
     {
         absl::optional<bool> result = obj->connection->can_trickle_ice_candidates();
-        value = result.value_or(false);
+        *value = result.value_or(false);
         return result.has_value();
     }
 
