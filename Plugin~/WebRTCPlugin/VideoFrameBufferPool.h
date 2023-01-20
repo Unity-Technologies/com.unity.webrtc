@@ -23,6 +23,7 @@ namespace webrtc
 
         virtual ~VideoFrameBufferPool();
 
+        uint32_t bufferCount() { return pool_.size(); };
         rtc::scoped_refptr<VideoFrameBuffer> Create(int width, int height, UnityRenderingExtTextureFormat format);
 
     private:

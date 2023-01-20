@@ -58,9 +58,8 @@ namespace webrtc
             return *result;
 
         auto buffer = device_->CreateVideoFrameBuffer(width, height, format);
-        auto ptr = buffer.get();
-        pool_.emplace_back(std::move(buffer));
-        return ptr;
+        pool_.emplace_back(buffer);
+        return buffer;
     }
 }
 }

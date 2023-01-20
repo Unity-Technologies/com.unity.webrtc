@@ -49,7 +49,7 @@ namespace webrtc
         static rtc::scoped_refptr<NativeFrameBuffer>
         Create(int width, int height, UnityRenderingExtTextureFormat format, IGraphicsDevice* device)
         {
-            return new rtc::RefCountedObject<NativeFrameBuffer>(width, height, format, device);
+            return rtc::make_ref_counted<NativeFrameBuffer>(width, height, format, device);
         }
         VideoFrameBuffer::Type type() const override { return Type::kNative; }
         int width() const override { return texture_->GetWidth(); }
@@ -57,8 +57,8 @@ namespace webrtc
         bool scaled() const override { return false; }
         UnityRenderingExtTextureFormat format() { return texture_->GetFormat(); };
         ITexture2D* texture() { return texture_.get(); }
-        rtc::scoped_refptr<I420BufferInterface> ToI420() override { return I420Buffer::Create(width(), height()); }
-        const webrtc::I420BufferInterface* GetI420() const override { return I420Buffer::Create(width(), height()); }
+        rtc::scoped_refptr<I420BufferInterface> ToI420() override;
+        const webrtc::I420BufferInterface* GetI420() const override;
         const GpuMemoryBufferHandle* handle() { return handle_.get(); }
 
     protected:
@@ -70,8 +70,17 @@ namespace webrtc
         ~NativeFrameBuffer() override { }
 
     private:
+        rtc::scoped_refptr<webrtc::VideoFrameBuffer> GetOrCreateFrameBufferForSize(const Size& size);
+        rtc::scoped_refptr<I420BufferInterface>
+        ConvertToVideoFrameBuffer(rtc::scoped_refptr<VideoFrame> video_frame) const;
         std::unique_ptr<ITexture2D> texture_;
         std::unique_ptr<GpuMemoryBufferHandle> handle_;
+        mutable rtc::scoped_refptr<I420BufferInterface> i420Buffer_;
+        std::vector<rtc::scoped_refptr<VideoFrameBuffer>> scaledI40Buffers_;
+        const rtc::scoped_refptr<VideoFrame> frame_;
+        const Size size_;
+        mutable std::mutex scaleLock_;
+        mutable std::mutex convertLock_;
     };
 }
 }
