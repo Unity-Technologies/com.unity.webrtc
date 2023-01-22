@@ -128,9 +128,9 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteRefPtr(self, ptr);
         }
 
-        public IntPtr CreateFrameTransformer(DelegateTransformedFrame callback)
+        public IntPtr CreateFrameTransformer()
         {
-            return NativeMethods.ContextCreateFrameTransformer(self, callback);
+            return NativeMethods.ContextCreateFrameTransformer(self);
         }
 
         public IntPtr CreatePeerConnection()

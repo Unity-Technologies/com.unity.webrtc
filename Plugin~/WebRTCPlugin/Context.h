@@ -113,8 +113,6 @@ namespace webrtc
         // Video Source
         rtc::scoped_refptr<UnityVideoTrackSource> CreateVideoSource();
 
-        rtc::scoped_refptr<FrameTransformerInterface> CreateFrameTransformer(DelegateTransformedFrame callback);
-
         // MediaStreamTrack
         rtc::scoped_refptr<VideoTrackInterface>
         CreateVideoTrack(const std::string& label, webrtc::VideoTrackSourceInterface* source);

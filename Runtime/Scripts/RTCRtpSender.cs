@@ -10,6 +10,7 @@ namespace Unity.WebRTC
     public class RTCRtpSender : RefCountedObject
     {
         private RTCPeerConnection peer;
+        private RTCRtpTransform transform;
 
         internal RTCRtpSender(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
@@ -83,9 +84,17 @@ namespace Unity.WebRTC
         {
             set
             {
+                // cache reference
+                transform = value;
                 NativeMethods.SenderSetTransform(GetSelfOrThrow(), value.self);
             }
+            get
+            {
+                return transform;
+            }
         }
+
+
 
         /// <summary>
         ///
@@ -131,7 +140,7 @@ namespace Unity.WebRTC
             Marshal.StructureToPtr(instance, ptr, false);
             RTCErrorType type = NativeMethods.SenderSetParameters(GetSelfOrThrow(), ptr);
             Marshal.FreeCoTaskMem(ptr);
-            return new RTCError {errorType = type};
+            return new RTCError { errorType = type };
         }
 
         /// <summary>

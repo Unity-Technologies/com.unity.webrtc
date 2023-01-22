@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -101,7 +102,7 @@ namespace Unity.WebRTC
     /// </summary>
     public class RTCEncodedFrame
     {
-        protected IntPtr self;
+        internal IntPtr self;
 
         /// <summary>
         /// 
@@ -202,7 +203,7 @@ namespace Unity.WebRTC
         internal TransformedFrameCallback callback_;
 
         internal RTCRtpTransform(TrackKind kind, TransformedFrameCallback callback)
-            : base(WebRTC.Context.CreateFrameTransformer(OnSetTransformedFrame))
+            : base(WebRTC.Context.CreateFrameTransformer())
         {
             Kind = kind;
             callback_ = callback;
@@ -212,6 +213,11 @@ namespace Unity.WebRTC
         ~RTCRtpTransform()
         {
             this.Dispose();
+        }
+
+        public void Write(RTCEncodedFrame frame)
+        {
+            NativeMethods.FrameTransformerSendFrameToSink(self, frame.self);
         }
 
         /// <summary>
@@ -228,21 +234,6 @@ namespace Unity.WebRTC
                 WebRTC.Table.Remove(self);
             }
             base.Dispose();
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(DelegateTransformedFrame))]
-        static void OnSetTransformedFrame(IntPtr ptr, IntPtr frame)
-        {
-            // Run on worker thread, not on main thread.
-            if(WebRTC.Table.TryGetValue(ptr, out RTCRtpScriptTransform transform))
-            {
-                RTCEncodedFrame frame_ = null;
-                if (transform.Kind == TrackKind.Video)
-                    frame_ = new RTCEncodedVideoFrame(frame);
-                else
-                    frame_ = new RTCEncodedAudioFrame(frame);
-                transform.callback_(new RTCTransformEvent(frame_));
-            }
         }
     }
 

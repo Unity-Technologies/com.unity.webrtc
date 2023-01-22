@@ -61,6 +61,7 @@ namespace Unity.WebRTC
     public class RTCRtpReceiver : RefCountedObject
     {
         private RTCPeerConnection peer;
+        private RTCRtpTransform transform;
 
         internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
@@ -167,7 +168,13 @@ namespace Unity.WebRTC
         {
             set
             {
+                // cache reference
+                transform = value;
                 NativeMethods.ReceiverSetTransform(GetSelfOrThrow(), value.self);
+            }
+            get
+            {
+                return transform;
             }
         }
 

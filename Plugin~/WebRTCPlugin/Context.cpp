@@ -237,11 +237,6 @@ namespace webrtc
         return m_peerConnectionFactory->CreateVideoTrack(label, source);
     }
 
-    rtc::scoped_refptr<FrameTransformerInterface> Context::CreateFrameTransformer(DelegateTransformedFrame callback)
-    {
-        return rtc::make_ref_counted<EncodedStreamTransformer>(callback);
-    }
-
     void Context::StopMediaStreamTrack(webrtc::MediaStreamTrackInterface* track)
     {
         // todo:(kazuki)

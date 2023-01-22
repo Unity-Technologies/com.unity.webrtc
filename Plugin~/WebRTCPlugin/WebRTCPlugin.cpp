@@ -313,10 +313,10 @@ extern "C"
         context->RemoveRefPtr(ptr);
     }
 
-    UNITY_INTERFACE_EXPORT FrameTransformerInterface*
+    UNITY_INTERFACE_EXPORT EncodedStreamTransformer*
     ContextCreateFrameTransformer(Context* context, DelegateTransformedFrame callback)
     {
-        rtc::scoped_refptr<FrameTransformerInterface> transformer = context->CreateFrameTransformer(callback);
+        rtc::scoped_refptr<EncodedStreamTransformer> transformer = rtc::make_ref_counted<EncodedStreamTransformer>();
         context->AddRefPtr(transformer);
         return transformer.get();
     }
@@ -954,6 +954,11 @@ extern "C"
         unity::webrtc::SetRemoteDescriptionObserver::RegisterCallback(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void SetTransformedFrameRegisterCallback(DelegateTransformedFrame callback)
+    {
+        unity::webrtc::EncodedStreamTransformer::RegisterCallback(callback);
+    }
+
     UNITY_INTERFACE_EXPORT bool
     PeerConnectionAddIceCandidate(PeerConnectionObject* obj, const IceCandidateInterface* candidate)
     {
@@ -1364,9 +1369,11 @@ extern "C"
             return nullptr;
 
         std::vector<::RtpSource> result;
-        std::transform(sources.begin(), sources.end(), std::back_inserter(result), [](webrtc::RtpSource source) {
-            return source;
-        });
+        std::transform(
+            sources.begin(),
+            sources.end(),
+            std::back_inserter(result),
+            [](webrtc::RtpSource source) { return source; });
         return ConvertArray(result, length);
     }
 
@@ -1538,6 +1545,12 @@ extern "C"
     //{
     //    frame->GetHeader();
     //}
+
+    UNITY_INTERFACE_EXPORT void
+    FrameTransformerSendFrameToSink(EncodedStreamTransformer* transformer, TransformableFrameInterface* frame)
+    {
+        transformer->SendFrameToSink(std::move(std::unique_ptr<TransformableFrameInterface>(frame)));
+    }
 
     UNITY_INTERFACE_EXPORT void FrameGetData(TransformableFrameInterface* frame, const uint8_t** data, size_t* size)
     {

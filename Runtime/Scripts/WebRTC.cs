@@ -675,6 +675,7 @@ namespace Unity.WebRTC
             NativeMethods.CreateSessionDescriptionObserverRegisterCallback(OnCreateSessionDescription);
             NativeMethods.SetLocalDescriptionObserverRegisterCallback(OnSetLocalDescription);
             NativeMethods.SetRemoteDescriptionObserverRegisterCallback(OnSetRemoteDescription);
+            NativeMethods.SetTransformedFrameRegisterCallback(OnSetTransformedFrame);
 #if UNITY_IOS && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
@@ -1116,6 +1117,22 @@ namespace Unity.WebRTC
             });
         }
 
+        [AOT.MonoPInvokeCallback(typeof(DelegateTransformedFrame))]
+        static void OnSetTransformedFrame(IntPtr ptr, IntPtr frame)
+        {
+            // Run on worker thread, not on main thread.
+            if (WebRTC.Table.TryGetValue(ptr, out RTCRtpScriptTransform transform))
+            {
+                RTCEncodedFrame frame_;
+                if (transform.Kind == TrackKind.Video)
+                    frame_ = new RTCEncodedVideoFrame(frame);
+                else
+                    frame_ = new RTCEncodedAudioFrame(frame);
+                transform.callback_(new RTCTransformEvent(frame_));
+            }
+        }
+
+
         internal static Context Context { get { return s_context; } }
         internal static WeakReferenceTable Table { get { return s_context?.table; } }
 
@@ -1235,7 +1252,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteRefPtr(IntPtr context, IntPtr ptr);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateFrameTransformer(IntPtr ptr, DelegateTransformedFrame callback);
+        public static extern IntPtr ContextCreateFrameTransformer(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr PeerConnectionGetConfiguration(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
@@ -1250,6 +1267,8 @@ namespace Unity.WebRTC
         public static extern void SetLocalDescriptionObserverRegisterCallback(DelegateSetLocalDescription callback);
         [DllImport(WebRTC.Lib)]
         public static extern void SetRemoteDescriptionObserverRegisterCallback(DelegateSetRemoteDescription callback);
+        [DllImport(WebRTC.Lib)]
+        public static extern void SetTransformedFrameRegisterCallback(DelegateTransformedFrame callback);
         [DllImport(WebRTC.Lib)]
         public static extern void PeerConnectionRegisterIceConnectionChange(IntPtr ptr, DelegateNativeOnIceConnectionChange callback);
         [DllImport(WebRTC.Lib)]
@@ -1545,6 +1564,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool VideoFrameIsKeyFrame(IntPtr frame, [MarshalAs(UnmanagedType.U1)] out bool isKeyFrame);
+        [DllImport(WebRTC.Lib)]
+        public static extern void FrameTransformerSendFrameToSink(IntPtr transform, IntPtr frame);
+
     }
 
     internal static class VideoEncoderMethods
