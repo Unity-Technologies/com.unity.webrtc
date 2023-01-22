@@ -132,7 +132,7 @@ namespace webrtc
         return new MetalTexture2D(width, height, texture);
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+    bool MetalGraphicsDevice::ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<webrtc::I420Buffer> buffer)
     {
         id<MTLTexture> source = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
         const uint32_t width = tex->GetWidth();
@@ -146,28 +146,26 @@ namespace webrtc
         const uint32_t bytesPerRow = width * BYTES_PER_PIXEL;
         const uint32_t bufferSize = bytesPerRow * height;
 
-        std::vector<uint8_t> buffer;
-        buffer.resize(bufferSize);
+        std::vector<uint8_t> dst;
+        dst.resize(bufferSize);
 
-        [source getBytes:buffer.data()
+        [source getBytes:dst.data()
              bytesPerRow:bytesPerRow
               fromRegion:MTLRegionMake2D(0, 0, width, height)
              mipmapLevel:0];
 
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(
-            static_cast<int32_t>(width), static_cast<int32_t>(height));
         libyuv::ARGBToI420(
-            buffer.data(),
+            dst.data(),
             static_cast<int32_t>(bytesPerRow),
-            i420_buffer->MutableDataY(),
-            i420_buffer->StrideY(),
-            i420_buffer->MutableDataU(),
-            i420_buffer->StrideU(),
-            i420_buffer->MutableDataV(),
-            i420_buffer->StrideV(),
+            buffer->MutableDataY(),
+            buffer->StrideY(),
+            buffer->MutableDataU(),
+            buffer->StrideU(),
+            buffer->MutableDataV(),
+            buffer->StrideV(),
             static_cast<int32_t>(width),
             static_cast<int32_t>(height));
-        return i420_buffer;
+        return true;
     }
 
     MTLPixelFormat MetalGraphicsDevice::ConvertFormat(UnityRenderingExtTextureFormat format)

@@ -52,7 +52,7 @@ namespace webrtc
         // Required for software encoding
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;
-        virtual rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) = 0;
+        virtual bool ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<::webrtc::I420Buffer> buffer) = 0;
 
     protected:
         UnityGfxRenderer m_gfxRenderer;

@@ -79,7 +79,7 @@ namespace webrtc
 
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        bool ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<::webrtc::I420Buffer> buffer) override;
 
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }

@@ -62,6 +62,7 @@ namespace webrtc
 
     private:
         IGraphicsDevice* device_;
+        rtc::scoped_refptr<I420Buffer> i420Buffer_;
         UnityRenderingExtTextureFormat format_;
         Size size_;
         std::unique_ptr<ITexture2D> texture_;

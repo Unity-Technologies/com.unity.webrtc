@@ -108,10 +108,13 @@ namespace webrtc
         EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(device()->CopyResourceFromNativeV(dst.get(), src->GetNativeTexturePtrV()));
         EXPECT_TRUE(device()->WaitIdleForTest());
-        const auto frameBuffer = device()->ConvertRGBToI420(dst.get());
-        EXPECT_NE(nullptr, frameBuffer);
-        EXPECT_EQ(width, frameBuffer->width());
-        EXPECT_EQ(height, frameBuffer->height());
+        auto buffer = I420Buffer::Create(width, height);
+        EXPECT_TRUE(device()->ConvertI420Buffer(dst.get(), buffer));
+        EXPECT_NE(nullptr, buffer->DataY());
+        EXPECT_NE(nullptr, buffer->DataU());
+        EXPECT_NE(nullptr, buffer->DataV());
+        EXPECT_EQ(width, buffer->width());
+        EXPECT_EQ(height, buffer->height());
     }
 
     TEST_P(GraphicsDeviceTest, Map)

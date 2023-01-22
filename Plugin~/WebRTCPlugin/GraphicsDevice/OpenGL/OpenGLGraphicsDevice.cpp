@@ -212,7 +212,7 @@ namespace webrtc
 #endif
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> OpenGLGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+    bool OpenGLGraphicsDevice::ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<webrtc::I420Buffer> buffer)
     {
         if (!OpenGLContext::CurrentContext())
             contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
@@ -224,7 +224,6 @@ namespace webrtc
         const uint32_t width = sourceTex->GetWidth();
         const uint32_t height = sourceTex->GetHeight();
         const uint32_t bufferSize = sourceTex->GetBufferSize();
-        byte* data = sourceTex->GetBuffer();
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
         glBindTexture(GL_TEXTURE_2D, sourceId);
@@ -233,28 +232,26 @@ namespace webrtc
 
         // Send PBO to main memory
         GLubyte* pboPtr = static_cast<GLubyte*>(glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, bufferSize, GL_MAP_READ_BIT));
-        if (pboPtr)
-        {
-            std::memcpy(data, pboPtr, bufferSize);
-            glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-        }
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        if (!pboPtr)
+            return false;
 
-        // RGBA -> I420
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
         libyuv::ABGRToI420(
-            static_cast<uint8_t*>(data),
+            static_cast<uint8_t*>(pboPtr),
             width * 4,
-            i420_buffer->MutableDataY(),
+            buffer->MutableDataY(),
             width,
-            i420_buffer->MutableDataU(),
+            buffer->MutableDataU(),
             (width + 1) / 2,
-            i420_buffer->MutableDataV(),
+            buffer->MutableDataV(),
             (width + 1) / 2,
             width,
             height);
-        return i420_buffer;
+
+        glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+        return true;
     }
 
     std::unique_ptr<GpuMemoryBufferHandle> OpenGLGraphicsDevice::Map(ITexture2D* texture)

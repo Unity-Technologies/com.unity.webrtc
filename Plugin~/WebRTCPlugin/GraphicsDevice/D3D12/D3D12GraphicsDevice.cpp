@@ -313,18 +313,18 @@ namespace webrtc
         return tex;
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
+    bool
+    D3D12GraphicsDevice::ConvertI420Buffer(const ITexture2D* baseTex, rtc::scoped_refptr<webrtc::I420Buffer> buffer)
     {
-        D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
+        const D3D12Texture2D* tex = reinterpret_cast<const D3D12Texture2D*>(baseTex);
         assert(nullptr != tex);
         if (nullptr == tex)
-            return nullptr;
+            return false;
 
         ID3D12Resource* readbackResource = tex->GetReadbackResource();
         assert(nullptr != readbackResource);
         if (nullptr == readbackResource) // the texture has to be prepared for CPU access
-            return nullptr;
+            return false;
 
         const int width = static_cast<int>(tex->GetWidth());
         const int height = static_cast<int>(tex->GetHeight());
@@ -337,27 +337,25 @@ namespace webrtc
         assert(hr == S_OK);
         if (hr != S_OK)
         {
-            return nullptr;
+            return false;
         }
 
         // RGBA -> I420
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
         libyuv::ARGBToI420(
             static_cast<uint8_t*>(data),
             rowPitch,
-            i420_buffer->MutableDataY(),
-            i420_buffer->StrideY(),
-            i420_buffer->MutableDataU(),
-            i420_buffer->StrideU(),
-            i420_buffer->MutableDataV(),
-            i420_buffer->StrideV(),
+            buffer->MutableDataY(),
+            buffer->StrideY(),
+            buffer->MutableDataU(),
+            buffer->StrideU(),
+            buffer->MutableDataV(),
+            buffer->StrideV(),
             width,
             height);
 
         D3D12_RANGE emptyRange { 0, 0 };
         readbackResource->Unmap(0, &emptyRange);
-
-        return i420_buffer;
+        return true;
     }
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)

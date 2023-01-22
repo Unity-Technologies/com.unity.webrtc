@@ -85,10 +85,10 @@ namespace webrtc
             RTC_DCHECK_NOTREACHED();
             return nullptr;
         }
-        rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override
+        bool ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<::webrtc::I420Buffer> buffer) override
         {
             RTC_DCHECK_NOTREACHED();
-            return nullptr;
+            return false;
         }
 
 #if CUDA_PLATFORM

@@ -30,7 +30,7 @@ namespace webrtc
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
-        virtual rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        bool ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<::webrtc::I420Buffer> buffer) override;
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }

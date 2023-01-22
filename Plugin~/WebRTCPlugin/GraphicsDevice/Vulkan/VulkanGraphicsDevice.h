@@ -57,7 +57,7 @@ namespace webrtc
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
         bool WaitIdleForTest() override;
-        rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        bool ConvertI420Buffer(const ITexture2D* tex, rtc::scoped_refptr<I420Buffer> buffer) override;
 
 #if CUDA_PLATFORM
         bool IsCudaSupport() override { return m_isCudaSupport; }

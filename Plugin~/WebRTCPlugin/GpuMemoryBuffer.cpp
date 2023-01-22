@@ -77,7 +77,18 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "WaitSync failed.";
             return nullptr;
         }
-        return device_->ConvertRGBToI420(textureCpuRead_.get());
+        if (!i420Buffer_)
+        {
+            int width = static_cast<int>(textureCpuRead_->GetWidth());
+            int height = static_cast<int>(textureCpuRead_->GetHeight());
+            i420Buffer_ = I420Buffer::Create(width, height);
+        }
+        if(!device_->ConvertI420Buffer(textureCpuRead_.get(), i420Buffer_))
+        {
+            RTC_LOG(LS_INFO) << "ConvertI420Buffer failed.";
+            return nullptr;
+        }
+        return i420Buffer_;
     }
 
     const GpuMemoryBufferHandle* GpuMemoryBufferFromUnity::handle() const
