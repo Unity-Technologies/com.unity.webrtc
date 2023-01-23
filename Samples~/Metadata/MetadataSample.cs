@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Unity.Collections;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
 using UnityEngine.UI;
@@ -88,13 +89,23 @@ class MetadataSample : MonoBehaviour
         receiver.Transform = new RTCRtpScriptTransform(TrackKind.Video, e => OnReceiverTransform(receiver.Transform, e));
     }
 
+    static int lengthMetadata = 0;
+
     void OnSenderTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
+        var data = e.Frame.GetData();
+        // var updated = new NativeArray<byte>(data.Length + lengthMetadata, Allocator.Temp);
+        // NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: updated, dstIndex: lengthMetadata, length: data.Length);
+        //e.Frame.SetData(updated.AsReadOnly());
         transform.Write(e.Frame);
     }
 
     void OnReceiverTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
+        // var data = e.Frame.GetData();
+        // var updated = new NativeArray<byte>(data.Length - lengthMetadata, Allocator.Temp);
+        // NativeArray<byte>.Copy(src: data, srcIndex: lengthMetadata, dst: updated, dstIndex: 0, length: updated.Length);
+        // e.Frame.SetData(updated.AsReadOnly());
         transform.Write(e.Frame);
     }
 
