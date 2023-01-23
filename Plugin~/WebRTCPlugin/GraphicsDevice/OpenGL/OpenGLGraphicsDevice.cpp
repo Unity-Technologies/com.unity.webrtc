@@ -217,7 +217,7 @@ namespace webrtc
         if (!OpenGLContext::CurrentContext())
             contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
 
-        OpenGLTexture2D* sourceTex = static_cast<OpenGLTexture2D*>(tex);
+        const OpenGLTexture2D* sourceTex = static_cast<const OpenGLTexture2D*>(tex);
         const GLuint sourceId = reinterpret_cast<uintptr_t>(sourceTex->GetNativeTexturePtrV());
         const GLuint pbo = sourceTex->GetPBO();
         const GLenum format = GL_RGBA;
