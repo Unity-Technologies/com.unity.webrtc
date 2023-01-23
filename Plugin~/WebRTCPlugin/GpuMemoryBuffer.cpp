@@ -83,7 +83,7 @@ namespace webrtc
             int height = static_cast<int>(textureCpuRead_->GetHeight());
             i420Buffer_ = I420Buffer::Create(width, height);
         }
-        if(!device_->ConvertI420Buffer(textureCpuRead_.get(), i420Buffer_))
+        if (!device_->ConvertI420Buffer(textureCpuRead_.get(), i420Buffer_))
         {
             RTC_LOG(LS_INFO) << "ConvertI420Buffer failed.";
             return nullptr;
