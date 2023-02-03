@@ -244,7 +244,15 @@ namespace webrtc
             5;
         m_encodeConfig.rcParams.vbvInitialDelay = m_encodeConfig.rcParams.vbvBufferSize;
 
-        m_encoder->CreateEncoder(&m_initializeParams);
+        try
+        {
+            m_encoder->CreateEncoder(&m_initializeParams);
+        }
+        catch (const NVENCException& e)
+        {
+            RTC_LOG(LS_ERROR) << "Failed Initialize NvEncoder " << e.what();
+            return WEBRTC_VIDEO_CODEC_ERROR;
+        }
 
         return WEBRTC_VIDEO_CODEC_OK;
     }
@@ -577,7 +585,15 @@ namespace webrtc
             5;
         reInitCodecConfig.rcParams.vbvInitialDelay = m_encodeConfig.rcParams.vbvBufferSize;
 
-        m_encoder->Reconfigure(&reconfigureParams);
+        try
+        {
+            m_encoder->Reconfigure(&reconfigureParams);
+        }
+        catch (const NVENCException& e)
+        {
+            RTC_LOG(LS_ERROR) << "Failed Reconfigure NvEncoder " << e.what();
+            return;
+        }
 
         // Force send Keyframe
         m_configurations[0].SetStreamState(true);
