@@ -88,10 +88,8 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                if (WebRTC.Table.TryGetValue(self, out object value) && value == this)
-                {
-                    WebRTC.Table.Remove(self);
-                }
+//                transform?.Dispose();
+                WebRTC.Table.Remove(self);
             }
             base.Dispose();
         }

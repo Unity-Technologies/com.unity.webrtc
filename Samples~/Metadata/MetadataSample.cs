@@ -96,16 +96,16 @@ class MetadataSample : MonoBehaviour
         var data = e.Frame.GetData();
         // var updated = new NativeArray<byte>(data.Length + lengthMetadata, Allocator.Temp);
         // NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: updated, dstIndex: lengthMetadata, length: data.Length);
-        //e.Frame.SetData(updated.AsReadOnly());
+        e.Frame.SetData(data);
         transform.Write(e.Frame);
     }
 
     void OnReceiverTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
-        // var data = e.Frame.GetData();
+        var data = e.Frame.GetData();
         // var updated = new NativeArray<byte>(data.Length - lengthMetadata, Allocator.Temp);
         // NativeArray<byte>.Copy(src: data, srcIndex: lengthMetadata, dst: updated, dstIndex: 0, length: updated.Length);
-        // e.Frame.SetData(updated.AsReadOnly());
+        e.Frame.SetData(data);
         transform.Write(e.Frame);
     }
 
