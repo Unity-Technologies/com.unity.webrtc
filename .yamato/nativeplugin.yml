@@ -20,7 +20,7 @@ build_platforms:
   - name: macos
     type: Unity::metal::macmini
     flavor: m1.mac
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     build_command: BuildScripts~/build_plugin_mac.sh
     build_testrunner_command: BuildScripts~/build_testrunner_mac.sh
     plugin_path: Runtime/Plugins/macOS/libwebrtc.dylib
@@ -28,7 +28,7 @@ build_platforms:
   - name: ios
     type: Unity::metal::macmini
     flavor: m1.mac
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     build_command: BuildScripts~/build_plugin_ios.sh
     build_testrunner_command: BuildScripts~/build_testrunner_ios.sh
     plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
@@ -60,15 +60,15 @@ test_platforms:
   - name: macos
     type: Unity::metal::macmini
     gpu_type: Unity::metal::macmini
-    image: package-ci/mac:v1.21.1-1092905
-    gpu_image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
+    gpu_image: package-ci/macos-12:v4.10.0-1271191
     flavor: m1.mac
 # todo(kazuki): Need to support native test on iOS. 
 #  - name: ios
 #    type: Unity::metal::macmini
 #    gpu_type: Unity::metal::macmini
-#    image: package-ci/mac:v1.21.1-1092905
-#    gpu_image: package-ci/mac:v1.21.1-1092905
+#    image: package-ci/macos-12:v4.10.0-1271191
+#    gpu_image: package-ci/macos-12:v4.10.0-1271191
 #    flavor: m1.mac
   - name: android
     type: Unity::mobile::shield
