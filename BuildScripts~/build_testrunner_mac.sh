@@ -3,6 +3,10 @@
 export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M107/webrtc-mac.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 
+# Install cmake
+export HOMEBREW_NO_AUTO_UPDATE=1
+brew install cmake
+
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip
