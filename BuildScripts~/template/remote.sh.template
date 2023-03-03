@@ -41,6 +41,9 @@ then
   suite=editor
 fi
 
+# workaround: upgrade pip
+python3 -m pip install --upgrade pip
+
 # install unity-downloader-cli
 pip3 install unity-downloader-cli                                                     \
   --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple \

@@ -85,7 +85,7 @@ test_targets:
         platform: standalone
   - name: macos
     type: Unity::metal::macmini
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     flavor: m1.mac
     architecture: x64
     gfx_types:
@@ -110,7 +110,7 @@ test_targets:
         platform: standalone
   - name: macos-m1
     type: Unity::metal::devkit
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     flavor: m1.mac
     architecture: arm64
     gfx_types:
@@ -216,7 +216,7 @@ build_{{ package.name }}_{{ editor.version }}_ios:
   name : Build {{ package.packagename }} with {{ editor.version }} for ios device
   agent:
     type: Unity::VM::osx
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     flavor: b1.large
   commands:
     - |
@@ -241,7 +241,8 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
     type: Unity::mobile::iPhone
-    image: mobile/ios-macos-11:v0.1.2-1078219
+    image: package-ci/macos-12:v4.10.0-1271191
+    model: SE
     flavor: b1.medium
   skip_checkout: true
   dependencies:
@@ -263,7 +264,7 @@ build_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
   name : Build {{ package.packagename }} with {{ editor.version }} for android device {{ target.name }}
   agent:
     type: Unity::VM::osx
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     flavor: b1.xlarge
   commands:
     - |
@@ -350,7 +351,7 @@ build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name
   name : Build {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
     type: Unity::VM::osx
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     flavor: m1.mac
   commands:
     - |

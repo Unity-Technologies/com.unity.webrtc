@@ -18,7 +18,7 @@ platforms:
     model: rtx2080
   - name: macos
     type: Unity::metal::macmini
-    image: package-ci/mac:v1.21.1-1092905
+    image: package-ci/macos-12:v4.10.0-1271191
     flavor: m1.mac
 ---
 
