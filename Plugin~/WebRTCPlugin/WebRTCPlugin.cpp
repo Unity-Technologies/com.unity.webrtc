@@ -1520,7 +1520,6 @@ extern "C"
         int spacialIndex;
         int temporalIndex;
         MarshallArray<int64_t> dependencies;
-        //        MarshallArray<const int64_t> dependencies;
     };
 
     UNITY_INTERFACE_EXPORT void
@@ -1537,19 +1536,12 @@ extern "C"
         data_->spacialIndex = metadata.GetSpatialIndex();
         data_->temporalIndex = metadata.GetTemporalIndex();
         data_->dependencies = metadata.GetFrameDependencies();
-        //        data->dependencies = metadata.GetDecodeTargetIndications();
     }
-
-    // UNITY_INTERFACE_EXPORT void AudioFrameGetMetadata(
-    //    TransformableAudioFrameInterface* frame, RTCVideoFrameMetadata** data)
-    //{
-    //    frame->GetHeader();
-    //}
 
     UNITY_INTERFACE_EXPORT void
     FrameTransformerSendFrameToSink(EncodedStreamTransformer* transformer, TransformableFrameInterface* frame)
     {
-        transformer->SendFrameToSink(std::move(std::unique_ptr<TransformableFrameInterface>(frame)));
+        transformer->SendFrameToSink(std::unique_ptr<TransformableFrameInterface>(frame));
     }
 
     UNITY_INTERFACE_EXPORT void FrameGetData(TransformableFrameInterface* frame, const uint8_t** data, size_t* size)
