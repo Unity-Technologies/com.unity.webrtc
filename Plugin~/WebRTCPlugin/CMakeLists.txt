@@ -11,7 +11,7 @@ target_sources(
           DummyAudioDevice.cpp
           DummyAudioDevice.h
           EncodedStreamTransformer.cpp
-          EncodedStreamTransformer.h      
+          EncodedStreamTransformer.h
           AudioTrackSinkAdapter.h
           AudioTrackSinkAdapter.cpp
           Logger.cpp
