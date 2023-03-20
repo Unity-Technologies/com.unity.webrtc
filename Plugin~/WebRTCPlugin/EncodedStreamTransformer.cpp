@@ -8,9 +8,7 @@ namespace webrtc
 {
     DelegateTransformedFrame EncodedStreamTransformer::s_callback = nullptr;
 
-    EncodedStreamTransformer::EncodedStreamTransformer()
-    {
-    }
+    EncodedStreamTransformer::EncodedStreamTransformer() { }
 
     void EncodedStreamTransformer::RegisterTransformedFrameSinkCallback(
         rtc::scoped_refptr<webrtc::TransformedFrameCallback> callback, uint32_t ssrc)
@@ -43,8 +41,9 @@ namespace webrtc
         sink_callbacks_.erase(std::remove_if(
             sink_callbacks_.begin(),
             sink_callbacks_.end(),
-            [ssrc](std::pair<uint32_t, rtc::scoped_refptr<webrtc::TransformedFrameCallback>> v)
-            { return v.first == ssrc; }));
+            [ssrc](std::pair<uint32_t, rtc::scoped_refptr<webrtc::TransformedFrameCallback>> v) {
+                return v.first == ssrc;
+            }));
     }
 
     void EncodedStreamTransformer::Transform(std::unique_ptr<::webrtc::TransformableFrameInterface> frame)

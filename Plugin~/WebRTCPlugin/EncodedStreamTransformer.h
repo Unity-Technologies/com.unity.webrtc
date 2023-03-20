@@ -24,8 +24,7 @@ namespace webrtc
 
         void RegisterTransformedFrameSinkCallback(
             rtc::scoped_refptr<webrtc::TransformedFrameCallback> callback, uint32_t ssrc) override;
-        void RegisterTransformedFrameCallback(
-            rtc::scoped_refptr<TransformedFrameCallback> callback) override;
+        void RegisterTransformedFrameCallback(rtc::scoped_refptr<TransformedFrameCallback> callback) override;
 
         void UnregisterTransformedFrameCallback() override;
         void UnregisterTransformedFrameSinkCallback(uint32_t ssrc) override;
