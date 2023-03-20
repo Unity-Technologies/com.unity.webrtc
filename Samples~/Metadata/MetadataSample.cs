@@ -15,13 +15,13 @@ class MetadataSample : MonoBehaviour
     [SerializeField] private Button callButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button hangUpButton;
-    [SerializeField] private Text localCandidateId;
-    [SerializeField] private Text remoteCandidateId;
 
     [SerializeField] private Camera cam;
     [SerializeField] private RawImage sourceImage;
     [SerializeField] private RawImage receiveImage;
     [SerializeField] private Transform rotateObject;
+    [SerializeField] private InputField metadataInput;
+    [SerializeField] private Text metadataOutput;
 #pragma warning restore 0649
 
     private RTCPeerConnection _pc1, _pc2;
@@ -35,6 +35,15 @@ class MetadataSample : MonoBehaviour
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private bool videoUpdateStarted;
+
+    private readonly object metadataInputLock = new object();
+    private readonly object metadataOutputLock = new object();
+
+    private NativeArray<byte> metadataArray;
+    private NativeArray<byte> senderArray;
+    private NativeArray<byte> receiverArray;
+    private byte[] metadataOutputArray;
+
 
     private void Awake()
     {
@@ -52,6 +61,7 @@ class MetadataSample : MonoBehaviour
         callButton.interactable = false;
         restartButton.interactable = false;
         hangUpButton.interactable = false;
+        metadataInput.onValueChanged.AddListener(OnChangedMetadata);
 
         pc1OnIceConnectionChange = state => { OnIceConnectionChange(_pc1, state); };
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
@@ -79,6 +89,28 @@ class MetadataSample : MonoBehaviour
         };
     }
 
+    private void OnChangedMetadata(string data)
+    {
+        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(data);
+
+        lock (metadataInputLock)
+        {
+            if (metadataArray.IsCreated)
+                metadataArray.Dispose();
+            metadataArray = new NativeArray<byte>(bytes, Allocator.Persistent);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (metadataArray.IsCreated)
+            metadataArray.Dispose();
+        if (senderArray.IsCreated)
+            senderArray.Dispose();
+        if (receiverArray.IsCreated)
+            receiverArray.Dispose();
+    }
+
     private void SetUpSenderTransform(RTCRtpSender sender)
     {
         sender.Transform = new RTCRtpScriptTransform(TrackKind.Video, e => OnSenderTransform(sender.Transform, e));
@@ -89,24 +121,53 @@ class MetadataSample : MonoBehaviour
         receiver.Transform = new RTCRtpScriptTransform(TrackKind.Video, e => OnReceiverTransform(receiver.Transform, e));
     }
 
-    static int lengthMetadata = 0;
-
     void OnSenderTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
-        var data = e.Frame.GetData();
-        // var updated = new NativeArray<byte>(data.Length + lengthMetadata, Allocator.Temp);
-        // NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: updated, dstIndex: lengthMetadata, length: data.Length);
-        e.Frame.SetData(data);
-        transform.Write(e.Frame);
+        lock (metadataInputLock)
+        {
+            var data = e.Frame.GetData();
+            var length = 1 + metadataArray.Length + data.Length;
+
+            // resize NativeArray
+            if (length > senderArray.Length)
+            {
+                if (senderArray.IsCreated)
+                    senderArray.Dispose();
+                senderArray = new NativeArray<byte>(length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            }
+
+            // metadata length (< 256)
+            NativeArray<byte>.Copy(src: new byte[] { (byte)metadataArray.Length }, srcIndex: 0, dst: senderArray, dstIndex: 0, length: 1);
+
+            // metadata
+            if (metadataArray.IsCreated)
+                NativeArray<byte>.Copy(src: metadataArray, srcIndex: 0, dst: senderArray, dstIndex: 1, length: metadataArray.Length);
+
+            // encoded data
+            NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: senderArray, dstIndex: 1 + metadataArray.Length, length: data.Length);
+
+            e.Frame.SetData(senderArray.AsReadOnly(), 0, length);
+            transform.Write(e.Frame);
+        }
     }
 
     void OnReceiverTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
         var data = e.Frame.GetData();
-        // var updated = new NativeArray<byte>(data.Length - lengthMetadata, Allocator.Temp);
-        // NativeArray<byte>.Copy(src: data, srcIndex: lengthMetadata, dst: updated, dstIndex: 0, length: updated.Length);
-        e.Frame.SetData(data);
+        var metadataLength = data[0];
+        var length = data.Length - (1 + metadataLength);
+        e.Frame.SetData(data, 1 + metadataLength, length);
         transform.Write(e.Frame);
+
+        lock(metadataOutputLock)
+        {
+            if (metadataOutputArray == null || metadataOutputArray.Length != metadataLength)
+                metadataOutputArray = new byte[metadataLength];
+            for (int i = 0; i < metadataLength; i++)
+            {
+                metadataOutputArray[i] = data[i + 1];
+            }
+        }
     }
 
     private void OnStart()
@@ -129,6 +190,12 @@ class MetadataSample : MonoBehaviour
         {
             float t = Time.deltaTime;
             rotateObject.Rotate(100 * t, 200 * t, 300 * t);
+        }
+
+        lock(metadataOutputLock)
+        {
+            if(metadataOutputArray != null)
+                metadataOutput.text = System.Text.Encoding.UTF8.GetString(metadataOutputArray);
         }
     }
 
@@ -194,10 +261,6 @@ class MetadataSample : MonoBehaviour
         {
             yield break;
         }
-
-        //Debug.Log($"{GetName(pc)} candidate stats Id:{remoteCandidateStats.Id}, Type:{remoteCandidateStats.candidateType}");
-        //var updateText = GetName(pc) == "pc1" ? localCandidateId : remoteCandidateId;
-        //updateText.text = remoteCandidateStats.Id;
     }
 
     IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)

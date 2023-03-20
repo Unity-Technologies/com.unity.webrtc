@@ -143,6 +143,22 @@ namespace Unity.WebRTC
             }
         }
 
+        public void SetData(NativeArray<byte>.ReadOnly data, int startIndex, int length)
+        {
+            unsafe
+            {
+                NativeMethods.FrameSetData(self, IntPtr.Add(new IntPtr(data.GetUnsafeReadOnlyPtr()), startIndex), length);
+            }
+        }
+
+        public void SetData(NativeSlice<byte> data)
+        {
+            unsafe
+            {
+                NativeMethods.FrameSetData(self, new IntPtr(data.GetUnsafeReadOnlyPtr()), data.Length);
+            }
+        }
+
         internal RTCEncodedFrame(IntPtr ptr)
         {
             this.self = ptr;
