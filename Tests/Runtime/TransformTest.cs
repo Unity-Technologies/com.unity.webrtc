@@ -74,40 +74,7 @@ namespace Unity.WebRTC.RuntimeTest
             audioFrame.SetData(array);
         }
 
-        class CountdownEvent<T> : CountdownEvent
-        {
-            public T Result { get; private set; }
-
-            public CountdownEvent(int initialCount) : base(initialCount) {}
-
-            public bool Signal(T result)
-            {
-                Result = result;
-                return Signal();
-            }
-        }
-
-        Action<T> CatchException<T>(Action<T> callback, CountdownEvent<Exception> cde)
-        {
-            Action<T> callback_ = e =>
-            {
-                Exception exception = null;
-                try
-                {
-                    callback(e);
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
-                }
-                cde.Signal(exception);
-            };
-            return callback_;
-        }
-
-
         [Test]
-        [Category("RTCRtpTransform")]
         public void CreateVideoTransform()
         {
             void TransformedFrame(RTCTransformEvent e) {}
@@ -118,7 +85,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpTransform")]
         public void CreateAudioTransform()
         {
             void TransformedFrame(RTCTransformEvent e) { }
@@ -129,7 +95,6 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        [Category("RTCRtpTransform")]
         public void SenderSetTransform()
         {
             void TransformedFrame(RTCTransformEvent e) { }
@@ -148,7 +113,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("RTCRtpTransform")]
         public IEnumerator ReceiverSetTransform()
         {
             var rt = CreateRenderTexture();
@@ -173,7 +137,6 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("RTCRtpTransform")]
         public IEnumerator TransformedAudioFrameCallback()
         {
             GameObject obj = new GameObject("audio");
@@ -184,10 +147,9 @@ namespace Unity.WebRTC.RuntimeTest
             source.Play();
             var test = new MonoBehaviourTest<SignalingPeers>();
             var sender = test.component.AddTrack(0, track);
-            var cde = new CountdownEvent<Exception>(1);
-
-            var callback = new TransformedFrameCallback(
-                CatchException<RTCTransformEvent>(OnTransformedAudioFrame, cde));
+            var raisedTransformedFrame = false;
+            void TransformedFrame(RTCTransformEvent e) { raisedTransformedFrame = true; }
+            TransformedFrameCallback callback = TransformedFrame;
             RTCRtpScriptTransform transform =
                 new RTCRtpScriptTransform(TrackKind.Audio, callback);
             sender.Transform = transform;
@@ -195,12 +157,10 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             yield return new WaitUntil(() => test.component.GetPeerReceivers(1).Any());
             var receiver = test.component.GetPeerReceivers(1).First();
+            test.component.CoroutineUpdate();
 
-            yield return new WaitForSeconds(0.1f);
-
-            // waiting another thread.
-            cde.Wait(1000);
-            Assert.That(() => cde.Result, Is.Null);
+            yield return new WaitUntil(() => raisedTransformedFrame);
+            Assert.That(raisedTransformedFrame, Is.True);
 
             transform.Dispose();
             test.component.Dispose();
@@ -211,17 +171,15 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
-        [Category("RTCRtpTransform")]
         public IEnumerator TransformedVideoFrameCallback()
         {
             var rt = CreateRenderTexture();
             var track = new VideoStreamTrack(rt);
             var test = new MonoBehaviourTest<SignalingPeers>();
             var sender = test.component.AddTrack(0, track);
-            var cde = new CountdownEvent<Exception>(1);
-
-            var callback = new TransformedFrameCallback(
-                CatchException<RTCTransformEvent>(OnTransformedVideoFrame, cde));
+            var raisedTransformedFrame = false;
+            void TransformedFrame(RTCTransformEvent e) { raisedTransformedFrame = true; }
+            TransformedFrameCallback callback = TransformedFrame;
             RTCRtpScriptTransform transform =
                 new RTCRtpScriptTransform(TrackKind.Video, callback);
             sender.Transform = transform;
@@ -229,13 +187,10 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             yield return new WaitUntil(() => test.component.GetPeerReceivers(1).Any());
             var receiver = test.component.GetPeerReceivers(1).First();
-
             test.component.CoroutineUpdate();
-            yield return new WaitForSeconds(0.1f);
 
-            // waiting another thread.
-            cde.Wait(1000);
-            Assert.That(() => cde.Result, Is.Null);
+            yield return new WaitUntil(() => raisedTransformedFrame);
+            Assert.That(raisedTransformedFrame, Is.True);
 
             transform.Dispose();
             test.component.Dispose();
