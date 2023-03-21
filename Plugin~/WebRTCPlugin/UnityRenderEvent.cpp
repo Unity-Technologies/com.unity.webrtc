@@ -292,20 +292,14 @@ extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
     return OnRenderEvent;
 }
 
-extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventID()
-{
-    return s_renderEventID;
-}
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventID() { return s_renderEventID; }
 
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersFunc(Context* context)
 {
     return OnReleaseBuffers;
 }
 
-extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersEventID()
-{
-    return s_releaseBuffersEventID;
-}
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersEventID() { return s_releaseBuffersEventID; }
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {
