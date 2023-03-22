@@ -445,7 +445,8 @@ namespace webrtc
         picParams.encodePicFlags = 0;
         if (send_key_frame)
         {
-            picParams.encodePicFlags = NV_ENC_PIC_FLAG_FORCEINTRA | NV_ENC_PIC_FLAG_FORCEIDR;
+            picParams.encodePicFlags =
+                NV_ENC_PIC_FLAG_FORCEINTRA | NV_ENC_PIC_FLAG_FORCEIDR | NV_ENC_PIC_FLAG_OUTPUT_SPSPPS;
             m_configurations[0].key_frame_request = false;
         }
 
