@@ -148,8 +148,12 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             var sender = test.component.AddTrack(0, track);
             var raisedTransformedFrame = false;
-            void TransformedFrame(RTCTransformEvent e) { raisedTransformedFrame = true; }
-            TransformedFrameCallback callback = OnTransformedAudioFrame;
+            void TransformedFrame(RTCTransformEvent e)
+            {
+                OnTransformedAudioFrame(e);
+                raisedTransformedFrame = true;
+            }
+            TransformedFrameCallback callback = TransformedFrame;
             RTCRtpScriptTransform transform =
                 new RTCRtpScriptTransform(TrackKind.Audio, callback);
             sender.Transform = transform;
@@ -182,8 +186,12 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             var sender = test.component.AddTrack(0, track);
             var raisedTransformedFrame = false;
-            void TransformedFrame(RTCTransformEvent e) { raisedTransformedFrame = true; }
-            TransformedFrameCallback callback = OnTransformedVideoFrame;
+            void TransformedFrame(RTCTransformEvent e)
+            {
+                OnTransformedVideoFrame(e);
+                raisedTransformedFrame = true;
+            }
+            TransformedFrameCallback callback = TransformedFrame;
             RTCRtpScriptTransform transform =
                 new RTCRtpScriptTransform(TrackKind.Video, callback);
             sender.Transform = transform;
