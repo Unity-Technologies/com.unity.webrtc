@@ -1465,7 +1465,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetRenderEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
+        public static extern int GetRenderEventID();
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetReleaseBuffersFunc(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern int GetReleaseBuffersEventID();
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
@@ -1526,16 +1530,16 @@ namespace Unity.WebRTC
     {
         static CommandBuffer _command = new CommandBuffer();
 
-        public static void Encode(IntPtr callback, IntPtr data)
+        public static void Encode(IntPtr callback, int eventID, IntPtr data)
         {
-            _command.IssuePluginEventAndData(callback, 0, data);
+            _command.IssuePluginEventAndData(callback, eventID, data);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }
 
-        public static void ReleaseBuffers(IntPtr callback)
+        public static void ReleaseBuffers(IntPtr callback, int eventID)
         {
-            _command.IssuePluginEventAndData(callback, 0, IntPtr.Zero);
+            _command.IssuePluginEventAndData(callback, eventID, IntPtr.Zero);
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }

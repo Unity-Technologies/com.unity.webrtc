@@ -15,11 +15,6 @@
 #include "UnityVulkanInterfaceFunctions.h"
 #endif
 
-enum class VideoStreamRenderEventID
-{
-    Encode = 1,
-};
-
 using namespace unity::webrtc;
 using namespace ::webrtc;
 
@@ -41,6 +36,8 @@ namespace webrtc
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
     static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
+    static int s_renderEventID = 0;
+    static int s_releaseBuffersEventID = 0;
 
     IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
 
@@ -86,6 +83,10 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         if (renderer == kUnityGfxRendererNull)
             break;
 
+        // Reserve eventID range to use for custom plugin events.
+        s_renderEventID = s_UnityInterfaces->Get<IUnityGraphics>()->ReserveEventIDRange(2);
+        s_releaseBuffersEventID = s_renderEventID + 1;
+
 #if defined(SUPPORT_VULKAN)
         if (renderer == kUnityGfxRendererVulkan)
         {
@@ -98,15 +99,24 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
                 RTC_LOG(LS_INFO) << "LoadVulkanFunctions failed";
                 return;
             }
+
             /// note::
             /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
             /// managed code.
             UnityVulkanPluginEventConfig encodeEventConfig;
             encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
-            encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureInside;
+            encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
             encodeEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
                 kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
-            vulkan->ConfigureEvent(static_cast<int>(VideoStreamRenderEventID::Encode), &encodeEventConfig);
+
+            UnityVulkanPluginEventConfig releaseBufferEventConfig;
+            releaseBufferEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
+            releaseBufferEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_DontCare;
+            releaseBufferEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
+                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+
+            vulkan->ConfigureEvent(s_renderEventID, &encodeEventConfig);
+            vulkan->ConfigureEvent(s_releaseBuffersEventID, &releaseBufferEventConfig);
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));
@@ -229,6 +239,8 @@ struct EncodeData
 // So, we comment out `DebugLog`.
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 {
+    if (eventID != s_renderEventID)
+        return;
     if (!s_context)
         return;
     if (!ContextManager::GetInstance()->Exists(s_context))
@@ -267,6 +279,8 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
 
 static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
 {
+    if (eventID != s_releaseBuffersEventID)
+        return;
     // Release all buffers.
     if (s_bufferPool)
         s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
@@ -278,10 +292,14 @@ extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
     return OnRenderEvent;
 }
 
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventID() { return s_renderEventID; }
+
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersFunc(Context* context)
 {
     return OnReleaseBuffers;
 }
+
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersEventID() { return s_releaseBuffersEventID; }
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {
