@@ -63,7 +63,9 @@ namespace Unity.WebRTC
         private int id;
         private bool disposed;
         private IntPtr renderFunction;
+        private int renderEventID = -1;
         private IntPtr releaseBuffersFunction;
+        private int releaseBuffersEventID = -1;
         private IntPtr textureUpdateFunction;
 
         public static Context Create(int id = 0)
@@ -230,9 +232,19 @@ namespace Unity.WebRTC
             return NativeMethods.GetRenderEventFunc(self);
         }
 
+        public int GetRenderEventID()
+        {
+            return NativeMethods.GetRenderEventID();
+        }
+
         public IntPtr GetReleaseBufferFunc()
         {
             return NativeMethods.GetReleaseBuffersFunc(self);
+        }
+
+        public int GetReleaseBufferEventID()
+        {
+            return NativeMethods.GetReleaseBuffersEventID();
         }
 
         public IntPtr GetUpdateTextureFunc()
@@ -299,13 +311,15 @@ namespace Unity.WebRTC
         internal void Encode(IntPtr ptr)
         {
             renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            VideoEncoderMethods.Encode(renderFunction, ptr);
+            renderEventID = renderEventID == -1 ? GetRenderEventID() : renderEventID;
+            VideoEncoderMethods.Encode(renderFunction, renderEventID, ptr);
         }
 
         internal void ReleaseBuffers()
         {
             releaseBuffersFunction = releaseBuffersFunction == IntPtr.Zero ? GetReleaseBufferFunc() : releaseBuffersFunction;
-            VideoEncoderMethods.ReleaseBuffers(releaseBuffersFunction);
+            releaseBuffersEventID = releaseBuffersEventID == -1 ? GetReleaseBufferEventID() : releaseBuffersEventID;
+            VideoEncoderMethods.ReleaseBuffers(releaseBuffersFunction, releaseBuffersEventID);
         }
 
         internal void UpdateRendererTexture(uint rendererId, UnityEngine.Texture texture)

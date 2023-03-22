@@ -339,12 +339,13 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(error, Is.EqualTo(RTCErrorType.None));
 
             var callback = NativeMethods.GetRenderEventFunc(context);
+            int encodeEventID = NativeMethods.GetRenderEventID();
             yield return new WaitForSeconds(1.0f);
 
             VideoTrackSource.EncodeData data = new VideoTrackSource.EncodeData(renderTexture, source);
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoTrackSource.EncodeData)));
             Marshal.StructureToPtr(data, ptr, true);
-            VideoEncoderMethods.Encode(callback, ptr);
+            VideoEncoderMethods.Encode(callback, encodeEventID, ptr);
             yield return new WaitForSeconds(1.0f);
 
             Marshal.FreeHGlobal(ptr);
@@ -383,6 +384,7 @@ namespace Unity.WebRTC.RuntimeTest
             NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
 
             var renderEvent = NativeMethods.GetRenderEventFunc(context);
+            int encodeEventID = NativeMethods.GetRenderEventID();
             var updateTextureEvent = NativeMethods.GetUpdateTextureFunc(context);
 
             yield return new WaitForSeconds(1.0f);
@@ -390,7 +392,7 @@ namespace Unity.WebRTC.RuntimeTest
             VideoTrackSource.EncodeData data = new VideoTrackSource.EncodeData(renderTexture, source);
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoTrackSource.EncodeData)));
             Marshal.StructureToPtr(data, ptr, true);
-            VideoEncoderMethods.Encode(renderEvent, ptr);
+            VideoEncoderMethods.Encode(renderEvent, encodeEventID, ptr);
             yield return new WaitForSeconds(1.0f);
 
             // this method is not supported on Direct3D12
