@@ -54,8 +54,6 @@ namespace webrtc
         /// <returns></returns>
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
-        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
-        bool ResetSync(const ITexture2D* texture) override;
         bool WaitIdleForTest() override;
         rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
@@ -65,13 +63,10 @@ namespace webrtc
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 #endif
     private:
-        VkResult CreateCommandPool();
-
         UnityGraphicsVulkan* m_unityVulkan;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         VkQueue m_graphicsQueue;
-        VkCommandPool m_commandPool;
         uint32_t m_queueFamilyIndex;
         VkAllocationCallbacks* m_allocator;
         const UnityProfilerMarkerDesc* m_maker;

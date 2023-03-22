@@ -46,12 +46,12 @@ namespace webrtc
     {
     public:
         GpuMemoryBufferFromUnity(
-            IGraphicsDevice* device, NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format);
+            IGraphicsDevice* device, const Size& size, UnityRenderingExtTextureFormat format);
         GpuMemoryBufferFromUnity(const GpuMemoryBufferFromUnity&) = delete;
         GpuMemoryBufferFromUnity& operator=(const GpuMemoryBufferFromUnity&) = delete;
 
         bool ResetSync();
-        void CopyBuffer(NativeTexPtr ptr);
+        bool CopyBuffer(NativeTexPtr ptr);
         UnityRenderingExtTextureFormat GetFormat() const override;
         Size GetSize() const override;
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;

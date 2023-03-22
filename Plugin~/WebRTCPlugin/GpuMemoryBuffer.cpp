@@ -14,7 +14,7 @@ namespace webrtc
     GpuMemoryBufferHandle::~GpuMemoryBufferHandle() { }
 
     GpuMemoryBufferFromUnity::GpuMemoryBufferFromUnity(
-        IGraphicsDevice* device, NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format)
+        IGraphicsDevice* device, const Size& size, UnityRenderingExtTextureFormat format)
         : device_(device)
         , format_(format)
         , size_(size)
@@ -36,7 +36,6 @@ namespace webrtc
             handle_ = device_->Map(texture_.get());
         }
 #endif
-        CopyBuffer(ptr);
     }
 
     GpuMemoryBufferFromUnity::~GpuMemoryBufferFromUnity() { }
@@ -56,12 +55,15 @@ namespace webrtc
         return true;
     }
 
-    void GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)
+    bool GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)
     {
         // One texture cannot map CUDA memory and CPU memory simultaneously.
         // Believe there is still room for improvement.
-        device_->CopyResourceFromNativeV(texture_.get(), ptr);
-        device_->CopyResourceFromNativeV(textureCpuRead_.get(), ptr);
+        if (!device_->CopyResourceFromNativeV(texture_.get(), ptr))
+            return false;
+        if (!device_->CopyResourceFromNativeV(textureCpuRead_.get(), ptr))
+            return false;
+        return true;
     }
 
     UnityRenderingExtTextureFormat GpuMemoryBufferFromUnity::GetFormat() const { return format_; }
@@ -70,25 +72,11 @@ namespace webrtc
 
     rtc::scoped_refptr<I420BufferInterface> GpuMemoryBufferFromUnity::ToI420()
     {
-        using namespace std::chrono_literals;
-        const std::chrono::nanoseconds timeout(30ms); // 30ms
-        if (!device_->WaitSync(textureCpuRead_.get(), timeout.count()))
-        {
-            RTC_LOG(LS_INFO) << "WaitSync failed.";
-            return nullptr;
-        }
         return device_->ConvertRGBToI420(textureCpuRead_.get());
     }
 
     const GpuMemoryBufferHandle* GpuMemoryBufferFromUnity::handle() const
     {
-        using namespace std::chrono_literals;
-        const std::chrono::nanoseconds timeout(30ms); // 30ms
-        if (!device_->WaitSync(texture_.get(), timeout.count()))
-        {
-            RTC_LOG(LS_INFO) << "WaitSync failed.";
-            return nullptr;
-        }
         return handle_.get();
     }
 }

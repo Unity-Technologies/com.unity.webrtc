@@ -22,6 +22,9 @@ namespace webrtc
         NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp)
     {
         auto buffer = GetOrCreateFrameResources(ptr, size, format);
+        if (!buffer)
+            return nullptr;
+
         VideoFrame::ReturnBufferToPoolCallback callback =
             std::bind(&GpuMemoryBufferPool::OnReturnBuffer, this, std::placeholders::_1);
 
@@ -32,8 +35,7 @@ namespace webrtc
     rtc::scoped_refptr<GpuMemoryBufferInterface> GpuMemoryBufferPool::GetOrCreateFrameResources(
         NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format)
     {
-        auto it = resourcesPool_.begin();
-        while (it != resourcesPool_.end())
+        for (auto it = resourcesPool_.begin(); it != resourcesPool_.end(); ++it)
         {
             FrameResources* resources = it->get();
             if (!resources->IsUsed() && AreFrameResourcesCompatible(resources, size, format))
@@ -44,14 +46,22 @@ namespace webrtc
                     RTC_LOG(LS_INFO) << "It has not signaled yet";
                     continue;
                 }
+                if (!buffer->CopyBuffer(ptr))
+                {
+                    RTC_LOG(LS_INFO) << "Copy buffer is failed.";
+                    continue;
+                }
                 resources->MarkUsed(clock_->CurrentTime());
-                buffer->CopyBuffer(ptr);
                 return resources->buffer_;
             }
-            it++;
         }
         rtc::scoped_refptr<GpuMemoryBufferFromUnity> buffer =
-            rtc::make_ref_counted<GpuMemoryBufferFromUnity>(device_, ptr, size, format);
+            rtc::make_ref_counted<GpuMemoryBufferFromUnity>(device_, size, format);
+        if (!buffer->CopyBuffer(ptr))
+        {
+            RTC_LOG(LS_INFO) << "Copy buffer is failed.";
+            return nullptr;
+        }
         std::unique_ptr<FrameResources> resources = std::make_unique<FrameResources>(buffer);
         resources->MarkUsed(clock_->CurrentTime());
         resourcesPool_.push_back(std::move(resources));

@@ -16,8 +16,6 @@ namespace webrtc
         , m_textureImageMemory(nullptr)
         , m_textureImageMemorySize(0)
         , m_device(nullptr)
-        , m_fence(nullptr)
-        , m_commandBuffer(nullptr)
         , m_textureFormat(VK_FORMAT_B8G8R8A8_UNORM)
     {
     }
@@ -30,52 +28,21 @@ namespace webrtc
             vkDestroyImage(m_device, m_textureImage, m_allocator);
         if (m_textureImageMemory)
             vkFreeMemory(m_device, m_textureImageMemory, m_allocator);
-        if (m_commandBuffer)
-            vkFreeCommandBuffers(m_device, m_commandPool, 1, &m_commandBuffer);
-        if (m_fence)
-            vkDestroyFence(m_device, m_fence, nullptr);
 
         m_textureImage = nullptr;
         m_textureImageMemory = nullptr;
         m_textureImageMemorySize = 0;
         m_device = nullptr;
-        m_commandPool = nullptr;
     }
 
     bool
-    VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool)
+    VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device)
     {
         m_physicalDevice = physicalDevice;
         m_device = device;
-        m_commandPool = commandPool;
-
-        // Create a command buffer to copy
-        VkCommandBufferAllocateInfo allocInfo = {};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandPool = commandPool;
-        allocInfo.commandBufferCount = 1;
-
-        VkResult result = vkAllocateCommandBuffers(m_device, &allocInfo, &m_commandBuffer);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_INFO) << "vkAllocateCommandBuffers failed. result:" << result;
-            return false;
-        }
-
-        VkFenceCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        createInfo.pNext = nullptr;
-        createInfo.flags = 0;
-        result = vkCreateFence(m_device, &createInfo, nullptr, &m_fence);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_INFO) << "vkCreateFence failed. result:" << result;
-            return false;
-        }
 
         const bool EXPORT_HANDLE = true;
-        result = VulkanUtility::CreateImage(
+        VkResult result = VulkanUtility::CreateImage(
             physicalDevice,
             device,
             m_allocator,
@@ -102,39 +69,13 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
     bool VulkanTexture2D::InitCpuRead(
-        const VkPhysicalDevice physicalDevice, const VkDevice device, const VkCommandPool commandPool)
+        const VkPhysicalDevice physicalDevice, const VkDevice device)
     {
         m_physicalDevice = physicalDevice;
         m_device = device;
-        m_commandPool = commandPool;
-
-        // Create a command buffer to copy
-        VkCommandBufferAllocateInfo allocInfo = {};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandPool = commandPool;
-        allocInfo.commandBufferCount = 1;
-
-        VkResult result = vkAllocateCommandBuffers(m_device, &allocInfo, &m_commandBuffer);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_INFO) << "vkAllocateCommandBuffers failed. result:" << result;
-            return false;
-        }
-
-        VkFenceCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        createInfo.pNext = nullptr;
-        createInfo.flags = 0;
-        result = vkCreateFence(m_device, &createInfo, nullptr, &m_fence);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_INFO) << "vkCreateFence failed. result:" << result;
-            return false;
-        }
 
         const bool EXPORT_HANDLE = false;
-        result = VulkanUtility::CreateImage(
+        VkResult result = VulkanUtility::CreateImage(
             physicalDevice,
             device,
             m_allocator,
