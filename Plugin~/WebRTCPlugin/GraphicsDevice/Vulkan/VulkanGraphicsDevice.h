@@ -68,7 +68,6 @@ namespace webrtc
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         VkQueue m_graphicsQueue;
-        uint32_t m_queueFamilyIndex;
         VkAllocationCallbacks* m_allocator;
         const UnityProfilerMarkerDesc* m_maker;
 
