@@ -35,7 +35,6 @@ namespace webrtc
         , m_physicalDevice(physicalDevice)
         , m_device(device)
         , m_graphicsQueue(graphicsQueue)
-        , m_allocator(nullptr)
 #if CUDA_PLATFORM
         , m_instance(instance)
         , m_isCudaSupport(false)

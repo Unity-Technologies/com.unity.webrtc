@@ -68,7 +68,6 @@ namespace webrtc
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         VkQueue m_graphicsQueue;
-        VkAllocationCallbacks* m_allocator;
         const UnityProfilerMarkerDesc* m_maker;
 
 #if CUDA_PLATFORM
