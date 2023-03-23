@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <system_wrappers/include/sleep.h>
 #include <third_party/libyuv/include/libyuv/convert.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"
@@ -134,7 +135,7 @@ namespace webrtc
             return false;
 
         UnityVulkanRecordingState state;
-        if(!m_unityVulkan->CommandRecordingState(&state, kUnityVulkanGraphicsQueueAccess_DontCare))
+        if (!m_unityVulkan->CommandRecordingState(&state, kUnityVulkanGraphicsQueueAccess_DontCare))
         {
             RTC_LOG(LS_ERROR) << "CommandRecordingState failed.";
             return false;
@@ -197,6 +198,7 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
             return false;
         }
+        destTexture->currentFrameNumber = state.currentFrameNumber;
         return true;
     }
 
@@ -267,6 +269,7 @@ namespace webrtc
                 return false;
             }
         }
+        destTexture->currentFrameNumber = state.currentFrameNumber;
         return true;
     }
 
@@ -397,6 +400,39 @@ namespace webrtc
             return false;
         }
         return true;
+    }
+
+    static bool IsFinished(UnityGraphicsVulkan* unityVulkan, const VulkanTexture2D* vulkanTexture)
+    {
+        UnityVulkanRecordingState state;
+        if (!unityVulkan->CommandRecordingState(&state, kUnityVulkanGraphicsQueueAccess_DontCare))
+        {
+            return false;
+        }
+        return vulkanTexture->currentFrameNumber <= state.safeFrameNumber;
+    }
+
+    bool VulkanGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    {
+        const int msecs = 3;
+        const auto t0 = std::chrono::high_resolution_clock::now();
+        const VulkanTexture2D* vulkanTexture = static_cast<const VulkanTexture2D*>(texture);
+
+        uint64_t total = 0;
+
+        while (nsTimeout > total)
+        {
+            if (IsFinished(m_unityVulkan, vulkanTexture))
+                return true;
+
+            SleepMs(msecs);
+            total = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        std::chrono::high_resolution_clock::now().time_since_epoch() - t0.time_since_epoch())
+                        .count();
+            continue;
+        }
+        RTC_LOG(LS_INFO) << "VulkanGraphicsDevice::WaitSync failed.";
+        return false;
     }
 } // end namespace webrtc
 } // end namespace unity

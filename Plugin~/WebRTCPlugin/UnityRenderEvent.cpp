@@ -30,7 +30,8 @@ namespace webrtc
     static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     static std::unique_ptr<Clock> s_clock;
 
-    static const size_t kLimitBufferCount = 10;
+    // limitation of reserved texture count.
+    static const size_t kLimitBufferCount = 20;
     static constexpr TimeDelta kStaleFrameLimit = TimeDelta::Seconds(10);
     static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
@@ -281,6 +282,7 @@ static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
 {
     if (eventID != s_releaseBuffersEventID)
         return;
+
     // Release all buffers.
     if (s_bufferPool)
         s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
