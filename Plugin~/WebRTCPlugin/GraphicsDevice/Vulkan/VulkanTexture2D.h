@@ -31,6 +31,7 @@ namespace webrtc
         inline VkFormat GetTextureFormat() const;
 
         unsigned long long currentFrameNumber = 0;
+
     private:
         VkImage m_textureImage;
         VkDeviceMemory m_textureImageMemory;

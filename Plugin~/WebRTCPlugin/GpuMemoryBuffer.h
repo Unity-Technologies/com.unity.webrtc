@@ -45,8 +45,7 @@ namespace webrtc
     class GpuMemoryBufferFromUnity : public GpuMemoryBufferInterface
     {
     public:
-        GpuMemoryBufferFromUnity(
-            IGraphicsDevice* device, const Size& size, UnityRenderingExtTextureFormat format);
+        GpuMemoryBufferFromUnity(IGraphicsDevice* device, const Size& size, UnityRenderingExtTextureFormat format);
         GpuMemoryBufferFromUnity(const GpuMemoryBufferFromUnity&) = delete;
         GpuMemoryBufferFromUnity& operator=(const GpuMemoryBufferFromUnity&) = delete;
 
