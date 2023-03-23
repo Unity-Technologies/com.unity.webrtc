@@ -1542,11 +1542,11 @@ extern "C"
         transformer->SendFrameToSink(std::unique_ptr<TransformableFrameInterface>(frame));
     }
 
-    UNITY_INTERFACE_EXPORT void FrameGetData(TransformableFrameInterface* frame, const uint8_t** data, size_t* size)
+    UNITY_INTERFACE_EXPORT const uint8_t* FrameGetData(TransformableFrameInterface* frame, size_t* size)
     {
         auto data_ = frame->GetData();
-        *data = data_.data();
         *size = data_.size();
+        return data_.data();
     }
 
     UNITY_INTERFACE_EXPORT void FrameSetData(TransformableFrameInterface* frame, const uint8_t* data, size_t size)

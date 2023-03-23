@@ -119,7 +119,8 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public NativeArray<byte>.ReadOnly GetData()
         {
-            NativeMethods.FrameGetData(self, out var data, out var size);
+            IntPtr data = NativeMethods.FrameGetData(self, out var size);
+
             unsafe
             {
                 var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(

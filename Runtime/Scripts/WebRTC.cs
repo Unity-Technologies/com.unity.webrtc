@@ -1556,7 +1556,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern uint FrameGetSsrc(IntPtr frame);
         [DllImport(WebRTC.Lib)]
-        public static extern void FrameGetData(IntPtr frame, out IntPtr data, out int size);
+        public static extern IntPtr FrameGetData(IntPtr frame, out int size);
         [DllImport(WebRTC.Lib)]
         public static extern void FrameSetData(IntPtr frame, IntPtr data, int size);
         [DllImport(WebRTC.Lib)]
