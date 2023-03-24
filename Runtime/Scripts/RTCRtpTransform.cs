@@ -2,7 +2,6 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -57,14 +56,10 @@ namespace Unity.WebRTC
         /// </summary>
         public readonly long temporalIndex;
 
-//        public readonly long synchronizationSource;
-
         /// <summary>
         ///
         /// </summary>
         public readonly long[] dependencies;
-
-//        public readonly long[] contributingSources;
 
         internal RTCEncodedVideoFrameMetadata(
             RTCEncodedVideoFrameMetadataInternal data)
@@ -75,7 +70,6 @@ namespace Unity.WebRTC
             spatialIndex = data.spatialIndex;
             temporalIndex = data.temporalIndex;
             dependencies = data.dependencies.ToArray();
-//            contributingSources = data.contributingSources.ToArray();
         }
     };
 
@@ -88,12 +82,10 @@ namespace Unity.WebRTC
         public int spatialIndex;
         public int temporalIndex;
         public MarshallingArray<long> dependencies;
-//        public MarshallingArray<long> contributingSources;
 
         public void Dispose()
         {
             dependencies.Dispose();
-//            contributingSources.Dispose();
         }
     }
 
@@ -144,6 +136,12 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="length"></param>
         public void SetData(NativeArray<byte>.ReadOnly data, int startIndex, int length)
         {
             unsafe
@@ -152,6 +150,10 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
         public void SetData(NativeSlice<byte> data)
         {
             unsafe
@@ -226,12 +228,19 @@ namespace Unity.WebRTC
             callback_ = callback;
             WebRTC.Table.Add(self, this);
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         ~RTCRtpTransform()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
         public void Write(RTCEncodedFrame frame)
         {
             NativeMethods.FrameTransformerSendFrameToSink(self, frame.self);
@@ -270,6 +279,10 @@ namespace Unity.WebRTC
         }
     }
 
+    /// <summary>
+    ///  
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void TransformedFrameCallback(RTCTransformEvent e);
 
     /// <summary>
