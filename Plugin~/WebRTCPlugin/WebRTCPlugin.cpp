@@ -1504,10 +1504,9 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT uint32_t FrameGetSsrc(TransformableFrameInterface* frame) { return frame->GetSsrc(); }
 
-    UNITY_INTERFACE_EXPORT bool VideoFrameIsKeyFrame(TransformableVideoFrameInterface* frame, bool* isKeyFrame)
+    UNITY_INTERFACE_EXPORT bool VideoFrameIsKeyFrame(TransformableVideoFrameInterface* frame)
     {
-        *isKeyFrame = frame->IsKeyFrame();
-        return true;
+        return frame->IsKeyFrame();
     }
 
     struct RTCVideoFrameMetadata
@@ -1520,20 +1519,21 @@ extern "C"
         MarshallArray<int64_t> dependencies;
     };
 
-    UNITY_INTERFACE_EXPORT void
-    VideoFrameGetMetadata(TransformableVideoFrameInterface* frame, RTCVideoFrameMetadata** data)
+    UNITY_INTERFACE_EXPORT RTCVideoFrameMetadata*
+    VideoFrameGetMetadata(TransformableVideoFrameInterface* frame)
     {
-        *data = static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
+        RTCVideoFrameMetadata* data = static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
 
         auto metadata = frame->GetMetadata();
 
-        RTCVideoFrameMetadata* data_ = *data;
-        data_->frameId = metadata.GetFrameId();
-        data_->width = metadata.GetWidth();
-        data_->height = metadata.GetHeight();
-        data_->spacialIndex = metadata.GetSpatialIndex();
-        data_->temporalIndex = metadata.GetTemporalIndex();
-        data_->dependencies = metadata.GetFrameDependencies();
+        data->frameId = metadata.GetFrameId();
+        data->width = metadata.GetWidth();
+        data->height = metadata.GetHeight();
+        data->spacialIndex = metadata.GetSpatialIndex();
+        data->temporalIndex = metadata.GetTemporalIndex();
+        data->dependencies = metadata.GetFrameDependencies();
+
+        return data;
     }
 
     UNITY_INTERFACE_EXPORT void

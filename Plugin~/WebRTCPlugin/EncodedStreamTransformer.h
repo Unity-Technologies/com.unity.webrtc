@@ -20,7 +20,7 @@ namespace webrtc
         static void RegisterCallback(DelegateTransformedFrame callback) { s_callback = callback; }
 
         explicit EncodedStreamTransformer();
-        ~EncodedStreamTransformer() override { RTC_LOG(LS_INFO) << "EncodedStreamTransformer"; }
+        ~EncodedStreamTransformer() override { }
 
         void RegisterTransformedFrameSinkCallback(
             rtc::scoped_refptr<webrtc::TransformedFrameCallback> callback, uint32_t ssrc) override;

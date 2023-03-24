@@ -7,60 +7,60 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum RTCEncodedVideoFrameType
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Empty,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Key,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         Delta
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCEncodedVideoFrameMetadata
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public readonly long? frameId;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public readonly ushort width;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public readonly ushort height;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public readonly int spatialIndex;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public readonly long temporalIndex;
 
 //        public readonly long synchronizationSource;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public readonly long[] dependencies;
 
@@ -98,23 +98,23 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCEncodedFrame
     {
         internal IntPtr self;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint Timestamp => NativeMethods.FrameGetTimestamp(self);
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint Ssrc => NativeMethods.FrameGetSsrc(self);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public NativeArray<byte>.ReadOnly GetData()
@@ -133,7 +133,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="data"></param>
         public void SetData(NativeArray<byte>.ReadOnly data)
@@ -167,7 +167,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCEncodedAudioFrame : RTCEncodedFrame
     {
@@ -175,32 +175,32 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCEncodedVideoFrame : RTCEncodedFrame
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCEncodedVideoFrameType Type
         {
             get
             {
-                if (!NativeMethods.VideoFrameIsKeyFrame(self, out var isKeyFrame))
-                    return RTCEncodedVideoFrameType.Empty;
+                var isKeyFrame = NativeMethods.VideoFrameIsKeyFrame(self);
                 return isKeyFrame ? RTCEncodedVideoFrameType.Key : RTCEncodedVideoFrameType.Delta;
             }
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public RTCEncodedVideoFrameMetadata GetMetadata()
         {
-            NativeMethods.VideoFrameGetMetadata(self, out IntPtr ptr);
+            IntPtr ptr = NativeMethods.VideoFrameGetMetadata(self);
             RTCEncodedVideoFrameMetadataInternal data =
                 Marshal.PtrToStructure<RTCEncodedVideoFrameMetadataInternal>(ptr);
+            Marshal.FreeHGlobal(ptr);
             return new RTCEncodedVideoFrameMetadata(data);
         }
 
@@ -208,12 +208,12 @@ namespace Unity.WebRTC
     };
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpTransform : RefCountedObject
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public TrackKind Kind { get; }
 
@@ -238,7 +238,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -255,12 +255,12 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCTransformEvent
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCEncodedFrame Frame { get; }
 
@@ -273,12 +273,12 @@ namespace Unity.WebRTC
     public delegate void TransformedFrameCallback(RTCTransformEvent e);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpScriptTransform : RTCRtpTransform
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="kind"></param>
         /// <param name="callback"></param>

@@ -1560,10 +1560,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void FrameSetData(IntPtr frame, IntPtr data, int size);
         [DllImport(WebRTC.Lib)]
-        public static extern void VideoFrameGetMetadata(IntPtr frame, out IntPtr ptr);
+        public static extern IntPtr VideoFrameGetMetadata(IntPtr frame);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool VideoFrameIsKeyFrame(IntPtr frame, [MarshalAs(UnmanagedType.U1)] out bool isKeyFrame);
+        public static extern bool VideoFrameIsKeyFrame(IntPtr frame);
         [DllImport(WebRTC.Lib)]
         public static extern void FrameTransformerSendFrameToSink(IntPtr transform, IntPtr frame);
 
