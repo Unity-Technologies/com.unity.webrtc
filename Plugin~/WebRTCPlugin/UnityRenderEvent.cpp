@@ -199,8 +199,13 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
     /// note::
     /// Intercept Vulkan initialization process to hook vulkan functions because vulkan extensions need adding when
     /// initializing vulkan device. This process have to be run before graphics device initialization.
-    auto vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
-    if (!vulkan->AddInterceptInitialization(InterceptVulkanInitialization, nullptr, 0))
+    std::unique_ptr<UnityGraphicsVulkan> vulkan;
+    vulkan = UnityGraphicsVulkan::Get(s_UnityInterfaces);
+    if (!vulkan)
+    {
+        RTC_LOG(LS_INFO) << "Failed to get Vulkan.";
+    }
+    else if (!vulkan->AddInterceptInitialization(InterceptVulkanInitialization, nullptr, 0))
     {
         RTC_LOG(LS_INFO) << "AddInterceptInitialization failed.";
     }
