@@ -104,16 +104,18 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
             /// managed code.
             UnityVulkanPluginEventConfig encodeEventConfig;
-            encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
+            encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_Allow;
             encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
             encodeEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
-                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState |
+                kUnityVulkanEventConfigFlag_FlushCommandBuffers;
 
             UnityVulkanPluginEventConfig releaseBufferEventConfig;
-            releaseBufferEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
-            releaseBufferEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_DontCare;
+            releaseBufferEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_Allow;
+            releaseBufferEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
             releaseBufferEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
-                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState |
+                kUnityVulkanEventConfigFlag_FlushCommandBuffers;
 
             vulkan->ConfigureEvent(s_renderEventID, &encodeEventConfig);
             vulkan->ConfigureEvent(s_releaseBuffersEventID, &releaseBufferEventConfig);
