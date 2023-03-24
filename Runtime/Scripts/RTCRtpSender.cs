@@ -37,7 +37,6 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-//                transform?.Dispose();
                 WebRTC.Table.Remove(self);
             }
             base.Dispose();
@@ -85,6 +84,9 @@ namespace Unity.WebRTC
         {
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // cache reference
                 transform = value;
                 NativeMethods.SenderSetTransform(GetSelfOrThrow(), value.self);

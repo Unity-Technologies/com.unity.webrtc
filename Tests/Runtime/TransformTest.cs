@@ -105,6 +105,11 @@ namespace Unity.WebRTC.RuntimeTest
             RTCPeerConnection pc = new RTCPeerConnection();
             RTCRtpTransceiver transceiver = pc.AddTransceiver(TrackKind.Video);
             Assert.That(transceiver.Sender, Is.Not.Null);
+
+            RTCRtpSender sender = transceiver.Sender;
+            Assert.That(sender.Transform, Is.Null);
+            Assert.That(() => sender.Transform = null, Throws.ArgumentNullException);
+
             transceiver.Sender.Transform = transform;
 
             transform.Dispose();
@@ -122,6 +127,9 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             yield return new WaitUntil(() => test.component.GetPeerReceivers(1).Any());
             var receiver = test.component.GetPeerReceivers(1).First();
+
+            Assert.That(receiver.Transform, Is.Null);
+            Assert.That(() => receiver.Transform = null, Throws.ArgumentNullException);
 
             void TransformedFrame(RTCTransformEvent e) {}
             TransformedFrameCallback callback = TransformedFrame;
