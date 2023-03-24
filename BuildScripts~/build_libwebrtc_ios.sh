@@ -58,7 +58,8 @@ do
       treat_warnings_as_errors=false \
       ios_enable_code_signing=false \
       rtc_include_tests=false \
-      rtc_build_examples=false"
+      rtc_build_examples=false \
+      use_cxx17=true"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc

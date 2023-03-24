@@ -49,7 +49,7 @@ for %%i in (x64) do (
 
     rem generate ninja for release
     call gn.bat gen %OUTPUT_DIR% --root="src" ^
-      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false"
+      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
 
     rem build
     ninja.exe -C %OUTPUT_DIR% webrtc

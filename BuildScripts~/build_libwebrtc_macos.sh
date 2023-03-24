@@ -53,7 +53,8 @@ do
       enable_iterator_debugging=false \
       is_component_build=false \
       use_rtti=true \
-      rtc_use_x11=false"
+      rtc_use_x11=false \
+      use_cxx17=true"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc

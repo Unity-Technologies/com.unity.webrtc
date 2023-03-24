@@ -60,7 +60,8 @@ do
       is_component_build=false \
       use_rtti=true \
       use_custom_libcxx=false \
-      treat_warnings_as_errors=false"
+      treat_warnings_as_errors=false \
+      use_cxx17=true"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
