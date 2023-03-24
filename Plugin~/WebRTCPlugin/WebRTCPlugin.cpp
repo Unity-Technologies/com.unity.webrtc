@@ -1519,10 +1519,10 @@ extern "C"
         MarshallArray<int64_t> dependencies;
     };
 
-    UNITY_INTERFACE_EXPORT RTCVideoFrameMetadata*
-    VideoFrameGetMetadata(TransformableVideoFrameInterface* frame)
+    UNITY_INTERFACE_EXPORT RTCVideoFrameMetadata* VideoFrameGetMetadata(TransformableVideoFrameInterface* frame)
     {
-        RTCVideoFrameMetadata* data = static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
+        RTCVideoFrameMetadata* data =
+            static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
 
         auto metadata = frame->GetMetadata();
 
