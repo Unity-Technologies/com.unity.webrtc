@@ -1,0 +1,13 @@
+--- depot_tools/fetch_configs/webrtc.py	2023-03-22 06:38:50.000000000 +0900
++++ depot_tools/fetch_configs/webrtc.py.patch	2023-03-27 09:33:06.000000000 +0900
+@@ -22,7 +22,9 @@ class WebRTC(config_util.Config):
+           'url': url,
+           'deps_file': 'DEPS',
+           'managed': False,
+-          'custom_deps': {},
++          'custom_deps': {
++            "src/examples": None
++          },
+         },
+       ],
+       'with_branch_heads': True,

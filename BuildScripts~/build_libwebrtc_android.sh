@@ -14,6 +14,8 @@ export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
+  # Exclude example for reduction
+  patch -N "depot_tools/fetch_configs/webrtc.py" < "$COMMAND_DIR/patches/fetch_exclude_examples.patch"
   fetch --nohooks webrtc_android
   cd src
   sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
