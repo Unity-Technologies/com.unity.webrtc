@@ -2,6 +2,7 @@
 
 #include "Context.h"
 #include "CreateSessionDescriptionObserver.h"
+#include "EncodedStreamTransformer.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "MediaStreamObserver.h"
 #include "PeerConnectionObject.h"
@@ -155,6 +156,19 @@ namespace webrtc
             }
             return *this;
         }
+
+        template<typename U>
+        MarshallArray& operator=(const rtc::ArrayView<U>& src)
+        {
+            length = static_cast<uint32_t>(src.size());
+            values = static_cast<T*>(CoTaskMemAlloc(sizeof(T) * src.size()));
+
+            for (size_t i = 0; i < src.size(); i++)
+            {
+                values[i] = src[i];
+            }
+            return *this;
+        }
     };
 
     template<typename T, typename U>
@@ -297,6 +311,14 @@ extern "C"
     UNITY_INTERFACE_EXPORT void ContextDeleteRefPtr(Context* context, rtc::RefCountInterface* ptr)
     {
         context->RemoveRefPtr(ptr);
+    }
+
+    UNITY_INTERFACE_EXPORT EncodedStreamTransformer*
+    ContextCreateFrameTransformer(Context* context, DelegateTransformedFrame callback)
+    {
+        rtc::scoped_refptr<EncodedStreamTransformer> transformer = rtc::make_ref_counted<EncodedStreamTransformer>();
+        context->AddRefPtr(transformer);
+        return transformer.get();
     }
 
     UNITY_INTERFACE_EXPORT bool MediaStreamAddTrack(MediaStreamInterface* stream, MediaStreamTrackInterface* track)
@@ -932,6 +954,11 @@ extern "C"
         unity::webrtc::SetRemoteDescriptionObserver::RegisterCallback(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void SetTransformedFrameRegisterCallback(DelegateTransformedFrame callback)
+    {
+        unity::webrtc::EncodedStreamTransformer::RegisterCallback(callback);
+    }
+
     UNITY_INTERFACE_EXPORT bool
     PeerConnectionAddIceCandidate(PeerConnectionObject* obj, const IceCandidateInterface* candidate)
     {
@@ -1300,6 +1327,11 @@ extern "C"
         return sender->track().get();
     }
 
+    UNITY_INTERFACE_EXPORT void SenderSetTransform(RtpSenderInterface* sender, FrameTransformerInterface* transformer)
+    {
+        sender->SetEncoderToPacketizerFrameTransformer(rtc::scoped_refptr<FrameTransformerInterface>(transformer));
+    }
+
     UNITY_INTERFACE_EXPORT MediaStreamTrackInterface* ReceiverGetTrack(RtpReceiverInterface* receiver)
     {
         return receiver->track().get();
@@ -1341,6 +1373,12 @@ extern "C"
             return source;
         });
         return ConvertArray(result, length);
+    }
+
+    UNITY_INTERFACE_EXPORT void
+    ReceiverSetTransform(RtpReceiverInterface* receiver, FrameTransformerInterface* transformer)
+    {
+        receiver->SetDepacketizerToDecoderFrameTransformer(rtc::scoped_refptr<FrameTransformerInterface>(transformer));
     }
 
     UNITY_INTERFACE_EXPORT char* DataChannelGetLabel(DataChannelInterface* channel)
@@ -1457,6 +1495,63 @@ extern "C"
     AudioTrackSinkProcessAudio(AudioTrackSinkAdapter* sink, float* data, size_t length, int channels, int sampleRate)
     {
         sink->ProcessAudio(data, length, static_cast<size_t>(channels), sampleRate);
+    }
+
+    UNITY_INTERFACE_EXPORT uint32_t FrameGetTimestamp(TransformableFrameInterface* frame)
+    {
+        return frame->GetTimestamp();
+    }
+
+    UNITY_INTERFACE_EXPORT uint32_t FrameGetSsrc(TransformableFrameInterface* frame) { return frame->GetSsrc(); }
+
+    UNITY_INTERFACE_EXPORT bool VideoFrameIsKeyFrame(TransformableVideoFrameInterface* frame)
+    {
+        return frame->IsKeyFrame();
+    }
+
+    struct RTCVideoFrameMetadata
+    {
+        Optional<int64_t> frameId;
+        uint16_t width;
+        uint16_t height;
+        int spacialIndex;
+        int temporalIndex;
+        MarshallArray<int64_t> dependencies;
+    };
+
+    UNITY_INTERFACE_EXPORT RTCVideoFrameMetadata* VideoFrameGetMetadata(TransformableVideoFrameInterface* frame)
+    {
+        RTCVideoFrameMetadata* data =
+            static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
+
+        auto metadata = frame->GetMetadata();
+
+        data->frameId = metadata.GetFrameId();
+        data->width = metadata.GetWidth();
+        data->height = metadata.GetHeight();
+        data->spacialIndex = metadata.GetSpatialIndex();
+        data->temporalIndex = metadata.GetTemporalIndex();
+        data->dependencies = metadata.GetFrameDependencies();
+
+        return data;
+    }
+
+    UNITY_INTERFACE_EXPORT void
+    FrameTransformerSendFrameToSink(EncodedStreamTransformer* transformer, TransformableFrameInterface* frame)
+    {
+        transformer->SendFrameToSink(std::unique_ptr<TransformableFrameInterface>(frame));
+    }
+
+    UNITY_INTERFACE_EXPORT const uint8_t* FrameGetData(TransformableFrameInterface* frame, size_t* size)
+    {
+        auto data_ = frame->GetData();
+        *size = data_.size();
+        return data_.data();
+    }
+
+    UNITY_INTERFACE_EXPORT void FrameSetData(TransformableFrameInterface* frame, const uint8_t* data, size_t size)
+    {
+        frame->SetData(rtc::ArrayView<const uint8_t>(static_cast<const uint8_t*>(data), size));
     }
 #pragma clang diagnostic pop
 }

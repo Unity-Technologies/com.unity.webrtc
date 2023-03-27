@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRtpContributingSource
     {
@@ -15,17 +15,17 @@ namespace Unity.WebRTC
         public double? audioLevel { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public long? rtpTimestamp { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint? source { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public long? timestamp { get; private set; }
 
@@ -61,6 +61,7 @@ namespace Unity.WebRTC
     public class RTCRtpReceiver : RefCountedObject
     {
         private RTCPeerConnection peer;
+        private RTCRtpTransform transform;
 
         internal RTCRtpReceiver(IntPtr ptr, RTCPeerConnection peer) : base(ptr)
         {
@@ -87,10 +88,7 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
-                if (WebRTC.Table.TryGetValue(self, out object value) && value == this)
-                {
-                    WebRTC.Table.Remove(self);
-                }
+                WebRTC.Table.Remove(self);
             }
             base.Dispose();
         }
@@ -157,6 +155,26 @@ namespace Unity.WebRTC
                 if (ptr == IntPtr.Zero)
                     return null;
                 return WebRTC.FindOrCreate(ptr, MediaStreamTrack.Create);
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public RTCRtpTransform Transform
+        {
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
+                // cache reference
+                transform = value;
+                NativeMethods.ReceiverSetTransform(GetSelfOrThrow(), value.self);
+            }
+            get
+            {
+                return transform;
             }
         }
 

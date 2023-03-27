@@ -60,6 +60,24 @@ namespace Unity.WebRTC
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    internal struct OptionalLong
+    {
+        [MarshalAs(UnmanagedType.U1)]
+        public bool hasValue;
+        public long value;
+
+        public static implicit operator long?(OptionalLong a)
+        {
+            return a.hasValue ? a.value : (long?)null;
+        }
+        public static implicit operator OptionalLong(long? a)
+        {
+            return new OptionalLong { hasValue = a.HasValue, value = a.GetValueOrDefault() };
+        }
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct OptionalUshort
     {
         [MarshalAs(UnmanagedType.U1)]

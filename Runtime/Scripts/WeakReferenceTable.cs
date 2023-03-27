@@ -34,6 +34,17 @@ namespace Unity.WebRTC
             }
         }
 
+        public bool TryGetValue<T>(object key, out T value)
+        {
+            if (!ContainsKey(key))
+            {
+                value = default;
+                return false;
+            }
+            value = (T)this[key];
+            return true;
+        }
+
         public ICollection CopiedValues
         {
             get

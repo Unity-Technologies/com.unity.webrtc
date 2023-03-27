@@ -127,6 +127,26 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
+        public IEnumerator CreateDataChannelMultiple()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var label = "test";
+
+            RTCDataChannel channel1 = test.component.CreateDataChannel(0, label);
+            RTCDataChannel channel2 = test.component.CreateDataChannel(1, label);
+            Assert.That(channel1, Is.Not.Null);
+            yield return test;
+
+            var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
+            yield return op1;
+
+            UnityEngine.Debug.Log(test.component.GetDataChannelList(0).Count);
+            UnityEngine.Debug.Log(test.component.GetDataChannelList(1).Count);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator SendAndReceiveMessage()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();

@@ -10,6 +10,8 @@ target_sources(
           DataChannelObject.h
           DummyAudioDevice.cpp
           DummyAudioDevice.h
+          EncodedStreamTransformer.cpp
+          EncodedStreamTransformer.h
           AudioTrackSinkAdapter.h
           AudioTrackSinkAdapter.cpp
           Logger.cpp
