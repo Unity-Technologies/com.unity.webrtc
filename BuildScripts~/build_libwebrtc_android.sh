@@ -37,6 +37,7 @@ patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.
 # downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
 pushd "src/build"
+git apply "$COMMAND_DIR/patches/downgrade_JDK_17to11.patch"
 git apply "$COMMAND_DIR/patches/downgrade_JDK.patch"
 popd
 

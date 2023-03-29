@@ -1,0 +1,1110 @@
+diff -Naur webrtc_build_m112/android/gyp/bundletool.py webrtc_build_m107/android/gyp/bundletool.py
+--- webrtc_build_m112/android/gyp/bundletool.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/bundletool.py	2023-03-28 10:16:38.529427423 +0900
+@@ -24,10 +24,12 @@
+ BUNDLETOOL_JAR_PATH = os.path.join(BUNDLETOOL_DIR, 'bundletool.jar')
+ 
+ 
+-def RunBundleTool(args, print_stdout=False):
++def RunBundleTool(args, warnings_as_errors=(), print_stdout=False):
++  # Use () instead of None because command-line flags are None by default.
++  verify = warnings_as_errors == () or warnings_as_errors
+   # ASAN builds failed with the default of 1GB (crbug.com/1120202).
+   # Bug for bundletool: https://issuetracker.google.com/issues/165911616
+-  cmd = build_utils.JavaCmd(xmx='4G')
++  cmd = build_utils.JavaCmd(verify, xmx='4G')
+   cmd += ['-jar', BUNDLETOOL_JAR_PATH]
+   cmd += args
+   logging.debug(' '.join(cmd))
+diff -Naur webrtc_build_m112/android/gyp/compile_java.py webrtc_build_m107/android/gyp/compile_java.py
+--- webrtc_build_m112/android/gyp/compile_java.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/compile_java.py	2023-03-28 10:16:38.529427423 +0900
+@@ -244,39 +244,10 @@
+   return '\n'.join(lines)
+ 
+ 
+-def CreateJarFile(jar_path,
+-                  classes_dir,
+-                  service_provider_configuration_dir=None,
+-                  additional_jar_files=None,
+-                  extra_classes_jar=None):
+-  """Zips files from compilation into a single jar."""
+-  logging.info('Start creating jar file: %s', jar_path)
+-  with build_utils.AtomicOutput(jar_path) as f:
+-    with zipfile.ZipFile(f.name, 'w') as z:
+-      build_utils.ZipDir(z, classes_dir)
+-      if service_provider_configuration_dir:
+-        config_files = build_utils.FindInDirectory(
+-            service_provider_configuration_dir)
+-        for config_file in config_files:
+-          zip_path = os.path.relpath(config_file,
+-                                     service_provider_configuration_dir)
+-          build_utils.AddToZipHermetic(z, zip_path, src_path=config_file)
+-
+-      if additional_jar_files:
+-        for src_path, zip_path in additional_jar_files:
+-          build_utils.AddToZipHermetic(z, zip_path, src_path=src_path)
+-      if extra_classes_jar:
+-        build_utils.MergeZips(
+-            z, [extra_classes_jar],
+-            path_transform=lambda p: p if p.endswith('.class') else None)
+-  logging.info('Completed jar file: %s', jar_path)
+-
+-
+-def _ParsePackageAndClassNames(source_file):
+-  """This should support both Java and Kotlin files."""
++def _ParsePackageAndClassNames(java_file):
+   package_name = ''
+   class_names = []
+-  with open(source_file) as f:
++  with open(java_file) as f:
+     for l in f:
+       # Strip unindented comments.
+       # Considers a leading * as a continuation of a multi-line comment (our
+@@ -287,8 +258,7 @@
+       # (with escaped quotes) but covers a very large percentage of cases.
+       l = re.sub('(?:".*?")', '', l)
+ 
+-      # Java lines end in semicolon, whereas Kotlin lines do not.
+-      m = re.match(r'package\s+(.*?)(;|\s*$)', l)
++      m = re.match(r'package\s+(.*?);', l)
+       if m and not package_name:
+         package_name = m.group(1)
+ 
+@@ -300,9 +270,9 @@
+   return package_name, class_names
+ 
+ 
+-def _ProcessSourceFileForInfo(source_file):
+-  package_name, class_names = _ParsePackageAndClassNames(source_file)
+-  return source_file, package_name, class_names
++def _ProcessJavaFileForInfo(java_file):
++  package_name, class_names = _ParsePackageAndClassNames(java_file)
++  return java_file, package_name, class_names
+ 
+ 
+ class _InfoFileContext:
+@@ -325,29 +295,23 @@
+       self._srcjar_files[path] = '{}/{}'.format(
+           srcjar_path, os.path.relpath(path, parent_dir))
+ 
+-  def SubmitFiles(self, source_files):
+-    if not source_files:
+-      return
++  def SubmitFiles(self, java_files):
+     if self._pool is None:
+       # Restrict to just one process to not slow down compiling. Compiling
+       # is always slower.
+       self._pool = multiprocessing.Pool(1)
+-    logging.info('Submitting %d files for info', len(source_files))
++    logging.info('Submitting %d files for info', len(java_files))
+     self._results.append(
+-        self._pool.imap_unordered(_ProcessSourceFileForInfo,
+-                                  source_files,
+-                                  chunksize=1000))
+-
+-  def _CheckPathMatchesClassName(self, source_file, package_name, class_name):
+-    if source_file.endswith('.java'):
+-      parts = package_name.split('.') + [class_name + '.java']
+-    else:
+-      parts = package_name.split('.') + [class_name + '.kt']
+-    expected_suffix = os.path.sep.join(parts)
+-    if not source_file.endswith(expected_suffix):
+-      raise Exception(('Source package+class name do not match its path.\n'
++        self._pool.imap_unordered(
++            _ProcessJavaFileForInfo, java_files, chunksize=1000))
++
++  def _CheckPathMatchesClassName(self, java_file, package_name, class_name):
++    parts = package_name.split('.') + [class_name + '.java']
++    expected_path_suffix = os.path.sep.join(parts)
++    if not java_file.endswith(expected_path_suffix):
++      raise Exception(('Java package+class name do not match its path.\n'
+                        'Actual path: %s\nExpected path: %s') %
+-                      (source_file, expected_suffix))
++                      (java_file, expected_path_suffix))
+ 
+   def _ProcessInfo(self, java_file, package_name, class_names, source):
+     for class_name in class_names:
+@@ -402,7 +366,27 @@
+     logging.info('Completed info file: %s', output_path)
+ 
+ 
+-def _OnStaleMd5(changes, options, javac_cmd, javac_args, java_files, kt_files):
++def _CreateJarFile(jar_path, service_provider_configuration_dir,
++                   additional_jar_files, classes_dir):
++  logging.info('Start creating jar file: %s', jar_path)
++  with build_utils.AtomicOutput(jar_path) as f:
++    with zipfile.ZipFile(f.name, 'w') as z:
++      build_utils.ZipDir(z, classes_dir)
++      if service_provider_configuration_dir:
++        config_files = build_utils.FindInDirectory(
++            service_provider_configuration_dir)
++        for config_file in config_files:
++          zip_path = os.path.relpath(config_file,
++                                     service_provider_configuration_dir)
++          build_utils.AddToZipHermetic(z, zip_path, src_path=config_file)
++
++      if additional_jar_files:
++        for src_path, zip_path in additional_jar_files:
++          build_utils.AddToZipHermetic(z, zip_path, src_path=src_path)
++  logging.info('Completed jar file: %s', jar_path)
++
++
++def _OnStaleMd5(changes, options, javac_cmd, javac_args, java_files):
+   logging.info('Starting _OnStaleMd5')
+   if options.enable_kythe_annotations:
+     # Kythe requires those env variables to be set and compile_java.py does the
+@@ -413,11 +397,6 @@
+                       'KYTHE_ROOT_DIRECTORY and KYTHE_OUTPUT_DIRECTORY '
+                       'environment variables to be set.')
+     javac_extractor_cmd = build_utils.JavaCmd() + [
+-        '--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
+-        '--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+-        '--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
+-        '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+-        '--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED',
+         '-jar',
+         _JAVAC_EXTRACTOR,
+     ]
+@@ -452,7 +431,6 @@
+                javac_cmd + javac_args,
+                java_files,
+                options.jar_path,
+-               kt_files=kt_files,
+                jar_info_path=jar_info_path,
+                intermediates_out_dir=intermediates_out_dir,
+                enable_partial_javac=True)
+@@ -464,7 +442,6 @@
+                  javac_cmd,
+                  java_files,
+                  jar_path,
+-                 kt_files=None,
+                  jar_info_path=None,
+                  intermediates_out_dir=None,
+                  enable_partial_javac=False):
+@@ -476,7 +453,6 @@
+     javac_cmd: Command to execute.
+     java_files: List of java files passed from command line.
+     jar_path: Path of output jar file.
+-    kt_files: List of Kotlin files passed from command line if any.
+     jar_info_path: Path of the .info file to generate.
+         If None, .info file will not be generated.
+     intermediates_out_dir: Directory for saving intermediate outputs.
+@@ -561,7 +537,6 @@
+ 
+     if save_info_file and java_files:
+       info_file_context.SubmitFiles(java_files)
+-      info_file_context.SubmitFiles(kt_files)
+ 
+     if java_files:
+       # Don't include the output directory in the initial set of args since it
+@@ -592,8 +567,8 @@
+       end = time.time() - start
+       logging.info('Java compilation took %ss', end)
+ 
+-    CreateJarFile(jar_path, classes_dir, service_provider_configuration,
+-                  options.additional_jar_files, options.kotlin_jar_path)
++    _CreateJarFile(jar_path, service_provider_configuration,
++                   options.additional_jar_files, classes_dir)
+ 
+     if save_info_file:
+       info_file_context.Commit(jar_info_path)
+@@ -678,10 +653,6 @@
+       '--header-jar',
+       help='This is the header jar for the current target that contains '
+       'META-INF/services/* files to be included in the output jar.')
+-  parser.add_option(
+-      '--kotlin-jar-path',
+-      help='Kotlin jar to be merged into the output jar. This contains the '
+-      ".class files from this target's .kt files.")
+ 
+   options, args = parser.parse_args(argv)
+   build_utils.CheckOptions(options, parser, required=('jar_path', ))
+@@ -698,29 +669,21 @@
+     additional_jar_files.append((filepath, jar_filepath))
+   options.additional_jar_files = additional_jar_files
+ 
+-  files = []
++  java_files = []
+   for arg in args:
+     # Interpret a path prefixed with @ as a file containing a list of sources.
+     if arg.startswith('@'):
+-      files.extend(build_utils.ReadSourcesList(arg[1:]))
++      java_files.extend(build_utils.ReadSourcesList(arg[1:]))
+     else:
+-      files.append(arg)
+-
+-  # The target's .sources file contains both Java and Kotlin files. We use
+-  # compile_kt.py to compile the Kotlin files to .class and header jars. Javac
+-  # is run only on .java files.
+-  java_files = [f for f in files if f.endswith('.java')]
+-  # Kotlin files are needed to populate the info file and attribute size in
+-  # supersize back to the appropriate Kotlin file.
+-  kt_files = [f for f in files if f.endswith('.kt')]
++      java_files.append(arg)
+ 
+-  return options, java_files, kt_files
++  return options, java_files
+ 
+ 
+ def main(argv):
+   build_utils.InitLogging('JAVAC_DEBUG')
+   argv = build_utils.ExpandFileArgs(argv)
+-  options, java_files, kt_files = _ParseOptions(argv)
++  options, java_files = _ParseOptions(argv)
+ 
+   # Only use the build server for errorprone runs.
+   if (options.enable_errorprone and not options.skip_build_server
+@@ -737,8 +700,7 @@
+ 
+   javac_args = [
+       '-g',
+-      # We currently target JDK 11 everywhere, since Mockito is broken by JDK17.
+-      # See crbug.com/1409661 for more details.
++      # We currently target JDK 11 everywhere.
+       '--release',
+       '11',
+       # Chromium only allows UTF8 source files.  Being explicit avoids
+@@ -773,22 +735,6 @@
+           '-XepPatchChecks:,' + ','.join(ERRORPRONE_CHECKS_TO_APPLY)
+       ]
+ 
+-    # These are required to use JDK 16, and are taken directly from
+-    # https://errorprone.info/docs/installation
+-    javac_args += [
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.processing='
+-        'ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+-        '-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+-        '-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+-        '-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED',
+-    ]
+-
+     javac_args += ['-XDcompilePolicy=simple', ' '.join(errorprone_flags)]
+ 
+     # This flag quits errorprone after checks and before code generation, since
+@@ -815,7 +761,7 @@
+ 
+   depfile_deps = classpath_inputs
+   # Files that are already inputs in GN should go in input_paths.
+-  input_paths = depfile_deps + options.java_srcjars + java_files + kt_files
++  input_paths = depfile_deps + options.java_srcjars + java_files
+   if options.header_jar:
+     input_paths.append(options.header_jar)
+   input_paths += [x[0] for x in options.additional_jar_files]
+@@ -824,13 +770,13 @@
+   if not options.enable_errorprone:
+     output_paths += [options.jar_path + '.info']
+ 
+-  input_strings = (javac_cmd + javac_args + options.classpath + java_files +
+-                   kt_files +
+-                   [options.warnings_as_errors, options.jar_info_exclude_globs])
++  input_strings = javac_cmd + javac_args + options.classpath + java_files + [
++      options.warnings_as_errors, options.jar_info_exclude_globs
++  ]
+ 
+   # Use md5_check for |pass_changes| feature.
+   md5_check.CallAndWriteDepfileIfStale(lambda changes: _OnStaleMd5(
+-      changes, options, javac_cmd, javac_args, java_files, kt_files),
++      changes, options, javac_cmd, javac_args, java_files),
+                                        options,
+                                        depfile_deps=depfile_deps,
+                                        input_paths=input_paths,
+diff -Naur webrtc_build_m112/android/gyp/create_app_bundle.py webrtc_build_m107/android/gyp/create_app_bundle.py
+--- webrtc_build_m112/android/gyp/create_app_bundle.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/create_app_bundle.py	2023-03-28 10:16:38.529427423 +0900
+@@ -11,7 +11,6 @@
+ import json
+ import logging
+ import os
+-import posixpath
+ import shutil
+ import sys
+ import zipfile
+@@ -132,13 +131,15 @@
+ 
+   # Merge all uncompressed assets into a set.
+   uncompressed_list = []
+-  for entry in build_utils.ParseGnList(options.uncompressed_assets):
+-    # Each entry has the following format: 'zipPath' or 'srcPath:zipPath'
+-    pos = entry.find(':')
+-    if pos >= 0:
+-      uncompressed_list.append(entry[pos + 1:])
+-    else:
+-      uncompressed_list.append(entry)
++  if options.uncompressed_assets:
++    for l in options.uncompressed_assets:
++      for entry in build_utils.ParseGnList(l):
++        # Each entry has the following format: 'zipPath' or 'srcPath:zipPath'
++        pos = entry.find(':')
++        if pos >= 0:
++          uncompressed_list.append(entry[pos + 1:])
++        else:
++          uncompressed_list.append(entry)
+ 
+   options.uncompressed_assets = set(uncompressed_list)
+ 
+@@ -198,13 +199,14 @@
+   split_dimensions = [ _MakeSplitDimension(dim, dim in split_dimensions)
+                        for dim in _ALL_SPLIT_DIMENSIONS ]
+ 
++  # Native libraries loaded by the crazy linker.
++  # Whether other .so files are compressed is controlled by
++  # "uncompressNativeLibraries".
++  uncompressed_globs = ['lib/*/crazy.*']
+   # Locale-specific pak files stored in bundle splits need not be compressed.
+-  uncompressed_globs = [
+-      'assets/locales#lang_*/*.pak', 'assets/fallback-locales/*.pak'
+-  ]
+-  # normpath to allow for ../ prefix.
+   uncompressed_globs.extend(
+-      posixpath.normpath('assets/' + x) for x in uncompressed_assets)
++      ['assets/locales#lang_*/*.pak', 'assets/fallback-locales/*.pak'])
++  uncompressed_globs.extend('assets/' + x for x in uncompressed_assets)
+   # NOTE: Use '**' instead of '*' to work through directories!
+   uncompressed_globs.extend('**.' + ext for ext in _UNCOMPRESSED_FILE_EXTS)
+   if not compress_dex:
+@@ -532,7 +534,7 @@
+       f.write(bundle_config)
+ 
+     logging.info('Running bundletool')
+-    cmd_args = build_utils.JavaCmd() + [
++    cmd_args = build_utils.JavaCmd(options.warnings_as_errors) + [
+         '-jar',
+         bundletool.BUNDLETOOL_JAR_PATH,
+         'build-bundle',
+diff -Naur webrtc_build_m112/android/gyp/create_java_binary_script.py webrtc_build_m107/android/gyp/create_java_binary_script.py
+--- webrtc_build_m112/android/gyp/create_java_binary_script.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/create_java_binary_script.py	2023-03-28 10:16:38.539427423 +0900
+@@ -10,7 +10,7 @@
+ jar. This includes correctly setting the classpath and the main class.
+ """
+ 
+-import argparse
++import optparse
+ import os
+ import sys
+ 
+@@ -76,60 +76,44 @@
+ 
+ def main(argv):
+   argv = build_utils.ExpandFileArgs(argv)
+-  parser = argparse.ArgumentParser()
+-  parser.add_argument('--output',
+-                      required=True,
+-                      help='Output path for executable script.')
+-  parser.add_argument(
+-      '--main-class',
+-      required=True,
++  parser = optparse.OptionParser()
++  parser.add_option('--output', help='Output path for executable script.')
++  parser.add_option('--main-class',
+       help='Name of the java class with the "main" entry point.')
+-  parser.add_argument('--max-heap-size',
+-                      required=True,
+-                      help='Argument for -Xmx')
+-  parser.add_argument('--classpath',
+-                      action='append',
+-                      default=[],
+-                      help='Classpath for running the jar.')
+-  parser.add_argument('--tiered-stop-at-level-one',
+-                      action='store_true',
+-                      help='JVM flag: -XX:TieredStopAtLevel=1.')
+-  parser.add_argument('--use-jdk-11',
+-                      action='store_true',
+-                      help='Use older JDK11 instead of modern JDK.')
+-  parser.add_argument('extra_program_args',
+-                      nargs='*',
+-                      help='This captures all '
+-                      'args after "--" to pass as extra args to the java cmd.')
+-
+-  args = parser.parse_args(argv)
+-
+-  extra_flags = [f'java_cmd.append("-Xmx{args.max_heap_size}")']
+-  if args.tiered_stop_at_level_one:
++  parser.add_option('--classpath', action='append', default=[],
++      help='Classpath for running the jar.')
++  parser.add_option('--noverify', action='store_true',
++      help='JVM flag: noverify.')
++  parser.add_option('--tiered-stop-at-level-one',
++                    action='store_true',
++                    help='JVM flag: -XX:TieredStopAtLevel=1.')
++
++  options, extra_program_args = parser.parse_args(argv)
++
++  extra_flags = []
++  if options.noverify:
++    extra_flags.append('java_cmd.append("-noverify")')
++  if options.tiered_stop_at_level_one:
+     extra_flags.append('java_cmd.append("-XX:TieredStopAtLevel=1")')
+ 
+   classpath = []
+-  for cp_arg in args.classpath:
++  for cp_arg in options.classpath:
+     classpath += build_utils.ParseGnList(cp_arg)
+ 
+-  run_dir = os.path.dirname(args.output)
++  run_dir = os.path.dirname(options.output)
+   classpath = [os.path.relpath(p, run_dir) for p in classpath]
++  java_path = os.path.relpath(
++      os.path.join(build_utils.JAVA_HOME, 'bin', 'java'), run_dir)
+ 
+-  if args.use_jdk_11:
+-    java_home = build_utils.JAVA_11_HOME_DEPRECATED
+-  else:
+-    java_home = build_utils.JAVA_HOME
+-  java_path = os.path.relpath(os.path.join(java_home, 'bin', 'java'), run_dir)
+-
+-  with build_utils.AtomicOutput(args.output, mode='w') as script:
++  with build_utils.AtomicOutput(options.output, mode='w') as script:
+     script.write(
+         script_template.format(classpath=('"%s"' % '", "'.join(classpath)),
+                                java_path=repr(java_path),
+-                               main_class=args.main_class,
+-                               extra_program_args=repr(args.extra_program_args),
++                               main_class=options.main_class,
++                               extra_program_args=repr(extra_program_args),
+                                extra_flags='\n'.join(extra_flags)))
+ 
+-  os.chmod(args.output, 0o750)
++  os.chmod(options.output, 0o750)
+ 
+ 
+ if __name__ == '__main__':
+diff -Naur webrtc_build_m112/android/gyp/dex.py webrtc_build_m107/android/gyp/dex.py
+--- webrtc_build_m112/android/gyp/dex.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/dex.py	2023-03-28 10:16:38.539427423 +0900
+@@ -23,32 +23,31 @@
+ _DEX_XMX = '2G'  # Increase this when __final_dex OOMs.
+ 
+ _IGNORE_WARNINGS = (
+-    # E.g. Triggers for weblayer_instrumentation_test_apk since both it and its
+-    # apk_under_test have no shared_libraries.
+-    # https://crbug.com/1364192 << To fix this in a better way.
++    # Caused by Play Services:
++    r'Type `libcore.io.Memory` was not found',
++    # Caused by flogger supporting these as fallbacks. Not needed at runtime.
++    r'Type `dalvik.system.VMStack` was not found',
++    r'Type `sun.misc.JavaLangAccess` was not found',
++    r'Type `sun.misc.SharedSecrets` was not found',
++    # Caused by jacoco code coverage:
++    r'Type `java.lang.management.ManagementFactory` was not found',
++    # Caused when the test apk and the apk under test do not having native libs.
+     r'Missing class org.chromium.build.NativeLibraries',
++    # Caused by internal annotation: https://crbug.com/1180222
++    r'Missing class com.google.errorprone.annotations.RestrictedInheritance',
+     # Caused by internal protobuf package: https://crbug.com/1183971
+     r'referenced from: com.google.protobuf.GeneratedMessageLite$GeneratedExtension',  # pylint: disable=line-too-long
++    # Caused by using Bazel desugar instead of D8 for desugar, since Bazel
++    # desugar doesn't preserve interfaces in the same way. This should be
++    # removed when D8 is used for desugaring.
++    r'Warning: Cannot emulate interface ',
+     # Desugaring configs may occasionally not match types in our program. This
+     # may happen temporarily until we move over to the new desugared library
+     # json flags. See crbug.com/1302088 - this should be removed when this bug
+     # is fixed.
+-    r'Warning: Specification conversion: The following',
+-    # Caused by protobuf runtime using -identifiernamestring in a way that
+-    # doesn't work with R8. Looks like:
+-    # Rule matches the static final field `...`, which may have been inlined...
+-    # com.google.protobuf.*GeneratedExtensionRegistryLite {
+-    #   static java.lang.String CONTAINING_TYPE_*;
+-    # }
+-    r'GeneratedExtensionRegistryLite.CONTAINING_TYPE_',
+-    # Relevant for R8 when optimizing an app that doesn't use protobuf.
++    r'Warning: Specification conversion: The following prefixes do not match any type:',  # pylint: disable=line-too-long
++    # Only relevant for R8 when optimizing an app that doesn't use proto.
+     r'Ignoring -shrinkunusedprotofields since the protobuf-lite runtime is',
+-    # Ignore Unused Rule Warnings in third_party libraries.
+-    r'/third_party/.*Proguard configuration rule does not match anything',
+-    # Ignore Unused Rule Warnings for system classes (aapt2 generates these).
+-    r'Proguard configuration rule does not match anything:.*class android\.',
+-    # TODO(crbug.com/1303951): Don't ignore all such warnings.
+-    r'Proguard configuration rule does not match anything:',
+ )
+ 
+ _SKIPPED_CLASS_FILE_NAMES = (
+@@ -105,6 +104,8 @@
+       '--bootclasspath',
+       action='append',
+       help='GN-list of bootclasspath. Needed for --desugar')
++  parser.add_argument(
++      '--desugar-jdk-libs-json', help='Path to desugar_jdk_libs.json.')
+   parser.add_argument('--show-desugar-default-interface-warnings',
+                       action='store_true',
+                       help='Enable desugaring warnings.')
+@@ -155,27 +156,40 @@
+ 
+ def CreateStderrFilter(show_desugar_default_interface_warnings):
+   def filter_stderr(output):
+-    # Set this when debugging R8 output.
+-    if os.environ.get('R8_SHOW_ALL_OUTPUT', '0') != '0':
+-      return output
+-
+-    warnings = re.split(r'^(?=Warning)', output, flags=re.MULTILINE)
+-    preamble, *warnings = warnings
+-
+     patterns = list(_IGNORE_WARNINGS)
+ 
+-    # Missing deps can happen for prebuilts that are missing transitive deps
+-    # and have set enable_bytecode_checks=false.
++    # When using Bazel's Desugar tool to desugar lambdas and interface methods,
++    # we do not provide D8 with a classpath, which causes a lot of warnings from
++    # D8's default interface desugaring pass. Not having a classpath makes
++    # incremental dexing much more effective. D8 still does backported method
++    # desugaring.
++    # These warnings are also turned off when bytecode checks are turned off.
+     if not show_desugar_default_interface_warnings:
+       patterns += ['default or static interface methods']
+ 
+     combined_pattern = '|'.join(re.escape(p) for p in patterns)
+-    preamble = build_utils.FilterLines(preamble, combined_pattern)
++    output = build_utils.FilterLines(output, combined_pattern)
+ 
+-    compiled_re = re.compile(combined_pattern, re.DOTALL)
+-    warnings = [w for w in warnings if not compiled_re.search(w)]
++    # Each warning has a prefix line of the file it's from. If we've filtered
++    # out the warning, then also filter out the file header.
++    # E.g.:
++    # Warning in path/to/Foo.class:
++    #   Error message #1 indented here.
++    #   Error message #2 indented here.
++    output = re.sub(r'^Warning in .*?:\n(?!  )', '', output, flags=re.MULTILINE)
+ 
+-    return preamble + ''.join(warnings)
++    # Caused by protobuf runtime using -identifiernamestring in a way that
++    # doesn't work with R8. Looks like:
++    # Rule matches ... (very long line) {
++    #   static java.lang.String CONTAINING_TYPE_*;
++    # }
++    output = re.sub(
++        r'Rule matches the static final field `java\.lang\.String '
++        r'com\.google\.protobuf.*\{\n.*?\n\}\n?',
++        '',
++        output,
++        flags=re.DOTALL)
++    return output
+ 
+   return filter_stderr
+ 
+@@ -422,7 +436,7 @@
+ 
+ def MergeDexForIncrementalInstall(r8_jar_path, src_paths, dest_dex_jar,
+                                   min_api):
+-  dex_cmd = build_utils.JavaCmd(xmx=_DEX_XMX) + [
++  dex_cmd = build_utils.JavaCmd(verify=False, xmx=_DEX_XMX) + [
+       '-cp',
+       r8_jar_path,
+       'com.android.tools.r8.D8',
+@@ -460,7 +474,7 @@
+     final_dex_inputs = list(options.class_inputs)
+   final_dex_inputs += options.dex_inputs
+ 
+-  dex_cmd = build_utils.JavaCmd(xmx=_DEX_XMX)
++  dex_cmd = build_utils.JavaCmd(options.warnings_as_errors, xmx=_DEX_XMX)
+ 
+   if options.dump_inputs:
+     dex_cmd += ['-Dcom.android.tools.r8.dumpinputtofile=d8inputs.zip']
+@@ -507,6 +521,9 @@
+     input_paths += options.bootclasspath
+ 
+ 
++  if options.desugar_jdk_libs_json:
++    dex_cmd += ['--desugared-lib', options.desugar_jdk_libs_json]
++    input_paths += [options.desugar_jdk_libs_json]
+   if options.assertion_handler:
+     dex_cmd += ['--force-assertions-handler:' + options.assertion_handler]
+   if options.force_enable_assertions:
+diff -Naur webrtc_build_m112/android/gyp/finalize_apk.py webrtc_build_m107/android/gyp/finalize_apk.py
+--- webrtc_build_m112/android/gyp/finalize_apk.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/finalize_apk.py	2023-03-28 10:16:38.539427423 +0900
+@@ -38,7 +38,7 @@
+     else:
+       signer_input_path = unsigned_apk_path
+ 
+-    sign_cmd = build_utils.JavaCmd() + [
++    sign_cmd = build_utils.JavaCmd(warnings_as_errors) + [
+         '-jar',
+         apksigner_path,
+         'sign',
+diff -Naur webrtc_build_m112/android/gyp/merge_manifest.py webrtc_build_m107/android/gyp/merge_manifest.py
+--- webrtc_build_m112/android/gyp/merge_manifest.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/merge_manifest.py	2023-03-28 10:16:38.539427423 +0900
+@@ -7,7 +7,6 @@
+ """Merges dependency Android manifests into a root manifest."""
+ 
+ import argparse
+-import collections
+ import contextlib
+ import os
+ import sys
+@@ -21,14 +20,17 @@
+ 
+ 
+ @contextlib.contextmanager
+-def _ProcessMainManifest(manifest_path, min_sdk_version, target_sdk_version,
+-                         max_sdk_version, manifest_package):
+-  """Patches the main Android manifest"""
++def _ProcessManifest(manifest_path, min_sdk_version, target_sdk_version,
++                     max_sdk_version, manifest_package):
++  """Patches an Android manifest's package and performs assertions to ensure
++  correctness for the manifest.
++  """
+   doc, manifest, _ = manifest_utils.ParseManifest(manifest_path)
+-  manifest_utils.SetUsesSdk(manifest, target_sdk_version, min_sdk_version,
+-                            max_sdk_version)
++  manifest_utils.AssertUsesSdk(manifest, min_sdk_version, target_sdk_version,
++                               max_sdk_version)
+   assert manifest_utils.GetPackage(manifest) or manifest_package, \
+             'Must set manifest package in GN or in AndroidManifest.xml'
++  manifest_utils.AssertPackage(manifest, manifest_package)
+   if manifest_package:
+     manifest.set('package', manifest_package)
+   tmp_prefix = manifest_path.replace(os.path.sep, '-')
+@@ -38,30 +40,19 @@
+ 
+ 
+ @contextlib.contextmanager
+-def _ProcessOtherManifest(manifest_path, target_sdk_version,
+-                          seen_package_names):
+-  """Patches non-main AndroidManifest.xml if necessary."""
+-  # 1. Ensure targetSdkVersion is set to the expected value to avoid
+-  #    spurious permissions being added (b/222331337).
+-  # 2. Ensure all manifests have a unique package name so that the merger
+-  #    does not fail when this happens.
+-  doc, manifest, _ = manifest_utils.ParseManifest(manifest_path)
+-
+-  changed_api = manifest_utils.SetTargetApiIfUnset(manifest, target_sdk_version)
++def _SetTargetApi(manifest_path, target_sdk_version):
++  """Patches an Android manifest's TargetApi if not set.
+ 
+-  package_name = manifest_utils.GetPackage(manifest)
+-  package_count = seen_package_names[package_name]
+-  seen_package_names[package_name] += 1
+-  if package_count > 0:
+-    manifest.set('package', f'{package_name}_{package_count}')
+-
+-  if package_count > 0 or changed_api:
+-    tmp_prefix = manifest_path.replace(os.path.sep, '-')
+-    with tempfile.NamedTemporaryFile(prefix=tmp_prefix) as patched_manifest:
+-      manifest_utils.SaveManifest(doc, patched_manifest.name)
+-      yield patched_manifest.name
+-  else:
+-    yield manifest_path
++  We do this to avoid the manifest merger assuming we have a targetSdkVersion
++  of 1 and inserting unnecessary permission requests into our merged manifests.
++  See b/222331337 for more details.
++  """
++  doc, manifest, _ = manifest_utils.ParseManifest(manifest_path)
++  manifest_utils.SetTargetApiIfUnset(manifest, target_sdk_version)
++  tmp_prefix = manifest_path.replace(os.path.sep, '-')
++  with tempfile.NamedTemporaryFile(prefix=tmp_prefix) as patched_manifest:
++    manifest_utils.SaveManifest(doc, patched_manifest.name)
++    yield patched_manifest.name
+ 
+ 
+ def main(argv):
+@@ -96,7 +87,7 @@
+   args = parser.parse_args(argv)
+ 
+   with build_utils.AtomicOutput(args.output) as output:
+-    cmd = build_utils.JavaCmd() + [
++    cmd = build_utils.JavaCmd(args.warnings_as_errors) + [
+         '-cp',
+         args.manifest_merger_jar,
+         _MANIFEST_MERGER_MAIN_CLASS,
+@@ -118,15 +109,13 @@
+ 
+     with contextlib.ExitStack() as stack:
+       root_manifest, package = stack.enter_context(
+-          _ProcessMainManifest(args.root_manifest, args.min_sdk_version,
+-                               args.target_sdk_version, args.max_sdk_version,
+-                               args.manifest_package))
++          _ProcessManifest(args.root_manifest, args.min_sdk_version,
++                           args.target_sdk_version, args.max_sdk_version,
++                           args.manifest_package))
+       if extras:
+-        seen_package_names = collections.Counter()
+         extras_processed = [
+-            stack.enter_context(
+-                _ProcessOtherManifest(e, args.target_sdk_version,
+-                                      seen_package_names)) for e in extras
++            stack.enter_context(_SetTargetApi(e, args.target_sdk_version))
++            for e in extras
+         ]
+         cmd += ['--libs', ':'.join(extras_processed)]
+       cmd += [
+@@ -144,6 +133,12 @@
+           IsTimeStale(output.name, [root_manifest] + extras),
+           fail_on_output=args.warnings_as_errors)
+ 
++    # Check for correct output.
++    _, manifest, _ = manifest_utils.ParseManifest(output.name)
++    manifest_utils.AssertUsesSdk(manifest, args.min_sdk_version,
++                                 args.target_sdk_version)
++    manifest_utils.AssertPackage(manifest, package)
++
+   if args.depfile:
+     build_utils.WriteDepfile(args.depfile, args.output, inputs=extras)
+ 
+diff -Naur webrtc_build_m112/android/gyp/proguard.py webrtc_build_m107/android/gyp/proguard.py
+--- webrtc_build_m112/android/gyp/proguard.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/proguard.py	2023-03-28 10:16:38.539427423 +0900
+@@ -11,21 +11,17 @@
+ import re
+ import shutil
+ import sys
++import tempfile
+ import zipfile
+ 
+ import dex
++import dex_jdk_libs
+ from util import build_utils
+ from util import diff_utils
+ 
+ sys.path.insert(1, os.path.dirname(os.path.dirname(__file__)))
+ from pylib.dex import dex_parser
+ 
+-_BLOCKLISTED_EXPECTATION_PATHS = [
+-    # A separate expectation file is created for these files.
+-    'clank/third_party/google3/pg_confs/'
+-]
+-
+-
+ def _ParseOptions():
+   args = build_utils.ExpandFileArgs(sys.argv[1:])
+   parser = argparse.ArgumentParser()
+@@ -33,10 +29,16 @@
+   parser.add_argument('--r8-path',
+                       required=True,
+                       help='Path to the R8.jar to use.')
++  parser.add_argument(
++      '--desugar-jdk-libs-json', help='Path to desugar_jdk_libs.json.')
+   parser.add_argument('--input-paths',
+                       action='append',
+                       required=True,
+                       help='GN-list of .jar files to optimize.')
++  parser.add_argument('--desugar-jdk-libs-jar',
++                      help='Path to desugar_jdk_libs.jar.')
++  parser.add_argument('--desugar-jdk-libs-configuration-jar',
++                      help='Path to desugar_jdk_libs_configuration.jar.')
+   parser.add_argument('--output-path', help='Path to the generated .jar file.')
+   parser.add_argument(
+       '--proguard-configs',
+@@ -118,10 +120,6 @@
+                       help='Use when filing R8 bugs to capture inputs.'
+                       ' Stores inputs to r8inputs.zip')
+   parser.add_argument(
+-      '--dump-unknown-refs',
+-      action='store_true',
+-      help='Log all reasons why API modelling cannot determine API level')
+-  parser.add_argument(
+       '--stamp',
+       help='File to touch upon success. Mutually exclusive with --output-path')
+   parser.add_argument('--desugared-library-keep-rule-output',
+@@ -186,12 +184,18 @@
+     self.staging_dir = os.path.join(work_dir, name)
+     os.mkdir(self.staging_dir)
+ 
+-  def CreateOutput(self):
++  def CreateOutput(self, has_imported_lib=False, keep_rule_output=None):
+     found_files = build_utils.FindInDirectory(self.staging_dir)
+     if not found_files:
+       raise Exception('Missing dex outputs in {}'.format(self.staging_dir))
+ 
+     if self.final_output_path.endswith('.dex'):
++      if has_imported_lib:
++        raise Exception(
++            'Trying to create a single .dex file, but a dependency requires '
++            'JDK Library Desugaring (which necessitates a second file).'
++            'Refer to %s to see what desugaring was required' %
++            keep_rule_output)
+       if len(found_files) != 1:
+         raise Exception('Expected exactly 1 dex file output, found: {}'.format(
+             '\t'.join(found_files)))
+@@ -205,6 +209,48 @@
+     shutil.move(tmp_jar_output, self.final_output_path)
+ 
+ 
++def _DeDupeInputJars(split_contexts_by_name):
++  """Moves jars used by multiple splits into common ancestors.
++
++  Updates |input_jars| for each _SplitContext.
++  """
++
++  def count_ancestors(split_context):
++    ret = 0
++    if split_context.parent_name:
++      ret += 1
++      ret += count_ancestors(split_contexts_by_name[split_context.parent_name])
++    return ret
++
++  base_context = split_contexts_by_name['base']
++  # Sort by tree depth so that ensure children are visited before their parents.
++  sorted_contexts = list(split_contexts_by_name.values())
++  sorted_contexts.remove(base_context)
++  sorted_contexts.sort(key=count_ancestors, reverse=True)
++
++  # If a jar is present in multiple siblings, promote it to their parent.
++  seen_jars_by_parent = defaultdict(set)
++  for split_context in sorted_contexts:
++    seen_jars = seen_jars_by_parent[split_context.parent_name]
++    new_dupes = seen_jars.intersection(split_context.input_jars)
++    parent_context = split_contexts_by_name[split_context.parent_name]
++    parent_context.input_jars.update(new_dupes)
++    seen_jars.update(split_context.input_jars)
++
++  def ancestor_jars(parent_name, dest=None):
++    dest = dest or set()
++    if not parent_name:
++      return dest
++    parent_context = split_contexts_by_name[parent_name]
++    dest.update(parent_context.input_jars)
++    return ancestor_jars(parent_context.parent_name, dest)
++
++  # Now that jars have been moved up the tree, remove those that appear in
++  # ancestors.
++  for split_context in sorted_contexts:
++    split_context.input_jars -= ancestor_jars(split_context.parent_name)
++
++
+ def _OptimizeWithR8(options,
+                     config_paths,
+                     libraries,
+@@ -247,18 +293,11 @@
+     base_context = split_contexts_by_name['base']
+ 
+     # R8 OOMs with the default xmx=1G.
+-    cmd = build_utils.JavaCmd(xmx='2G') + [
+-        # Allows -whyareyounotinlining, which we don't have by default, but
+-        # which is useful for one-off queries.
++    cmd = build_utils.JavaCmd(options.warnings_as_errors, xmx='2G') + [
+         '-Dcom.android.tools.r8.experimental.enablewhyareyounotinlining=1',
+-        # Restricts horizontal class merging to apply only to classes that
+-        # share a .java file (nested classes). https://crbug.com/1363709
+-        '-Dcom.android.tools.r8.enableSameFilePolicy=1',
+     ]
+     if options.dump_inputs:
+       cmd += ['-Dcom.android.tools.r8.dumpinputtofile=r8inputs.zip']
+-    if options.dump_unknown_refs:
+-      cmd += ['-Dcom.android.tools.r8.reportUnknownApiReferences=1']
+     cmd += [
+         '-cp',
+         options.r8_path,
+@@ -273,10 +312,16 @@
+     if options.disable_checks:
+       # Info level priority logs are not printed by default.
+       cmd += ['--map-diagnostics:CheckDiscardDiagnostic', 'error', 'info']
+-    else:
+-      cmd += ['--map-diagnostics', 'info', 'warning']
+-      if not options.warnings_as_errors:
+-        cmd += ['--map-diagnostics', 'error', 'warning']
++    elif not options.warnings_as_errors:
++      cmd += ['--map-diagnostics:CheckDiscardDiagnostic', 'error', 'warning']
++
++    if options.desugar_jdk_libs_json:
++      cmd += [
++          '--desugared-lib',
++          options.desugar_jdk_libs_json,
++          '--desugared-lib-pg-conf-output',
++          options.desugared_library_keep_rule_output,
++      ]
+ 
+     if options.min_api:
+       cmd += ['--min-api', options.min_api]
+@@ -296,6 +341,8 @@
+       for main_dex_rule in options.main_dex_rules_path:
+         cmd += ['--main-dex-rules', main_dex_rule]
+ 
++    _DeDupeInputJars(split_contexts_by_name)
++
+     # Add any extra inputs to the base context (e.g. desugar runtime).
+     extra_jars = set(options.input_paths)
+     for split_context in split_contexts_by_name.values():
+@@ -325,8 +372,39 @@
+           'https://chromium.googlesource.com/chromium/src/+/HEAD/build/'
+           'android/docs/java_optimization.md#Debugging-common-failures') from e
+ 
++    base_has_imported_lib = False
++    if options.desugar_jdk_libs_json:
++      logging.debug('Running L8')
++      existing_files = build_utils.FindInDirectory(base_context.staging_dir)
++      jdk_dex_output = os.path.join(base_context.staging_dir,
++                                    'classes%d.dex' % (len(existing_files) + 1))
++      # Use -applymapping to avoid name collisions.
++      l8_dynamic_config_path = os.path.join(tmp_dir, 'l8_dynamic_config.flags')
++      with open(l8_dynamic_config_path, 'w') as f:
++        f.write("-applymapping '{}'\n".format(tmp_mapping_path))
++      # Pass the dynamic config so that obfuscation options are picked up.
++      l8_config_paths = [dynamic_config_path, l8_dynamic_config_path]
++      if os.path.exists(options.desugared_library_keep_rule_output):
++        l8_config_paths.append(options.desugared_library_keep_rule_output)
++
++      base_has_imported_lib = dex_jdk_libs.DexJdkLibJar(
++          options.r8_path, options.min_api, options.desugar_jdk_libs_json,
++          options.desugar_jdk_libs_jar,
++          options.desugar_jdk_libs_configuration_jar, jdk_dex_output,
++          options.warnings_as_errors, l8_config_paths)
++      if int(options.min_api) >= 24 and base_has_imported_lib:
++        with open(jdk_dex_output, 'rb') as f:
++          dexfile = dex_parser.DexFile(bytearray(f.read()))
++          for m in dexfile.IterMethodSignatureParts():
++            print('{}#{}'.format(m[0], m[2]))
++        assert False, (
++            'Desugared JDK libs are disabled on Monochrome and newer - see '
++            'crbug.com/1159984 for details, and see above list for desugared '
++            'classes and methods.')
++
+     logging.debug('Collecting ouputs')
+-    base_context.CreateOutput()
++    base_context.CreateOutput(base_has_imported_lib,
++                              options.desugared_library_keep_rule_output)
+     for split_context in split_contexts_by_name.values():
+       if split_context is not base_context:
+         split_context.CreateOutput()
+@@ -337,7 +415,7 @@
+ 
+ def _OutputKeepRules(r8_path, input_paths, classpath, targets_re_string,
+                      keep_rules_output):
+-  cmd = build_utils.JavaCmd() + [
++  cmd = build_utils.JavaCmd(False) + [
+       '-cp', r8_path, 'com.android.tools.r8.tracereferences.TraceReferences',
+       '--map-diagnostics:MissingDefinitionsDiagnostic', 'error', 'warning',
+       '--keep-rules', '--output', keep_rules_output
+@@ -356,7 +434,7 @@
+ 
+ def _CheckForMissingSymbols(r8_path, dex_files, classpath, warnings_as_errors,
+                             error_title):
+-  cmd = build_utils.JavaCmd() + [
++  cmd = build_utils.JavaCmd(warnings_as_errors) + [
+       '-cp', r8_path, 'com.android.tools.r8.tracereferences.TraceReferences',
+       '--map-diagnostics:MissingDefinitionsDiagnostic', 'error', 'warning',
+       '--check'
+@@ -468,10 +546,6 @@
+     if exclude_generated and config.endswith('.resources.proguard.txt'):
+       continue
+ 
+-    # Exclude some confs from expectations.
+-    if any(entry in config for entry in _BLOCKLISTED_EXPECTATION_PATHS):
+-      continue
+-
+     with open(config) as config_file:
+       contents = config_file.read().rstrip()
+ 
+diff -Naur webrtc_build_m112/android/gyp/turbine.py webrtc_build_m107/android/gyp/turbine.py
+--- webrtc_build_m112/android/gyp/turbine.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/turbine.py	2023-03-28 10:16:38.539427423 +0900
+@@ -9,7 +9,6 @@
+ import logging
+ import sys
+ import time
+-import zipfile
+ 
+ import javac_output_processor
+ from util import build_utils
+@@ -56,8 +55,6 @@
+   parser.add_argument('--warnings-as-errors',
+                       action='store_true',
+                       help='Treat all warnings as errors.')
+-  parser.add_argument('--kotlin-jar-path',
+-                      help='Kotlin jar to be merged into the output jar.')
+   options, unknown_args = parser.parse_known_args(argv)
+ 
+   options.classpath = build_utils.ParseGnList(options.classpath)
+@@ -71,12 +68,7 @@
+     if arg.startswith('@'):
+       files.extend(build_utils.ReadSourcesList(arg[1:]))
+ 
+-  # The target's .sources file contains both Java and Kotlin files. We use
+-  # compile_kt.py to compile the Kotlin files to .class and header jars.
+-  # Turbine is run only on .java files.
+-  java_files = [f for f in files if f.endswith('.java')]
+-
+-  cmd = build_utils.JavaCmd() + [
++  cmd = build_utils.JavaCmd(options.warnings_as_errors) + [
+       '-classpath', options.turbine_jar_path, 'com.google.turbine.main.Main'
+   ]
+   javac_cmd = [
+@@ -108,11 +100,11 @@
+     cmd += ['--source_jars']
+     cmd += options.java_srcjars
+ 
+-  if java_files:
++  if files:
+     # Use jar_path to ensure paths are relative (needed for goma).
+-    files_rsp_path = options.jar_path + '.java_files_list.txt'
++    files_rsp_path = options.jar_path + '.files_list.txt'
+     with open(files_rsp_path, 'w') as f:
+-      f.write(' '.join(java_files))
++      f.write(' '.join(files))
+     # Pass source paths as response files to avoid extremely long command lines
+     # that are tedius to debug.
+     cmd += ['--sources']
+@@ -140,11 +132,6 @@
+                             fail_on_output=options.warnings_as_errors)
+     end = time.time() - start
+     logging.info('Header compilation took %ss', end)
+-    if options.kotlin_jar_path:
+-      with zipfile.ZipFile(output_jar.name, 'a') as out_zip:
+-        build_utils.MergeZips(
+-            out_zip, [options.kotlin_jar_path],
+-            path_transform=lambda p: p if p.endswith('.class') else None)
+ 
+   if options.depfile:
+     # GN already knows of the java files, so avoid listing individual java files
+diff -Naur webrtc_build_m112/android/gyp/util/build_utils.py webrtc_build_m107/android/gyp/util/build_utils.py
+--- webrtc_build_m112/android/gyp/util/build_utils.py	2023-03-28 10:10:29.749430122 +0900
++++ webrtc_build_m107/android/gyp/util/build_utils.py	2023-03-28 10:16:38.539427423 +0900
+@@ -37,12 +37,6 @@
+ JAVA_HOME = os.path.join(DIR_SOURCE_ROOT, 'third_party', 'jdk', 'current')
+ JAVAC_PATH = os.path.join(JAVA_HOME, 'bin', 'javac')
+ JAVAP_PATH = os.path.join(JAVA_HOME, 'bin', 'javap')
+-KOTLIN_HOME = os.path.join(DIR_SOURCE_ROOT, 'third_party', 'kotlinc', 'current')
+-KOTLINC_PATH = os.path.join(KOTLIN_HOME, 'bin', 'kotlinc')
+-# Please avoid using this. Our JAVA_HOME is using a newer and actively patched
+-# JDK.
+-JAVA_11_HOME_DEPRECATED = os.path.join(DIR_SOURCE_ROOT, 'third_party', 'jdk11',
+-                                       'current')
+ 
+ try:
+   string_types = basestring
+@@ -50,12 +44,17 @@
+   string_types = (str, bytes)
+ 
+ 
+-def JavaCmd(xmx='1G'):
++def JavaCmd(verify=True, xmx='1G'):
+   ret = [os.path.join(JAVA_HOME, 'bin', 'java')]
+   # Limit heap to avoid Java not GC'ing when it should, and causing
+   # bots to OOM when many java commands are runnig at the same time
+   # https://crbug.com/1098333
+   ret += ['-Xmx' + xmx]
++
++  # Disable bytecode verification for local builds gives a ~2% speed-up.
++  if not verify:
++    ret += ['-noverify']
++
+   return ret
+ 
+ 
+@@ -572,14 +571,12 @@
+     compress: Overrides compression setting from origin zip entries.
+   """
+   path_transform = path_transform or (lambda p: p)
++  added_names = set()
+ 
+   out_zip = output
+   if not isinstance(output, zipfile.ZipFile):
+     out_zip = zipfile.ZipFile(output, 'w')
+ 
+-  # Include paths in the existing zip here to avoid adding duplicate files.
+-  added_names = set(out_zip.namelist())
+-
+   try:
+     for in_file in input_zips:
+       with zipfile.ZipFile(in_file, 'r') as in_zip:
