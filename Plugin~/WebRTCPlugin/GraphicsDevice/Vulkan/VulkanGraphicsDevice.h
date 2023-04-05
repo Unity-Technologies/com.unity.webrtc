@@ -67,7 +67,7 @@ namespace webrtc
     private:
         VkResult CreateCommandPool();
         static void AccessQueueCallback(int eventID, void* data);
-
+        static VulkanGraphicsDevice* m_graphicsInstance;
         UnityGraphicsVulkan* m_unityVulkan;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;

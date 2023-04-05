@@ -19,7 +19,7 @@ namespace unity
 {
 namespace webrtc
 {
-    static std::unique_ptr<VulkanGraphicsDevice> s_GraphicsDevice = nullptr;
+    static VulkanGraphicsDevice* s_GraphicsDevice = nullptr;
 
     VulkanGraphicsDevice::VulkanGraphicsDevice(
         UnityGraphicsVulkan* unityVulkan,
@@ -46,8 +46,6 @@ namespace webrtc
         if (profiler)
             m_maker = profiler->CreateMarker(
                 "VulkanGraphicsDevice.CopyImage", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
-
-        s_GraphicsDevice.reset(this);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -56,6 +54,8 @@ namespace webrtc
 #if CUDA_PLATFORM
         m_isCudaSupport = InitCudaContext();
 #endif
+        s_GraphicsDevice = this;
+
         return VK_SUCCESS == CreateCommandPool();
     }
 
@@ -82,7 +82,7 @@ namespace webrtc
 #endif
         VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator)
 
-        s_GraphicsDevice.reset();
+        s_GraphicsDevice = nullptr;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -231,7 +231,14 @@ namespace webrtc
             return false;
         }
 
-        m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
+        if (m_unityVulkan != nullptr)
+        {
+            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
+        }
+        else
+        {
+            AccessQueueCallback(0, dest);
+        }
 
         return true;
     }
@@ -308,7 +315,14 @@ namespace webrtc
             return false;
         }
 
-        m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
+        if (m_unityVulkan != nullptr)
+        {
+            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
+        }
+        else
+        {
+            AccessQueueCallback(0, dest);
+        }
 
         return true;
     }
