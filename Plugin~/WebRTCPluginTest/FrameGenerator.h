@@ -28,6 +28,7 @@ namespace webrtc
         VideoFrameGenerator(IGraphicsDevice* device, int width, int height, OutputType type, int num_squares);
 
         void ChangeResolution(size_t width, size_t height) override;
+        FrameGeneratorInterface::Resolution GetResolution() const override;
         VideoFrameData NextFrame() override;
 
     private:
