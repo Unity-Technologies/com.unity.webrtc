@@ -19,6 +19,7 @@ namespace unity
 {
 namespace webrtc
 {
+    static VulkanGraphicsDevice* s_GraphicsDevice = nullptr;
 
     VulkanGraphicsDevice::VulkanGraphicsDevice(
         UnityGraphicsVulkan* unityVulkan,
@@ -53,6 +54,8 @@ namespace webrtc
 #if CUDA_PLATFORM
         m_isCudaSupport = InitCudaContext();
 #endif
+        s_GraphicsDevice = this;
+
         return VK_SUCCESS == CreateCommandPool();
     }
 
@@ -78,6 +81,8 @@ namespace webrtc
         m_cudaContext.Shutdown();
 #endif
         VULKAN_SAFE_DESTROY_COMMAND_POOL(m_device, m_commandPool, m_allocator)
+
+        s_GraphicsDevice = nullptr;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -225,13 +230,16 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "vkEndCommandBuffer failed. result:" << result;
             return false;
         }
-        VkFence fence = destTexture->GetFence();
-        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
-        if (result != VK_SUCCESS)
+
+        if (m_unityVulkan != nullptr)
         {
-            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
-            return false;
+            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
         }
+        else
+        {
+            AccessQueueCallback(0, dest);
+        }
+
         return true;
     }
 
@@ -306,13 +314,16 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "vkEndCommandBuffer failed. result:" << result;
             return false;
         }
-        VkFence fence = destTexture->GetFence();
-        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
-        if (result != VK_SUCCESS)
+
+        if (m_unityVulkan != nullptr)
         {
-            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
-            return false;
+            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
         }
+        else
+        {
+            AccessQueueCallback(0, dest);
+        }
+
         return true;
     }
 
@@ -321,7 +332,7 @@ namespace webrtc
         VkCommandPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = m_queueFamilyIndex;
-        poolInfo.flags = 0;
+        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
         return vkCreateCommandPool(m_device, &poolInfo, m_allocator, &m_commandPool);
     }
@@ -493,6 +504,18 @@ namespace webrtc
             return false;
         }
         return true;
+    }
+
+    void VulkanGraphicsDevice::AccessQueueCallback(int eventID, void* data)
+    {
+        VulkanTexture2D* texture = reinterpret_cast<VulkanTexture2D*>(data);
+
+        VkResult qResult =
+            QueueSubmit(s_GraphicsDevice->m_graphicsQueue, texture->GetCommandBuffer(), texture->GetFence());
+        if (qResult != VK_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << qResult;
+        }
     }
 
 } // end namespace webrtc

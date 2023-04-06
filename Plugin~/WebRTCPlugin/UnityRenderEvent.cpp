@@ -30,7 +30,7 @@ namespace webrtc
     static std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> s_mapVideoRenderer;
     static std::unique_ptr<Clock> s_clock;
 
-    static const size_t kLimitBufferCount = 10;
+    static const size_t kLimitBufferCount = 20;
     static constexpr TimeDelta kStaleFrameLimit = TimeDelta::Seconds(10);
     static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
@@ -111,7 +111,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 
             UnityVulkanPluginEventConfig releaseBufferEventConfig;
             releaseBufferEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
-            releaseBufferEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_DontCare;
+            releaseBufferEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
             releaseBufferEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
                 kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
 
