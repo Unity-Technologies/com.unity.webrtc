@@ -46,7 +46,7 @@ for %%i in (x64) do (
       --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
 
     rem build
-    ninja.bat -C %OUTPUT_DIR% webrtc
+    call ninja.bat -C %OUTPUT_DIR% webrtc
 
     set filename=
     if true==%%j (
