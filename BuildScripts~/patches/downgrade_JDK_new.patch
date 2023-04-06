@@ -206,3 +206,89 @@ diff -uprN M112/android/gyp/util/build_utils.py M107/android/gyp/util/build_util
  
  try:
    string_types = basestring
+diff -uprN M112/config/android/internal_rules.gni M107/config/android/internal_rules.gni
+--- M112/config/android/internal_rules.gni	2023-04-06 10:49:06.337903638 +0900
++++ M107/config/android/internal_rules.gni.patch	2023-04-06 12:14:06.647866312 +0900
+@@ -1663,24 +1663,6 @@ if (enable_java_templates) {
+           }
+         }
+         if (_desugar_needs_classpath) {
+-          # Cannot use header jar for the active jar, because it does not
+-          # contain anonymous classes. https://crbug.com/1342018#c5
+-          # Cannot use processed .jar here because it might have classes
+-          # filtered out via jar_excluded_patterns.
+-          # Must come first in classpath in order to take precedence over
+-          # deps that defined the same classes (via jar_excluded_patterns).
+-          if (defined(invoker.unprocessed_jar_path_filearg)) {
+-            args += [
+-              "--classpath",
+-              invoker.unprocessed_jar_path_filearg,
+-            ]
+-          } else if (defined(invoker.unprocessed_jar_path)) {
+-            args += [
+-              "--classpath",
+-              rebase_path(invoker.unprocessed_jar_path, root_build_dir),
+-            ]
+-            inputs += [ invoker.unprocessed_jar_path ]
+-          }
+           _desugar_dependencies_path =
+               "$target_gen_dir/$target_name.desugardeps"
+           args += [
+@@ -1699,6 +1681,16 @@ if (enable_java_templates) {
+               "--classpath=@FileArg($_rebased_build_config:deps_info:javac_full_interface_classpath)",
+             ]
+           }
++
++          if (defined(invoker.final_ijar_path)) {
++            # Need to include the input .interface.jar on the classpath in order to make
++            # jar_excluded_patterns classes visible to desugar.
++            args += [
++              "--classpath",
++              rebase_path(invoker.final_ijar_path, root_build_dir),
++            ]
++            inputs += [ invoker.final_ijar_path ]
++          }
+         }
+ 
+         if (defined(invoker.custom_assertion_handler)) {
+@@ -3005,6 +2997,9 @@ if (enable_java_templates) {
+         ]
+       }
+ 
++      if (invoker.supports_android || invoker.use_turbine) {
++        args += [ "--java-version=1.8" ]
++      }
+       if (use_java_goma) {
+         args += [ "--gomacc-path=$goma_dir/gomacc" ]
+ 
+@@ -3795,6 +3790,7 @@ if (enable_java_templates) {
+               target_sources_file = _target_sources_file
+             }
+             chromium_code = _chromium_code
++            supports_android = _supports_android
+             include_android_sdk = _is_robolectric || _requires_android
+           }
+         }
+@@ -4024,8 +4020,8 @@ if (enable_java_templates) {
+           if (enable_desugar) {
+             # Desugaring with D8 requires full classpath.
+             build_config = _build_config
+-            unprocessed_jar_path = _unprocessed_jar_path
+-            deps += _header_classpath_deps + _unprocessed_jar_deps
++            final_ijar_path = _final_ijar_path
++            deps += _header_classpath_deps + [ ":$_header_target_name" ]
+           }
+ 
+           enable_multidex = false
+@@ -4063,7 +4059,10 @@ if (enable_java_templates) {
+         if (defined(invoker.wrapper_script_name)) {
+           script_name = invoker.wrapper_script_name
+         }
+-        deps = [ ":$_build_config_target_name" ]
++        deps = [
++          ":$_build_config_target_name",
++          "//third_party/jdk:java_data",
++        ]
+         if (_is_robolectric) {
+           # For robolectric tests, we also add the normal sdk jar to the
+           # classpath since whenever we start using a new Android SDK,

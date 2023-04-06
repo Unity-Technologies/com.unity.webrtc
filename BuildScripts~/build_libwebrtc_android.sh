@@ -22,6 +22,9 @@ then
   sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
+
+  ## Downgrade jdkversion
+  patch -N "src/DEPS" < "$COMMAND_DIR/patches/change_jdkversion.patch"
   gclient sync -D --force --reset
 fi
 
@@ -107,14 +110,14 @@ done
 
 popd
 
-# "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-#   --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+"$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
+  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
-# cd src
-# find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
+cd src
+find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-# cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
-# # create zip
-# cd "$ARTIFACTS_DIR"
-# zip -r webrtc-android.zip lib include LICENSE.md
+# create zip
+cd "$ARTIFACTS_DIR"
+zip -r webrtc-android.zip lib include LICENSE.md
