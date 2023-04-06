@@ -7,7 +7,7 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5481
+export WEBRTC_VERSION=5615
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"

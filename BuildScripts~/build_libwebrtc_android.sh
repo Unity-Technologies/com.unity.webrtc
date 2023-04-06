@@ -7,7 +7,7 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5481
+export WEBRTC_VERSION=5615
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
@@ -37,7 +37,7 @@ patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.
 # downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
 pushd "src/build"
-git apply "$COMMAND_DIR/patches/downgrade_JDK.patch"
+git apply "$COMMAND_DIR/patches/downgrade_JDK_new.patch"
 popd
 
 
@@ -107,14 +107,14 @@ done
 
 popd
 
-"$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+# "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
+#   --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
-cd src
-find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
+# cd src
+# find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+# cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
-# create zip
-cd "$ARTIFACTS_DIR"
-zip -r webrtc-android.zip lib include LICENSE.md
+# # create zip
+# cd "$ARTIFACTS_DIR"
+# zip -r webrtc-android.zip lib include LICENSE.md
