@@ -663,7 +663,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT const char* StatsGetJson(const RTCStats* stats) { return ConvertString(stats->ToJson()); }
 
-    UNITY_INTERFACE_EXPORT int64_t StatsGetTimestamp(const RTCStats* stats) { return stats->timestamp_us(); }
+    UNITY_INTERFACE_EXPORT int64_t StatsGetTimestamp(const RTCStats* stats) { return stats->timestamp().us(); }
 
     UNITY_INTERFACE_EXPORT const char* StatsGetId(const RTCStats* stats) { return ConvertString(stats->id()); }
 
