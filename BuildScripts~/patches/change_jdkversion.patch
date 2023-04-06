@@ -1,0 +1,32 @@
+--- src/DEPS	2023-04-06 13:09:33.417841965 +0900
++++ src/DEPS.patch	2023-04-06 13:09:08.417842147 +0900
+@@ -225,23 +225,21 @@ deps = {
+       'packages': [
+           {
+               'package': 'chromium/third_party/jdk',
+-              'version': '-FR8HTNcMfxy7J2HUaWVa0QmEE4f68iotzvFbqOj2LEC',
++              'version': 'egbcSHbmF1XZQbKxp_PQiGLFWlQK65krTGqQE-Bj4j8C',
+           },
+      ],
+       'condition': 'host_os == "linux" and checkout_android',
+       'dep_type': 'cipd',
+   },
+-  # Deprecated - only use for tools which are broken real JDK.
+-  # Not used by WebRTC. Added for compatibility with Chromium.
+-  'src/third_party/jdk11': {
++  'src/third_party/jdk/extras': {
+       'packages': [
+           {
+-              'package': 'chromium/third_party/jdk',
+-              # Do not update this hash - any newer hash will point to JDK17+.
+-              'version': 'egbcSHbmF1XZQbKxp_PQiGLFWlQK65krTGqQE-Bj4j8C',
++              'package': 'chromium/third_party/jdk/extras',
++              'version': '-7m_pvgICYN60yQI3qmTj_8iKjtnT4NXicT0G_jJPqsC',
+           },
+       ],
+-      'condition': 'checkout_android',
++      # Needed on Linux for use on chromium_presubmit (for checkstyle).
++      'condition': 'checkout_android or checkout_linux',
+       'dep_type': 'cipd',
+   },
+  'src/third_party/jsoncpp/source':
