@@ -16,8 +16,6 @@ set PYPI_URL=https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/si
 set vs2019_install=C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional
 
 if not exist src (
-  powershell -Command "get-content depot_tools\update_depot_tools.bat | foreach-object {$_ -replace \"origin/master\",\"origin/main\"} | add-content depot_tools\update_depot_tools.bat.edited"
-  move /Y depot_tools\update_depot_tools.bat.edited depot_tools\update_depot_tools.bat
   call fetch.bat --nohooks webrtc
   cd src
   call git.bat config --system core.longpaths true
@@ -35,10 +33,6 @@ patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc
 rem fix abseil
 patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "%COMMAND_DIR%\patches\fix_abseil.patch"
 
-rem install pywin32
-call "%cd%\depot_tools\bootstrap-3_8_0_chromium_8_bin\python\bin\python.exe" ^
-  -m pip install pywin32 --index-url "%PYPI_URL%" --upgrade
-
 mkdir "%ARTIFACTS_DIR%\lib"
 
 setlocal enabledelayedexpansion
@@ -52,7 +46,7 @@ for %%i in (x64) do (
       --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
 
     rem build
-    ninja.exe -C %OUTPUT_DIR% webrtc
+    ninja.bat -C %OUTPUT_DIR% webrtc
 
     set filename=
     if true==%%j (
