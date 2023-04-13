@@ -43,6 +43,8 @@ pushd "src/build"
 git apply "$COMMAND_DIR/patches/downgrade_JDK_new.patch"
 popd
 
+# Add desugar jdk lib json
+patch -N "src/third_party/r8/desugar_jdk_libs.json" < "$COMMAND_DIR/patches/desugar_jdk_libs.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
