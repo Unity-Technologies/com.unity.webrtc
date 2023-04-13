@@ -1,5 +1,5 @@
---- src/DEPS	2023-04-06 13:09:33.417841965 +0900
-+++ src/DEPS.patch	2023-04-06 13:09:08.417842147 +0900
+--- src/DEPS	2023-04-13 09:39:55.785885419 +0900
++++ src/DEPS.patch	2023-04-13 09:40:46.955884979 +0900
 @@ -225,23 +225,21 @@ deps = {
        'packages': [
            {
@@ -30,3 +30,32 @@
        'dep_type': 'cipd',
    },
   'src/third_party/jsoncpp/source':
+@@ -983,6 +981,28 @@ deps = {
+           },
+       ],
+       'condition': 'checkout_android',
++      'dep_type': 'cipd',
++  },
++
++  'src/third_party/android_deps/libs/com_android_tools_desugar_jdk_libs': {
++      'packages': [
++          {
++              'package': 'chromium/third_party/android_deps/libs/com_android_tools_desugar_jdk_libs',
++              'version': 'version:2@1.1.5.cr1',
++          },
++      ],
++      'condition': 'checkout_android',
++      'dep_type': 'cipd',
++  },
++
++  'src/third_party/android_deps/libs/com_android_tools_desugar_jdk_libs_configuration': {
++      'packages': [
++          {
++              'package': 'chromium/third_party/android_deps/libs/com_android_tools_desugar_jdk_libs_configuration',
++              'version': 'version:2@1.1.5.cr1',
++          },
++      ],
++      'condition': 'checkout_android',
+       'dep_type': 'cipd',
+   },
+ 
