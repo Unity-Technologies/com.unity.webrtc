@@ -1551,7 +1551,7 @@ extern "C"
 
     UNITY_INTERFACE_EXPORT void FrameSetData(TransformableFrameInterface* frame, const uint8_t* data, size_t size)
     {
-        frame->SetData(rtc::ArrayView<const uint8_t>(static_cast<const uint8_t*>(data), size));
+        frame->SetData(rtc::ArrayView<const uint8_t>(data, size));
     }
 #pragma clang diagnostic pop
 }

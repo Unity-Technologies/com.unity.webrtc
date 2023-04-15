@@ -136,15 +136,15 @@ class MetadataSample : MonoBehaviour
                 senderArray = new NativeArray<byte>(length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             }
 
-            // metadata length (< 256)
-            NativeArray<byte>.Copy(src: new byte[] { (byte)metadataArray.Length }, srcIndex: 0, dst: senderArray, dstIndex: 0, length: 1);
+            // encoded data
+            NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: senderArray, dstIndex: 0, length: data.Length);
 
             // metadata
             if (metadataArray.IsCreated)
-                NativeArray<byte>.Copy(src: metadataArray, srcIndex: 0, dst: senderArray, dstIndex: 1, length: metadataArray.Length);
+                NativeArray<byte>.Copy(src: metadataArray, srcIndex: 0, dst: senderArray, dstIndex: data.Length, length: metadataArray.Length);
 
-            // encoded data
-            NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: senderArray, dstIndex: 1 + metadataArray.Length, length: data.Length);
+            // metadata length (< 256)
+            NativeArray<byte>.Copy(src: new byte[] { (byte)metadataArray.Length }, srcIndex: 0, dst: senderArray, dstIndex: length - 1, length: 1);
 
             e.Frame.SetData(senderArray.AsReadOnly(), 0, length);
             transform.Write(e.Frame);
@@ -154,18 +154,19 @@ class MetadataSample : MonoBehaviour
     void OnReceiverTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
         var data = e.Frame.GetData();
-        var metadataLength = data[0];
+
+        var metadataLength = data[data.Length - 1];
         var length = data.Length - (1 + metadataLength);
-        e.Frame.SetData(data, 1 + metadataLength, length);
+        e.Frame.SetData(data, 0, length);
         transform.Write(e.Frame);
 
-        lock(metadataOutputLock)
+        lock (metadataOutputLock)
         {
             if (metadataOutputArray == null || metadataOutputArray.Length != metadataLength)
                 metadataOutputArray = new byte[metadataLength];
             for (int i = 0; i < metadataLength; i++)
             {
-                metadataOutputArray[i] = data[i + 1];
+                metadataOutputArray[i] = data[length + i];
             }
         }
     }
