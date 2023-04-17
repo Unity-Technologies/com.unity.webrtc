@@ -46,20 +46,27 @@ class EncryptionSample : MonoBehaviour
     private NativeArray<byte> encryptedDataArray;
     private NativeArray<byte> decryptedDataArray;
 
+    // workaround.
+    // A first I-frame of H264 codec is needed in webrtc.
+    // These flags are used for determine the first I-frame to not encrypt.
+    private bool firstKeyFrameSent = false;
+    private bool firstKeyFrameReceived = false;
+
 
     static Dictionary<RTCEncodedVideoFrameType, int> GetFrameTypeToCryptoOffset(string mimetype)
     {
-        switch(mimetype)
+        switch (mimetype)
         {
             case "video/H264":
                 {
                     return new Dictionary<RTCEncodedVideoFrameType, int>
                     {
-                        { RTCEncodedVideoFrameType.Key, 10 },
-                        { RTCEncodedVideoFrameType.Delta, 10 },
+                        { RTCEncodedVideoFrameType.Key, 43 },
+                        { RTCEncodedVideoFrameType.Delta, 7 },
                         { RTCEncodedVideoFrameType.Empty, 1 }
                     };
                 }
+            // todo(kazuki): Not worked with AV1 codec
             case "video/AV1":
                 {
                     return new Dictionary<RTCEncodedVideoFrameType, int>
@@ -139,7 +146,7 @@ class EncryptionSample : MonoBehaviour
         {
             if (encryptKeyArray.IsCreated)
                 encryptKeyArray.Dispose();
-            if(bytes.Length > 0)
+            if (bytes.Length > 0)
                 encryptKeyArray = new NativeArray<byte>(bytes, Allocator.Persistent);
         }
     }
@@ -159,14 +166,20 @@ class EncryptionSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (encryptKeyArray.IsCreated)
-            encryptKeyArray.Dispose();
-        if (decryptKeyArray.IsCreated)
-            decryptKeyArray.Dispose();
-        if (encryptedDataArray.IsCreated)
-            encryptedDataArray.Dispose();
-        if (decryptedDataArray.IsCreated)
-            decryptedDataArray.Dispose();
+        lock (encryptKeyInputLock)
+        {
+            if (encryptKeyArray.IsCreated)
+                encryptKeyArray.Dispose();
+            if (encryptedDataArray.IsCreated)
+                encryptedDataArray.Dispose();
+        }
+        lock (decryptKeyInputLock)
+        {
+            if (decryptKeyArray.IsCreated)
+                decryptKeyArray.Dispose();
+            if (decryptedDataArray.IsCreated)
+                decryptedDataArray.Dispose();
+        }
     }
 
     private void SetUpSenderTransform(RTCRtpSender sender)
@@ -183,13 +196,12 @@ class EncryptionSample : MonoBehaviour
     {
         lock (encryptKeyInputLock)
         {
-            if(encryptKeyArray.IsCreated)
+            if (!(e.Frame is RTCEncodedVideoFrame frame))
             {
-                if (!(e.Frame is RTCEncodedVideoFrame frame))
-                {
-                    return;
-                }
-
+                return;
+            }
+            if (encryptKeyArray.IsCreated && firstKeyFrameSent)
+            {
                 var data = frame.GetData();
 
                 // resize NativeArray
@@ -203,28 +215,30 @@ class EncryptionSample : MonoBehaviour
                 var cryptoOffset = frameTypeToCryptoOffset[frame.Type];
                 NativeArray<byte>.Copy(src: data, srcIndex: 0, dst: encryptedDataArray, dstIndex: 0, length: cryptoOffset);
 
-                for(int i = cryptoOffset; i < data.Length; i++)
+                for (int i = cryptoOffset; i < data.Length; i++)
                 {
                     var key = encryptKeyArray[i % encryptKeyArray.Length];
                     encryptedDataArray[i] = (byte)(data[i] ^ key);
                 }
                 e.Frame.SetData(encryptedDataArray.AsReadOnly(), 0, data.Length);
             }
+            if (frame.Type == RTCEncodedVideoFrameType.Key && !firstKeyFrameSent)
+                firstKeyFrameSent = true;
         }
         transform.Write(e.Frame);
     }
 
     void OnReceiverTransform(RTCRtpTransform transform, RTCTransformEvent e)
     {
-
         lock (decryptKeyInputLock)
         {
-            if (decryptKeyArray.IsCreated)
+            if (!(e.Frame is RTCEncodedVideoFrame frame))
             {
-                if (!(e.Frame is RTCEncodedVideoFrame frame))
-                {
-                    return;
-                }
+                return;
+            }
+
+            if (decryptKeyArray.IsCreated && firstKeyFrameReceived)
+            {
                 var data = frame.GetData();
 
                 // resize NativeArray
@@ -245,12 +259,26 @@ class EncryptionSample : MonoBehaviour
                 }
                 e.Frame.SetData(decryptedDataArray.AsReadOnly(), 0, data.Length);
             }
+            if (frame.Type == RTCEncodedVideoFrameType.Key && !firstKeyFrameReceived)
+                firstKeyFrameReceived = true;
         }
         transform.Write(e.Frame);
     }
 
     private void OnStart()
     {
+        if (_pc1 != null)
+        {
+            _pc1.Close();
+            _pc1.Dispose();
+            _pc1 = null;
+        }
+        if (_pc2 != null)
+        {
+            _pc2.Close();
+            _pc2.Dispose();
+            _pc2 = null;
+        }
         startButton.interactable = false;
         callButton.interactable = true;
 
@@ -275,7 +303,7 @@ class EncryptionSample : MonoBehaviour
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+        config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
         return config;
     }
@@ -366,7 +394,7 @@ class EncryptionSample : MonoBehaviour
 
         if (WebRTCSettings.UseVideoCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] { WebRTCSettings.UseVideoCodec };
             foreach (var transceiver in _pc1.GetTransceivers())
             {
                 if (pc1Senders.Contains(transceiver.Sender))
@@ -407,6 +435,8 @@ class EncryptionSample : MonoBehaviour
 
     private void Call()
     {
+        firstKeyFrameSent = false;
+        firstKeyFrameReceived = false;
         callButton.interactable = false;
         hangUpButton.interactable = true;
         restartButton.interactable = true;
@@ -433,14 +463,13 @@ class EncryptionSample : MonoBehaviour
 
     private void HangUp()
     {
-        RemoveTracks();
-
-        _pc1.Close();
-        _pc2.Close();
-        _pc1.Dispose();
-        _pc2.Dispose();
-        _pc1 = null;
-        _pc2 = null;
+        lock (encryptKeyInputLock)
+        {
+            lock (decryptKeyInputLock)
+            {
+                RemoveTracks();
+            }
+        }
 
         callButton.interactable = true;
         restartButton.interactable = false;

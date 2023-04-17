@@ -41,7 +41,6 @@ class MetadataSample : MonoBehaviour
 
     private NativeArray<byte> metadataArray;
     private NativeArray<byte> senderArray;
-    private NativeArray<byte> receiverArray;
     private byte[] metadataOutputArray;
 
 
@@ -103,12 +102,13 @@ class MetadataSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (metadataArray.IsCreated)
-            metadataArray.Dispose();
-        if (senderArray.IsCreated)
-            senderArray.Dispose();
-        if (receiverArray.IsCreated)
-            receiverArray.Dispose();
+        lock(metadataInputLock)
+        {
+            if (metadataArray.IsCreated)
+                metadataArray.Dispose();
+            if (senderArray.IsCreated)
+                senderArray.Dispose();
+        }
     }
 
     private void SetUpSenderTransform(RTCRtpSender sender)
