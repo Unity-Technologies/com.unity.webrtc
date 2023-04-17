@@ -221,7 +221,7 @@ class EncryptionSample : MonoBehaviour
         {
             if (decryptKeyArray.IsCreated)
             {
-                if (e.Frame is not RTCEncodedVideoFrame frame)
+                if (!(e.Frame is RTCEncodedVideoFrame frame))
                 {
                     return;
                 }
