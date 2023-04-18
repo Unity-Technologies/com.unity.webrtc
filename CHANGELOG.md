@@ -4,7 +4,26 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [3.0.0-pre.4] - 2023-01-13
+## [3.0.0-pre.5] - 2023-04-28
+
+### Added
+
+- Add Encoded Transform API.
+- Add `RTCRtpReceiver.GetContributingSources` method.
+- Add **Metadata** and **Encrypt** into package sample.
+
+### Changed
+
+- Upgrade NVIDIA Codec SDK 12.0.
+- Change to send SPS and PPS when using the encoder of NVIDIA video codec.
+
+### Fixed
+
+- Fix unhandled NVENCException's occurring during initialization & reconfigure calls when using NVIDIA video codec.
+- Fix crash on dedicated Linux Server.
+- Fix a performance issue of video streaming with Unity 2022.2
+
+## [3.0.0-pre.4] - 2023-01-28
 
 ### Fixed
 

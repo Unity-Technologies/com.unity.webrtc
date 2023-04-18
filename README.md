@@ -54,6 +54,7 @@ Please read this if you have an interest to customize native code in this projec
 | `3.0.0-pre.2` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Update libwebrtc M107 | Dec 2022 |
 | `3.0.0-pre.3` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Fix bugs | Dec 2022 |
 | `3.0.0-pre.4` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Fix bugs | Jan 2023 |
+| `3.0.0-pre.5` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Encoded Transform API | Apr 2023 |
 
 ## Licenses
 
