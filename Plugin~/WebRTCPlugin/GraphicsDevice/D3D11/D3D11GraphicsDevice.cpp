@@ -204,39 +204,18 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        CUgraphicsResource resource;
-        ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
-
-        // set context on the thread.
-        cuCtxPushCurrent(GetCUcontext());
-
-        CUresult result =
-            cuGraphicsD3D11RegisterResource(&resource, pResource, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsD3D11RegisterResource";
-            throw;
-        }
-        result = cuGraphicsMapResources(1, &resource, nullptr);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsMapResources";
-            throw;
-        }
-
-        CUarray mappedArray;
-        result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsSubResourceGetMappedArray";
-            throw;
-        }
-        cuCtxPopCurrent(nullptr);
+        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
         handle->context = GetCUcontext();
-        handle->mappedArray = mappedArray;
-        handle->resource = resource;
+
+        ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
+        GMB_CUDA_CALL_NULLPTR(
+            cuGraphicsD3D11RegisterResource(&handle->resource, pResource, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, nullptr));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
+        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
+
         return std::move(handle);
     }
 

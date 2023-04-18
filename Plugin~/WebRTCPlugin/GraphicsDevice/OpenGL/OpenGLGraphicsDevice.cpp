@@ -263,46 +263,22 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
+        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
+
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = GetCUcontext();
+
         if (!OpenGLContext::CurrentContext())
             contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
 
         OpenGLTexture2D* glTexture2D = static_cast<OpenGLTexture2D*>(texture);
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsGLRegisterImage(
+            &handle->resource, glTexture2D->GetTexture(), GL_TEXTURE_2D, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, 0));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
+        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(NULL));
 
-        CUarray mappedArray;
-        CUgraphicsResource resource;
-        GLuint image = glTexture2D->GetTexture();
-        GLenum target = GL_TEXTURE_2D;
-
-        // set context on the thread.
-        cuCtxPushCurrent(GetCUcontext());
-
-        CUresult result = cuGraphicsGLRegisterImage(&resource, image, target, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsD3D11RegisterResource error" << result;
-            throw;
-        }
-
-        result = cuGraphicsMapResources(1, &resource, 0);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsMapResources";
-            throw;
-        }
-
-        result = cuGraphicsSubResourceGetMappedArray(&mappedArray, resource, 0, 0);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuGraphicsSubResourceGetMappedArray";
-            throw;
-        }
-        cuCtxPopCurrent(NULL);
-
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = GetCUcontext();
-        handle->mappedArray = mappedArray;
-        handle->resource = resource;
-        return handle;
+        return std::move(handle);
 #else
         return nullptr;
 #endif
