@@ -79,7 +79,7 @@ namespace webrtc
 
         // bUseDeviceFrame: allocate in memory or cuda device memory
         m_decoder = std::make_unique<NvDecoderInternal>(
-            m_context, false, cudaVideoCodec_H264, true, false, nullptr, nullptr, maxWidth, maxHeight);
+            m_context, false, cudaVideoCodec_H264, true, false, nullptr, nullptr, false, maxWidth, maxHeight);
         return true;
     }
 
