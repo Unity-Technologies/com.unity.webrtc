@@ -86,17 +86,17 @@ namespace webrtc
     void GpuMemoryBufferPool::ReleaseStaleBuffers(Timestamp now, TimeDelta timeLimit)
     {
         auto it = resourcesPool_.begin();
-        while (it != resourcesPool_.end())
+        for (; it != resourcesPool_.end();)
         {
             FrameResources* resources = (*it).get();
 
             if (!resources->IsUsed() && now - resources->lastUseTime() > timeLimit)
             {
-                resourcesPool_.erase(it++);
+                it = resourcesPool_.erase(it);
             }
             else
             {
-                it++;
+                ++it;
             }
         }
     }
