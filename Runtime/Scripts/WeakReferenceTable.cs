@@ -17,19 +17,20 @@ namespace Unity.WebRTC
 
         public void Add(object key, object value)
         {
-            m_table.Add(key, new WeakReference(value));
+            Hashtable.Synchronized(m_table).Add(key, new WeakReference(value));
         }
 
         public void Remove(object key)
         {
-            m_table.Remove(key);
+            Hashtable.Synchronized(m_table).Remove(key);
         }
 
         public object this[object key]
         {
             get
             {
-                WeakReference reference = m_table[key] as WeakReference;
+                var table = Hashtable.Synchronized(m_table);
+                WeakReference reference = table[key] as WeakReference;
                 return reference.NullOrValue();
             }
         }
@@ -49,9 +50,10 @@ namespace Unity.WebRTC
         {
             get
             {
-                var array = new object[m_table.Count];
+                var table = Hashtable.Synchronized(m_table);
+                var array = new object[table.Count];
                 int i = 0;
-                foreach (var value in m_table.Values)
+                foreach (var value in table.Values)
                 {
                     var reference = value as WeakReference;
                     array[i] = reference.NullOrValue();
@@ -63,17 +65,17 @@ namespace Unity.WebRTC
 
         public void Clear()
         {
-            m_table.Clear();
+            Hashtable.Synchronized(m_table).Clear();
         }
 
         public bool ContainsKey(object key)
         {
-            return m_table.ContainsKey(key);
+            return Hashtable.Synchronized(m_table).ContainsKey(key);
         }
         public bool TryGetValue(object key, out object value)
         {
             value = null;
-            if (!m_table.ContainsKey(key))
+            if (!ContainsKey(key))
                 return false;
             value = this[key];
             return true;
