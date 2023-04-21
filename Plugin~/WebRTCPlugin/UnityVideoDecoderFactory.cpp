@@ -5,7 +5,7 @@
 #include <modules/video_coding/include/video_error_codes.h>
 
 #include "Codec/CreateVideoCodecFactory.h"
-#include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityVideoDecoderFactory.h"

@@ -7,7 +7,7 @@
 #include "D3D12Texture2D.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "GraphicsDevice/D3D11/D3D11Texture2D.h"
-#include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "NvCodecUtils.h"
 
 // nonstandard extension used : class rvalue used as lvalue

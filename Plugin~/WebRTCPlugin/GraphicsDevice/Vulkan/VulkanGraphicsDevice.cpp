@@ -2,7 +2,7 @@
 
 #include <third_party/libyuv/include/libyuv/convert.h>
 
-#include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "UnityVulkanInterfaceFunctions.h"
 #include "VulkanGraphicsDevice.h"
 #include "VulkanTexture2D.h"

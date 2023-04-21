@@ -3,7 +3,6 @@
 #include "Context.h"
 #include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityProfilerInterfaceFunctions.h"
@@ -270,7 +269,6 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
     }
 
     IGraphicsDevice* device = Plugin::GraphicsDevice();
-    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
     Timestamp timestamp = s_clock->CurrentTime();
 
     if (!device->UpdateState())
@@ -298,12 +296,6 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
             }
 
             timestamp = s_clock->CurrentTime();
-            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
-            if (!ptr)
-            {
-                RTC_LOG(LS_ERROR) << "GraphicsUtility::TextureHandleToNativeGraphicsPtr returns nullptr.";
-                return;
-            }
             unity::webrtc::Size size(trackData->width, trackData->height);
 
             if (s_bufferPool->bufferCount() < kLimitBufferCount)
@@ -312,7 +304,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
                 if (s_ProfilerMarkerFactory)
                     profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
-                auto frame = s_bufferPool->CreateFrame(ptr, size, trackData->format, timestamp);
+                auto frame = s_bufferPool->CreateFrame(trackData->texture, size, trackData->format, timestamp);
                 source->OnFrameCaptured(std::move(frame));
             }
         }
