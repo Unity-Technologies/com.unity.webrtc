@@ -27,6 +27,7 @@ namespace webrtc
         : IGraphicsDevice(renderer, profiler)
         , m_unityVulkan(unityVulkan)
         , m_Instance(*unityVulkanInstance)
+        , m_hasHostCachedMemory(false)
         , m_commandPool(VK_NULL_HANDLE)
         , m_commandBuffer(VK_NULL_HANDLE)
         , m_fence(VK_NULL_HANDLE)
@@ -34,13 +35,21 @@ namespace webrtc
         , m_isCudaSupport(false)
 #endif
     {
-        if (profiler)
-            m_maker = profiler->CreateMarker(
-                "VulkanGraphicsDevice.CopyImage", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
     }
 
     bool VulkanGraphicsDevice::InitV()
     {
+        VkPhysicalDeviceMemoryProperties memory;
+        vkGetPhysicalDeviceMemoryProperties(m_Instance.physicalDevice, &memory);
+
+        for (uint32_t i = 0; i < memory.memoryTypeCount; ++i)
+        {
+            const VkMemoryPropertyFlags propertyFlags = memory.memoryTypes[i].propertyFlags;
+            if ((propertyFlags & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT)) ==
+                (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT))
+                m_hasHostCachedMemory = true;
+        }
+
 #if CUDA_PLATFORM
         m_isCudaSupport = InitCudaContext();
 #endif
@@ -77,28 +86,6 @@ namespace webrtc
             m_commandBuffer = VK_NULL_HANDLE;
         }
         VULKAN_SAFE_DESTROY_COMMAND_POOL(m_Instance.device, m_commandPool, VK_NULL_HANDLE)
-    }
-
-    std::unique_ptr<UnityVulkanImage> VulkanGraphicsDevice::AccessTexture(void* ptr) const
-    {
-        // cannot do resource uploads inside renderpass
-        m_unityVulkan->EnsureOutsideRenderPass();
-
-        std::unique_ptr<UnityVulkanImage> unityVulkanImage = std::make_unique<UnityVulkanImage>();
-
-        VkImageSubresource subResource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
-        if (!m_unityVulkan->AccessTexture(
-                ptr,
-                &subResource,
-                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                VK_PIPELINE_STAGE_TRANSFER_BIT,
-                VK_ACCESS_TRANSFER_READ_BIT,
-                kUnityVulkanResourceAccess_PipelineBarrier,
-                unityVulkanImage.get()))
-        {
-            return nullptr;
-        }
-        return unityVulkanImage;
     }
 
     VkCommandBuffer VulkanGraphicsDevice::GetCommandBuffer()
@@ -188,173 +175,183 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::Init failed.";
             return nullptr;
         }
+
+        VkCommandBuffer commandBuffer = GetCommandBuffer();
+        if (!commandBuffer)
+        {
+            RTC_LOG(LS_ERROR) << "GetCommandBuffer failed";
+            return nullptr;
+        }
+
+        VulkanUtility::DoImageLayoutTransition(
+            commandBuffer,
+            vulkanTexture->GetUnityVulkanImage(),
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            true);
+
+        SubmitCommandBuffer();
         return vulkanTexture.release();
     }
 
     ITexture2D*
     VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
+        bool writable = false;
         std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
-        if (!vulkanTexture->InitCpuRead(&m_Instance))
+        if (!vulkanTexture->InitStaging(&m_Instance, writable, m_hasHostCachedMemory))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::InitCpuRead failed.";
             return nullptr;
         }
+
+        VkCommandBuffer commandBuffer = GetCommandBuffer();
+        if (!commandBuffer)
+        {
+            RTC_LOG(LS_ERROR) << "GetCommandBuffer failed";
+            return nullptr;
+        }
+
+        VulkanUtility::DoImageLayoutTransition(
+            commandBuffer,
+            vulkanTexture->GetUnityVulkanImage(),
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            (writable ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL : VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL),
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            true);
+
+        SubmitCommandBuffer();
         return vulkanTexture.release();
+    }
+
+    bool VulkanGraphicsDevice::LookupUnityVulkanImage(
+        VkImage src, UnityVulkanImage* outImage, bool* setLayout, VkImageLayout layout)
+    {
+        VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(ITexture2D::GetTexturePtr(src));
+
+        *setLayout = false;
+        if (vulkanTexture != nullptr)
+        {
+            *outImage = *vulkanTexture->GetUnityVulkanImage();
+            // We need to do this after CommandRecordingState and AccessTexture
+            *setLayout = true;
+
+            if (layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && m_unityVulkan)
+                vulkanTexture->currentFrameNumber = m_LastState.currentFrameNumber;
+            return true;
+        }
+
+        VkAccessFlagBits access = (VkAccessFlagBits)0; // VK_ACCESS_NONE is VK_VERSION_1_3
+        if (layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+            access = VK_ACCESS_TRANSFER_WRITE_BIT;
+        else if (layout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+            access = VK_ACCESS_TRANSFER_READ_BIT;
+
+        // IUnityGraphicsVulkan bugs:
+        //
+        // UnityVulkanImage.layout is not filled by the plugin interface.
+        //
+        // Calling AccessTexture SHOULD be enough, but current Unity versions have a bug where pipeline barriers
+        // are not flushed/restored. This means even if you do AccessTexture before calling out CommandRecordingState,
+        // the validation layer will complain during custom call to vkCmdCopyImage.
+        //
+        // To avoid Vulkan validation layer from complaining, you could call DoImageLayoutTransition after
+        // AccessTexture and restore the state after CopyImage, but it seems to prevent copy texture from
+        // working with GTX 1080 while it works ok with RTX series.
+        //
+        // AccessTexture flushing pipeline barriers should be fixed with Unity 2022.1+
+        if (m_unityVulkan &&
+            m_unityVulkan->AccessTexture(
+                (void*)src,
+                UnityVulkanWholeImage,
+                layout,
+                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                access,
+                kUnityVulkanResourceAccess_PipelineBarrier,
+                outImage))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool VulkanGraphicsDevice::CopyTexture(void* dst, void* src, uint32_t width, uint32_t height)
+    {
+        if (!dst || !src)
+            return false;
+
+        VkImage nativeDst = reinterpret_cast<VkImage>(dst);
+        VkImage nativeSrc = reinterpret_cast<VkImage>(src);
+
+        if (nativeDst == nativeSrc)
+            return false;
+
+        UnityVulkanImage nativeDstUnity;
+        bool setDstLayout = false;
+        if (!LookupUnityVulkanImage(nativeDst, &nativeDstUnity, &setDstLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL))
+            return false;
+
+        UnityVulkanImage nativeSrcUnity;
+        bool setSrcLayout = false;
+        if (!LookupUnityVulkanImage(nativeSrc, &nativeSrcUnity, &setSrcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL))
+            return false;
+
+        VkCommandBuffer commandBuffer = GetCommandBuffer();
+        if (!commandBuffer)
+        {
+            RTC_LOG(LS_ERROR) << "GetCommandBuffer failed";
+            return false;
+        }
+
+        if (setDstLayout)
+        {
+            VulkanUtility::DoImageLayoutTransition(
+                commandBuffer,
+                &nativeDstUnity,
+                nativeDstUnity.layout,
+                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                VK_PIPELINE_STAGE_TRANSFER_BIT);
+        }
+        if (setSrcLayout)
+        {
+            VulkanUtility::DoImageLayoutTransition(
+                commandBuffer,
+                &nativeSrcUnity,
+                nativeSrcUnity.layout,
+                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                VK_PIPELINE_STAGE_TRANSFER_BIT);
+        }
+        VulkanUtility::CopyImage(commandBuffer, nativeSrcUnity.image, nativeDstUnity.image, width, height);
+        SubmitCommandBuffer();
+        return true;
     }
 
     bool VulkanGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src)
     {
         VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
         VulkanTexture2D* srcTexture = reinterpret_cast<VulkanTexture2D*>(src);
-        if (destTexture == srcTexture)
-            return false;
+
         if (!destTexture || !srcTexture)
             return false;
 
-        VkCommandBuffer commandBuffer = GetCommandBuffer();
-        if (!commandBuffer)
-        {
-            RTC_LOG(LS_ERROR) << "GetCommandBuffer failed";
+        if (destTexture == srcTexture)
             return false;
-        }
 
-        // Transition the src texture layout.
-        VkResult result = VulkanUtility::DoImageLayoutTransition(
-            commandBuffer,
-            srcTexture->GetImage(),
-            srcTexture->GetTextureFormat(),
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
-            return false;
-        }
-
-        // Transition the dst texture layout.
-        result = VulkanUtility::DoImageLayoutTransition(
-            commandBuffer,
-            destTexture->GetImage(),
-            destTexture->GetTextureFormat(),
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
-            return false;
-        }
-
-        result = VulkanUtility::CopyImage(
-            commandBuffer,
-            srcTexture->GetImage(),
-            destTexture->GetImage(),
-            destTexture->GetWidth(),
-            destTexture->GetHeight());
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "CopyImage failed. result:" << result;
-            return false;
-        }
-        // transition the src texture layout back to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-        result = VulkanUtility::DoImageLayoutTransition(
-            commandBuffer,
-            srcTexture->GetImage(),
-            srcTexture->GetTextureFormat(),
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
-            return false;
-        }
-
-        destTexture->currentFrameNumber = m_LastState.currentFrameNumber;
-        SubmitCommandBuffer();
-        return true;
+        return CopyTexture(
+            destTexture->GetImage(), srcTexture->GetImage(), destTexture->GetWidth(), destTexture->GetHeight());
     }
 
     bool VulkanGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
-        if (!nativeTexturePtr)
-        {
-            RTC_LOG(LS_ERROR) << "nativeTexturePtr is nullptr.";
-            return false;
-        }
-
-        if (!dest)
-        {
-            RTC_LOG(LS_ERROR) << "dest is nullptr.";
-            return false;
-        }
         VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
-        UnityVulkanImage* unityVulkanImage = static_cast<UnityVulkanImage*>(nativeTexturePtr);
+        VkImage nativeSrc = reinterpret_cast<VkImage>(nativeTexturePtr);
 
-        VkCommandBuffer commandBuffer = GetCommandBuffer();
-        if (!commandBuffer)
-        {
-            RTC_LOG(LS_ERROR) << "GetCommandBuffer failed";
-            return false;
-        }
-
-        // Transition the src texture layout.
-        VkResult result = VulkanUtility::DoImageLayoutTransition(
-            commandBuffer,
-            unityVulkanImage->image,
-            unityVulkanImage->format,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
-            return false;
-        }
-
-        // Transition the dst texture layout.
-        result = VulkanUtility::DoImageLayoutTransition(
-            commandBuffer,
-            destTexture->GetImage(),
-            destTexture->GetTextureFormat(),
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_PIPELINE_STAGE_TRANSFER_BIT);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "DoImageLayoutTransition failed. result:" << result;
-            return false;
-        }
-
-        VkImage image = unityVulkanImage->image;
-        if (destTexture->GetImage() == image)
-            return false;
-        {
-            std::unique_ptr<const ScopedProfiler> profiler;
-            if (m_profiler)
-                profiler = m_profiler->CreateScopedProfiler(*m_maker);
-
-            // The layouts of All VulkanTexture2D should be VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            // so no transition for destTex
-            VkResult result = VulkanUtility::CopyImage(
-                commandBuffer, image, destTexture->GetImage(), destTexture->GetWidth(), destTexture->GetHeight());
-            if (result != VK_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "CopyImage failed. result:" << result;
-                return false;
-            }
-        }
-
-        destTexture->currentFrameNumber = m_LastState.currentFrameNumber;
-        SubmitCommandBuffer();
-        return true;
+        return CopyTexture(destTexture->GetImage(), nativeSrc, destTexture->GetWidth(), destTexture->GetHeight());
     }
 
     rtc::scoped_refptr<webrtc::I420Buffer> VulkanGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
@@ -362,29 +359,18 @@ namespace webrtc
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(tex);
         const int32_t width = static_cast<int32_t>(tex->GetWidth());
         const int32_t height = static_cast<int32_t>(tex->GetHeight());
-        const VkDeviceMemory dstImageMemory = vulkanTexture->GetTextureImageMemory();
-        VkImageSubresource subresource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
-        VkSubresourceLayout subresourceLayout;
-        vkGetImageSubresourceLayout(m_Instance.device, vulkanTexture->GetImage(), &subresource, &subresourceLayout);
-        const int32_t rowPitch = static_cast<int32_t>(subresourceLayout.rowPitch);
+        const int32_t rowPitch = static_cast<int32_t>(vulkanTexture->GetPitch());
 
-        void* data;
-        std::vector<uint8_t> dst;
-        dst.resize(vulkanTexture->GetTextureImageMemorySize());
-        const VkResult result = vkMapMemory(m_Instance.device, dstImageMemory, 0, VK_WHOLE_SIZE, 0, &data);
-        if (result != VK_SUCCESS)
-        {
-            RTC_LOG(LS_INFO) << "vkMapMemory failed.";
+        VkDeviceMemory textureImageMemory = vulkanTexture->GetTextureImageMemory();
+        void* data = nullptr;
+
+        if (vkMapMemory(m_Instance.device, textureImageMemory, 0, VK_WHOLE_SIZE, 0, &data) != VK_SUCCESS)
             return nullptr;
-        }
-        std::memcpy(static_cast<void*>(dst.data()), data, dst.size());
-
-        vkUnmapMemory(m_Instance.device, dstImageMemory);
 
         // convert format to i420
         rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer = webrtc::I420Buffer::Create(width, height);
         libyuv::ARGBToI420(
-            dst.data(),
+            (const uint8_t*)data,
             rowPitch,
             i420Buffer->MutableDataY(),
             i420Buffer->StrideY(),
@@ -394,7 +380,7 @@ namespace webrtc
             i420Buffer->StrideV(),
             width,
             height);
-
+        vkUnmapMemory(m_Instance.device, textureImageMemory);
         return i420Buffer;
     }
 

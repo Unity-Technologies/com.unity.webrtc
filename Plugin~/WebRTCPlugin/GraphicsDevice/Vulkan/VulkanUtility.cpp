@@ -262,13 +262,22 @@ namespace webrtc
 
     VkResult VulkanUtility::DoImageLayoutTransition(
         const VkCommandBuffer commandBuffer,
-        const VkImage image,
-        const VkFormat format,
+        UnityVulkanImage* unityImage,
         const VkImageLayout oldLayout,
         const VkPipelineStageFlags oldStage,
         const VkImageLayout newLayout,
-        const VkPipelineStageFlags newStage)
+        const VkPipelineStageFlags newStage,
+        bool saveLayout)
     {
+        if (unityImage == nullptr)
+            return VK_NOT_READY;
+
+        if (oldStage == newStage && oldLayout == newLayout)
+            return VK_SUCCESS;
+
+        if (saveLayout)
+            unityImage->layout = newLayout;
+
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -276,7 +285,7 @@ namespace webrtc
         barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; // for transferring queue family ownership
         barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-        barrier.image = image;
+        barrier.image = unityImage->image;
         barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         barrier.subresourceRange.baseMipLevel = 0;
         barrier.subresourceRange.levelCount = 1; // No mip map
@@ -348,7 +357,9 @@ namespace webrtc
         case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
             // Image will be used as a color attachment
             // Make sure any writes to the color buffer have been finished
-            barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+            // Vulkan API validation error?
+            // barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
             break;
 
         case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
@@ -364,7 +375,9 @@ namespace webrtc
             {
                 barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
             }
-            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            // Vulkan API validation error?
+            // barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
             break;
         default:
             // Other source layouts aren't handled (yet)
