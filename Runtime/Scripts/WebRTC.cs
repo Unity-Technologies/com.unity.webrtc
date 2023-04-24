@@ -1123,6 +1123,9 @@ namespace Unity.WebRTC
             // Run on worker thread, not on main thread.
             if (WebRTC.Table.TryGetValue(ptr, out RTCRtpTransform transform))
             {
+				if(transform == null)
+					return;
+
                 RTCEncodedFrame frame_;
                 if (transform.Kind == TrackKind.Video)
                     frame_ = new RTCEncodedVideoFrame(frame);
