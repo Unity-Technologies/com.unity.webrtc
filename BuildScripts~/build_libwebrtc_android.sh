@@ -36,6 +36,7 @@ patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches
 
 # Add deps libunwind
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
+patch -N "src/build/config/android/BUILD.gn" < "$COMMAND_DIR/patches/add_unwind_dependencies.patch"
 
 # downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
