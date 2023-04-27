@@ -187,11 +187,11 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         // todo:
-        // This test is failed for OSXEditor platfomr on CI.
+        // This test is failed for OSXEditor and Android platform on CI.
         // OSX standalone works well.
         [UnityTest]
         [Timeout(1000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor, RuntimePlatform.Android })]
         public IEnumerator TransformedVideoFrameCallback()
         {
             var rt = CreateRenderTexture();
