@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 namespace Unity.WebRTC.RuntimeTest
 {
     [TestFixture]
-    [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxPlayer })]
     [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
     class VideoReceiveTestWithH264Codec : VideoReceiveTestBase
     {
