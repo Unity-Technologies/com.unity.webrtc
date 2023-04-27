@@ -1123,6 +1123,9 @@ namespace Unity.WebRTC
             // Run on worker thread, not on main thread.
             if (WebRTC.Table.TryGetValue(ptr, out RTCRtpTransform transform))
             {
+				if(transform == null)
+					return;
+
                 RTCEncodedFrame frame_;
                 if (transform.Kind == TrackKind.Video)
                     frame_ = new RTCEncodedVideoFrame(frame);
@@ -1556,7 +1559,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern uint FrameGetSsrc(IntPtr frame);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr FrameGetData(IntPtr frame, out int size);
+        public static extern void FrameGetData(IntPtr frame, out IntPtr data, out int size);
         [DllImport(WebRTC.Lib)]
         public static extern void FrameSetData(IntPtr frame, IntPtr data, int size);
         [DllImport(WebRTC.Lib)]

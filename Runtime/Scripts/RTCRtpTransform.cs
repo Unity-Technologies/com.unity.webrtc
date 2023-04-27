@@ -111,12 +111,11 @@ namespace Unity.WebRTC
         /// <returns></returns>
         public NativeArray<byte>.ReadOnly GetData()
         {
-            IntPtr data = NativeMethods.FrameGetData(self, out var size);
-
+            NativeMethods.FrameGetData(self, out var data, out var size);
             unsafe
             {
-                var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
-                    data.ToPointer(), size, Allocator.Invalid);
+                 var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                     data.ToPointer(), size, Allocator.None);
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref arr, AtomicSafetyHandle.Create());
 #endif
@@ -137,7 +136,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="data"></param>
         /// <param name="startIndex"></param>
@@ -151,7 +150,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="data"></param>
         public void SetData(NativeSlice<byte> data)
@@ -228,9 +227,9 @@ namespace Unity.WebRTC
             callback_ = callback;
             WebRTC.Table.Add(self, this);
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~RTCRtpTransform()
         {
@@ -238,7 +237,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="frame"></param>
         public void Write(RTCEncodedFrame frame)
@@ -280,7 +279,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///  
+    ///
     /// </summary>
     /// <param name="e"></param>
     public delegate void TransformedFrameCallback(RTCTransformEvent e);

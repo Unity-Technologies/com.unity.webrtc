@@ -139,9 +139,6 @@ namespace Unity.WebRTC.RuntimeTest
 
             var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
             yield return op1;
-
-            UnityEngine.Debug.Log(test.component.GetDataChannelList(0).Count);
-            UnityEngine.Debug.Log(test.component.GetDataChannelList(1).Count);
         }
 
         [UnityTest]
