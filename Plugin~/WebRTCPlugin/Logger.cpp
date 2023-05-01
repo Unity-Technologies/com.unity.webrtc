@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
 #include "pch.h"
 
 #include "WebRTCPlugin.h"
@@ -45,3 +47,4 @@ namespace webrtc
 
 } // end namespace webrtc
 } // end namespace unity
+#pragma clang diagnostic pop

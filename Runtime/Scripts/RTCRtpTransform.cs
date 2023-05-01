@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using System.Runtime.CompilerServices;
 
 namespace Unity.WebRTC
 {
@@ -109,13 +110,19 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         /// <returns></returns>
+#if UNITY_ANDROID
+        // todo: Optimizing for Android platform leads a crash issue.
+        [MethodImpl(MethodImplOptions.NoOptimization)]
+#endif
         public NativeArray<byte>.ReadOnly GetData()
         {
             NativeMethods.FrameGetData(self, out var data, out var size);
+
             unsafe
             {
-                 var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
-                     data.ToPointer(), size, Allocator.None);
+                var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                    data.ToPointer(), size, Allocator.None);
+
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref arr, AtomicSafetyHandle.Create());
 #endif
@@ -205,7 +212,7 @@ namespace Unity.WebRTC
             return new RTCEncodedVideoFrameMetadata(data);
         }
 
-        internal RTCEncodedVideoFrame(IntPtr ptr) : base(ptr) {}
+        internal RTCEncodedVideoFrame(IntPtr ptr) : base(ptr) { }
     };
 
     /// <summary>
