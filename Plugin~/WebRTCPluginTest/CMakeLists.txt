@@ -1,5 +1,7 @@
 add_executable(WebRTCLibTest)
 
+target_precompile_headers(WebRTCLibTest PRIVATE pch.h)
+
 target_sources(
   WebRTCLibTest
   PRIVATE pch.cpp
@@ -84,8 +86,6 @@ else()
 endif()
 
 if(Windows)
-  # Use precompiled header
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
   target_link_libraries(
     WebRTCLibTest
     PRIVATE ${WEBRTC_LIBRARY}
@@ -109,8 +109,7 @@ if(Windows)
   target_include_directories(
     WebRTCLibTest PRIVATE ${CUDA_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIR}
                           ${NVCODEC_INCLUDE_DIR})
-  # Creare precompiled header
-  set_source_files_properties(pch.cpp PROPERTIES COMPILE_FLAGS "/Yc /Ycpch.h")
+
   set_target_properties(
     WebRTCLibTest
     PROPERTIES
