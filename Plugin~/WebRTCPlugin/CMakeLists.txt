@@ -1,7 +1,5 @@
 add_library(WebRTCLib STATIC)
 
-target_precompile_headers(WebRTCLib PRIVATE pch.h)
-
 target_sources(
   WebRTCLib
   PRIVATE Context.cpp
@@ -108,6 +106,7 @@ add_subdirectory(Codec)
 add_subdirectory(GraphicsDevice)
 
 if(Windows)
+  target_precompile_headers(WebRTCLib PRIVATE pch.h)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

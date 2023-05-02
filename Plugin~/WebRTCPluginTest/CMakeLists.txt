@@ -1,7 +1,5 @@
 add_executable(WebRTCLibTest)
 
-target_precompile_headers(WebRTCLibTest PRIVATE pch.h)
-
 target_sources(
   WebRTCLibTest
   PRIVATE pch.cpp
@@ -86,6 +84,7 @@ else()
 endif()
 
 if(Windows)
+  target_precompile_headers(WebRTCLibTest PRIVATE pch.h)
   target_link_libraries(
     WebRTCLibTest
     PRIVATE ${WEBRTC_LIBRARY}
