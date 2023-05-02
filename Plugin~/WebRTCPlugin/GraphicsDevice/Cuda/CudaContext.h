@@ -38,7 +38,7 @@ namespace webrtc
         // This method returns context for the thread which called the method.
         CUcontext GetContext() const;
 
-        static CUresult FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice);
+        static CUresult FindCudaDevice(const uint8_t* uuid, CUdevice* device);
 
     private:
         CUcontext m_context;

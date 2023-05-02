@@ -10,6 +10,22 @@
 using namespace Microsoft::WRL;
 #endif
 
+#define __CUCTX_CUDA_CALL(call, ret)                                                                                   \
+    CUresult err__ = call;                                                                                             \
+    if (err__ != CUDA_SUCCESS)                                                                                         \
+    {                                                                                                                  \
+        const char* szErrName = NULL;                                                                                  \
+        cuGetErrorName(err__, &szErrName);                                                                             \
+        RTC_LOG(LS_ERROR) << "CudaContext error " << szErrName;                                                        \
+        return ret;                                                                                                    \
+    }
+
+#define CUCTX_CUDA_CALL_ERROR(call)                                                                                    \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        __CUCTX_CUDA_CALL(call, err__);                                                                                \
+    } while (0)
+
 namespace unity
 {
 namespace webrtc
@@ -45,12 +61,8 @@ namespace webrtc
     static CUresult CheckDriverVersion()
     {
         int driverVersion = 0;
-        CUresult result = cuDriverGetVersion(&driverVersion);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
 
+        CUCTX_CUDA_CALL_ERROR(cuDriverGetVersion(&driverVersion));
         if (kRequiredDriverVersion > driverVersion)
         {
             RTC_LOG(LS_ERROR) << "CUDA driver version is not higher than the required version. " << driverVersion;
@@ -64,41 +76,29 @@ namespace webrtc
     {
     }
 
-    CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* cuDevice)
+    CUresult CudaContext::FindCudaDevice(const uint8_t* uuid, CUdevice* device)
     {
         bool found = FindModule();
         if (!found)
             return CUDA_ERROR_NO_DEVICE;
 
-        CUdevice _cuDevice = 0;
-        CUresult result = CUDA_SUCCESS;
         int numDevices = 0;
-        result = cuDeviceGetCount(&numDevices);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
+        CUdevice cuDevice = 0;
         CUuuid id = {};
+
+        CUCTX_CUDA_CALL_ERROR(cuDeviceGetCount(&numDevices));
 
         // Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
         // this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
         for (int i = 0; i < numDevices; i++)
         {
-            result = cuDeviceGet(&_cuDevice, i);
-            if (result != CUDA_SUCCESS)
-            {
-                return result;
-            }
-            result = cuDeviceGetUuid(&id, _cuDevice);
-            if (result != CUDA_SUCCESS)
-            {
-                return result;
-            }
+            CUCTX_CUDA_CALL_ERROR(cuDeviceGet(&cuDevice, i));
+            CUCTX_CUDA_CALL_ERROR(cuDeviceGetUuid(&id, cuDevice));
 
             if (!std::memcmp(static_cast<const void*>(&id), static_cast<const void*>(uuid), sizeof(CUuuid)))
             {
-                if (cuDevice != nullptr)
-                    *cuDevice = _cuDevice;
+                if (device != nullptr)
+                    *device = cuDevice;
                 return CUDA_SUCCESS;
             }
         }
@@ -110,61 +110,22 @@ namespace webrtc
         // dll check
         bool found = FindModule();
         if (!found)
-        {
             return CUDA_ERROR_NOT_FOUND;
-        }
-
-        CUresult result = CheckDriverVersion();
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
-
-        CUdevice cuDevice = 0;
-        result = cuInit(0);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
 
         int numDevices = 0;
-        result = cuDeviceGetCount(&numDevices);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
+        CUdevice cuDevice = 0;
 
-        CUuuid id = {};
+        CUCTX_CUDA_CALL_ERROR(CheckDriverVersion());
+        CUCTX_CUDA_CALL_ERROR(cuInit(0));
+        CUCTX_CUDA_CALL_ERROR(cuDeviceGetCount(&numDevices));
+
         std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
         if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID))
-        {
             return CUDA_ERROR_INVALID_DEVICE;
-        }
 
-        // Loop over the available devices and identify the CUdevice  corresponding to the physical device in use by
-        // this Vulkan instance. This is required because there is no other way to match GPUs across API boundaries.
-        bool foundDevice = false;
-        for (int i = 0; i < numDevices; i++)
-        {
-            cuDeviceGet(&cuDevice, i);
-
-            cuDeviceGetUuid(&id, cuDevice);
-
-            if (!std::memcmp(
-                    static_cast<const void*>(&id), static_cast<const void*>(deviceUUID.data()), sizeof(CUuuid)))
-            {
-                foundDevice = true;
-                break;
-            }
-        }
-
-        if (!foundDevice)
-        {
-            return CUDA_ERROR_NO_DEVICE;
-        }
-
-        result = cuCtxCreate(&m_context, 0, cuDevice);
-        return result;
+        CUCTX_CUDA_CALL_ERROR(FindCudaDevice(deviceUUID.data(), &cuDevice));
+        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, cuDevice));
+        return CUDA_SUCCESS;
     }
     //---------------------------------------------------------------------------------------------------------------------
 
@@ -173,46 +134,28 @@ namespace webrtc
     {
         bool found = FindModule();
         if (!found)
-        {
             return CUDA_ERROR_NOT_FOUND;
-        }
 
-        CUresult result = CheckDriverVersion();
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
-
-        result = cuInit(0);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
         int numDevices = 0;
-        result = cuDeviceGetCount(&numDevices);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
+
+        CUCTX_CUDA_CALL_ERROR(CheckDriverVersion());
+        CUCTX_CUDA_CALL_ERROR(cuInit(0));
+        CUCTX_CUDA_CALL_ERROR(cuDeviceGetCount(&numDevices));
 
         ComPtr<IDXGIDevice> pDxgiDevice = nullptr;
         if (device->QueryInterface(IID_PPV_ARGS(&pDxgiDevice)) != S_OK)
-        {
             return CUDA_ERROR_NO_DEVICE;
-        }
+
         ComPtr<IDXGIAdapter> pDxgiAdapter = nullptr;
         if (pDxgiDevice->GetAdapter(&pDxgiAdapter) != S_OK)
-        {
             return CUDA_ERROR_NO_DEVICE;
-        }
+
         CUdevice dev;
         if (cuD3D11GetDevice(&dev, pDxgiAdapter.Get()) != CUDA_SUCCESS)
-        {
             return CUDA_ERROR_NO_DEVICE;
-        }
 
-        result = cuCtxCreate(&m_context, 0, dev);
-        return result;
+        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, dev));
+        return CUDA_SUCCESS;
     }
 #endif
     //---------------------------------------------------------------------------------------------------------------------
@@ -220,51 +163,30 @@ namespace webrtc
 #if defined(SUPPORT_D3D12)
     CUresult CudaContext::Init(ID3D12Device* device)
     {
-
         bool found = FindModule();
         if (!found)
         {
             return CUDA_ERROR_NOT_FOUND;
         }
 
-        CUresult result = CheckDriverVersion();
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
-
-        result = cuInit(0);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
-
         int numDevices = 0;
-        result = cuDeviceGetCount(&numDevices);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
+
+        CUCTX_CUDA_CALL_ERROR(CheckDriverVersion());
+        CUCTX_CUDA_CALL_ERROR(cuInit(0));
+        CUCTX_CUDA_CALL_ERROR(cuDeviceGetCount(&numDevices));
 
         LUID luid = device->GetAdapterLuid();
-
         CUdevice cuDevice = 0;
         bool deviceFound = false;
 
         for (int32_t deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
         {
-            result = cuDeviceGet(&cuDevice, deviceIndex);
-            if (result != CUDA_SUCCESS)
-            {
-                return result;
-            }
+            CUCTX_CUDA_CALL_ERROR(cuDeviceGet(&cuDevice, deviceIndex));
+
             char luid_[8];
             unsigned int nodeMask;
-            result = cuDeviceGetLuid(luid_, &nodeMask, cuDevice);
-            if (result != CUDA_SUCCESS)
-            {
-                return result;
-            }
+            CUCTX_CUDA_CALL_ERROR(cuDeviceGetLuid(luid_, &nodeMask, cuDevice));
+
             if (memcmp(&luid.LowPart, luid_, sizeof(luid.LowPart)) == 0 &&
                 memcmp(&luid.HighPart, luid_ + sizeof(luid.LowPart), sizeof(luid.HighPart)) == 0)
             {
@@ -275,7 +197,9 @@ namespace webrtc
 
         if (!deviceFound)
             return CUDA_ERROR_NO_DEVICE;
-        return cuCtxCreate(&m_context, 0, cuDevice);
+
+        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, cuDevice));
+        return CUDA_SUCCESS;
     }
 #endif
 //---------------------------------------------------------------------------------------------------------------------
@@ -291,24 +215,11 @@ namespace webrtc
             return CUDA_ERROR_NOT_FOUND;
         }
 
-        CUresult result = CheckDriverVersion();
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
-
-        result = cuInit(0);
-        if (result != CUDA_SUCCESS)
-        {
-            return result;
-        }
+        CUCTX_CUDA_CALL_ERROR(CheckDriverVersion());
+        CUCTX_CUDA_CALL_ERROR(cuInit(0));
 
         int numDevices;
-        result = cuDeviceGetCount(&numDevices);
-        if (CUDA_SUCCESS != result)
-        {
-            return result;
-        }
+        CUCTX_CUDA_CALL_ERROR(cuDeviceGetCount(&numDevices));
         if (numDevices == 0)
         {
             return CUDA_ERROR_NO_DEVICE;
@@ -317,16 +228,10 @@ namespace webrtc
         // TODO:: check GPU capability
         int cuDevId = 0;
         CUdevice cuDevice = 0;
-        result = cuDeviceGet(&cuDevice, cuDevId);
-        if (CUDA_SUCCESS != result)
-        {
-            return result;
-        }
-        result = cuCtxCreate(&m_context, 0, cuDevice);
-        if (CUDA_SUCCESS != result)
-        {
-            return result;
-        }
+
+        CUCTX_CUDA_CALL_ERROR(cuDeviceGet(&cuDevice, cuDevId));
+        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, cuDevice));
+
         return CUDA_SUCCESS;
     }
 #endif

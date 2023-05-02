@@ -38,7 +38,13 @@ namespace webrtc
 #endif
     }
 
-    GpuMemoryBufferFromUnity::~GpuMemoryBufferFromUnity() { }
+    GpuMemoryBufferFromUnity::~GpuMemoryBufferFromUnity()
+    {
+        // Make sure handle_ is released first
+        handle_ = nullptr;
+        texture_ = nullptr;
+        textureCpuRead_ = nullptr;
+    }
 
     bool GpuMemoryBufferFromUnity::ResetSync()
     {

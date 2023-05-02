@@ -365,21 +365,23 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        D3D12Texture2D* d3d12Texure = static_cast<D3D12Texture2D*>(texture);
+        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
 
-        // set context on the thread.
-        cuCtxPushCurrent(GetCUcontext());
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = GetCUcontext();
 
-        HANDLE sharedHandle = d3d12Texure->GetHandle();
+        D3D12Texture2D* d3d12Tex = static_cast<D3D12Texture2D*>(texture);
+
+        HANDLE sharedHandle = d3d12Tex->GetHandle();
         if (!sharedHandle)
         {
             RTC_LOG(LS_ERROR) << "cannot get shared handle";
-            throw;
+            return nullptr;
         }
 
-        size_t width = d3d12Texure->GetWidth();
-        size_t height = d3d12Texure->GetHeight();
-        D3D12_RESOURCE_DESC desc = d3d12Texure->GetDesc();
+        size_t width = d3d12Tex->GetWidth();
+        size_t height = d3d12Tex->GetHeight();
+        D3D12_RESOURCE_DESC desc = d3d12Tex->GetDesc();
         D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo;
         d3d12ResourceAllocationInfo = m_d3d12Device->GetResourceAllocationInfo(0, 1, &desc);
         size_t actualSize = d3d12ResourceAllocationInfo.SizeInBytes;
@@ -390,14 +392,7 @@ namespace webrtc
         memDesc.size = actualSize;
         memDesc.flags = CUDA_EXTERNAL_MEMORY_DEDICATED;
 
-        CUresult result;
-        CUexternalMemory externalMemory = {};
-        result = cuImportExternalMemory(&externalMemory, &memDesc);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuImportExternalMemory error";
-            throw;
-        }
+        GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&handle->externalMemory, &memDesc));
 
         CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
         arrayDesc.Width = width;
@@ -411,27 +406,11 @@ namespace webrtc
         mipmapArrayDesc.arrayDesc = arrayDesc;
         mipmapArrayDesc.numLevels = 1;
 
-        CUmipmappedArray mipmappedArray;
-        result = cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuExternalMemoryGetMappedMipmappedArray error";
-            throw;
-        }
+        GMB_CUDA_CALL_NULLPTR(
+            cuExternalMemoryGetMappedMipmappedArray(&handle->mipmappedArray, handle->externalMemory, &mipmapArrayDesc));
+        GMB_CUDA_CALL_NULLPTR(cuMipmappedArrayGetLevel(&handle->mappedArray, handle->mipmappedArray, 0));
+        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
-        CUarray array;
-        result = cuMipmappedArrayGetLevel(&array, mipmappedArray, 0);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuMipmappedArrayGetLevel error";
-            throw;
-        }
-        cuCtxPopCurrent(nullptr);
-
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = GetCUcontext();
-        handle->mappedArray = array;
-        handle->externalMemory = externalMemory;
         return std::move(handle);
     }
 

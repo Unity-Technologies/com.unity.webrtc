@@ -8,7 +8,7 @@ namespace webrtc
 {
     GpuMemoryBufferCudaHandle::GpuMemoryBufferCudaHandle()
         : context(nullptr)
-        , array(nullptr)
+        , mipmappedArray(nullptr)
         , mappedArray(nullptr)
         , mappedPtr(0)
         , resource(nullptr)
@@ -21,40 +21,27 @@ namespace webrtc
 
     GpuMemoryBufferCudaHandle::~GpuMemoryBufferCudaHandle()
     {
-        cuCtxPushCurrent(context);
+        GMB_CUDA_CALL(cuCtxPushCurrent(context));
 
-        CUresult result;
+        mappedArray = nullptr;
+        if (mipmappedArray != nullptr)
+        {
+            GMB_CUDA_CALL(cuMipmappedArrayDestroy(mipmappedArray));
+            mipmappedArray = nullptr;
+        }
         if (externalMemory != nullptr)
         {
-            result = cuDestroyExternalMemory(externalMemory);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "faild cuDestroyExternalMemory CUresult: " << result;
-            }
+            GMB_CUDA_CALL(cuDestroyExternalMemory(externalMemory));
+            externalMemory = nullptr;
         }
         if (resource != nullptr)
         {
-            result = cuGraphicsUnmapResources(1, &resource, nullptr);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "faild cuGraphicsUnmapResources CUresult: " << result;
-            }
-            result = cuGraphicsUnregisterResource(resource);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "faild cuGraphicsUnregisterResource CUresult: " << result;
-            }
-        }
-        if (array != nullptr)
-        {
-            result = cuArrayDestroy(array);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "faild cuArrayDestroy CUresult: " << result;
-            }
+            GMB_CUDA_CALL(cuGraphicsUnmapResources(1, &resource, nullptr));
+            GMB_CUDA_CALL(cuGraphicsUnregisterResource(resource));
+            resource = nullptr;
         }
 
-        cuCtxPopCurrent(nullptr);
+        GMB_CUDA_CALL(cuCtxPopCurrent(nullptr));
     }
 }
 }
