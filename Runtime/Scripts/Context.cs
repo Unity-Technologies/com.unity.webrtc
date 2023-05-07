@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 
@@ -54,6 +55,69 @@ namespace Unity.WebRTC
         }
     }
 
+    internal class Batch
+    {
+        public struct BatchData
+        {
+            public int tracksCount;
+            public IntPtr[] tracks;
+        }
+
+        public BatchData data;
+        public IntPtr ptr;
+
+        public Batch()
+        {
+            ResizeCapacity(1);
+        }
+
+        ~Batch()
+        {
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (ptr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(ptr);
+                ptr = IntPtr.Zero;
+            }
+        }
+
+        public void ResizeCapacity(int totalTracks)
+        {
+            const int roundedCapacity = 32;
+            int totalCapacity = ((totalTracks + roundedCapacity) / roundedCapacity) * roundedCapacity;
+
+            data.tracksCount = 0;
+            data.tracks = new IntPtr[totalCapacity];
+
+            int size = Marshal.SizeOf(typeof(BatchData)) +
+                       Marshal.SizeOf(typeof(IntPtr)) * data.tracks.Length;
+
+            if (ptr == IntPtr.Zero)
+                ptr = Marshal.AllocHGlobal(size);
+            else
+                ptr = Marshal.ReAllocHGlobal(ptr, (IntPtr)size);
+            Marshal.StructureToPtr(data, ptr, false);
+        }
+
+        public void Submit(bool flush = false)
+        {
+            if (flush == false)
+            {
+                Marshal.StructureToPtr(data, ptr, false);
+                WebRTC.Context.BatchUpdate(ptr);
+            }
+            else
+            {
+                WebRTC.Context.BatchUpdate(IntPtr.Zero);
+            }
+            VideoUpdateMethods.Flush();
+        }
+    }
+
     internal class Context : IDisposable
     {
         internal IntPtr self;
@@ -62,11 +126,12 @@ namespace Unity.WebRTC
 
         private int id;
         private bool disposed;
-        private IntPtr renderFunction;
-        private int renderEventID = -1;
-        private IntPtr releaseBuffersFunction;
-        private int releaseBuffersEventID = -1;
+
+        private IntPtr batchUpdateFunction;
+        private int batchUpdateEventID = -1;
         private IntPtr textureUpdateFunction;
+
+        internal Batch batch;
 
         public static Context Create(int id = 0)
         {
@@ -84,6 +149,7 @@ namespace Unity.WebRTC
             self = ptr;
             this.id = id;
             this.table = new WeakReferenceTable();
+            this.batch = new Batch();
         }
 
         ~Context()
@@ -108,8 +174,8 @@ namespace Unity.WebRTC
                 }
                 table.Clear();
 
-                // Release buffers on the renedering thread.
-                ReleaseBuffers();
+                // Release buffers on the rendering thread
+                batch.Submit(true);
 
                 NativeMethods.ContextDestroy(id);
                 self = IntPtr.Zero;
@@ -231,24 +297,14 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteAudioTrackSink(self, sink);
         }
 
-        public IntPtr GetRenderEventFunc()
+        public IntPtr GetBatchUpdateEventFunc()
         {
-            return NativeMethods.GetRenderEventFunc(self);
+            return NativeMethods.GetBatchUpdateEventFunc(self);
         }
 
-        public int GetRenderEventID()
+        public int GetBatchUpdateEventID()
         {
-            return NativeMethods.GetRenderEventID();
-        }
-
-        public IntPtr GetReleaseBufferFunc()
-        {
-            return NativeMethods.GetReleaseBuffersFunc(self);
-        }
-
-        public int GetReleaseBufferEventID()
-        {
-            return NativeMethods.GetReleaseBuffersEventID();
+            return NativeMethods.GetBatchUpdateEventID();
         }
 
         public IntPtr GetUpdateTextureFunc()
@@ -312,24 +368,17 @@ namespace Unity.WebRTC
             NativeMethods.ContextGetReceiverCapabilities(self, kind, out capabilities);
         }
 
-        internal void Encode(IntPtr ptr)
+        internal void BatchUpdate(IntPtr batchData)
         {
-            renderFunction = renderFunction == IntPtr.Zero ? GetRenderEventFunc() : renderFunction;
-            renderEventID = renderEventID == -1 ? GetRenderEventID() : renderEventID;
-            VideoEncoderMethods.Encode(renderFunction, renderEventID, ptr);
-        }
-
-        internal void ReleaseBuffers()
-        {
-            releaseBuffersFunction = releaseBuffersFunction == IntPtr.Zero ? GetReleaseBufferFunc() : releaseBuffersFunction;
-            releaseBuffersEventID = releaseBuffersEventID == -1 ? GetReleaseBufferEventID() : releaseBuffersEventID;
-            VideoEncoderMethods.ReleaseBuffers(releaseBuffersFunction, releaseBuffersEventID);
+            batchUpdateFunction = batchUpdateFunction == IntPtr.Zero ? GetBatchUpdateEventFunc() : batchUpdateFunction;
+            batchUpdateEventID = batchUpdateEventID == -1 ? GetBatchUpdateEventID() : batchUpdateEventID;
+            VideoUpdateMethods.BatchUpdate(batchUpdateFunction, batchUpdateEventID, batchData);
         }
 
         internal void UpdateRendererTexture(uint rendererId, UnityEngine.Texture texture)
         {
             textureUpdateFunction = textureUpdateFunction == IntPtr.Zero ? GetUpdateTextureFunc() : textureUpdateFunction;
-            VideoDecoderMethods.UpdateRendererTexture(textureUpdateFunction, texture, rendererId);
+            VideoUpdateMethods.UpdateRendererTexture(textureUpdateFunction, texture, rendererId);
         }
     }
 }

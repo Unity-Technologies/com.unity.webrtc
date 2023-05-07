@@ -36,8 +36,7 @@ namespace webrtc
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
     static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
-    static int s_renderEventID = 0;
-    static int s_releaseBuffersEventID = 0;
+    static int s_batchUpdateEventID = 0;
 
     IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
 
@@ -84,8 +83,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             break;
 
         // Reserve eventID range to use for custom plugin events.
-        s_renderEventID = s_UnityInterfaces->Get<IUnityGraphics>()->ReserveEventIDRange(2);
-        s_releaseBuffersEventID = s_renderEventID + 1;
+        s_batchUpdateEventID = s_UnityInterfaces->Get<IUnityGraphics>()->ReserveEventIDRange(1);
 
 #if defined(SUPPORT_VULKAN)
         if (renderer == kUnityGfxRendererVulkan)
@@ -103,20 +101,13 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             /// note::
             /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
             /// managed code.
-            UnityVulkanPluginEventConfig encodeEventConfig;
-            encodeEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
-            encodeEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
-            encodeEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
+            UnityVulkanPluginEventConfig batchUpdateEventConfig;
+            batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
+            batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
+            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
                 kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
 
-            UnityVulkanPluginEventConfig releaseBufferEventConfig;
-            releaseBufferEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
-            releaseBufferEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
-            releaseBufferEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
-                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
-
-            vulkan->ConfigureEvent(s_renderEventID, &encodeEventConfig);
-            vulkan->ConfigureEvent(s_releaseBuffersEventID, &releaseBufferEventConfig);
+            vulkan->ConfigureEvent(s_batchUpdateEventID, &batchUpdateEventConfig);
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));
@@ -228,23 +219,38 @@ void PluginLoad(IUnityInterfaces* unityInterfaces)
 
 void PluginUnload() { OnGraphicsDeviceEvent(kUnityGfxDeviceEventShutdown); }
 
-// Data format used by the managed code.
-// CommandBuffer.IssuePluginEventAndData method pass data packed by this format.
-struct EncodeData
+enum class VideoStreamTrackAction
 {
+    Ignore = 0,
+    Decode = 1,
+    Encode = 2,
+};
+
+// Keep in sync with VideoStreamTrack.cs
+struct VideoStreamTrackData
+{
+    VideoStreamTrackAction action;
     void* texture;
-    UnityVideoTrackSource* source;
+    void* source;
     int width;
     int height;
     UnityRenderingExtTextureFormat format;
 };
 
+// Data format used by the managed code.
+// CommandBuffer.IssuePluginEventAndData method pass data packed by this format.
+struct BatchData
+{
+    int32_t tracksCount;
+    VideoStreamTrackData** tracks;
+};
+
 // Notice: When DebugLog is used in a method called from RenderingThread,
 // it hangs when attempting to leave PlayMode and re-enter PlayMode.
 // So, we comment out `DebugLog`.
-static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
+static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
 {
-    if (eventID != s_renderEventID)
+    if (eventID != s_batchUpdateEventID)
         return;
     if (!s_context)
         return;
@@ -254,57 +260,76 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     if (!lock.owns_lock())
         return;
 
-    EncodeData* encodeData = static_cast<EncodeData*>(data);
+    BatchData* batchData = static_cast<BatchData*>(data);
 
-    RTC_DCHECK(encodeData->texture);
-    RTC_DCHECK(encodeData->source);
-    RTC_DCHECK_GT(encodeData->width, 0);
-    RTC_DCHECK_GT(encodeData->height, 0);
-
-    UnityVideoTrackSource* source = encodeData->source;
-    if (!s_context->ExistsRefPtr(source))
-        return;
-    Timestamp timestamp = s_clock->CurrentTime();
-    IGraphicsDevice* device = Plugin::GraphicsDevice();
-    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
-    void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
-    unity::webrtc::Size size(encodeData->width, encodeData->height);
-
-    if (s_bufferPool->bufferCount() < kLimitBufferCount)
+    if (batchData == nullptr || batchData->tracks == nullptr)
     {
-        std::unique_ptr<const ScopedProfiler> profiler;
-        if (s_ProfilerMarkerFactory)
-            profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
-
-        auto frame = s_bufferPool->CreateFrame(ptr, size, encodeData->format, timestamp);
-        source->OnFrameCaptured(std::move(frame));
+        // Release all buffers.
+        if (s_bufferPool)
+            s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
+        return;
     }
+
+    for (int i = 0; i < batchData->tracksCount; i++)
+    {
+        VideoStreamTrackData* trackData = batchData->tracks[i];
+
+        if (trackData == nullptr || trackData->texture == nullptr || trackData->source == nullptr)
+            continue;
+
+        if (trackData->action == VideoStreamTrackAction::Encode)
+        {
+            RTC_DCHECK(trackData->texture);
+            RTC_DCHECK(trackData->source);
+            RTC_DCHECK_GT(trackData->width, 0);
+            RTC_DCHECK_GT(trackData->height, 0);
+
+            UnityVideoTrackSource* source = static_cast<UnityVideoTrackSource*>(trackData->source);
+            if (!s_context->ExistsRefPtr(source))
+            {
+                trackData->source = nullptr;
+                continue;
+            }
+
+            Timestamp timestamp = s_clock->CurrentTime();
+            IGraphicsDevice* device = Plugin::GraphicsDevice();
+            UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
+            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
+            unity::webrtc::Size size(trackData->width, trackData->height);
+
+            if (s_bufferPool->bufferCount() < kLimitBufferCount)
+            {
+                std::unique_ptr<const ScopedProfiler> profiler;
+                if (s_ProfilerMarkerFactory)
+                    profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
+
+                auto frame = s_bufferPool->CreateFrame(ptr, size, trackData->format, timestamp);
+                source->OnFrameCaptured(std::move(frame));
+            }
+        }
+#if 0
+        else if (trackData->action == VideoStreamTrackAction::Decode)
+        {
+            std::unique_ptr<const ScopedProfiler> profiler;
+            if (s_ProfilerMarkerFactory)
+                profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerDecodeCopy);
+            UnityVideoRenderer* renderer = static_cast<UnityVideoRenderer*>(trackData->source);
+            renderer->CopyBuffer(trackData->texture, trackData->width, trackData->height, trackData->format);
+        }
+#endif
+    }
+
     s_bufferPool->ReleaseStaleBuffers(timestamp, kStaleFrameLimit);
 }
 
-static void UNITY_INTERFACE_API OnReleaseBuffers(int eventID, void* data)
-{
-    if (eventID != s_releaseBuffersEventID)
-        return;
-    // Release all buffers.
-    if (s_bufferPool)
-        s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
-}
-
-extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc(Context* context)
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+GetBatchUpdateEventFunc(Context* context)
 {
     s_context = context;
-    return OnRenderEvent;
+    return OnBatchUpdateEvent;
 }
 
-extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventID() { return s_renderEventID; }
-
-extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersFunc(Context* context)
-{
-    return OnReleaseBuffers;
-}
-
-extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetReleaseBuffersEventID() { return s_releaseBuffersEventID; }
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetBatchUpdateEventID() { return s_batchUpdateEventID; }
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {
@@ -330,9 +355,8 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
         int height = static_cast<int>(params->height);
 
         {
-            std::unique_ptr<const ScopedProfiler> profiler;
-            if (s_ProfilerMarkerFactory)
-                profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerDecode);
+            if (s_UnityProfiler && s_UnityProfiler->IsAvailable())
+                s_UnityProfiler->BeginSample(s_MarkerDecode);
 
             params->texData = renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
                 width, height, ConvertTextureFormat(params->format));
@@ -342,6 +366,9 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
     {
         auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2*>(data);
         s_mapVideoRenderer.erase(params->userData);
+
+        if (s_UnityProfiler && s_UnityProfiler->IsAvailable())
+            s_UnityProfiler->EndSample(s_MarkerDecode);
     }
 }
 

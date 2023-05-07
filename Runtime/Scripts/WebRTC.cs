@@ -700,13 +700,31 @@ namespace Unity.WebRTC
                 {
                     var tempTextureActive = RenderTexture.active;
                     RenderTexture.active = null;
+
+                    int trackIndex = 0;
+                    int totalTracks = VideoStreamTrack.s_tracks.Count;
+                    var batch = Context.batch;
+
+                    if (batch.data.tracks.Length < totalTracks)
+                        batch.ResizeCapacity(totalTracks);
+
                     foreach (var reference in VideoStreamTrack.s_tracks.Values)
                     {
                         if (!reference.TryGetTarget(out var track))
                             continue;
-                        track.UpdateSendTexture();
-                        track.UpdateReceiveTexture();
+
+                        track.UpdateTexture();
+                        if (track.DataPtr != IntPtr.Zero)
+                        {
+                            batch.data.tracks[trackIndex] = track.DataPtr;
+                            trackIndex++;
+                        }
                     }
+
+                    batch.data.tracksCount = trackIndex;
+                    if (trackIndex > 0)
+                        batch.Submit();
+
                     RenderTexture.active = tempTextureActive;
                 }
             }
@@ -1493,13 +1511,9 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void SetCurrentContext(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr GetRenderEventFunc(IntPtr context);
+        public static extern IntPtr GetBatchUpdateEventFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
-        public static extern int GetRenderEventID();
-        [DllImport(WebRTC.Lib)]
-        public static extern IntPtr GetReleaseBuffersFunc(IntPtr context);
-        [DllImport(WebRTC.Lib)]
-        public static extern int GetReleaseBuffersEventID();
+        public static extern int GetBatchUpdateEventID();
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
@@ -1572,28 +1586,25 @@ namespace Unity.WebRTC
 
     }
 
-    internal static class VideoEncoderMethods
+    internal static class VideoUpdateMethods
     {
         static CommandBuffer _command = new CommandBuffer();
 
-        public static void Encode(IntPtr callback, int eventID, IntPtr data)
+        static VideoUpdateMethods()
         {
-            _command.IssuePluginEventAndData(callback, eventID, data);
+            _command.name = "WebRTC";
+        }
+
+        public static void Flush()
+        {
             Graphics.ExecuteCommandBuffer(_command);
             _command.Clear();
         }
 
-        public static void ReleaseBuffers(IntPtr callback, int eventID)
+        public static void BatchUpdate(IntPtr callback, int eventID, IntPtr tracks)
         {
-            _command.IssuePluginEventAndData(callback, eventID, IntPtr.Zero);
-            Graphics.ExecuteCommandBuffer(_command);
-            _command.Clear();
+            _command.IssuePluginEventAndData(callback, eventID, tracks);
         }
-    }
-
-    internal static class VideoDecoderMethods
-    {
-        static UnityEngine.Rendering.CommandBuffer _command = new UnityEngine.Rendering.CommandBuffer();
 
         public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
         {
@@ -1606,8 +1617,6 @@ namespace Unity.WebRTC
             }
 #endif
             _command.IssuePluginCustomTextureUpdateV2(callback, texture, rendererId);
-            Graphics.ExecuteCommandBuffer(_command);
-            _command.Clear();
         }
     }
 }
