@@ -106,6 +106,7 @@ add_subdirectory(Codec)
 add_subdirectory(GraphicsDevice)
 
 if(Windows)
+  target_precompile_headers(WebRTCLib PRIVATE pch.h)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -121,8 +122,6 @@ if(Windows)
 endif()
 
 if(Windows)
-  # Use precompiled header
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu /Yupch.h")
   set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/x86_64")
 
   target_compile_definitions(WebRTCLib PUBLIC WEBRTC_WIN NOMINMAX
@@ -149,9 +148,6 @@ if(Windows)
   set_target_properties(
     WebRTCLib PROPERTIES MSVC_RUNTIME_LIBRARY
                          "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-  # Creare precompiled header
-  set_source_files_properties(pch.cpp PROPERTIES COMPILE_FLAGS "/Yc /Ycpch.h")
 elseif(macOS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
