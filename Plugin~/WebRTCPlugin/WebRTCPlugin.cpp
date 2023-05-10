@@ -1514,7 +1514,7 @@ extern "C"
         Optional<int64_t> frameId;
         uint16_t width;
         uint16_t height;
-        int spacialIndex;
+        int simulcastIndex;
         int temporalIndex;
         MarshallArray<int64_t> dependencies;
     };
@@ -1529,7 +1529,7 @@ extern "C"
         data->frameId = metadata.GetFrameId();
         data->width = metadata.GetWidth();
         data->height = metadata.GetHeight();
-        data->spacialIndex = metadata.GetSpatialIndex();
+        data->simulcastIndex = metadata.GetSimulcastIdx();
         data->temporalIndex = metadata.GetTemporalIndex();
         data->dependencies = metadata.GetFrameDependencies();
 

@@ -473,7 +473,7 @@ namespace webrtc
         m_encodedImage._encodedWidth = inputFrame.video_frame_buffer()->width();
         m_encodedImage._encodedHeight = inputFrame.video_frame_buffer()->height();
         m_encodedImage.SetTimestamp(inputFrame.timestamp());
-        m_encodedImage.SetSpatialIndex(0);
+        m_encodedImage.SetSimulcastIndex(0);
         m_encodedImage.ntp_time_ms_ = inputFrame.ntp_time_ms();
         m_encodedImage.capture_time_ms_ = inputFrame.render_time_ms();
         m_encodedImage.rotation_ = inputFrame.rotation();
