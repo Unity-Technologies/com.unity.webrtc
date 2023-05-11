@@ -84,7 +84,7 @@ test_editors:
   - version: 2022.1
     tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
@@ -93,7 +93,7 @@ test_editors:
   - version: 2021.3
     tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
@@ -102,7 +102,7 @@ test_editors:
   - version: 2020.3
     tests:
       - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified
+      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
