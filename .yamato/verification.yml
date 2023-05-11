@@ -10,16 +10,10 @@
 #   - win10_test
 # UnityIntegrationTests.TestIntegrationTestsiOSiPhoneSE
 #   - mac_iphone_se
-# UnityPlaymodeTests.TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
-#   - lin_test_ubuntu16.04
 # UnityPlaymodeTests.TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
 #   - mac_test_10.14
 # UnityPlaymodeTests.TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 #   - win10_test
-# UnityEditorTests.TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
-#   - lin_test_ubuntu16.04
-# UnityEditorTests.TestEditorTestsMacEditorIsolatedPackagesVerified
-#   - mac_test_10.13
 
 platforms:
   - name: Ubuntu 18.04
@@ -37,7 +31,7 @@ platforms:
   - name: Windows 10
     agent: win10_test
     type: Unity::VM
-    image: katana-to-yamato/test-platform-win10-katana-git:v1.9-auto
+    image: automation-tooling/win-10:v2.794960
     flavor: b1.large
     group: windows
   - name: iOS
@@ -46,18 +40,6 @@ platforms:
     image: katana-to-yamato/mobile-ios-macos-11-katana-se-git:v1.6-auto
     flavor: m1.mac
     group: ios
-  - name: Ubuntu 16.04
-    agent: lin_test_ubuntu16.04
-    type: Unity::VM
-    image: katana-to-yamato/test-platform-ubuntu16.04-katana-git:v1.11-auto
-    flavor: b1.large
-    group: linux
-  - name: macOS 10.13
-    agent: mac_test_10.13
-    type: Unity::VM::osx
-    image: katana-to-yamato/test-platform-macos-10.13-katana-git:v1.10-auto
-    flavor: m1.mac
-    group: macos
 
 tests:
   - name: Editor Tests on Ubuntu 18.04
@@ -76,15 +58,11 @@ tests:
     id: TestIntegrationTestsiOSiPhoneSE
     suite: playmode
     agent: mac_iphone_se
-  - name: Playmode Tests on Ubuntu 16.04
-    id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1604
-    suite: playmode
-    agent: lin_test_ubuntu16.04
   - name: Playmode Tests on Ubuntu 18.04
     id: TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
     suite: playmode
     agent: lin_18.04_bokken
-  - name: Playmode Tests on macOS 10.04
+  - name: Playmode Tests on macOS 10.14
     id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
     suite: playmode
     agent: mac_test_10.14
@@ -92,23 +70,6 @@ tests:
     id: TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
     suite: playmode
     agent: win10_test
-  - name: Editor Tests on Ubuntu 16.04
-    id: TestEditorTestsLinuxEditorIsolatedPackagesVerified1604
-    suite: editor
-    agent: lin_test_ubuntu16.04
-  - name: Editor Tests on macOS 10.13
-    id: TestEditorTestsMacEditorIsolatedPackagesVerified
-    suite: editor
-    agent: mac_test_10.13
-  - name: Playmode Tests on macOS 10.13
-    id: TestPlaymodeTestsMacEditorIsolatedPackagesVerified
-    suite: playmode
-    agent: mac_test_10.13
-
-# todo:: APV requires that the package works well on Ubuntu 16.04. However, 
-# unity-downloader-cli doesn't support Ubuntu 16.04. Therefore, there is no way 
-# to install Unity Editor to the test environments.
-# Added tests on Ubuntu 18.04 instead of Ubuntu 16.04 for the reasons above.
 
 test_editors:
   - version: trunk
