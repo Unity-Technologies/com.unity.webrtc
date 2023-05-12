@@ -88,7 +88,7 @@ test_editors:
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2021.3
     tests:
@@ -97,7 +97,7 @@ test_editors:
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
   - version: 2020.3
     tests:
@@ -106,7 +106,7 @@ test_editors:
       - TestEditorTestsWindowsEditorIsolatedPackagesVerified
       - TestIntegrationTestsiOSiPhoneSE
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified
+      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
 
