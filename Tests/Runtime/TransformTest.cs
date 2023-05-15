@@ -120,6 +120,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(1000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor })]
         public IEnumerator ReceiverSetTransform()
         {
             var rt = CreateRenderTexture();
@@ -192,7 +193,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(1000)]
         [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor, RuntimePlatform.Android,
-            RuntimePlatform.WindowsPlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+            RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor })]
         public IEnumerator TransformedVideoFrameCallback()
         {
             var rt = CreateRenderTexture();
