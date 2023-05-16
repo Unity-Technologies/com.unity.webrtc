@@ -6,7 +6,7 @@
            'managed': False,
 -          'custom_deps': {},
 +          'custom_deps': {
-+            "src/examples": None
++            "src/examples/androidtests/third_party/gradle": None
 +          },
          },
        ],
