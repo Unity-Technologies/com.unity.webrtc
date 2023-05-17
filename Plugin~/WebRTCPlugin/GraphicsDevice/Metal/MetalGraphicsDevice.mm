@@ -105,7 +105,6 @@ namespace webrtc
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(
         uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
@@ -154,8 +153,8 @@ namespace webrtc
               fromRegion:MTLRegionMake2D(0, 0, width, height)
              mipmapLevel:0];
 
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(
-            static_cast<int32_t>(width), static_cast<int32_t>(height));
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
+            webrtc::I420Buffer::Create(static_cast<int32_t>(width), static_cast<int32_t>(height));
         libyuv::ARGBToI420(
             buffer.data(),
             static_cast<int32_t>(bytesPerRow),
