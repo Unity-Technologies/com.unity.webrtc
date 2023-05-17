@@ -817,12 +817,14 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label(
                     $"{nameof(candidatePairStats.remoteCandidateId)}: {candidatePairStats.remoteCandidateId}"));
                 container.Add(new Label($"{nameof(candidatePairStats.state)}: {candidatePairStats.state}"));
-                container.Add(new Label($"{nameof(candidatePairStats.priority)}: {candidatePairStats.priority}"));
                 container.Add(new Label($"{nameof(candidatePairStats.nominated)}: {candidatePairStats.nominated}"));
-                container.Add(new Label($"{nameof(candidatePairStats.writable)}: {candidatePairStats.writable}"));
                 container.Add(new Label($"{nameof(candidatePairStats.bytesSent)}: {candidatePairStats.bytesSent}"));
                 container.Add(
                     new Label($"{nameof(candidatePairStats.bytesReceived)}: {candidatePairStats.bytesReceived}"));
+                container.Add(
+                    new Label($"{nameof(candidatePairStats.lastPacketSentTimestamp)}: {candidatePairStats.lastPacketSentTimestamp}"));
+                container.Add(
+                    new Label($"{nameof(candidatePairStats.lastPacketReceivedTimestamp)}: {candidatePairStats.lastPacketReceivedTimestamp}"));
                 container.Add(new Label(
                     $"{nameof(candidatePairStats.totalRoundTripTime)}: {candidatePairStats.totalRoundTripTime}"));
                 container.Add(new Label(
@@ -878,7 +880,6 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidateStats.Id)}: {candidateStats.Id}"));
                 container.Add(new Label($"{nameof(candidateStats.Timestamp)}: {candidateStats.Timestamp}"));
                 container.Add(new Label($"{nameof(candidateStats.transportId)}: {candidateStats.transportId}"));
-                container.Add(new Label($"{nameof(candidateStats.isRemote)}: {candidateStats.isRemote}"));
                 container.Add(new Label($"{nameof(candidateStats.networkType)}: {candidateStats.networkType}"));
                 container.Add(new Label($"{nameof(candidateStats.ip)}: {candidateStats.ip}"));
                 container.Add(new Label($"{nameof(candidateStats.address)}: {candidateStats.address}"));
@@ -888,6 +889,13 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidateStats.candidateType)}: {candidateStats.candidateType}"));
                 container.Add(new Label($"{nameof(candidateStats.priority)}: {candidateStats.priority}"));
                 container.Add(new Label($"{nameof(candidateStats.url)}: {candidateStats.url}"));
+                container.Add(new Label($"{nameof(candidateStats.foundation)}: {candidateStats.foundation}"));
+                container.Add(new Label($"{nameof(candidateStats.relatedAddress)}: {candidateStats.relatedAddress}"));
+                container.Add(new Label($"{nameof(candidateStats.relatedPort)}: {candidateStats.relatedPort}"));
+                container.Add(new Label($"{nameof(candidateStats.usernameFragment)}: {candidateStats.usernameFragment}"));
+                container.Add(new Label($"{nameof(candidateStats.tcpType)}: {candidateStats.tcpType}"));
+                container.Add(new Label($"{nameof(candidateStats.vpn)}: {candidateStats.vpn}"));
+                container.Add(new Label($"{nameof(candidateStats.networkAdapterType)}: {candidateStats.networkAdapterType}"));
             };
             return root;
         }
@@ -916,7 +924,6 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidateStats.Id)}: {candidateStats.Id}"));
                 container.Add(new Label($"{nameof(candidateStats.Timestamp)}: {candidateStats.Timestamp}"));
                 container.Add(new Label($"{nameof(candidateStats.transportId)}: {candidateStats.transportId}"));
-                container.Add(new Label($"{nameof(candidateStats.isRemote)}: {candidateStats.isRemote}"));
                 container.Add(new Label($"{nameof(candidateStats.networkType)}: {candidateStats.networkType}"));
                 container.Add(new Label($"{nameof(candidateStats.ip)}: {candidateStats.ip}"));
                 container.Add(new Label($"{nameof(candidateStats.address)}: {candidateStats.address}"));
@@ -926,6 +933,13 @@ namespace Unity.WebRTC.Editor
                 container.Add(new Label($"{nameof(candidateStats.candidateType)}: {candidateStats.candidateType}"));
                 container.Add(new Label($"{nameof(candidateStats.priority)}: {candidateStats.priority}"));
                 container.Add(new Label($"{nameof(candidateStats.url)}: {candidateStats.url}"));
+                container.Add(new Label($"{nameof(candidateStats.foundation)}: {candidateStats.foundation}"));
+                container.Add(new Label($"{nameof(candidateStats.relatedAddress)}: {candidateStats.relatedAddress}"));
+                container.Add(new Label($"{nameof(candidateStats.relatedPort)}: {candidateStats.relatedPort}"));
+                container.Add(new Label($"{nameof(candidateStats.usernameFragment)}: {candidateStats.usernameFragment}"));
+                container.Add(new Label($"{nameof(candidateStats.tcpType)}: {candidateStats.tcpType}"));
+                container.Add(new Label($"{nameof(candidateStats.vpn)}: {candidateStats.vpn}"));
+                container.Add(new Label($"{nameof(candidateStats.networkAdapterType)}: {candidateStats.networkAdapterType}"));
             };
             return root;
         }

@@ -5,17 +5,17 @@ using System.Collections.Generic;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class StringValueAttribute : Attribute
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string StringValue { get; protected set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="value"></param>
         public StringValueAttribute(string value)
@@ -25,146 +25,146 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum RTCStatsType
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("codec")]
         Codec = 0,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("inbound-rtp")]
         InboundRtp = 1,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("outbound-rtp")]
         OutboundRtp = 2,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("remote-inbound-rtp")]
         RemoteInboundRtp = 3,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("remote-outbound-rtp")]
         RemoteOutboundRtp = 4,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("media-source")]
         MediaSource = 5,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("csrc")]
         Csrc = 6,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("peer-connection")]
         PeerConnection = 7,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("data-channel")]
         DataChannel = 8,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Obsolete]
         [StringValue("stream")]
         Stream = 9,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Obsolete]
         [StringValue("track")]
         Track = 10,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("transceiver")]
         Transceiver = 11,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("sender")]
         Sender = 12,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("receiver")]
         Receiver = 13,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("transport")]
         Transport = 14,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("sctp-transport")]
         SctpTransport = 15,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("candidate-pair")]
         CandidatePair = 16,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("local-candidate")]
         LocalCandidate = 17,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("remote-candidate")]
         RemoteCandidate = 18,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("certificate")]
         Certificate = 19,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("ice-server")]
         IceServer = 20,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("received-rtp")]
         ReceivedRtp = 21,
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [StringValue("sent-rtp")]
         SentRtp = 22,
@@ -263,7 +263,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCStats
     {
@@ -272,7 +272,7 @@ namespace Unity.WebRTC
         internal Dictionary<string, object> m_dict;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public RTCStatsType Type
         {
@@ -283,7 +283,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string Id
         {
@@ -299,7 +299,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public DateTime UtcTimeStamp
         {
@@ -307,7 +307,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public IDictionary<string, object> Dict
         {
@@ -495,7 +495,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public string ToJson()
@@ -505,27 +505,27 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCCertificateStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string fingerprint { get { return GetString("fingerprint"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string fingerprintAlgorithm { get { return GetString("fingerprintAlgorithm"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string base64Certificate { get { return GetString("base64Certificate"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string issuerCertificateId { get { return GetString("issuerCertificateId"); } }
 
@@ -535,37 +535,37 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCCodecStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string transportId { get { return GetString("transportId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint payloadType { get { return GetUnsignedInt("payloadType"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string mimeType { get { return GetString("mimeType"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint clockRate { get { return GetUnsignedInt("clockRate"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint channels { get { return GetUnsignedInt("channels"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string sdpFmtpLine { get { return GetString("sdpFmtpLine"); } }
 
@@ -575,47 +575,47 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCDataChannelStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string label { get { return GetString("label"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string protocol { get { return GetString("protocol"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int dataChannelIdentifier { get { return GetInt("dataChannelIdentifier"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string state { get { return GetString("state"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint messagesSent { get { return GetUnsignedInt("messagesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint messagesReceived { get { return GetUnsignedInt("messagesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
 
@@ -625,117 +625,117 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCIceCandidatePairStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string transportId { get { return GetString("transportId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string localCandidateId { get { return GetString("localCandidateId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string remoteCandidateId { get { return GetString("remoteCandidateId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string state { get { return GetString("state"); } }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public ulong priority { get { return GetUnsignedLong("priority"); } }
-
-        /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool nominated { get { return GetBool("nominated"); } }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public bool writable { get { return GetBool("writable"); } }
-
-        /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong packetsSent { get { return GetUnsignedLong("packetsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong packetsReceived { get { return GetUnsignedLong("packetsReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public ulong lastPacketSentTimestamp { get { return GetUnsignedLong("lastPacketSentTimestamp"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public ulong lastPacketReceivedTimestamp { get { return GetUnsignedLong("lastPacketReceivedTimestamp"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public double totalRoundTripTime { get { return GetDouble("totalRoundTripTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double currentRoundTripTime { get { return GetDouble("currentRoundTripTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double availableOutgoingBitrate { get { return GetDouble("availableOutgoingBitrate"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double availableIncomingBitrate { get { return GetDouble("availableIncomingBitrate"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong requestsReceived { get { return GetUnsignedLong("requestsReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong requestsSent { get { return GetUnsignedLong("requestsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong responsesReceived { get { return GetUnsignedLong("responsesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong responsesSent { get { return GetUnsignedLong("responsesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong consentRequestsSent { get { return GetUnsignedLong("consentRequestsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong packetsDiscardedOnSend { get { return GetUnsignedLong("packetsDiscardedOnSend"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesDiscardedOnSend { get { return GetUnsignedLong("bytesDiscardedOnSend"); } }
 
@@ -745,94 +745,119 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCIceCandidateStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string transportId { get { return GetString("transportId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
+        [Obsolete]
         public bool isRemote { get { return GetBool("isRemote"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string networkType { get { return GetString("networkType"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string ip { get { return GetString("ip"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string address { get { return GetString("address"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int port { get { return GetInt("port"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string protocol { get { return GetString("protocol"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string relayProtocol { get { return GetString("relayProtocol"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string candidateType { get { return GetString("candidateType"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int priority { get { return GetInt("priority"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string url { get { return GetString("url"); } }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public string foundation { get { return GetString("foundation"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string relatedAddress { get { return GetString("relatedAddress"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public int relatedPort { get { return GetInt("relatedPort"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string usernameFragment { get { return GetString("usernameFragment"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string tcpType { get { return GetString("tcpType"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public bool vpn { get { return GetBool("vpn"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string networkAdapterType { get { return GetString("networkAdapterType"); } }
-        
-        
+
         internal RTCIceCandidateStats(IntPtr ptr) : base(ptr)
         {
         }
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Obsolete]
     public class RTCMediaStreamStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string streamIdentifier { get { return GetString("streamIdentifier"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string[] trackIds { get { return GetStringArray("trackIds"); } }
 
@@ -842,224 +867,224 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Obsolete]
     public class RTCMediaStreamTrackStats : RTCStats
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string trackIdentifier { get { return GetString("trackIdentifier"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string mediaSourceId { get { return GetString("mediaSourceId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool remoteSource { get { return GetBool("remoteSource"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool ended { get { return GetBool("ended"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool detached { get { return GetBool("detached"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string kind { get { return GetString("kind"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double jitterBufferDelay { get { return GetDouble("jitterBufferDelay"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong jitterBufferEmittedCount { get { return GetUnsignedLong("jitterBufferEmittedCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>Video-only members.</remarks>
         public uint frameWidth { get { return GetUnsignedInt("frameWidth"); } }
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint frameHeight { get { return GetUnsignedInt("frameHeight"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesSent { get { return GetUnsignedInt("framesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint hugeFramesSent { get { return GetUnsignedInt("hugeFramesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesReceived { get { return GetUnsignedInt("framesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesDecoded { get { return GetUnsignedInt("framesDecoded"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesDropped { get { return GetUnsignedInt("framesDropped"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesCorrupted { get { return GetUnsignedInt("framesCorrupted"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint partialFramesLost { get { return GetUnsignedInt("partialFramesLost"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint fullFramesLost { get { return GetUnsignedInt("fullFramesLost"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>Audio-only members.</remarks>
         public double audioLevel { get { return GetDouble("audioLevel"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double echoReturnLoss { get { return GetDouble("echoReturnLoss"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double echoReturnLossEnhancement { get { return GetDouble("echoReturnLossEnhancement"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong totalSamplesReceived { get { return GetUnsignedLong("totalSamplesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalSamplesDuration { get { return GetDouble("totalSamplesDuration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong concealedSamples { get { return GetUnsignedLong("concealedSamples"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong silentConcealedSamples { get { return GetUnsignedLong("silentConcealedSamples"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong concealmentEvents { get { return GetUnsignedLong("concealmentEvents"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong insertedSamplesForDeceleration { get { return GetUnsignedLong("insertedSamplesForDeceleration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong removedSamplesForAcceleration { get { return GetUnsignedLong("removedSamplesForAcceleration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>Non-standard audio-only member.</remarks>
         public ulong jitterBufferFlushes { get { return GetUnsignedLong("jitterBufferFlushes"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong delayedPacketOutageSamples { get { return GetUnsignedLong("delayedPacketOutageSamples"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double relativePacketArrivalDelay { get { return GetDouble("relativePacketArrivalDelay"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>Non-standard metric showing target delay of jitter buffer.</remarks>
         public double jitterBufferTargetDelay { get { return GetDouble("jitterBufferTargetDelay"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint interruptionCount { get { return GetUnsignedInt("interruptionCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalInterruptionDuration { get { return GetDouble("totalInterruptionDuration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint freezeCount { get { return GetUnsignedInt("freezeCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint pauseCount { get { return GetUnsignedInt("pauseCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalFreezesDuration { get { return GetDouble("totalFreezesDuration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalPausesDuration { get { return GetDouble("totalPausesDuration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalFramesDuration { get { return GetDouble("totalFramesDuration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double sumOfSquaredFramesDuration { get { return GetDouble("sumOfSquaredFramesDuration"); } }
 
@@ -1070,18 +1095,18 @@ namespace Unity.WebRTC
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCPeerConnectionStats : RTCStats
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint dataChannelsOpened { get { return GetUnsignedInt("dataChannelsOpened"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint dataChannelsClosed { get { return GetUnsignedInt("dataChannelsClosed"); } }
 
@@ -1091,39 +1116,39 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRTPStreamStats : RTCStats
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint ssrc { get { return GetUnsignedInt("ssrc"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string kind { get { return GetString("kind"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Obsolete]
         public string trackId { get { return GetString("trackId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string transportId { get { return GetString("transportId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string codecId { get { return GetString("codecId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Obsolete("rename to kind")]
         public string mediaType { get { return GetString("mediaType"); } }
@@ -1134,17 +1159,17 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCReceivedRtpStreamStats : RTCRTPStreamStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double jitter { get { return GetDouble("jitter"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int packetsLost { get { return GetInt("packetsLost"); } }
 
@@ -1154,17 +1179,17 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCSentRtpStreamStats : RTCRTPStreamStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
 
@@ -1174,197 +1199,247 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCInboundRTPStreamStats : RTCReceivedRtpStreamStats
     {
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public string playoutId { get { return GetString("playoutId"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string trackIdentifier { get { return GetString("trackIdentifier"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string mid { get { return GetString("mid"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public string remoteId { get { return GetString("remoteId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint packetsReceived { get { return GetUnsignedInt("packetsReceived"); } }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public ulong packetsDiscarded { get { return GetUnsignedLong("packetsDiscarded"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public ulong fecPacketsReceived { get { return GetUnsignedLong("fecPacketsReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong fecPacketsDiscarded { get { return GetUnsignedLong("fecPacketsDiscarded"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong headerBytesReceived { get { return GetUnsignedLong("headerBytesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double lastPacketReceivedTimestamp { get { return GetDouble("lastPacketReceivedTimestamp"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double jitterBufferDelay { get { return GetDouble("jitterBufferDelay"); } }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public double jitterBufferTargetDelay { get { return GetDouble("jitterBufferTargetDelay"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public double jitterBufferMinimumDelay { get { return GetDouble("jitterBufferMinimumDelay"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public ulong jitterBufferEmittedCount { get { return GetUnsignedLong("jitterBufferEmittedCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong totalSamplesReceived { get { return GetUnsignedLong("totalSamplesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong concealedSamples { get { return GetUnsignedLong("concealedSamples"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong silentConcealedSamples { get { return GetUnsignedLong("silentConcealedSamples"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong concealmentEvents { get { return GetUnsignedLong("concealmentEvents"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong insertedSamplesForDeceleration { get { return GetUnsignedLong("insertedSamplesForDeceleration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong removedSamplesForAcceleration { get { return GetUnsignedLong("removedSamplesForAcceleration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double audioLevel { get { return GetDouble("audioLevel"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalSamplesDuration { get { return GetDouble("totalSamplesDuration"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int framesReceived { get { return GetInt("framesReceived"); } }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public uint packetsDiscarded { get { return GetUnsignedInt("packetsDiscarded"); } }
-
-        /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint frameWidth { get { return GetUnsignedInt("frameWidth"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint frameHeight { get { return GetUnsignedInt("frameHeight"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesDecoded { get { return GetUnsignedInt("framesDecoded"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint keyFramesDecoded { get { return GetUnsignedInt("keyFramesDecoded"); } }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public uint framesDropped { get { return GetUnsignedInt("framesDropped"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public double totalDecodeTime { get { return GetDouble("totalDecodeTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalProcessingDelay { get { return GetDouble("totalProcessingDelay"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalAssemblyTime { get { return GetDouble("totalAssemblyTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesAssembledFromMultiplePackets { get { return GetUnsignedInt("framesAssembledFromMultiplePackets"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalInterFrameDelay { get { return GetDouble("totalInterFrameDelay"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalSquaredInterFrameDelay { get { return GetDouble("totalSquaredInterFrameDelay"); } }
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        public uint pauseCount { get { return GetUnsignedInt("pauseCount"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public double totalPausesDuration { get { return GetDouble("totalPausesDuration"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public uint freezeCount { get { return GetUnsignedInt("freezeCount"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public double totalFreezesDuration { get { return GetDouble("totalFreezesDuration"); } }
+
+        /// <summary>
+        ///
         /// </summary>
         public string contentType { get { return GetString("contentType"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double estimatedPlayoutTimestamp { get { return GetDouble("estimatedPlayoutTimestamp"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string decoderImplementation { get { return GetString("decoderImplementation"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint firCount { get { return GetUnsignedInt("firCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint pliCount { get { return GetUnsignedInt("pliCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint nackCount { get { return GetUnsignedInt("nackCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong qpSum { get { return GetUnsignedLong("qpSum"); } }
 
@@ -1374,150 +1449,155 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCOutboundRTPStreamStats : RTCRTPStreamStats
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string mediaSourceId { get { return GetString("mediaSourceId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string remoteId { get { return GetString("remoteId"); } }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string mid { get { return GetString("mid"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string rid { get { return GetString("rid"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong retransmittedPacketsSent { get { return GetUnsignedLong("retransmittedPacketsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong headerBytesSent { get { return GetUnsignedLong("headerBytesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong retransmittedBytesSent { get { return GetUnsignedLong("retransmittedBytesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double targetBitrate { get { return GetDouble("targetBitrate"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesEncoded { get { return GetUnsignedInt("framesEncoded"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint keyFramesEncoded { get { return GetUnsignedInt("keyFramesEncoded"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalEncodeTime { get { return GetDouble("totalEncodeTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong totalEncodedBytesTarget { get { return GetUnsignedLong("totalEncodedBytesTarget"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint frameWidth { get { return GetUnsignedInt("frameWidth"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint frameHeight { get { return GetUnsignedInt("frameHeight"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint framesSent { get { return GetUnsignedInt("framesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint hugeFramesSent { get { return GetUnsignedInt("hugeFramesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalPacketSendDelay { get { return GetDouble("totalPacketSendDelay"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string qualityLimitationReason { get { return GetString("qualityLimitationReason"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint qualityLimitationResolutionChanges { get { return GetUnsignedInt("qualityLimitationResolutionChanges"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string contentType { get { return GetString("contentType"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string encoderImplementation { get { return GetString("encoderImplementation"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint firCount { get { return GetUnsignedInt("firCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint pliCount { get { return GetUnsignedInt("pliCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint nackCount { get { return GetUnsignedInt("nackCount"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong qpSum { get { return GetUnsignedLong("qpSum"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public bool active { get { return GetBool("active"); } }
 
         internal RTCOutboundRTPStreamStats(IntPtr ptr) : base(ptr)
         {
@@ -1525,32 +1605,32 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRemoteInboundRtpStreamStats : RTCReceivedRtpStreamStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string localId { get { return GetString("localId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double roundTripTime { get { return GetDouble("roundTripTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double fractionLost { get { return GetDouble("fractionLost"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalRoundTripTime { get { return GetDouble("totalRoundTripTime"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int roundTripTimeMeasurements { get { return GetInt("roundTripTimeMeasurements"); } }
 
@@ -1560,22 +1640,22 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCRemoteOutboundRtpStreamStats : RTCSentRtpStreamStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string localId { get { return GetString("localId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double remoteTimestamp { get { return GetDouble("remoteTimestamp"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong reportsSent { get { return GetUnsignedLong("reportsSent"); } }
 
@@ -1585,17 +1665,17 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCMediaSourceStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string trackIdentifier { get { return GetString("trackIdentifier"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string kind { get { return GetString("kind"); } }
 
@@ -1605,22 +1685,22 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCAudioSourceStats : RTCMediaSourceStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double audioLevel { get { return GetDouble("audioLevel"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double totalSamplesDuration { get { return GetDouble("totalSamplesDuration"); } }
 
@@ -1630,27 +1710,27 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCVideoSourceStats : RTCMediaSourceStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint width { get { return GetUnsignedInt("width"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint height { get { return GetUnsignedInt("height"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint frames { get { return GetUnsignedInt("frames"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>
         /// RFC define double but chromium define uint32_t
@@ -1664,72 +1744,72 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCTransportStats : RTCStats
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong packetsSent { get { return GetUnsignedLong("packetsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesReceived { get { return GetUnsignedLong("bytesReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong packetsReceived { get { return GetUnsignedLong("packetsReceived"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string rtcpTransportStatsId { get { return GetString("rtcpTransportStatsId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string dtlsState { get { return GetString("dtlsState"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string selectedCandidatePairId { get { return GetString("selectedCandidatePairId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string localCertificateId { get { return GetString("localCertificateId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string remoteCertificateId { get { return GetString("remoteCertificateId"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string tlsVersion { get { return GetString("tlsVersion"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string dtlsCipher { get { return GetString("dtlsCipher"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string srtpCipher { get { return GetString("srtpCipher"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint selectedCandidatePairChanges { get { return GetUnsignedInt("selectedCandidatePairChanges"); } }
 
@@ -1739,7 +1819,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCTransceiverStats : RTCStats
     {
@@ -1749,7 +1829,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCSenderStats : RTCStats
     {
@@ -1759,7 +1839,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCReceiverStats : RTCStats
     {
@@ -1769,7 +1849,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCReceivedRtpStats :RTCStats
     {
@@ -1778,12 +1858,12 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public double jitter { get { return GetDouble("jitter"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int packetsLost { get { return GetInt("packetsLost"); } }
     }
@@ -1796,12 +1876,12 @@ namespace Unity.WebRTC
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
     }
@@ -1860,7 +1940,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RTCStatsReport : IDisposable
     {
@@ -1892,7 +1972,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~RTCStatsReport()
         {
@@ -1900,7 +1980,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void Dispose()
         {
@@ -1921,7 +2001,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -1931,7 +2011,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="id"></param>
         /// <param name="stats"></param>
@@ -1942,7 +2022,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public IDictionary<string, RTCStats> Stats
         {
