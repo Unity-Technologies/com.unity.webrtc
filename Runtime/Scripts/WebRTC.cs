@@ -1601,9 +1601,9 @@ namespace Unity.WebRTC
             _command.Clear();
         }
 
-        public static void BatchUpdate(IntPtr callback, int eventID, IntPtr tracks)
+        public static void BatchUpdate(IntPtr callback, int eventID, IntPtr batchData)
         {
-            _command.IssuePluginEventAndData(callback, eventID, tracks);
+            _command.IssuePluginEventAndData(callback, eventID, batchData);
         }
 
         public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
