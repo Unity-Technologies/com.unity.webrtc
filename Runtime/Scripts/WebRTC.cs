@@ -701,13 +701,10 @@ namespace Unity.WebRTC
                     var tempTextureActive = RenderTexture.active;
                     RenderTexture.active = null;
 
-                    int trackIndex = 0;
-                    int totalTracks = VideoStreamTrack.s_tracks.Count;
                     var batch = Context.batch;
+                    batch.ResizeCapacity(VideoStreamTrack.s_tracks.Count);
 
-                    if (batch.data.tracks.Length < totalTracks)
-                        batch.ResizeCapacity(totalTracks);
-
+                    int trackIndex = 0;
                     foreach (var reference in VideoStreamTrack.s_tracks.Values)
                     {
                         if (!reference.TryGetTarget(out var track))

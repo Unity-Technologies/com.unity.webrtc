@@ -90,6 +90,9 @@ namespace Unity.WebRTC
             const int roundedCapacity = 32;
             int totalCapacity = ((totalTracks + roundedCapacity) / roundedCapacity) * roundedCapacity;
 
+            if (ptr != IntPtr.Zero && data.tracks.Length >= totalCapacity)
+                return;
+
             data.tracksCount = 0;
             data.tracks = new IntPtr[totalCapacity];
 
