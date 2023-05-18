@@ -270,6 +270,10 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
         return;
     }
 
+    IGraphicsDevice* device = Plugin::GraphicsDevice();
+    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
+    Timestamp timestamp = s_clock->CurrentTime();
+
     for (int i = 0; i < batchData->tracksCount; i++)
     {
         VideoStreamTrackData* trackData = batchData->tracks[i];
@@ -291,9 +295,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
                 continue;
             }
 
-            Timestamp timestamp = s_clock->CurrentTime();
-            IGraphicsDevice* device = Plugin::GraphicsDevice();
-            UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
+            timestamp = s_clock->CurrentTime();
             void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
             unity::webrtc::Size size(trackData->width, trackData->height);
 
