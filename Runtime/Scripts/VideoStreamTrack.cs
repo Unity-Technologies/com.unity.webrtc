@@ -1,6 +1,3 @@
-// Update textures through built-in Unity plugin interface (CPU buffer upload in render thread)
-#define USE_UNITY_RENDERING_EXT_UPDATE_TEXTURE
-
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -98,9 +95,8 @@ namespace Unity.WebRTC
                 return;
 
             m_source?.Update();
-#if USE_UNITY_RENDERING_EXT_UPDATE_TEXTURE
-            m_renderer?.Update();
-#endif
+            if (m_renderer?.customTextureUpload == false)
+                m_renderer?.Update();
 
             var texturePtr = TexturePtr;
             if (m_data.ptrTexture != texturePtr)
@@ -113,13 +109,11 @@ namespace Unity.WebRTC
                     m_data.ptrSource = (IntPtr)m_source?.self;
                     m_data.action = VideoStreamTrackAction.Encode;
                 }
-#if !USE_UNITY_RENDERING_EXT_UPDATE_TEXTURE
-                else if (Decoding == true)
+                else if (Decoding == true && m_renderer?.customTextureUpload == true)
                 {
                     m_data.ptrSource = (IntPtr)m_renderer?.self;
                     m_data.action = VideoStreamTrackAction.Decode;
                 }
-#endif
                 m_data.width = texture.width;
                 m_data.height = texture.height;
                 m_data.format = texture.graphicsFormat;
@@ -387,6 +381,7 @@ namespace Unity.WebRTC
 
         public Texture Texture { get; private set; }
         public IntPtr TexturePtr { get; private set; }
+        public bool customTextureUpload { get; private set; }
 
         public UnityVideoRenderer(VideoStreamTrack track, bool needFlip)
         {
@@ -394,16 +389,17 @@ namespace Unity.WebRTC
             this.track = track;
             NativeMethods.VideoTrackAddOrUpdateSink(track.GetSelfOrThrow(), self);
             WebRTC.Table.Add(self, this);
+
+            // If false, upload textures through built-in Unity plugin interface (CPU buffer upload in render thread)
+            customTextureUpload = false;
         }
 
-#if USE_UNITY_RENDERING_EXT_UPDATE_TEXTURE
         public void Update()
         {
             if (Texture == null)
                 return;
             WebRTC.Context.UpdateRendererTexture(id, Texture);
         }
-#endif
 
         ~UnityVideoRenderer()
         {
