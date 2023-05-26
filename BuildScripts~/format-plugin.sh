@@ -11,7 +11,7 @@ sudo pip3 install cmakelang
 pushd $SOLUTION_DIR
 
 # Check native code format
-find . -type f \( -name "*.cpp" -or -name "*.h" \) \
+find . -type f \( -name "*.cpp" -or -name '*.mm' -or -name "*.h" \) \
   ! -path "./libcxx/*" \
   ! -path "./NvCodec/*" \
   ! -path "./unity/*" \

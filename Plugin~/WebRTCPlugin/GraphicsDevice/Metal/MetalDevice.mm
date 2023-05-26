@@ -10,56 +10,36 @@ namespace webrtc
     {
     public:
         FakeMetalDeviceImpl()
-        : device_(MTLCreateSystemDefaultDevice())
+            : device_(MTLCreateSystemDefaultDevice())
         {
         }
-        
+
         ~FakeMetalDeviceImpl() = default;
-        
-        id<MTLDevice> Device() override
-        {
-            return device_;
-        }
-        id<MTLCommandBuffer> CurrentCommandBuffer() override
-        {
-            return nullptr;
-        }
-        id<MTLCommandEncoder> CurrentCommandEncoder() override
-        {
-            return nullptr;
-        }
-        void EndCurrentCommandEncoder() override
-        {}
+
+        id<MTLDevice> Device() override { return device_; }
+        id<MTLCommandBuffer> CurrentCommandBuffer() override { return nullptr; }
+        id<MTLCommandEncoder> CurrentCommandEncoder() override { return nullptr; }
+        void EndCurrentCommandEncoder() override { }
+
     private:
-        id<MTLDevice> device_;      
+        id<MTLDevice> device_;
     };
 
     class UnityMetalDeviceImpl : public MetalDevice
     {
     public:
         UnityMetalDeviceImpl(IUnityGraphicsMetal* graphics)
-        : graphics_(graphics)
+            : graphics_(graphics)
         {
         }
-        
+
         ~UnityMetalDeviceImpl() = default;
-        
-        id<MTLDevice> Device() override
-        {
-            return graphics_->MetalDevice();
-        }
-        id<MTLCommandBuffer> CurrentCommandBuffer() override
-        {
-            return graphics_->CurrentCommandBuffer();
-        }
-        id<MTLCommandEncoder> CurrentCommandEncoder() override
-        {
-            return graphics_->CurrentCommandEncoder();
-        }
-        void EndCurrentCommandEncoder() override
-        {
-            graphics_->EndCurrentCommandEncoder();            
-        }
+
+        id<MTLDevice> Device() override { return graphics_->MetalDevice(); }
+        id<MTLCommandBuffer> CurrentCommandBuffer() override { return graphics_->CurrentCommandBuffer(); }
+        id<MTLCommandEncoder> CurrentCommandEncoder() override { return graphics_->CurrentCommandEncoder(); }
+        void EndCurrentCommandEncoder() override { graphics_->EndCurrentCommandEncoder(); }
+
     private:
         IUnityGraphicsMetal* graphics_;
     };
@@ -68,10 +48,7 @@ namespace webrtc
     {
         return std::make_unique<UnityMetalDeviceImpl>(device);
     }
-    std::unique_ptr<MetalDevice> MetalDevice::CreateForTest()
-    {
-        return std::make_unique<FakeMetalDeviceImpl>();
-    }
+    std::unique_ptr<MetalDevice> MetalDevice::CreateForTest() { return std::make_unique<FakeMetalDeviceImpl>(); }
 
 }
 }
