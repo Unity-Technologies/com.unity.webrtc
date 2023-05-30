@@ -73,7 +73,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest, LongRunning]
         [Timeout(15000)]
         [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
-            "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
+            "VideoStreamTrack.UpdateTexture is not supported on Direct3D12 for decoder")]
         [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
             "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
@@ -217,8 +217,7 @@ namespace Unity.WebRTC.RuntimeTest
             {
                 if (!reference.TryGetTarget(out var track))
                     continue;
-                track.UpdateSendTexture();
-                track.UpdateReceiveTexture();
+                track.UpdateTexture();
             }
         }
 
