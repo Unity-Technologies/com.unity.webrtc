@@ -57,9 +57,11 @@ namespace Unity.WebRTC
 
     internal class Batch
     {
+        [StructLayout(LayoutKind.Sequential)]
         public struct BatchData
         {
             public int tracksCount;
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)]
             public IntPtr[] tracks;
         }
 
