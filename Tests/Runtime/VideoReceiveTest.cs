@@ -21,7 +21,7 @@ namespace Unity.WebRTC.RuntimeTest
     }
 
     [TestFixture]
-    [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.LinuxPlayer })]
+    [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer, RuntimePlatform.OSXPlayer, RuntimePlatform.OSXEditor, RuntimePlatform.LinuxPlayer })]
     [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
     class VideoReceiveTestWithVP8Codec : VideoReceiveTestBase
     {
@@ -100,6 +100,7 @@ namespace Unity.WebRTC.RuntimeTest
 
                 yield return new WaitUntilWithTimeout(() => receiveVideoTrack.Texture != null, 15000);
                 Assert.That(receiveVideoTrack.Texture, Is.Not.Null);
+
                 test.component.Clear();
             }
 
@@ -129,6 +130,7 @@ namespace Unity.WebRTC.RuntimeTest
         int width;
         int height;
         RTCRtpCodecCapability videoCodec;
+        Coroutine coroutine;
 
         void Start()
         {
@@ -136,7 +138,11 @@ namespace Unity.WebRTC.RuntimeTest
             cam = camObj.AddComponent<Camera>();
 
             IsTestFinished = true;
+
+            coroutine = StartCoroutine(WebRTC.Update());
         }
+
+
 
         public void SetResolution(int width, int height)
         {
@@ -209,16 +215,11 @@ namespace Unity.WebRTC.RuntimeTest
             Clear();
             DestroyImmediate(camObj);
             camObj = null;
+            StopCoroutine(coroutine);
         }
 
         private void Update()
         {
-            foreach (var reference in VideoStreamTrack.s_tracks.Values)
-            {
-                if (!reference.TryGetTarget(out var track))
-                    continue;
-                track.UpdateTexture();
-            }
         }
 
         public IEnumerator Signaling()
