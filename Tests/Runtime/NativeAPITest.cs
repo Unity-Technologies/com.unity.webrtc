@@ -20,6 +20,20 @@ namespace Unity.WebRTC.RuntimeTest
             return renderTexture;
         }
 
+        private static void GetTrackDataAndPtr(RenderTexture texture, IntPtr source, VideoStreamTrack.VideoStreamTrackAction action, out VideoStreamTrack.VideoStreamTrackData data, out IntPtr ptr)
+        {
+            data = new VideoStreamTrack.VideoStreamTrackData();
+            data.action = action;
+            data.ptrTexture = texture.GetNativeTexturePtr();
+            data.ptrSource = source;
+            data.width = texture.width;
+            data.height = texture.height;
+            data.format = texture.graphicsFormat;
+
+            ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoStreamTrack.VideoStreamTrackData)));
+            Marshal.StructureToPtr(data, ptr, true);
+        }
+
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         protected static void DebugLog(string str)
         {
@@ -290,11 +304,11 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void CallGetRenderEventFunc()
+        public void CallGetBatchUpdateEventFunc()
         {
-            var callback = NativeMethods.GetRenderEventFunc(context);
+            var callback = NativeMethods.GetBatchUpdateEventFunc(context);
             Assert.AreNotEqual(callback, IntPtr.Zero);
-            NativeMethods.GetRenderEventFunc(IntPtr.Zero);
+            NativeMethods.GetBatchUpdateEventFunc(IntPtr.Zero);
         }
 
         [Test]
@@ -324,7 +338,7 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest, LongRunning]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL,
             "Not support VideoStreamTrack for OpenGL")]
-        public IEnumerator CallVideoEncoderMethods()
+        public IEnumerator CallVideoUpdateMethodsEncode()
         {
             var peer = NativeMethods.ContextCreatePeerConnection(context);
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
@@ -338,16 +352,25 @@ namespace Unity.WebRTC.RuntimeTest
             var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
             Assert.That(error, Is.EqualTo(RTCErrorType.None));
 
-            var callback = NativeMethods.GetRenderEventFunc(context);
-            int encodeEventID = NativeMethods.GetRenderEventID();
+            GetTrackDataAndPtr(renderTexture, source, VideoStreamTrack.VideoStreamTrackAction.Encode, out var data, out var ptr);
+
+            var batchUpdateEvent = NativeMethods.GetBatchUpdateEventFunc(context);
+            int batchUpdateEventID = NativeMethods.GetBatchUpdateEventID();
+            Batch batch = new Batch();
+
+            int trackIndex = 0;
+            batch.data.tracks[trackIndex] = ptr;
+            batch.data.tracksCount = ++trackIndex;
+
             yield return new WaitForSeconds(1.0f);
 
-            VideoTrackSource.EncodeData data = new VideoTrackSource.EncodeData(renderTexture, source);
-            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoTrackSource.EncodeData)));
-            Marshal.StructureToPtr(data, ptr, true);
-            VideoEncoderMethods.Encode(callback, encodeEventID, ptr);
+            Marshal.StructureToPtr(batch.data, batch.ptr, false);
+            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.ptr);
+            VideoUpdateMethods.Flush();
+
             yield return new WaitForSeconds(1.0f);
 
+            batch.Dispose();
             Marshal.FreeHGlobal(ptr);
             Assert.That(NativeMethods.PeerConnectionRemoveTrack(peer, sender), Is.EqualTo(RTCErrorType.None));
             NativeMethods.ContextDeleteRefPtr(context, track);
@@ -368,10 +391,10 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest, LongRunning]
         [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
-            "VideoDecoderMethods.UpdateRendererTexture is not supported on Direct3D12.")]
+            "VideoUpdateMethods.UpdateRendererTexture is not supported on Direct3D12.")]
         [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
             "Not support VideoStreamTrack for OpenGL")]
-        public IEnumerator CallVideoDecoderMethods()
+        public IEnumerator CallVideoUpdateMethodsUpdateRenderer()
         {
             const int width = 1280;
             const int height = 720;
@@ -383,24 +406,29 @@ namespace Unity.WebRTC.RuntimeTest
             var rendererId = NativeMethods.GetVideoRendererId(renderer);
             NativeMethods.VideoTrackAddOrUpdateSink(track, renderer);
 
-            var renderEvent = NativeMethods.GetRenderEventFunc(context);
-            int encodeEventID = NativeMethods.GetRenderEventID();
+            GetTrackDataAndPtr(renderTexture, source, VideoStreamTrack.VideoStreamTrackAction.Encode, out var data, out var ptr);
+
+            var batchUpdateEvent = NativeMethods.GetBatchUpdateEventFunc(context);
+            int batchUpdateEventID = NativeMethods.GetBatchUpdateEventID();
             var updateTextureEvent = NativeMethods.GetUpdateTextureFunc(context);
+            Batch batch = new Batch();
+
+            int trackIndex = 0;
+            batch.data.tracks[trackIndex] = ptr;
+            batch.data.tracksCount = ++trackIndex;
 
             yield return new WaitForSeconds(1.0f);
 
-            VideoTrackSource.EncodeData data = new VideoTrackSource.EncodeData(renderTexture, source);
-            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoTrackSource.EncodeData)));
-            Marshal.StructureToPtr(data, ptr, true);
-            VideoEncoderMethods.Encode(renderEvent, encodeEventID, ptr);
-            yield return new WaitForSeconds(1.0f);
+            Marshal.StructureToPtr(batch.data, batch.ptr, false);
+            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.ptr);
 
             // this method is not supported on Direct3D12
-            VideoDecoderMethods.UpdateRendererTexture(updateTextureEvent, receiveTexture, rendererId);
-            yield return new WaitForSeconds(1.0f);
+            VideoUpdateMethods.UpdateRendererTexture(updateTextureEvent, receiveTexture, rendererId);
+            VideoUpdateMethods.Flush();
 
             yield return new WaitForSeconds(1.0f);
 
+            batch.Dispose();
             Marshal.FreeHGlobal(ptr);
             NativeMethods.VideoTrackRemoveSink(track, renderer);
             NativeMethods.DeleteVideoRenderer(context, renderer);
