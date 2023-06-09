@@ -14,17 +14,12 @@ export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
-  # Exclude example for reduction
-  patch -N "depot_tools/fetch_configs/webrtc.py" < "$COMMAND_DIR/patches/fetch_exclude_examples.patch"
   fetch --nohooks webrtc_android
   cd src
   sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
   sudo git config --system core.longpaths true
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
-
-  ## Downgrade jdkversion
-  patch -N "src/DEPS" < "$COMMAND_DIR/patches/change_jdkversion.patch"
   gclient sync -D --force --reset
 fi
 
@@ -36,16 +31,11 @@ patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches
 
 # Add deps libunwind
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
-patch -N "src/build/config/android/BUILD.gn" < "$COMMAND_DIR/patches/add_unwind_dependencies.patch"
 
 # downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
-pushd "src/build"
-git apply "$COMMAND_DIR/patches/downgrade_JDK_new.patch"
-popd
-
-# Add desugar jdk lib json
-patch -N "src/third_party/r8/desugar_jdk_libs.json" < "$COMMAND_DIR/patches/desugar_jdk_libs.patch"
+patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/compile_java8.patch"
+patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/turbine8.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
@@ -55,9 +45,10 @@ do
 
   for is_debug in "true" "false"
   do
+    outputDir="${OUTPUT_DIR}_${target_cpu}_${is_debug}"
     # generate ninja files
     # use `treat_warnings_as_errors` option to avoid deprecation warnings
-    gn gen "$OUTPUT_DIR" --root="src" \
+    gn gen "$outputDir" --root="src" \
       --args="is_debug=${is_debug} \
       is_java_debug=${is_debug} \
       target_os=\"android\" \
@@ -69,10 +60,11 @@ do
       use_rtti=true \
       use_custom_libcxx=false \
       treat_warnings_as_errors=false \
-      use_cxx17=true"
+      use_errorprone_java_compiler=false" #\
+      # use_cxx17=true"
 
     # build static library
-    ninja -C "$OUTPUT_DIR" webrtc
+    ninja -C "$outputDir" webrtc
 
     filename="libwebrtc.a"
     if [ $is_debug = "true" ]; then
@@ -80,7 +72,7 @@ do
     fi
 
     # copy static library
-    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
+    cp "$outputDir/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
   done
 done
 
@@ -88,10 +80,11 @@ pushd src
 
 for is_debug in "true" "false"
 do
+  outputDir="${OUTPUT_DIR}_aar_${is_debug}"
   # use `treat_warnings_as_errors` option to avoid deprecation warnings
   "$PYTHON3_BIN" tools_webrtc/android/build_aar.py \
-    --build-dir $OUTPUT_DIR \
-    --output $OUTPUT_DIR/libwebrtc.aar \
+    --build-dir $outputDir \
+    --output $outputDir/libwebrtc.aar \
     --arch arm64-v8a \
     --extra-gn-args "is_debug=${is_debug} \
       is_java_debug=${is_debug} \
@@ -101,26 +94,28 @@ do
       is_component_build=false \
       use_rtti=true \
       use_custom_libcxx=false \
-      treat_warnings_as_errors=false"
+      treat_warnings_as_errors=false \
+      use_errorprone_java_compiler=false" #\
+      #use_cxx17=true"
 
   filename="libwebrtc.aar"
   if [ $is_debug = "true" ]; then
     filename="libwebrtc-debug.aar"
   fi
   # copy aar
-  cp "$OUTPUT_DIR/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
+  cp "$outputDir/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
 done
 
 popd
 
-"$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+# "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
+#   --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+# cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
 # create zip
-cd "$ARTIFACTS_DIR"
-zip -r webrtc-android.zip lib include LICENSE.md
+# cd "$ARTIFACTS_DIR"
+# zip -r webrtc-android.zip lib include LICENSE.md
