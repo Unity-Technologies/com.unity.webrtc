@@ -35,10 +35,10 @@ patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.
 # Add -mno-outline-atomics flag
 patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutlineatomics_flag.patch"
 
-# downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
+# downgrade to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
-patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/compile_java8.patch"
-patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/turbine8.patch"
+patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
+patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
