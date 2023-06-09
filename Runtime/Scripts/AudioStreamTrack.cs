@@ -231,6 +231,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
+        /// This method can be called from a worker thread(non Unity default, e.g. Wwise Source Plugin)
+        /// It should be invoked periodically to pull data from audio track.
+        /// </summary>
+        public void GetData(float[] data, uint channels, uint sampleRate)
+        {
+            if (_streamRenderer != null)
+            {
+                _streamRenderer.SetData(data, (int)channels, (int)sampleRate);
+            }
+        }
+
+        /// <summary>
         ///
         /// </summary>
         public override void Dispose()
@@ -329,6 +341,28 @@ namespace Unity.WebRTC
             NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
             SetData(ref nativeArray, channels, sampleRate);
             nativeArray.Dispose();
+        }
+
+        /// <summary>
+        /// This method can be called from a worker thread(non Unity default, e.g. Wwise Effect Plugin).
+        /// It should be invoked periodically to fill the audio track to send
+        /// </summary>
+        /// <param name="data">input audio data in float format</param>
+        /// <param name="channels">input audio channel count</param>
+        /// <param name="sampleRate">input audio sample rate</param>
+        public void UnsafeSetData(float[] data, int channels, int sampleRate)
+        {
+            IntPtr pBuf = Marshal.AllocHGlobal(data.Length * sizeof(float));
+
+            try
+            {
+                Marshal.Copy(data, 0, pBuf, data.Length);
+                ProcessAudio(_trackSource, pBuf, sampleRate, channels, data.Length);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(pBuf);
+            }
         }
     }
 
