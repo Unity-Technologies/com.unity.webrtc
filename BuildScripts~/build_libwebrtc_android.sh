@@ -32,6 +32,9 @@ patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches
 # Add deps libunwind
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
 
+# Add -mno-outline-atomics flag
+patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutlineatomics_flag.patch"
+
 # downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
 patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/compile_java8.patch"
@@ -60,8 +63,8 @@ do
       use_rtti=true \
       use_custom_libcxx=false \
       treat_warnings_as_errors=false \
-      use_errorprone_java_compiler=false" #\
-      # use_cxx17=true"
+      use_errorprone_java_compiler=false \
+      use_cxx17=true"
 
     # build static library
     ninja -C "$outputDir" webrtc
@@ -95,8 +98,8 @@ do
       use_rtti=true \
       use_custom_libcxx=false \
       treat_warnings_as_errors=false \
-      use_errorprone_java_compiler=false" #\
-      #use_cxx17=true"
+      use_errorprone_java_compiler=false \
+      use_cxx17=true"
 
   filename="libwebrtc.aar"
   if [ $is_debug = "true" ]; then
@@ -108,14 +111,14 @@ done
 
 popd
 
-# "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-#   --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+"$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
+  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-# cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
-# create zip
-# cd "$ARTIFACTS_DIR"
-# zip -r webrtc-android.zip lib include LICENSE.md
+create zip
+cd "$ARTIFACTS_DIR"
+zip -r webrtc-android.zip lib include LICENSE.md

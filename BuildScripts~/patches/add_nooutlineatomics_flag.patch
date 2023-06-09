@@ -1,0 +1,12 @@
+--- BUILD.gn	2023-06-09 17:09:07.453095363 +0900
++++ BUILD.gn.patch	2023-06-09 17:12:03.383095446 +0900
+@@ -946,6 +946,9 @@ config("compiler_cpu_abi") {
+         cflags += [ "--target=aarch64-linux-gnu" ]
+         ldflags += [ "--target=aarch64-linux-gnu" ]
+       }
++      if (is_android) {
++         cflags += [ "-mno-outline-atomics" ]
++      }
+     } else if (current_cpu == "mipsel" && !is_nacl) {
+       ldflags += [ "-Wl,--hash-style=sysv" ]
+       if (custom_toolchain == "") {
