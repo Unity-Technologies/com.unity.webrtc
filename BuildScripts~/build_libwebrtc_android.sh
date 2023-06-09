@@ -42,6 +42,8 @@ patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDK
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
+outputDir=""
+
 for target_cpu in "arm64"
 do
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
@@ -112,13 +114,13 @@ done
 popd
 
 "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+  --target :webrtc "$outputDir" "$outputDir"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+cp "$outputDir/LICENSE.md" "$ARTIFACTS_DIR"
 
-create zip
+# create zip
 cd "$ARTIFACTS_DIR"
 zip -r webrtc-android.zip lib include LICENSE.md
