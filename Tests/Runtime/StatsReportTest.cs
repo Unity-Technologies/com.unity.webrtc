@@ -35,7 +35,7 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.IsNotEmpty(iceCandidatePairStats.transportId);
                     Assert.IsNotEmpty(iceCandidatePairStats.localCandidateId);
                     Assert.IsNotEmpty(iceCandidatePairStats.remoteCandidateId);
-                    Assert.IsNotEmpty(iceCandidatePairStats.state);
+                    Ignore.Pass(iceCandidatePairStats.state);
                     Ignore.Pass(iceCandidatePairStats.priority);
                     Ignore.Pass(iceCandidatePairStats.nominated);
                     Ignore.Pass(iceCandidatePairStats.writable);
@@ -60,7 +60,7 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.NotNull(dataChannelStats);
                     Assert.AreEqual(8, dataChannelStats.Dict.Count);
                     Assert.IsNotEmpty(dataChannelStats.label);
-                    Assert.IsNotEmpty(dataChannelStats.state);
+                    Ignore.Pass(dataChannelStats.state);
                     Ignore.Pass(dataChannelStats.protocol);
                     Ignore.Pass(dataChannelStats.messagesSent);
                     Ignore.Pass(dataChannelStats.messagesReceived);

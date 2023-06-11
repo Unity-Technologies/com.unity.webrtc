@@ -21,6 +21,8 @@ namespace Unity.WebRTC
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
 
+        public bool NeedFlip { get; private set; }
+        RenderTexture m_destTexture;
         UnityVideoRenderer m_renderer;
         VideoTrackSource m_source;
 
@@ -107,7 +109,6 @@ namespace Unity.WebRTC
             {
                 m_renderer?.Dispose();
                 m_source?.Dispose();
-
                 s_tracks.TryRemove(self, out var value);
             }
             base.Dispose();
@@ -157,7 +158,11 @@ namespace Unity.WebRTC
 
             var label = Guid.NewGuid().ToString();
             source = new VideoTrackSource();
+#if !UNITY_WEBGL
             return WebRTC.Context.CreateVideoTrack(label, source.GetSelfOrThrow());
+#else
+            return WebRTC.Context.CreateVideoTrack(source.sourceTexture_.GetNativeTexturePtr(),source.destTexture_.GetNativeTexturePtr(),source.sourceTexture_.width,source.sourceTexture_.height);
+#endif
         }
 
         /// <summary>

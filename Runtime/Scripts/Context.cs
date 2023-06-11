@@ -1,6 +1,12 @@
 using System;
 using System.Threading;
+using System.Collections;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -148,34 +154,139 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeletePeerConnection(self, ptr);
         }
 
+        public RTCError PeerConnectionSetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        {
+            IntPtr ptrError = IntPtr.Zero;
+#if !UNITY_WEBGL
+            var observer = NativeMethods.PeerConnectionSetLocalDescription(ptr, ref desc, out var errorType, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            return new RTCError { errorType = errorType, message = message};
+#else
+            IntPtr buf = NativeMethods.PeerConnectionSetLocalDescription(self, ptr, desc.type, desc.sdp);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType errorType = (RTCErrorType)arr[0];
+            string errorMsg = arr[1].AsAnsiStringWithFreeMem();
+            return new RTCError { errorType = errorType, message = errorMsg };
+#endif
+        }
+
+        public RTCError PeerConnectionSetLocalDescription(IntPtr ptr)
+        {
+            IntPtr ptrError = IntPtr.Zero;
+#if !UNITY_WEBGL
+            var observer = NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(ptr, out var errorType, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            return new RTCError { errorType = errorType, message = message };
+#else
+            IntPtr buf = NativeMethods.PeerConnectionSetLocalDescriptionWithoutDescription(self, ptr);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType errorType = (RTCErrorType)arr[0];
+            string errorMsg = arr[1].AsAnsiStringWithFreeMem();
+            return new RTCError { errorType = errorType, message = errorMsg };
+#endif
+
+        }
+
+        public RTCError PeerConnectionSetRemoteDescription(IntPtr ptr, ref RTCSessionDescription desc)
+        {
+            IntPtr ptrError = IntPtr.Zero;
+#if !UNITY_WEBGL
+            var observer = NativeMethods.PeerConnectionSetRemoteDescription(ptr, ref desc, out var errorType, ref ptrError);
+            string message = ptrError != IntPtr.Zero ? ptrError.AsAnsiStringWithFreeMem() : null;
+            return new RTCError { errorType = errorType, message = message};
+#else
+            IntPtr buf = NativeMethods.PeerConnectionSetRemoteDescription(self, ptr, desc.type, desc.sdp);
+            var arr = NativeMethods.ptrToIntPtrArray(buf);
+            RTCErrorType errorType = (RTCErrorType)arr[0];
+            string errorMsg = arr[1].AsAnsiStringWithFreeMem();
+            return new RTCError { errorType = errorType, message = errorMsg };
+#endif
+        }
+
+        public void PeerConnectionRegisterOnSetSessionDescSuccess(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescSuccess callback)
+        {
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self, ptr, callback);
+        }
+
+        public void PeerConnectionRegisterOnSetSessionDescFailure(IntPtr ptr, DelegateNativePeerConnectionSetSessionDescFailure callback)
+        {
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self, ptr, callback);
+        }
+
+        public IntPtr PeerConnectionAddTransceiver(IntPtr pc, IntPtr track)
+        {
+            return NativeMethods.PeerConnectionAddTransceiver(pc, track);
+        }
+
+        public IntPtr PeerConnectionAddTransceiverWithType(IntPtr pc, TrackKind kind)
+        {
+            return NativeMethods.PeerConnectionAddTransceiverWithType(pc, kind);
+        }
+
         public IntPtr PeerConnectionGetReceivers(IntPtr ptr, out ulong length)
         {
+#if !UNITY_WEBGL
             return NativeMethods.PeerConnectionGetReceivers(self, ptr, out length);
+#else
+            length = 0;
+            return NativeMethods.PeerConnectionGetReceivers(self, ptr);
+#endif
         }
 
         public IntPtr PeerConnectionGetSenders(IntPtr ptr, out ulong length)
         {
+#if !UNITY_WEBGL
             return NativeMethods.PeerConnectionGetSenders(self, ptr, out length);
+#else
+            length = 0;
+            return NativeMethods.PeerConnectionGetSenders(self, ptr);
+#endif
         }
 
         public IntPtr PeerConnectionGetTransceivers(IntPtr ptr, out ulong length)
         {
+#if !UNITY_WEBGL
             return NativeMethods.PeerConnectionGetTransceivers(self, ptr, out length);
+#else
+            length = 0;
+            return NativeMethods.PeerConnectionGetTransceivers(self, ptr);
+#endif
         }
 
         public CreateSessionDescriptionObserver PeerConnectionCreateOffer(IntPtr ptr, ref RTCOfferAnswerOptions options)
         {
+#if !UNITY_WEBGL
             return NativeMethods.PeerConnectionCreateOffer(self, ptr, ref options);
+#else
+            var observer = new CreateSessionDescriptionObserver();
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self,ptr,(result) => observer.Invoke(RTCSdpType.Offer,result.ToString(),RTCErrorType.None,null));
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self,ptr,(result,errorType,msg) => observer.Invoke(RTCSdpType.Offer,result.ToString(),(RTCErrorType)errorType,msg.ToString()));
+            NativeMethods.PeerConnectionCreateOffer(ptr,JObject.FromObject(options).ToString());
+            return observer;
+#endif
         }
 
         public CreateSessionDescriptionObserver PeerConnectionCreateAnswer(IntPtr ptr, ref RTCOfferAnswerOptions options)
         {
+#if !UNITY_WEBGL
             return NativeMethods.PeerConnectionCreateAnswer(self, ptr, ref options);
+#else
+            var observer = new CreateSessionDescriptionObserver();
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescSuccess(self,ptr,(result) => observer.Invoke(RTCSdpType.Answer,result.ToString(),RTCErrorType.None,null));
+            NativeMethods.PeerConnectionRegisterOnSetSessionDescFailure(self,ptr,(result,errorType,msg) => observer.Invoke(RTCSdpType.Answer,result.ToString(),(RTCErrorType)errorType,msg.ToString()));
+            NativeMethods.PeerConnectionCreateAnswer(ptr,JObject.FromObject(options).ToString());
+            return observer;
+#endif
         }
 
         public IntPtr CreateDataChannel(IntPtr ptr, string label, ref RTCDataChannelInitInternal options)
         {
+#if !UNITY_WEBGL
             return NativeMethods.ContextCreateDataChannel(self, ptr, label, ref options);
+#else
+            var optionsJson = JsonUtility.ToJson(options);
+            return NativeMethods.ContextCreateDataChannel(self, ptr, label, optionsJson);
+#endif
         }
 
         public void DeleteDataChannel(IntPtr ptr)
@@ -236,6 +347,7 @@ namespace Unity.WebRTC
             return NativeMethods.GetRenderEventFunc(self);
         }
 
+#if !UNITY_WEBGL
         public int GetRenderEventID()
         {
             return NativeMethods.GetRenderEventID();
@@ -250,6 +362,22 @@ namespace Unity.WebRTC
         {
             return NativeMethods.GetReleaseBuffersEventID();
         }
+#else
+        public int GetRenderEventID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IntPtr GetReleaseBufferFunc()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetReleaseBufferEventID()
+        {
+            throw new NotImplementedException();
+        }
+#endif
 
         public IntPtr GetUpdateTextureFunc()
         {
@@ -270,11 +398,22 @@ namespace Unity.WebRTC
         {
             return NativeMethods.ContextCreateAudioTrack(self, label, trackSource);
         }
-
+#if !UNITY_WEBGL
         public IntPtr CreateVideoTrack(string label, IntPtr source)
         {
             return NativeMethods.ContextCreateVideoTrack(self, label, source);
         }
+#else
+        public IntPtr CreateVideoTrack(string label)
+        {
+            return IntPtr.Zero; // NativeMethods.ContextCreateVideoTrack(self, label);
+        }
+
+        public IntPtr CreateVideoTrack(IntPtr srcTexturePtr, IntPtr dstTexturePtr, int width, int height)
+        {
+            return NativeMethods.ContextCreateVideoTrack(self, srcTexturePtr, dstTexturePtr, width, height);
+        }
+#endif
 
         public void StopMediaStreamTrack(IntPtr track)
         {
@@ -302,15 +441,36 @@ namespace Unity.WebRTC
             NativeMethods.ContextDeleteStatsReport(self, report);
         }
 
+        public void SetVideoEncoderParameter(IntPtr track, int width, int height, GraphicsFormat format, IntPtr texturePtr)
+        {
+            NativeMethods.ContextSetVideoEncoderParameter(self, track, width, height, format, texturePtr);
+        }
+
+#if !UNITY_WEBGL        
         public void GetSenderCapabilities(TrackKind kind, out IntPtr capabilities)
         {
             NativeMethods.ContextGetSenderCapabilities(self, kind, out capabilities);
         }
+#else
+        public RTCRtpCapabilities GetSenderCapabilities(TrackKind kind)
+        {
+            string json = NativeMethods.ContextGetSenderCapabilities(self, kind);
+            return JsonConvert.DeserializeObject<RTCRtpCapabilities>(json);
+        }
+#endif
 
+#if !UNITY_WEBGL
         public void GetReceiverCapabilities(TrackKind kind, out IntPtr capabilities)
         {
             NativeMethods.ContextGetReceiverCapabilities(self, kind, out capabilities);
         }
+#else
+        public RTCRtpCapabilities GetReceiverCapabilities(TrackKind kind)
+        {
+            string json = NativeMethods.ContextGetReceiverCapabilities(self, kind);
+            return JsonConvert.DeserializeObject<RTCRtpCapabilities>(json);
+        }
+#endif
 
         internal void Encode(IntPtr ptr)
         {

@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -5,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// 
     /// </summary>
     public class RTCRtpContributingSource
     {
@@ -88,24 +89,33 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+#if UNITY_WEBGL
+                NativeMethods.DeleteReceiver(self);
+#endif
                 WebRTC.Table.Remove(self);
             }
             base.Dispose();
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
         public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
         {
+
+#if !UNITY_WEBGL
             WebRTC.Context.GetReceiverCapabilities(kind, out IntPtr ptr);
             RTCRtpCapabilitiesInternal capabilitiesInternal =
                 Marshal.PtrToStructure<RTCRtpCapabilitiesInternal>(ptr);
             RTCRtpCapabilities capabilities = new RTCRtpCapabilities(capabilitiesInternal);
             Marshal.FreeHGlobal(ptr);
             return capabilities;
+#else
+            return WebRTC.Context.GetReceiverCapabilities(kind);
+#endif
+
         }
 
         /// <summary>

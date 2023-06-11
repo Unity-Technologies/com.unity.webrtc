@@ -49,7 +49,9 @@ namespace Unity.WebRTC.Samples
             useWebCamToggle.onValueChanged.AddListener(SwitchUseWebCam);
             webCamListDropdown.options = WebCamTexture.devices.Select(x => new Dropdown.OptionData(x.name)).ToList();
             useMicToggle.onValueChanged.AddListener(SwitchUseMic);
+#if !UNITY_WEBGL
             micListDropdown.options = Microphone.devices.Select(x => new Dropdown.OptionData(x)).ToList();
+#endif
         }
 
         private void OnDestroy()
@@ -245,7 +247,7 @@ namespace Unity.WebRTC.Samples
                 audioStreamTrack = new AudioStreamTrack(sourceAudio);
                 return;
             }
-
+#if !UNITY_WEBGL
             var deviceName = Microphone.devices[micListDropdown.value];
             Microphone.GetDeviceCaps(deviceName, out int minFreq, out int maxFreq);
             var micClip = Microphone.Start(deviceName, true, 1, 48000);
@@ -257,6 +259,7 @@ namespace Unity.WebRTC.Samples
             sourceAudio.loop = true;
             sourceAudio.Play();
             audioStreamTrack = new AudioStreamTrack(sourceAudio);
+#endif
         }
 
         private IEnumerator CaptureVideoStart()

@@ -210,6 +210,7 @@ namespace Unity.WebRTC.RuntimeTest
 
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator TransceiverStop()

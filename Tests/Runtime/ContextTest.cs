@@ -1,15 +1,28 @@
 using System;
 using NUnit.Framework;
 
+using Debug = UnityEngine.Debug;
+
 namespace Unity.WebRTC.RuntimeTest
 {
     class ContextTest
     {
+#if !UNITY_WEBGL
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
         static void DebugLog(string str)
         {
-            UnityEngine.Debug.Log(str);
+            Debug.Log(str);
         }
+#else
+        [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
+        static void DebugLog(string level, string msg)
+        {
+            Debug.Log($"{level}:{msg}");
+            if (level == "error") Debug.LogError(msg);
+            if (level == "warning") Debug.LogWarning(msg);
+            if (level == "log") Debug.Log(msg);
+        }
+#endif
 
         [SetUp]
         public void SetUp()
@@ -75,7 +88,11 @@ namespace Unity.WebRTC.RuntimeTest
             var rt = new UnityEngine.RenderTexture(width, height, 0, format);
             rt.Create();
             var source = context.CreateVideoTrackSource();
+#if UNITY_WEBGL
+            var track = context.CreateVideoTrack(source, System.IntPtr.Zero, width, height);
+#else
             var track = context.CreateVideoTrack("video", source);
+#endif
             context.DeleteRefPtr(track);
             context.DeleteRefPtr(source);
             UnityEngine.Object.DestroyImmediate(rt);

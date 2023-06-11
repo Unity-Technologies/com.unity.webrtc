@@ -52,6 +52,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonReplaceTrack;
         [SerializeField] private Button buttonMetadata;
         [SerializeField] private Button buttonEncryption;
+        [SerializeField] private Button buttonWebGL;
 
         List<Vector2Int> streamSizeList = new List<Vector2Int>()
         {
@@ -131,6 +132,7 @@ namespace Unity.WebRTC.Samples
             buttonReplaceTrack.onClick.AddListener(OnPressedReplaceTrackButton);
             buttonMetadata.onClick.AddListener(OnPressedMetadataButton);
             buttonEncryption.onClick.AddListener(OnPressedEncryption);
+            buttonWebGL.onClick.AddListener(OnPressedWebGLButton);
 
             // This sample uses Compute Shader, so almost Android devices don't work correctly.
             if (!SystemInfo.supportsComputeShaders)
@@ -267,6 +269,11 @@ namespace Unity.WebRTC.Samples
         private void OnPressedEncryption()
         {
             SceneManager.LoadScene("Encryption", LoadSceneMode.Single);
+        }
+
+        private void OnPressedWebGLButton()
+        {
+            SceneManager.LoadScene("WebGL", LoadSceneMode.Single);
         }
     }
 }

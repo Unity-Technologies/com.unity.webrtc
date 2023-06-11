@@ -7,7 +7,7 @@ namespace Unity.WebRTC
     {
         public Action<RTCSdpType, string, RTCErrorType, string> onCreateSessionDescription;
 
-        private CreateSessionDescriptionObserver ()
+        internal CreateSessionDescriptionObserver ()
             : base(IntPtr.Zero, true)
         {
         }

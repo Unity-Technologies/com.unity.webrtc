@@ -49,7 +49,8 @@ namespace Unity.WebRTC.RuntimeTest
         [UnityTest]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.Android })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.Android, RuntimePlatform.WebGLPlayer })]
+        [Category("MediaStream")]
         public IEnumerator VideoStreamAddTrackAndRemoveTrack()
         {
             var width = 256;
@@ -118,6 +119,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CameraCaptureStream()
@@ -140,6 +142,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CaptureStream()
@@ -167,6 +170,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator SenderGetStats()
@@ -214,6 +218,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator ReceiverGetStats()
@@ -257,6 +262,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator SetParametersReturnNoError()
@@ -387,7 +393,7 @@ namespace Unity.WebRTC.RuntimeTest
         // todo::(kazuki) Test execution timed out on linux standalone
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxPlayer, RuntimePlatform.WebGLPlayer})]
         [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformOpenGL, "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator OnAddTrackDelegatesWithEvent()
         {
@@ -447,6 +453,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         public IEnumerator ReceiverGetStreams()
         {
             var obj = new GameObject("audio");

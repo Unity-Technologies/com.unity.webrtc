@@ -46,6 +46,31 @@ namespace Unity.WebRTC.RuntimeTest
             SetUpCodecCapability();
         }
 
+        [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        [Timeout(5000)]
+        public IEnumerator InitializeReceiver()
+        {
+            var peer = new RTCPeerConnection();
+            var transceiver = peer.AddTransceiver(TrackKind.Video);
+            Assert.That(transceiver, Is.Not.Null);
+            RTCRtpReceiver receiver = transceiver.Receiver;
+            Assert.That(receiver, Is.Not.Null);
+            MediaStreamTrack track = receiver.Track;
+            Assert.That(track, Is.Not.Null);
+            Assert.AreEqual(TrackKind.Video, track.Kind);
+            Assert.That(track.Kind, Is.EqualTo(TrackKind.Video));
+            var videoTrack = track as VideoStreamTrack;
+            Assert.That(videoTrack, Is.Not.Null);
+            var rt = videoTrack.Texture;
+            videoTrack.Dispose();
+            // wait for disposing video track.
+            yield return 0;
+
+            peer.Dispose();
+            Object.DestroyImmediate(rt);
+        }
+
         internal class TestValue
         {
             public int width;
@@ -72,7 +97,8 @@ namespace Unity.WebRTC.RuntimeTest
         // refer to https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-tests-parameterized.html
         [UnityTest, LongRunning]
         [Timeout(15000)]
-        [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer })]
+        [ConditionalIgnore(ConditionalIgnore.UnsupportedPlatformVideoDecoder,
             "VideoStreamTrack.UpdateReceiveTexture is not supported on Direct3D12")]
         [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
             "Not support VideoStreamTrack for OpenGL")]

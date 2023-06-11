@@ -1,12 +1,15 @@
 using System;
-using UnityEngine.TestTools;
-using NUnit.Framework;
 using System.Collections;
 using System.Diagnostics;
+
+using UnityEngine;
+using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
+
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
+
+using NUnit.Framework;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -81,7 +84,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer,RuntimePlatform.WebGLPlayer })]
         public IEnumerator SendThrowsException()
         {
             byte[] message1 = { 1, 2, 3 };
@@ -126,7 +129,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer,RuntimePlatform.WebGLPlayer })]
         public IEnumerator CreateDataChannelMultiple()
         {
             var test = new MonoBehaviourTest<SignalingPeers>();

@@ -12,13 +12,15 @@
         "iOS",
         "LinuxStandalone64",
         "macOSStandalone",
+        "WebGL",
         "WindowsStandalone64"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
