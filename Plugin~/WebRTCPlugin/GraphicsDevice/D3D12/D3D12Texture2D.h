@@ -25,6 +25,9 @@ namespace webrtc
         inline const void* GetNativeTexturePtrV() const override;
         inline void* GetEncodeTexturePtrV() override;
         inline const void* GetEncodeTexturePtrV() const override;
+        ID3D12Fence* GetFence() const { return m_fence.Get(); }
+        uint64_t GetSyncCount() const { return m_syncCount; }
+        void UpdateSyncCount() const { m_syncCount = m_fence->GetCompletedValue(); }
         HRESULT CreateReadbackResource(ID3D12Device* device);
         inline ID3D12Resource* GetReadbackResource() const;
         inline const D3D12ResourceFootprint* GetNativeTextureFootprint() const;
@@ -34,6 +37,9 @@ namespace webrtc
     private:
         ComPtr<ID3D12Resource> m_nativeTexture;
         HANDLE m_sharedHandle;
+        ID3D11Texture2D* m_sharedTexture; // Shared between DX11 and DX12
+        ComPtr<ID3D12Fence> m_fence;
+        mutable uint64_t m_syncCount;
 
         // For CPU Read
         ComPtr<ID3D12Resource> m_readbackResource;

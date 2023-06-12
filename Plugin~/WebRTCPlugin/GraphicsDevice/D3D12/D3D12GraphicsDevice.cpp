@@ -30,8 +30,6 @@ namespace webrtc
         : IGraphicsDevice(renderer, profiler)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
-        , m_copyResourceFence(nullptr)
-        , m_copyResourceEventHandle(nullptr)
     {
     }
     //---------------------------------------------------------------------------------------------------------------------
@@ -43,8 +41,6 @@ namespace webrtc
         : IGraphicsDevice(renderer, profiler)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(commandQueue)
-        , m_copyResourceFence(nullptr)
-        , m_copyResourceEventHandle(nullptr)
     {
     }
 
@@ -80,20 +76,21 @@ namespace webrtc
             return false;
         }
 
-        hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
-        if (FAILED(hr))
-        {
-            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
-            return false;
-        }
+        //hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
+        //if (FAILED(hr))
+        //{
+        //    RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
+        //    return false;
+        //}
 
-        m_copyResourceEventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        if (m_copyResourceEventHandle == nullptr)
-        {
-            hr = HRESULT_FROM_WIN32(GetLastError());
-            RTC_LOG(LS_ERROR) << "CreateEvent is failed. " << HrToString(hr);
-            return false;
-        }
+        //m_copyResourceEventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        //if (m_copyResourceEventHandle == nullptr)
+        //{
+        //    hr = HRESULT_FROM_WIN32(GetLastError());
+        //    RTC_LOG(LS_ERROR) << "CreateEvent is failed. " << HrToString(hr);
+        //    return false;
+        //}
+
         m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d12Device.Get());
         return true;
     }
@@ -102,7 +99,7 @@ namespace webrtc
     void D3D12GraphicsDevice::ShutdownV()
     {
         m_cudaContext.Shutdown();
-        SAFE_CLOSE_HANDLE(m_copyResourceEventHandle)
+//        SAFE_CLOSE_HANDLE(m_copyResourceEventHandle)
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -164,12 +161,32 @@ namespace webrtc
         ID3D12CommandList* cmdList[] = { m_commandList };
         m_d3d12CommandQueue->ExecuteCommandLists(_countof(cmdList), cmdList);
 
-        WaitForFence(m_copyResourceFence.Get(), m_copyResourceEventHandle, &m_copyResourceFenceValue);
+        hr = Signal(dest->GetFence());
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_ERROR) << "Signal failed. result:" << hr;
+            return false;
+        }
+        //WaitForFence(m_copyResourceFence.Get(), m_copyResourceEventHandle, &m_copyResourceFenceValue);
 
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
+    HRESULT D3D12GraphicsDevice::Signal(ID3D12Fence* fence)
+    {
+        //ComPtr<ID3D11DeviceContext> context;
+        //m_d3d12Device->GetImmediateContext(context.GetAddressOf());
+
+        //ComPtr<ID3D11DeviceContext4> context4;
+        //HRESULT hr = context.As(&context4);
+        //if (hr != S_OK)
+        //    return hr;
+        //uint64_t value = fence->GetCompletedValue() + 1;
+        //return context4->Signal(fence, value);
+
+        uint64_t value = fence->GetCompletedValue() + 1;
+        return m_d3d12CommandQueue->Signal(fence, value);
+    }
 
     D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h)
     {
@@ -215,19 +232,73 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "CreateSharedHandle failed. error:" << result;
             return nullptr;
         }
-        return new D3D12Texture2D(w, h, resource, handle);
+
+        ID3D12Fence* fence = nullptr;
+        HRESULT hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
+            return false;
+        }
+
+        return new D3D12Texture2D(w, h, resource, handle, fence);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    void D3D12GraphicsDevice::WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue)
+    bool D3D12GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
-        ThrowIfFailed(m_d3d12CommandQueue->Signal(fence, *fenceValue));
-        ThrowIfFailed(fence->SetEventOnCompletion(*fenceValue, handle));
-        WaitForSingleObject(handle, INFINITE);
-        ++(*fenceValue);
+        const D3D12Texture2D* d3d12Texture = static_cast<const D3D12Texture2D*>(texture);
+        ID3D12Fence* fence = d3d12Texture->GetFence();
+        HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+        uint64_t value = d3d12Texture->GetSyncCount() + 1;
+        RTC_LOG(LS_INFO) << "WaitSync " << value;
+
+        HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
+        if (hr != S_OK)
+        {
+            RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
+            return false;
+        }
+        auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+
+        if (WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
+        {
+            RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << GetLastError();
+            return false;
+        }
+
+        CloseHandle(fenceEvent);
+
+        RTC_LOG(LS_INFO) << "WaitSync end" << value;
+        return true;
+
+        //m_d3d12CommandQueue->Signal(fence, *fenceValue)
+        //ThrowIfFailed(m_d3d12CommandQueue->Signal(fence, *fenceValue));
+        //ThrowIfFailed(fence->SetEventOnCompletion(*fenceValue, handle));
+        //WaitForSingleObject(handle, INFINITE);
+        //++(*fenceValue);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
+    bool D3D12GraphicsDevice::ResetSync(const ITexture2D* texture)
+    {
+        const D3D12Texture2D* d3d12Texture = static_cast<const D3D12Texture2D*>(texture);
+        ID3D12Fence* fence = d3d12Texture->GetFence();
+        const auto value = d3d12Texture->GetSyncCount();
+
+        //if (value == fence->GetCompletedValue())
+        //{
+        //    RTC_LOG(LS_INFO) << "ResetSync failed" << value;
+        //    return false;
+        //}
+
+        RTC_LOG(LS_INFO) << "ResetSync " << this << "" << value << " " << fence->GetCompletedValue();
+
+        d3d12Texture->UpdateSyncCount();
+
+        RTC_LOG(LS_INFO) << "ResetSync end" << this << "" << value;
+        return true;
+    }
 
     void D3D12GraphicsDevice::Barrier(
         ID3D12Resource* res,

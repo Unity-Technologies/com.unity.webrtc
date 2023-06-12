@@ -87,7 +87,8 @@ namespace webrtc
 
     private:
         D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
-        void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
+        HRESULT Signal(ID3D12Fence* fence);
+        //void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
         void Barrier(
             ID3D12Resource* res,
             const D3D12_RESOURCE_STATES stateBefore,
@@ -105,9 +106,6 @@ namespace webrtc
         ID3D12GraphicsCommandList4Ptr m_commandList;
 
         // Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
-        ComPtr<ID3D12Fence> m_copyResourceFence;
-        HANDLE m_copyResourceEventHandle;
-        uint64_t m_copyResourceFenceValue = 1;
     };
 
     //---------------------------------------------------------------------------------------------------------------------
