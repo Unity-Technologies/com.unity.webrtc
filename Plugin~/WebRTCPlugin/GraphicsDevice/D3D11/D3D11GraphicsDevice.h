@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <d3d11_4.h>
 #include <memory>
 #include <wrl/client.h>
 
@@ -30,13 +31,15 @@ namespace webrtc
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
+        bool ResetSync(const ITexture2D* texture) override;
         virtual rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 
     private:
-        HRESULT WaitFlush();
+        HRESULT Signal(ID3D11Fence* fence);
         ID3D11Device* m_d3d11Device;
 
         bool m_isCudaSupport;
