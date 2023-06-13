@@ -75,8 +75,7 @@ namespace webrtc
             return nullptr;
         }
         ID3D11Fence* fence = nullptr;
-        hr = d3d11Device5->CreateFence(
-            0, D3D11_FENCE_FLAG_NONE, __uuidof(ID3D11Fence), reinterpret_cast<void**>(&fence));
+        hr = d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
         if (hr != S_OK)
         {
             RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
@@ -115,8 +114,7 @@ namespace webrtc
             return nullptr;
         }
         ID3D11Fence* fence = nullptr;
-        hr = d3d11Device5->CreateFence(
-            0, D3D11_FENCE_FLAG_NONE, __uuidof(ID3D11Fence), reinterpret_cast<void**>(&fence));
+        hr = d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
         if (hr != S_OK)
         {
             RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
