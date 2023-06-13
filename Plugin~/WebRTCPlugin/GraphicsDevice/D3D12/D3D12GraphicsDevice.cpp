@@ -30,8 +30,6 @@ namespace webrtc
         : IGraphicsDevice(renderer, profiler)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
-        , m_d3d11Device(nullptr)
-        , m_d3d11Context(nullptr)
         , m_copyResourceFence(nullptr)
         , m_copyResourceEventHandle(nullptr)
     {
@@ -45,8 +43,6 @@ namespace webrtc
         : IGraphicsDevice(renderer, profiler)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(commandQueue)
-        , m_d3d11Device(nullptr)
-        , m_d3d11Context(nullptr)
         , m_copyResourceFence(nullptr)
         , m_copyResourceEventHandle(nullptr)
     {
@@ -59,44 +55,8 @@ namespace webrtc
 
     bool D3D12GraphicsDevice::InitV()
     {
-
-        ID3D11Device* legacyDevice;
-        ID3D11DeviceContext* legacyContext;
-
-        HRESULT hr = D3D11CreateDevice(
-            nullptr,
-            D3D_DRIVER_TYPE_HARDWARE,
-            nullptr,
-            0,
-            nullptr,
-            0,
-            D3D11_SDK_VERSION,
-            &legacyDevice,
-            nullptr,
-            &legacyContext);
-
-        if (FAILED(hr))
-        {
-            RTC_LOG(LS_ERROR) << "D3D11CreateDevice is failed. " << HrToString(hr);
-            return false;
-        }
-
-        hr = legacyDevice->QueryInterface(IID_PPV_ARGS(&m_d3d11Device));
-        if (FAILED(hr))
-        {
-            RTC_LOG(LS_ERROR) << "ID3D11DeviceContext::QueryInterface is failed. " << HrToString(hr);
-            return false;
-        }
-
-        legacyDevice->GetImmediateContext(&legacyContext);
-        hr = legacyContext->QueryInterface(IID_PPV_ARGS(&m_d3d11Context));
-        if (FAILED(hr))
-        {
-            RTC_LOG(LS_ERROR) << "ID3D11DeviceContext::QueryInterface is failed. " << HrToString(hr);
-            return false;
-        }
-
-        hr = m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
+        HRESULT hr =
+            m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
         if (FAILED(hr))
         {
             RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandAllocator is failed. " << HrToString(hr);
@@ -149,7 +109,6 @@ namespace webrtc
     ITexture2D*
     D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
-
         return CreateSharedD3D12Texture(w, h);
     }
 
@@ -256,18 +215,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "CreateSharedHandle failed. error:" << result;
             return nullptr;
         }
-
-        // ID3D11Device::OpenSharedHandle() doesn't accept handles created by d3d12.
-        // OpenSharedResource1() is needed.
-        ID3D11Texture2D* sharedTex = nullptr;
-        result = m_d3d11Device->OpenSharedResource1(handle, IID_PPV_ARGS(&sharedTex));
-        if (result != S_OK)
-        {
-            RTC_LOG(LS_INFO) << "OpenSharedResource1 failed. error:" << result;
-            return nullptr;
-        }
-
-        return new D3D12Texture2D(w, h, resource, handle, sharedTex);
+        return new D3D12Texture2D(w, h, resource, handle);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
