@@ -28,6 +28,7 @@ namespace webrtc
         UnityGfxRenderer renderer,
         ProfilerMarkerFactory* profiler)
         : IGraphicsDevice(renderer, profiler)
+        , m_unityInterface(unityInterface)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
     {
@@ -39,6 +40,7 @@ namespace webrtc
         UnityGfxRenderer renderer,
         ProfilerMarkerFactory* profiler)
         : IGraphicsDevice(renderer, profiler)
+        , m_unityInterface(nullptr)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(commandQueue)
     {
@@ -75,32 +77,12 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
             return false;
         }
-
-        //hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_copyResourceFence));
-        //if (FAILED(hr))
-        //{
-        //    RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
-        //    return false;
-        //}
-
-        //m_copyResourceEventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        //if (m_copyResourceEventHandle == nullptr)
-        //{
-        //    hr = HRESULT_FROM_WIN32(GetLastError());
-        //    RTC_LOG(LS_ERROR) << "CreateEvent is failed. " << HrToString(hr);
-        //    return false;
-        //}
-
         m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d12Device.Get());
         return true;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    void D3D12GraphicsDevice::ShutdownV()
-    {
-        m_cudaContext.Shutdown();
-//        SAFE_CLOSE_HANDLE(m_copyResourceEventHandle)
-    }
+    void D3D12GraphicsDevice::ShutdownV() { m_cudaContext.Shutdown(); }
 
     //---------------------------------------------------------------------------------------------------------------------
     ITexture2D*
@@ -120,72 +102,63 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* nativeTexturePtr)
     {
-
         D3D12Texture2D* dest = reinterpret_cast<D3D12Texture2D*>(baseDest);
-        assert(nullptr != dest);
-        if (nullptr == dest)
+        if (!dest)
             return false;
 
         ID3D12Resource* nativeDest = reinterpret_cast<ID3D12Resource*>(dest->GetNativeTexturePtrV());
         ID3D12Resource* nativeSrc = reinterpret_cast<ID3D12Resource*>(nativeTexturePtr);
+        ID3D12Resource* readbackResource = dest->GetReadbackResource();
+
         if (nativeSrc == nativeDest)
             return false;
-        if (nativeSrc == nullptr || nativeDest == nullptr)
+        if (!nativeSrc)
             return false;
 
         ThrowIfFailed(m_commandAllocator->Reset());
         ThrowIfFailed(m_commandList->Reset(m_commandAllocator, nullptr));
 
-        m_commandList->CopyResource(nativeDest, nativeSrc);
+        std::vector<UnityGraphicsD3D12ResourceState> states;
+
+        // for GPU accessible texture
+        if (nativeDest)
+        {
+            m_commandList->CopyResource(nativeDest, nativeSrc);
+            states.push_back(UnityGraphicsD3D12ResourceState {
+                nativeSrc, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_SOURCE });
+            states.push_back(UnityGraphicsD3D12ResourceState {
+                nativeDest, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_DEST });
+        }
 
         // for CPU accessible texture
-        ID3D12Resource* readbackResource = dest->GetReadbackResource();
-        const D3D12ResourceFootprint* resFP = dest->GetNativeTextureFootprint();
-        if (nullptr != readbackResource)
+        if (readbackResource)
         {
+            const D3D12ResourceFootprint* resFP = dest->GetNativeTextureFootprint();
+
             // Change dest state, copy, change dest state back
-            Barrier(nativeDest, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_SOURCE);
-            D3D12_TEXTURE_COPY_LOCATION td, ts;
-            td.pResource = readbackResource;
-            td.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-            td.PlacedFootprint = resFP->Footprint;
-            ts.pResource = nativeDest;
-            ts.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-            ts.SubresourceIndex = 0;
-            m_commandList->CopyTextureRegion(&td, 0, 0, 0, &ts, nullptr);
-            Barrier(nativeDest, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST);
+            D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
+            srcLoc.pResource = nativeSrc;
+            srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+            srcLoc.SubresourceIndex = 0;
+
+            D3D12_TEXTURE_COPY_LOCATION dstLoc = {};
+            dstLoc.pResource = readbackResource;
+            dstLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+            dstLoc.PlacedFootprint = resFP->Footprint;
+
+            m_commandList->CopyTextureRegion(&dstLoc, 0, 0, 0, &srcLoc, nullptr);
+
+            states.push_back(UnityGraphicsD3D12ResourceState {
+                nativeSrc, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_SOURCE });
         }
 
         ThrowIfFailed(m_commandList->Close());
 
-        ID3D12CommandList* cmdList[] = { m_commandList };
-        m_d3d12CommandQueue->ExecuteCommandLists(_countof(cmdList), cmdList);
-
-        hr = Signal(dest->GetFence());
-        if (hr != S_OK)
-        {
-            RTC_LOG(LS_ERROR) << "Signal failed. result:" << hr;
-            return false;
-        }
-        //WaitForFence(m_copyResourceFence.Get(), m_copyResourceEventHandle, &m_copyResourceFenceValue);
+        ID3D12GraphicsCommandList* cmdList = { m_commandList };
+        uint64_t value = m_unityInterface->ExecuteCommandList(cmdList, static_cast<int>(states.size()), states.data());
+        dest->SetSyncCount(value);
 
         return true;
-    }
-
-    HRESULT D3D12GraphicsDevice::Signal(ID3D12Fence* fence)
-    {
-        //ComPtr<ID3D11DeviceContext> context;
-        //m_d3d12Device->GetImmediateContext(context.GetAddressOf());
-
-        //ComPtr<ID3D11DeviceContext4> context4;
-        //HRESULT hr = context.As(&context4);
-        //if (hr != S_OK)
-        //    return hr;
-        //uint64_t value = fence->GetCompletedValue() + 1;
-        //return context4->Signal(fence, value);
-
-        uint64_t value = fence->GetCompletedValue() + 1;
-        return m_d3d12CommandQueue->Signal(fence, value);
     }
 
     D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h)
@@ -232,112 +205,52 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "CreateSharedHandle failed. error:" << result;
             return nullptr;
         }
-
-        ID3D12Fence* fence = nullptr;
-        HRESULT hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-        if (FAILED(hr))
-        {
-            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
-            return false;
-        }
-
-        return new D3D12Texture2D(w, h, resource, handle, fence);
+        return new D3D12Texture2D(w, h, resource, handle);
     }
 
     bool D3D12GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
         const D3D12Texture2D* d3d12Texture = static_cast<const D3D12Texture2D*>(texture);
-        ID3D12Fence* fence = d3d12Texture->GetFence();
-        HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        ID3D12Fence* fence = m_unityInterface->GetFrameFence();
+        uint64_t value = d3d12Texture->GetSyncCount();
 
-        uint64_t value = d3d12Texture->GetSyncCount() + 1;
-        RTC_LOG(LS_INFO) << "WaitSync " << value;
-
-        HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
-        if (hr != S_OK)
+        if (fence->GetCompletedValue() < value)
         {
-            RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
-            return false;
+            HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
+            if (hr != S_OK)
+            {
+                RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
+                return false;
+            }
+            auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+
+            if (WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
+            {
+                RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << GetLastError();
+                return false;
+            }
+            CloseHandle(fenceEvent);
         }
-        auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
-        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
-
-        if (WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
-        {
-            RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << GetLastError();
-            return false;
-        }
-
-        CloseHandle(fenceEvent);
-
-        RTC_LOG(LS_INFO) << "WaitSync end" << value;
-        return true;
-
-        //m_d3d12CommandQueue->Signal(fence, *fenceValue)
-        //ThrowIfFailed(m_d3d12CommandQueue->Signal(fence, *fenceValue));
-        //ThrowIfFailed(fence->SetEventOnCompletion(*fenceValue, handle));
-        //WaitForSingleObject(handle, INFINITE);
-        //++(*fenceValue);
-    }
-
-    bool D3D12GraphicsDevice::ResetSync(const ITexture2D* texture)
-    {
-        const D3D12Texture2D* d3d12Texture = static_cast<const D3D12Texture2D*>(texture);
-        ID3D12Fence* fence = d3d12Texture->GetFence();
-        const auto value = d3d12Texture->GetSyncCount();
-
-        //if (value == fence->GetCompletedValue())
-        //{
-        //    RTC_LOG(LS_INFO) << "ResetSync failed" << value;
-        //    return false;
-        //}
-
-        RTC_LOG(LS_INFO) << "ResetSync " << this << "" << value << " " << fence->GetCompletedValue();
-
-        d3d12Texture->UpdateSyncCount();
-
-        RTC_LOG(LS_INFO) << "ResetSync end" << this << "" << value;
         return true;
     }
 
-    void D3D12GraphicsDevice::Barrier(
-        ID3D12Resource* res,
-        const D3D12_RESOURCE_STATES stateBefore,
-        const D3D12_RESOURCE_STATES stateAfter,
-        const UINT subresource)
-    {
-        D3D12_RESOURCE_BARRIER barrier;
-        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource = res;
-        barrier.Transition.StateBefore = stateBefore;
-        barrier.Transition.StateAfter = stateAfter;
-        barrier.Transition.Subresource = subresource;
-        m_commandList->ResourceBarrier(1, &barrier);
-    }
+    bool D3D12GraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
 
     //----------------------------------------------------------------------------------------------------------------------
 
     ITexture2D*
     D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
-        D3D12Texture2D* tex = CreateSharedD3D12Texture(w, h);
-        const HRESULT hr = tex->CreateReadbackResource(m_d3d12Device.Get());
-        if (FAILED(hr))
-        {
-            delete tex;
-            return nullptr;
-        }
-
-        return tex;
+        return D3D12Texture2D::CreateReadbackResource(m_d3d12Device.Get(), w, h);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
     {
         D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
-        assert(nullptr != tex);
-        if (nullptr == tex)
+        if (!tex)
             return nullptr;
 
         ID3D12Resource* readbackResource = tex->GetReadbackResource();

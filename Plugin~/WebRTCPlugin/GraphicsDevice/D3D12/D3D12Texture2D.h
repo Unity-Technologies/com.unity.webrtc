@@ -17,7 +17,7 @@ namespace webrtc
     class D3D12Texture2D : public ITexture2D
     {
     public:
-        D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle);
+        D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle = nullptr);
 
         virtual ~D3D12Texture2D() override { CloseHandle(m_sharedHandle); }
 
@@ -25,20 +25,19 @@ namespace webrtc
         inline const void* GetNativeTexturePtrV() const override;
         inline void* GetEncodeTexturePtrV() override;
         inline const void* GetEncodeTexturePtrV() const override;
-        ID3D12Fence* GetFence() const { return m_fence.Get(); }
         uint64_t GetSyncCount() const { return m_syncCount; }
-        void UpdateSyncCount() const { m_syncCount = m_fence->GetCompletedValue(); }
-        HRESULT CreateReadbackResource(ID3D12Device* device);
+        void SetSyncCount(uint64_t value) { m_syncCount = value; }
         inline ID3D12Resource* GetReadbackResource() const;
         inline const D3D12ResourceFootprint* GetNativeTextureFootprint() const;
         HANDLE GetHandle() const { return m_sharedHandle; }
         D3D12_RESOURCE_DESC GetDesc() const { return m_nativeTexture->GetDesc(); }
 
+        static D3D12Texture2D* CreateReadbackResource(ID3D12Device* device, uint32_t w, uint32_t h);
+
     private:
         ComPtr<ID3D12Resource> m_nativeTexture;
         HANDLE m_sharedHandle;
         ID3D11Texture2D* m_sharedTexture; // Shared between DX11 and DX12
-        ComPtr<ID3D12Fence> m_fence;
         mutable uint64_t m_syncCount;
 
         // For CPU Read
