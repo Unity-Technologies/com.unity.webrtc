@@ -1,7 +1,6 @@
 #pragma once
 
 #include <comdef.h>
-#include <d3d11_4.h>
 #include <d3d12.h>
 #include <stdexcept>
 #include <wrl/client.h>
@@ -12,11 +11,12 @@
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 
+using namespace Microsoft::WRL;
+
 namespace unity
 {
 namespace webrtc
 {
-    using namespace Microsoft::WRL;
     namespace webrtc = ::webrtc;
 
 #define DefPtr(_a) _COM_SMARTPTR_TYPEDEF(_a, __uuidof(_a))
@@ -97,11 +97,6 @@ namespace webrtc
         ComPtr<ID3D12Device> m_d3d12Device;
         ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
 
-        //[Note-sin: 2019-10-30] sharing res from d3d12 to d3d11 require d3d11.1. Fence is supported in d3d11.4 or
-        // newer.
-        ComPtr<ID3D11Device5> m_d3d11Device;
-        ComPtr<ID3D11DeviceContext4> m_d3d11Context;
-
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
 
@@ -113,15 +108,12 @@ namespace webrtc
         ComPtr<ID3D12Fence> m_copyResourceFence;
         HANDLE m_copyResourceEventHandle;
         uint64_t m_copyResourceFenceValue = 1;
-
-        CUcontext m_context;
-        CUdevice m_device;
     };
 
     //---------------------------------------------------------------------------------------------------------------------
 
     // use D3D11. See notes below
-    void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device.Get()); }
+    void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d12Device.Get()); }
 
 } // end namespace webrtc
 } // end namespace unity

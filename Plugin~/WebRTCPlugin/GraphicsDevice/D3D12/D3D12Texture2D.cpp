@@ -13,12 +13,10 @@ namespace webrtc
 
     //---------------------------------------------------------------------------------------------------------------------
 
-    D3D12Texture2D::D3D12Texture2D(
-        uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle, ID3D11Texture2D* sharedTex)
+    D3D12Texture2D::D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle)
         : ITexture2D(w, h)
         , m_nativeTexture(nativeTex)
         , m_sharedHandle(handle)
-        , m_sharedTexture(sharedTex)
         , m_readbackResource(nullptr)
     {
     }
@@ -27,7 +25,7 @@ namespace webrtc
 
     HRESULT D3D12Texture2D::CreateReadbackResource(ID3D12Device* device)
     {
-        SAFE_RELEASE(m_readbackResource)
+        m_readbackResource.Reset();
 
         D3D12_RESOURCE_DESC origDesc = m_nativeTexture->GetDesc();
         device->GetCopyableFootprints(
