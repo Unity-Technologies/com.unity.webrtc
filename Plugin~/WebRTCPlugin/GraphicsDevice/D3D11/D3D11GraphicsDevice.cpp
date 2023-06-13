@@ -256,7 +256,7 @@ namespace webrtc
         auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
         auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
 
-        if(WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
+        if (WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
         {
             RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << GetLastError();
             return false;
