@@ -19,10 +19,7 @@ namespace webrtc
     public:
         D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle);
 
-        virtual ~D3D12Texture2D() override
-        {
-            CloseHandle(m_sharedHandle);
-        }
+        virtual ~D3D12Texture2D() override { CloseHandle(m_sharedHandle); }
 
         inline void* GetNativeTexturePtrV() override;
         inline const void* GetNativeTexturePtrV() const override;
