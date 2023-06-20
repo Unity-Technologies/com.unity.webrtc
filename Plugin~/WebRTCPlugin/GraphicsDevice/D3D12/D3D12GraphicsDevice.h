@@ -93,6 +93,7 @@ namespace webrtc
         IUnityGraphicsD3D12v5* m_unityInterface;
         ComPtr<ID3D12Device> m_d3d12Device;
         ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
+        ComPtr<ID3D12Fence> m_fence;
 
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
@@ -101,7 +102,12 @@ namespace webrtc
         ID3D12CommandAllocatorPtr m_commandAllocator;
         ID3D12GraphicsCommandList4Ptr m_commandList;
 
-        // Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
+        uint64_t ExecuteCommandList(
+            int listCount,
+            ID3D12GraphicsCommandList* commandList,
+            int stateCount,
+            UnityGraphicsD3D12ResourceState* states);
+        ID3D12Fence* GetFence();
     };
 
     //---------------------------------------------------------------------------------------------------------------------

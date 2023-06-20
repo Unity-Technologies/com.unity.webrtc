@@ -77,6 +77,17 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
             return false;
         }
+
+        // If a unityInterface is not passed, use m_fence to synchronize between GPU and CPU.
+        if (!m_unityInterface)
+        {
+            hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
+            if (FAILED(hr))
+            {
+                RTC_LOG(LS_ERROR) << "ID3D12Device::CreateFence is failed. " << HrToString(hr);
+                return false;
+            }
+        }
         m_isCudaSupport = CUDA_SUCCESS == m_cudaContext.Init(m_d3d12Device.Get());
         return true;
     }
@@ -154,8 +165,9 @@ namespace webrtc
 
         ThrowIfFailed(m_commandList->Close());
 
+        const int commandListsCount = 1;
         ID3D12GraphicsCommandList* cmdList = { m_commandList };
-        uint64_t value = m_unityInterface->ExecuteCommandList(cmdList, static_cast<int>(states.size()), states.data());
+        uint64_t value = ExecuteCommandList(commandListsCount, cmdList, static_cast<int>(states.size()), states.data());
         dest->SetSyncCount(value);
 
         return true;
@@ -211,7 +223,7 @@ namespace webrtc
     bool D3D12GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
         const D3D12Texture2D* d3d12Texture = static_cast<const D3D12Texture2D*>(texture);
-        ID3D12Fence* fence = m_unityInterface->GetFrameFence();
+        ID3D12Fence* fence = GetFence();
         uint64_t value = d3d12Texture->GetSyncCount();
 
         if (fence->GetCompletedValue() < value)
@@ -254,8 +266,8 @@ namespace webrtc
             return nullptr;
 
         ID3D12Resource* readbackResource = tex->GetReadbackResource();
-        assert(nullptr != readbackResource);
-        if (nullptr == readbackResource) // the texture has to be prepared for CPU access
+        assert(readbackResource);
+        if (!readbackResource) // the texture has to be prepared for CPU access
             return nullptr;
 
         const int width = static_cast<int>(tex->GetWidth());
@@ -344,6 +356,33 @@ namespace webrtc
         GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
         return std::move(handle);
+    }
+
+    uint64_t D3D12GraphicsDevice::ExecuteCommandList(
+        int listCount, ID3D12GraphicsCommandList* commandList, int stateCount, UnityGraphicsD3D12ResourceState* states)
+    {
+        if (m_unityInterface)
+        {
+            return m_unityInterface->ExecuteCommandList(commandList, stateCount, states);
+        }
+        else
+        {
+            ID3D12CommandList* cmdList = commandList;
+            m_d3d12CommandQueue->ExecuteCommandLists(static_cast<UINT>(listCount), &cmdList);
+            return m_fence->GetCompletedValue() + 1;
+        }
+    }
+
+    ID3D12Fence* D3D12GraphicsDevice::GetFence()
+    {
+        if (m_unityInterface)
+        {
+            return m_unityInterface->GetFrameFence();
+        }
+        else
+        {
+            return m_fence.Get();
+        }
     }
 
 } // end namespace webrtc

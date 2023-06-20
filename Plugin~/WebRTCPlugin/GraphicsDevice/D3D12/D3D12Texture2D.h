@@ -37,7 +37,6 @@ namespace webrtc
     private:
         ComPtr<ID3D12Resource> m_nativeTexture;
         HANDLE m_sharedHandle;
-        ID3D11Texture2D* m_sharedTexture; // Shared between DX11 and DX12
         mutable uint64_t m_syncCount;
 
         // For CPU Read

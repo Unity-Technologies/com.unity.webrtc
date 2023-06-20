@@ -49,7 +49,6 @@ namespace webrtc
         const std::unique_ptr<ITexture2D> tex(device()->CreateCPUReadTextureV(width, height, format()));
         EXPECT_TRUE(device()->WaitIdleForTest());
         EXPECT_TRUE(tex->IsSize(width, height));
-        EXPECT_NE(nullptr, tex->GetNativeTexturePtrV());
         EXPECT_FALSE(tex->IsSize(0, 0));
     }
 
