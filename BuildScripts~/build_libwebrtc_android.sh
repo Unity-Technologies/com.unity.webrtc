@@ -14,6 +14,8 @@ export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
+  # Exclude example for reduction
+  patch -N "depot_tools/fetch_configs/webrtc.py" < "$COMMAND_DIR/patches/fetch_exclude_examples.patch"
   fetch --nohooks webrtc_android
   cd src
   sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
@@ -42,7 +44,6 @@ patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDK
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-outputDir=""
 
 for target_cpu in "arm64"
 do
@@ -50,10 +51,9 @@ do
 
   for is_debug in "true" "false"
   do
-    outputDir="${OUTPUT_DIR}_${target_cpu}_${is_debug}"
     # generate ninja files
     # use `treat_warnings_as_errors` option to avoid deprecation warnings
-    gn gen "$outputDir" --root="src" \
+    gn gen "$OUTPUT_DIR" --root="src" \
       --args="is_debug=${is_debug} \
       is_java_debug=${is_debug} \
       target_os=\"android\" \
@@ -69,7 +69,7 @@ do
       use_cxx17=true"
 
     # build static library
-    ninja -C "$outputDir" webrtc
+    ninja -C "$OUTPUT_DIR" webrtc
 
     filename="libwebrtc.a"
     if [ $is_debug = "true" ]; then
@@ -77,7 +77,7 @@ do
     fi
 
     # copy static library
-    cp "$outputDir/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
+    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
   done
 done
 
@@ -85,11 +85,10 @@ pushd src
 
 for is_debug in "true" "false"
 do
-  outputDir="${OUTPUT_DIR}_aar_${is_debug}"
   # use `treat_warnings_as_errors` option to avoid deprecation warnings
   "$PYTHON3_BIN" tools_webrtc/android/build_aar.py \
-    --build-dir $outputDir \
-    --output $outputDir/libwebrtc.aar \
+    --build-dir $OUTPUT_DIR \
+    --output $OUTPUT_DIR/libwebrtc.aar \
     --arch arm64-v8a \
     --extra-gn-args "is_debug=${is_debug} \
       is_java_debug=${is_debug} \
@@ -108,18 +107,18 @@ do
     filename="libwebrtc-debug.aar"
   fi
   # copy aar
-  cp "$outputDir/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
+  cp "$OUTPUT_DIR/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
 done
 
 popd
 
 "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target :webrtc "$outputDir" "$outputDir"
+  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-cp "$outputDir/LICENSE.md" "$ARTIFACTS_DIR"
+cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
 # create zip
 cd "$ARTIFACTS_DIR"

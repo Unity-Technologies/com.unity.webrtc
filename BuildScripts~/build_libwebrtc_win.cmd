@@ -9,11 +9,11 @@ set PATH=%cd%\depot_tools;%PATH%
 set WEBRTC_VERSION=5615
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set GYP_GENERATORS=ninja,msvs-ninja
-set GYP_MSVS_VERSION=2019
+set GYP_MSVS_VERSION=2022
 set OUTPUT_DIR=out
 set ARTIFACTS_DIR=%cd%\artifacts
 set PYPI_URL=https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-set vs2019_install=C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional
+set vs2022_install=C:\Program Files\Microsoft Visual Studio\2022\Professional
 
 if not exist src (
   call fetch.bat --nohooks webrtc
