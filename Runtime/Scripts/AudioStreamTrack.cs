@@ -173,7 +173,6 @@ namespace Unity.WebRTC
 
                 onReceived.Invoke(data, channels, sampleRate);
             }
-
             internal event AudioReadEventHandler onReceived;
         }
 
@@ -339,6 +338,25 @@ namespace Unity.WebRTC
             NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
             SetData(ref nativeArray, channels, sampleRate);
             nativeArray.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event AudioReadEventHandler onReceived
+        {
+            add
+            {
+                if (_streamRenderer == null)
+                    throw new InvalidOperationException("AudioStreamTrack is not receiver side.");
+                _streamRenderer.onReceived += value;
+            }
+            remove
+            {
+                if (_streamRenderer == null)
+                    throw new InvalidOperationException("AudioStreamTrack is not receiver side.");
+                _streamRenderer.onReceived -= value;
+            }
         }
     }
 
