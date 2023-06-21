@@ -76,6 +76,8 @@ namespace webrtc
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
+        bool ResetSync(const ITexture2D* texture) override;
 
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
@@ -87,15 +89,11 @@ namespace webrtc
 
     private:
         D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
-        void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
-        void Barrier(
-            ID3D12Resource* res,
-            const D3D12_RESOURCE_STATES stateBefore,
-            const D3D12_RESOURCE_STATES stateAfter,
-            const UINT subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
+        IUnityGraphicsD3D12v5* m_unityInterface;
         ComPtr<ID3D12Device> m_d3d12Device;
         ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
+        ComPtr<ID3D12Fence> m_fence;
 
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
@@ -104,10 +102,12 @@ namespace webrtc
         ID3D12CommandAllocatorPtr m_commandAllocator;
         ID3D12GraphicsCommandList4Ptr m_commandList;
 
-        // Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
-        ComPtr<ID3D12Fence> m_copyResourceFence;
-        HANDLE m_copyResourceEventHandle;
-        uint64_t m_copyResourceFenceValue = 1;
+        uint64_t ExecuteCommandList(
+            int listCount,
+            ID3D12GraphicsCommandList* commandList,
+            int stateCount,
+            UnityGraphicsD3D12ResourceState* states);
+        ID3D12Fence* GetFence();
     };
 
     //---------------------------------------------------------------------------------------------------------------------
