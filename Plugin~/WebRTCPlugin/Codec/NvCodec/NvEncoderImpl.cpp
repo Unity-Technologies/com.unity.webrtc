@@ -478,8 +478,8 @@ namespace webrtc
 
     int32_t NvEncoderImpl::ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame)
     {
-        m_encodedImage._encodedWidth = inputFrame.video_frame_buffer()->width();
-        m_encodedImage._encodedHeight = inputFrame.video_frame_buffer()->height();
+        m_encodedImage._encodedWidth = m_encoder->GetEncodeWidth();
+        m_encodedImage._encodedHeight = m_encoder->GetEncodeHeight();
         m_encodedImage.SetTimestamp(inputFrame.timestamp());
         m_encodedImage.SetSimulcastIndex(0);
         m_encodedImage.ntp_time_ms_ = inputFrame.ntp_time_ms();
