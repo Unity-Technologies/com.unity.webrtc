@@ -20,6 +20,8 @@ target_include_directories(
   NvCodec PRIVATE ${CUDA_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIR}
                   ${GLEW_INCLUDE_DIRS} ${NVCODEC_INCLUDE_DIR})
 
+set_target_properties(NvCodec PROPERTIES CUDA_ARCHITECTURES "75")
+
 if(Windows)
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(CUVID_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/x64/nvcuvid.lib)

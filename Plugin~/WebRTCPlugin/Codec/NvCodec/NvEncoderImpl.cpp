@@ -10,11 +10,11 @@
 #include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
-#include "NvCodecUtils.h"
 #include "NvEncoder/NvEncoder.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "ProfilerMarkerFactory.h"
+#include "ResizeSurf.h"
 #include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
@@ -280,14 +280,14 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    void NvEncoderImpl::Resize(const CUarray& src, CUarray& dst, const Size& size)
+    CUresult NvEncoderImpl::Resize(const CUarray& src, CUarray& dst, const Size& size)
     {
         CUDA_ARRAY_DESCRIPTOR srcDesc = {};
         CUresult result = cuArrayGetDescriptor(&srcDesc, src);
         if (result != CUDA_SUCCESS)
         {
             RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-            return;
+            return result;
         }
         CUDA_ARRAY_DESCRIPTOR dstDesc = {};
         dstDesc.Format = srcDesc.Format;
@@ -307,7 +307,7 @@ namespace webrtc
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-                return;
+                return result;
             }
             if (desc != dstDesc)
             {
@@ -315,7 +315,7 @@ namespace webrtc
                 if (result != CUDA_SUCCESS)
                 {
                     RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
-                    return;
+                    return result;
                 }
                 dst = nullptr;
                 create = true;
@@ -328,9 +328,10 @@ namespace webrtc
             if (result != CUDA_SUCCESS)
             {
                 RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
-                return;
+                return result;
             }
         }
+        return ResizeSurf(src, dst);
     }
 
     bool NvEncoderImpl::CopyResource(
@@ -374,7 +375,14 @@ namespace webrtc
             // The output buffer named m_scaledArray is reused while the resolution is matched.
             if (buffer->GetSize() != size)
             {
-                Resize(handle->mappedArray, m_scaledArray, size);
+                CUresult result = Resize(handle->mappedArray, m_scaledArray, size);
+                if (result != CUDA_SUCCESS)
+                {
+                    RTC_LOG(LS_INFO) << "Resize failed. original size=" << buffer->GetSize().width() << ","
+                                     << buffer->GetSize().height() << " output size=" << size.width() << ","
+                                     << size.height();
+                    return false;
+                }
                 pSrcArray = static_cast<void*>(m_scaledArray);
             }
 
