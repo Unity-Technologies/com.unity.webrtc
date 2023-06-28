@@ -188,7 +188,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             yield return new WaitUntil(() =>
 			{
-	            track.SetData(ref nativeArray, 1, 48000);
+	            track.SetData(nativeArray.AsReadOnly(), 1, 48000);
 				return receiver2.GetContributingSources().Length > 0;
 			});
             var sources2 = receiver2.GetContributingSources();
