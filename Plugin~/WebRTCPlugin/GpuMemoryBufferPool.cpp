@@ -22,6 +22,8 @@ namespace webrtc
         NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp)
     {
         auto buffer = GetOrCreateFrameResources(ptr, size, format);
+        if (!buffer)
+            return nullptr;
         VideoFrame::ReturnBufferToPoolCallback callback =
             std::bind(&GpuMemoryBufferPool::OnReturnBuffer, this, std::placeholders::_1);
 
@@ -32,6 +34,8 @@ namespace webrtc
     rtc::scoped_refptr<GpuMemoryBufferInterface> GpuMemoryBufferPool::GetOrCreateFrameResources(
         NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
+
         for (auto it = resourcesPool_.begin(); it != resourcesPool_.end(); ++it)
         {
             FrameResources* resources = it->get();
@@ -73,15 +77,12 @@ namespace webrtc
 
     void GpuMemoryBufferPool::OnReturnBuffer(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
+
         GpuMemoryBufferInterface* ptr = buffer.get();
         if (!ptr)
         {
             RTC_LOG(LS_INFO) << "buffer is nullptr.";
-            auto it = std::find_if(
-                resourcesPool_.begin(),
-                resourcesPool_.end(),
-                [](std::unique_ptr<FrameResources>& x) { return x->buffer_.get() == nullptr; });
-            resourcesPool_.erase(it);
             return;
         }
 
@@ -96,6 +97,8 @@ namespace webrtc
 
     void GpuMemoryBufferPool::ReleaseStaleBuffers(Timestamp now, TimeDelta timeLimit)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
+
         auto it = resourcesPool_.begin();
         for (; it != resourcesPool_.end();)
         {
