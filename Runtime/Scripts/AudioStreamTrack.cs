@@ -6,6 +6,13 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
+    /// This event is called on audio thread.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="channels"></param>
+    public delegate void AudioReadEventHandler(float[] data, int channels, int sampleRate);
+
+    /// <summary>
     /// 
     /// </summary>
     public static class AudioSourceExtension
@@ -92,7 +99,6 @@ namespace Unity.WebRTC
                 }
             }
 
-
             private static T GetOrAddComponent<T>(GameObject go) where T : Component
             {
                 T comp = go.GetComponent<T>();
@@ -139,7 +145,7 @@ namespace Unity.WebRTC
 
                 if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
                 {
-                    if(_track != null && WebRTC.Table.ContainsKey(_track.self))
+                    if (_track != null && WebRTC.Table.ContainsKey(_track.self))
                         _track.RemoveSink(this);
                     WebRTC.Table.Remove(self);
                     WebRTC.Context.DeleteAudioTrackSink(self);
@@ -164,7 +170,10 @@ namespace Unity.WebRTC
             internal void SetData(float[] data, int channels, int sampleRate)
             {
                 NativeMethods.AudioTrackSinkProcessAudio(self, data, data.Length, channels, sampleRate);
+
+                onReceived.Invoke(data, channels, sampleRate);
             }
+            internal event AudioReadEventHandler onReceived;
         }
 
         readonly AudioCustomFilter _audioCapturer;
@@ -329,6 +338,25 @@ namespace Unity.WebRTC
             NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
             SetData(ref nativeArray, channels, sampleRate);
             nativeArray.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event AudioReadEventHandler onReceived
+        {
+            add
+            {
+                if (_streamRenderer == null)
+                    throw new InvalidOperationException("AudioStreamTrack is not receiver side.");
+                _streamRenderer.onReceived += value;
+            }
+            remove
+            {
+                if (_streamRenderer == null)
+                    throw new InvalidOperationException("AudioStreamTrack is not receiver side.");
+                _streamRenderer.onReceived -= value;
+            }
         }
     }
 

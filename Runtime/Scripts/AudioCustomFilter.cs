@@ -3,13 +3,6 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// This event is called on audio thread.
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="channels"></param>
-    delegate void AudioReadEventHandler(float[] data, int channels, int sampleRate);
-
-    /// <summary>
     ///
     /// </summary>
     internal class AudioCustomFilter : MonoBehaviour
