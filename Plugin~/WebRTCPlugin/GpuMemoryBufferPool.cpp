@@ -74,6 +74,12 @@ namespace webrtc
     void GpuMemoryBufferPool::OnReturnBuffer(rtc::scoped_refptr<GpuMemoryBufferInterface> buffer)
     {
         GpuMemoryBufferInterface* ptr = buffer.get();
+        if (!ptr)
+        {
+            RTC_LOG(LS_INFO) << "buffer is nullptr";
+            return;
+        }
+
         auto result =
             std::find_if(resourcesPool_.begin(), resourcesPool_.end(), [ptr](std::unique_ptr<FrameResources>& x) {
                 return x->buffer_.get() == ptr;
