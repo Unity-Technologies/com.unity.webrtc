@@ -42,6 +42,11 @@ patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutl
 patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
 patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
 
+# Fix AdaptedVideoTrackSource::video_adapter()
+pushd src
+patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
+popd
+
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 
