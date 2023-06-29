@@ -58,6 +58,7 @@ namespace webrtc
             const FrameResources* resources, const Size& size, UnityRenderingExtTextureFormat format);
 
         IGraphicsDevice* device_;
+        std::mutex mutex_;
         std::list<std::unique_ptr<FrameResources>> resourcesPool_;
         Clock* const clock_;
     };

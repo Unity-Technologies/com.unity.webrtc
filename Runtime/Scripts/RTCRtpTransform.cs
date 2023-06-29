@@ -50,7 +50,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public readonly int spatialIndex;
+        public readonly int simulcastIndex;
 
         /// <summary>
         ///
@@ -68,7 +68,7 @@ namespace Unity.WebRTC
             frameId = data.frameId;
             width = data.width;
             height = data.height;
-            spatialIndex = data.spatialIndex;
+            simulcastIndex = data.simulcastIndex;
             temporalIndex = data.temporalIndex;
             dependencies = data.dependencies.ToArray();
         }
@@ -80,7 +80,7 @@ namespace Unity.WebRTC
         public OptionalLong frameId;
         public ushort width;
         public ushort height;
-        public int spatialIndex;
+        public int simulcastIndex;
         public int temporalIndex;
         public MarshallingArray<long> dependencies;
 

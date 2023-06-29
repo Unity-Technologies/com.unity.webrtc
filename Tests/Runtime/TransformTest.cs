@@ -51,7 +51,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(metadata.frameId.HasValue, Is.True);
             Assert.That(metadata.width, Is.GreaterThan(0));
             Assert.That(metadata.height, Is.GreaterThan(0));
-            Assert.That(metadata.spatialIndex, Is.Zero);
+            Assert.That(metadata.simulcastIndex, Is.Zero);
             Assert.That(metadata.temporalIndex, Is.Zero);
 
             // Sometimes this parameter is not empty.

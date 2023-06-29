@@ -262,7 +262,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
 
     BatchData* batchData = static_cast<BatchData*>(data);
 
-    if (batchData == nullptr || batchData->tracks == nullptr)
+    if (!batchData || !batchData->tracks)
     {
         // Release all buffers.
         if (s_bufferPool)
@@ -278,7 +278,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
     {
         VideoStreamTrackData* trackData = batchData->tracks[i];
 
-        if (trackData == nullptr || trackData->texture == nullptr || trackData->source == nullptr)
+        if (!trackData || !trackData->texture || !trackData->source)
             continue;
 
         if (trackData->action == VideoStreamTrackAction::Encode)
@@ -297,6 +297,11 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
 
             timestamp = s_clock->CurrentTime();
             void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
+            if (!ptr)
+            {
+                RTC_LOG(LS_ERROR) << "GraphicsUtility::TextureHandleToNativeGraphicsPtr returns nullptr.";
+                return;
+            }
             unity::webrtc::Size size(trackData->width, trackData->height);
 
             if (s_bufferPool->bufferCount() < kLimitBufferCount)

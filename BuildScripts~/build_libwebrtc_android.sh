@@ -7,13 +7,15 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5304
+export WEBRTC_VERSION=5615
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
+  # Exclude example for reduction
+  patch -N "depot_tools/fetch_configs/webrtc.py" < "$COMMAND_DIR/patches/fetch_exclude_examples.patch"
   fetch --nohooks webrtc_android
   cd src
   sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
@@ -32,14 +34,21 @@ patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches
 # Add deps libunwind
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
 
-# downgrade JDK11 to JDK8 because Unity supports OpenJDK version 1.8.
+# Add -mno-outline-atomics flag
+patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutlineatomics_flag.patch"
+
+# downgrade to JDK8 because Unity supports OpenJDK version 1.8.
 # https://docs.unity3d.com/Manual/android-sdksetup.html
-pushd "src/build"
-git apply "$COMMAND_DIR/patches/downgrade_JDK.patch"
+patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
+patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
+
+# Fix AdaptedVideoTrackSource::video_adapter()
+pushd src
+patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
 popd
 
-
 mkdir -p "$ARTIFACTS_DIR/lib"
+
 
 for target_cpu in "arm64"
 do
@@ -60,7 +69,9 @@ do
       is_component_build=false \
       use_rtti=true \
       use_custom_libcxx=false \
-      treat_warnings_as_errors=false"
+      treat_warnings_as_errors=false \
+      use_errorprone_java_compiler=false \
+      use_cxx17=true"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
@@ -92,7 +103,9 @@ do
       is_component_build=false \
       use_rtti=true \
       use_custom_libcxx=false \
-      treat_warnings_as_errors=false"
+      treat_warnings_as_errors=false \
+      use_errorprone_java_compiler=false \
+      use_cxx17=true"
 
   filename="libwebrtc.aar"
   if [ $is_debug = "true" ]; then

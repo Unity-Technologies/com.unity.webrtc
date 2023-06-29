@@ -1,0 +1,11 @@
+--- turbine.py	2023-06-09 08:51:09.865773799 +0900
++++ turbine8.py	2023-06-09 08:49:47.075773759 +0900
+@@ -82,7 +82,7 @@ def main(argv):
+   javac_cmd = [
+       # We currently target JDK 11 everywhere.
+       '--release',
+-      '11',
++      '8',
+   ]
+ 
+   # Turbine reads lists from command line args by consuming args until one

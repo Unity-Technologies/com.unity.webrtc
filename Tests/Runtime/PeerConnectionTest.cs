@@ -124,7 +124,8 @@ namespace Unity.WebRTC.RuntimeTest
 
             RTCRtpSendParameters parameters = sender.GetParameters();
             Assert.That(parameters, Is.Not.Null);
-            Assert.That(parameters.encodings, Is.Empty);
+            Assert.That(parameters.encodings[0].active, Is.True);
+            Assert.That(parameters.transactionId, Is.Not.Empty);
 
             track.Dispose();
             peer.Dispose();
@@ -161,7 +162,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             RTCRtpSendParameters parameters = sender.GetParameters();
             Assert.That(parameters, Is.Not.Null);
-            Assert.That(parameters.encodings, Is.Empty);
+            Assert.That(parameters.encodings[0].active, Is.True);
             Assert.That(parameters.transactionId, Is.Not.Empty);
             Assert.That(peer.GetTransceivers(), Has.Count.EqualTo(1));
             Assert.That(peer.GetTransceivers().First(), Is.Not.Null);

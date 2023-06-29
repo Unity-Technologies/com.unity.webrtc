@@ -246,8 +246,17 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     bool VulkanGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
-        if (nullptr == dest || nullptr == nativeTexturePtr)
+        if (!nativeTexturePtr)
+        {
+            RTC_LOG(LS_ERROR) << "nativeTexturePtr is nullptr.";
             return false;
+        }
+
+        if (!dest)
+        {
+            RTC_LOG(LS_ERROR) << "dest is nullptr.";
+            return false;
+        }
 
         VulkanTexture2D* destTexture = reinterpret_cast<VulkanTexture2D*>(dest);
         UnityVulkanImage* unityVulkanImage = static_cast<UnityVulkanImage*>(nativeTexturePtr);

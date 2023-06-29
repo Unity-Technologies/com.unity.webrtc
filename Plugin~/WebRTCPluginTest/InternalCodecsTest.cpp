@@ -109,7 +109,8 @@ namespace webrtc
             ASSERT_TRUE(WaitForEncodedFrame(encodedFrame, codec_specific_info));
             VerifyQpParser(*encodedFrame);
             EXPECT_EQ(kVideoCodecVP8, codec_specific_info->codecType);
-            EXPECT_EQ(0, encodedFrame->SpatialIndex());
+            EXPECT_TRUE(encodedFrame->SimulcastIndex().has_value());
+            EXPECT_EQ(0, encodedFrame->SimulcastIndex());
         }
 
         std::string codecName = "VP8";
