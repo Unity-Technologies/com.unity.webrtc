@@ -26,15 +26,16 @@ Unity supports OpenJDK version 1.8 for building Android app. You can see [the ta
 
 ### Patch files
 
-- downgrade_JDK.patch
+- downgradeJDKto8_compile_java.patch
+- downgradeJDKto8_turbine.patch
 
 ### Example
 
 ```
 # `src` is a root directory of libwebrtc. 
 
-pushd "src/build"
-git apply "BuildScripts~\patches\downgrade_JDK.patch"
+patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
+patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
 ```
 
 
@@ -101,22 +102,6 @@ T data_;
 patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "BuildScripts~\patches\fix_abseil.patch"
 ```
 
-## Workaround for crash when encoding Full HD resolution or higher using VideoToolbox on macOS(Intel)
-
-Crash occurs when encoding FullHD or higher resolutions using VideoToolbox. This workaround referred from [here](https://groups.google.com/g/discuss-webrtc/c/AVeyMXnM0gY).
-
-### Patch file
-
-- avoid_crashusingvideoencoderh264.patch
-
-### Example
-
-```
-# `src` is a root directory of libwebrtc.
-
-patch -N "src/sdk/objc/components/video_codec/RTCVideoEncoderH264.mm" < "BuildScripts~/patches/avoid_crashusingvideoencoderh264.patch"
-```
-
 ## Workaround for can't be profiled correctly encode/decode process on macOS/iOS
 
 Task queuing in libwebrtc is implemented differently on each platform. macOS/iOS is implemented using [GCD (Global Central Dispatch)](https://developer.apple.com/documentation/DISPATCH). GCD makes no guarantees about which thread it uses to execute a task. Referenced [here](https://developer.apple.com/documentation/dispatch/dispatchqueue). Since UnityProfiler is implemented assuming execution in the same thread, it was changed to use TaskQueue implementation by STDLIB which is executed in the same thread.
@@ -131,4 +116,54 @@ Task queuing in libwebrtc is implemented differently on each platform. macOS/iOS
 # `src` is a root directory of libwebrtc.
 
 patch -N "src/api/task_queue/BUILD.gn" < "BuildScripts~/patches/disable_task_queue_gcd.patch"
+```
+
+## Workaround for dlopen error on Android.
+
+The `nooutlineatomics` flag no longer applies due to the update to M112. However, DLOpenError occurs when loading a plugin built without the flag in the Unity Runtime. [Commit](https://chromium.googlesource.com/chromium/src/build/+/49b04e63ae168f3299bcf6fd2cc50d9906a1a165%5E%21/) where this flag was removed.
+
+### Patch file
+
+- add_nooutlineatomics_flag.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc.
+
+patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutlineatomics_flag.patch"
+```
+
+## Workaround for timeout when downloading libwebrtc source.
+
+It takes a long time to download data that is not necessary for building the library, and a timeout occurs. Avoid downloading anything that takes a particularly long time.
+
+### Patch file
+
+- fetch_exclude_examples.patch
+
+### Example
+
+```
+# `depot_tools` is a root directory of depot_tools.
+
+patch -N "depot_tools/fetch_configs/webrtc.py" < "$COMMAND_DIR/patches/fetch_exclude_examples.patch"
+```
+
+## Workaround for received video not displayed on Android.
+
+No video is being passed to the encoder because `VideoAdapter::GetMaxFramerate` always returns `0`. The return value of `AdaptedVideoTrackSource::video_adapter()` was returning a different reference.
+
+### Patch file
+
+- fix_adaptedvideotracksource.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc.
+
+pushd src
+patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
+popd
 ```

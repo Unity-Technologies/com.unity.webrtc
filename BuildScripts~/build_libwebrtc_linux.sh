@@ -7,7 +7,7 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5304
+export WEBRTC_VERSION=5615
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
@@ -44,7 +44,8 @@ do
       enable_iterator_debugging=false \
       is_component_build=false \
       use_rtti=true \
-      rtc_use_x11=false"
+      rtc_use_x11=false \
+      use_cxx17=true"
 
     if [ $is_debug = "true" ]; then
       args="${args} is_asan=true is_lsan=true";

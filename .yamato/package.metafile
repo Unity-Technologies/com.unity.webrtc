@@ -2,7 +2,7 @@ upm:
   registry_url: https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
   package_version: stable
 webrtc_version:
-  name: M107
+  name: M112
 
 editors:
   - version: 2020.3

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <comdef.h>
-#include <d3d11_4.h>
 #include <d3d12.h>
 #include <stdexcept>
 #include <wrl/client.h>
@@ -12,11 +11,12 @@
 #include "GraphicsDevice/Cuda/CudaContext.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 
+using namespace Microsoft::WRL;
+
 namespace unity
 {
 namespace webrtc
 {
-    using namespace Microsoft::WRL;
     namespace webrtc = ::webrtc;
 
 #define DefPtr(_a) _COM_SMARTPTR_TYPEDEF(_a, __uuidof(_a))
@@ -76,6 +76,8 @@ namespace webrtc
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
+        bool ResetSync(const ITexture2D* texture) override;
 
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
@@ -87,20 +89,11 @@ namespace webrtc
 
     private:
         D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
-        void WaitForFence(ID3D12Fence* fence, HANDLE handle, uint64_t* fenceValue);
-        void Barrier(
-            ID3D12Resource* res,
-            const D3D12_RESOURCE_STATES stateBefore,
-            const D3D12_RESOURCE_STATES stateAfter,
-            const UINT subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
+        IUnityGraphicsD3D12v5* m_unityInterface;
         ComPtr<ID3D12Device> m_d3d12Device;
         ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
-
-        //[Note-sin: 2019-10-30] sharing res from d3d12 to d3d11 require d3d11.1. Fence is supported in d3d11.4 or
-        // newer.
-        ComPtr<ID3D11Device5> m_d3d11Device;
-        ComPtr<ID3D11DeviceContext4> m_d3d11Context;
+        ComPtr<ID3D12Fence> m_fence;
 
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
@@ -109,19 +102,18 @@ namespace webrtc
         ID3D12CommandAllocatorPtr m_commandAllocator;
         ID3D12GraphicsCommandList4Ptr m_commandList;
 
-        // Fence to copy resource on GPU (and CPU if the texture was created with CPU-access)
-        ComPtr<ID3D12Fence> m_copyResourceFence;
-        HANDLE m_copyResourceEventHandle;
-        uint64_t m_copyResourceFenceValue = 1;
-
-        CUcontext m_context;
-        CUdevice m_device;
+        uint64_t ExecuteCommandList(
+            int listCount,
+            ID3D12GraphicsCommandList* commandList,
+            int stateCount,
+            UnityGraphicsD3D12ResourceState* states);
+        ID3D12Fence* GetFence();
     };
 
     //---------------------------------------------------------------------------------------------------------------------
 
     // use D3D11. See notes below
-    void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d11Device.Get()); }
+    void* D3D12GraphicsDevice::GetEncodeDevicePtrV() { return reinterpret_cast<void*>(m_d3d12Device.Get()); }
 
 } // end namespace webrtc
 } // end namespace unity

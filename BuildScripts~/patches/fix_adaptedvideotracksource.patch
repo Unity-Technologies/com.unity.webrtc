@@ -1,0 +1,28 @@
+diff --git a/media/base/adapted_video_track_source.cc b/media/base/adapted_video_track_source.cc
+index 816ada5f16..528e43292c 100644
+--- a/media/base/adapted_video_track_source.cc
++++ b/media/base/adapted_video_track_source.cc
+@@ -82,6 +82,10 @@ bool AdaptedVideoTrackSource::apply_rotation() {
+   return broadcaster_.wants().rotation_applied;
+ }
+ 
++cricket::VideoAdapter* AdaptedVideoTrackSource::video_adapter() {
++  return &video_adapter_;
++}
++
+ void AdaptedVideoTrackSource::OnSinkWantsChanged(
+     const rtc::VideoSinkWants& wants) {
+   video_adapter_.OnSinkWants(wants);
+diff --git a/media/base/adapted_video_track_source.h b/media/base/adapted_video_track_source.h
+index 1c3e0b68d3..e8a680d5ad 100644
+--- a/media/base/adapted_video_track_source.h
++++ b/media/base/adapted_video_track_source.h
+@@ -68,7 +68,7 @@ class RTC_EXPORT AdaptedVideoTrackSource
+   // become stale before it is used.
+   bool apply_rotation();
+ 
+-  cricket::VideoAdapter* video_adapter() { return &video_adapter_; }
++  cricket::VideoAdapter* video_adapter();
+ 
+  private:
+   // Implements rtc::VideoSourceInterface.

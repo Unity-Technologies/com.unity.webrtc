@@ -1,10 +1,18 @@
 using System;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// This event is called on audio thread.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="channels"></param>
+    public delegate void AudioReadEventHandler(float[] data, int channels, int sampleRate);
+
     /// <summary>
     /// 
     /// </summary>
@@ -92,7 +100,6 @@ namespace Unity.WebRTC
                 }
             }
 
-
             private static T GetOrAddComponent<T>(GameObject go) where T : Component
             {
                 T comp = go.GetComponent<T>();
@@ -139,7 +146,7 @@ namespace Unity.WebRTC
 
                 if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
                 {
-                    if(_track != null && WebRTC.Table.ContainsKey(_track.self))
+                    if (_track != null && WebRTC.Table.ContainsKey(_track.self))
                         _track.RemoveSink(this);
                     WebRTC.Table.Remove(self);
                     WebRTC.Context.DeleteAudioTrackSink(self);
@@ -164,7 +171,10 @@ namespace Unity.WebRTC
             internal void SetData(float[] data, int channels, int sampleRate)
             {
                 NativeMethods.AudioTrackSinkProcessAudio(self, data, data.Length, channels, sampleRate);
+
+                onReceived.Invoke(data, channels, sampleRate);
             }
+            internal event AudioReadEventHandler onReceived;
         }
 
         readonly AudioCustomFilter _audioCapturer;
@@ -259,30 +269,13 @@ namespace Unity.WebRTC
             base.Dispose();
         }
 
-#if UNITY_2020_1_OR_NEWER
         /// <summary>
         ///
         /// </summary>
         /// <param name="nativeArray"></param>
         /// <param name="channels"></param>
         /// <param name="sampleRate"></param>
-        public void SetData(ref NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
-        {
-            unsafe
-            {
-                void* ptr = nativeArray.GetUnsafeReadOnlyPtr();
-                ProcessAudio(_trackSource, (IntPtr)ptr, sampleRate, channels, nativeArray.Length);
-            }
-        }
-#endif
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="nativeArray"></param>
-        /// <param name="channels"></param>
-        /// <param name="sampleRate"></param>
-        public void SetData(ref NativeArray<float> nativeArray, int channels, int sampleRate)
+        public void SetData(NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
         {
             unsafe
             {
@@ -297,7 +290,7 @@ namespace Unity.WebRTC
         /// <param name="nativeSlice"></param>
         /// <param name="channels"></param>
         /// <param name="sampleRate"></param>
-        public void SetData(ref NativeSlice<float> nativeSlice, int channels, int sampleRate)
+        public void SetData(NativeSlice<float> nativeSlice, int channels, int sampleRate)
         {
             unsafe
             {
@@ -326,9 +319,50 @@ namespace Unity.WebRTC
         {
             if (array == null)
                 throw new ArgumentNullException("array is null");
-            NativeArray<float> nativeArray = new NativeArray<float>(array, Allocator.Temp);
-            SetData(ref nativeArray, channels, sampleRate);
-            nativeArray.Dispose();
+
+            unsafe
+            {
+                fixed (float* ptr = array)
+                {
+                    ProcessAudio(_trackSource, (IntPtr)ptr, sampleRate, channels, array.Length);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="span"></param>
+        /// <param name="channels"></param>
+        /// <param name="sampleRate"></param>
+        public void SetData(ReadOnlySpan<float> span, int channels, int sampleRate)
+        {
+            unsafe
+            {
+                fixed (float* ptr = span)
+                {
+                    ProcessAudio(_trackSource, (IntPtr)ptr, sampleRate, channels, span.Length);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event AudioReadEventHandler onReceived
+        {
+            add
+            {
+                if (_streamRenderer == null)
+                    throw new InvalidOperationException("AudioStreamTrack is not receiver side.");
+                _streamRenderer.onReceived += value;
+            }
+            remove
+            {
+                if (_streamRenderer == null)
+                    throw new InvalidOperationException("AudioStreamTrack is not receiver side.");
+                _streamRenderer.onReceived -= value;
+            }
         }
     }
 

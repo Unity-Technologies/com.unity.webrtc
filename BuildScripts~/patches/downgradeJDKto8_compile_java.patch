@@ -1,0 +1,11 @@
+--- compile_java.py	2023-06-09 08:51:05.355773796 +0900
++++ compile_java8.py	2023-06-09 08:49:36.705773754 +0900
+@@ -719,7 +719,7 @@ def main(argv):
+       '-g',
+       # We currently target JDK 11 everywhere.
+       '--release',
+-      '11',
++      '8',
+       # Chromium only allows UTF8 source files.  Being explicit avoids
+       # javac pulling a default encoding from the user's environment.
+       '-encoding',

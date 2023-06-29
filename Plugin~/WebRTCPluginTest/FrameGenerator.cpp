@@ -38,6 +38,11 @@ namespace webrtc
         RTC_CHECK(height_ > 0);
     }
 
+    FrameGeneratorInterface::Resolution VideoFrameGenerator::GetResolution() const
+    {
+        return { .width = static_cast<size_t>(width_), .height = static_cast<size_t>(height_) };
+    }
+
     FrameGeneratorInterface::VideoFrameData VideoFrameGenerator::NextFrame()
     {
         MutexLock lock(&mutex_);
@@ -45,7 +50,7 @@ namespace webrtc
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
 
         ITexture2D* texture =
-            device_->CreateCPUReadTextureV(static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), kFormat);
+            device_->CreateDefaultTextureV(static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), kFormat);
 
         queue_.push(std::unique_ptr<ITexture2D>(texture));
         rtc::scoped_refptr<VideoFrame> frame = CreateTestFrame(device_, texture, kFormat);

@@ -7,7 +7,7 @@ fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5304
+export WEBRTC_VERSION=5615
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
@@ -58,7 +58,8 @@ do
       treat_warnings_as_errors=false \
       ios_enable_code_signing=false \
       rtc_include_tests=false \
-      rtc_build_examples=false"
+      rtc_build_examples=false \
+      use_cxx17=true"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc

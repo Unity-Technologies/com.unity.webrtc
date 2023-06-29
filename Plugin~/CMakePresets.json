@@ -11,7 +11,7 @@
       "displayName": "Default Windows Config",
       "hidden": true,
       "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "generator": "Visual Studio 16 2019",
+      "generator": "Visual Studio 17 2022",
       "architecture": {
         "value": "x64",
         "strategy": "set"
