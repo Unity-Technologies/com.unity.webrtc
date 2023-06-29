@@ -86,10 +86,10 @@ namespace webrtc
             return;
         }
 
-        auto result = std::find_if(
-            resourcesPool_.begin(),
-            resourcesPool_.end(),
-            [ptr](std::unique_ptr<FrameResources>& x) { return x->buffer_.get() == ptr; });
+        auto result =
+            std::find_if(resourcesPool_.begin(), resourcesPool_.end(), [ptr](std::unique_ptr<FrameResources>& x) {
+                return x->buffer_.get() == ptr;
+            });
         RTC_DCHECK(result != resourcesPool_.end());
 
         (*result)->MarkUnused(clock_->CurrentTime());
