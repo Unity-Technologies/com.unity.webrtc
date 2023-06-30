@@ -50,7 +50,7 @@ popd
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 
-for target_cpu in "arm64"
+for target_cpu in "arm64" "x64"
 do
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
 
@@ -94,7 +94,7 @@ do
   "$PYTHON3_BIN" tools_webrtc/android/build_aar.py \
     --build-dir $OUTPUT_DIR \
     --output $OUTPUT_DIR/libwebrtc.aar \
-    --arch arm64-v8a \
+    --arch arm64-v8a x86_64 \
     --extra-gn-args "is_debug=${is_debug} \
       is_java_debug=${is_debug} \
       rtc_use_h264=false \
