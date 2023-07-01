@@ -83,10 +83,11 @@ if(iOS OR macOS)
 endif()
 
 if(Windows OR Linux)
-  find_package(CUDA REQUIRED)
   find_package(Vulkan REQUIRED)
-  add_subdirectory(NvCodec)
+
+  find_package(CUDA REQUIRED)
   enable_language(CUDA)
+  add_subdirectory(NvCodec)
 endif()
 
 add_subdirectory(WebRTCPlugin)
