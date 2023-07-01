@@ -11,6 +11,7 @@ namespace webrtc
         : ITexture2D(w, h)
         , m_texture(tex)
     {
+        
     }
 
     MetalTexture2D::~MetalTexture2D() { [m_texture release]; }

@@ -19,8 +19,11 @@ namespace webrtc
         inline void* GetEncodeTexturePtrV() override;
         inline const void* GetEncodeTexturePtrV() const override;
 
+        void SetSemaphore(dispatch_semaphore_t semaphore) { m_semaphore = semaphore; }
+        dispatch_semaphore_t GetSemaphore() const { return m_semaphore; }
     private:
         id<MTLTexture> m_texture;
+        dispatch_semaphore_t m_semaphore;
     };
 
     void* MetalTexture2D::GetNativeTexturePtrV() { return m_texture; }
