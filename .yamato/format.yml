@@ -2,7 +2,7 @@ check_code_format_nativeplugin:
   name: Checking codes formatting using clang-format
   agent:
     type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.9-1258156
+    image: renderstreaming/ubuntu:v0.4.1-1294624
     flavor: b1.large
   commands:
     - BuildScripts~/format-plugin.sh
