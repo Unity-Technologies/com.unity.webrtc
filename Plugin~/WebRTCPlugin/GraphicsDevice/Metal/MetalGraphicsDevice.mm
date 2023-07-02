@@ -66,7 +66,11 @@ namespace webrtc
     bool MetalGraphicsDevice::CopyTexture(MetalTexture2D* dest, id<MTLTexture> src)
     {
         id<MTLTexture> mtlTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
-
+//        __block dispatch_semaphore_t semaphore = dest->GetSemaphore();
+//
+//        RTC_LOG(LS_INFO) << "CopyTexture dispatch_semaphore_wait" << dest;
+//        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        
         RTC_DCHECK_NE(src, mtlTexture);
         RTC_DCHECK_EQ(src.pixelFormat, mtlTexture.pixelFormat);
         RTC_DCHECK_EQ(src.width, mtlTexture.width);
@@ -100,30 +104,40 @@ namespace webrtc
 #endif
         [blit endEncoding];
 
-        __block dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
-        dest->SetSemaphore(semaphore);
-        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
-        {
-            dispatch_semaphore_signal(semaphore);
-        }];
+//        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+//        {
+//            RTC_LOG(LS_INFO) << "CopyTexture dispatch_semaphore_signal";
+//            dispatch_semaphore_signal(semaphore);
+//        }];
 
         // Commit the current command buffer and wait until the GPU process is completed.
         [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
 
         return true;
     }
 
     bool MetalGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
-        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
-        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
-        
-        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
-        return value == 0;
+        RTC_LOG(LS_INFO) << "WaitSync";
+
+//        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
+//        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
+//
+//        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
+//        if(value != 0)
+//        {
+//            RTC_LOG(LS_INFO) << "timeout";
+//            return false;
+//        }
+        return true;
     }
 
     bool MetalGraphicsDevice::ResetSync(const ITexture2D* texture)
     {
+        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
+        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
+        dispatch_semaphore_signal(semaphore);
         return true;
     }
 
@@ -156,6 +170,8 @@ namespace webrtc
 
     rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
     {
+        RTC_LOG(LS_INFO) << "ConvertRGBToI420";
+        
         id<MTLTexture> source = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
         const uint32_t width = tex->GetWidth();
         const uint32_t height = tex->GetHeight();
