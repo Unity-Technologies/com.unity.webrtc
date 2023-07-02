@@ -66,10 +66,10 @@ namespace webrtc
     bool MetalGraphicsDevice::CopyTexture(MetalTexture2D* dest, id<MTLTexture> src)
     {
         id<MTLTexture> mtlTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
-//        __block dispatch_semaphore_t semaphore = dest->GetSemaphore();
-//
-//        RTC_LOG(LS_INFO) << "CopyTexture dispatch_semaphore_wait" << dest;
-//        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        __block dispatch_semaphore_t semaphore = dest->GetSemaphore();
+        __block MetalTexture2D* destTexture = dest;
+        DebugLog("CopyTexture dispatch_semaphore_wait:%x", destTexture);
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
         
         RTC_DCHECK_NE(src, mtlTexture);
         RTC_DCHECK_EQ(src.pixelFormat, mtlTexture.pixelFormat);
@@ -103,33 +103,31 @@ namespace webrtc
             [blit synchronizeResource:mtlTexture];
 #endif
         [blit endEncoding];
-
-//        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
-//        {
-//            RTC_LOG(LS_INFO) << "CopyTexture dispatch_semaphore_signal";
-//            dispatch_semaphore_signal(semaphore);
-//        }];
+        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+        {
+            DebugLog("CopyTexture dispatch_semaphore_signal:%x", destTexture);
+            dispatch_semaphore_signal(semaphore);
+        }];
 
         // Commit the current command buffer and wait until the GPU process is completed.
         [commandBuffer commit];
-        [commandBuffer waitUntilCompleted];
-
         return true;
     }
 
     bool MetalGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
-        RTC_LOG(LS_INFO) << "WaitSync";
+        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
+        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
 
-//        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
-//        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
-//
-//        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
-//        if(value != 0)
-//        {
-//            RTC_LOG(LS_INFO) << "timeout";
-//            return false;
-//        }
+        DebugLog("dispatch_semaphore_wait:%x", texture);
+        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
+        DebugLog("dispatch_semaphore_wait end:%x", texture);
+        if(value != 0)
+        {
+            DebugLog("dispatch_semaphore_wait end. The timeout occurred.:%x", texture);
+            RTC_LOG(LS_INFO) << "The timeout occurred.";
+            return false;
+        }
         return true;
     }
 
@@ -170,8 +168,6 @@ namespace webrtc
 
     rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
     {
-        RTC_LOG(LS_INFO) << "ConvertRGBToI420";
-        
         id<MTLTexture> source = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
         const uint32_t width = tex->GetWidth();
         const uint32_t height = tex->GetHeight();
