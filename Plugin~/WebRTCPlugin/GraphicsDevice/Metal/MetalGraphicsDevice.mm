@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include <third_party/libyuv/include/libyuv/convert.h>
-
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "MetalDevice.h"
 #include "MetalGraphicsDevice.h"
@@ -67,8 +65,6 @@ namespace webrtc
     {
         id<MTLTexture> mtlTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
         __block dispatch_semaphore_t semaphore = dest->GetSemaphore();
-        __block MetalTexture2D* destTexture = dest;
-        DebugLog("CopyTexture dispatch_semaphore_wait:%x", destTexture);
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
         
         RTC_DCHECK_NE(src, mtlTexture);
@@ -77,7 +73,6 @@ namespace webrtc
         RTC_DCHECK_EQ(src.height, mtlTexture.height);
 
         m_device->EndCurrentCommandEncoder();
-
         id<MTLCommandBuffer> commandBuffer = [m_queue commandBuffer];
         id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         NSUInteger width = src.width;
@@ -105,7 +100,6 @@ namespace webrtc
         [blit endEncoding];
         [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
         {
-            DebugLog("CopyTexture dispatch_semaphore_signal:%x", destTexture);
             dispatch_semaphore_signal(semaphore);
         }];
 
@@ -119,12 +113,9 @@ namespace webrtc
         const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
         dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
 
-        DebugLog("dispatch_semaphore_wait:%x", texture);
         intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
-        DebugLog("dispatch_semaphore_wait end:%x", texture);
         if(value != 0)
         {
-            DebugLog("dispatch_semaphore_wait end. The timeout occurred.:%x", texture);
             RTC_LOG(LS_INFO) << "The timeout occurred.";
             return false;
         }
@@ -133,9 +124,6 @@ namespace webrtc
 
     bool MetalGraphicsDevice::ResetSync(const ITexture2D* texture)
     {
-        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
-        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
-        dispatch_semaphore_signal(semaphore);
         return true;
     }
 
@@ -166,41 +154,15 @@ namespace webrtc
         return new MetalTexture2D(width, height, texture);
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* texture)
     {
-        id<MTLTexture> source = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
-        const uint32_t width = tex->GetWidth();
-        const uint32_t height = tex->GetHeight();
-
-        RTC_DCHECK(source);
-        RTC_DCHECK_GT(width, 0);
-        RTC_DCHECK_GT(height, 0);
-
-        const uint32_t BYTES_PER_PIXEL = 4;
-        const uint32_t bytesPerRow = width * BYTES_PER_PIXEL;
-        const uint32_t bufferSize = bytesPerRow * height;
-
-        std::vector<uint8_t> buffer;
-        buffer.resize(bufferSize);
-
-        [source getBytes:buffer.data()
-             bytesPerRow:bytesPerRow
-              fromRegion:MTLRegionMake2D(0, 0, width, height)
-             mipmapLevel:0];
-
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
-            webrtc::I420Buffer::Create(static_cast<int32_t>(width), static_cast<int32_t>(height));
-        libyuv::ARGBToI420(
-            buffer.data(),
-            static_cast<int32_t>(bytesPerRow),
-            i420_buffer->MutableDataY(),
-            i420_buffer->StrideY(),
-            i420_buffer->MutableDataU(),
-            i420_buffer->StrideU(),
-            i420_buffer->MutableDataV(),
-            i420_buffer->StrideV(),
-            static_cast<int32_t>(width),
-            static_cast<int32_t>(height));
+        MetalTexture2D* texture2D = static_cast<MetalTexture2D*>(texture);
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = texture2D->ConvertI420Buffer();
+        
+        //
+        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
+        dispatch_semaphore_signal(semaphore);
+        
         return i420_buffer;
     }
 
