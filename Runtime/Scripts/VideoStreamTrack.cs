@@ -21,7 +21,7 @@ namespace Unity.WebRTC
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
 
-        public enum VideoStreamTrackAction
+        internal enum VideoStreamTrackAction
         {
             Ignore = 0,
             Decode = 1,
@@ -29,7 +29,7 @@ namespace Unity.WebRTC
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct VideoStreamTrackData
+        internal struct VideoStreamTrackData
         {
             public VideoStreamTrackAction action;
             public IntPtr ptrTexture;

@@ -4,6 +4,22 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-pre.6] - 2023-07-16
+
+### Added
+
+- Add `AudioStreamTrack.onReceived` delegate which fetch audio buffers from other peers.
+
+### Changed
+
+- Upgrade libwebrtc [M112](https://groups.google.com/g/discuss-webrtc/c/V-XFau9W9gY).
+
+### Fixed 
+
+- Improve video encoding performance for DX11/DX12 which decrease the loads on the rendering thread.
+- Fix a runtime error when replacing track with NvCodec.
+-  Support calling `AudioStreamTrack.SetData` on worker thread 
+
 ## [3.0.0-pre.5] - 2023-04-28
 
 ### Added
