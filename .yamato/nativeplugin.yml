@@ -4,7 +4,7 @@ build_platforms:
   - name: win
     type: Unity::VM
     flavor: b1.large
-    image: renderstreaming/win10:v0.6.1-1294365
+    image: renderstreaming/win10:v0.6.2-1294670
     build_command: BuildScripts~/build_plugin_win.cmd
     build_testrunner_command: BuildScripts~/build_testrunner_win.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
@@ -46,8 +46,8 @@ test_platforms:
   - name: win
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.6.1-1294365
-    gpu_image: renderstreaming/win10:v0.6.1-1294381
+    image: renderstreaming/win10:v0.6.2-1294670
+    gpu_image: renderstreaming/win10:v0.6.2-1294671
     flavor: b1.large
     model: rtx2080
   - name: linux

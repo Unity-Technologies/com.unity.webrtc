@@ -329,6 +329,8 @@ namespace Unity.WebRTC
             }
         }
 
+        // ReadOnlySpan<T> is supported since .NET Standard 2.1.
+#if UNITY_2021_2_OR_NEWER
         /// <summary>
         /// 
         /// </summary>
@@ -345,6 +347,7 @@ namespace Unity.WebRTC
                 }
             }
         }
+#endif
 
         /// <summary>
         /// 

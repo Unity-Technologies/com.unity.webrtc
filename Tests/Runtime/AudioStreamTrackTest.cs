@@ -205,11 +205,13 @@ namespace Unity.WebRTC.RuntimeTest
             var slice = nativeArray.Slice();
             Assert.That(() => track.SetData(slice, 1, 48000), Throws.Nothing);
 
+            // ReadOnlySpan<T> is supported since .NET Standard 2.1.
+#if UNITY_2021_2_OR_NEWER
             unsafe
             {
                 Assert.That(() => track.SetData(new ReadOnlySpan<float>(nativeArray.GetUnsafePtr(), nativeArray.Length), 1, 48000), Throws.Nothing);
             }
-
+#endif
             nativeArray.Dispose();
             track.Dispose();
             UnityEngine.Object.DestroyImmediate(source.clip);
