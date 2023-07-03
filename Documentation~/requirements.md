@@ -10,11 +10,12 @@ This version of the package is compatible with the following versions of the Uni
 
 - **Unity 2020.3**
 - **Unity 2021.3**
-- **Unity 2022.1**
+- **Unity 2022.3**
+- **Unity 2023.1**
 
 ## Support Platform
 
-- **Windows**
+- **Windows 10** (x64 only)
 - **Linux** (Ubuntu 16.04, 18.04, 20.04)
 - **macOS** (**Intel** and **Apple Slicon**)
 - **iOS**
