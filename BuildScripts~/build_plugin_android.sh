@@ -7,6 +7,7 @@ export PLUGIN_DIR=$(pwd)/Runtime/Plugins/Android
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
+cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
 
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
@@ -27,7 +28,6 @@ do
     --target WebRTCPlugin
 
   # libwebrtc.so move into libwebrtc.aar
-  cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
   pushd $PLUGIN_DIR
   mkdir -p jni/$ARCH_ABI
   mv libwebrtc.so jni/$ARCH_ABI
