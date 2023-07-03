@@ -12,7 +12,7 @@ build_platforms:
   - name: linux
     type: Unity::VM
     flavor: b1.large
-    image: renderstreaming/ubuntu-16.04:v0.1.0-1257787
+    image: renderstreaming/ubuntu-18.04:v0.3.0-1294653
     build_command: BuildScripts~/build_plugin_linux.sh
     build_testrunner_command: BuildScripts~/build_testrunner_linux.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
