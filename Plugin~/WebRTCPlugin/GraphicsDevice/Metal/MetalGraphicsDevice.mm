@@ -66,7 +66,7 @@ namespace webrtc
         id<MTLTexture> mtlTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
         __block dispatch_semaphore_t semaphore = dest->GetSemaphore();
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-        
+
         RTC_DCHECK_NE(src, mtlTexture);
         RTC_DCHECK_EQ(src.pixelFormat, mtlTexture.pixelFormat);
         RTC_DCHECK_EQ(src.width, mtlTexture.width);
@@ -98,10 +98,7 @@ namespace webrtc
             [blit synchronizeResource:mtlTexture];
 #endif
         [blit endEncoding];
-        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
-        {
-            dispatch_semaphore_signal(semaphore);
-        }];
+        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) { dispatch_semaphore_signal(semaphore); }];
 
         // Commit the current command buffer and wait until the GPU process is completed.
         [commandBuffer commit];
@@ -114,7 +111,7 @@ namespace webrtc
         dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
 
         intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
-        if(value != 0)
+        if (value != 0)
         {
             RTC_LOG(LS_INFO) << "The timeout occurred.";
             return false;
@@ -122,11 +119,7 @@ namespace webrtc
         return true;
     }
 
-    bool MetalGraphicsDevice::ResetSync(const ITexture2D* texture)
-    {
-        return true;
-    }
-
+    bool MetalGraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
 
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(
         uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
@@ -158,11 +151,11 @@ namespace webrtc
     {
         MetalTexture2D* texture2D = static_cast<MetalTexture2D*>(texture);
         rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = texture2D->ConvertI420Buffer();
-        
+
         //
         dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
         dispatch_semaphore_signal(semaphore);
-        
+
         return i420_buffer;
     }
 

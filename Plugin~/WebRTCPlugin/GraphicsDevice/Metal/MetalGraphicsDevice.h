@@ -33,7 +33,7 @@ namespace webrtc
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
-        
+
     private:
         MetalDevice* m_device;
         id<MTLCommandQueue> m_queue;

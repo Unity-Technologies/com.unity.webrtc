@@ -25,8 +25,9 @@ namespace webrtc
 
         void SetSemaphore(dispatch_semaphore_t semaphore) { m_semaphore = semaphore; }
         dispatch_semaphore_t GetSemaphore() const { return m_semaphore; }
-        
+
         rtc::scoped_refptr<I420Buffer> ConvertI420Buffer();
+
     private:
         id<MTLTexture> m_texture;
         dispatch_semaphore_t m_semaphore;

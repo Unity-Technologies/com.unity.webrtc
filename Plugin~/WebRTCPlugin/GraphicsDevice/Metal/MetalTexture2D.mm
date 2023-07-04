@@ -27,20 +27,20 @@ namespace webrtc
         RTC_DCHECK(m_texture);
         RTC_DCHECK_GT(m_width, 0);
         RTC_DCHECK_GT(m_height, 0);
-        
+
         const uint32_t BYTES_PER_PIXEL = 4;
         const uint32_t bytesPerRow = m_width * BYTES_PER_PIXEL;
         const uint32_t bufferSize = bytesPerRow * m_height;
 
-        if(m_buffer.size() != bufferSize)
+        if (m_buffer.size() != bufferSize)
             m_buffer.resize(bufferSize);
 
         [m_texture getBytes:m_buffer.data()
-             bytesPerRow:bytesPerRow
-             fromRegion:MTLRegionMake2D(0, 0, m_width, m_height)
-             mipmapLevel:0];
-        
-        if(!m_i420Buffer)
+                bytesPerRow:bytesPerRow
+                 fromRegion:MTLRegionMake2D(0, 0, m_width, m_height)
+                mipmapLevel:0];
+
+        if (!m_i420Buffer)
             m_i420Buffer = I420Buffer::Create(static_cast<int32_t>(m_width), static_cast<int32_t>(m_height));
 
         libyuv::ARGBToI420(
@@ -54,7 +54,7 @@ namespace webrtc
             m_i420Buffer->StrideV(),
             static_cast<int32_t>(m_width),
             static_cast<int32_t>(m_height));
-        
+
         return m_i420Buffer;
     }
 
