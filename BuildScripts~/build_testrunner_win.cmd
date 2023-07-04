@@ -15,11 +15,11 @@ echo -------------------
 echo Build com.unity.webrtc Plugin
 
 pushd %SOLUTION_DIR%
-cmake --preset=x64-windows-clang
-cmake --build --preset=debug-windows-clang --target=WebRTCLibTest
+cmake --preset=x64-windows-msvc
+cmake --build --preset=debug-windows-msvc --target=WebRTCLibTest
 popd
 
 echo -------------------
 echo Copy test runner
 
-copy %SOLUTION_DIR%\out\build\x64-windows-clang\WebRTCPluginTest\Debug\WebRTCLibTest.exe .
+copy %SOLUTION_DIR%\out\build\x64-windows-msvc\WebRTCPluginTest\Debug\WebRTCLibTest.exe .
