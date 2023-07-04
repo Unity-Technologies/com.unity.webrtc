@@ -558,21 +558,12 @@ namespace Unity.WebRTC
         /// </summary>
         public int? iceCandidatePoolSize;
 
-        /// <summary>
-        ///
-        /// </summary>
-        [Obsolete]
-        public bool? enableDtlsSrtp;
-
         internal RTCConfiguration(ref RTCConfigurationInternal v)
         {
             iceServers = v.iceServers;
             iceTransportPolicy = v.iceTransportPolicy.AsEnum<RTCIceTransportPolicy>();
             bundlePolicy = v.bundlePolicy.AsEnum<RTCBundlePolicy>();
             iceCandidatePoolSize = v.iceCandidatePoolSize;
-#pragma warning disable 0612
-            enableDtlsSrtp = v.enableDtlsSrtp;
-#pragma warning restore 0612
         }
 
         internal RTCConfigurationInternal Cast()
@@ -583,9 +574,6 @@ namespace Unity.WebRTC
                 iceTransportPolicy = OptionalInt.FromEnum(this.iceTransportPolicy),
                 bundlePolicy = OptionalInt.FromEnum(this.bundlePolicy),
                 iceCandidatePoolSize = this.iceCandidatePoolSize,
-#pragma warning disable 0612
-                enableDtlsSrtp = this.enableDtlsSrtp
-#pragma warning restore 0612
             };
             return instance;
         }
@@ -644,18 +632,6 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="limitTextureSize"></param>
-        /// <param name="enableNativeLog"></param>
-        /// <param name="nativeLoggingSeverity"></param>
-        [Obsolete]
-        public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
-            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
-        {
-        }
 
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitializeOnLoadMethod()
@@ -754,14 +730,6 @@ namespace Unity.WebRTC
         {
             get { return s_context.limitTextureSize; }
             set { s_context.limitTextureSize = value; }
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        [Obsolete]
-        public static void Dispose()
-        {
         }
 
         internal static void DisposeInternal()
