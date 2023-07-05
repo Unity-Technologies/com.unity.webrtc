@@ -21,7 +21,7 @@ namespace webrtc
         // waiting for finishing usage of semaphore
         dispatch_semaphore_wait(m_semaphore, DISPATCH_TIME_FOREVER);
         dispatch_semaphore_signal(m_semaphore);
-        
+
         dispatch_release(m_semaphore);
         [m_texture release];
     }
