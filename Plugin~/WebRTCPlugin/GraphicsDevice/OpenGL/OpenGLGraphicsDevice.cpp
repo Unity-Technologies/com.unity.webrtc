@@ -173,9 +173,7 @@ namespace webrtc
             dstSize.height(),
             1);
 
-        // todo(kazuki): "glFinish" is used to sync GPU for waiting to copy the texture buffer.
-        // But this command affects graphics performance.
-        //glFinish();
+        // Create sync object.
         GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
         GLenum error = glGetError();
         if(error != GL_NO_ERROR)
@@ -281,8 +279,16 @@ namespace webrtc
 
     bool OpenGLGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
+        if (!OpenGLContext::CurrentContext())
+            contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
+
         const OpenGLTexture2D* glTexture2D = static_cast<const OpenGLTexture2D*>(texture);
         GLsync sync = glTexture2D->GetSync();
+        if(sync == 0)
+        {
+            RTC_LOG(LS_INFO) << "The sync object is already reset.";
+            return true;
+        }
         GLenum ret = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, nsTimeout);
         GLenum error = glGetError();
         if(error != GL_NO_ERROR)
@@ -305,6 +311,11 @@ namespace webrtc
     {
         const OpenGLTexture2D* glTexture2D = static_cast<const OpenGLTexture2D*>(texture);
         GLsync sync = glTexture2D->GetSync();
+        if(sync == 0)
+        {
+            RTC_LOG(LS_INFO) << "The sync object is already reset.";
+            return true;
+        }
         glDeleteSync(sync);
         GLenum error = glGetError();
         if(error != GL_NO_ERROR)
