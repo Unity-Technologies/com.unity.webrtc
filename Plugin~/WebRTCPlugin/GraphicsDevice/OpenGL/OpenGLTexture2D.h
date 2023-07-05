@@ -36,9 +36,13 @@ namespace webrtc
         GLuint GetTexture() const { return m_texture; }
         void Release();
 
+        void SetSync(GLsync sync) { m_sync = sync; }
+        GLsync GetSync() const { return m_sync; }
+
     private:
         GLuint m_texture;
         GLuint m_pbo;
+        GLsync m_sync;
         std::vector<byte> m_buffer;
         ReleaseOpenGLTextureCallback m_callback;
     };

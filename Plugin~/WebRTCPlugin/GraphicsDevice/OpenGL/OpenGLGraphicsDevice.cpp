@@ -111,20 +111,19 @@ namespace webrtc
         OpenGLTexture2D* srcTexture = static_cast<OpenGLTexture2D*>(src);
         OpenGLTexture2D* dstTexture = static_cast<OpenGLTexture2D*>(dst);
         const GLuint srcName = srcTexture->GetTexture();
-        const GLuint dstName = dstTexture->GetTexture();
-        return CopyResource(dstName, srcName);
+        return CopyResource(dstTexture, srcName);
     }
 
     bool OpenGLGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dst, void* nativeTexturePtr)
     {
-        OpenGLTexture2D* dstTexture = static_cast<OpenGLTexture2D*>(dst);
+        OpenGLTexture2D* texture2D = static_cast<OpenGLTexture2D*>(dst);
         const GLuint srcName = reinterpret_cast<uintptr_t>(nativeTexturePtr);
-        const GLuint dstName = dstTexture->GetTexture();
-        return CopyResource(dstName, srcName);
+        return CopyResource(texture2D, srcName);
     }
 
-    bool OpenGLGraphicsDevice::CopyResource(GLuint dstName, GLuint srcName)
+    bool OpenGLGraphicsDevice::CopyResource(OpenGLTexture2D* texture, GLuint srcName)
     {
+        const GLuint dstName = texture->GetTexture();
         if (srcName == dstName)
         {
             RTC_LOG(LS_INFO) << "Same texture";
@@ -176,8 +175,15 @@ namespace webrtc
 
         // todo(kazuki): "glFinish" is used to sync GPU for waiting to copy the texture buffer.
         // But this command affects graphics performance.
-        glFinish();
-
+        //glFinish();
+        GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        GLenum error = glGetError();
+        if(error != GL_NO_ERROR)
+        {
+            RTC_LOG(LS_INFO) << "glFenceSync returns error " << error;
+            return false;
+        }
+        texture->SetSync(sync);
         return true;
     }
 
@@ -271,6 +277,42 @@ namespace webrtc
 #else
         return nullptr;
 #endif
+    }
+
+    bool OpenGLGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    {
+        const OpenGLTexture2D* glTexture2D = static_cast<const OpenGLTexture2D*>(texture);
+        GLsync sync = glTexture2D->GetSync();
+        GLenum ret = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, nsTimeout);
+        GLenum error = glGetError();
+        if(error != GL_NO_ERROR)
+        {
+            RTC_LOG(LS_INFO) << "glClientWaitSync returns error " << error;
+            return false;
+        }
+
+        switch(ret)
+        {
+        case GL_CONDITION_SATISFIED:
+        case GL_ALREADY_SIGNALED:
+            return true;
+        }
+        RTC_LOG(LS_INFO) << "glClientWaitSync returns " << ret;
+        return false;
+    }
+
+    bool OpenGLGraphicsDevice::ResetSync(const ITexture2D* texture)
+    {
+        const OpenGLTexture2D* glTexture2D = static_cast<const OpenGLTexture2D*>(texture);
+        GLsync sync = glTexture2D->GetSync();
+        glDeleteSync(sync);
+        GLenum error = glGetError();
+        if(error != GL_NO_ERROR)
+        {
+            RTC_LOG(LS_INFO) << "glDeleteSync returns error " << error;
+            return false;
+        }
+        return true;
     }
 
 } // end namespace webrtc
