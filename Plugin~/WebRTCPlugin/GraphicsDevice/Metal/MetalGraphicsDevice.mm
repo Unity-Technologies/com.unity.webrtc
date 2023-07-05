@@ -52,8 +52,9 @@ namespace webrtc
 
     bool MetalGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
-        if (nativeTexturePtr == nullptr)
+        if (!nativeTexturePtr)
         {
+            RTC_LOG(LS_INFO) << "nativeTexturePtr is nullptr.";
             return false;
         }
         id<MTLTexture> srcTexture = (__bridge id<MTLTexture>)nativeTexturePtr;
@@ -152,7 +153,7 @@ namespace webrtc
         MetalTexture2D* texture2D = static_cast<MetalTexture2D*>(texture);
         rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = texture2D->ConvertI420Buffer();
 
-        //
+        // Notify finishing usage of semaphore.
         dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
         dispatch_semaphore_signal(semaphore);
 
