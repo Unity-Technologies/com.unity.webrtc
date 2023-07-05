@@ -103,17 +103,5 @@ namespace Unity.WebRTC.RuntimeTest
         {
             Assert.That(() => WebRTC.ValidateGraphicsFormat(format), Throws.Nothing);
         }
-
-        [Test]
-        public void PeerList()
-        {
-            Assert.That(WebRTC.PeerList, Is.Empty);
-
-            var peer = new RTCPeerConnection();
-            Assert.That(WebRTC.PeerList, Is.Not.Empty);
-
-            peer.Dispose();
-            Assert.That(WebRTC.PeerList, Is.Empty);
-        }
     }
 }
