@@ -56,6 +56,21 @@ namespace Unity.WebRTC.RuntimeTest
         [TestCase(2160, 3840)]
         public void ValidateTextureSize(int width, int height)
         {
+            if(!WebRTC.enableLimitTextureSize)
+                WebRTC.enableLimitTextureSize = true;
+
+            var platform = Application.platform;
+            var error = WebRTC.ValidateTextureSize(width, height, platform);
+            Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
+        }
+
+        [TestCase(1920, 1080)]
+        [TestCase(3841, 2161)] // over max count
+        public void DisableLimitTextureSize(int width, int height)
+        {
+            if (WebRTC.enableLimitTextureSize)
+                WebRTC.enableLimitTextureSize = false;
+
             var platform = Application.platform;
             var error = WebRTC.ValidateTextureSize(width, height, platform);
             Assert.That(error.errorType, Is.EqualTo(RTCErrorType.None));
@@ -66,6 +81,9 @@ namespace Unity.WebRTC.RuntimeTest
         [TestCase(4000, 4000)]
         public void ErrorOnValidateTextureSize(int width, int height)
         {
+            if (!WebRTC.enableLimitTextureSize)
+                WebRTC.enableLimitTextureSize = true;
+
             var platform = Application.platform;
             var error = WebRTC.ValidateTextureSize(width, height, platform);
             Assert.That(error.errorType, Is.EqualTo(RTCErrorType.InvalidRange));
