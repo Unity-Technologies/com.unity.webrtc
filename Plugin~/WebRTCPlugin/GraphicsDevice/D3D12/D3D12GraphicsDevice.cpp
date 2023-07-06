@@ -131,7 +131,7 @@ namespace webrtc
         uint64_t nextFrameFenceValue = GetNextFrameFenceValue();
 
         // Reset m_commandAllocator when the process is arriving here first time in the frame.
-        if(m_nextFrameFenceValue < nextFrameFenceValue)
+        if (m_nextFrameFenceValue < nextFrameFenceValue)
         {
             m_nextFrameFenceValue = nextFrameFenceValue;
             ThrowIfFailed(m_commandAllocator->Reset());
