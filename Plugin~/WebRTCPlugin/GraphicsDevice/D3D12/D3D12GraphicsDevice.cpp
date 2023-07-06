@@ -31,6 +31,7 @@ namespace webrtc
         , m_unityInterface(unityInterface)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
+        , m_nextFrameFenceValue(0)
     {
     }
     //---------------------------------------------------------------------------------------------------------------------
@@ -43,6 +44,7 @@ namespace webrtc
         , m_unityInterface(nullptr)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(commandQueue)
+        , m_nextFrameFenceValue(0)
     {
     }
 
@@ -126,7 +128,14 @@ namespace webrtc
         if (!srcResource || !destResource)
             return false;
 
-        ThrowIfFailed(m_commandAllocator->Reset());
+        uint64_t nextFrameFenceValue = GetNextFrameFenceValue();
+
+        // Reset m_commandAllocator when the process is arriving here first time in the frame.
+        if(m_nextFrameFenceValue < nextFrameFenceValue)
+        {
+            m_nextFrameFenceValue = nextFrameFenceValue;
+            ThrowIfFailed(m_commandAllocator->Reset());
+        }
         ThrowIfFailed(m_commandList->Reset(m_commandAllocator, nullptr));
 
         std::vector<UnityGraphicsD3D12ResourceState> states;
@@ -159,6 +168,8 @@ namespace webrtc
 
             states.push_back(UnityGraphicsD3D12ResourceState {
                 srcResource, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_SOURCE });
+            //states.push_back(UnityGraphicsD3D12ResourceState {
+            //    destResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_DEST });
         }
 
         ThrowIfFailed(m_commandList->Close());
@@ -221,27 +232,30 @@ namespace webrtc
     bool D3D12GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
         const D3D12Texture2D* d3d12Texture = static_cast<const D3D12Texture2D*>(texture);
+        const uint64_t value = d3d12Texture->GetSyncCount();
         ID3D12Fence* fence = GetFence();
-        uint64_t value = d3d12Texture->GetSyncCount();
 
         if (fence->GetCompletedValue() < value)
         {
             HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            if (!fenceEvent)
+                return false;
             HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
             if (hr != S_OK)
             {
-                RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
+                RTC_LOG(LS_INFO) << "ID3D12Fence::SetEventOnCompletion failed. error:" << hr;
                 return false;
             }
             auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+            DWORD ret = WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds));
+            CloseHandle(fenceEvent);
 
-            if (WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
+            if (ret != WAIT_OBJECT_0)
             {
-                RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << GetLastError();
+                RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << ret;
                 return false;
             }
-            CloseHandle(fenceEvent);
         }
         return true;
     }
@@ -303,20 +317,23 @@ namespace webrtc
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* baseTex)
+    rtc::scoped_refptr<webrtc::I420Buffer> D3D12GraphicsDevice::ConvertRGBToI420(ITexture2D* texture)
     {
-        D3D12Texture2D* tex = reinterpret_cast<D3D12Texture2D*>(baseTex);
-        if (!tex)
+        D3D12Texture2D* d3dTexture2d = reinterpret_cast<D3D12Texture2D*>(texture);
+        if (!d3dTexture2d)
+        {
+            RTC_LOG(LS_INFO) << "texture is nullptr.";
             return nullptr;
+        }
 
-        ID3D12Resource* readbackResource = reinterpret_cast<ID3D12Resource*>(tex->GetNativeTexturePtrV());
+        ID3D12Resource* readbackResource = reinterpret_cast<ID3D12Resource*>(d3dTexture2d->GetNativeTexturePtrV());
         assert(readbackResource);
         if (!readbackResource) // the texture has to be prepared for CPU access
             return nullptr;
 
-        const int width = static_cast<int>(tex->GetWidth());
-        const int height = static_cast<int>(tex->GetHeight());
-        const D3D12ResourceFootprint* footprint = tex->GetNativeTextureFootprint();
+        const int width = static_cast<int>(d3dTexture2d->GetWidth());
+        const int height = static_cast<int>(d3dTexture2d->GetHeight());
+        const D3D12ResourceFootprint* footprint = d3dTexture2d->GetNativeTextureFootprint();
         const int rowPitch = static_cast<int>(footprint->Footprint.Footprint.RowPitch);
 
         // Map to read from CPU
@@ -400,6 +417,18 @@ namespace webrtc
         GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
         return std::move(handle);
+    }
+
+    uint64_t D3D12GraphicsDevice::GetNextFrameFenceValue() const
+    {
+        if (m_unityInterface)
+        {
+            return m_unityInterface->GetNextFrameFenceValue();
+        }
+        else
+        {
+            return m_fence->GetCompletedValue() + 1;
+        }
     }
 
     uint64_t D3D12GraphicsDevice::ExecuteCommandList(
