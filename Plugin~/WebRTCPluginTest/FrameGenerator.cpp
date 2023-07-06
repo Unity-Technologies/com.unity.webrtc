@@ -40,7 +40,7 @@ namespace webrtc
 
     FrameGeneratorInterface::Resolution VideoFrameGenerator::GetResolution() const
     {
-        return { .width = static_cast<size_t>(width_), .height = static_cast<size_t>(height_) };
+        return { static_cast<size_t>(width_), static_cast<size_t>(height_) };
     }
 
     FrameGeneratorInterface::VideoFrameData VideoFrameGenerator::NextFrame()
