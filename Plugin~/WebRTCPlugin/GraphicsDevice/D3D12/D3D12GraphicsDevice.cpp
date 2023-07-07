@@ -260,7 +260,23 @@ namespace webrtc
 
     bool D3D12GraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
 
-    //----------------------------------------------------------------------------------------------------------------------
+
+    bool D3D12GraphicsDevice::WaitIdleForTest()
+    {
+        HANDLE handle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        if (!handle)
+            return false;
+        ThrowIfFailed(m_d3d12CommandQueue->Signal(m_fence.Get(), m_nextFrameFenceValue));
+        ThrowIfFailed(m_fence->SetEventOnCompletion(m_nextFrameFenceValue, handle));
+        DWORD ret = WaitForSingleObject(handle, INFINITE);
+        CloseHandle(handle);
+        if (ret != WAIT_OBJECT_0)
+        {
+            RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << ret;
+            return false;
+        }
+        return true;
+    }
 
     ITexture2D*
     D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
