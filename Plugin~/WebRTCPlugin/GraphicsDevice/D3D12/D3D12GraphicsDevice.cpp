@@ -260,7 +260,6 @@ namespace webrtc
 
     bool D3D12GraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
 
-
     bool D3D12GraphicsDevice::WaitIdleForTest()
     {
         HANDLE handle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
