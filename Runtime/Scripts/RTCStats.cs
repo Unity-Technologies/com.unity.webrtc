@@ -677,12 +677,12 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public ulong lastPacketSentTimestamp { get { return GetUnsignedLong("lastPacketSentTimestamp"); } }
+        public double lastPacketSentTimestamp { get { return GetDouble("lastPacketSentTimestamp"); } }
 
         /// <summary>
         ///
         /// </summary>
-        public ulong lastPacketReceivedTimestamp { get { return GetUnsignedLong("lastPacketReceivedTimestamp"); } }
+        public double lastPacketReceivedTimestamp { get { return GetDouble("lastPacketReceivedTimestamp"); } }
 
         /// <summary>
         ///
