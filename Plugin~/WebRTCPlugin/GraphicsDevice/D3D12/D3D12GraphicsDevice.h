@@ -78,10 +78,11 @@ namespace webrtc
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
+        bool WaitIdleForTest();
 
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* texture) override;
 
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
@@ -94,6 +95,7 @@ namespace webrtc
         ComPtr<ID3D12Device> m_d3d12Device;
         ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
         ComPtr<ID3D12Fence> m_fence;
+        uint64_t m_nextFrameFenceValue;
 
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
@@ -102,6 +104,7 @@ namespace webrtc
         ID3D12CommandAllocatorPtr m_commandAllocator;
         ID3D12GraphicsCommandList4Ptr m_commandList;
 
+        uint64_t GetNextFrameFenceValue() const;
         uint64_t ExecuteCommandList(
             int listCount,
             ID3D12GraphicsCommandList* commandList,
