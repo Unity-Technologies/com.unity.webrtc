@@ -1,14 +1,30 @@
 using System;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Unity.WebRTC.RuntimeTest
 {
     class ContextTest
     {
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
-        static void DebugLog(string str)
+        static void DebugLog(string str, NativeLoggingSeverity severity)
         {
-            UnityEngine.Debug.Log(str);
+            LogType logType = LogType.Log;
+            switch (severity)
+            {
+                case NativeLoggingSeverity.Warning:
+                {
+                    logType = LogType.Warning;
+                    break;
+                }
+                case NativeLoggingSeverity.Error:
+                {
+                    logType = LogType.Exception;
+                    break;
+                }
+            }
+
+            UnityEngine.Debug.unityLogger.Log(logType, str);
         }
 
         [SetUp]

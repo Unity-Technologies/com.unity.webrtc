@@ -7,6 +7,12 @@ namespace Unity.WebRTC.RuntimeTest
 {
     class WebRTCTest
     {
+        [TearDown]
+        public void TearDown()
+        {
+            WebRTC.Logger = Debug.unityLogger;
+        }
+
         [Test]
         public void GraphicsFormat()
         {
@@ -102,6 +108,28 @@ namespace Unity.WebRTC.RuntimeTest
         public void ValidateLegacyGraphicsFormat(GraphicsFormat format)
         {
             Assert.That(() => WebRTC.ValidateGraphicsFormat(format), Throws.Nothing);
+        }
+
+        [Test]
+        public void EnableLogging()
+        {
+            Assert.DoesNotThrow(() => WebRTC.ConfigureNativeLogging(true, NativeLoggingSeverity.Verbose));
+            Assert.DoesNotThrow(() => WebRTC.ConfigureNativeLogging(false, NativeLoggingSeverity.None));
+        }
+
+        [Test]
+        public void Logger()
+        {
+            Assert.NotNull(WebRTC.Logger);
+            Assert.AreEqual(WebRTC.Logger, Debug.unityLogger);
+
+            Assert.That(() => WebRTC.Logger = null, Throws.ArgumentNullException);
+
+            MockLogger logger = new MockLogger();
+            Assert.That(() => WebRTC.Logger = logger, Throws.Nothing);
+            Assert.AreEqual(logger, WebRTC.Logger);
+
+            Assert.That(() => WebRTC.Logger = Debug.unityLogger, Throws.Nothing);
         }
     }
 }
