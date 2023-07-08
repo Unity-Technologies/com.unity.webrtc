@@ -100,9 +100,13 @@ namespace webrtc
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
 
-        //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
-        ID3D12CommandAllocatorPtr m_commandAllocator;
-        ID3D12GraphicsCommandList4Ptr m_commandList;
+        struct Frame
+        {
+            ID3D12CommandAllocatorPtr commandAllocator;
+            ID3D12GraphicsCommandList4Ptr commandList;
+            uint64_t fenceValue;
+        };
+        Frame m_frames[2];
 
         uint64_t GetNextFrameFenceValue() const;
         uint64_t ExecuteCommandList(

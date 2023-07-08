@@ -19,9 +19,6 @@ namespace unity
 {
 namespace webrtc
 {
-
-    //---------------------------------------------------------------------------------------------------------------------
-
     D3D12GraphicsDevice::D3D12GraphicsDevice(
         ID3D12Device* nativeDevice,
         IUnityGraphicsD3D12v5* unityInterface,
@@ -55,34 +52,45 @@ namespace webrtc
 
     bool D3D12GraphicsDevice::InitV()
     {
-        HRESULT hr =
-            m_d3d12Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator));
-        if (FAILED(hr))
+        HRESULT hr = S_OK;
+
+        for (auto& frame : m_frames)
         {
-            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandAllocator is failed. " << HrToString(hr);
-            return false;
+            frame.fenceValue = 0;
+
+            hr = m_d3d12Device->CreateCommandAllocator(
+                D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&frame.commandAllocator));
+            if (FAILED(hr))
+            {
+                RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandAllocator is failed. " << HrToString(hr);
+                return false;
+            }
+
+            hr = m_d3d12Device->CreateCommandList(
+                0, D3D12_COMMAND_LIST_TYPE_DIRECT, frame.commandAllocator, nullptr, IID_PPV_ARGS(&frame.commandList));
+            if (FAILED(hr))
+            {
+                RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandList is failed. " << HrToString(hr);
+                return false;
+            }
+
+            // Command lists are created in the recording state, but there is nothing
+            // to record yet. The main loop expects it to be closed, so close it now.
+            hr = frame.commandList->Close();
+            if (FAILED(hr))
+            {
+                RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
+                return false;
+            }
         }
 
-        hr = m_d3d12Device->CreateCommandList(
-            0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
-        if (FAILED(hr))
+        if (m_unityInterface)
         {
-            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandList is failed. " << HrToString(hr);
-            return false;
+            m_fence = m_unityInterface->GetFrameFence();
         }
-
-        // Command lists are created in the recording state, but there is nothing
-        // to record yet. The main loop expects it to be closed, so close it now.
-        hr = m_commandList->Close();
-        if (FAILED(hr))
+        else
         {
-            RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
-            return false;
-        }
-
-        // If a unityInterface is not passed, use m_fence to synchronize between GPU and CPU.
-        if (!m_unityInterface)
-        {
+            // If a unityInterface is not passed, use m_fence to synchronize between GPU and CPU.
             hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
             if (FAILED(hr))
             {
@@ -112,7 +120,6 @@ namespace webrtc
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
     bool D3D12GraphicsDevice::CopyResourceFromNativeV(ITexture2D* baseDest, void* nativeTexturePtr)
     {
         D3D12Texture2D* dest = reinterpret_cast<D3D12Texture2D*>(baseDest);
@@ -128,22 +135,42 @@ namespace webrtc
         if (!srcResource || !destResource)
             return false;
 
-        uint64_t nextFrameFenceValue = GetNextFrameFenceValue();
+        // Find elements with the finished commands and reset the CommandAllocator.
+        uint64_t completedValue = m_fence->GetCompletedValue();
+        for (auto& frame : m_frames)
+        {
+            if (frame.fenceValue > 0 && frame.fenceValue <= completedValue)
+            {
+                frame.commandAllocator->Reset();
+                frame.fenceValue = 0;
+            }
+        }
+
+        // Find an element with the same fenceValue. If it does not exist, find an unused element.
+        uint64_t nextValue = GetNextFrameFenceValue();
+        auto frame = std::find_if(
+            std::begin(m_frames),
+            std::end(m_frames),
+            [nextValue](Frame frame) { return frame.fenceValue == nextValue; });
+        if (frame == std::end(m_frames))
+        {
+            frame = std::find_if(
+                std::begin(m_frames),
+                std::end(m_frames),
+                [](Frame frame) { return frame.fenceValue == 0; });
+            frame->fenceValue = nextValue;
+        }        
+        auto commandList = frame->commandList;
 
         // Reset m_commandAllocator when the process is arriving here first time in the frame.
-        if (m_nextFrameFenceValue < nextFrameFenceValue)
-        {
-            m_nextFrameFenceValue = nextFrameFenceValue;
-            ThrowIfFailed(m_commandAllocator->Reset());
-        }
-        ThrowIfFailed(m_commandList->Reset(m_commandAllocator, nullptr));
+        ThrowIfFailed(commandList->Reset(frame->commandAllocator, nullptr));
 
         std::vector<UnityGraphicsD3D12ResourceState> states;
 
         // for GPU accessible texture
         if (!isReadbackResource)
         {
-            m_commandList->CopyResource(destResource, srcResource);
+            commandList->CopyResource(destResource, srcResource);
             states.push_back(UnityGraphicsD3D12ResourceState {
                 srcResource, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_SOURCE });
             states.push_back(UnityGraphicsD3D12ResourceState {
@@ -164,16 +191,16 @@ namespace webrtc
             dstLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
             dstLoc.PlacedFootprint = resFP->Footprint;
 
-            m_commandList->CopyTextureRegion(&dstLoc, 0, 0, 0, &srcLoc, nullptr);
+            commandList->CopyTextureRegion(&dstLoc, 0, 0, 0, &srcLoc, nullptr);
 
             states.push_back(UnityGraphicsD3D12ResourceState {
                 srcResource, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_SOURCE });
         }
 
-        ThrowIfFailed(m_commandList->Close());
+        ThrowIfFailed(commandList->Close());
 
         const int commandListsCount = 1;
-        ID3D12GraphicsCommandList* cmdList = { m_commandList };
+        ID3D12GraphicsCommandList* cmdList = { commandList };
         uint64_t value = ExecuteCommandList(commandListsCount, cmdList, static_cast<int>(states.size()), states.data());
         dest->SetSyncCount(value);
 
