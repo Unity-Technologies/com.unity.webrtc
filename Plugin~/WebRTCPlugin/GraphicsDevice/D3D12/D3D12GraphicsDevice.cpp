@@ -54,36 +54,6 @@ namespace webrtc
     {
         HRESULT hr = S_OK;
 
-        for (auto& frame : m_frames)
-        {
-            frame.fenceValue = 0;
-
-            hr = m_d3d12Device->CreateCommandAllocator(
-                D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&frame.commandAllocator));
-            if (FAILED(hr))
-            {
-                RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandAllocator is failed. " << HrToString(hr);
-                return false;
-            }
-
-            hr = m_d3d12Device->CreateCommandList(
-                0, D3D12_COMMAND_LIST_TYPE_DIRECT, frame.commandAllocator, nullptr, IID_PPV_ARGS(&frame.commandList));
-            if (FAILED(hr))
-            {
-                RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandList is failed. " << HrToString(hr);
-                return false;
-            }
-
-            // Command lists are created in the recording state, but there is nothing
-            // to record yet. The main loop expects it to be closed, so close it now.
-            hr = frame.commandList->Close();
-            if (FAILED(hr))
-            {
-                RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
-                return false;
-            }
-        }
-
         if (m_unityInterface)
         {
             m_fence = m_unityInterface->GetFrameFence();
@@ -149,17 +119,26 @@ namespace webrtc
         // Find an element with the same fenceValue. If it does not exist, find an unused element.
         uint64_t nextValue = GetNextFrameFenceValue();
         auto frame = std::find_if(
-            std::begin(m_frames),
-            std::end(m_frames),
-            [nextValue](Frame frame) { return frame.fenceValue == nextValue; });
-        if (frame == std::end(m_frames))
+            m_frames.begin(), m_frames.end(), [nextValue](Frame frame) { return frame.fenceValue == nextValue; });
+        if (frame == m_frames.end())
         {
-            frame = std::find_if(
-                std::begin(m_frames),
-                std::end(m_frames),
-                [](Frame frame) { return frame.fenceValue == 0; });
+            // Find an unused element.
+            frame = std::find_if(m_frames.begin(), m_frames.end(), [](Frame frame) { return frame.fenceValue == 0; });
+            if (frame == m_frames.end())
+            {
+                // Create a new element.
+                Frame newFrame;
+                if (!CreateFrame(newFrame))
+                {
+                    RTC_LOG(LS_INFO) << "Failed to create a new frame.";
+                    return false;
+                }
+                m_frames.push_back(newFrame);
+                frame = m_frames.end();
+                frame--;
+            }
             frame->fenceValue = nextValue;
-        }        
+        }
         auto commandList = frame->commandList;
 
         // Reset m_commandAllocator when the process is arriving here first time in the frame.
@@ -496,6 +475,37 @@ namespace webrtc
         {
             return m_fence.Get();
         }
+    }
+
+    bool D3D12GraphicsDevice::CreateFrame(Frame& frame)
+    {
+        frame.fenceValue = 0;
+
+        HRESULT hr = m_d3d12Device->CreateCommandAllocator(
+            D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&frame.commandAllocator));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandAllocator is failed. " << HrToString(hr);
+            return false;
+        }
+
+        hr = m_d3d12Device->CreateCommandList(
+            0, D3D12_COMMAND_LIST_TYPE_DIRECT, frame.commandAllocator, nullptr, IID_PPV_ARGS(&frame.commandList));
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12Device::CreateCommandList is failed. " << HrToString(hr);
+            return false;
+        }
+
+        // Command lists are created in the recording state, but there is nothing
+        // to record yet. The main loop expects it to be closed, so close it now.
+        hr = frame.commandList->Close();
+        if (FAILED(hr))
+        {
+            RTC_LOG(LS_ERROR) << "ID3D12GraphicsCommandList::Close is failed. " << HrToString(hr);
+            return false;
+        }
+        return true;
     }
 
 } // end namespace webrtc
