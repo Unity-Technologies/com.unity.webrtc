@@ -109,7 +109,6 @@ namespace webrtc
         ComPtr<ID3D12Device> m_d3d12Device;
         ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
         ComPtr<ID3D12Fence> m_fence;
-        uint64_t m_nextFrameFenceValue;
 
         bool m_isCudaSupport;
         CudaContext m_cudaContext;

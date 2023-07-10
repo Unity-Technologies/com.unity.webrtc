@@ -28,7 +28,6 @@ namespace webrtc
         , m_unityInterface(unityInterface)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(unityInterface->GetCommandQueue())
-        , m_nextFrameFenceValue(0)
     {
     }
     //---------------------------------------------------------------------------------------------------------------------
@@ -41,7 +40,6 @@ namespace webrtc
         , m_unityInterface(nullptr)
         , m_d3d12Device(nativeDevice)
         , m_d3d12CommandQueue(commandQueue)
-        , m_nextFrameFenceValue(0)
     {
     }
 
@@ -271,8 +269,9 @@ namespace webrtc
         HANDLE handle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         if (!handle)
             return false;
-        ThrowIfFailed(m_d3d12CommandQueue->Signal(m_fence.Get(), m_nextFrameFenceValue));
-        ThrowIfFailed(m_fence->SetEventOnCompletion(m_nextFrameFenceValue, handle));
+        uint64_t nextFrameFenceValue = GetNextFrameFenceValue();
+        ThrowIfFailed(m_d3d12CommandQueue->Signal(m_fence.Get(), nextFrameFenceValue));
+        ThrowIfFailed(m_fence->SetEventOnCompletion(nextFrameFenceValue, handle));
         DWORD ret = WaitForSingleObject(handle, INFINITE);
         CloseHandle(handle);
         if (ret != WAIT_OBJECT_0)
