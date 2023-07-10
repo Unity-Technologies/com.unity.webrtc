@@ -1,8 +1,24 @@
 check_code_format_nativeplugin:
-  name: Check code format for webrtc native plugin
+  name: Check codes formatting using clang-format
   agent:
     type: Unity::VM
     image: renderstreaming/ubuntu:v0.2.9-1258156
     flavor: b1.large
   commands:
     - BuildScripts~/format-plugin.sh
+
+# Check formatting using dotnet-format tool.
+check_formatting_dotnet-format:
+  name: Checking codes formatting using dotnet-format tool
+  agent:
+    type: Unity::VM
+    image: renderstreaming/ubuntu:v0.2.9-1258156
+    flavor: b1.large
+  commands:
+    - dotnet tool install --tool-path tools dotnet-format || echo dotnet format already installed
+    - tools/dotnet-format --check -f . 1>formatting.log 2>formatting_errors.log
+  artifacts:
+    logs:
+      paths:
+        - formatting.log
+        - formatting_errors.log
