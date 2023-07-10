@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
+using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -179,7 +179,7 @@ class ChangeCodecsSample : MonoBehaviour
         }
         else
         {
-            RTCRtpCodecCapability preferredCodec = availableCodecs[codecSelector.value-1];
+            RTCRtpCodecCapability preferredCodec = availableCodecs[codecSelector.value - 1];
             codecs = new[] { preferredCodec };
         }
         RTCRtpTransceiver transceiver = _pc1.GetTransceivers().First();

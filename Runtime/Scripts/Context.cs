@@ -61,7 +61,7 @@ namespace Unity.WebRTC
         public struct BatchData
         {
             public int tracksCount;
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)]
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
             public IntPtr[] tracks;
         }
 

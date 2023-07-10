@@ -40,10 +40,10 @@ namespace Unity.WebRTC.Editor
             var root = this.rootVisualElement;
             root.style.backgroundColor = EditorGUIUtility.isProSkin ? BackgroundColorInProSkin : Color.white;
 
-            var toolbar = new Toolbar {style = {alignItems = Align.FlexEnd}};
+            var toolbar = new Toolbar { style = { alignItems = Align.FlexEnd } };
             root.Add(toolbar);
 
-            toolbar.Add(new ToolbarSpacer {flex = true});
+            toolbar.Add(new ToolbarSpacer { flex = true });
 
             var buttonContainer = new VisualElement
             {
@@ -72,7 +72,7 @@ namespace Unity.WebRTC.Editor
                 File.WriteAllText(filePath, json);
 
             })
-            { text = "Save"};
+            { text = "Save" };
             buttonContainer.Add(dumpButton);
 
             root.Add(CreateStatsView());
@@ -153,13 +153,13 @@ namespace Unity.WebRTC.Editor
 
         private VisualElement CreateStatsView()
         {
-            var container = new VisualElement {style = {flexDirection = FlexDirection.Row, flexGrow = 1,}};
+            var container = new VisualElement { style = { flexDirection = FlexDirection.Row, flexGrow = 1, } };
 
             var sideView = new VisualElement
             {
-                style = {borderRightColor = Color.gray, borderRightWidth = 1, width = 250,}
+                style = { borderRightColor = Color.gray, borderRightWidth = 1, width = 250, }
             };
-            var mainView = new VisualElement {style = {flexGrow = 1}};
+            var mainView = new VisualElement { style = { flexGrow = 1 } };
 
             container.Add(sideView);
             container.Add(mainView);
@@ -254,8 +254,8 @@ namespace Unity.WebRTC.Editor
         {
             return string.Join(",", m_memberRecord.Select(x =>
             {
-                var start = DateTimeOffset.FromUnixTimeMilliseconds(x.Value.Min(y => y.timeStamp)/1000).DateTime.ToUniversalTime().ToString("O");
-                var end = DateTimeOffset.FromUnixTimeMilliseconds(x.Value.Max(y => y.timeStamp)/1000).DateTime.ToUniversalTime().ToString("O");
+                var start = DateTimeOffset.FromUnixTimeMilliseconds(x.Value.Min(y => y.timeStamp) / 1000).DateTime.ToUniversalTime().ToString("O");
+                var end = DateTimeOffset.FromUnixTimeMilliseconds(x.Value.Max(y => y.timeStamp) / 1000).DateTime.ToUniversalTime().ToString("O");
                 var values = string.Join(",", x.Value.Select(y =>
                 {
                     if (y.value is string z && !string.IsNullOrEmpty(z))

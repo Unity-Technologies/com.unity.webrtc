@@ -76,9 +76,9 @@ namespace Unity.WebRTC.RuntimeTest
             "VideoStreamTrack.UpdateTexture is not supported on Direct3D12 for decoder")]
         [ConditionalIgnoreMultiple(ConditionalIgnore.UnsupportedPlatformOpenGL,
             "Not support VideoStreamTrack for OpenGL")]
-        public IEnumerator VideoReceive([ValueSource(nameof(range))]int index)
+        public IEnumerator VideoReceive([ValueSource(nameof(range))] int index)
         {
-            if(SystemInfo.processorType == "Apple M1")
+            if (SystemInfo.processorType == "Apple M1")
                 Assert.Ignore("todo:: This test will hang up on Apple M1");
 
             var value = testValues[index];
@@ -185,7 +185,7 @@ namespace Unity.WebRTC.RuntimeTest
             if (videoCodec != null)
             {
                 var transceiver = offerPc.GetTransceivers().First(t => t.Sender == sender);
-                transceiver.SetCodecPreferences(new[] {videoCodec});
+                transceiver.SetCodecPreferences(new[] { videoCodec });
             }
         }
 

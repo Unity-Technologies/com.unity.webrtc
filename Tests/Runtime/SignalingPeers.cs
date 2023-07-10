@@ -1,9 +1,9 @@
-using UnityEngine;
-using UnityEngine.TestTools;
-using NUnit.Framework;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -47,7 +47,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         public RTCDataChannel CreateDataChannel(int indexPeer, string label, RTCDataChannelInit option = null)
         {
-            RTCDataChannel channel =  peers[indexPeer].CreateDataChannel(label, option);
+            RTCDataChannel channel = peers[indexPeer].CreateDataChannel(label, option);
             dataChannels[peers[indexPeer]].Add(channel);
             return channel;
         }

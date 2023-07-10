@@ -127,7 +127,7 @@ namespace Unity.WebRTC
             }
         }
 
-        
+
         public static RTCIceTcpCandidateType? ParseRTCIceTcpCandidateType(this string src)
         {
             if (string.IsNullOrEmpty(src))
@@ -248,7 +248,7 @@ namespace Unity.WebRTC
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
-            if(candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
+            if (candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
                 throw new ArgumentException("sdpMid and sdpMLineIndex are both null");
 
             RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;

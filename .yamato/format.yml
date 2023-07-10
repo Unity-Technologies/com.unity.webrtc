@@ -16,7 +16,7 @@ check_formatting_dotnet-format:
     flavor: b1.large
   commands:
     - dotnet tool install --tool-path tools dotnet-format || echo dotnet format already installed
-    - tools/dotnet-format --check -f . 1>formatting.log 2>formatting_errors.log
+    - tools/dotnet-format --check --exclude WebRTC~ -f . 1>formatting.log 2>formatting_errors.log
   artifacts:
     logs:
       paths:

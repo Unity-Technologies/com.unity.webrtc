@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Unity.Collections;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
+using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -102,7 +102,7 @@ class MetadataSample : MonoBehaviour
 
     private void OnDestroy()
     {
-        lock(metadataInputLock)
+        lock (metadataInputLock)
         {
             if (metadataArray.IsCreated)
                 metadataArray.Dispose();
@@ -193,9 +193,9 @@ class MetadataSample : MonoBehaviour
             rotateObject.Rotate(100 * t, 200 * t, 300 * t);
         }
 
-        lock(metadataOutputLock)
+        lock (metadataOutputLock)
         {
-            if(metadataOutputArray != null)
+            if (metadataOutputArray != null)
                 metadataOutput.text = System.Text.Encoding.UTF8.GetString(metadataOutputArray);
         }
     }
@@ -203,7 +203,7 @@ class MetadataSample : MonoBehaviour
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+        config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
         return config;
     }
@@ -294,7 +294,7 @@ class MetadataSample : MonoBehaviour
 
         if (WebRTCSettings.UseVideoCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] { WebRTCSettings.UseVideoCodec };
             foreach (var transceiver in _pc1.GetTransceivers())
             {
                 if (pc1Senders.Contains(transceiver.Sender))

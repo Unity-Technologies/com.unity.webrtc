@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using NUnit.Framework; 
+using NUnit.Framework;
 using UnityEngine;
 
 
@@ -60,7 +60,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void AsArrayReturnsIntArray()
         {
-            int[] source = {1, 2, 3};
+            int[] source = { 1, 2, 3 };
             IntPtr ptr = source.ToPtr();
             int[] dest = ptr.AsArray<int>(source.Length);
             Assert.That(dest, Is.Not.Null);

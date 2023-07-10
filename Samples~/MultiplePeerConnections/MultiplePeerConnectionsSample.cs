@@ -24,7 +24,7 @@ namespace Unity.WebRTC.Samples
 
         private static RTCConfiguration configuration = new RTCConfiguration
         {
-            iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}}
+            iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } }
         };
 
         private RTCPeerConnection pc1Local, pc1Remote, pc2Local, pc2Remote;
@@ -136,7 +136,7 @@ namespace Unity.WebRTC.Samples
 
             if (WebRTCSettings.UseVideoCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] { WebRTCSettings.UseVideoCodec };
                 foreach (var transceiver in pc1Local.GetTransceivers())
                 {
                     if (pc1VideoSenders.Contains(transceiver.Sender))

@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.WebRTC;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.WebRTC;
-using System.Linq;
 
 class StatsSample : MonoBehaviour
 {
@@ -303,11 +303,11 @@ class StatsSample : MonoBehaviour
             var op1 = pc1.GetStats();
             yield return op1;
 
-            if(op1.IsError)
+            if (op1.IsError)
                 continue;
 
             var report = op1.Value;
-            if(dropdown.options.Count != report.Stats.Count)
+            if (dropdown.options.Count != report.Stats.Count)
             {
                 var options = report.Stats.Select(pair => $"{pair.Value.Type}:{pair.Key}").ToList();
                 dropdown.ClearOptions();

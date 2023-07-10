@@ -115,7 +115,7 @@ namespace Unity.WebRTC.Editor
 
             var architecture = (iOSArchitecture)PlayerSettings.GetArchitecture(BuildTargetGroup.iOS);
 
-            if(architecture != iOSArchitecture.ARM64)
+            if (architecture != iOSArchitecture.ARM64)
             {
                 Debug.LogWarning(
                     $"WebRTC apps require a target architecture to be set {RequiredIOSArchitectures}. " +

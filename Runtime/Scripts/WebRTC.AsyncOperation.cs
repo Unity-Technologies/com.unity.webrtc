@@ -89,7 +89,7 @@ namespace Unity.WebRTC
         {
             IsError = errorType != RTCErrorType.None;
             Error = new RTCError() { errorType = errorType, message = error };
-            Desc = new RTCSessionDescription() { type = type, sdp = sdp};
+            Desc = new RTCSessionDescription() { type = type, sdp = sdp };
             this.Done();
         }
     }

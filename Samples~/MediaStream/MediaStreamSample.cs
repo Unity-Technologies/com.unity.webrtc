@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Text;
 
 namespace Unity.WebRTC.Samples
 {
@@ -61,7 +61,7 @@ namespace Unity.WebRTC.Samples
         private static RTCConfiguration GetSelectedSdpSemantics()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             return config;
         }
 
@@ -146,7 +146,7 @@ namespace Unity.WebRTC.Samples
             {
                 _pc1.RemoveTrack(sender);
             }
-            foreach(var transceiver in _pc1.GetTransceivers())
+            foreach (var transceiver in _pc1.GetTransceivers())
             {
                 transceiver.Stop();
             }

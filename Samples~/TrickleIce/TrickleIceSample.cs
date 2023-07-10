@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
+using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -128,7 +128,7 @@ class TrickleIceSample : MonoBehaviour
     {
         List<Toggle> toggles = iceTransportOption.ActiveToggles().ToList();
         int index = toggles.FindIndex(toggle => toggle.isOn);
-        RTCIceTransportPolicy policy = 0 == index ? RTCIceTransportPolicy.All: RTCIceTransportPolicy.Relay;
+        RTCIceTransportPolicy policy = 0 == index ? RTCIceTransportPolicy.All : RTCIceTransportPolicy.Relay;
 
         RTCConfiguration config = default;
         config.iceServers = iceServers.Values.ToArray();
