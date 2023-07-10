@@ -1,5 +1,5 @@
 check_code_format_nativeplugin:
-  name: Check codes formatting using clang-format
+  name: Checking codes formatting using clang-format
   agent:
     type: Unity::VM
     image: renderstreaming/ubuntu:v0.2.9-1258156
@@ -11,8 +11,8 @@ check_code_format_nativeplugin:
 check_formatting_dotnet-format:
   name: Checking codes formatting using dotnet-format tool
   agent:
-    type: Unity::VM
-    image: renderstreaming/ubuntu:v0.2.9-1258156
+    type: Unity::VM::osx
+    image: package-ci/macos-12:v4
     flavor: b1.large
   commands:
     - dotnet tool install --tool-path tools dotnet-format || echo dotnet format already installed
