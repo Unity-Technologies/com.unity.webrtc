@@ -176,7 +176,7 @@ namespace webrtc
         // Create sync object.
         GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
+        if (error != GL_NO_ERROR)
         {
             RTC_LOG(LS_INFO) << "glFenceSync returns error " << error;
             return false;
@@ -284,20 +284,20 @@ namespace webrtc
 
         const OpenGLTexture2D* glTexture2D = static_cast<const OpenGLTexture2D*>(texture);
         GLsync sync = glTexture2D->GetSync();
-        if(sync == 0)
+        if (sync == 0)
         {
             RTC_LOG(LS_INFO) << "The sync object is already reset.";
             return true;
         }
         GLenum ret = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, nsTimeout);
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
+        if (error != GL_NO_ERROR)
         {
             RTC_LOG(LS_INFO) << "glClientWaitSync returns error " << error;
             return false;
         }
 
-        switch(ret)
+        switch (ret)
         {
         case GL_CONDITION_SATISFIED:
         case GL_ALREADY_SIGNALED:
@@ -311,14 +311,14 @@ namespace webrtc
     {
         const OpenGLTexture2D* glTexture2D = static_cast<const OpenGLTexture2D*>(texture);
         GLsync sync = glTexture2D->GetSync();
-        if(sync == 0)
+        if (sync == 0)
         {
             RTC_LOG(LS_INFO) << "The sync object is already reset.";
             return true;
         }
         glDeleteSync(sync);
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
+        if (error != GL_NO_ERROR)
         {
             RTC_LOG(LS_INFO) << "glDeleteSync returns error " << error;
             return false;
