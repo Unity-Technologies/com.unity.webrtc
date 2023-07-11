@@ -108,11 +108,11 @@ add_subdirectory(GraphicsDevice)
 if(Windows)
   target_precompile_headers(WebRTCLib PRIVATE pch.h)
   # Force to always compile with W4
-  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-  endif()
+  # if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+  #   string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  # else()
+  #   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+  # endif()
   # Replace /GR option to disable RTTI
   foreach(flag_var
           CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -257,7 +257,8 @@ if(Windows)
     WebRTCPlugin
     PROPERTIES
       LINK_FLAGS
-      "/SUBSYSTEM:WINDOWS -delayload:nvcuda.dll -delayload:nvEncodeAPI64.dll -delayload:nvcuvid.dll"
+      "-delayload:nvcuda.dll -delayload:nvEncodeAPI64.dll -delayload:nvcuvid.dll"      
+#      "/SUBSYSTEM:WINDOWS -delayload:nvcuda.dll -delayload:nvEncodeAPI64.dll -delayload:nvcuvid.dll"
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(macOS)
   set_target_properties(WebRTCPlugin PROPERTIES LINK_FLAGS "-ObjC")

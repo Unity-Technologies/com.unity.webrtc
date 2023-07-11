@@ -16,8 +16,9 @@ namespace webrtc
 
 #ifdef _WIN32
     static PFN_vkGetMemoryWin32HandleKHR vkGetMemoryWin32HandleKHR = nullptr;
-#endif
+#else
     static PFN_vkGetMemoryFdKHR vkGetMemoryFdKHR = nullptr;
+#endif
     static PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = nullptr;
 
     bool VulkanUtility::FindMemoryTypeInto(
