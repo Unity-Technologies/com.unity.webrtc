@@ -295,19 +295,16 @@ namespace Unity.WebRTC.RuntimeTest
                     Ignore.Pass(peerConnectionStats.dataChannelsOpened);
                     Ignore.Pass(peerConnectionStats.dataChannelsClosed);
                     break;
-                case RTCStatsType.ReceivedRtp:
-                    var receivedRtpStats = stats as RTCReceivedRtpStats;
-                    Assert.NotNull(receivedRtpStats);
-                    Assert.AreEqual(2, receivedRtpStats.Dict.Count);
-                    Ignore.Pass(receivedRtpStats.jitter);
-                    Ignore.Pass(receivedRtpStats.packetsLost);
-                    break;
-                case RTCStatsType.SentRtp:
-                    var sentRtpStats = stats as RTCSentRtpStats;
-                    Assert.NotNull(sentRtpStats);
-                    Assert.AreEqual(2, sentRtpStats.Dict.Count);
-                    Ignore.Pass(sentRtpStats.packetsSent);
-                    Ignore.Pass(sentRtpStats.bytesSent);
+                case RTCStatsType.MediaPlayOut:
+                    var mediaPlayOutStats = stats as RTCAudioPlayoutStats;
+                    Assert.NotNull(mediaPlayOutStats);
+                    Assert.AreEqual(6, mediaPlayOutStats.Dict.Count);
+                    Assert.IsNotEmpty(mediaPlayOutStats.kind);
+                    Ignore.Pass(mediaPlayOutStats.synthesizedSamplesDuration);
+                    Ignore.Pass(mediaPlayOutStats.synthesizedSamplesEvents);
+                    Ignore.Pass(mediaPlayOutStats.totalSamplesDuration);
+                    Ignore.Pass(mediaPlayOutStats.totalPlayoutDelay);
+                    Ignore.Pass(mediaPlayOutStats.totalSamplesCount);
                     break;
             }
         }
