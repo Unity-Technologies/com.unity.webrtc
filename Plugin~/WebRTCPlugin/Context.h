@@ -21,21 +21,17 @@ namespace webrtc
                                                          { "remote-inbound-rtp", 3 },
                                                          { "remote-outbound-rtp", 4 },
                                                          { "media-source", 5 },
-                                                         { "csrc", 6 },
+                                                         { "media-playout", 6 },
                                                          { "peer-connection", 7 },
                                                          { "data-channel", 8 },
-                                                         { "stream", 9 },
-                                                         { "track", 10 },
-                                                         { "transceiver", 11 },
-                                                         { "sender", 12 },
-                                                         { "receiver", 13 },
-                                                         { "transport", 14 },
-                                                         { "sctp-transport", 15 },
-                                                         { "candidate-pair", 16 },
-                                                         { "local-candidate", 17 },
-                                                         { "remote-candidate", 18 },
-                                                         { "certificate", 19 },
-                                                         { "ice-server", 20 } };
+                                                         { "transport", 9 },
+                                                         { "candidate-pair", 10 },
+                                                         { "local-candidate", 11 },
+                                                         { "remote-candidate", 12 },
+                                                         { "certificate", 13 },
+                                                         // todo: If the following types are deleted from rtcstats_objects.h, delete them as well.
+                                                         { "stream", 21 },
+                                                         { "track", 22 } };
 
     class IGraphicsDevice;
     class ProfilerMarkerFactory;

@@ -68,8 +68,8 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        [StringValue("csrc")]
-        Csrc = 6,
+        [StringValue("media-playout")]
+        MediaPlayOut = 6,
 
         /// <summary>
         ///
@@ -86,88 +86,32 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        [Obsolete]
-        [StringValue("stream")]
-        Stream = 9,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [Obsolete]
-        [StringValue("track")]
-        Track = 10,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("transceiver")]
-        Transceiver = 11,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("sender")]
-        Sender = 12,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("receiver")]
-        Receiver = 13,
-
-        /// <summary>
-        ///
-        /// </summary>
         [StringValue("transport")]
-        Transport = 14,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("sctp-transport")]
-        SctpTransport = 15,
+        Transport = 9,
 
         /// <summary>
         ///
         /// </summary>
         [StringValue("candidate-pair")]
-        CandidatePair = 16,
+        CandidatePair = 10,
 
         /// <summary>
         ///
         /// </summary>
         [StringValue("local-candidate")]
-        LocalCandidate = 17,
+        LocalCandidate = 11,
 
         /// <summary>
         ///
         /// </summary>
         [StringValue("remote-candidate")]
-        RemoteCandidate = 18,
+        RemoteCandidate = 12,
 
         /// <summary>
         ///
         /// </summary>
         [StringValue("certificate")]
-        Certificate = 19,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("ice-server")]
-        IceServer = 20,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("received-rtp")]
-        ReceivedRtp = 21,
-
-        /// <summary>
-        ///
-        /// </summary>
-        [StringValue("sent-rtp")]
-        SentRtp = 22,
+        Certificate = 13,
     }
 
     internal enum StatsMemberType
@@ -1497,6 +1441,46 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
+    public class RTCAudioPlayoutStats : RTCStats
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        public string kind { get { return GetString("kind"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public double synthesizedSamplesDuration { get { return GetDouble("synthesizedSamplesDuration"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public ulong synthesizedSamplesEvents { get { return GetUnsignedLong("synthesizedSamplesEvents"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public double totalSamplesDuration { get { return GetDouble("totalSamplesDuration"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public double totalPlayoutDelay { get { return GetDouble("totalPlayoutDelay"); } }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public ulong totalSamplesCount { get { return GetUnsignedLong("totalSamplesCount"); } }
+
+        internal RTCAudioPlayoutStats(IntPtr ptr) : base(ptr)
+        {
+        }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
     public class RTCTransportStats : RTCStats
     {
         /// <summary>
@@ -1569,75 +1553,6 @@ namespace Unity.WebRTC
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    public class RTCTransceiverStats : RTCStats
-    {
-        internal RTCTransceiverStats(IntPtr ptr) : base(ptr)
-        {
-        }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    public class RTCSenderStats : RTCStats
-    {
-        internal RTCSenderStats(IntPtr ptr) : base(ptr)
-        {
-        }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    public class RTCReceiverStats : RTCStats
-    {
-        internal RTCReceiverStats(IntPtr ptr) : base(ptr)
-        {
-        }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    public class RTCReceivedRtpStats :RTCStats
-    {
-        internal RTCReceivedRtpStats(IntPtr ptr) : base(ptr)
-        {
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double jitter { get { return GetDouble("jitter"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public int packetsLost { get { return GetInt("packetsLost"); } }
-    }
-
-    public class RTCSentRtpStats : RTCStats
-    {
-        internal RTCSentRtpStats(IntPtr ptr) : base(ptr)
-        {
-        }
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong bytesSent { get { return GetUnsignedLong("bytesSent"); } }
-    }
-
-
     internal class StatsFactory
     {
         static Dictionary<RTCStatsType, Func<IntPtr, RTCStats>> m_map;
@@ -1663,20 +1578,14 @@ namespace Unity.WebRTC
                         return new RTCVideoSourceStats(ptr);
                     }
                 },
-                {RTCStatsType.Csrc, ptr => new RTCCodecStats(ptr)},
+                {RTCStatsType.MediaPlayOut, ptr => new RTCAudioPlayoutStats(ptr)},
                 {RTCStatsType.PeerConnection, ptr => new RTCPeerConnectionStats(ptr)},
                 {RTCStatsType.DataChannel, ptr => new RTCDataChannelStats(ptr)},
-                {RTCStatsType.Transceiver, ptr => new RTCTransceiverStats(ptr)},
-                {RTCStatsType.Sender, ptr => new RTCSenderStats(ptr)},
-                {RTCStatsType.Receiver, ptr => new RTCReceiverStats(ptr)},
                 {RTCStatsType.Transport, ptr => new RTCTransportStats(ptr)},
-                {RTCStatsType.SctpTransport, ptr => new RTCTransportStats(ptr)},
                 {RTCStatsType.CandidatePair, ptr => new RTCIceCandidatePairStats(ptr)},
                 {RTCStatsType.LocalCandidate, ptr => new RTCIceCandidateStats(ptr)},
                 {RTCStatsType.RemoteCandidate, ptr => new RTCIceCandidateStats(ptr)},
                 {RTCStatsType.Certificate, ptr => new RTCCertificateStats(ptr)},
-                {RTCStatsType.ReceivedRtp, ptr => new RTCReceivedRtpStats(ptr)},
-                {RTCStatsType.SentRtp, ptr => new RTCSentRtpStats(ptr)},
             };
         }
 

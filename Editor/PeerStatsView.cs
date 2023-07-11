@@ -67,29 +67,14 @@ namespace Unity.WebRTC.Editor
                         case RTCStatsType.MediaSource:
                             container.Add(CreateMediaSourceView(id));
                             break;
-                        case RTCStatsType.Csrc:
-                            container.Add(CreateCsrcView(id));
-                            break;
                         case RTCStatsType.PeerConnection:
                             container.Add(CreatePeerConnectionView(id));
                             break;
                         case RTCStatsType.DataChannel:
                             container.Add(CreateDataChannelView(id));
                             break;
-                        case RTCStatsType.Transceiver:
-                            container.Add(CreateTransceiverView(id));
-                            break;
-                        case RTCStatsType.Sender:
-                            container.Add(CreateSenderView(id));
-                            break;
-                        case RTCStatsType.Receiver:
-                            container.Add(CreateReceiverView(id));
-                            break;
                         case RTCStatsType.Transport:
                             container.Add(CreateTransportView(id));
-                            break;
-                        case RTCStatsType.SctpTransport:
-                            container.Add(CreateSctpTransportView(id));
                             break;
                         case RTCStatsType.CandidatePair:
                             container.Add(CreateCandidatePairView(id));
@@ -102,9 +87,6 @@ namespace Unity.WebRTC.Editor
                             break;
                         case RTCStatsType.Certificate:
                             container.Add(CreateCertificateView(id));
-                            break;
-                        case RTCStatsType.IceServer:
-                            container.Add(CreateIceServerView(id));
                             break;
                         default:
                             throw new ArgumentOutOfRangeException($"this type is not supported : {type}");
@@ -380,33 +362,6 @@ namespace Unity.WebRTC.Editor
             return root;
         }
 
-        private VisualElement CreateCsrcView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCCodecStats csrcStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Csrc}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(csrcStats.Id)}: {csrcStats.Id}"));
-                container.Add(new Label($"{nameof(csrcStats.Timestamp)}: {csrcStats.Timestamp}"));
-            };
-            return root;
-        }
-
         private VisualElement CreatePeerConnectionView(string id)
         {
             var root = new VisualElement();
@@ -476,87 +431,6 @@ namespace Unity.WebRTC.Editor
 
             root.Add(dataChannelGraph.Create());
 
-            return root;
-        }
-
-        private VisualElement CreateTransceiverView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCTransceiverStats transceiverStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Transceiver}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(transceiverStats.Id)}: {transceiverStats.Id}"));
-                container.Add(new Label($"{nameof(transceiverStats.Timestamp)}: {transceiverStats.Timestamp}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateSenderView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCSenderStats senderStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Sender}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(senderStats.Id)}: {senderStats.Id}"));
-                container.Add(new Label($"{nameof(senderStats.Timestamp)}: {senderStats.Timestamp}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateReceiverView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCReceiverStats receiverStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Receiver}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(receiverStats.Id)}: {receiverStats.Id}"));
-                container.Add(new Label($"{nameof(receiverStats.Timestamp)}: {receiverStats.Timestamp}"));
-            };
             return root;
         }
 
@@ -842,33 +716,6 @@ namespace Unity.WebRTC.Editor
                     new Label($"{nameof(certificateStats.base64Certificate)}: {certificateStats.base64Certificate}"));
                 container.Add(new Label(
                     $"{nameof(certificateStats.issuerCertificateId)}: {certificateStats.issuerCertificateId}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateIceServerView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCCertificateStats outboundStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.IceServer}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(outboundStats.Id)}: {outboundStats.Id}"));
-                container.Add(new Label($"{nameof(outboundStats.Timestamp)}: {outboundStats.Timestamp}"));
             };
             return root;
         }
