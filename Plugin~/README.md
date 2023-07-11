@@ -8,22 +8,22 @@ Install dependencies to make development environment.
 
 ### Windows
 
-On windows, first, the build process use the **clang** compiler. To install clang, see [MSDN](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170). And [chocolatey](https://chocolatey.org/) is used to install.
+On windows, first, you need to install **Visual Studio 2022**. The build process use the **clang** compiler. To install clang, see [MSDN](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170). And [chocolatey](https://chocolatey.org/) is used to install.
 
 ```powershell
 # Install CUDA
 choco install cuda --version=11.0.3
 
 # Install Windows SDK
-# WARNING: If you have versions of Windows SDK earlier than Version 1809,
+# WARNING: If you have versions of Windows SDK earlier than Version 22H2,
 # compiling the plugin will fail. Make sure to uninstall earlier versions.
-choco install -y vcredist2010 vcredist2013 vcredist140 windows-sdk-10-version-1809-all
+choco install -y vcredist2010 vcredist2013 vcredist140 windows-sdk-11-version-22h2-all
 
 # Install Vulkan
 choco install vulkan-sdk --version=1.2.182.0
 
-# Install CMake 3.22.3
-choco install cmake -y --version=3.22.3
+# Install CMake 3.24.3
+choco install cmake -y --version=3.24.3
 
 # Install 7zip (used to extract Google's webrtc library after download)
 choco install 7zip
@@ -68,9 +68,9 @@ sudo apt install -y cuda-toolkit-11-0
 # Install CMake 3.22.3
 sudo apt install -y libssl-dev
 sudo apt purge -y cmake
-wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3.tar.gz
-tar xvf cmake-3.22.3.tar.gz
-cd cmake-3.22.3
+wget https://github.com/Kitware/CMake/releases/download/v3.24.3/cmake-3.24.3.tar.gz
+tar xvf cmake-3.24.3.tar.gz
+cd cmake-3.24.3
 ./bootstrap && make && sudo make install
 ```
 
@@ -98,12 +98,12 @@ wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
 # Set Android NDK root path to `ANDROID_NDK` environment variable
 echo "export ANDROID_NDK=~/android-ndk-r21d/" >> ~/.profile
 
-# Install CMake 3.22.3
+# Install CMake 3.24.3
 sudo apt install -y libssl-dev
 sudo apt purge -y cmake
-wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3.tar.gz
-tar xvf cmake-3.22.3.tar.gz
-cd cmake-3.22.3
+wget https://github.com/Kitware/CMake/releases/download/v3.24.3/cmake-3.24.3.tar.gz
+tar xvf cmake-3.24.3.tar.gz
+cd cmake-3.24.3
 ./bootstrap && make && sudo make install
 
 # Install pkg-config, zip
