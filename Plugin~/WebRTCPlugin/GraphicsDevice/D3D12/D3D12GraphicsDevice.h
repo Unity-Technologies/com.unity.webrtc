@@ -89,21 +89,13 @@ namespace webrtc
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 
     private:
+        struct Frame
+        {
+            ID3D12CommandAllocatorPtr commandAllocator;
+            ID3D12GraphicsCommandList4Ptr commandList;
+            uint64_t fenceValue;
+        };
         D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
-
-        IUnityGraphicsD3D12v5* m_unityInterface;
-        ComPtr<ID3D12Device> m_d3d12Device;
-        ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
-        ComPtr<ID3D12Fence> m_fence;
-        uint64_t m_nextFrameFenceValue;
-
-        bool m_isCudaSupport;
-        CudaContext m_cudaContext;
-
-        //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
-        ID3D12CommandAllocatorPtr m_commandAllocator;
-        ID3D12GraphicsCommandList4Ptr m_commandList;
-
         uint64_t GetNextFrameFenceValue() const;
         uint64_t ExecuteCommandList(
             int listCount,
@@ -111,6 +103,17 @@ namespace webrtc
             int stateCount,
             UnityGraphicsD3D12ResourceState* states);
         ID3D12Fence* GetFence();
+        bool CreateFrame(Frame& frame);
+
+        IUnityGraphicsD3D12v5* m_unityInterface;
+        ComPtr<ID3D12Device> m_d3d12Device;
+        ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue;
+        ComPtr<ID3D12Fence> m_fence;
+
+        bool m_isCudaSupport;
+        CudaContext m_cudaContext;
+
+        std::vector<Frame> m_frames;
     };
 
     //---------------------------------------------------------------------------------------------------------------------
