@@ -848,255 +848,6 @@ namespace Unity.WebRTC
     /// <summary>
     ///
     /// </summary>
-    [Obsolete]
-    public class RTCMediaStreamStats : RTCStats
-    {
-        /// <summary>
-        ///
-        /// </summary>
-        public string streamIdentifier { get { return GetString("streamIdentifier"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string[] trackIds { get { return GetStringArray("trackIds"); } }
-
-        internal RTCMediaStreamStats(IntPtr ptr) : base(ptr)
-        {
-        }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    [Obsolete]
-    public class RTCMediaStreamTrackStats : RTCStats
-    {
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string trackIdentifier { get { return GetString("trackIdentifier"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string mediaSourceId { get { return GetString("mediaSourceId"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public bool remoteSource { get { return GetBool("remoteSource"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public bool ended { get { return GetBool("ended"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public bool detached { get { return GetBool("detached"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string kind { get { return GetString("kind"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double jitterBufferDelay { get { return GetDouble("jitterBufferDelay"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong jitterBufferEmittedCount { get { return GetUnsignedLong("jitterBufferEmittedCount"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <remarks>Video-only members.</remarks>
-        public uint frameWidth { get { return GetUnsignedInt("frameWidth"); } }
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint frameHeight { get { return GetUnsignedInt("frameHeight"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double framesPerSecond { get { return GetDouble("framesPerSecond"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint framesSent { get { return GetUnsignedInt("framesSent"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint hugeFramesSent { get { return GetUnsignedInt("hugeFramesSent"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint framesReceived { get { return GetUnsignedInt("framesReceived"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint framesDecoded { get { return GetUnsignedInt("framesDecoded"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint framesDropped { get { return GetUnsignedInt("framesDropped"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint framesCorrupted { get { return GetUnsignedInt("framesCorrupted"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint partialFramesLost { get { return GetUnsignedInt("partialFramesLost"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint fullFramesLost { get { return GetUnsignedInt("fullFramesLost"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <remarks>Audio-only members.</remarks>
-        public double audioLevel { get { return GetDouble("audioLevel"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double echoReturnLoss { get { return GetDouble("echoReturnLoss"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double echoReturnLossEnhancement { get { return GetDouble("echoReturnLossEnhancement"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong totalSamplesReceived { get { return GetUnsignedLong("totalSamplesReceived"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double totalSamplesDuration { get { return GetDouble("totalSamplesDuration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong concealedSamples { get { return GetUnsignedLong("concealedSamples"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong silentConcealedSamples { get { return GetUnsignedLong("silentConcealedSamples"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong concealmentEvents { get { return GetUnsignedLong("concealmentEvents"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong insertedSamplesForDeceleration { get { return GetUnsignedLong("insertedSamplesForDeceleration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong removedSamplesForAcceleration { get { return GetUnsignedLong("removedSamplesForAcceleration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <remarks>Non-standard audio-only member.</remarks>
-        public ulong jitterBufferFlushes { get { return GetUnsignedLong("jitterBufferFlushes"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ulong delayedPacketOutageSamples { get { return GetUnsignedLong("delayedPacketOutageSamples"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double relativePacketArrivalDelay { get { return GetDouble("relativePacketArrivalDelay"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <remarks>Non-standard metric showing target delay of jitter buffer.</remarks>
-        public double jitterBufferTargetDelay { get { return GetDouble("jitterBufferTargetDelay"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint interruptionCount { get { return GetUnsignedInt("interruptionCount"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double totalInterruptionDuration { get { return GetDouble("totalInterruptionDuration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint freezeCount { get { return GetUnsignedInt("freezeCount"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public uint pauseCount { get { return GetUnsignedInt("pauseCount"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double totalFreezesDuration { get { return GetDouble("totalFreezesDuration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double totalPausesDuration { get { return GetDouble("totalPausesDuration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double totalFramesDuration { get { return GetDouble("totalFramesDuration"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public double sumOfSquaredFramesDuration { get { return GetDouble("sumOfSquaredFramesDuration"); } }
-
-        internal RTCMediaStreamTrackStats(IntPtr ptr) : base(ptr)
-        {
-        }
-    }
-
-
-    /// <summary>
-    ///
-    /// </summary>
     public class RTCPeerConnectionStats : RTCStats
     {
 
@@ -1915,10 +1666,6 @@ namespace Unity.WebRTC
                 {RTCStatsType.Csrc, ptr => new RTCCodecStats(ptr)},
                 {RTCStatsType.PeerConnection, ptr => new RTCPeerConnectionStats(ptr)},
                 {RTCStatsType.DataChannel, ptr => new RTCDataChannelStats(ptr)},
-#pragma warning disable 0612
-                {RTCStatsType.Stream, ptr => new RTCMediaStreamStats(ptr)},
-                {RTCStatsType.Track, ptr => new RTCMediaStreamTrackStats(ptr)},
-#pragma warning restore 0612
                 {RTCStatsType.Transceiver, ptr => new RTCTransceiverStats(ptr)},
                 {RTCStatsType.Sender, ptr => new RTCSenderStats(ptr)},
                 {RTCStatsType.Receiver, ptr => new RTCReceiverStats(ptr)},
@@ -1935,7 +1682,7 @@ namespace Unity.WebRTC
 
         public static RTCStats Create(RTCStatsType type, IntPtr ptr)
         {
-            return m_map[type](ptr);
+            return m_map.TryGetValue(type, out var constructor) ? constructor(ptr) : null;
         }
     }
 
@@ -1965,6 +1712,10 @@ namespace Unity.WebRTC
             {
                 RTCStatsType type = (RTCStatsType)types[i];
                 RTCStats stats = StatsFactory.Create(type, array[i]);
+                if (stats == null)
+                {
+                    continue;
+                }
                 m_dictStats[stats.Id] = stats;
             }
 
