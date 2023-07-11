@@ -15,23 +15,25 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-    const std::map<std::string, uint32_t> statsTypes = { { "codec", 0 },
-                                                         { "inbound-rtp", 1 },
-                                                         { "outbound-rtp", 2 },
-                                                         { "remote-inbound-rtp", 3 },
-                                                         { "remote-outbound-rtp", 4 },
-                                                         { "media-source", 5 },
-                                                         { "media-playout", 6 },
-                                                         { "peer-connection", 7 },
-                                                         { "data-channel", 8 },
-                                                         { "transport", 9 },
-                                                         { "candidate-pair", 10 },
-                                                         { "local-candidate", 11 },
-                                                         { "remote-candidate", 12 },
-                                                         { "certificate", 13 },
-                                                         // todo: If the following types are deleted from rtcstats_objects.h, delete them as well.
-                                                         { "stream", 21 },
-                                                         { "track", 22 } };
+    const std::map<std::string, uint32_t> statsTypes = {
+        { "codec", 0 },
+        { "inbound-rtp", 1 },
+        { "outbound-rtp", 2 },
+        { "remote-inbound-rtp", 3 },
+        { "remote-outbound-rtp", 4 },
+        { "media-source", 5 },
+        { "media-playout", 6 },
+        { "peer-connection", 7 },
+        { "data-channel", 8 },
+        { "transport", 9 },
+        { "candidate-pair", 10 },
+        { "local-candidate", 11 },
+        { "remote-candidate", 12 },
+        { "certificate", 13 },
+        // todo: If the following types are deleted from rtcstats_objects.h, delete them as well.
+        { "stream", 21 },
+        { "track", 22 }
+    };
 
     class IGraphicsDevice;
     class ProfilerMarkerFactory;
