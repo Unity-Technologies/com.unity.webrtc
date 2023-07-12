@@ -42,6 +42,10 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void QuitAndInitContextManager()
         {
+            // ignore error message
+            // Unhandled log message: '[Exception] [000:016](rtp_transceiver.cc:598): PeerConnection is closed. (INVALID_STATE)
+            UnityEngine.TestTools.LogAssert.ignoreFailingMessages = true;
+
             // ContextManager.Init is already called when the process reaches here.
             ContextManager.Quit();
             ContextManager.Init();
@@ -50,6 +54,7 @@ namespace Unity.WebRTC.RuntimeTest
             // Reinitialize
             WebRTC.InitializeInternal();
 #endif
+            UnityEngine.TestTools.LogAssert.ignoreFailingMessages = false;
         }
 
         [Test]
