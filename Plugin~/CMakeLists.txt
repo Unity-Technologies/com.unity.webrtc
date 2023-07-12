@@ -62,11 +62,13 @@ endif()
 # enable debug output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-# set iterator debug level
-if(Windows)
+# set iterator debug level and compiler flags.
+if(Windows AND CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  set(CMAKE_CXX_FLAGS_DEBUG
+      "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0 /Zi /Od")
+else()
   set(CMAKE_CXX_FLAGS_DEBUG
       "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0")
-#      "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0 /Zi /Od")
 endif()
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
