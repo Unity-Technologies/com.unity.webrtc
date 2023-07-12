@@ -1281,6 +1281,9 @@ namespace Unity.WebRTC
         public static extern RTCStatsCollectorCallback PeerConnectionReceiverGetStats(IntPtr sender, IntPtr receiver);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool PeerConnectionCanTrickleIceCandidates(IntPtr ptr, [MarshalAs(UnmanagedType.U1)] out bool value);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
