@@ -115,7 +115,7 @@ if(Windows)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     endif()
   endif()
-  
+
   # Replace /GR option to disable RTTI
   foreach(flag_var
           CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
