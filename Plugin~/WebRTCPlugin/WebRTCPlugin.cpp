@@ -1276,17 +1276,13 @@ extern "C"
         return error.type();
     }
 
-    UNITY_INTERFACE_EXPORT bool SenderGetSyncApplicationFramerate(RtpSenderInterface* sender)
+    UNITY_INTERFACE_EXPORT bool VideoSourceGetSyncApplicationFramerate(UnityVideoTrackSource* source)
     {
-        auto track = static_cast<VideoTrackInterface*>(sender->track().get());
-        auto source = static_cast<UnityVideoTrackSource*>(track->GetSource());
         return source->syncApplicationFramerate();
     }
 
-    UNITY_INTERFACE_EXPORT void SenderSetSyncApplicationFramerate(RtpSenderInterface* sender, bool value)
+    UNITY_INTERFACE_EXPORT void VideoSourceSetSyncApplicationFramerate(UnityVideoTrackSource* source, bool value)
     {
-        auto track = static_cast<VideoTrackInterface*>(sender->track().get());
-        auto source = static_cast<UnityVideoTrackSource*>(track->GetSource());
         source->SetSyncApplicationFramerate(value);
     }
 

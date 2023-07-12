@@ -55,7 +55,8 @@ namespace webrtc
         Create(bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory);
 
     private:
-        void CaptureNextFrame();
+        void OnUpdateVideoFrame();
+        void CaptureVideoFrame();
         void SendFeedback();
         FrameAdaptationParams ComputeAdaptationParams(int width, int height, int64_t time_us);
 

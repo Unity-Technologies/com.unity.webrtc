@@ -25,7 +25,7 @@ namespace webrtc
         taskQueue_ = std::make_unique<rtc::TaskQueue>(
             taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
         scheduler_ = std::make_unique<VideoFrameScheduler>(taskQueue_->Get());
-        scheduler_->Start(std::bind(&UnityVideoTrackSource::CaptureNextFrame, this));
+        scheduler_->Start(std::bind(&UnityVideoTrackSource::OnUpdateVideoFrame, this));
     }
 
     UnityVideoTrackSource::~UnityVideoTrackSource() { scheduler_ = nullptr; }
@@ -55,9 +55,14 @@ namespace webrtc
 
     absl::optional<bool> UnityVideoTrackSource::needs_denoising() const { return needs_denoising_; }
 
-    void UnityVideoTrackSource::CaptureNextFrame()
+    void UnityVideoTrackSource::OnUpdateVideoFrame()
     {
         const std::unique_lock<std::mutex> lock(mutex_);
+        CaptureVideoFrame();
+    }
+
+    void UnityVideoTrackSource::CaptureVideoFrame()
+    {
         if (!frame_)
             return;
 
@@ -97,7 +102,7 @@ namespace webrtc
         frame_ = frame;
 
         if (syncApplicationFramerate_)
-            CaptureNextFrame();
+            CaptureVideoFrame();
     }
 
     void UnityVideoTrackSource::SetSyncApplicationFramerate(bool value)

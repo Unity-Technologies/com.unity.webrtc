@@ -97,6 +97,9 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool SyncApplicationFramerate
         {
             get

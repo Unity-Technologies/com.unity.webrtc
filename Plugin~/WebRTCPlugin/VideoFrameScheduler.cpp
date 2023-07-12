@@ -41,11 +41,7 @@ namespace webrtc
     void VideoFrameScheduler::Pause(bool pause)
     {
         paused_ = pause;
-        if (paused_)
-        {
-            StopTask();
-        }
-        else
+        if (!paused_)
         {
             StartRepeatingTask();
         }
