@@ -39,8 +39,9 @@ namespace Unity.WebRTC
             public GraphicsFormat format;
         }
 
+        internal VideoTrackSource m_source;
+
         UnityVideoRenderer m_renderer;
-        VideoTrackSource m_source;
         VideoStreamTrackData m_data;
         IntPtr m_dataptr = IntPtr.Zero;
 
@@ -320,6 +321,12 @@ namespace Unity.WebRTC
         internal Texture sourceTexture_;
         internal RenderTexture destTexture_;
         internal IntPtr destTexturePtr_;
+
+        internal bool SyncApplicationFramerate
+        {
+            get => NativeMethods.VideoSourceGetSyncApplicationFramerate(GetSelfOrThrow());
+            set => NativeMethods.VideoSourceSetSyncApplicationFramerate(GetSelfOrThrow(), value);
+        }
 
         public VideoTrackSource()
             : base(WebRTC.Context.CreateVideoTrackSource())

@@ -97,13 +97,45 @@ namespace Unity.WebRTC
             }
         }
 
+        public bool SyncApplicationFramerate
+        {
+            get
+            {
+                if (Track is VideoStreamTrack videoTrack)
+                {
+                    if(videoTrack.m_source == null)
+                    {
+                        throw new InvalidOperationException("This track doesn't have a video source.");
+                    }
+                    return videoTrack.m_source.SyncApplicationFramerate;
+                }
+                else
+                {
+                    throw new InvalidOperationException("This track is not VideoStreamTrack.");
+                }
+            }
+            set
+            {
+                if (Track is VideoStreamTrack videoTrack)
+                {
+                    if (videoTrack.m_source == null)
+                    {
+                        throw new InvalidOperationException("This track doesn't have a video source.");
+                    }
+                    videoTrack.m_source.SyncApplicationFramerate = value;
+                }
+                else
+                {
+                    throw new InvalidOperationException("This track is not VideoStreamTrack.");
+                }
+            }
+        }
 
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public RTCRtpSendParameters GetParameters()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(GetSelfOrThrow(), out var ptr);
             RTCRtpSendParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);

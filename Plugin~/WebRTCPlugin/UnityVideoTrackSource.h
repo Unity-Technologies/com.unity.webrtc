@@ -45,8 +45,9 @@ namespace webrtc
         bool remote() const override;
         bool is_screencast() const override;
         absl::optional<bool> needs_denoising() const override;
+        bool syncApplicationFramerate() const { return syncApplicationFramerate_; };
         void OnFrameCaptured(rtc::scoped_refptr<VideoFrame> frame);
-
+        void SetSyncApplicationFramerate(bool value);
         using VideoTrackSourceInterface::AddOrUpdateSink;
         using VideoTrackSourceInterface::RemoveSink;
 
@@ -80,6 +81,7 @@ namespace webrtc
         std::unique_ptr<rtc::TaskQueue> taskQueue_;
         std::unique_ptr<VideoFrameScheduler> scheduler_;
         rtc::scoped_refptr<unity::webrtc::VideoFrame> frame_;
+        bool syncApplicationFramerate_;
     };
 
 } // end namespace webrtc

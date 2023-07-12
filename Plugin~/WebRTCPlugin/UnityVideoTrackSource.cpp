@@ -20,6 +20,7 @@ namespace webrtc
         : AdaptedVideoTrackSource(/*required_alignment=*/1)
         , is_screencast_(is_screencast)
         , frame_(nullptr)
+        , syncApplicationFramerate_(false)
     {
         taskQueue_ = std::make_unique<rtc::TaskQueue>(
             taskQueueFactory->CreateTaskQueue("VideoFrameScheduler", TaskQueueFactory::Priority::NORMAL));
@@ -94,6 +95,18 @@ namespace webrtc
 
         const std::unique_lock<std::mutex> lock(mutex_);
         frame_ = frame;
+
+        if (syncApplicationFramerate_)
+            CaptureNextFrame();
+    }
+
+    void UnityVideoTrackSource::SetSyncApplicationFramerate(bool value)
+    {
+        if (syncApplicationFramerate_ == value)
+            return;
+
+        scheduler_->Pause(value);
+        syncApplicationFramerate_ = value;
     }
 
 } // end namespace webrtc
