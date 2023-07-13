@@ -632,6 +632,7 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
+        private static ILogger s_logger;
 
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitializeOnLoadMethod()
@@ -730,6 +731,45 @@ namespace Unity.WebRTC
         {
             get { return s_context.limitTextureSize; }
             set { s_context.limitTextureSize = value; }
+        }
+
+        /// <summary>
+        /// Get & set the logger to use when logging debug messages inside the WebRTC package.
+        /// By default will use Debug.unityLogger.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Throws if setting a null logger.</exception>
+        public static ILogger Logger
+        {
+            get
+            {
+                if (s_logger == null)
+                {
+                    return Debug.unityLogger;
+                }
+
+                return s_logger;
+            }
+            set
+            {
+                s_logger = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
+
+        /// <summary>
+        /// Configure native logging settings for WebRTC.
+        /// </summary>
+        /// <param name="enableNativeLogging">Enables or disable native logging.</param>
+        /// <param name="nativeLoggingSeverity">Sets the native logging level.</param>
+        public static void ConfigureNativeLogging(bool enableNativeLogging, NativeLoggingSeverity nativeLoggingSeverity)
+        {
+            if (enableNativeLogging)
+            {
+                NativeMethods.RegisterDebugLog(DebugLog, enableNativeLogging, nativeLoggingSeverity);
+            }
+            else
+            {
+                NativeMethods.RegisterDebugLog(null, false, nativeLoggingSeverity);
+            }
         }
 
         internal static void DisposeInternal()
@@ -995,7 +1035,7 @@ namespace Unity.WebRTC
             foreach (var ptr in array)
             {
                 if (ptr == IntPtr.Zero)
-                    UnityEngine.Debug.LogError("IntPtr is zero");
+                    WebRTC.Logger.Log(LogType.Error, "IntPtr is zero");
                 list.Add(FindOrCreate(ptr, constructor));
             }
             return list;
@@ -1025,9 +1065,24 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
-        static void DebugLog(string str)
+        static void DebugLog(string str, NativeLoggingSeverity loggingSeverity)
         {
-            UnityEngine.Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "{0}", str);
+            LogType logType = LogType.Log;
+            switch (loggingSeverity)
+            {
+                case NativeLoggingSeverity.Warning:
+                {
+                    logType = LogType.Warning;
+                    break;
+                }
+                case NativeLoggingSeverity.Error:
+                {
+                    logType = LogType.Exception;
+                    break;
+                }
+            }
+
+            Logger.LogFormat(logType, "{0}", str);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateSetLocalDescription))]
@@ -1145,7 +1200,7 @@ namespace Unity.WebRTC
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str);
+    internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str, NativeLoggingSeverity severity);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCollectStats(IntPtr ptr, IntPtr ptrCallback, IntPtr reportPtr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

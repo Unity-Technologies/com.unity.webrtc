@@ -21,7 +21,7 @@ namespace webrtc
     enum class RTCPeerConnectionEventType;
     struct MediaStreamEvent;
 
-    using DelegateDebugLog = void (*)(const char*);
+    using DelegateDebugLog = void (*)(const char*, rtc::LoggingSeverity severity);
     using DelegateSetResolution = void (*)(int32_t*, int32_t*);
     using DelegateMediaStreamOnAddTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);
     using DelegateMediaStreamOnRemoveTrack = void (*)(MediaStreamInterface*, MediaStreamTrackInterface*);

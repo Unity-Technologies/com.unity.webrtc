@@ -1,14 +1,30 @@
 using System;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Unity.WebRTC.RuntimeTest
 {
     class ContextTest
     {
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
-        static void DebugLog(string str)
+        static void DebugLog(string str, NativeLoggingSeverity severity)
         {
-            UnityEngine.Debug.Log(str);
+            LogType logType = LogType.Log;
+            switch (severity)
+            {
+                case NativeLoggingSeverity.Warning:
+                {
+                    logType = LogType.Warning;
+                    break;
+                }
+                case NativeLoggingSeverity.Error:
+                {
+                    logType = LogType.Exception;
+                    break;
+                }
+            }
+
+            UnityEngine.Debug.unityLogger.Log(logType, str);
         }
 
         [SetUp]
@@ -26,6 +42,10 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void QuitAndInitContextManager()
         {
+            // ignore error message
+            // Unhandled log message: '[Exception] [000:016](rtp_transceiver.cc:598): PeerConnection is closed. (INVALID_STATE)
+            UnityEngine.TestTools.LogAssert.ignoreFailingMessages = true;
+
             // ContextManager.Init is already called when the process reaches here.
             ContextManager.Quit();
             ContextManager.Init();
@@ -34,6 +54,7 @@ namespace Unity.WebRTC.RuntimeTest
             // Reinitialize
             WebRTC.InitializeInternal();
 #endif
+            UnityEngine.TestTools.LogAssert.ignoreFailingMessages = false;
         }
 
         [Test]
