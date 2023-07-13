@@ -1456,6 +1456,12 @@ extern "C"
         context->GetDataChannelObject(channel)->RegisterOnClose(callback);
     }
 
+    UNITY_INTERFACE_EXPORT void
+    DataChannelRegisterOnError(Context* context, DataChannelInterface* channel, DelegateOnError callback)
+    {
+        context->GetDataChannelObject(channel)->RegisterOnError(callback);
+    }
+
     UNITY_INTERFACE_EXPORT void SetCurrentContext(Context* context)
     {
         ContextManager::GetInstance()->curContext = context;
