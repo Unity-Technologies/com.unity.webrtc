@@ -258,7 +258,7 @@ namespace Unity.WebRTC
                     _audioCapturer.onAudioRead -= SetData;
                     WebRTC.DestroyOnMainThread(_audioCapturer);
                 }
-                if(_streamRenderer != null)
+                if (_streamRenderer != null)
                 {
                     _streamRenderer?.Dispose();
                     _streamRenderer = null;

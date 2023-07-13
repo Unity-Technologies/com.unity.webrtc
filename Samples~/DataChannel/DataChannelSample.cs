@@ -1,19 +1,19 @@
+using System;
 using System.Collections;
+using Unity.WebRTC;
+using Unity.WebRTC.Samples;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.WebRTC;
-using System;
-using Unity.WebRTC.Samples;
 
 class DataChannelSample : MonoBehaviour
 {
-    #pragma warning disable 0649
+#pragma warning disable 0649
     [SerializeField] private Button callButton;
     [SerializeField] private Button hangupButton;
     [SerializeField] private Button sendButton;
     [SerializeField] private InputField textSend;
     [SerializeField] private InputField textReceive;
-    #pragma warning restore 0649
+#pragma warning restore 0649
 
     private RTCPeerConnection pc1, pc2;
     private RTCDataChannel dataChannel, remoteDataChannel;

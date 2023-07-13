@@ -14,7 +14,7 @@ namespace Unity.WebRTC.Editor
         private const float TimeStampLabelHeight = 20f;
         private const float LineWidth = 5f;
         private const uint GraphGridDivide = 5;
-        private static readonly string[] unitStr = {"", "k", "M", "G"};
+        private static readonly string[] unitStr = { "", "k", "M", "G" };
 
         private List<KeyValuePair<DateTime, float>> data;
         private string label;
@@ -33,16 +33,16 @@ namespace Unity.WebRTC.Editor
 
         public VisualElement Create()
         {
-            var root = new VisualElement {style = {flexDirection = FlexDirection.Row}};
-            var container = new VisualElement {style = {width = 200, maxWidth = 250}};
+            var root = new VisualElement { style = { flexDirection = FlexDirection.Row } };
+            var container = new VisualElement { style = { width = 200, maxWidth = 250 } };
 
             container.Add(new Label(label));
             container.Add(new IMGUIContainer(() => Draw(GUILayoutUtility.GetRect(GraphWidth, GraphHeight + TimeStampLabelHeight), ref data)));
-            container.Add(new VisualElement {style = {height = 15}});
+            container.Add(new VisualElement { style = { height = 15 } });
 
-            root.Add(new VisualElement {style = {width = 15}});
+            root.Add(new VisualElement { style = { width = 15 } });
             root.Add(container);
-            root.Add(new VisualElement {style = {width = 15}});
+            root.Add(new VisualElement { style = { width = 15 } });
 
             return root;
         }
@@ -73,7 +73,7 @@ namespace Unity.WebRTC.Editor
             {
                 float x = graphWidth / GraphGridDivide * i;
                 float y = graphHeight / GraphGridDivide * i;
-                int dataPoint = (int) (data.Count / GraphGridDivide * i);
+                int dataPoint = (int)(data.Count / GraphGridDivide * i);
                 Handles.DrawLine(
                     new Vector2(area.x, area.y + y),
                     new Vector2(area.xMax, area.y + y));

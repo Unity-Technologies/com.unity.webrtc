@@ -58,7 +58,7 @@ namespace Unity.WebRTC
             { "Best Performance", 1024 },
         };
 
-    void Start()
+        void Start()
         {
             StartCoroutine(WebRTC.Update());
             StartCoroutine(LoopStatsCoroutine());
@@ -87,7 +87,7 @@ namespace Unity.WebRTC
             // best latency is default
             OnDSPBufferSizeChanged(dropdownDSPBufferSize.value);
 
-            dropdownAudioCodecs.AddOptions(new List<string>{"Default"});
+            dropdownAudioCodecs.AddOptions(new List<string> { "Default" });
             var codecs = RTCRtpSender.GetCapabilities(TrackKind.Audio).codecs;
 
             var excludeCodecTypes = new[] { "audio/CN", "audio/telephone-event" };
@@ -130,7 +130,7 @@ namespace Unity.WebRTC
                 m_deviceName = dropdownMicrophoneDevices.captionText.text;
                 m_clipInput = Microphone.Start(m_deviceName, true, m_lengthSeconds, m_samplingFrequency);
                 // set the latency to “0” samples before the audio starts to play.
-                while (!(Microphone.GetPosition(m_deviceName) > 0)) {}
+                while (!(Microphone.GetPosition(m_deviceName) > 0)) { }
             }
             else
             {
@@ -197,7 +197,7 @@ namespace Unity.WebRTC
             if (dropdownAudioCodecs.value == 0)
             {
                 var error = transceiver1.SetCodecPreferences(this.availableCodecs.ToArray());
-                if(error != RTCErrorType.None)
+                if (error != RTCErrorType.None)
                     Debug.LogError(error);
             }
             else

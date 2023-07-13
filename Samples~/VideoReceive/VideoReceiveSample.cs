@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.UI;
 
 namespace Unity.WebRTC.Samples
 {
@@ -106,7 +106,7 @@ namespace Unity.WebRTC.Samples
         private static RTCConfiguration GetSelectedSdpSemantics()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
             return config;
         }
@@ -174,7 +174,7 @@ namespace Unity.WebRTC.Samples
 
             if (WebRTCSettings.UseVideoCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] { WebRTCSettings.UseVideoCodec };
                 var transceiver = _pc1.GetTransceivers().First(t => t.Sender == videoSender);
                 transceiver.SetCodecPreferences(codecs);
             }
@@ -188,7 +188,7 @@ namespace Unity.WebRTC.Samples
             var transceivers = _pc1.GetTransceivers();
             foreach (var transceiver in transceivers)
             {
-                if(transceiver.Sender != null)
+                if (transceiver.Sender != null)
                 {
                     transceiver.Stop();
                     _pc1.RemoveTrack(transceiver.Sender);
@@ -254,7 +254,7 @@ namespace Unity.WebRTC.Samples
             var micClip = Microphone.Start(deviceName, true, 1, 48000);
 
             // set the latency to “0” samples before the audio starts to play.
-            while (!(Microphone.GetPosition(deviceName) > 0)) {}
+            while (!(Microphone.GetPosition(deviceName) > 0)) { }
 
             sourceAudio.clip = micClip;
             sourceAudio.loop = true;

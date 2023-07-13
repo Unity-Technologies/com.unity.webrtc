@@ -43,7 +43,7 @@ namespace Unity.WebRTC.Samples
             array = new Vector3[positionCount];
 
             // This line object is used as a template.
-            if(line.gameObject.activeInHierarchy)
+            if (line.gameObject.activeInHierarchy)
                 line.gameObject.SetActive(false);
 
             var conf = AudioSettings.GetConfiguration();

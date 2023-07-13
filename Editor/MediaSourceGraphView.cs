@@ -34,7 +34,7 @@ namespace Unity.WebRTC.Editor
 
         public VisualElement Create()
         {
-            var container = new VisualElement {style = {flexDirection = FlexDirection.Row, flexWrap = Wrap.Wrap}};
+            var container = new VisualElement { style = { flexDirection = FlexDirection.Row, flexWrap = Wrap.Wrap } };
             container.Add(widthGraph.Create());
             container.Add(heightGraph.Create());
             container.Add(framesGraph.Create());

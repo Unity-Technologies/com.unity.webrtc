@@ -1,11 +1,11 @@
 using System;
-using UnityEngine;
-using UnityEngine.TestTools;
-using NUnit.Framework;
 using System.Collections;
 using System.Linq;
 using System.Threading;
+using NUnit.Framework;
 using Unity.Collections;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -79,7 +79,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void CreateVideoTransform()
         {
-            void TransformedFrame(RTCTransformEvent e) {}
+            void TransformedFrame(RTCTransformEvent e) { }
             TransformedFrameCallback callback = TransformedFrame;
             RTCRtpScriptTransform transform =
                 new RTCRtpScriptTransform(TrackKind.Video, callback);
@@ -134,7 +134,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(receiver.Transform, Is.Null);
             Assert.That(() => receiver.Transform = null, Throws.ArgumentNullException);
 
-            void TransformedFrame(RTCTransformEvent e) {}
+            void TransformedFrame(RTCTransformEvent e) { }
             TransformedFrameCallback callback = TransformedFrame;
             RTCRtpScriptTransform transform =
                 new RTCRtpScriptTransform(TrackKind.Video, callback);

@@ -56,7 +56,7 @@ namespace Unity.WebRTC.RuntimeTest
         [TestCase(2160, 3840)]
         public void ValidateTextureSize(int width, int height)
         {
-            if(!WebRTC.enableLimitTextureSize)
+            if (!WebRTC.enableLimitTextureSize)
                 WebRTC.enableLimitTextureSize = true;
 
             var platform = Application.platform;
