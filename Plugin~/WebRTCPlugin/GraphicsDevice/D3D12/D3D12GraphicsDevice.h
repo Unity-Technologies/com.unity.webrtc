@@ -78,7 +78,7 @@ namespace webrtc
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
-        bool WaitIdleForTest();
+        bool WaitIdleForTest() override;
 
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
