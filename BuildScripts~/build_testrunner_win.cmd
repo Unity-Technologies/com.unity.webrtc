@@ -26,4 +26,4 @@ popd
 echo -------------------
 echo Copy test runner
 
-copy %SOLUTION_DIR%\out\build\x64-windows-clang\WebRTCPluginTest\Release\WebRTCLibTest.exe .
+copy %SOLUTION_DIR%\out\build\x64-windows-msvc\WebRTCPluginTest\Release\WebRTCLibTest.exe .
