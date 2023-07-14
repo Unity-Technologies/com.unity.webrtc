@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
+using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Toggle = UnityEngine.UI.Toggle;
@@ -76,7 +76,7 @@ class BandwidthSample : MonoBehaviour
     private void Awake()
     {
         bandwidthSelector.options = bandwidthOptions
-            .Select(pair => new Dropdown.OptionData{text = pair.Key })
+            .Select(pair => new Dropdown.OptionData { text = pair.Key })
             .ToList();
         bandwidthSelector.onValueChanged.AddListener(ChangeBandwitdh);
         scaleResolutionDownSelector.options = scaleResolutionDownOptions
@@ -145,7 +145,7 @@ class BandwidthSample : MonoBehaviour
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+        config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
         return config;
     }
@@ -213,7 +213,7 @@ class BandwidthSample : MonoBehaviour
 
         if (WebRTCSettings.UseVideoCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] { WebRTCSettings.UseVideoCodec };
             foreach (var transceiver in _pc1.GetTransceivers())
             {
                 if (pc1Senders.Contains(transceiver.Sender))
@@ -370,9 +370,9 @@ class BandwidthSample : MonoBehaviour
 
     private void CopyClipboard()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorGUIUtility.systemCopyBuffer = statsField.text;
-        #endif
+#endif
     }
 
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)

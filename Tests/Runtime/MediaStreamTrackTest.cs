@@ -1,9 +1,9 @@
 using System;
+using System.Collections;
+using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using NUnit.Framework;
-using System.Linq;
-using System.Collections;
 using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
@@ -28,7 +28,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void ConstructorThrowException()
         {
-            if(VideoStreamTrack.IsSupported(Application.platform, SystemInfo.graphicsDeviceType))
+            if (VideoStreamTrack.IsSupported(Application.platform, SystemInfo.graphicsDeviceType))
                 Assert.Ignore();
 
             var width = 256;

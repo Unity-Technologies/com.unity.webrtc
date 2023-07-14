@@ -1,12 +1,12 @@
 using System;
-using UnityEngine.TestTools;
-using NUnit.Framework;
 using System.Collections;
 using System.Diagnostics;
-using Object = UnityEngine.Object;
+using NUnit.Framework;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using UnityEngine.TestTools;
+using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -16,7 +16,7 @@ namespace Unity.WebRTC.RuntimeTest
         public void CreateDataChannel()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
             var peer = new RTCPeerConnection(ref config);
             var channel1 = peer.CreateDataChannel("test1");
             Assert.AreEqual("test1", channel1.Label);
@@ -174,7 +174,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(message1, Is.EqualTo(message2));
 
             // send byte array
-            byte[] message3 = {1, 2, 3};
+            byte[] message3 = { 1, 2, 3 };
             byte[] message4 = null;
             channel2.OnMessage = bytes => { message4 = bytes; };
             channel1.Send(message3);
@@ -313,7 +313,7 @@ namespace Unity.WebRTC.RuntimeTest
         static void ExecutePendingTasksWithTimeout(ref string message, int timeoutInMilliseconds)
         {
             Stopwatch watchdog = Stopwatch.StartNew();
-            while(watchdog.ElapsedMilliseconds < timeoutInMilliseconds && message == null)
+            while (watchdog.ElapsedMilliseconds < timeoutInMilliseconds && message == null)
             {
                 WebRTC.ExecutePendingTasks(timeoutInMilliseconds);
             }
@@ -323,7 +323,7 @@ namespace Unity.WebRTC.RuntimeTest
         static void ExecutePendingTasksWithTimeout(ref byte[] message, int timeoutInMilliseconds)
         {
             Stopwatch watchdog = Stopwatch.StartNew();
-            while(watchdog.ElapsedMilliseconds < timeoutInMilliseconds && message == null)
+            while (watchdog.ElapsedMilliseconds < timeoutInMilliseconds && message == null)
             {
                 WebRTC.ExecutePendingTasks(timeoutInMilliseconds);
             }

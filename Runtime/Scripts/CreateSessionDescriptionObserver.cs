@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace Unity.WebRTC
 {
-    class CreateSessionDescriptionObserver  : SafeHandle
+    class CreateSessionDescriptionObserver : SafeHandle
     {
         public Action<RTCSdpType, string, RTCErrorType, string> onCreateSessionDescription;
 
-        private CreateSessionDescriptionObserver ()
+        private CreateSessionDescriptionObserver()
             : base(IntPtr.Zero, true)
         {
         }

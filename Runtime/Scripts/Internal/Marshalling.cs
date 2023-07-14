@@ -26,12 +26,12 @@ namespace Unity.WebRTC
             if (!type.IsEnum)
                 throw new ArgumentException();
 
-            return new OptionalInt {hasValue = a.HasValue, value = Convert.ToInt32(a.GetValueOrDefault()) };
+            return new OptionalInt { hasValue = a.HasValue, value = Convert.ToInt32(a.GetValueOrDefault()) };
         }
 
         public T? AsEnum<T>() where T : struct
         {
-            if(!hasValue)
+            if (!hasValue)
                 return null;
             Type type = typeof(T);
             if (!type.IsEnum)

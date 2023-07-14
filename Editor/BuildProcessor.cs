@@ -29,9 +29,9 @@ namespace Unity.WebRTC.Editor
         ///
         /// </summary>
 #if UNITY_2021_1_OR_NEWER
-        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel22;
+        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel23;
 #else
-        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
+        public const AndroidSdkVersions RequiredAndroidSdkVersion = AndroidSdkVersions.AndroidApiLevel22;
 #endif
         /// <summary>
         ///
@@ -115,7 +115,7 @@ namespace Unity.WebRTC.Editor
 
             var architecture = (iOSArchitecture)PlayerSettings.GetArchitecture(BuildTargetGroup.iOS);
 
-            if(architecture != iOSArchitecture.ARM64)
+            if (architecture != iOSArchitecture.ARM64)
             {
                 Debug.LogWarning(
                     $"WebRTC apps require a target architecture to be set {RequiredIOSArchitectures}. " +

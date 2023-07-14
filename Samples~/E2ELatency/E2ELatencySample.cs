@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
+using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -175,7 +175,7 @@ class E2ELatencySample : MonoBehaviour
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+        config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
         return config;
     }
@@ -187,7 +187,7 @@ class E2ELatencySample : MonoBehaviour
         if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
         {
             StartCoroutine(CheckStats(pc));
-            foreach(var sender in _pc1.GetSenders())
+            foreach (var sender in _pc1.GetSenders())
             {
                 ChangeFramerate(sender, (uint)Application.targetFrameRate);
             }
@@ -277,7 +277,7 @@ class E2ELatencySample : MonoBehaviour
 
         if (WebRTCSettings.UseVideoCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] { WebRTCSettings.UseVideoCodec };
             foreach (var transceiver in _pc1.GetTransceivers())
             {
                 if (pc1VideoSenders.Contains(transceiver.Sender))

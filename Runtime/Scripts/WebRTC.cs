@@ -558,21 +558,12 @@ namespace Unity.WebRTC
         /// </summary>
         public int? iceCandidatePoolSize;
 
-        /// <summary>
-        ///
-        /// </summary>
-        [Obsolete]
-        public bool? enableDtlsSrtp;
-
         internal RTCConfiguration(ref RTCConfigurationInternal v)
         {
             iceServers = v.iceServers;
             iceTransportPolicy = v.iceTransportPolicy.AsEnum<RTCIceTransportPolicy>();
             bundlePolicy = v.bundlePolicy.AsEnum<RTCBundlePolicy>();
             iceCandidatePoolSize = v.iceCandidatePoolSize;
-#pragma warning disable 0612
-            enableDtlsSrtp = v.enableDtlsSrtp;
-#pragma warning restore 0612
         }
 
         internal RTCConfigurationInternal Cast()
@@ -583,9 +574,6 @@ namespace Unity.WebRTC
                 iceTransportPolicy = OptionalInt.FromEnum(this.iceTransportPolicy),
                 bundlePolicy = OptionalInt.FromEnum(this.bundlePolicy),
                 iceCandidatePoolSize = this.iceCandidatePoolSize,
-#pragma warning disable 0612
-                enableDtlsSrtp = this.enableDtlsSrtp
-#pragma warning restore 0612
             };
             return instance;
         }
@@ -644,18 +632,7 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="limitTextureSize"></param>
-        /// <param name="enableNativeLog"></param>
-        /// <param name="nativeLoggingSeverity"></param>
-        [Obsolete]
-        public static void Initialize(bool limitTextureSize = true, bool enableNativeLog = false,
-            NativeLoggingSeverity nativeLoggingSeverity = NativeLoggingSeverity.Info)
-        {
-        }
+        private static ILogger s_logger;
 
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitializeOnLoadMethod()
@@ -757,11 +734,42 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Get & set the logger to use when logging debug messages inside the WebRTC package.
+        /// By default will use Debug.unityLogger.
         /// </summary>
-        [Obsolete]
-        public static void Dispose()
+        /// <exception cref="ArgumentNullException">Throws if setting a null logger.</exception>
+        public static ILogger Logger
         {
+            get
+            {
+                if (s_logger == null)
+                {
+                    return Debug.unityLogger;
+                }
+
+                return s_logger;
+            }
+            set
+            {
+                s_logger = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
+
+        /// <summary>
+        /// Configure native logging settings for WebRTC.
+        /// </summary>
+        /// <param name="enableNativeLogging">Enables or disable native logging.</param>
+        /// <param name="nativeLoggingSeverity">Sets the native logging level.</param>
+        public static void ConfigureNativeLogging(bool enableNativeLogging, NativeLoggingSeverity nativeLoggingSeverity)
+        {
+            if (enableNativeLogging)
+            {
+                NativeMethods.RegisterDebugLog(DebugLog, enableNativeLogging, nativeLoggingSeverity);
+            }
+            else
+            {
+                NativeMethods.RegisterDebugLog(null, false, nativeLoggingSeverity);
+            }
         }
 
         internal static void DisposeInternal()
@@ -1027,7 +1035,7 @@ namespace Unity.WebRTC
             foreach (var ptr in array)
             {
                 if (ptr == IntPtr.Zero)
-                    UnityEngine.Debug.LogError("IntPtr is zero");
+                    WebRTC.Logger.Log(LogType.Error, "IntPtr is zero");
                 list.Add(FindOrCreate(ptr, constructor));
             }
             return list;
@@ -1057,9 +1065,24 @@ namespace Unity.WebRTC
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateDebugLog))]
-        static void DebugLog(string str)
+        static void DebugLog(string str, NativeLoggingSeverity loggingSeverity)
         {
-            UnityEngine.Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "{0}", str);
+            LogType logType = LogType.Log;
+            switch (loggingSeverity)
+            {
+                case NativeLoggingSeverity.Warning:
+                {
+                    logType = LogType.Warning;
+                    break;
+                }
+                case NativeLoggingSeverity.Error:
+                {
+                    logType = LogType.Exception;
+                    break;
+                }
+            }
+
+            Logger.LogFormat(logType, "{0}", str);
         }
 
         [AOT.MonoPInvokeCallback(typeof(DelegateSetLocalDescription))]
@@ -1138,8 +1161,8 @@ namespace Unity.WebRTC
             // Run on worker thread, not on main thread.
             if (WebRTC.Table.TryGetValue(ptr, out RTCRtpTransform transform))
             {
-				if(transform == null)
-					return;
+                if (transform == null)
+                    return;
 
                 RTCEncodedFrame frame_;
                 if (transform.Kind == TrackKind.Video)
@@ -1177,7 +1200,7 @@ namespace Unity.WebRTC
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str);
+    internal delegate void DelegateDebugLog([MarshalAs(UnmanagedType.LPStr)] string str, NativeLoggingSeverity severity);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DelegateCollectStats(IntPtr ptr, IntPtr ptrCallback, IntPtr reportPtr);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1311,6 +1334,9 @@ namespace Unity.WebRTC
         public static extern void ContextGetReceiverCapabilities(IntPtr context, TrackKind kind, out IntPtr capabilities);
         [DllImport(WebRTC.Lib)]
         public static extern RTCStatsCollectorCallback PeerConnectionReceiverGetStats(IntPtr sender, IntPtr receiver);
+        [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool PeerConnectionCanTrickleIceCandidates(IntPtr ptr, [MarshalAs(UnmanagedType.U1)] out bool value);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PeerConnectionGetLocalDescription(IntPtr ptr, ref RTCSessionDescription desc);

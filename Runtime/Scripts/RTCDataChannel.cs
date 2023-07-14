@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
@@ -56,7 +56,7 @@ namespace Unity.WebRTC
         public OptionalBool negotiated;
         public OptionalInt id;
 
-        public static explicit operator RTCDataChannelInitInternal (RTCDataChannelInit origin)
+        public static explicit operator RTCDataChannelInitInternal(RTCDataChannelInit origin)
         {
             RTCDataChannelInitInternal dst = new RTCDataChannelInitInternal
             {

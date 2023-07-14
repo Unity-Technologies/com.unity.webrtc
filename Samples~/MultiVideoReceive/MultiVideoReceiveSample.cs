@@ -84,7 +84,7 @@ namespace Unity.WebRTC.Samples
         private static RTCConfiguration GetSelectedSdpSemantics()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
             return config;
         }
@@ -215,7 +215,7 @@ namespace Unity.WebRTC.Samples
 
             if (WebRTCSettings.UseVideoCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] { WebRTCSettings.UseVideoCodec };
                 foreach (var transceiver in _pc1.GetTransceivers())
                 {
                     if (sendingSenderList.Contains(transceiver.Sender))

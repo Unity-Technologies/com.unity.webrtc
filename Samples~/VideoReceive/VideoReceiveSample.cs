@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Unity.WebRTC.Samples
@@ -39,6 +40,8 @@ namespace Unity.WebRTC.Samples
         private DelegateOnTrack pc2Ontrack;
         private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
         private WebCamTexture webCamTexture;
+        private Texture2D webcamCopyTexture;
+        private Coroutine coroutineConvertFrame;
 
         private void Awake()
         {
@@ -103,7 +106,7 @@ namespace Unity.WebRTC.Samples
         private static RTCConfiguration GetSelectedSdpSemantics()
         {
             RTCConfiguration config = default;
-            config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+            config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
             return config;
         }
@@ -171,7 +174,7 @@ namespace Unity.WebRTC.Samples
 
             if (WebRTCSettings.UseVideoCodec != null)
             {
-                var codecs = new[] {WebRTCSettings.UseVideoCodec};
+                var codecs = new[] { WebRTCSettings.UseVideoCodec };
                 var transceiver = _pc1.GetTransceivers().First(t => t.Sender == videoSender);
                 transceiver.SetCodecPreferences(codecs);
             }
@@ -185,7 +188,7 @@ namespace Unity.WebRTC.Samples
             var transceivers = _pc1.GetTransceivers();
             foreach (var transceiver in transceivers)
             {
-                if(transceiver.Sender != null)
+                if (transceiver.Sender != null)
                 {
                     transceiver.Stop();
                     _pc1.RemoveTrack(transceiver.Sender);
@@ -251,7 +254,7 @@ namespace Unity.WebRTC.Samples
             var micClip = Microphone.Start(deviceName, true, 1, 48000);
 
             // set the latency to “0” samples before the audio starts to play.
-            while (!(Microphone.GetPosition(deviceName) > 0)) {}
+            while (!(Microphone.GetPosition(deviceName) > 0)) { }
 
             sourceAudio.clip = micClip;
             sourceAudio.loop = true;
@@ -281,13 +284,39 @@ namespace Unity.WebRTC.Samples
                 yield break;
             }
 
+            int width = WebRTCSettings.StreamSize.x;
+            int height = WebRTCSettings.StreamSize.y;
+            const int fps = 30;
             WebCamDevice userCameraDevice = WebCamTexture.devices[webCamListDropdown.value];
-            webCamTexture = new WebCamTexture(userCameraDevice.name, WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y, 30);
+            webCamTexture = new WebCamTexture(userCameraDevice.name, height, height, fps);
             webCamTexture.Play();
             yield return new WaitUntil(() => webCamTexture.didUpdateThisFrame);
 
-            videoStreamTrack = new VideoStreamTrack(webCamTexture);
+            /// Convert texture if the graphicsFormat is not supported.
+            /// Since Unity 2022.1, WebCamTexture.graphicsFormat returns R8G8B8A8_SRGB on Android Vulkan.
+            /// WebRTC doesn't support the graphics format when using Vulkan, and throw exception.
+            var supportedFormat = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
+            if (webCamTexture.graphicsFormat != supportedFormat)
+            {
+                webcamCopyTexture = new Texture2D(width, height, supportedFormat, TextureCreationFlags.None);
+                videoStreamTrack = new VideoStreamTrack(webcamCopyTexture);
+                coroutineConvertFrame = StartCoroutine(ConvertFrame());
+            }
+            else
+            {
+                videoStreamTrack = new VideoStreamTrack(webCamTexture);
+            }
+
             sourceImage.texture = webCamTexture;
+        }
+
+        IEnumerator ConvertFrame()
+        {
+            while (true)
+            {
+                yield return new WaitForEndOfFrame();
+                Graphics.ConvertTexture(webCamTexture, webcamCopyTexture);
+            }
         }
 
         private void HangUp()
@@ -296,6 +325,12 @@ namespace Unity.WebRTC.Samples
             {
                 webCamTexture.Stop();
                 webCamTexture = null;
+            }
+
+            if (coroutineConvertFrame != null)
+            {
+                StopCoroutine(coroutineConvertFrame);
+                coroutineConvertFrame = null;
             }
 
             receiveAudioStream?.Dispose();
@@ -308,7 +343,6 @@ namespace Unity.WebRTC.Samples
             audioStreamTrack?.Dispose();
             audioStreamTrack = null;
 
-            Debug.Log("Close local/remote peer connection");
             _pc1?.Dispose();
             _pc2?.Dispose();
             _pc1 = null;

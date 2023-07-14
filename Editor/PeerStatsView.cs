@@ -67,37 +67,14 @@ namespace Unity.WebRTC.Editor
                         case RTCStatsType.MediaSource:
                             container.Add(CreateMediaSourceView(id));
                             break;
-                        case RTCStatsType.Csrc:
-                            container.Add(CreateCsrcView(id));
-                            break;
                         case RTCStatsType.PeerConnection:
                             container.Add(CreatePeerConnectionView(id));
                             break;
                         case RTCStatsType.DataChannel:
                             container.Add(CreateDataChannelView(id));
                             break;
-#pragma warning disable 0612
-                        case RTCStatsType.Stream:
-                            container.Add(CreateStreamView(id));
-                            break;
-                        case RTCStatsType.Track:
-                            container.Add(CreateTrackView(id));
-                            break;
-#pragma warning restore 0612
-                        case RTCStatsType.Transceiver:
-                            container.Add(CreateTransceiverView(id));
-                            break;
-                        case RTCStatsType.Sender:
-                            container.Add(CreateSenderView(id));
-                            break;
-                        case RTCStatsType.Receiver:
-                            container.Add(CreateReceiverView(id));
-                            break;
                         case RTCStatsType.Transport:
                             container.Add(CreateTransportView(id));
-                            break;
-                        case RTCStatsType.SctpTransport:
-                            container.Add(CreateSctpTransportView(id));
                             break;
                         case RTCStatsType.CandidatePair:
                             container.Add(CreateCandidatePairView(id));
@@ -110,9 +87,6 @@ namespace Unity.WebRTC.Editor
                             break;
                         case RTCStatsType.Certificate:
                             container.Add(CreateCertificateView(id));
-                            break;
-                        case RTCStatsType.IceServer:
-                            container.Add(CreateIceServerView(id));
                             break;
                         default:
                             throw new ArgumentOutOfRangeException($"this type is not supported : {type}");
@@ -388,33 +362,6 @@ namespace Unity.WebRTC.Editor
             return root;
         }
 
-        private VisualElement CreateCsrcView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCCodecStats csrcStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Csrc}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(csrcStats.Id)}: {csrcStats.Id}"));
-                container.Add(new Label($"{nameof(csrcStats.Timestamp)}: {csrcStats.Timestamp}"));
-            };
-            return root;
-        }
-
         private VisualElement CreatePeerConnectionView(string id)
         {
             var root = new VisualElement();
@@ -484,211 +431,6 @@ namespace Unity.WebRTC.Editor
 
             root.Add(dataChannelGraph.Create());
 
-            return root;
-        }
-
-        private VisualElement CreateStreamView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-
-#pragma warning disable 0612
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCMediaStreamStats streamStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Stream}"));
-                    return;
-                }
-#pragma warning restore 0612
-
-                container.Add(new Label($"{nameof(streamStats.Id)}: {streamStats.Id}"));
-                container.Add(new Label($"{nameof(streamStats.Timestamp)}: {streamStats.Timestamp}"));
-                container.Add(new Label($"{nameof(streamStats.streamIdentifier)}: {streamStats.streamIdentifier}"));
-                container.Add(
-                    new Label($"{nameof(streamStats.trackIds)}: {string.Join(",", streamStats.trackIds)}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateTrackView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-#pragma warning disable 0612
-            var trackGraph = new MediaStreamTrackGraphView();
-#pragma warning restore 0612
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-#pragma warning disable 0612
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCMediaStreamTrackStats trackStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Track}"));
-                    return;
-                }
-#pragma warning restore 0612
-
-                container.Add(new Label($"{nameof(trackStats.Id)}: {trackStats.Id}"));
-                container.Add(new Label($"{nameof(trackStats.Timestamp)}: {trackStats.Timestamp}"));
-                container.Add(new Label($"{nameof(trackStats.trackIdentifier)}: {trackStats.trackIdentifier}"));
-                container.Add(new Label($"{nameof(trackStats.mediaSourceId)}: {trackStats.mediaSourceId}"));
-                container.Add(new Label($"{nameof(trackStats.remoteSource)}: {trackStats.remoteSource}"));
-                container.Add(new Label($"{nameof(trackStats.ended)}: {trackStats.ended}"));
-                container.Add(new Label($"{nameof(trackStats.detached)}: {trackStats.detached}"));
-                container.Add(new Label($"{nameof(trackStats.kind)}: {trackStats.kind}"));
-                container.Add(new Label($"{nameof(trackStats.jitterBufferDelay)}: {trackStats.jitterBufferDelay}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.jitterBufferEmittedCount)}: {trackStats.jitterBufferEmittedCount}"));
-                container.Add(new Label($"{nameof(trackStats.frameWidth)}: {trackStats.frameWidth}"));
-                container.Add(new Label($"{nameof(trackStats.frameHeight)}: {trackStats.frameHeight}"));
-                container.Add(new Label($"{nameof(trackStats.framesPerSecond)}: {trackStats.framesPerSecond}"));
-                container.Add(new Label($"{nameof(trackStats.framesSent)}: {trackStats.framesSent}"));
-                container.Add(new Label($"{nameof(trackStats.hugeFramesSent)}: {trackStats.hugeFramesSent}"));
-                container.Add(new Label($"{nameof(trackStats.framesReceived)}: {trackStats.framesReceived}"));
-                container.Add(new Label($"{nameof(trackStats.framesDecoded)}: {trackStats.framesDecoded}"));
-                container.Add(new Label($"{nameof(trackStats.framesDropped)}: {trackStats.framesDropped}"));
-                container.Add(new Label($"{nameof(trackStats.framesCorrupted)}: {trackStats.framesCorrupted}"));
-                container.Add(new Label($"{nameof(trackStats.partialFramesLost)}: {trackStats.partialFramesLost}"));
-                container.Add(new Label($"{nameof(trackStats.fullFramesLost)}: {trackStats.fullFramesLost}"));
-                container.Add(new Label($"{nameof(trackStats.audioLevel)}: {trackStats.audioLevel}"));
-                container.Add(new Label($"{nameof(trackStats.totalAudioEnergy)}: {trackStats.totalAudioEnergy}"));
-                container.Add(new Label($"{nameof(trackStats.echoReturnLoss)}: {trackStats.echoReturnLoss}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.echoReturnLossEnhancement)}: {trackStats.echoReturnLossEnhancement}"));
-                container.Add(
-                    new Label($"{nameof(trackStats.totalSamplesReceived)}: {trackStats.totalSamplesReceived}"));
-                container.Add(
-                    new Label($"{nameof(trackStats.totalSamplesDuration)}: {trackStats.totalSamplesDuration}"));
-                container.Add(new Label($"{nameof(trackStats.concealedSamples)}: {trackStats.concealedSamples}"));
-                container.Add(
-                    new Label($"{nameof(trackStats.silentConcealedSamples)}: {trackStats.silentConcealedSamples}"));
-                container.Add(new Label($"{nameof(trackStats.concealmentEvents)}: {trackStats.concealmentEvents}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.insertedSamplesForDeceleration)}: {trackStats.insertedSamplesForDeceleration}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.removedSamplesForAcceleration)}: {trackStats.removedSamplesForAcceleration}"));
-                container.Add(new Label($"{nameof(trackStats.jitterBufferFlushes)}: {trackStats.jitterBufferFlushes}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.delayedPacketOutageSamples)}: {trackStats.delayedPacketOutageSamples}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.relativePacketArrivalDelay)}: {trackStats.relativePacketArrivalDelay}"));
-                container.Add(new Label($"{nameof(trackStats.interruptionCount)}: {trackStats.interruptionCount}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.totalInterruptionDuration)}: {trackStats.totalInterruptionDuration}"));
-                container.Add(new Label($"{nameof(trackStats.freezeCount)}: {trackStats.freezeCount}"));
-                container.Add(new Label($"{nameof(trackStats.pauseCount)}: {trackStats.pauseCount}"));
-                container.Add(
-                    new Label($"{nameof(trackStats.totalFreezesDuration)}: {trackStats.totalFreezesDuration}"));
-                container.Add(new Label($"{nameof(trackStats.totalPausesDuration)}: {trackStats.totalPausesDuration}"));
-                container.Add(new Label($"{nameof(trackStats.totalFramesDuration)}: {trackStats.totalFramesDuration}"));
-                container.Add(new Label(
-                    $"{nameof(trackStats.sumOfSquaredFramesDuration)}: {trackStats.sumOfSquaredFramesDuration}"));
-
-                trackGraph.AddInput(trackStats);
-            };
-
-            root.Add(trackGraph.Create());
-
-            return root;
-        }
-
-        private VisualElement CreateTransceiverView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCTransceiverStats transceiverStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Transceiver}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(transceiverStats.Id)}: {transceiverStats.Id}"));
-                container.Add(new Label($"{nameof(transceiverStats.Timestamp)}: {transceiverStats.Timestamp}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateSenderView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCSenderStats senderStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Sender}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(senderStats.Id)}: {senderStats.Id}"));
-                container.Add(new Label($"{nameof(senderStats.Timestamp)}: {senderStats.Timestamp}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateReceiverView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCReceiverStats receiverStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.Receiver}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(receiverStats.Id)}: {receiverStats.Id}"));
-                container.Add(new Label($"{nameof(receiverStats.Timestamp)}: {receiverStats.Timestamp}"));
-            };
             return root;
         }
 
@@ -974,33 +716,6 @@ namespace Unity.WebRTC.Editor
                     new Label($"{nameof(certificateStats.base64Certificate)}: {certificateStats.base64Certificate}"));
                 container.Add(new Label(
                     $"{nameof(certificateStats.issuerCertificateId)}: {certificateStats.issuerCertificateId}"));
-            };
-            return root;
-        }
-
-        private VisualElement CreateIceServerView(string id)
-        {
-            var root = new VisualElement();
-            var container = new VisualElement();
-            root.Add(container);
-
-            m_parent.OnStats += (peer, report) =>
-            {
-                if (peer != m_peerConnection)
-                {
-                    return;
-                }
-
-                container.Clear();
-                if (!report.TryGetValue(id, out var stats) ||
-                    !(stats is RTCCertificateStats outboundStats))
-                {
-                    container.Add(new Label($"no stats report about {RTCStatsType.IceServer}"));
-                    return;
-                }
-
-                container.Add(new Label($"{nameof(outboundStats.Id)}: {outboundStats.Id}"));
-                container.Add(new Label($"{nameof(outboundStats.Timestamp)}: {outboundStats.Timestamp}"));
             };
             return root;
         }

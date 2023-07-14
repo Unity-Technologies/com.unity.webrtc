@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.WebRTC;
 using Unity.WebRTC.Samples;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
@@ -73,7 +73,7 @@ class PerfectNegotiationSample : MonoBehaviour
     {
         count++;
         count %= MAX;
-        lerp = (float) count / MAX;
+        lerp = (float)count / MAX;
         politeSourceCamera1.backgroundColor = Color.LerpUnclamped(red, magenta, lerp);
         politeSourceCamera2.backgroundColor = Color.LerpUnclamped(magenta, yellow, lerp);
         impoliteSourceCamera1.backgroundColor = Color.LerpUnclamped(blue, cyan, lerp);

@@ -32,7 +32,7 @@ namespace Unity.WebRTC
 
         internal RTCRtpContributingSource(ref RTCRtpContributingSourceInternal data, RtpSourceType sourceType)
         {
-            audioLevel = data.audioLevel.hasValue ? data.audioLevel.value / byte.MaxValue : (double?) null;
+            audioLevel = data.audioLevel.hasValue ? data.audioLevel.value / byte.MaxValue : (double?)null;
             rtpTimestamp = data.rtpTimestamp;
             source = data.sourceType == sourceType ? data.source : (uint?)null;
             timestamp = data.timestamp;

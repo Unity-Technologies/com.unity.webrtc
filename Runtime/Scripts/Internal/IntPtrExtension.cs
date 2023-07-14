@@ -116,7 +116,7 @@ namespace Unity.WebRTC
             string[] keys = ptr.AsArray<string>(length, freePtr);
             T[] values = valuesPtr.AsArray<T>(length, freePtr);
 
-            for(int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 ret[keys[i]] = values[i];
             }

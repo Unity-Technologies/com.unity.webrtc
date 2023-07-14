@@ -77,7 +77,7 @@ namespace Unity.WebRTC.Samples
                 .Where(codec => !excludeCodecMimeType.Contains(codec.mimeType))
                 .ToList();
             var list = availableCodecs
-                .Select(codec => new Dropdown.OptionData {text = codec.mimeType + " " + codec.sdpFmtpLine})
+                .Select(codec => new Dropdown.OptionData { text = codec.mimeType + " " + codec.sdpFmtpLine })
                 .ToList();
 
             codecSelector.options.AddRange(list);

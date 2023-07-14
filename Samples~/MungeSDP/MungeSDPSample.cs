@@ -25,7 +25,7 @@ class MungeSDPSample : MonoBehaviour
 
     private RTCConfiguration configuration = new RTCConfiguration
     {
-        iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}}
+        iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } }
     };
 
     private RTCPeerConnection pcLocal, pcRemote;
@@ -99,7 +99,7 @@ class MungeSDPSample : MonoBehaviour
 
         if (WebRTCSettings.UseVideoCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] { WebRTCSettings.UseVideoCodec };
             foreach (var transceiver in pcLocal.GetTransceivers())
             {
                 if (senders.Contains(transceiver.Sender))
@@ -136,7 +136,7 @@ class MungeSDPSample : MonoBehaviour
 
     private IEnumerator SetOffer()
     {
-        var offer = new RTCSessionDescription {type = RTCSdpType.Offer, sdp = offerSdpInput.text};
+        var offer = new RTCSessionDescription { type = RTCSdpType.Offer, sdp = offerSdpInput.text };
         Debug.Log($"Modified Offer from LocalPeerConnection\n{offer.sdp}");
 
         var opLocal = pcLocal.SetLocalDescription(ref offer);
@@ -179,7 +179,7 @@ class MungeSDPSample : MonoBehaviour
 
     private IEnumerator SetAnswer()
     {
-        var answer = new RTCSessionDescription {type = RTCSdpType.Answer, sdp = answerSdpInput.text};
+        var answer = new RTCSessionDescription { type = RTCSdpType.Answer, sdp = answerSdpInput.text };
         Debug.Log($"Modified Answer from RemotePeerConnection\n{answer.sdp}");
 
         var opLocal = pcRemote.SetLocalDescription(ref answer);

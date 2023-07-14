@@ -1,10 +1,10 @@
 using System;
-using UnityEngine;
-using UnityEngine.TestTools;
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
@@ -373,6 +373,15 @@ namespace Unity.WebRTC.RuntimeTest
             peer.Dispose();
             Object.DestroyImmediate(source.clip);
             Object.DestroyImmediate(obj);
+        }
+
+        [Test]
+        public void CanTrickleIceCandidates()
+        {
+            var config = GetDefaultConfiguration();
+            var peer = new RTCPeerConnection(ref config);
+
+            Assert.That(peer.CanTrickleIceCandidates, Is.Null);
         }
 
         [UnityTest]

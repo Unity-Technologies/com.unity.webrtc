@@ -1,6 +1,6 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Unity.WebRTC
 {
@@ -761,6 +761,15 @@ namespace Unity.WebRTC
             if (!dictCollectStatsCallback.ContainsKey(ptr))
                 dictCollectStatsCallback.Add(ptr, callback);
             return new RTCStatsReportAsyncOperation(callback);
+        }
+
+        public bool? CanTrickleIceCandidates
+        {
+            get
+            {
+                bool hasValue = NativeMethods.PeerConnectionCanTrickleIceCandidates(GetSelfOrThrow(), out var value);
+                return hasValue ? value : (bool?)null;
+            }
         }
 
         /// <summary>

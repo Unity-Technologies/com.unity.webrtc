@@ -1,9 +1,9 @@
-using UnityEngine;
-using UnityEngine.TestTools;
-using Unity.Collections;
-using NUnit.Framework;
 using System.Collections;
 using System.Linq;
+using NUnit.Framework;
+using Unity.Collections;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Unity.WebRTC.RuntimeTest
 {
@@ -187,10 +187,10 @@ namespace Unity.WebRTC.RuntimeTest
             var nativeArray = new NativeArray<float>(480, Allocator.Persistent);
 
             yield return new WaitUntil(() =>
-			{
-	            track.SetData(nativeArray.AsReadOnly(), 1, 48000);
-				return receiver2.GetContributingSources().Length > 0;
-			});
+            {
+                track.SetData(nativeArray.AsReadOnly(), 1, 48000);
+                return receiver2.GetContributingSources().Length > 0;
+            });
             var sources2 = receiver2.GetContributingSources();
             Assert.That(sources2, Is.Not.Empty);
             Assert.That(sources2.Length, Is.EqualTo(1));
@@ -198,11 +198,11 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(sources2[0].audioLevel, Is.Not.Null);
             Assert.That(sources2[0].source, Is.Null);
 
-			// todo(kazuki): Returns zero on Linux platform.
+            // todo(kazuki): Returns zero on Linux platform.
             // Assert.That(sources2[0].rtpTimestamp, Is.Not.Zero);
             // Assert.That(sources2[0].timestamp, Is.Not.Zero);
 
-			nativeArray.Dispose();
+            nativeArray.Dispose();
             test.component.Dispose();
             track.Dispose();
             Object.DestroyImmediate(test.gameObject);

@@ -1,8 +1,8 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using System.Runtime.CompilerServices;
 
 namespace Unity.WebRTC
 {

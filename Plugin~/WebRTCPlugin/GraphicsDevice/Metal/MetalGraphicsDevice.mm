@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include <third_party/libyuv/include/libyuv/convert.h>
-
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "MetalDevice.h"
 #include "MetalGraphicsDevice.h"
@@ -47,31 +45,35 @@ namespace webrtc
 
     bool MetalGraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src)
     {
-        id<MTLTexture> dstTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
         id<MTLTexture> srcTexture = (__bridge id<MTLTexture>)src->GetNativeTexturePtrV();
-        return CopyTexture(dstTexture, srcTexture);
+        MetalTexture2D* texture2D = static_cast<MetalTexture2D*>(dest);
+        return CopyTexture(texture2D, srcTexture);
     }
 
     bool MetalGraphicsDevice::CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr)
     {
-        if (nativeTexturePtr == nullptr)
+        if (!nativeTexturePtr)
         {
+            RTC_LOG(LS_INFO) << "nativeTexturePtr is nullptr.";
             return false;
         }
-        id<MTLTexture> dstTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
         id<MTLTexture> srcTexture = (__bridge id<MTLTexture>)nativeTexturePtr;
-        return CopyTexture(dstTexture, srcTexture);
+        MetalTexture2D* texture2D = static_cast<MetalTexture2D*>(dest);
+        return CopyTexture(texture2D, srcTexture);
     }
 
-    bool MetalGraphicsDevice::CopyTexture(id<MTLTexture> dest, id<MTLTexture> src)
+    bool MetalGraphicsDevice::CopyTexture(MetalTexture2D* dest, id<MTLTexture> src)
     {
-        RTC_DCHECK_NE(dest, src);
-        RTC_DCHECK_EQ(src.pixelFormat, dest.pixelFormat);
-        RTC_DCHECK_EQ(src.width, dest.width);
-        RTC_DCHECK_EQ(src.height, dest.height);
+        id<MTLTexture> mtlTexture = (__bridge id<MTLTexture>)dest->GetNativeTexturePtrV();
+        __block dispatch_semaphore_t semaphore = dest->GetSemaphore();
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+
+        RTC_DCHECK_NE(src, mtlTexture);
+        RTC_DCHECK_EQ(src.pixelFormat, mtlTexture.pixelFormat);
+        RTC_DCHECK_EQ(src.width, mtlTexture.width);
+        RTC_DCHECK_EQ(src.height, mtlTexture.height);
 
         m_device->EndCurrentCommandEncoder();
-
         id<MTLCommandBuffer> commandBuffer = [m_queue commandBuffer];
         id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
         NSUInteger width = src.width;
@@ -86,24 +88,39 @@ namespace webrtc
                   sourceLevel:0
                  sourceOrigin:inTxtOrigin
                    sourceSize:inTxtSize
-                    toTexture:dest
+                    toTexture:mtlTexture
              destinationSlice:0
              destinationLevel:0
             destinationOrigin:outTxtOrigin];
 
 #if TARGET_OS_OSX
         // must be explicitly synchronized if the storageMode is Managed.
-        if (dest.storageMode == MTLStorageModeManaged)
-            [blit synchronizeResource:dest];
+        if (mtlTexture.storageMode == MTLStorageModeManaged)
+            [blit synchronizeResource:mtlTexture];
 #endif
         [blit endEncoding];
+        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) { dispatch_semaphore_signal(semaphore); }];
 
         // Commit the current command buffer and wait until the GPU process is completed.
         [commandBuffer commit];
-        [commandBuffer waitUntilCompleted];
-
         return true;
     }
+
+    bool MetalGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    {
+        const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
+        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
+
+        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
+        if (value != 0)
+        {
+            RTC_LOG(LS_INFO) << "The timeout occurred.";
+            return false;
+        }
+        return true;
+    }
+
+    bool MetalGraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
 
     ITexture2D* MetalGraphicsDevice::CreateCPUReadTextureV(
         uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
@@ -131,41 +148,15 @@ namespace webrtc
         return new MetalTexture2D(width, height, texture);
     }
 
-    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* tex)
+    rtc::scoped_refptr<webrtc::I420Buffer> MetalGraphicsDevice::ConvertRGBToI420(ITexture2D* texture)
     {
-        id<MTLTexture> source = (__bridge id<MTLTexture>)tex->GetNativeTexturePtrV();
-        const uint32_t width = tex->GetWidth();
-        const uint32_t height = tex->GetHeight();
+        MetalTexture2D* texture2D = static_cast<MetalTexture2D*>(texture);
+        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = texture2D->ConvertI420Buffer();
 
-        RTC_DCHECK(source);
-        RTC_DCHECK_GT(width, 0);
-        RTC_DCHECK_GT(height, 0);
+        // Notify finishing usage of semaphore.
+        dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
+        dispatch_semaphore_signal(semaphore);
 
-        const uint32_t BYTES_PER_PIXEL = 4;
-        const uint32_t bytesPerRow = width * BYTES_PER_PIXEL;
-        const uint32_t bufferSize = bytesPerRow * height;
-
-        std::vector<uint8_t> buffer;
-        buffer.resize(bufferSize);
-
-        [source getBytes:buffer.data()
-             bytesPerRow:bytesPerRow
-              fromRegion:MTLRegionMake2D(0, 0, width, height)
-             mipmapLevel:0];
-
-        rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer =
-            webrtc::I420Buffer::Create(static_cast<int32_t>(width), static_cast<int32_t>(height));
-        libyuv::ARGBToI420(
-            buffer.data(),
-            static_cast<int32_t>(bytesPerRow),
-            i420_buffer->MutableDataY(),
-            i420_buffer->StrideY(),
-            i420_buffer->MutableDataU(),
-            i420_buffer->StrideU(),
-            i420_buffer->MutableDataV(),
-            i420_buffer->StrideV(),
-            static_cast<int32_t>(width),
-            static_cast<int32_t>(height));
         return i420_buffer;
     }
 

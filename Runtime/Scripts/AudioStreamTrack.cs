@@ -172,7 +172,7 @@ namespace Unity.WebRTC
             {
                 NativeMethods.AudioTrackSinkProcessAudio(self, data, data.Length, channels, sampleRate);
 
-                onReceived.Invoke(data, channels, sampleRate);
+                onReceived?.Invoke(data, channels, sampleRate);
             }
             internal event AudioReadEventHandler onReceived;
         }
@@ -258,7 +258,7 @@ namespace Unity.WebRTC
                     _audioCapturer.onAudioRead -= SetData;
                     WebRTC.DestroyOnMainThread(_audioCapturer);
                 }
-                if(_streamRenderer != null)
+                if (_streamRenderer != null)
                 {
                     _streamRenderer?.Dispose();
                     _streamRenderer = null;

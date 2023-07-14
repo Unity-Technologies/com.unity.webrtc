@@ -78,17 +78,32 @@ namespace webrtc
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
+        bool WaitIdleForTest() override;
 
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* texture) override;
 
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 
     private:
+        struct Frame
+        {
+            ID3D12CommandAllocatorPtr commandAllocator;
+            ID3D12GraphicsCommandList4Ptr commandList;
+            uint64_t fenceValue;
+        };
         D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
+        uint64_t GetNextFrameFenceValue() const;
+        uint64_t ExecuteCommandList(
+            int listCount,
+            ID3D12GraphicsCommandList* commandList,
+            int stateCount,
+            UnityGraphicsD3D12ResourceState* states);
+        ID3D12Fence* GetFence();
+        bool CreateFrame(Frame& frame);
 
         IUnityGraphicsD3D12v5* m_unityInterface;
         ComPtr<ID3D12Device> m_d3d12Device;
@@ -98,16 +113,7 @@ namespace webrtc
         bool m_isCudaSupport;
         CudaContext m_cudaContext;
 
-        //[TODO-sin: 2019-12-2] //This should be allocated for each frame.
-        ID3D12CommandAllocatorPtr m_commandAllocator;
-        ID3D12GraphicsCommandList4Ptr m_commandList;
-
-        uint64_t ExecuteCommandList(
-            int listCount,
-            ID3D12GraphicsCommandList* commandList,
-            int stateCount,
-            UnityGraphicsD3D12ResourceState* states);
-        ID3D12Fence* GetFence();
+        std::vector<Frame> m_frames;
     };
 
     //---------------------------------------------------------------------------------------------------------------------
