@@ -89,7 +89,7 @@ if(Windows OR Linux)
 
   # Building CUDA kernel is not supported with Clang compiler on Windows.
   # https://gitlab.kitware.com/cmake/cmake/-/issues/20776
-  if((WINDOWS AND CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR LINUX)
+  if((Windows AND CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR LINUX)
     enable_language(CUDA)
   endif()
   add_subdirectory(NvCodec)
