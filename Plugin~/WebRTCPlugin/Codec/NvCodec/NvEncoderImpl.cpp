@@ -1,5 +1,12 @@
 #include "pch.h"
 
+// todo::
+// CMake doesn't support building CUDA kernel with Clang compiler on Windows.
+// https://gitlab.kitware.com/cmake/cmake/-/issues/20776
+#if _WIN32 && __clang__
+#define NOT_SUPPORTED_CUDA_RESIZE 1
+#endif
+
 #include <absl/strings/match.h>
 #include <api/video/video_codec_constants.h>
 #include <api/video/video_codec_type.h>
@@ -14,7 +21,9 @@
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "ProfilerMarkerFactory.h"
+#if !NOT_SUPPORTED_CUDA_RESIZE
 #include "ResizeSurf.h"
+#endif
 #include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
@@ -331,7 +340,12 @@ namespace webrtc
                 return result;
             }
         }
+
+#if NOT_SUPPORTED_CUDA_RESIZE
+        return CUDA_SUCCESS;
+#else
         return ResizeSurf(src, dst);
+#endif
     }
 
     bool NvEncoderImpl::CopyResource(

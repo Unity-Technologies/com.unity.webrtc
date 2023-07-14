@@ -86,7 +86,12 @@ if(Windows OR Linux)
   find_package(Vulkan REQUIRED)
 
   find_package(CUDA REQUIRED)
-  enable_language(CUDA)
+
+  # Building CUDA kernel is not supported with Clang compiler on Windows.
+  # https://gitlab.kitware.com/cmake/cmake/-/issues/20776
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    enable_language(CUDA)
+  endif()
   add_subdirectory(NvCodec)
 endif()
 
