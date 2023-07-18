@@ -1071,15 +1071,15 @@ namespace Unity.WebRTC
             switch (loggingSeverity)
             {
                 case NativeLoggingSeverity.Warning:
-                {
-                    logType = LogType.Warning;
-                    break;
-                }
+                    {
+                        logType = LogType.Warning;
+                        break;
+                    }
                 case NativeLoggingSeverity.Error:
-                {
-                    logType = LogType.Exception;
-                    break;
-                }
+                    {
+                        logType = LogType.Exception;
+                        break;
+                    }
             }
 
             Logger.LogFormat(logType, "{0}", str);
