@@ -382,7 +382,6 @@ namespace webrtc
         {
             void* pSrcArray = static_cast<void*>(handle->mappedArray);
 
-
             // Resize cuda array when the resolution of input buffer is different from output one.
             // The output buffer named m_scaledArray is reused while the resolution is matched.
 #if SUPPORT_CUDA_KERNEL
