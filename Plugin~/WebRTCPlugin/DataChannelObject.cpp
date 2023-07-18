@@ -52,7 +52,7 @@ namespace webrtc
             else
             {
                 if (onError)
-                    onError(dataChannel.get());
+                    onError(dataChannel.get(), error.type(), error.message(), std::strlen(error.message()));
             }
             break;
         }

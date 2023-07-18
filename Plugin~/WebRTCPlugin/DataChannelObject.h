@@ -14,7 +14,7 @@ namespace webrtc
     using DelegateOnMessage = void (*)(DataChannelInterface*, const uint8_t*, int32_t);
     using DelegateOnOpen = void (*)(DataChannelInterface*);
     using DelegateOnClose = void (*)(DataChannelInterface*);
-    using DelegateOnError = void (*)(DataChannelInterface*);
+    using DelegateOnError = void (*)(DataChannelInterface*, RTCErrorType, const char*, int32_t);
 
     class DataChannelObject : public DataChannelObserver
     {
@@ -33,11 +33,11 @@ namespace webrtc
         //  A data buffer was successfully received.
         void OnMessage(const webrtc::DataBuffer& buffer) override;
 
+        rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
         DelegateOnMessage onMessage;
         DelegateOnOpen onOpen;
         DelegateOnClose onClose;
         DelegateOnError onError;
-        rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
     };
 
 } // end namespace webrtc
