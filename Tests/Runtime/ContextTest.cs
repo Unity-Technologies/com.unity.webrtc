@@ -13,15 +13,15 @@ namespace Unity.WebRTC.RuntimeTest
             switch (severity)
             {
                 case NativeLoggingSeverity.Warning:
-                {
-                    logType = LogType.Warning;
-                    break;
-                }
+                    {
+                        logType = LogType.Warning;
+                        break;
+                    }
                 case NativeLoggingSeverity.Error:
-                {
-                    logType = LogType.Exception;
-                    break;
-                }
+                    {
+                        logType = LogType.Exception;
+                        break;
+                    }
             }
 
             UnityEngine.Debug.unityLogger.Log(logType, str);
