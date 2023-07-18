@@ -3,8 +3,8 @@
 // todo::
 // CMake doesn't support building CUDA kernel with Clang compiler on Windows.
 // https://gitlab.kitware.com/cmake/cmake/-/issues/20776
-#if _WIN32 && __clang__
-#define NOT_SUPPORTED_CUDA_RESIZE 1
+#if !(_WIN32 && __clang__)
+#define SUPPORT_CUDA_KERNEL 1
 #endif
 
 #include <absl/strings/match.h>
@@ -21,7 +21,7 @@
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "ProfilerMarkerFactory.h"
-#if !NOT_SUPPORTED_CUDA_RESIZE
+#if SUPPORT_CUDA_KERNEL
 #include "ResizeSurf.h"
 #endif
 #include "ScopedProfiler.h"
@@ -85,6 +85,62 @@ namespace webrtc
 
     absl::optional<H264Level> NvEncoderImpl::s_maxSupportedH264Level;
     std::vector<SdpVideoFormat> NvEncoderImpl::s_formats;
+
+#if SUPPORT_CUDA_KERNEL
+    CUresult Resize(const CUarray& src, CUarray& dst, const Size& size)
+    {
+        CUDA_ARRAY_DESCRIPTOR srcDesc = {};
+        CUresult result = cuArrayGetDescriptor(&srcDesc, src);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
+            return result;
+        }
+        CUDA_ARRAY_DESCRIPTOR dstDesc = {};
+        dstDesc.Format = srcDesc.Format;
+        dstDesc.NumChannels = srcDesc.NumChannels;
+        dstDesc.Width = static_cast<size_t>(size.width());
+        dstDesc.Height = static_cast<size_t>(size.height());
+
+        bool create = false;
+        if (!dst)
+        {
+            create = true;
+        }
+        else
+        {
+            CUDA_ARRAY_DESCRIPTOR desc = {};
+            result = cuArrayGetDescriptor(&desc, dst);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
+                return result;
+            }
+            if (desc != dstDesc)
+            {
+                result = cuArrayDestroy(dst);
+                if (result != CUDA_SUCCESS)
+                {
+                    RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
+                    return result;
+                }
+                dst = nullptr;
+                create = true;
+            }
+        }
+
+        if (create)
+        {
+            CUresult result = cuArrayCreate(&dst, &dstDesc);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
+                return result;
+            }
+        }
+        return ResizeSurf(src, dst);
+    }
+#endif
 
     NvEncoderImpl::NvEncoderImpl(
         const cricket::VideoCodec& codec,
@@ -289,65 +345,6 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    CUresult NvEncoderImpl::Resize(const CUarray& src, CUarray& dst, const Size& size)
-    {
-        CUDA_ARRAY_DESCRIPTOR srcDesc = {};
-        CUresult result = cuArrayGetDescriptor(&srcDesc, src);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-            return result;
-        }
-        CUDA_ARRAY_DESCRIPTOR dstDesc = {};
-        dstDesc.Format = srcDesc.Format;
-        dstDesc.NumChannels = srcDesc.NumChannels;
-        dstDesc.Width = static_cast<size_t>(size.width());
-        dstDesc.Height = static_cast<size_t>(size.height());
-
-        bool create = false;
-        if (!dst)
-        {
-            create = true;
-        }
-        else
-        {
-            CUDA_ARRAY_DESCRIPTOR desc = {};
-            result = cuArrayGetDescriptor(&desc, dst);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-                return result;
-            }
-            if (desc != dstDesc)
-            {
-                result = cuArrayDestroy(dst);
-                if (result != CUDA_SUCCESS)
-                {
-                    RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
-                    return result;
-                }
-                dst = nullptr;
-                create = true;
-            }
-        }
-
-        if (create)
-        {
-            CUresult result = cuArrayCreate(&dst, &dstDesc);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
-                return result;
-            }
-        }
-
-#if NOT_SUPPORTED_CUDA_RESIZE
-        return CUDA_SUCCESS;
-#else
-        return ResizeSurf(src, dst);
-#endif
-    }
-
     bool NvEncoderImpl::CopyResource(
         const NvEncInputFrame* encoderInputFrame,
         GpuMemoryBufferInterface* buffer,
@@ -385,8 +382,10 @@ namespace webrtc
         {
             void* pSrcArray = static_cast<void*>(handle->mappedArray);
 
+
             // Resize cuda array when the resolution of input buffer is different from output one.
             // The output buffer named m_scaledArray is reused while the resolution is matched.
+#if SUPPORT_CUDA_KERNEL
             if (buffer->GetSize() != size)
             {
                 CUresult result = Resize(handle->mappedArray, m_scaledArray, size);
@@ -399,7 +398,7 @@ namespace webrtc
                 }
                 pSrcArray = static_cast<void*>(m_scaledArray);
             }
-
+#endif
             NvEncoderCudaWithCUarray::CopyToDeviceFrame(
                 context,
                 pSrcArray,

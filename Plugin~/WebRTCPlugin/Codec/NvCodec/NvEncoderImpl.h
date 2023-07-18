@@ -79,8 +79,6 @@ namespace webrtc
             CUcontext context,
             CUmemorytype memoryType);
 
-        CUresult Resize(const CUarray& src, CUarray& dst, const Size& size);
-
         CUcontext m_context;
         CUmemorytype m_memoryType;
         CUarray m_scaledArray;
