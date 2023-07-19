@@ -1,5 +1,12 @@
 #include "pch.h"
 
+// todo::
+// CMake doesn't support building CUDA kernel with Clang compiler on Windows.
+// https://gitlab.kitware.com/cmake/cmake/-/issues/20776
+#if !(_WIN32 && __clang__)
+#define SUPPORT_CUDA_KERNEL 1
+#endif
+
 #include <absl/strings/match.h>
 #include <api/video/video_codec_constants.h>
 #include <api/video/video_codec_type.h>
@@ -10,11 +17,13 @@
 #include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
-#include "NvCodecUtils.h"
 #include "NvEncoder/NvEncoder.h"
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "ProfilerMarkerFactory.h"
+#if SUPPORT_CUDA_KERNEL
+#include "ResizeSurf.h"
+#endif
 #include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
@@ -76,6 +85,62 @@ namespace webrtc
 
     absl::optional<H264Level> NvEncoderImpl::s_maxSupportedH264Level;
     std::vector<SdpVideoFormat> NvEncoderImpl::s_formats;
+
+#if SUPPORT_CUDA_KERNEL
+    CUresult Resize(const CUarray& src, CUarray& dst, const Size& size)
+    {
+        CUDA_ARRAY_DESCRIPTOR srcDesc = {};
+        CUresult result = cuArrayGetDescriptor(&srcDesc, src);
+        if (result != CUDA_SUCCESS)
+        {
+            RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
+            return result;
+        }
+        CUDA_ARRAY_DESCRIPTOR dstDesc = {};
+        dstDesc.Format = srcDesc.Format;
+        dstDesc.NumChannels = srcDesc.NumChannels;
+        dstDesc.Width = static_cast<size_t>(size.width());
+        dstDesc.Height = static_cast<size_t>(size.height());
+
+        bool create = false;
+        if (!dst)
+        {
+            create = true;
+        }
+        else
+        {
+            CUDA_ARRAY_DESCRIPTOR desc = {};
+            result = cuArrayGetDescriptor(&desc, dst);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
+                return result;
+            }
+            if (desc != dstDesc)
+            {
+                result = cuArrayDestroy(dst);
+                if (result != CUDA_SUCCESS)
+                {
+                    RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
+                    return result;
+                }
+                dst = nullptr;
+                create = true;
+            }
+        }
+
+        if (create)
+        {
+            CUresult result = cuArrayCreate(&dst, &dstDesc);
+            if (result != CUDA_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
+                return result;
+            }
+        }
+        return ResizeSurf(src, dst);
+    }
+#endif
 
     NvEncoderImpl::NvEncoderImpl(
         const cricket::VideoCodec& codec,
@@ -280,59 +345,6 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    void NvEncoderImpl::Resize(const CUarray& src, CUarray& dst, const Size& size)
-    {
-        CUDA_ARRAY_DESCRIPTOR srcDesc = {};
-        CUresult result = cuArrayGetDescriptor(&srcDesc, src);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-            return;
-        }
-        CUDA_ARRAY_DESCRIPTOR dstDesc = {};
-        dstDesc.Format = srcDesc.Format;
-        dstDesc.NumChannels = srcDesc.NumChannels;
-        dstDesc.Width = static_cast<size_t>(size.width());
-        dstDesc.Height = static_cast<size_t>(size.height());
-
-        bool create = false;
-        if (!dst)
-        {
-            create = true;
-        }
-        else
-        {
-            CUDA_ARRAY_DESCRIPTOR desc = {};
-            result = cuArrayGetDescriptor(&desc, dst);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-                return;
-            }
-            if (desc != dstDesc)
-            {
-                result = cuArrayDestroy(dst);
-                if (result != CUDA_SUCCESS)
-                {
-                    RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
-                    return;
-                }
-                dst = nullptr;
-                create = true;
-            }
-        }
-
-        if (create)
-        {
-            CUresult result = cuArrayCreate(&dst, &dstDesc);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
-                return;
-            }
-        }
-    }
-
     bool NvEncoderImpl::CopyResource(
         const NvEncInputFrame* encoderInputFrame,
         GpuMemoryBufferInterface* buffer,
@@ -372,12 +384,20 @@ namespace webrtc
 
             // Resize cuda array when the resolution of input buffer is different from output one.
             // The output buffer named m_scaledArray is reused while the resolution is matched.
+#if SUPPORT_CUDA_KERNEL
             if (buffer->GetSize() != size)
             {
-                Resize(handle->mappedArray, m_scaledArray, size);
+                CUresult result = Resize(handle->mappedArray, m_scaledArray, size);
+                if (result != CUDA_SUCCESS)
+                {
+                    RTC_LOG(LS_INFO) << "Resize failed. original size=" << buffer->GetSize().width() << ","
+                                     << buffer->GetSize().height() << " output size=" << size.width() << ","
+                                     << size.height();
+                    return false;
+                }
                 pSrcArray = static_cast<void*>(m_scaledArray);
             }
-
+#endif
             NvEncoderCudaWithCUarray::CopyToDeviceFrame(
                 context,
                 pSrcArray,
@@ -470,8 +490,8 @@ namespace webrtc
 
     int32_t NvEncoderImpl::ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame)
     {
-        m_encodedImage._encodedWidth = inputFrame.video_frame_buffer()->width();
-        m_encodedImage._encodedHeight = inputFrame.video_frame_buffer()->height();
+        m_encodedImage._encodedWidth = m_encoder->GetEncodeWidth();
+        m_encodedImage._encodedHeight = m_encoder->GetEncodeHeight();
         m_encodedImage.SetTimestamp(inputFrame.timestamp());
         m_encodedImage.SetSimulcastIndex(0);
         m_encodedImage.ntp_time_ms_ = inputFrame.ntp_time_ms();

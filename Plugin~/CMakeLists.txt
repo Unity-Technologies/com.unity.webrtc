@@ -83,8 +83,15 @@ if(iOS OR macOS)
 endif()
 
 if(Windows OR Linux)
-  find_package(CUDA REQUIRED)
   find_package(Vulkan REQUIRED)
+
+  find_package(CUDA REQUIRED)
+
+  # Building CUDA kernel is not supported with Clang compiler on Windows.
+  # https://gitlab.kitware.com/cmake/cmake/-/issues/20776
+  if((Windows AND CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR Linux)
+    enable_language(CUDA)
+  endif()
   add_subdirectory(NvCodec)
 endif()
 

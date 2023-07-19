@@ -4,7 +4,7 @@ build_platforms:
   - name: win
     type: Unity::VM
     flavor: b1.large
-    image: renderstreaming/win10:v0.8.0-1295875
+    image: renderstreaming/win10:v0.8.1-1296107
     build_command: BuildScripts~/build_plugin_win.cmd
     build_testrunner_command: BuildScripts~/build_testrunner_win.cmd
     plugin_path: Runtime/Plugins/x86_64/webrtc.dll
@@ -12,7 +12,7 @@ build_platforms:
   - name: linux
     type: Unity::VM
     flavor: b1.large
-    image: renderstreaming/ubuntu-16.04:v0.1.0-1257787
+    image: renderstreaming/ubuntu-18.04:v0.3.0-1294653
     build_command: BuildScripts~/build_plugin_linux.sh
     build_testrunner_command: BuildScripts~/build_testrunner_linux.sh
     plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
@@ -46,15 +46,15 @@ test_platforms:
   - name: win
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/win10:v0.8.0-1295875
-    gpu_image: renderstreaming/win10:v0.8.0-1295876
+    image: renderstreaming/win10:v0.8.1-1296107
+    gpu_image: renderstreaming/win10:v0.8.1-1296108
     flavor: b1.large
     model: rtx2080
   - name: linux
     type: Unity::VM
     gpu_type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.3.1-1262596
-    gpu_image: renderstreaming/ubuntu:v0.3.1-1262597
+    image: renderstreaming/ubuntu:v0.4.1-1294624
+    gpu_image: renderstreaming/ubuntu:v0.4.1-1294625
     flavor: b1.large
     model: rtx2080
   - name: macos
