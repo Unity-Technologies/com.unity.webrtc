@@ -124,7 +124,7 @@ CUresult ResizeSurf(CUarray srcArray, CUarray dstArray)
         srcWidth / dstWidth,
         srcHeight / dstHeight);
 
-    result = cuSurfObjectDestroy(dstSurface);
+    result = cuSurfObjectDestroy(srcSurface);
     if (result != CUDA_SUCCESS)
         return result;
     return cuSurfObjectDestroy(dstSurface);
