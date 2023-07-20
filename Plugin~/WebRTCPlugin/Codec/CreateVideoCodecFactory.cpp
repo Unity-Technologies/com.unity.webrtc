@@ -9,6 +9,7 @@
 
 #if CUDA_PLATFORM
 #include "Codec/NvCodec/NvCodec.h"
+#include "SimulcastEncoderFactory.h"
 #endif
 
 #if UNITY_OSX || UNITY_IOS
@@ -57,7 +58,9 @@ namespace webrtc
             {
                 CUcontext context = gfxDevice->GetCUcontext();
                 NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
-                return new NvEncoderFactory(context, format, profiler);
+                std::unique_ptr<VideoEncoderFactory> factory =
+                    std::make_unique<NvEncoderFactory>(context, format, profiler);
+                return CreateSimulcastEncoderFactory(std::move(factory));
             }
 #endif
         }

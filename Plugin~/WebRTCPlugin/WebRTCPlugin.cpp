@@ -469,6 +469,7 @@ extern "C"
         PeerConnectionInterface::RTCConfiguration config;
         config.sdp_semantics = SdpSemantics::kUnifiedPlan;
         config.enable_implicit_rollback = true;
+        config.set_suspend_below_min_bitrate(false);
         return context->CreatePeerConnection(config);
     }
 
@@ -481,6 +482,7 @@ extern "C"
 
         config.sdp_semantics = SdpSemantics::kUnifiedPlan;
         config.enable_implicit_rollback = true;
+        config.set_suspend_below_min_bitrate(false);
         return context->CreatePeerConnection(config);
     }
 
