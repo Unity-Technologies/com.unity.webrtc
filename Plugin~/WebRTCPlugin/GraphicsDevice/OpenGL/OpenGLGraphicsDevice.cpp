@@ -263,22 +263,11 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
-
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = GetCUcontext();
-
         if (!OpenGLContext::CurrentContext())
             contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
 
         OpenGLTexture2D* glTexture2D = static_cast<OpenGLTexture2D*>(texture);
-        GMB_CUDA_CALL_NULLPTR(cuGraphicsGLRegisterImage(
-            &handle->resource, glTexture2D->GetTexture(), GL_TEXTURE_2D, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
-        GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, 0));
-        GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
-        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(NULL));
-
-        return std::move(handle);
+        return GpuMemoryBufferCudaHandle::CreateHandle(GetCUcontext(), glTexture2D->GetTexture());
 #else
         return nullptr;
 #endif

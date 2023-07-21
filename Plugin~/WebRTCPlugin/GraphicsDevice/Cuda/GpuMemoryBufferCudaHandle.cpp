@@ -48,7 +48,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle>
     GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, ID3D11Resource* resource)
     {
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
+        GMB_CUDA_CALL(cuCtxPushCurrent(context));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
         handle->context = context;
@@ -65,8 +65,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle> GpuMemoryBufferCudaHandle::CreateHandle(
         CUcontext context, ID3D12Resource* resource, HANDLE sharedHandle, size_t memorySize)
     {
-        // set context on the thread.
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
+        GMB_CUDA_CALL(cuCtxPushCurrent(context));
 
         D3D12_RESOURCE_DESC desc = resource->GetDesc();
         size_t width = desc.Width;
@@ -111,8 +110,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle>
     GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, void* exportHandle, size_t memorySize, const Size& size)
     {
-        // set context on the thread.
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
+        GMB_CUDA_CALL(cuCtxPushCurrent(context));
 
         CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
 #if _WIN32
@@ -152,5 +150,26 @@ namespace webrtc
         handle->externalMemory = externalMemory;
         return std::move(handle);
     }
+
+#ifdef __linux__
+        static std::unique_ptr<GpuMemoryBufferCudaHandle>
+        CreateHandle(CUcontext context, GLuint texture)
+        {
+            GMB_CUDA_CALL(cuCtxPushCurrent(context));
+
+            if (!OpenGLContext::CurrentContext())
+                contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
+
+            std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+
+            GMB_CUDA_CALL_NULLPTR(cuGraphicsGLRegisterImage(
+                &handle->resource, texture, GL_TEXTURE_2D, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
+            GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, 0));
+            GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
+            GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(NULL));
+
+            handle->context = context;
+        }
+#endif
 }
 }

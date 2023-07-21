@@ -3,10 +3,6 @@
 #include "OpenGLContext.h"
 #include "OpenGLTexture2D.h"
 
-#if CUDA_PLATFORM
-#include <cudaGL.h>
-#endif
-
 namespace unity
 {
 namespace webrtc
