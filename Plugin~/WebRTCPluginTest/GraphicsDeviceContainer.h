@@ -18,9 +18,6 @@ namespace webrtc
         virtual ~GraphicsDeviceContainer();
         IGraphicsDevice* device() { return device_.get(); }
 
-    protected:
-        virtual int FindDeviceIndex() const { return 0; }
-
     private:
         std::unique_ptr<IGraphicsDevice> device_;
         UnityGfxRenderer renderer_;
