@@ -128,7 +128,7 @@ namespace webrtc
     {
         D3D11Texture2D* texture = static_cast<D3D11Texture2D*>(dest);
         ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
-        ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Texture2D*>(src->GetNativeTexturePtrV());
+        ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Resource*>(src->GetNativeTexturePtrV());
         if (nativeSrc == nativeDest)
             return false;
         if (nativeSrc == nullptr || nativeDest == nullptr)
@@ -225,19 +225,9 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
+        ID3D11Resource* resource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
 
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = GetCUcontext();
-
-        ID3D11Resource* pResource = static_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
-        GMB_CUDA_CALL_NULLPTR(
-            cuGraphicsD3D11RegisterResource(&handle->resource, pResource, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
-        GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, nullptr));
-        GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
-        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
-
-        return std::move(handle);
+        return GpuMemoryBufferCudaHandle::CreateHandle(GetCUcontext(), resource);
     }
 
     bool D3D11GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)

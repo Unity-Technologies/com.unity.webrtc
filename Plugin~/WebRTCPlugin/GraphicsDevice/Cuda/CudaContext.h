@@ -3,7 +3,7 @@
 #include <cuda.h>
 #include <vulkan/vulkan.h>
 
-#if SUPPORT_D3D11 && SUPPORT_D3D12
+#if _WIN32
 #include <d3d11.h>
 #include <d3d12.h>
 #endif
