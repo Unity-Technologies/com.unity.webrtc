@@ -151,21 +151,22 @@ namespace webrtc
     }
 
 #ifdef __linux__
-        std::unique_ptr<GpuMemoryBufferCudaHandle> GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, GLuint texture)
-        {
-            GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
+    std::unique_ptr<GpuMemoryBufferCudaHandle>
+    GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, GLuint texture)
+    {
+        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
-            std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
 
-            GMB_CUDA_CALL_NULLPTR(cuGraphicsGLRegisterImage(
-                &handle->resource, texture, GL_TEXTURE_2D, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
-            GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, 0));
-            GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
-            GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsGLRegisterImage(
+            &handle->resource, texture, GL_TEXTURE_2D, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsMapResources(1, &handle->resource, 0));
+        GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
+        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
-            handle->context = context;
-            return handle;
-        }
+        handle->context = context;
+        return handle;
+    }
 #endif
 }
 }

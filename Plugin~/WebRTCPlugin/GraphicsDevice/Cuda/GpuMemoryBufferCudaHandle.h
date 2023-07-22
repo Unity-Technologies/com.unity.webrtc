@@ -75,8 +75,7 @@ namespace webrtc
         static std::unique_ptr<GpuMemoryBufferCudaHandle>
         CreateHandle(CUcontext context, void* exportHandle, size_t memorySize, const Size& size);
 #ifdef __linux__
-        static std::unique_ptr<GpuMemoryBufferCudaHandle>
-        CreateHandle(CUcontext context, GLuint texture);
+        static std::unique_ptr<GpuMemoryBufferCudaHandle> CreateHandle(CUcontext context, GLuint texture);
 #endif
     };
 }
