@@ -2,6 +2,11 @@
 
 #include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/ITexture2D.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
+
+#if CUDA_PLATFORM
+#include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
+#endif
 
 namespace unity
 {
@@ -10,11 +15,43 @@ namespace webrtc
     GpuMemoryBufferHandle::GpuMemoryBufferHandle() { }
     GpuMemoryBufferHandle::GpuMemoryBufferHandle(GpuMemoryBufferHandle&& other) = default;
     GpuMemoryBufferHandle& GpuMemoryBufferHandle::operator=(GpuMemoryBufferHandle&& other) = default;
+    GpuMemoryBufferHandle::~GpuMemoryBufferHandle() = default;
 
-    GpuMemoryBufferHandle::~GpuMemoryBufferHandle() { }
+#if CUDA_PLATFORM
+    GpuMemoryBufferFromCuda::GpuMemoryBufferFromCuda(
+        CUcontext context,
+        CUdeviceptr ptr,
+        const Size& size,
+        UnityRenderingExtTextureFormat format,
+        GpuMemoryBufferHandle::AccessMode mode)
+        : size_(size)
+        , handle_(GpuMemoryBufferCudaHandle::CreateHandle(context, ptr, mode))
+        , format_(format)
+    {
+    }
+
+    GpuMemoryBufferFromCuda::~GpuMemoryBufferFromCuda() = default;
+
+    UnityRenderingExtTextureFormat GpuMemoryBufferFromCuda::GetFormat() const { return format_; }
+    Size GpuMemoryBufferFromCuda::GetSize() const { return size_; }
+    rtc::scoped_refptr<I420BufferInterface> GpuMemoryBufferFromCuda::ToI420()
+    {
+        assert("This is not supported");
+        throw;
+    }
+    const GpuMemoryBufferHandle* GpuMemoryBufferFromCuda::handle() const { return handle_.get(); }
+#endif
+
+#if __ANDROID__
+    AHardwareBufferHandle::AHardwareBufferHandle() : buffer(nullptr) { }
+    AHardwareBufferHandle::AHardwareBufferHandle(AHardwareBufferHandle&& other) = default;
+    AHardwareBufferHandle& AHardwareBufferHandle::operator=(AHardwareBufferHandle&& other) = default;
+
+    AHardwareBufferHandle::~AHardwareBufferHandle() { }
+#endif
 
     GpuMemoryBufferFromUnity::GpuMemoryBufferFromUnity(
-        IGraphicsDevice* device, const Size& size, UnityRenderingExtTextureFormat format)
+        IGraphicsDevice* device, void* ptr, const Size& size, UnityRenderingExtTextureFormat format, GpuMemoryBufferHandle::AccessMode mode)
         : device_(device)
         , format_(format)
         , size_(size)
@@ -33,7 +70,7 @@ namespace webrtc
         {
             // IGraphicsDevice::Map method is too heavy and stop the graphics process,
             // so must not call this method on the worker thread instead of the render thread.
-            handle_ = device_->Map(texture_.get());
+            handle_ = device_->Map(texture_.get(), mode);
         }
 #endif
     }

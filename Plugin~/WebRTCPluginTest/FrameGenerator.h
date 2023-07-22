@@ -4,6 +4,7 @@
 
 #include "api/test/frame_generator_interface.h"
 #include "rtc_base/synchronization/mutex.h"
+#include "VideoFrameBufferPool.h"
 
 namespace unity
 {
@@ -37,6 +38,7 @@ namespace webrtc
         int width_;
         int height_;
         std::queue<std::unique_ptr<ITexture2D>> queue_;
+        VideoFrameBufferPool pool_;
     };
 
 }

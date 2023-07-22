@@ -46,7 +46,8 @@ namespace webrtc
         const uint32_t kHeight2 = kHeight * 2;
 
         std::unique_ptr<ITexture2D> texture(device_->CreateDefaultTextureV(kWidth2, kHeight2, kFormat));
-        std::unique_ptr<GpuMemoryBufferHandle> handle = device_->Map(texture.get());
+        std::unique_ptr<GpuMemoryBufferHandle> handle =
+            device_->Map(texture.get(), GpuMemoryBufferHandle::AccessMode::kRead);
 
         GpuMemoryBufferCudaHandle* cudaHandle = static_cast<GpuMemoryBufferCudaHandle*>(handle.get());
 

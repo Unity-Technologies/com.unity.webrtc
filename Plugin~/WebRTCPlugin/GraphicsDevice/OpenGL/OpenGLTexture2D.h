@@ -20,7 +20,7 @@ namespace webrtc
     {
     public:
         using ReleaseOpenGLTextureCallback = std::function<void(OpenGLTexture2D*)>;
-        OpenGLTexture2D(uint32_t w, uint32_t h, GLuint tex, ReleaseOpenGLTextureCallback callback);
+        OpenGLTexture2D(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat format, GLuint tex, ReleaseOpenGLTextureCallback callback);
         virtual ~OpenGLTexture2D() override;
 
         inline void* GetNativeTexturePtrV() override;

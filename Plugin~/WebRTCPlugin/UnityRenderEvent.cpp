@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include "Context.h"
-#include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
@@ -9,6 +8,7 @@
 #include "UnityProfilerInterfaceFunctions.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrame.h"
+#include "VideoFrameBufferPool.h"
 
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
@@ -17,6 +17,14 @@
 
 using namespace unity::webrtc;
 using namespace ::webrtc;
+
+// todo(kazuki) refactor
+#include "NativeFrameBuffer.h"
+
+enum class VideoStreamRenderEventID
+{
+    Encode = 1,
+};
 
 namespace unity
 {
@@ -35,8 +43,7 @@ namespace webrtc
     static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
-    static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
-    static int s_batchUpdateEventID = 0;
+    static std::unique_ptr<VideoFrameBufferPool> s_bufferPool;
 
     IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
 
@@ -67,6 +74,9 @@ namespace webrtc
     }
 } // end namespace webrtc
 } // end namespace unity
+
+using namespace ::webrtc;
+using namespace unity::webrtc;
 
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
@@ -115,13 +125,13 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             s_gfxDevice->InitV();
         }
-        s_bufferPool = std::make_unique<GpuMemoryBufferPool>(s_gfxDevice.get(), s_clock.get());
+        s_bufferPool = std::make_unique<VideoFrameBufferPool>(s_gfxDevice.get(), 10);
         break;
     }
     case kUnityGfxDeviceEventShutdown:
     {
         // Release buffers before graphics device because buffers depends on the device.
-        s_bufferPool = nullptr;
+        //s_bufferPool = nullptr;
 
         s_mapVideoRenderer.clear();
 

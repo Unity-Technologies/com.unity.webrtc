@@ -97,8 +97,8 @@ namespace webrtc
         VkExportMemoryAllocateInfoKHR exportInfo = {};
         if (exportHandle)
         {
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
-            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR;
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
             allocInfo.pNext = &exportInfo;
         }
 
@@ -160,8 +160,12 @@ namespace webrtc
         VkExportMemoryAllocateInfoKHR exportInfo = {};
         if (exportHandle)
         {
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
-            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR;
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+#if UNITY_WIN
+            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#elif UNITY_ANDROID
+            exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID;
+#endif
             allocInfo.pNext = &exportInfo;
         }
 
@@ -439,13 +443,10 @@ namespace webrtc
         const uint32_t width,
         const uint32_t height)
     {
-
         // Start copy
         VkImageCopy copyRegion {};
         copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-        copyRegion.srcOffset = { 0, 0, 0 };
         copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-        copyRegion.dstOffset = { 0, 0, 0 };
         copyRegion.extent = { width, height, 1 };
         vkCmdCopyImage(
             commandBuffer,
@@ -455,7 +456,6 @@ namespace webrtc
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &copyRegion);
-
         return VK_SUCCESS;
     }
 

@@ -8,6 +8,7 @@
 #include "PlatformBase.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
+#include "GpuMemoryBuffer.h"
 
 #if CUDA_PLATFORM
 #include "Cuda/ICudaDevice.h"
@@ -19,7 +20,6 @@ namespace webrtc
 {
     using NativeTexPtr = void*;
     class ITexture2D;
-    struct GpuMemoryBufferHandle;
     class ProfilerMarkerFactory;
     class IGraphicsDevice
 #if CUDA_PLATFORM
@@ -41,11 +41,20 @@ namespace webrtc
         virtual void ShutdownV() = 0;
         virtual ITexture2D*
         CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;
+        virtual rtc::scoped_refptr<::webrtc::VideoFrameBuffer> CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) { return nullptr; }
         virtual void* GetEncodeDevicePtrV() = 0;
         virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) = 0;
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;
+
+        virtual bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer) { return true; }
+        virtual bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
+        {
+            return true;
+        }
+
         virtual UnityGfxRenderer GetGfxRenderer() const { return m_gfxRenderer; }
-        virtual std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) = 0;
+        virtual std::unique_ptr<GpuMemoryBufferHandle>
+        Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode) = 0;
         virtual bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) { return true; }
         virtual bool ResetSync(const ITexture2D* texture) { return true; }
         virtual bool WaitIdleForTest() { return true; }
@@ -53,6 +62,11 @@ namespace webrtc
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;
         virtual rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) = 0;
+        virtual rtc::scoped_refptr<::webrtc::VideoFrameBuffer> ConvertToBuffer(void* texture) { return nullptr; }
+
+#if __ANDROID__
+        virtual std::unique_ptr<Surface> GetSurface(ANativeWindow* window) { return nullptr; }
+#endif
 
     protected:
         UnityGfxRenderer m_gfxRenderer;

@@ -5,6 +5,7 @@
 
 #include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/ITexture2D.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "VideoFrameUtil.h"
 
 namespace unity
@@ -18,7 +19,8 @@ namespace webrtc
         NativeTexPtr ptr = NativeTexPtr(texture->GetNativeTexturePtrV());
         Size size = Size(static_cast<int>(texture->GetWidth()), static_cast<int>(texture->GetHeight()));
 
-        auto buffer = rtc::make_ref_counted<GpuMemoryBufferFromUnity>(device, size, format);
+        rtc::scoped_refptr<GpuMemoryBufferInterface> gmb = new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(
+            device, ptr, size, format, GpuMemoryBufferHandle::AccessMode::kRead);
 
         if (!buffer->CopyBuffer(ptr))
             return nullptr;

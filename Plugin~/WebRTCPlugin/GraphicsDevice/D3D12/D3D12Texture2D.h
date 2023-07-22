@@ -18,7 +18,11 @@ namespace webrtc
     {
     public:
         // copy to GPU texture
-        D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, HANDLE handle);
+        D3D12Texture2D(
+            uint32_t width,
+            uint32_t height,
+            ID3D12Resource* nativeTex, 
+            HANDLE handle);
 
         // copy to CPU buffer
         D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, const D3D12ResourceFootprint& footprint);

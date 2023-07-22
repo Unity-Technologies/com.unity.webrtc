@@ -8,6 +8,7 @@
 #include "VulkanTexture2D.h"
 #include "VulkanUtility.h"
 #include "WebRTCMacros.h"
+#include "NativeFrameBuffer.h"
 
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
@@ -128,9 +129,9 @@ namespace webrtc
 
     // Returns null if failed
     ITexture2D* VulkanGraphicsDevice::CreateDefaultTextureV(
-        const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+        const uint32_t width, const uint32_t height, UnityRenderingExtTextureFormat format)
     {
-        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
+        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(width, height, format);
         if (!vulkanTexture->Init(m_physicalDevice, m_device, m_commandPool))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::Init failed.";
@@ -139,10 +140,16 @@ namespace webrtc
         return vulkanTexture.release();
     }
 
-    ITexture2D*
-    VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    rtc::scoped_refptr<::webrtc::VideoFrameBuffer>
+    VulkanGraphicsDevice::CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
-        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
+        return NativeFrameBuffer::Create(width, height, textureFormat, this);
+    }
+
+    ITexture2D*
+    VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
+    {
+        std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(width, height, format);
         if (!vulkanTexture->InitCpuRead(m_physicalDevice, m_device, m_commandPool))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::InitCpuRead failed.";
@@ -386,7 +393,8 @@ namespace webrtc
         return i420Buffer;
     }
 
-    std::unique_ptr<GpuMemoryBufferHandle> VulkanGraphicsDevice::Map(ITexture2D* texture)
+    std::unique_ptr<GpuMemoryBufferHandle>
+    VulkanGraphicsDevice::Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode)
     {
 #if CUDA_PLATFORM
         if (!IsCudaSupport())
@@ -399,21 +407,12 @@ namespace webrtc
 
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
         void* exportHandle = VulkanUtility::GetExportHandle(m_device, vulkanTexture->GetTextureImageMemory());
-
         if (!exportHandle)
         {
             RTC_LOG(LS_ERROR) << "cannot get export handle";
             return nullptr;
         }
 
-        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
-#ifndef _WIN32
-        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD;
-#else
-        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32;
-#endif
-        memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(exportHandle));
-        memDesc.size = vulkanTexture->GetTextureImageMemorySize();
 
         GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&handle->externalMemory, &memDesc));
 
@@ -426,9 +425,8 @@ namespace webrtc
         arrayDesc.NumChannels = 1;
         arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
 
-        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
-        mipmapArrayDesc.arrayDesc = arrayDesc;
-        mipmapArrayDesc.numLevels = 1;
+        AHardwareBuffer* buffer = nullptr;
+//        AHardwareBuffer_Desc ahb_desc = {};
 
         GMB_CUDA_CALL_NULLPTR(
             cuExternalMemoryGetMappedMipmappedArray(&handle->mipmappedArray, handle->externalMemory, &mipmapArrayDesc));

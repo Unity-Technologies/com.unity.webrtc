@@ -5,6 +5,7 @@
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
 #include "VideoFrameUtil.h"
+#include "NativeFrameBuffer.h"
 
 namespace unity
 {
@@ -26,6 +27,7 @@ namespace webrtc
         : device_(device)
         , width_(width)
         , height_(height)
+        , pool_(device_, 10)
     {
     }
 
@@ -48,16 +50,14 @@ namespace webrtc
         MutexLock lock(&mutex_);
 
         const UnityRenderingExtTextureFormat kFormat = kUnityRenderingExtFormatR8G8B8A8_SRGB;
-
-        ITexture2D* texture =
-            device_->CreateDefaultTextureV(static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), kFormat);
-
-        queue_.push(std::unique_ptr<ITexture2D>(texture));
-        rtc::scoped_refptr<VideoFrame> frame = CreateTestFrame(device_, texture, kFormat);
-        EXPECT_TRUE(device_->WaitIdleForTest());
-
-        ::webrtc::VideoFrame videoFrame = VideoFrameAdapter::CreateVideoFrame(frame);
-        rtc::scoped_refptr<VideoFrameBuffer> buffer = videoFrame.video_frame_buffer();
+        auto buffer = pool_.Create(width_, height_, kFormat);
+#if UNITY_OSX || UNITY_IOS
+#else
+        // gpu memory mapping
+        auto nativeFrameBuffer = static_cast<NativeFrameBuffer*>(buffer.get());
+        if (!nativeFrameBuffer->handle())
+            nativeFrameBuffer->Map(GpuMemoryBufferHandle::AccessMode::kRead);
+#endif
         return VideoFrameData(buffer, absl::nullopt);
     }
 }

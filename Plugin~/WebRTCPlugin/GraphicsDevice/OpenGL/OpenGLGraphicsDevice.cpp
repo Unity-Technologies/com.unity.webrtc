@@ -95,7 +95,7 @@ namespace webrtc
 
         OpenGLTexture2D::ReleaseOpenGLTextureCallback callback =
             std::bind(&OpenGLGraphicsDevice::ReleaseTexture, this, std::placeholders::_1);
-        return new OpenGLTexture2D(w, h, tex, callback);
+        return new OpenGLTexture2D(w, h, textureFormat, tex, callback);
     }
 
     ITexture2D*

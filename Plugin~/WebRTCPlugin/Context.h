@@ -136,7 +136,8 @@ namespace webrtc
         void DeleteDataChannel(DataChannelInterface* channel);
 
         // Renderer
-        UnityVideoRenderer* CreateVideoRenderer(DelegateVideoFrameResize callback, bool needFlipVertical);
+        UnityVideoRenderer*
+        CreateVideoRenderer(DelegateVideoFrameResize callback, bool needFlipVertical, IGraphicsDevice* device);
         std::shared_ptr<UnityVideoRenderer> GetVideoRenderer(uint32_t id);
         void DeleteVideoRenderer(UnityVideoRenderer* renderer);
 

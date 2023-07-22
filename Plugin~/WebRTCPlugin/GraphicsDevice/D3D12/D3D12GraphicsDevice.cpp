@@ -9,6 +9,7 @@
 #include "GraphicsDevice/D3D11/D3D11Texture2D.h"
 #include "GraphicsDevice/GraphicsUtility.h"
 #include "NvCodecUtils.h"
+#include "NativeFrameBuffer.h"
 
 // nonstandard extension used : class rvalue used as lvalue
 #pragma clang diagnostic ignored "-Wlanguage-extension-token"
@@ -73,14 +74,14 @@ namespace webrtc
     //---------------------------------------------------------------------------------------------------------------------
     void D3D12GraphicsDevice::ShutdownV() { m_cudaContext.Shutdown(); }
 
-    //---------------------------------------------------------------------------------------------------------------------
     ITexture2D*
-    D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
-        return CreateSharedD3D12Texture(w, h);
+     rtc::scoped_refptr<::webrtc::VideoFrameBuffer> D3D12GraphicsDevice::CreateVideoFrameBuffer(
+        uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
+    {
+        return rtc::make_ref_counted<NativeFrameBuffer>(width, height, textureFormat, this);
     }
-
-    //---------------------------------------------------------------------------------------------------------------------
 
     bool D3D12GraphicsDevice::CopyResourceV(ITexture2D* dest, ITexture2D* src)
     {
@@ -184,7 +185,7 @@ namespace webrtc
         return true;
     }
 
-    D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t w, uint32_t h)
+    D3D12Texture2D* D3D12GraphicsDevice::CreateSharedD3D12Texture(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
         //[Note-sin: 2019-10-30] Taken from RaytracedHardShadow
         // note: sharing textures with d3d11 requires some flags and restrictions:
@@ -196,8 +197,8 @@ namespace webrtc
         D3D12_RESOURCE_DESC desc {};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         desc.Alignment = 0;
-        desc.Width = w;
-        desc.Height = h;
+        desc.Width = width;
+        desc.Height = height;
         desc.DepthOrArraySize = 1;
         desc.MipLevels = 1;
         desc.Format =
@@ -283,7 +284,7 @@ namespace webrtc
     }
 
     ITexture2D*
-    D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D12GraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
         D3D12_RESOURCE_DESC desc {};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -383,7 +384,8 @@ namespace webrtc
         return i420_buffer;
     }
 
-    std::unique_ptr<GpuMemoryBufferHandle> D3D12GraphicsDevice::Map(ITexture2D* texture)
+    std::unique_ptr<GpuMemoryBufferHandle>
+    D3D12GraphicsDevice::Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode)
     {
         if (!IsCudaSupport())
             return nullptr;

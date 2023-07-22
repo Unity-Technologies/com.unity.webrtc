@@ -6,6 +6,7 @@
 #include "D3D11Texture2D.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
 #include "GraphicsDevice/GraphicsUtility.h"
+#include "NativeFrameBuffer.h"
 #include "NvCodecUtils.h"
 
 using namespace ::webrtc;
@@ -48,7 +49,6 @@ namespace webrtc
     ITexture2D*
     D3D11GraphicsDevice::CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
-
         ID3D11Texture2D* texture = nullptr;
         D3D11_TEXTURE2D_DESC desc = {};
         desc.Width = w;
@@ -81,18 +81,23 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
             return nullptr;
         }
-        return new D3D11Texture2D(w, h, texture, fence);
+        return new D3D11Texture2D(w, h, texture, textureFormat, fence);
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
+    rtc::scoped_refptr<::webrtc::VideoFrameBuffer> D3D11GraphicsDevice::CreateVideoFrameBuffer(
+        uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
+    {
+        return rtc::make_ref_counted<NativeFrameBuffer>(width, height, textureFormat, this);
+    }
+
     ITexture2D*
-    D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
+    D3D11GraphicsDevice::CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
 
         ID3D11Texture2D* texture = nullptr;
         D3D11_TEXTURE2D_DESC desc = {};
-        desc.Width = w;
-        desc.Height = h;
+        desc.Width = width;
+        desc.Height = height;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -120,7 +125,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
             return nullptr;
         }
-        return new D3D11Texture2D(w, h, texture, fence);
+        return new D3D11Texture2D(width, height, format, texture, fence);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -128,7 +133,7 @@ namespace webrtc
     {
         D3D11Texture2D* texture = static_cast<D3D11Texture2D*>(dest);
         ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest->GetNativeTexturePtrV());
-        ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Texture2D*>(src->GetNativeTexturePtrV());
+        ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Resource*>(src->GetNativeTexturePtrV());
         if (nativeSrc == nativeDest)
             return false;
         if (nativeSrc == nullptr || nativeDest == nullptr)
@@ -159,7 +164,7 @@ namespace webrtc
 
         ComPtr<ID3D11DeviceContext> context;
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
-        context->CopyResource(nativeDest, nativeSrc);
+        context->CopyResource(dest, src);
 
         HRESULT hr = Signal(texture->GetFence());
         if (hr != S_OK)
@@ -170,7 +175,25 @@ namespace webrtc
         return true;
     }
 
-    HRESULT D3D11GraphicsDevice::Signal(ID3D11Fence* fence)
+    bool D3D11GraphicsDevice::CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer)
+    {
+        RTC_DCHECK(dest);
+        RTC_DCHECK(buffer);
+        NativeFrameBuffer* nativeFrameBuffer = static_cast<NativeFrameBuffer*>(buffer.get());
+        ITexture2D* texture = nativeFrameBuffer->texture();
+        RTC_DCHECK(texture);
+        ID3D11Resource* nativeDest = reinterpret_cast<ID3D11Resource*>(dest);
+        ID3D11Resource* nativeSrc = reinterpret_cast<ID3D11Resource*>(texture->GetNativeTexturePtrV());
+        return CopyTexture(nativeDest, nativeSrc);
+    }
+
+    bool D3D11GraphicsDevice::CopyToVideoFrameBuffer(rtc::scoped_refptr<VideoFrameBuffer>& buffer, void* texture)
+    {
+        NativeFrameBuffer* nativeBuffer = static_cast<NativeFrameBuffer*>(buffer.get());
+        return CopyResourceFromNativeV(nativeBuffer->texture(), texture);
+    }
+
+    HRESULT D3D11GraphicsDevice::WaitFlush()
     {
         ComPtr<ID3D11DeviceContext> context;
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
@@ -218,6 +241,17 @@ namespace webrtc
 
         context->Unmap(pResource, 0);
         return i420_buffer;
+    }
+
+    rtc::scoped_refptr<::webrtc::VideoFrameBuffer> D3D11GraphicsDevice::ConvertToBuffer(void* ptr)
+    {
+        ID3D11Texture2D* d3dTexture = static_cast<ID3D11Texture2D*>(ptr);
+        D3D11_TEXTURE2D_DESC desc = {};
+        d3dTexture->GetDesc(&desc);
+
+        RTC_DCHECK_EQ(desc.Format, DXGI_FORMAT_B8G8R8A8_UNORM);
+        UnityRenderingExtTextureFormat format = kUnityRenderingExtFormatB8G8R8A8_UNorm;
+        return rtc::make_ref_counted<NativeFrameBuffer>(desc.Width, desc.Height, format, this);
     }
 
     std::unique_ptr<GpuMemoryBufferHandle> D3D11GraphicsDevice::Map(ITexture2D* texture)

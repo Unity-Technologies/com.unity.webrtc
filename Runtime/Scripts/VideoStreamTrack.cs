@@ -285,7 +285,7 @@ namespace Unity.WebRTC
             }
 
             int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+            var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
@@ -449,6 +449,7 @@ namespace Unity.WebRTC
 
             var format = WebRTC.GetSupportedGraphicsFormat(SystemInfo.graphicsDeviceType);
             Texture = new Texture2D(width, height, format, TextureCreationFlags.None);
+            NativeMethods.VideoRendererSetTexture(self, Texture.GetNativeTexturePtr());
             TexturePtr = Texture.GetNativeTexturePtr();
             track.OnVideoFrameResize(Texture);
         }

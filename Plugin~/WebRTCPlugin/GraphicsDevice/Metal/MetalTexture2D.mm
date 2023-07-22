@@ -8,9 +8,9 @@ namespace unity
 {
 namespace webrtc
 {
-
-    MetalTexture2D::MetalTexture2D(uint32_t w, uint32_t h, id<MTLTexture> tex)
-        : ITexture2D(w, h)
+    MetalTexture2D::MetalTexture2D(
+        uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format, id<MTLTexture> tex)
+        : ITexture2D(width, height, format)
         , m_texture(tex)
         , m_semaphore(dispatch_semaphore_create(1))
     {

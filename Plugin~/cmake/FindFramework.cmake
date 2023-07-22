@@ -10,8 +10,10 @@ if(iOS)
     "-framework AudioToolbox"
     "-framework VideoToolbox"
     "-framework Metal"
+    "-framework IOSurface"
     "-framework UIKit"
     "-framework Network"
+    "-framework IOSurface"
   )
 else()
   find_library(CORE_FOUNDATION Foundation)
@@ -24,6 +26,7 @@ else()
   find_library(AUDIO_TOOLBOX AudioToolbox)
   find_library(VIDEO_TOOLBOX VideoToolbox)
   find_library(METAL Metal)
+  find_library(IOSURFACE IOSurface)
 
   set(FRAMEWORK_LIBS
     ${CORE_FOUNDATION}
@@ -36,5 +39,6 @@ else()
     ${AUDIO_TOOLBOX}
     ${VIDEO_TOOLBOX}
     ${METAL}
+    ${IOSURFACE}
   )
 endif()

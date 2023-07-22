@@ -10,6 +10,7 @@ namespace unity
 namespace webrtc
 {
     using namespace ::webrtc;
+
     class MetalDevice;
     struct MetalTexture2D;
     class MetalGraphicsDevice : public IGraphicsDevice
@@ -24,12 +25,17 @@ namespace webrtc
 
         ITexture2D*
         CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
+        rtc::scoped_refptr<VideoFrameBuffer>
+        CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format) override;
         ITexture2D* CreateDefaultTextureFromNativeV(uint32_t w, uint32_t h, void* nativeTexturePtr);
         ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
         bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+        bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<VideoFrameBuffer> buffer) override;
+        bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture) override;
         rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        rtc::scoped_refptr<VideoFrameBuffer> ConvertToBuffer(void* ptr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override { return nullptr; }
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;

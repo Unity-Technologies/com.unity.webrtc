@@ -4,6 +4,7 @@
 #include "VideoFrameUtil.h"
 
 #include "GraphicsDevice/ITexture2D.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "GraphicsDeviceContainer.h"
 
 namespace unity

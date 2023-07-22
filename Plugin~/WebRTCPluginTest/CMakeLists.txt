@@ -1,31 +1,34 @@
 add_executable(WebRTCLibTest)
 
-target_sources(
-  WebRTCLibTest
-  PRIVATE pch.cpp
-          pch.h
-          ContextTest.cpp
-          CreateVideoCodecFactoryTest.cpp
-          FrameGenerator.cpp
-          FrameGenerator.h
-          GpuMemoryBufferTest.cpp
-          GpuMemoryBufferPoolTest.cpp
-          GraphicsDeviceContainer.cpp
-          GraphicsDeviceContainer.h
-          GraphicsDeviceContainerTest.cpp
-          GraphicsDeviceTest.cpp
-          GraphicsDeviceTestBase.cpp
-          GraphicsDeviceTestBase.h
-          H264ProfileLevelIdTest.cpp
-          InternalCodecsTest.cpp
-          UnityVideoEncoderFactoryTest.cpp
-          UnityVideoDecoderFactoryTest.cpp
-          VideoCodecTest.cpp
-          VideoCodecTest.h
-          VideoFrameSchedulerTest.cpp
-          VideoFrameTest.cpp
-          VideoRendererTest.cpp
-          VideoTrackSourceTest.cpp)
+target_sources(WebRTCLibTest
+  PRIVATE
+    pch.cpp
+    pch.h
+    ContextTest.cpp
+    CreateVideoCodecFactoryTest.cpp
+    FrameGenerator.cpp
+    FrameGenerator.h
+    GpuMemoryBufferTest.cpp
+    GpuMemoryBufferPoolTest.cpp
+    GraphicsDeviceContainer.cpp
+    GraphicsDeviceContainer.h
+    GraphicsDeviceContainerTest.cpp
+    GraphicsDeviceTest.cpp
+    GraphicsDeviceTestBase.cpp
+    GraphicsDeviceTestBase.h
+    H264ProfileLevelIdTest.cpp
+    InternalCodecsTest.cpp
+    NativeFrameBufferTest.cpp
+    UnityVideoEncoderFactoryTest.cpp
+    UnityVideoDecoderFactoryTest.cpp
+    VideoCodecTest.cpp
+    VideoCodecTest.h
+    VideoFrameBufferPoolTest.cpp
+    VideoFrameSchedulerTest.cpp
+    VideoFrameTest.cpp
+    VideoRendererTest.cpp
+    VideoTrackSourceTest.cpp
+)
 
 if(Windows OR Linux)
   add_subdirectory(NvCodec)
