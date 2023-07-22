@@ -392,11 +392,6 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
-
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = GetCUcontext();
-
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
         void* exportHandle = VulkanUtility::GetExportHandle(m_device, vulkanTexture->GetTextureImageMemory());
 

@@ -152,8 +152,7 @@ namespace webrtc
     }
 
 #ifdef __linux__
-        static std::unique_ptr<GpuMemoryBufferCudaHandle>
-        CreateHandle(CUcontext context, GLuint texture)
+        std::unique_ptr<GpuMemoryBufferCudaHandle> GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, GLuint texture)
         {
             GMB_CUDA_CALL(cuCtxPushCurrent(context));
 
