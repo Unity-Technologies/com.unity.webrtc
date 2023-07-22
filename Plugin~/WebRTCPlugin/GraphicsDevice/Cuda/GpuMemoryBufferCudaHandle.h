@@ -6,6 +6,7 @@
 #endif
 
 #ifdef __linux__
+#include <cudaGL.h>
 #include <glad/gl.h>
 #endif
 
