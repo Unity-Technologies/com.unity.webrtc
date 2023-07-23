@@ -77,6 +77,9 @@ namespace webrtc
     ITexture2D*
     D3D12GraphicsDevice::CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat format)
     {
+        return CreateSharedD3D12Texture(width, height, format);
+    }
+
      rtc::scoped_refptr<::webrtc::VideoFrameBuffer> D3D12GraphicsDevice::CreateVideoFrameBuffer(
         uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat)
     {
@@ -229,7 +232,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "CreateSharedHandle failed. error:" << result;
             return nullptr;
         }
-        return new D3D12Texture2D(w, h, resource, handle);
+        return new D3D12Texture2D(width, height, format, resource, handle);
     }
 
     bool D3D12GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
@@ -289,8 +292,8 @@ namespace webrtc
         D3D12_RESOURCE_DESC desc {};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         desc.Alignment = 0;
-        desc.Width = w;
-        desc.Height = h;
+        desc.Width = width;
+        desc.Height = height;
         desc.DepthOrArraySize = 1;
         desc.MipLevels = 1;
         desc.Format =
@@ -332,7 +335,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "ID3D12Device::CreateCommittedResource failed. " << hr;
             return nullptr;
         }
-        return new D3D12Texture2D(w, h, resource, footprint);
+        return new D3D12Texture2D(width, height, format, resource, footprint);
     }
 
     //----------------------------------------------------------------------------------------------------------------------

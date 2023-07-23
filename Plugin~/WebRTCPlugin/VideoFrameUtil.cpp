@@ -19,11 +19,8 @@ namespace webrtc
         NativeTexPtr ptr = NativeTexPtr(texture->GetNativeTexturePtrV());
         Size size = Size(static_cast<int>(texture->GetWidth()), static_cast<int>(texture->GetHeight()));
 
-        rtc::scoped_refptr<GpuMemoryBufferInterface> gmb = new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(
+        rtc::scoped_refptr<GpuMemoryBufferInterface> buffer = rtc::make_ref_counted<GpuMemoryBufferFromUnity>(
             device, ptr, size, format, GpuMemoryBufferHandle::AccessMode::kRead);
-
-        if (!buffer->CopyBuffer(ptr))
-            return nullptr;
 
         const int64_t timestamp_us = webrtc::Clock::GetRealTimeClock()->TimeInMicroseconds();
 

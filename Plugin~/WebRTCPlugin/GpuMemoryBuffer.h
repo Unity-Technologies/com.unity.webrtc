@@ -101,7 +101,7 @@ namespace webrtc
         GpuMemoryBufferFromUnity& operator=(const GpuMemoryBufferFromUnity&) = delete;
 
         bool ResetSync();
-        bool CopyBuffer(NativeTexPtr ptr);
+        bool CopyBuffer(void* ptr);
         UnityRenderingExtTextureFormat GetFormat() const override;
         Size GetSize() const override;
         rtc::scoped_refptr<I420BufferInterface> ToI420() override;

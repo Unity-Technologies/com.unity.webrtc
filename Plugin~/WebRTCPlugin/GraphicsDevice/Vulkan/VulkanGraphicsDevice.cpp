@@ -413,6 +413,14 @@ namespace webrtc
             return nullptr;
         }
 
+        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
+#ifndef _WIN32
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD;
+#else
+        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32;
+#endif
+        memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(exportHandle));
+        memDesc.size = vulkanTexture->GetTextureImageMemorySize();
 
         GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&handle->externalMemory, &memDesc));
 
@@ -425,8 +433,9 @@ namespace webrtc
         arrayDesc.NumChannels = 1;
         arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
 
-        AHardwareBuffer* buffer = nullptr;
-//        AHardwareBuffer_Desc ahb_desc = {};
+        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
+        mipmapArrayDesc.arrayDesc = arrayDesc;
+        mipmapArrayDesc.numLevels = 1;
 
         GMB_CUDA_CALL_NULLPTR(
             cuExternalMemoryGetMappedMipmappedArray(&handle->mipmappedArray, handle->externalMemory, &mipmapArrayDesc));

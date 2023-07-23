@@ -57,7 +57,7 @@ namespace webrtc
                 return resources->buffer_;
             }
         }
-        rtc::scoped_refptr<GpuMemoryBufferFromUnity> buffer = new rtc::RefCountedObject<GpuMemoryBufferFromUnity>(
+        rtc::scoped_refptr<GpuMemoryBufferFromUnity> buffer = rtc::make_ref_counted<GpuMemoryBufferFromUnity>(
             device_, ptr, size, format, GpuMemoryBufferHandle::AccessMode::kRead);
         std::unique_ptr<FrameResources> resources = std::make_unique<FrameResources>(buffer);
         resources->MarkUsed(clock_->CurrentTime());

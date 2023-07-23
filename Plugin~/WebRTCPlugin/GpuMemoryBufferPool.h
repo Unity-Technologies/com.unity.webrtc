@@ -21,7 +21,7 @@ namespace webrtc
         virtual ~GpuMemoryBufferPool();
 
         rtc::scoped_refptr<VideoFrame>
-        CreateFrame(NativeTexPtr ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp);
+        CreateFrame(void* ptr, const Size& size, UnityRenderingExtTextureFormat format, Timestamp timestamp);
         void ReleaseStaleBuffers(Timestamp timestamp, TimeDelta timeLimit);
 
         size_t bufferCount() { return resourcesPool_.size(); }

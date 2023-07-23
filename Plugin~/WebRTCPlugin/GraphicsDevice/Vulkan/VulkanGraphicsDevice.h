@@ -48,6 +48,11 @@ namespace webrtc
         std::unique_ptr<UnityVulkanImage> AccessTexture(void* ptr) const;
 
         bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+        bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer) { return false; }
+        bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
+        {
+            return false;
+        }
 
         /// <summary>
         ///
@@ -56,11 +61,13 @@ namespace webrtc
         /// <param name="nativeTexturePtr"> a pointer of UnityVulkanImage </param>
         /// <returns></returns>
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode) override;
+        std::unique_ptr<GpuMemoryBufferHandle>
+        Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode) override;
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
         bool WaitIdleForTest() override;
         rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        rtc::scoped_refptr<::webrtc::VideoFrameBuffer> ConvertToBuffer(void* texture) override { return nullptr; }
 
 #if CUDA_PLATFORM
         bool IsCudaSupport() override { return m_isCudaSupport; }

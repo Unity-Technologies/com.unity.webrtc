@@ -66,25 +66,33 @@ namespace webrtc
             ID3D12CommandQueue* commandQueue,
             UnityGfxRenderer renderer,
             ProfilerMarkerFactory* profiler);
-        virtual ~D3D12GraphicsDevice();
-        virtual bool InitV() override;
-        virtual void ShutdownV() override;
+        virtual ~D3D12GraphicsDevice() override;
+        bool InitV() override;
+        void ShutdownV() override;
         inline virtual void* GetEncodeDevicePtrV() override;
 
-        virtual ITexture2D*
+        ITexture2D*
         CreateDefaultTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
         rtc::scoped_refptr<::webrtc::VideoFrameBuffer>
         CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
-        virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+        bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+        bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
+        bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer) { return false; }
+        bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
+        {
+            return false;
+        }
+
+        std::unique_ptr<GpuMemoryBufferHandle>
+        Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode) override;
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
         bool WaitIdleForTest() override;
 
-        virtual ITexture2D*
+        ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* texture) override;
+        rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* texture) override;
+        rtc::scoped_refptr<::webrtc::VideoFrameBuffer> ConvertToBuffer(void* texture) override { return nullptr; }
 
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
@@ -97,7 +105,7 @@ namespace webrtc
             ID3D12GraphicsCommandList4Ptr commandList;
             uint64_t fenceValue;
         };
-        D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h);
+        D3D12Texture2D* CreateSharedD3D12Texture(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat);
         uint64_t GetNextFrameFenceValue() const;
         uint64_t ExecuteCommandList(
             int listCount,

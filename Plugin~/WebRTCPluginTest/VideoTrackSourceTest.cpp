@@ -76,7 +76,7 @@ namespace webrtc
         {
             auto buffer = device()->CreateVideoFrameBuffer(m_texture->GetWidth(), m_texture->GetHeight(), m_texture->GetFormat());
             device()->CopyToVideoFrameBuffer(buffer, m_texture->GetNativeTexturePtrV());
-            m_trackSource->OnFrameCaptured(std::move(buffer), webrtc::Clock::GetRealTimeClock()->CurrentTime());
+            m_trackSource->OnFrameCaptured(buffer, Timestamp::Zero());
         }
     };
 

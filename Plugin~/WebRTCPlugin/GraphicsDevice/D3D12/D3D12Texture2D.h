@@ -21,11 +21,17 @@ namespace webrtc
         D3D12Texture2D(
             uint32_t width,
             uint32_t height,
+            UnityRenderingExtTextureFormat format,
             ID3D12Resource* nativeTex, 
             HANDLE handle);
 
         // copy to CPU buffer
-        D3D12Texture2D(uint32_t w, uint32_t h, ID3D12Resource* nativeTex, const D3D12ResourceFootprint& footprint);
+        D3D12Texture2D(
+            uint32_t width,
+            uint32_t height,
+            UnityRenderingExtTextureFormat format,
+            ID3D12Resource* nativeTex,
+            const D3D12ResourceFootprint& footprint);
 
         virtual ~D3D12Texture2D() override { CloseHandle(m_sharedHandle); }
 

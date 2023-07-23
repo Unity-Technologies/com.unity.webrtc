@@ -6,6 +6,16 @@ namespace unity
 {
 namespace webrtc
 {
+    std::unique_ptr<GpuMemoryBufferCudaHandle>
+    GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, CUdeviceptr ptr, AccessMode mode)
+    {
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = context;
+        handle->mappedPtr = ptr;
+
+        return std::move(handle);
+    }
+
     GpuMemoryBufferCudaHandle::GpuMemoryBufferCudaHandle()
         : context(nullptr)
         , mipmappedArray(nullptr)

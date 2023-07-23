@@ -44,6 +44,9 @@ namespace webrtc
 {
     struct GpuMemoryBufferCudaHandle : public GpuMemoryBufferHandle
     {
+        static std::unique_ptr<GpuMemoryBufferCudaHandle>
+        CreateHandle(CUcontext context, CUdeviceptr ptr, AccessMode mode);
+
         GpuMemoryBufferCudaHandle();
         GpuMemoryBufferCudaHandle(GpuMemoryBufferCudaHandle&& other);
         GpuMemoryBufferCudaHandle& operator=(GpuMemoryBufferCudaHandle&& other);

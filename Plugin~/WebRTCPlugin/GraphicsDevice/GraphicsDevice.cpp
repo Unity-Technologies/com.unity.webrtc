@@ -42,6 +42,11 @@ namespace webrtc
             RTC_DCHECK_NOTREACHED();
             return nullptr;
         }
+        rtc::scoped_refptr<::webrtc::VideoFrameBuffer>
+        CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override
+        {
+            return nullptr;
+        }
         void* GetEncodeDevicePtrV() override
         {
             RTC_DCHECK_NOTREACHED();
@@ -57,8 +62,14 @@ namespace webrtc
             RTC_DCHECK_NOTREACHED();
             return true;
         }
+        bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer) { return false; }
+        bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture)
+        {
+            return false;
+        }
+
         UnityGfxRenderer GetGfxRenderer() const override { return m_gfxRenderer; }
-        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override
+        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode) override
         {
             RTC_DCHECK_NOTREACHED();
             return nullptr;
@@ -86,6 +97,12 @@ namespace webrtc
             return nullptr;
         }
         rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override
+        {
+            RTC_DCHECK_NOTREACHED();
+            return nullptr;
+        }
+
+        virtual rtc::scoped_refptr<::webrtc::VideoFrameBuffer> ConvertToBuffer(void* texture) override
         {
             RTC_DCHECK_NOTREACHED();
             return nullptr;

@@ -98,7 +98,7 @@ namespace webrtc
         return true;
     }
 
-    bool GpuMemoryBufferFromUnity::CopyBuffer(NativeTexPtr ptr)
+    bool GpuMemoryBufferFromUnity::CopyBuffer(void* ptr)
     {
         // One texture cannot map CUDA memory and CPU memory simultaneously.
         // Believe there is still room for improvement.

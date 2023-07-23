@@ -4,10 +4,14 @@ target_sources(
   WebRTCLib
   PRIVATE Context.cpp
           Context.h
+          CreateSessionDescriptionObserver.cpp
+          CreateSessionDescriptionObserver.h
           DataChannelObject.cpp
           DataChannelObject.h
           DummyAudioDevice.cpp
           DummyAudioDevice.h
+          EncodedStreamTransformer.cpp
+          EncodedStreamTransformer.h
           AudioTrackSinkAdapter.h
           AudioTrackSinkAdapter.cpp
           Logger.cpp
@@ -24,8 +28,10 @@ target_sources(
           PlatformBase.h
           ProfilerMarkerFactory.cpp
           ProfilerMarkerFactory.h
-          SetSessionDescriptionObserver.cpp
-          SetSessionDescriptionObserver.h
+          SetLocalDescriptionObserver.cpp
+          SetLocalDescriptionObserver.h
+          SetRemoteDescriptionObserver.cpp
+          SetRemoteDescriptionObserver.h
           ScopedProfiler.h
           ScopedProfiler.cpp
           targetver.h

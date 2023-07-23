@@ -18,10 +18,10 @@ namespace webrtc
     {
     public:
         D3D11Texture2D(
-            uint32_t w, 
-            uint32_t h, 
-            ID3D11Texture2D* tex,
+            uint32_t width,
+            uint32_t height,
             UnityRenderingExtTextureFormat format,
+            ID3D11Texture2D* texture,
             ID3D11Fence* fence);
         ~D3D11Texture2D() override = default;
 

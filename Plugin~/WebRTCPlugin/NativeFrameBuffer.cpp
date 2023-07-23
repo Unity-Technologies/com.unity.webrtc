@@ -21,11 +21,12 @@ namespace webrtc
 
     rtc::scoped_refptr<I420BufferInterface> NativeFrameBuffer::ToI420()
     {
+        // todo::
         return I420Buffer::Create(width(), height());
     }
     const webrtc::I420BufferInterface* NativeFrameBuffer::GetI420() const
     {
-        return I420Buffer::Create(width(), height());
+        return nullptr;
     }
 
     void NativeFrameBuffer::Map(GpuMemoryBufferHandle::AccessMode mode)

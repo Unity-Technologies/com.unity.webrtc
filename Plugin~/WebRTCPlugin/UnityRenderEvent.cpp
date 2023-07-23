@@ -43,7 +43,10 @@ namespace webrtc
     static const UnityProfilerMarkerDesc* s_MarkerEncode = nullptr;
     static const UnityProfilerMarkerDesc* s_MarkerDecode = nullptr;
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
+
+    // todo: create multiple pools to support multiple resolutions.
     static std::unique_ptr<VideoFrameBufferPool> s_bufferPool;
+    static int s_batchUpdateEventID = 0;
 
     IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
 
@@ -125,7 +128,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
         {
             s_gfxDevice->InitV();
         }
-        s_bufferPool = std::make_unique<VideoFrameBufferPool>(s_gfxDevice.get(), 10);
+        s_bufferPool = std::make_unique<VideoFrameBufferPool>(s_gfxDevice.get(), kLimitBufferCount);
         break;
     }
     case kUnityGfxDeviceEventShutdown:
@@ -275,8 +278,8 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
     if (!batchData || !batchData->tracks)
     {
         // Release all buffers.
-        if (s_bufferPool)
-            s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
+        //if (s_bufferPool)
+        //    s_bufferPool->ReleaseStaleBuffers(Timestamp::PlusInfinity(), kStaleFrameLimit);
         return;
     }
 
@@ -314,14 +317,26 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
             }
             unity::webrtc::Size size(trackData->width, trackData->height);
 
-            if (s_bufferPool->bufferCount() < kLimitBufferCount)
+            //if (s_bufferPool->bufferCount() < kLimitBufferCount)
             {
                 std::unique_ptr<const ScopedProfiler> profiler;
                 if (s_ProfilerMarkerFactory)
                     profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
-                auto frame = s_bufferPool->CreateFrame(ptr, size, trackData->format, timestamp);
-                source->OnFrameCaptured(std::move(frame));
+                //ptr, size, trackData->format, timestamp
+                auto buffer = s_bufferPool->Create(trackData->width, trackData->height, trackData->format);
+
+                // todo(kazuki) refactor
+                auto nativeFrameBuffer = static_cast<NativeFrameBuffer*>(buffer.get());
+                if (!nativeFrameBuffer->handle())
+                    nativeFrameBuffer->Map(GpuMemoryBufferHandle::AccessMode::kRead);
+
+                if (!device->CopyToVideoFrameBuffer(buffer, trackData->texture))
+                {
+                    RTC_LOG(LS_INFO) << "IGraphicsDevice::CopyToVideoFrameBuffer failed.";
+                    return;
+                }
+                source->OnFrameCaptured(std::move(buffer), timestamp);
             }
         }
 #if 0
@@ -336,7 +351,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
 #endif
     }
 
-    s_bufferPool->ReleaseStaleBuffers(timestamp, kStaleFrameLimit);
+    // s_bufferPool->ReleaseStaleBuffers(timestamp, kStaleFrameLimit);
 }
 
 extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

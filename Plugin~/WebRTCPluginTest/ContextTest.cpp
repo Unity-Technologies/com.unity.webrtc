@@ -151,7 +151,7 @@ namespace webrtc
 
         auto buffer =
             device_->CreateVideoFrameBuffer(texture_->GetWidth(), texture_->GetHeight(), texture_->GetFormat());
-        source->OnFrameCaptured(buffer, webrtc::Clock::GetRealTimeClock()->CurrentTime());
+        source->OnFrameCaptured(buffer, Timestamp::Zero());
 
         const auto sender = result.value();
         const auto result2 = connection->connection->RemoveTrackOrError(sender);

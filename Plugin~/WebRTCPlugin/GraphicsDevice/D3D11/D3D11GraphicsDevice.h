@@ -21,19 +21,27 @@ namespace webrtc
     public:
         D3D11GraphicsDevice(ID3D11Device* nativeDevice, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler);
         virtual ~D3D11GraphicsDevice() override;
-        virtual bool InitV() override;
-        virtual void ShutdownV() override;
+        bool InitV() override;
+        void ShutdownV() override;
         inline virtual void* GetEncodeDevicePtrV() override;
-        virtual ITexture2D*
+        rtc::scoped_refptr<::webrtc::VideoFrameBuffer>
+        CreateVideoFrameBuffer(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) override;
+        ITexture2D*
         CreateDefaultTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual ITexture2D*
+        ITexture2D*
         CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
-        virtual bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
-        virtual bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
-        std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
+        bool CopyResourceV(ITexture2D* dest, ITexture2D* src) override;
+        bool CopyResourceFromNativeV(ITexture2D* dest, void* texture) override;
+        bool CopyResourceFromBuffer(void* dest, rtc::scoped_refptr<::webrtc::VideoFrameBuffer> buffer) override;
+        bool CopyToVideoFrameBuffer(rtc::scoped_refptr<::webrtc::VideoFrameBuffer>& buffer, void* texture) override;
+
+        std::unique_ptr<GpuMemoryBufferHandle>
+        Map(ITexture2D* texture, GpuMemoryBufferHandle::AccessMode mode) override;
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
-        virtual rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        rtc::scoped_refptr<::webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
+        rtc::scoped_refptr<::webrtc::VideoFrameBuffer> ConvertToBuffer(void* texture) override;
+
         bool IsCudaSupport() override { return m_isCudaSupport; }
         CUcontext GetCUcontext() override { return m_cudaContext.GetContext(); }
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
