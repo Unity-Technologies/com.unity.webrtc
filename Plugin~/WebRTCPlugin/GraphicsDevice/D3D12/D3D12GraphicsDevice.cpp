@@ -399,7 +399,8 @@ namespace webrtc
         }
 
         D3D12_RESOURCE_DESC desc = resource->GetDesc();
-        D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo = m_d3d12Device->GetResourceAllocationInfo(0, 1, &desc);
+        D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo =
+            m_d3d12Device->GetResourceAllocationInfo(0, 1, &desc);
         size_t actualSize = d3d12ResourceAllocationInfo.SizeInBytes;
         return GpuMemoryBufferCudaHandle::CreateHandle(GetCUcontext(), resource, sharedHandle, actualSize);
     }
