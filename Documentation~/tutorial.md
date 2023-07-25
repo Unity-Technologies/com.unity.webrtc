@@ -20,8 +20,8 @@ Create a local peer and get [`RTCDataChannel`](../api/Unity.WebRTC.RTCDataChanne
     // Create local peer
     var localConnection = new RTCPeerConnection();
     var sendChannel = localConnection.CreateDataChannel("sendChannel");
-    channel.OnOpen = handleSendChannelStatusChange;
-    channel.OnClose = handleSendChannelStatusChange;
+    sendChannel.OnOpen = handleSendChannelStatusChange;
+    sendChannel.OnClose = handleSendChannelStatusChange;
 ```
 
 ### Creating a remote peer
