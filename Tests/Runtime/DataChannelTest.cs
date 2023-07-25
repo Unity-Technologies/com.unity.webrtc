@@ -139,6 +139,38 @@ namespace Unity.WebRTC.RuntimeTest
 
             var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
             yield return op1;
+            Assert.That(test.component.GetDataChannelList(1).Count, Is.EqualTo(1));
+
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
+        }
+
+        [UnityTest]
+        [Timeout(5000)]
+        public IEnumerator CreateAndClose()
+        {
+            var test = new MonoBehaviourTest<SignalingPeers>();
+            var label = "test";
+            bool closed = false;
+
+            RTCDataChannel channel1 = test.component.CreateDataChannel(0, label);
+            Assert.That(channel1, Is.Not.Null);
+            yield return test;
+
+            var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
+            yield return op1;
+            RTCDataChannel channel2 = test.component.GetDataChannelList(1)[0];
+            Assert.That(channel2, Is.Not.Null);
+            channel2.OnClose = () => { closed = true; };
+
+            channel1.Close();
+
+            var op2 = new WaitUntilWithTimeout(() => closed, 5000);
+            yield return op2;
+            Assert.That(closed, Is.True);
+
+            test.component.Dispose();
+            Object.DestroyImmediate(test.gameObject);
         }
 
         [UnityTest]
