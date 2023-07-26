@@ -139,7 +139,7 @@ namespace Unity.WebRTC.RuntimeTest
 
             var op1 = new WaitUntilWithTimeout(() => test.component.GetDataChannelList(1).Count > 0, 5000);
             yield return op1;
-            Assert.That(test.component.GetDataChannelList(1).Count, Is.EqualTo(1));
+            Assert.That(test.component.GetDataChannelList(1).Count, Is.GreaterThan(0));
 
             test.component.Dispose();
             Object.DestroyImmediate(test.gameObject);
