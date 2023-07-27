@@ -67,18 +67,20 @@ namespace webrtc
     {
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = context;
+
         D3D12_RESOURCE_DESC desc = resource->GetDesc();
         size_t width = desc.Width;
         size_t height = desc.Height;
+
         CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
         memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE;
         memDesc.handle.win32.handle = static_cast<void*>(sharedHandle);
         memDesc.size = memorySize;
         memDesc.flags = CUDA_EXTERNAL_MEMORY_DEDICATED;
 
-        CUresult result;
-        CUexternalMemory externalMemory = {};
-        GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&externalMemory, &memDesc));
+        GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&handle->externalMemory, &memDesc));
 
         CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
         arrayDesc.Width = width;
@@ -92,17 +94,11 @@ namespace webrtc
         mipmapArrayDesc.arrayDesc = arrayDesc;
         mipmapArrayDesc.numLevels = 1;
 
-        CUmipmappedArray mipmappedArray;
-        CUarray array;
         GMB_CUDA_CALL_NULLPTR(
-            cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc));
-        GMB_CUDA_CALL_NULLPTR(cuMipmappedArrayGetLevel(&array, mipmappedArray, 0));
+            cuExternalMemoryGetMappedMipmappedArray(&handle->mipmappedArray, handle->externalMemory, &mipmapArrayDesc));
+        GMB_CUDA_CALL_NULLPTR(cuMipmappedArrayGetLevel(&handle->mappedArray, handle->mipmappedArray, 0));
         GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = context;
-        handle->mappedArray = array;
-        handle->externalMemory = externalMemory;
         return handle;
     }
 #endif
@@ -111,6 +107,9 @@ namespace webrtc
     GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, void* exportHandle, size_t memorySize, const Size& size)
     {
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
+
+        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = context;
 
         CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
 #if _WIN32
@@ -121,8 +120,7 @@ namespace webrtc
         memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(exportHandle));
         memDesc.size = memorySize;
 
-        CUexternalMemory externalMemory;
-        GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&externalMemory, &memDesc));
+        GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&handle->externalMemory, &memDesc));
 
         CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
         arrayDesc.Width = static_cast<size_t>(size.width());
@@ -136,17 +134,11 @@ namespace webrtc
         mipmapArrayDesc.arrayDesc = arrayDesc;
         mipmapArrayDesc.numLevels = 1;
 
-        CUmipmappedArray mipmappedArray;
-        CUarray array;
         GMB_CUDA_CALL_NULLPTR(
-            cuExternalMemoryGetMappedMipmappedArray(&mipmappedArray, externalMemory, &mipmapArrayDesc));
-        GMB_CUDA_CALL_NULLPTR(cuMipmappedArrayGetLevel(&array, mipmappedArray, 0));
+            cuExternalMemoryGetMappedMipmappedArray(&handle->mipmappedArray, handle->externalMemory, &mipmapArrayDesc));
+        GMB_CUDA_CALL_NULLPTR(cuMipmappedArrayGetLevel(&handle->mappedArray, handle->mipmappedArray, 0));
         GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = context;
-        handle->mappedArray = array;
-        handle->externalMemory = externalMemory;
         return handle;
     }
 
@@ -157,6 +149,7 @@ namespace webrtc
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
+        handle->context = context;
 
         GMB_CUDA_CALL_NULLPTR(cuGraphicsGLRegisterImage(
             &handle->resource, texture, GL_TEXTURE_2D, CU_GRAPHICS_REGISTER_FLAGS_SURFACE_LDST));
@@ -164,7 +157,6 @@ namespace webrtc
         GMB_CUDA_CALL_NULLPTR(cuGraphicsSubResourceGetMappedArray(&handle->mappedArray, handle->resource, 0, 0));
         GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
 
-        handle->context = context;
         return handle;
     }
 #endif

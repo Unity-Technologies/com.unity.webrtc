@@ -388,10 +388,10 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        D3D12Texture2D* d3d12Texure = static_cast<D3D12Texture2D*>(texture);
-        ID3D12Resource* resource = static_cast<ID3D12Resource*>(d3d12Texure->GetNativeTexturePtrV());
+        D3D12Texture2D* d3d12Texture = static_cast<D3D12Texture2D*>(texture);
+        ID3D12Resource* resource = static_cast<ID3D12Resource*>(d3d12Texture->GetNativeTexturePtrV());
 
-        HANDLE sharedHandle = d3d12Texure->GetHandle();
+        HANDLE sharedHandle = d3d12Texture->GetHandle();
         if (!sharedHandle)
         {
             RTC_LOG(LS_ERROR) << "cannot get shared handle";
