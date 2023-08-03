@@ -392,11 +392,6 @@ namespace webrtc
         if (!IsCudaSupport())
             return nullptr;
 
-        GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(GetCUcontext()));
-
-        std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
-        handle->context = GetCUcontext();
-
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(texture);
         void* exportHandle = VulkanUtility::GetExportHandle(m_device, vulkanTexture->GetTextureImageMemory());
 
@@ -405,37 +400,9 @@ namespace webrtc
             RTC_LOG(LS_ERROR) << "cannot get export handle";
             return nullptr;
         }
-
-        CUDA_EXTERNAL_MEMORY_HANDLE_DESC memDesc = {};
-#ifndef _WIN32
-        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD;
-#else
-        memDesc.type = CU_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32;
-#endif
-        memDesc.handle.fd = static_cast<int>(reinterpret_cast<uintptr_t>(exportHandle));
-        memDesc.size = vulkanTexture->GetTextureImageMemorySize();
-
-        GMB_CUDA_CALL_NULLPTR(cuImportExternalMemory(&handle->externalMemory, &memDesc));
-
-        const VkExtent2D extent = { texture->GetWidth(), texture->GetHeight() };
-        CUDA_ARRAY3D_DESCRIPTOR arrayDesc = {};
-        arrayDesc.Width = extent.width;
-        arrayDesc.Height = extent.height;
-        arrayDesc.Depth = 0; /* CUDA 2D arrays are defined to have depth 0 */
-        arrayDesc.Format = CU_AD_FORMAT_UNSIGNED_INT32;
-        arrayDesc.NumChannels = 1;
-        arrayDesc.Flags = CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_COLOR_ATTACHMENT;
-
-        CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC mipmapArrayDesc = {};
-        mipmapArrayDesc.arrayDesc = arrayDesc;
-        mipmapArrayDesc.numLevels = 1;
-
-        GMB_CUDA_CALL_NULLPTR(
-            cuExternalMemoryGetMappedMipmappedArray(&handle->mipmappedArray, handle->externalMemory, &mipmapArrayDesc));
-        GMB_CUDA_CALL_NULLPTR(cuMipmappedArrayGetLevel(&handle->mappedArray, handle->mipmappedArray, 0));
-        GMB_CUDA_CALL_NULLPTR(cuCtxPopCurrent(nullptr));
-
-        return std::move(handle);
+        size_t memorySize = vulkanTexture->GetTextureImageMemorySize();
+        Size size(static_cast<int>(texture->GetWidth()), static_cast<int>(texture->GetHeight()));
+        return GpuMemoryBufferCudaHandle::CreateHandle(GetCUcontext(), exportHandle, memorySize, size);
 #else
         return nullptr;
 #endif

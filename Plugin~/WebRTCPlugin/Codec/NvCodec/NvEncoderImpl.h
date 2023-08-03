@@ -13,6 +13,8 @@
 #include "NvEncoder/NvEncoderCuda.h"
 #include "Size.h"
 
+class UnityProfilerMarkerDesc;
+
 namespace unity
 {
 namespace webrtc
