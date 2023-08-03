@@ -266,7 +266,10 @@ namespace Unity.WebRTC
         {
             NativeMethods.DataChannelRegisterOnClose(self, channel, callback);
         }
-
+        public void DataChannelRegisterOnError(IntPtr channel, DelegateNativeOnError callback)
+        {
+            NativeMethods.DataChannelRegisterOnError(self, channel, callback);
+        }
         public IntPtr CreateMediaStream(string label)
         {
             return NativeMethods.ContextCreateMediaStream(self, label);
