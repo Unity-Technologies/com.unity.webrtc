@@ -18,24 +18,22 @@ namespace webrtc
 
         void Delete() override { }
 
-        void PostTask(absl::AnyInvocable<void() &&> task) override
+        void PostTaskImpl(
+            absl::AnyInvocable<void() &&> task, const PostTaskTraits& traits, const Location& location) override
         {
             last_task_ = std::move(task);
             last_precision_ = absl::nullopt;
             last_delay_ = TimeDelta::Zero();
         }
 
-        void PostDelayedTask(absl::AnyInvocable<void() &&> task, TimeDelta delay) override
+        void PostDelayedTaskImpl(
+            absl::AnyInvocable<void() &&> task,
+            TimeDelta delay,
+            const PostDelayedTaskTraits& traits,
+            const Location& location) override
         {
             last_task_ = std::move(task);
             last_precision_ = TaskQueueBase::DelayPrecision::kLow;
-            last_delay_ = delay;
-        }
-
-        void PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task, TimeDelta delay) override
-        {
-            last_task_ = std::move(task);
-            last_precision_ = TaskQueueBase::DelayPrecision::kHigh;
             last_delay_ = delay;
         }
 
