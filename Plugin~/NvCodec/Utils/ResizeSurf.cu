@@ -2,7 +2,7 @@
 
 #include <cuda_runtime.h>
 
-__global__ void ResizeSurfNearestNeiborKernel(
+__global__ void ResizeSurfNearestNeighborKernel(
     CUsurfObject srcSurface,
     int srcWidth,
     int srcHeight,
@@ -13,8 +13,8 @@ __global__ void ResizeSurfNearestNeiborKernel(
     float scaleHeight)
 {
     // calculate surface coordinates
-    unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
-    unsigned int y = blockIdx.y * blockDim.y + threadIdx.y;
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x >= dstWidth || y >= dstHeight)
         return;
@@ -43,18 +43,18 @@ __global__ void ResizeSurfBilinearKernel(
     if (x >= dstWidth || y >= dstHeight)
         return;
 
-    int x0 = x * scaleWidth - 1;
-    int x1 = x * scaleWidth + 1;
-    int y0 = y * scaleHeight - 1;
-    int y1 = y * scaleHeight + 1;
+    int x0 = (x * scaleWidth) - 1;
+    int x1 = (x * scaleWidth) + 1;
+    int y0 = (y * scaleHeight) - 1;
+    int y1 = (y * scaleHeight) + 1;
 
-    if (x0 < 0) 
+    if (x0 < 0)
         x0 = 0;
-    if (x1 >= srcWidth) 
+    if (x1 >= srcWidth)
         x1 = srcWidth - 1;
-    if (y0 < 0) 
+    if (y0 < 0)
         y0 = 0;
-    if (y1 >= srcHeight) 
+    if (y1 >= srcHeight)
         y1 = srcHeight - 1;
 
     uchar4 c00, c01, c10, c11;
@@ -67,7 +67,7 @@ __global__ void ResizeSurfBilinearKernel(
     data.x = 0.5f * (0.5f * c00.x + 0.5f * c01.x) + 0.5f * (0.5f * c10.x + 0.5f * c11.x);
     data.y = 0.5f * (0.5f * c00.y + 0.5f * c01.y) + 0.5f * (0.5f * c10.y + 0.5f * c11.y);
     data.z = 0.5f * (0.5f * c00.z + 0.5f * c01.z) + 0.5f * (0.5f * c10.z + 0.5f * c11.z);
-    
+
     surf2Dwrite(data, dstSurface, x * 4, y);
 }
 
@@ -114,15 +114,18 @@ CUresult ResizeSurf(CUarray srcArray, CUarray dstArray)
     int gridY = dstHeight / dimBlock.y + (dstHeight % dimBlock.y ? 1 : 0);
     dim3 dimGrid(gridX, gridY, 1);
 
-    ResizeSurfBilinearKernel<<<dimGrid, dimBlock>>>(
+    auto resize_kernel = ResizeSurfBilinearKernel;
+    // auto resize_kernel = ResizeSurfNearestNeighborKernel;
+
+    resize_kernel<<<dimGrid, dimBlock>>>(
         srcSurface,
         srcWidth,
         srcHeight,
         dstSurface,
         dstWidth,
         dstHeight,
-        srcWidth / dstWidth,
-        srcHeight / dstHeight);
+        (float)srcWidth / (float)dstWidth,
+        (float)srcHeight / (float)dstHeight);
 
     result = cuSurfObjectDestroy(srcSurface);
     if (result != CUDA_SUCCESS)
