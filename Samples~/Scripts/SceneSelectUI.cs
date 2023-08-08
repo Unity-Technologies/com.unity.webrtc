@@ -50,6 +50,7 @@ namespace Unity.WebRTC.Samples
         [SerializeField] private Button buttonPerfectNegotiation;
         [SerializeField] private Button buttonLatency;
         [SerializeField] private Button buttonReplaceTrack;
+        [SerializeField] private Button buttonSimulcast;
         [SerializeField] private Button buttonMetadata;
         [SerializeField] private Button buttonEncryption;
 
@@ -129,6 +130,7 @@ namespace Unity.WebRTC.Samples
             buttonPerfectNegotiation.onClick.AddListener(OnPressedPerfectNegotiationButton);
             buttonLatency.onClick.AddListener(OnPressedLatencyButton);
             buttonReplaceTrack.onClick.AddListener(OnPressedReplaceTrackButton);
+            buttonSimulcast.onClick.AddListener(OnPressedSimulcastButton);
             buttonMetadata.onClick.AddListener(OnPressedMetadataButton);
             buttonEncryption.onClick.AddListener(OnPressedEncryption);
 
@@ -258,6 +260,11 @@ namespace Unity.WebRTC.Samples
         private void OnPressedReplaceTrackButton()
         {
             SceneManager.LoadScene("ReplaceTrack", LoadSceneMode.Single);
+        }
+
+        private void OnPressedSimulcastButton()
+        {
+            SceneManager.LoadScene("Simulcast", LoadSceneMode.Single);
         }
 
         private void OnPressedMetadataButton()

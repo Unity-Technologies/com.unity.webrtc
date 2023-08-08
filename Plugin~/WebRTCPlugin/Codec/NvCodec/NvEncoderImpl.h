@@ -71,32 +71,29 @@ namespace webrtc
         EncoderInfo GetEncoderInfo() const override;
 
     protected:
-        int32_t ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame);
+        int32_t ProcessEncodedFrame(size_t i, std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame);
 
     private:
+        NV_ENC_INITIALIZE_PARAMS CreateEncoderParams(size_t i);
         bool CopyResource(
             const NvEncInputFrame* encoderInputFrame,
             GpuMemoryBufferInterface* buffer,
-            Size& size,
+            const Size& size,
             CUcontext context,
+            CUarray downscaledBuffer,
             CUmemorytype memoryType);
 
         CUcontext m_context;
         CUmemorytype m_memoryType;
-        CUarray m_scaledArray;
-        std::unique_ptr<NvEncoderInternal> m_encoder;
+        //std::unique_ptr<NvEncoderInternal> m_encoder;
 
         VideoCodec m_codec;
 
         NV_ENC_BUFFER_FORMAT m_format;
-        NV_ENC_INITIALIZE_PARAMS m_initializeParams;
-        NV_ENC_CONFIG m_encodeConfig;
 
         EncodedImageCallback* m_encodedCompleteCallback;
-        EncodedImage m_encodedImage;
         //    RTPFragmentationHeader m_fragHeader;
         H264BitstreamParser m_h264BitstreamParser;
-        std::unique_ptr<BitrateAdjuster> m_bitrateAdjuster;
         RateStatistics m_encode_fps;
         Clock* const m_clock;
         GUID m_profileGuid;
@@ -104,7 +101,12 @@ namespace webrtc
         ProfilerMarkerFactory* m_profiler;
         const UnityProfilerMarkerDesc* m_marker;
 
+        std::vector<CUarray> m_downscaledBuffers;
+        std::vector<EncodedImage> m_encodedImages;
         std::vector<LayerConfig> m_configurations;
+        std::vector<std::unique_ptr<NvEncoderInternal>> m_encoders;
+        std::vector<NV_ENC_INITIALIZE_PARAMS> m_initializeParams;
+        std::vector<NV_ENC_CONFIG> m_encodeConfigs;
 
         static absl::optional<webrtc::H264Level> s_maxSupportedH264Level;
         static std::vector<SdpVideoFormat> s_formats;
