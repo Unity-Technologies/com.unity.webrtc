@@ -33,6 +33,9 @@ patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc
 rem fix abseil
 patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "%COMMAND_DIR%\patches\fix_abseil.patch"
 
+rem fix task_queue_base
+patch -N "src\api\task_queue\task_queue_base.h" < "%COMMAND_DIR%\patches\fix_task_queue_base.patch"
+
 mkdir "%ARTIFACTS_DIR%\lib"
 
 setlocal enabledelayedexpansion
