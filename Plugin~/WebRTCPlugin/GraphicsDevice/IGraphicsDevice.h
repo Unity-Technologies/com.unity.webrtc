@@ -49,6 +49,9 @@ namespace webrtc
         virtual bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) { return true; }
         virtual bool ResetSync(const ITexture2D* texture) { return true; }
         virtual bool WaitIdleForTest() { return true; }
+        virtual void Enter() { }
+        virtual void Leave() { }
+
         // Required for software encoding
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;

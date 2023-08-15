@@ -20,19 +20,20 @@ namespace webrtc
         ID3D11Device* nativeDevice, UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
         : IGraphicsDevice(renderer, profiler)
         , m_d3d11Device(nativeDevice)
+        , m_d3d11Device5(nullptr)
         , m_isCudaSupport(false)
     {
         // Enable multithread protection
-        ComPtr<ID3D11Multithread> thread;
-        m_d3d11Device->QueryInterface<ID3D11Multithread>(&thread);
-        thread->SetMultithreadProtected(true);
+        m_d3d11Device->QueryInterface<ID3D11Multithread>(&m_d3d11Multithread);
+        m_d3d11Multithread->SetMultithreadProtected(true);
+        m_d3d11Device->QueryInterface<ID3D11Device5>(&m_d3d11Device5);
     }
 
     D3D11GraphicsDevice::~D3D11GraphicsDevice() { }
 
     bool D3D11GraphicsDevice::InitV()
     {
-        CUresult ret = m_cudaContext.Init(m_d3d11Device);
+        CUresult ret = m_cudaContext.Init(m_d3d11Device.Get());
         if (ret == CUDA_SUCCESS)
         {
             m_isCudaSupport = true;
@@ -60,22 +61,15 @@ namespace webrtc
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = 0;
         desc.CPUAccessFlags = 0;
-        HRESULT result = m_d3d11Device->CreateTexture2D(&desc, nullptr, &texture);
-        if (result != S_OK)
+        HRESULT hr = m_d3d11Device->CreateTexture2D(&desc, nullptr, &texture);
+        if (hr != S_OK)
         {
-            RTC_LOG(LS_INFO) << "ID3D11Device::CreateTexture2D failed. error:" << result;
+            RTC_LOG(LS_INFO) << "ID3D11Device::CreateTexture2D failed. error:" << hr;
             return nullptr;
         }
 
-        ID3D11Device5* d3d11Device5 = nullptr;
-        HRESULT hr = m_d3d11Device->QueryInterface<ID3D11Device5>(&d3d11Device5);
-        if (hr != S_OK)
-        {
-            RTC_LOG(LS_INFO) << "ID3D11Device::QueryInterface failed. error:" << hr;
-            return nullptr;
-        }
         ID3D11Fence* fence = nullptr;
-        hr = d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+        hr = m_d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
         if (hr != S_OK)
         {
             RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
@@ -106,15 +100,9 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "ID3D11Device::CreateTexture2D failed. error:" << hr;
             return nullptr;
         }
-        ID3D11Device5* d3d11Device5 = nullptr;
-        hr = m_d3d11Device->QueryInterface<ID3D11Device5>(&d3d11Device5);
-        if (hr != S_OK)
-        {
-            RTC_LOG(LS_INFO) << "ID3D11Device::QueryInterface failed. error:" << hr;
-            return nullptr;
-        }
+
         ID3D11Fence* fence = nullptr;
-        hr = d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+        hr = m_d3d11Device5->CreateFence(0, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
         if (hr != S_OK)
         {
             RTC_LOG(LS_INFO) << "ID3D11Device5::CreateFence failed. error:" << hr;
@@ -137,7 +125,9 @@ namespace webrtc
         ComPtr<ID3D11DeviceContext> context;
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
         context->CopyResource(nativeDest, nativeSrc);
-        HRESULT hr = Signal(texture->GetFence());
+
+        texture->UpdateSyncCount();
+        HRESULT hr = Signal(texture->GetFence(), texture->GetSyncCount());
         if (hr != S_OK)
         {
             RTC_LOG(LS_INFO) << "Signal failed. error:" << hr;
@@ -161,7 +151,8 @@ namespace webrtc
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
         context->CopyResource(nativeDest, nativeSrc);
 
-        HRESULT hr = Signal(texture->GetFence());
+        texture->UpdateSyncCount();
+        HRESULT hr = Signal(texture->GetFence(), texture->GetSyncCount());
         if (hr != S_OK)
         {
             RTC_LOG(LS_INFO) << "Signal failed. error:" << hr;
@@ -170,7 +161,7 @@ namespace webrtc
         return true;
     }
 
-    HRESULT D3D11GraphicsDevice::Signal(ID3D11Fence* fence)
+    HRESULT D3D11GraphicsDevice::Signal(ID3D11Fence* fence, uint64_t value)
     {
         ComPtr<ID3D11DeviceContext> context;
         m_d3d11Device->GetImmediateContext(context.GetAddressOf());
@@ -179,7 +170,6 @@ namespace webrtc
         HRESULT hr = context.As(&context4);
         if (hr != S_OK)
             return hr;
-        uint64_t value = fence->GetCompletedValue() + 1;
         return context4->Signal(fence, value);
     }
 
@@ -233,35 +223,46 @@ namespace webrtc
     bool D3D11GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
     {
         const D3D11Texture2D* d3d11Texture = static_cast<const D3D11Texture2D*>(texture);
+        const uint64_t value = d3d11Texture->GetSyncCount();
         ID3D11Fence* fence = d3d11Texture->GetFence();
-        HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
-        uint64_t value = d3d11Texture->GetSyncCount() + 1;
-        HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
-        if (hr != S_OK)
+        if (fence->GetCompletedValue() < value)
         {
-            RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
-            return false;
-        }
-        auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
-        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+            HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            if (!fenceEvent)
+                return false;
+            HRESULT hr = fence->SetEventOnCompletion(value, fenceEvent);
+            if (hr != S_OK)
+            {
+                RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
+                return false;
+            }
+            auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+            DWORD ret = WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds));
+            CloseHandle(fenceEvent);
 
-        if (WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds)) == WAIT_FAILED)
-        {
-            RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << GetLastError();
-            return false;
+            if (ret != WAIT_OBJECT_0)
+            {
+                RTC_LOG(LS_INFO) << "WaitForSingleObject failed. error:" << ret;
+                return false;
+            }
         }
-
-        CloseHandle(fenceEvent);
         return true;
     }
 
-    bool D3D11GraphicsDevice::ResetSync(const ITexture2D* texture)
+    bool D3D11GraphicsDevice::ResetSync(const ITexture2D* texture) { return true; }
+
+    void D3D11GraphicsDevice::Enter()
     {
-        const D3D11Texture2D* d3d11Texture = static_cast<const D3D11Texture2D*>(texture);
-        d3d11Texture->UpdateSyncCount();
-        return true;
+        if (m_d3d11Multithread.Get())
+            m_d3d11Multithread->Enter();
     }
 
+    void D3D11GraphicsDevice::Leave()
+    {
+        if (m_d3d11Multithread.Get())
+            m_d3d11Multithread->Leave();
+    }
 } // end namespace webrtc
 } // end namespace unity

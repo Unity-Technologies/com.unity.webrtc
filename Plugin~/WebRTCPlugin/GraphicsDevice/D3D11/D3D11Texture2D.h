@@ -26,7 +26,7 @@ namespace webrtc
         inline const void* GetEncodeTexturePtrV() const override;
         ID3D11Fence* GetFence() const { return m_fence.Get(); }
         uint64_t GetSyncCount() const { return m_syncCount; }
-        void UpdateSyncCount() const { m_syncCount = m_fence->GetCompletedValue(); }
+        void UpdateSyncCount() const { m_syncCount = m_fence->GetCompletedValue() + 1; }
 
     private:
         ComPtr<ID3D11Texture2D> m_texture;

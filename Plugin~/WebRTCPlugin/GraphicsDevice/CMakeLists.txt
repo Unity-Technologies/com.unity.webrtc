@@ -1,6 +1,13 @@
 target_sources(
-  WebRTCLib PRIVATE GraphicsDevice.cpp GraphicsDevice.h GraphicsUtility.cpp
-                    GraphicsUtility.h IGraphicsDevice.h ITexture2D.h)
+  WebRTCLib
+  PRIVATE GraphicsDevice.cpp
+          GraphicsDevice.h
+          GraphicsUtility.cpp
+          GraphicsUtility.h
+          IGraphicsDevice.h
+          ITexture2D.h
+          ScopedGraphicsDeviceLock.cpp
+          ScopedGraphicsDeviceLock.h)
 
 if(Windows)
   add_subdirectory(Vulkan)
