@@ -25,7 +25,7 @@ platforms:
   - name: macOS 10.14
     agent: mac_test_10.14
     type: Unity::VM::osx
-    image: katana-to-yamato/automation-tooling-macos-10.14-katana-git:v1.12-auto
+    image: automation-tooling/macos-11-unity:v2.953603
     flavor: m1.mac
     group: macos
   - name: Windows 10
