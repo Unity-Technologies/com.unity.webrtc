@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "GpuMemoryBufferCudaHandle.h"
+#include "GraphicsDevice/ScopedGraphicsDeviceLock.h"
 
 namespace unity
 {
@@ -21,6 +22,7 @@ namespace webrtc
 
     GpuMemoryBufferCudaHandle::~GpuMemoryBufferCudaHandle()
     {
+        ScopedGraphicsDeviceLock guard;
         GMB_CUDA_CALL(cuCtxPushCurrent(context));
 
         mappedArray = nullptr;
@@ -48,6 +50,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle>
     GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, ID3D11Resource* resource)
     {
+        ScopedGraphicsDeviceLock guard;
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
@@ -65,6 +68,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle> GpuMemoryBufferCudaHandle::CreateHandle(
         CUcontext context, ID3D12Resource* resource, HANDLE sharedHandle, size_t memorySize)
     {
+        ScopedGraphicsDeviceLock guard;
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
@@ -106,6 +110,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle>
     GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, void* exportHandle, size_t memorySize, const Size& size)
     {
+        ScopedGraphicsDeviceLock guard;
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
@@ -146,6 +151,7 @@ namespace webrtc
     std::unique_ptr<GpuMemoryBufferCudaHandle>
     GpuMemoryBufferCudaHandle::CreateHandle(CUcontext context, GLuint texture)
     {
+        ScopedGraphicsDeviceLock guard;
         GMB_CUDA_CALL_NULLPTR(cuCtxPushCurrent(context));
 
         std::unique_ptr<GpuMemoryBufferCudaHandle> handle = std::make_unique<GpuMemoryBufferCudaHandle>();
