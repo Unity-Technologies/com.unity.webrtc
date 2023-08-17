@@ -36,10 +36,15 @@
 #pragma clang diagnostic ignored "-Wlanguage-extension-token"
 #endif
 
+#include "WebRTCPlugin.h"
+
 namespace unity
 {
 namespace webrtc
 {
+    // For symbol compatibility with the plugin
+    static IGraphicsDevice* s_gfxDevice = nullptr;
+    IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice; }
 
 #if defined(SUPPORT_D3D11) // D3D11
 
@@ -532,6 +537,7 @@ namespace webrtc
             device = GraphicsDevice::GetInstance().Init(renderer, nativeGfxDevice_, nullptr, nullptr);
         }
         device_ = std::unique_ptr<IGraphicsDevice>(device);
+        s_gfxDevice = device_.get();
         EXPECT_TRUE(device_->InitV());
     }
 
@@ -539,6 +545,7 @@ namespace webrtc
     {
         if (device_)
             device_->ShutdownV();
+        s_gfxDevice = nullptr;
         if (nativeGfxDevice_)
             DestroyNativeGfxDevice(nativeGfxDevice_, renderer_);
     }
