@@ -4,6 +4,22 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-pre.7] - 2023-09-30
+
+### Added
+
+- Add **Android x86_64** support experimentally.
+
+### Changed
+
+- Change Android API minimum level to **23** because the api level **22** is obsoleted.
+- Add `RTCDataChannel.onError` event.
+
+### Fixed
+
+- Fix an issue when set scale factor of video encoding to a fractional scaling ratio.
+- Fix an occasional crash issue when using hardware encoder with D3D11.
+
 ## [3.0.0-pre.6] - 2023-07-16
 
 ### Added
@@ -19,6 +35,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve video encoding performance for DX11/DX12 which decrease the loads on the rendering thread.
 - Fix a runtime error when replacing track with NvCodec.
 -  Support calling `AudioStreamTrack.SetData` on worker thread 
+- Fix an issue in a **VideoReceive** sample scene which a video streaming doesn't work from camera device on Android since Unity 2022.1.
+
+### Removed
+
+- Remove Obsolete methods in **WebRTC** class. 
+  - `WebRTC.Initialize`
+  - `WebRTC.Dispose`
+
+- Remove Obsolete methods in **RTCConfiguration** class. 
+  - `RTCConfiguration.enableDtlsSrtp`
 
 ## [3.0.0-pre.5] - 2023-04-28
 
