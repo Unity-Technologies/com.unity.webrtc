@@ -12,13 +12,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Change Android API minimum level to **23** because the api level **22** is obsoleted.
+- Change Android API minimum level to **23** because the API level **22** is obsoleted on Unity2020.3 LTS.
 - Add `RTCDataChannel.onError` event.
 
 ### Fixed
 
-- Fix an issue when set scale factor of video encoding to a fractional scaling ratio.
-- Fix an occasional crash issue when using hardware encoder with D3D11.
+- Fix an issue when setting a scale factor of video encoding to a fractional scaling ratio.
+- Fix an occasional crash issue when using hardware encoder with D3D11 graphic device.
 
 ## [3.0.0-pre.6] - 2023-07-16
 
