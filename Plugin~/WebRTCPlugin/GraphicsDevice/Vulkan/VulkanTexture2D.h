@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
-
 #include "GraphicsDevice/ITexture2D.h"
 #include "IUnityGraphicsVulkan.h"
 
@@ -30,7 +28,8 @@ namespace webrtc
         inline VkDeviceSize GetTextureImageMemorySize() const;
         inline VkFormat GetTextureFormat() const;
 
-         unsigned long long currentFrameNumber = 0;
+        unsigned long long currentFrameNumber = 0;
+
     private:
         VkImage m_textureImage;
         VkDeviceMemory m_textureImageMemory;
@@ -41,8 +40,6 @@ namespace webrtc
         UnityVulkanImage m_unityVulkanImage;
         const VkAllocationCallbacks* m_allocator = nullptr;
     };
-
-    //---------------------------------------------------------------------------------------------------------------------
 
     void* VulkanTexture2D::GetNativeTexturePtrV() { return &m_unityVulkanImage; }
     const void* VulkanTexture2D::GetNativeTexturePtrV() const { return &m_unityVulkanImage; };

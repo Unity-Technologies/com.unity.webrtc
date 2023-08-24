@@ -35,8 +35,7 @@ namespace webrtc
         m_device = nullptr;
     }
 
-    bool
-    VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device)
+    bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device)
     {
         m_physicalDevice = physicalDevice;
         m_device = device;
@@ -68,8 +67,7 @@ namespace webrtc
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    bool VulkanTexture2D::InitCpuRead(
-        const VkPhysicalDevice physicalDevice, const VkDevice device)
+    bool VulkanTexture2D::InitCpuRead(const VkPhysicalDevice physicalDevice, const VkDevice device)
     {
         m_physicalDevice = physicalDevice;
         m_device = device;
