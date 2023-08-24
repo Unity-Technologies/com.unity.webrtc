@@ -37,7 +37,6 @@ namespace webrtc
         VkDeviceSize m_textureImageMemorySize;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
-        VkCommandPool m_commandPool;
         VkFormat m_textureFormat;
         UnityVulkanImage m_unityVulkanImage;
         const VkAllocationCallbacks* m_allocator = nullptr;
