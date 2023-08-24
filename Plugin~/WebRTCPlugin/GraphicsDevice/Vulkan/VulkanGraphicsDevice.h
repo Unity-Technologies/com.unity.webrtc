@@ -65,16 +65,11 @@ namespace webrtc
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 #endif
     private:
-        VkResult CreateCommandPool();
-        static void AccessQueueCallback(int eventID, void* data);
         static VulkanGraphicsDevice* m_graphicsInstance;
         UnityGraphicsVulkan* m_unityVulkan;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         VkQueue m_graphicsQueue;
-        VkCommandPool m_commandPool;
-        uint32_t m_queueFamilyIndex;
-        VkAllocationCallbacks* m_allocator;
         const UnityProfilerMarkerDesc* m_maker;
 
 #if CUDA_PLATFORM
