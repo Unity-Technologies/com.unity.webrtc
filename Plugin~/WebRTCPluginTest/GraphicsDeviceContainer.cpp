@@ -173,7 +173,7 @@ namespace webrtc
         for (size_t i = 0; i < list.size(); ++i)
         {
             VkPhysicalDevice physicalDevice = list[i];
-            if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID))
+            if (!VulkanUtility::GetPhysicalDeviceUUID(instance, physicalDevice, &deviceUUID))
             {
                 continue;
             }
@@ -354,11 +354,13 @@ namespace webrtc
         vkGetDeviceQueue(device, queueFamilyIndex, 0, &queue);
 
         UnityVulkanInstance* pVkInstance = new UnityVulkanInstance;
+        pVkInstance->pipelineCache = nullptr;
         pVkInstance->instance = instance;
         pVkInstance->physicalDevice = physicalDevice;
         pVkInstance->device = device;
-        pVkInstance->queueFamilyIndex = queueFamilyIndex;
         pVkInstance->graphicsQueue = queue;
+        pVkInstance->getInstanceProcAddr = nullptr;
+        pVkInstance->queueFamilyIndex = queueFamilyIndex;
         return pVkInstance;
     }
 

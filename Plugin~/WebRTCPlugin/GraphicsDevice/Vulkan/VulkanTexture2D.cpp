@@ -7,15 +7,8 @@ namespace unity
 {
 namespace webrtc
 {
-
-    //---------------------------------------------------------------------------------------------------------------------
-
     VulkanTexture2D::VulkanTexture2D(const uint32_t w, const uint32_t h)
         : ITexture2D(w, h)
-        , m_textureImage(nullptr)
-        , m_textureImageMemory(nullptr)
-        , m_textureImageMemorySize(0)
-        , m_device(nullptr)
         , m_textureFormat(VK_FORMAT_B8G8R8A8_UNORM)
     {
     }
@@ -24,26 +17,27 @@ namespace webrtc
 
     void VulkanTexture2D::Shutdown()
     {
-        if (m_textureImage)
-            vkDestroyImage(m_device, m_textureImage, m_allocator);
-        if (m_textureImageMemory)
-            vkFreeMemory(m_device, m_textureImageMemory, m_allocator);
-
-        m_textureImage = nullptr;
-        m_textureImageMemory = nullptr;
-        m_textureImageMemorySize = 0;
-        m_device = nullptr;
+        if (m_unityVulkanImage.image != VK_NULL_HANDLE)
+        {
+            vkDestroyImage(m_Instance.device, m_unityVulkanImage.image, m_allocator);
+            m_unityVulkanImage.image = VK_NULL_HANDLE;
+        }
+        if (m_unityVulkanImage.memory.memory != VK_NULL_HANDLE)
+        {
+            vkFreeMemory(m_Instance.device, m_unityVulkanImage.memory.memory, m_allocator);
+            m_unityVulkanImage.memory.memory = VK_NULL_HANDLE;
+        }
+        m_unityVulkanImage.memory.size = 0;
+        m_Instance.device = nullptr;
     }
 
-    bool VulkanTexture2D::Init(const VkPhysicalDevice physicalDevice, const VkDevice device)
+    bool VulkanTexture2D::Init(const UnityVulkanInstance* instance)
     {
-        m_physicalDevice = physicalDevice;
-        m_device = device;
+        m_Instance = *instance;
 
         const bool EXPORT_HANDLE = true;
         VkResult result = VulkanUtility::CreateImage(
-            physicalDevice,
-            device,
+            m_Instance,
             m_allocator,
             m_width,
             m_height,
@@ -59,23 +53,16 @@ namespace webrtc
             return false;
         }
 
-        m_textureImage = m_unityVulkanImage.image;
-        m_textureImageMemory = m_unityVulkanImage.memory.memory;
-        m_textureImageMemorySize = m_unityVulkanImage.memory.size;
-
         return true;
     }
 
-    //---------------------------------------------------------------------------------------------------------------------
-    bool VulkanTexture2D::InitCpuRead(const VkPhysicalDevice physicalDevice, const VkDevice device)
+    bool VulkanTexture2D::InitCpuRead(const UnityVulkanInstance* instance)
     {
-        m_physicalDevice = physicalDevice;
-        m_device = device;
+        m_Instance = *instance;
 
         const bool EXPORT_HANDLE = false;
         VkResult result = VulkanUtility::CreateImage(
-            physicalDevice,
-            device,
+            m_Instance,
             m_allocator,
             m_width,
             m_height,
@@ -91,9 +78,6 @@ namespace webrtc
             return false;
         }
 
-        m_textureImage = m_unityVulkanImage.image;
-        m_textureImageMemory = m_unityVulkanImage.memory.memory;
-        m_textureImageMemorySize = m_unityVulkanImage.memory.size;
         return true;
     }
 } // end namespace webrtc
