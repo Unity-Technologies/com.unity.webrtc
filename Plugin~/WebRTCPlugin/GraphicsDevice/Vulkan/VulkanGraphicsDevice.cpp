@@ -374,6 +374,7 @@ namespace webrtc
         const VkResult result = vkMapMemory(m_Instance.device, dstImageMemory, 0, VK_WHOLE_SIZE, 0, &data);
         if (result != VK_SUCCESS)
         {
+            RTC_LOG(LS_INFO) << "vkMapMemory failed.";
             return nullptr;
         }
         std::memcpy(static_cast<void*>(dst.data()), data, dst.size());
