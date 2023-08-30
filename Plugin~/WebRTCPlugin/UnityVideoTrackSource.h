@@ -39,7 +39,6 @@ namespace webrtc
         UnityVideoTrackSource(
             bool is_screencast, absl::optional<bool> needs_denoising, TaskQueueFactory* taskQueueFactory);
         ~UnityVideoTrackSource() override;
-        // void SetState(SourceState state);
         SourceState state() const override;
 
         bool remote() const override;

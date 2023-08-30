@@ -333,6 +333,7 @@ class BandwidthSample : MonoBehaviour
             return;
         uint? framerate = framerateOptions.Values.ElementAt(index);
         RTCRtpSender sender = _pc1.GetSenders().First();
+        sender.SyncApplicationFramerate = false;
         RTCRtpSendParameters parameters = sender.GetParameters();
         parameters.encodings[0].maxFramerate = framerate;
         RTCError error = sender.SetParameters(parameters);
