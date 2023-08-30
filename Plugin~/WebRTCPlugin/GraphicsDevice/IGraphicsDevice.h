@@ -52,6 +52,8 @@ namespace webrtc
         virtual void Enter() { }
         virtual void Leave() { }
 
+        virtual bool UpdateState() { return true; }
+
         // Required for software encoding
         virtual ITexture2D*
         CreateCPUReadTextureV(uint32_t width, uint32_t height, UnityRenderingExtTextureFormat textureFormat) = 0;

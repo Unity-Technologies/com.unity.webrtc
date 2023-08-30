@@ -52,3 +52,29 @@
             return failValue;                                                                                          \
         }                                                                                                              \
     }
+
+#define __VULKAN_API_CALL(call, ret)                                                                                   \
+    VkResult err__ = call;                                                                                             \
+    if (err__ != VK_SUCCESS)                                                                                           \
+    {                                                                                                                  \
+        RTC_LOG(LS_ERROR) << "Vulkan call failed, error: " << err__;                                                   \
+        return ret;                                                                                                    \
+    }
+
+#define VULKAN_API_CALL(call)                                                                                          \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        __VULKAN_API_CALL(call, ;);                                                                                    \
+    } while (0)
+
+#define VULKAN_API_CALL_ERROR(call)                                                                                    \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        __VULKAN_API_CALL(call, err__);                                                                                \
+    } while (0)
+
+#define VULKAN_API_CALL_ARG(call, arg)                                                                                 \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        __VULKAN_API_CALL(call, arg);                                                                                  \
+    } while (0)
