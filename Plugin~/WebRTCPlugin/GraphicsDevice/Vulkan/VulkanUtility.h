@@ -15,29 +15,14 @@ namespace webrtc
     {
 
     public:
-        static bool FindMemoryTypeInto(
+        static bool FindMemoryTypeIndex(
             const VkPhysicalDevice physicalDevice,
             uint32_t typeFilter,
             VkMemoryPropertyFlags properties,
             uint32_t* memoryTypeIndex);
 
-        static VkDeviceSize CreateImage(
-            const VkPhysicalDevice physicalDevice,
-            const VkDevice device,
-            const VkAllocationCallbacks* allocator,
-            const uint32_t width,
-            const uint32_t height,
-            const VkImageTiling tiling,
-            const VkImageUsageFlags usage,
-            const VkMemoryPropertyFlags properties,
-            const VkFormat format,
-            VkImage* image,
-            VkDeviceMemory* imageMemory,
-            bool exportHandle);
-
         static VkResult CreateImage(
-            const VkPhysicalDevice physicalDevice,
-            const VkDevice device,
+            const UnityVulkanInstance& instance,
             const VkAllocationCallbacks* allocator,
             const uint32_t width,
             const uint32_t height,
@@ -49,9 +34,12 @@ namespace webrtc
             bool exportHandle);
 
         static VkImageView CreateImageView(
-            const VkDevice device, const VkAllocationCallbacks* allocator, const VkImage image, const VkFormat format);
+            const UnityVulkanInstance& instance,
+            const VkAllocationCallbacks* allocator,
+            const VkImage image,
+            const VkFormat format);
 
-        static bool GetPhysicalDeviceUUIDInto(
+        static bool GetPhysicalDeviceUUID(
             VkInstance instance, VkPhysicalDevice phyDevice, std::array<uint8_t, VK_UUID_SIZE>* deviceUUID);
 
         static bool LoadDeviceFunctions(const VkDevice device);

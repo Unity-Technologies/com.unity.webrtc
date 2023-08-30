@@ -270,6 +270,9 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID, void* data)
     void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(encodeData->texture, device, gfxRenderer);
     unity::webrtc::Size size(encodeData->width, encodeData->height);
 
+    if (!device->UpdateState())
+        return;
+
     if (s_bufferPool->bufferCount() < kLimitBufferCount)
     {
         std::unique_ptr<const ScopedProfiler> profiler;
