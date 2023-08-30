@@ -2,7 +2,6 @@
 
 #include <IUnityGraphicsVulkan.h>
 #include <api/video/i420_buffer.h>
-#include <condition_variable>
 #include <memory>
 #include <vulkan/vulkan.h>
 
@@ -26,7 +25,11 @@ namespace webrtc
     public:
         VulkanGraphicsDevice(
             UnityGraphicsVulkan* unityVulkan,
-            const UnityVulkanInstance* unityVulkanInstance,
+            const VkInstance instance,
+            const VkPhysicalDevice physicalDevice,
+            const VkDevice device,
+            const VkQueue graphicsQueue,
+            const uint32_t queueFamilyIndex,
             UnityGfxRenderer renderer,
             ProfilerMarkerFactory* profiler);
 
@@ -54,7 +57,6 @@ namespace webrtc
         bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
         bool ResetSync(const ITexture2D* texture) override;
         bool WaitIdleForTest() override;
-        bool UpdateState() override;
         rtc::scoped_refptr<I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
 
 #if CUDA_PLATFORM
@@ -63,26 +65,21 @@ namespace webrtc
         NV_ENC_BUFFER_FORMAT GetEncodeBufferFormat() override { return NV_ENC_BUFFER_FORMAT_ARGB; }
 #endif
     private:
-        const UnityProfilerMarkerDesc* m_maker;
-
-        VkCommandBuffer GetCommandBuffer();
-        void SubmitCommandBuffer();
-
+        VkResult CreateCommandPool();
+        static void AccessQueueCallback(int eventID, void* data);
+        static VulkanGraphicsDevice* m_graphicsInstance;
         UnityGraphicsVulkan* m_unityVulkan;
-        UnityVulkanInstance m_Instance;
-
-        // No access to VkFence internals through rendering plugin, track safe frame numbers
-        UnityVulkanRecordingState m_LastState;
-        std::mutex m_LastStateMtx;
-        std::condition_variable m_LastStateCond;
-
-        // Only used for unit tests
+        VkPhysicalDevice m_physicalDevice;
+        VkDevice m_device;
+        VkQueue m_graphicsQueue;
         VkCommandPool m_commandPool;
-        VkCommandBuffer m_commandBuffer;
-        VkFence m_fence;
+        uint32_t m_queueFamilyIndex;
+        VkAllocationCallbacks* m_allocator;
+        const UnityProfilerMarkerDesc* m_maker;
 
 #if CUDA_PLATFORM
         bool InitCudaContext();
+        VkInstance m_instance;
         CudaContext m_cudaContext;
         bool m_isCudaSupport;
 #endif
@@ -97,5 +94,4 @@ namespace webrtc
 #endif
     }
 } // end namespace webrtc
-
 } // end namespace unity

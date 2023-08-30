@@ -120,7 +120,7 @@ namespace webrtc
         CUCTX_CUDA_CALL_ERROR(cuDeviceGetCount(&numDevices));
 
         std::array<uint8_t, VK_UUID_SIZE> deviceUUID;
-        if (!VulkanUtility::GetPhysicalDeviceUUID(instance, physicalDevice, &deviceUUID))
+        if (!VulkanUtility::GetPhysicalDeviceUUIDInto(instance, physicalDevice, &deviceUUID))
             return CUDA_ERROR_INVALID_DEVICE;
 
         CUCTX_CUDA_CALL_ERROR(FindCudaDevice(deviceUUID.data(), &cuDevice));

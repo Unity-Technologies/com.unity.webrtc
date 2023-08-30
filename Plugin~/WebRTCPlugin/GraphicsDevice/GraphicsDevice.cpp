@@ -163,6 +163,8 @@ namespace webrtc
         }
     }
 
+    //---------------------------------------------------------------------------------------------------------------------
+
     IGraphicsDevice* GraphicsDevice::Init(
         const UnityGfxRenderer renderer, void* device, void* unityInterface, ProfilerMarkerFactory* profiler)
     {
@@ -207,8 +209,15 @@ namespace webrtc
         {
             RTC_DCHECK(device);
             const UnityVulkanInstance* vulkan = static_cast<const UnityVulkanInstance*>(device);
-            pDevice =
-                new VulkanGraphicsDevice(static_cast<UnityGraphicsVulkan*>(unityInterface), vulkan, renderer, profiler);
+            pDevice = new VulkanGraphicsDevice(
+                static_cast<UnityGraphicsVulkan*>(unityInterface),
+                vulkan->instance,
+                vulkan->physicalDevice,
+                vulkan->device,
+                vulkan->graphicsQueue,
+                vulkan->queueFamilyIndex,
+                renderer,
+                profiler);
             break;
         }
 #endif
@@ -229,6 +238,8 @@ namespace webrtc
         }
         return pDevice;
     }
+
+    //---------------------------------------------------------------------------------------------------------------------
 
     GraphicsDevice::GraphicsDevice() { }
 

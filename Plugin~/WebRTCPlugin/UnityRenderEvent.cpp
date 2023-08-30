@@ -274,9 +274,6 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
     UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
     Timestamp timestamp = s_clock->CurrentTime();
 
-    if (!device->UpdateState())
-        return;
-
     for (int i = 0; i < batchData->tracksCount; i++)
     {
         VideoStreamTrackData* trackData = batchData->tracks[i];
