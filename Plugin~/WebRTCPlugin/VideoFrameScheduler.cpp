@@ -24,12 +24,10 @@ namespace webrtc
         rtc::Event done;
 
         // Waiting for stopping task.
-        queue_->PostTask(
-            [task = std::move(task_), &done]() mutable
-            {
-                task.Stop();
-                done.Set();
-            });
+        queue_->PostTask([task = std::move(task_), &done]() mutable {
+            task.Stop();
+            done.Set();
+        });
         done.Wait(kTimeout);
     }
 
