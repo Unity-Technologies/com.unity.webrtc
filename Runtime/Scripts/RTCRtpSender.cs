@@ -106,7 +106,7 @@ namespace Unity.WebRTC
             {
                 if (Track is VideoStreamTrack videoTrack)
                 {
-                    if(videoTrack.m_source == null)
+                    if (videoTrack.m_source == null)
                     {
                         throw new InvalidOperationException("This track doesn't have a video source.");
                     }
@@ -134,11 +134,11 @@ namespace Unity.WebRTC
             }
         }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <returns></returns>
-    public RTCRtpSendParameters GetParameters()
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(GetSelfOrThrow(), out var ptr);
             RTCRtpSendParametersInternal parametersInternal = Marshal.PtrToStructure<RTCRtpSendParametersInternal>(ptr);
