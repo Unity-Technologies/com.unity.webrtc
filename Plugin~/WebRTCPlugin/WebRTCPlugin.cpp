@@ -1537,7 +1537,7 @@ extern "C"
         RTCVideoFrameMetadata* data =
             static_cast<RTCVideoFrameMetadata*>(CoTaskMemAlloc(sizeof(RTCVideoFrameMetadata)));
 
-        auto metadata = frame->GetMetadata();
+        auto metadata = frame->Metadata();
 
         data->frameId = metadata.GetFrameId();
         data->width = metadata.GetWidth();

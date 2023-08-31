@@ -1,5 +1,36 @@
 # Patch
 
+## Workaround for the linker error of jsoncpp and InternalVideoEncoderFactory
+
+The Unity package depends on modules `jsoncpp` and `InternalVideoEncoderFactory`. However, they are not contained in libwebrtc library by default. This patch file rewrites `BUILD.gn` file to add dependencies of the library for resolving the linker error which there are no symbols about these modules.
+
+### Patch files
+
+- add_jsoncpp.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc. 
+
+patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
+```
+
+## Workaround for the compile error about designated initializer which is supported since c++20
+
+The C++ version of the compiler which build native plugins is **c++17** but not **c++20**. The libwebrtc library is built with **c++20**, and the header file contains the c++20 language feature [**designated initializer list**](https://en.cppreference.com/w/cpp/language/aggregate_initialization). That's why the compiler puts errors about the header file without this patch.
+
+### Patch files
+
+- fix_task_queue_base.patch
+
+### Example
+
+```
+# `src` is a root directory of libwebrtc. 
+
+patch -N "src/api/task_queue/task_queue_base.h" < "$COMMAND_DIR/patches/fix_task_queue_base.patch"
+```
 
 ## Workaround for gn error for building Android libwebrtc
 

@@ -1,0 +1,22 @@
+diff --git a/api/task_queue/task_queue_base.h b/api/task_queue/task_queue_base.h
+index da7a00d438..b68c415a5c 100644
+--- a/api/task_queue/task_queue_base.h
++++ b/api/task_queue/task_queue_base.h
+@@ -95,7 +95,7 @@ class RTC_LOCKABLE RTC_EXPORT TaskQueueBase {
+                        TimeDelta delay,
+                        const Location& location = Location::Current()) {
+     PostDelayedTaskImpl(std::move(task), delay,
+-                        PostDelayedTaskTraits{.high_precision = false},
++                        PostDelayedTaskTraits{false},
+                         location);
+   }
+ 
+@@ -120,7 +120,7 @@ class RTC_LOCKABLE RTC_EXPORT TaskQueueBase {
+       TimeDelta delay,
+       const Location& location = Location::Current()) {
+     PostDelayedTaskImpl(std::move(task), delay,
+-                        PostDelayedTaskTraits{.high_precision = true},
++                        PostDelayedTaskTraits{true},
+                         location);
+   }
+ 

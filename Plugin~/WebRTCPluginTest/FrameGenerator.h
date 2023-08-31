@@ -30,6 +30,7 @@ namespace webrtc
         void ChangeResolution(size_t width, size_t height) override;
         FrameGeneratorInterface::Resolution GetResolution() const override;
         VideoFrameData NextFrame() override;
+        absl::optional<int> fps() const override { return absl::nullopt; }
 
     private:
         IGraphicsDevice* device_;

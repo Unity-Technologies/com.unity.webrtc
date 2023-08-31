@@ -1,10 +1,14 @@
---- BUILD.gn	2019-10-26 18:36:07.387629080 +0900
-+++ BUILD.gn.edited	2019-10-26 18:36:38.013480481 +0900
-@@ -397,6 +397,7 @@ if (!build_with_chromium) {
-       "rtc_base",
+diff --git a/BUILD.gn b/BUILD.gn
+index d847605cdd..e4ae568f8f 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -518,6 +518,9 @@ if (!build_with_chromium) {
+       "pc:rtc_pc",
        "sdk",
        "video",
 +      "//third_party/jsoncpp",
++      "api/video_codecs:builtin_video_decoder_factory",
++      "api/video_codecs:builtin_video_encoder_factory",
      ]
  
-     # Include audio and video codecs by default.
+     if (rtc_include_builtin_audio_codecs) {

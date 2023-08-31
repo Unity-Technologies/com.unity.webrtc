@@ -6,7 +6,7 @@ if not exist depot_tools (
 
 set COMMAND_DIR=%~dp0
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=5615
+set WEBRTC_VERSION=5790
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2022
@@ -32,6 +32,9 @@ patch -N "src\modules\desktop_capture\win\full_screen_win_application_handler.cc
 
 rem fix abseil
 patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "%COMMAND_DIR%\patches\fix_abseil.patch"
+
+rem fix task_queue_base
+patch -N "src\api\task_queue\task_queue_base.h" < "%COMMAND_DIR%\patches\fix_task_queue_base.patch"
 
 mkdir "%ARTIFACTS_DIR%\lib"
 
