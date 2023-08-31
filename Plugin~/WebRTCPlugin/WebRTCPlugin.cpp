@@ -1286,7 +1286,6 @@ extern "C"
         source->SetSyncApplicationFramerate(value);
     }
 
-
     struct RTCRtpHeaderExtensionCapability
     {
         char* uri;
