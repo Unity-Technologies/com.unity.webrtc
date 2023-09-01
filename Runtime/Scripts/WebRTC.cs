@@ -1546,6 +1546,11 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void AudioSourceProcessLocalAudio(IntPtr source, IntPtr array, int sampleRate, int channels, int frames);
         [DllImport(WebRTC.Lib)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool VideoSourceGetSyncApplicationFramerate(IntPtr source);
+        [DllImport(WebRTC.Lib)]
+        public static extern void VideoSourceSetSyncApplicationFramerate(IntPtr source, [MarshalAs(UnmanagedType.U1)] bool value);
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsGetJson(IntPtr stats);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr StatsGetId(IntPtr stats);

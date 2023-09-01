@@ -97,7 +97,42 @@ namespace Unity.WebRTC
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool SyncApplicationFramerate
+        {
+            get
+            {
+                if (Track is VideoStreamTrack videoTrack)
+                {
+                    if (videoTrack.m_source == null)
+                    {
+                        throw new InvalidOperationException("This track doesn't have a video source.");
+                    }
+                    return videoTrack.m_source.SyncApplicationFramerate;
+                }
+                else
+                {
+                    throw new InvalidOperationException("This track is not VideoStreamTrack.");
+                }
+            }
+            set
+            {
+                if (Track is VideoStreamTrack videoTrack)
+                {
+                    if (videoTrack.m_source == null)
+                    {
+                        throw new InvalidOperationException("This track doesn't have a video source.");
+                    }
+                    videoTrack.m_source.SyncApplicationFramerate = value;
+                }
+                else
+                {
+                    throw new InvalidOperationException("This track is not VideoStreamTrack.");
+                }
+            }
+        }
 
         /// <summary>
         ///

@@ -82,8 +82,8 @@ namespace webrtc
     TEST_P(VideoTrackSourceTest, OnFrameCaptured)
     {
         rtc::Event done;
-        SendTestFrame();
         EXPECT_CALL(sink_, OnFrame(_)).WillOnce(Invoke([&done](const ::webrtc::VideoFrame& frame) { done.Set(); }));
+        SendTestFrame();
         EXPECT_TRUE(done.Wait(kTimeout));
     }
 

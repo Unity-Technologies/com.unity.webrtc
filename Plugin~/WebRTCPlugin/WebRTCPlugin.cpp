@@ -1276,6 +1276,16 @@ extern "C"
         return error.type();
     }
 
+    UNITY_INTERFACE_EXPORT bool VideoSourceGetSyncApplicationFramerate(UnityVideoTrackSource* source)
+    {
+        return source->syncApplicationFramerate();
+    }
+
+    UNITY_INTERFACE_EXPORT void VideoSourceSetSyncApplicationFramerate(UnityVideoTrackSource* source, bool value)
+    {
+        source->SetSyncApplicationFramerate(value);
+    }
+
     struct RTCRtpHeaderExtensionCapability
     {
         char* uri;

@@ -41,11 +41,7 @@ namespace webrtc
     void VideoFrameScheduler::Pause(bool pause)
     {
         paused_ = pause;
-        if (paused_)
-        {
-            StopTask();
-        }
-        else
+        if (!paused_)
         {
             StartRepeatingTask();
         }
@@ -93,18 +89,17 @@ namespace webrtc
         RTC_DCHECK(firstDelay);
 
         task_ = RepeatingTaskHandle::DelayedStart(queue_, firstDelay.value(), [this]() {
+            if (paused_)
+            {
+                task_.Stop();
+                return TimeDelta::PlusInfinity();
+            }
             CaptureNextFrame();
             auto delay = ScheduleNextFrame();
             if (delay.has_value())
                 return delay.value();
             return TimeDelta::PlusInfinity();
         });
-    }
-
-    void VideoFrameScheduler::StopTask()
-    {
-        RTC_DCHECK(task_.Running());
-        task_.Stop();
     }
 }
 }
