@@ -357,9 +357,7 @@ namespace webrtc
         case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
             // Image will be used as a color attachment
             // Make sure any writes to the color buffer have been finished
-
-            // Vulkan API validation error?
-            // barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
             break;
 
         case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
@@ -375,9 +373,7 @@ namespace webrtc
             {
                 barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
             }
-
-            // Vulkan API validation error?
-            // barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
             break;
         default:
             // Other source layouts aren't handled (yet)
