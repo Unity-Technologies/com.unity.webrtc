@@ -591,8 +591,7 @@ namespace webrtc
         m_encodedImages[i].content_type_ = VideoContentType::UNSPECIFIED;
         m_encodedImages[i].timing_.flags = VideoSendTiming::kInvalid;
         m_encodedImages[i]._frameType = VideoFrameType::kVideoFrameDelta;
-        // TODO(kazuki): Change EncodedImage::SetSimulcastIndex when upgrading libwebrtc.
-        m_encodedImages[i].SetSpatialIndex(m_configurations[i].simulcast_idx);
+        m_encodedImages[i].SetSimulcastIndex(m_configurations[i].simulcast_idx);
 
         std::vector<H264::NaluIndex> naluIndices = H264::FindNaluIndices(packet.data(), packet.size());
         for (uint32_t naluIdx = 0; naluIdx < naluIndices.size(); naluIdx++)
