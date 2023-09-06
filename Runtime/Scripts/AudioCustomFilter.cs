@@ -41,10 +41,7 @@ namespace Unity.WebRTC
 
             if (sender && !loopback)
             {
-                for (int i = 0; i < data.Length; i++)
-                {
-                    data[i] = 0;
-                }
+                Array.Clear(data, 0, data.Length);
             }
         }
     }
