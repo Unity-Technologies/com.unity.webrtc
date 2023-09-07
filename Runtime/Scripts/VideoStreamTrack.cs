@@ -128,7 +128,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="source"></param>
         /// <param name="needFlip"></param>
-        public VideoStreamTrack(Texture texture, bool needFlip = true)
+        public VideoStreamTrack(Texture texture, bool needFlipVertically = true, bool needFlipHorizontally = false)
             : base(CreateVideoTrack(texture, out var source))
         {
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
@@ -143,7 +143,8 @@ namespace Unity.WebRTC
             m_source.sourceTexture_ = texture;
             m_source.destTexture_ = dest;
             m_source.destTexturePtr_ = dest.GetNativeTexturePtr();
-            m_source.needFlip_ = needFlip;
+            m_source.needFlipVertically_ = needFlipVertically;
+            m_source.needFlipHorizontally_ = needFlipHorizontally;
         }
 
         /// <summary>
@@ -313,11 +314,18 @@ namespace Unity.WebRTC
 
     internal class VideoTrackSource : RefCountedObject
     {
-        // Blit parameter to flip vertically
-        static Vector2 s_scale = new Vector2(1f, -1f);
-        static Vector2 s_offset = new Vector2(0, 1f);
+        // Blit parameter to flip vertically 
+        private static readonly Vector2 s_verticalScale = new Vector2(1f, -1f);
+        private static readonly Vector2 s_verticalOffset = new Vector2(0f, 1f);
+        // Blit parameter to flip horizontally 
+        private static readonly Vector2 s_horizontalScale = new Vector2(-1f, 1f);
+        private static readonly Vector2 s_horixontalOffset = new Vector2(1f, 0f);
+        // Blit parameter to flip diagonally 
+        private static readonly Vector2 s_diagonalScale = new Vector2(-1f, -1f);
+        private static readonly Vector2 s_diagonalOffset = new Vector2(1f, 1f);
 
-        internal bool needFlip_ = false;
+        internal bool needFlipVertically_ = false;
+        internal bool needFlipHorizontally_ = false;
         internal Texture sourceTexture_;
         internal RenderTexture destTexture_;
         internal IntPtr destTexturePtr_;
@@ -346,9 +354,23 @@ namespace Unity.WebRTC
             //  - duplicate RenderTexture from its source texture
             //  - call Graphics.Blit command with flip material every frame
             //  - it might be better to implement this if possible
-            if (needFlip_)
+            if (needFlipVertically_)
             {
-                Graphics.Blit(sourceTexture_, destTexture_, s_scale, s_offset);
+                if (needFlipHorizontally_)
+                {
+                    //Flip diagonally
+                    Graphics.Blit(sourceTexture_, destTexture_, s_diagonalScale, s_diagonalOffset);
+                }
+                else
+                {
+                    //Flip vertically
+                    Graphics.Blit(sourceTexture_, destTexture_, s_verticalScale, s_verticalOffset);
+                }
+            }
+            else if (needFlipHorizontally_)
+            {
+                //Flip horizontally
+                Graphics.Blit(sourceTexture_, destTexture_, s_horizontalScale, s_horixontalOffset);
             }
             else
             {
