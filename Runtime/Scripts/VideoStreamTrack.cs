@@ -14,10 +14,22 @@ namespace Unity.WebRTC
     public delegate void OnVideoReceived(Texture renderer);
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dest"></param>
+    public delegate void CopyTexture(Texture source, RenderTexture dest);
+
+    /// <summary>
     ///
     /// </summary>
     public class VideoStreamTrack : MediaStreamTrack
     {
+        /// <summary>
+        /// Flip vertically received video, change it befor start receive video
+        /// </summary>
+        public static bool NeedReceivedVideoFlipVertically { get; set; } = false;
+
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
 
@@ -123,12 +135,17 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
+        /// Video Sender
         /// Creates a new VideoStream object.
         /// The track is created with a `source`.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="needFlip"></param>
-        public VideoStreamTrack(Texture texture, bool needFlipVertically = true, bool needFlipHorizontally = false)
+        /// <param name="texture"></param>
+        /// <param name="copyTexture">
+        /// By default, textures are copied as is, using Graphics.Blit,
+        /// use TextureCopyHelper for flip,
+        /// or write your own CopyTexture function</param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public VideoStreamTrack(Texture texture, CopyTexture copyTexture = null)
             : base(CreateVideoTrack(texture, out var source))
         {
             if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
@@ -139,12 +156,14 @@ namespace Unity.WebRTC
 
             var dest = CreateRenderTexture(texture.width, texture.height);
 
+            if (copyTexture != null)
+            {
+                m_source.copyTexture_ = copyTexture;
+            }
             m_source = source;
             m_source.sourceTexture_ = texture;
             m_source.destTexture_ = dest;
             m_source.destTexturePtr_ = dest.GetNativeTexturePtr();
-            m_source.needFlipVertically_ = needFlipVertically;
-            m_source.needFlipHorizontally_ = needFlipHorizontally;
         }
 
         /// <summary>
@@ -160,7 +179,7 @@ namespace Unity.WebRTC
             m_dataptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoStreamTrackData)));
             Marshal.StructureToPtr(m_data, m_dataptr, false);
 
-            m_renderer = new UnityVideoRenderer(this, true);
+            m_renderer = new UnityVideoRenderer(this, NeedReceivedVideoFlipVertically);
         }
 
         /// <summary>
@@ -266,10 +285,9 @@ namespace Unity.WebRTC
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="depth"></param>
-        /// <param name="needFlip"></param>
         /// <returns></returns>
         public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height,
-            RenderTextureDepth depth = RenderTextureDepth.Depth24, bool needFlip = true)
+            RenderTextureDepth depth = RenderTextureDepth.Depth24, CopyTexture textureCopy = null)
         {
             switch (depth)
             {
@@ -291,7 +309,7 @@ namespace Unity.WebRTC
             var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
             rt.Create();
             cam.targetTexture = rt;
-            return new VideoStreamTrack(rt, needFlip);
+            return new VideoStreamTrack(rt, textureCopy);
         }
 
         /// <summary>
@@ -314,21 +332,10 @@ namespace Unity.WebRTC
 
     internal class VideoTrackSource : RefCountedObject
     {
-        // Blit parameter to flip vertically 
-        private static readonly Vector2 s_verticalScale = new Vector2(1f, -1f);
-        private static readonly Vector2 s_verticalOffset = new Vector2(0f, 1f);
-        // Blit parameter to flip horizontally 
-        private static readonly Vector2 s_horizontalScale = new Vector2(-1f, 1f);
-        private static readonly Vector2 s_horixontalOffset = new Vector2(1f, 0f);
-        // Blit parameter to flip diagonally 
-        private static readonly Vector2 s_diagonalScale = new Vector2(-1f, -1f);
-        private static readonly Vector2 s_diagonalOffset = new Vector2(1f, 1f);
-
-        internal bool needFlipVertically_ = false;
-        internal bool needFlipHorizontally_ = false;
         internal Texture sourceTexture_;
         internal RenderTexture destTexture_;
         internal IntPtr destTexturePtr_;
+        internal CopyTexture copyTexture_ = Graphics.Blit;
 
         internal bool SyncApplicationFramerate
         {
@@ -354,28 +361,7 @@ namespace Unity.WebRTC
             //  - duplicate RenderTexture from its source texture
             //  - call Graphics.Blit command with flip material every frame
             //  - it might be better to implement this if possible
-            if (needFlipVertically_)
-            {
-                if (needFlipHorizontally_)
-                {
-                    //Flip diagonally
-                    Graphics.Blit(sourceTexture_, destTexture_, s_diagonalScale, s_diagonalOffset);
-                }
-                else
-                {
-                    //Flip vertically
-                    Graphics.Blit(sourceTexture_, destTexture_, s_verticalScale, s_verticalOffset);
-                }
-            }
-            else if (needFlipHorizontally_)
-            {
-                //Flip horizontally
-                Graphics.Blit(sourceTexture_, destTexture_, s_horizontalScale, s_horixontalOffset);
-            }
-            else
-            {
-                Graphics.Blit(sourceTexture_, destTexture_);
-            }
+            copyTexture_(sourceTexture_, destTexture_);
         }
 
         public override void Dispose()
@@ -492,6 +478,34 @@ namespace Unity.WebRTC
                     renderer.OnVideoFrameResizeInternal(width, height);
                 }
             });
+        }
+    }
+
+    public static class CopyTextureHelper
+    {
+        // Blit parameter to flip vertically 
+        private static readonly Vector2 s_verticalScale = new Vector2(1f, -1f);
+        private static readonly Vector2 s_verticalOffset = new Vector2(0f, 1f);
+        // Blit parameter to flip horizontally 
+        private static readonly Vector2 s_horizontalScale = new Vector2(-1f, 1f);
+        private static readonly Vector2 s_horixontalOffset = new Vector2(1f, 0f);
+        // Blit parameter to flip diagonally 
+        private static readonly Vector2 s_diagonalScale = new Vector2(-1f, -1f);
+        private static readonly Vector2 s_diagonalOffset = new Vector2(1f, 1f);
+
+        public static void HorizontalFlipCopy(Texture source, RenderTexture dest)
+        {
+            Graphics.Blit(source, dest, s_horizontalScale, s_horixontalOffset);
+        }
+
+        public static void VerticalFlipCopy(Texture source, RenderTexture dest)
+        {
+            Graphics.Blit(source, dest, s_verticalScale, s_verticalOffset);
+        }
+
+        public static void DiagonalFlipCopy(Texture source, RenderTexture dest)
+        {
+            Graphics.Blit(source, dest, s_diagonalScale, s_diagonalOffset);
         }
     }
 }
