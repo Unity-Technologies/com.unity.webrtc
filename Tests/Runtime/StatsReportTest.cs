@@ -117,10 +117,9 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.InboundRtp:
                     var inboundRtpStreamStats = stats as RTCInboundRTPStreamStats;
                     Assert.NotNull(inboundRtpStreamStats);
-                    Assert.AreEqual(65, inboundRtpStreamStats.Dict.Count);
+                    Assert.AreEqual(64, inboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(inboundRtpStreamStats.ssrc);
                     Assert.IsNotEmpty(inboundRtpStreamStats.kind);
-                    // Obsolete:  Ignore.Pass(inboundRtpStreamStats.trackId);
                     Assert.IsNotEmpty(inboundRtpStreamStats.transportId);
                     Ignore.Pass(inboundRtpStreamStats.codecId);
                     Ignore.Pass(inboundRtpStreamStats.jitter);
@@ -244,10 +243,9 @@ namespace Unity.WebRTC.RuntimeTest
                 case RTCStatsType.OutboundRtp:
                     var outboundRtpStreamStats = stats as RTCOutboundRTPStreamStats;
                     Assert.NotNull(outboundRtpStreamStats);
-                    Assert.AreEqual(37, outboundRtpStreamStats.Dict.Count);
+                    Assert.AreEqual(36, outboundRtpStreamStats.Dict.Count);
                     Ignore.Pass(outboundRtpStreamStats.ssrc);
                     Assert.IsNotEmpty(outboundRtpStreamStats.kind);
-                    // Obsolete: Ignore.Pass(outboundRtpStreamStats.trackId);
                     Assert.IsNotEmpty(outboundRtpStreamStats.transportId);
                     Ignore.Pass(outboundRtpStreamStats.codecId);
                     Ignore.Pass(outboundRtpStreamStats.mediaSourceId);

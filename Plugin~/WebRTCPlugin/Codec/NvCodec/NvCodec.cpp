@@ -194,7 +194,7 @@ namespace webrtc
     std::unique_ptr<VideoEncoder> NvEncoderFactory::CreateVideoEncoder(const SdpVideoFormat& format)
     {
         // todo(kazuki):: add CUmemorytype::CU_MEMORYTYPE_DEVICE option
-        return NvEncoder::Create(cricket::VideoCodec(format), context_, CU_MEMORYTYPE_ARRAY, format_, profiler_);
+        return NvEncoder::Create(cricket::CreateVideoCodec(format), context_, CU_MEMORYTYPE_ARRAY, format_, profiler_);
     }
 
     NvDecoderFactory::NvDecoderFactory(CUcontext context, ProfilerMarkerFactory* profiler)
@@ -211,7 +211,7 @@ namespace webrtc
 
     std::unique_ptr<VideoDecoder> NvDecoderFactory::CreateVideoDecoder(const SdpVideoFormat& format)
     {
-        return NvDecoder::Create(cricket::VideoCodec(format), context_, profiler_);
+        return NvDecoder::Create(cricket::CreateVideoCodec(format), context_, profiler_);
     }
 }
 }

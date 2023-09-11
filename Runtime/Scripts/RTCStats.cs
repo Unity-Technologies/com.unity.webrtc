@@ -840,12 +840,6 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        [Obsolete]
-        public string trackId { get { return GetString("trackId"); } }
-
-        /// <summary>
-        ///
-        /// </summary>
         public string transportId { get { return GetString("transportId"); } }
 
         /// <summary>
@@ -886,7 +880,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public uint packetsSent { get { return GetUnsignedInt("packetsSent"); } }
+        public ulong packetsSent { get { return GetUnsignedLong("packetsSent"); } }
 
         /// <summary>
         ///
@@ -1036,7 +1030,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public int framesReceived { get { return GetInt("framesReceived"); } }
+        public uint framesReceived { get { return GetUnsignedInt("framesReceived"); } }
 
         /// <summary>
         ///

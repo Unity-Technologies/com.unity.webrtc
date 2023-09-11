@@ -47,14 +47,14 @@ namespace webrtc
     protected:
         std::unique_ptr<VideoEncoder> CreateEncoder() override
         {
-            cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
+            cricket::VideoCodec codec = cricket::CreateVideoCodec(cricket::kH264CodecName);
             codec.SetParam(cricket::kH264FmtpProfileLevelId, kProfileLevelIdString());
             return NvEncoder::Create(codec, context_, CU_MEMORYTYPE_ARRAY, NV_ENC_BUFFER_FORMAT_ARGB, nullptr);
         }
 
         std::unique_ptr<VideoDecoder> CreateDecoder() override
         {
-            cricket::VideoCodec codec = cricket::VideoCodec(cricket::kH264CodecName);
+            cricket::VideoCodec codec = cricket::CreateVideoCodec(cricket::kH264CodecName);
             codec.SetParam(cricket::kH264FmtpProfileLevelId, kProfileLevelIdString());
             return NvDecoder::Create(codec, context_, nullptr);
         }
