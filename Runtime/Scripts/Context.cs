@@ -134,6 +134,8 @@ namespace Unity.WebRTC
 
         private IntPtr batchUpdateFunction;
         private int batchUpdateEventID = -1;
+        private IntPtr postLateUpdateFunction;
+        private int postLateUpdateEventID = -1;
         private IntPtr textureUpdateFunction;
 
         internal Batch batch;
@@ -315,6 +317,16 @@ namespace Unity.WebRTC
             return NativeMethods.GetBatchUpdateEventID();
         }
 
+        public IntPtr GetPostLateUpdateEventFunc()
+        {
+            return NativeMethods.GetPostLateUpdateEventFunc(self);
+        }
+
+        public int GetPostLateUpdateEventID()
+        {
+            return NativeMethods.GetPostLateUpdateEventID();
+        }
+
         public IntPtr GetUpdateTextureFunc()
         {
             return NativeMethods.GetUpdateTextureFunc(self);
@@ -380,7 +392,15 @@ namespace Unity.WebRTC
         {
             batchUpdateFunction = batchUpdateFunction == IntPtr.Zero ? GetBatchUpdateEventFunc() : batchUpdateFunction;
             batchUpdateEventID = batchUpdateEventID == -1 ? GetBatchUpdateEventID() : batchUpdateEventID;
-            VideoUpdateMethods.BatchUpdate(batchUpdateFunction, batchUpdateEventID, batchData);
+            VideoUpdateMethods.PluginEvent(batchUpdateFunction, batchUpdateEventID, batchData);
+        }
+
+        internal void PostLateUpdate()
+        {
+            postLateUpdateFunction = postLateUpdateFunction == IntPtr.Zero ? GetPostLateUpdateEventFunc() : postLateUpdateFunction;
+            postLateUpdateEventID = postLateUpdateEventID == -1 ? GetPostLateUpdateEventID() : postLateUpdateEventID;
+            VideoUpdateMethods.PluginEvent(postLateUpdateFunction, postLateUpdateEventID, IntPtr.Zero);
+            VideoUpdateMethods.Flush();
         }
 
         internal void UpdateRendererTexture(uint rendererId, UnityEngine.Texture texture)

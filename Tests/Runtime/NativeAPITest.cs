@@ -365,7 +365,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(1.0f);
 
             Marshal.StructureToPtr(batch.data, batch.ptr, false);
-            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.ptr);
+            VideoUpdateMethods.PluginEvent(batchUpdateEvent, batchUpdateEventID, batch.ptr);
             VideoUpdateMethods.Flush();
 
             yield return new WaitForSeconds(1.0f);
@@ -420,7 +420,7 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitForSeconds(1.0f);
 
             Marshal.StructureToPtr(batch.data, batch.ptr, false);
-            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.ptr);
+            VideoUpdateMethods.PluginEvent(batchUpdateEvent, batchUpdateEventID, batch.ptr);
 
             // this method is not supported on Direct3D12
             VideoUpdateMethods.UpdateRendererTexture(updateTextureEvent, receiveTexture, rendererId);
