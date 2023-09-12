@@ -110,7 +110,7 @@ class SimulcastSample : MonoBehaviour
     private static RTCConfiguration GetSelectedSdpSemantics()
     {
         RTCConfiguration config = default;
-        config.iceServers = new[] {new RTCIceServer {urls = new[] {"stun:stun.l.google.com:19302"}}};
+        config.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
 
         return config;
     }
@@ -237,7 +237,7 @@ class SimulcastSample : MonoBehaviour
 
         if (WebRTCSettings.UseVideoCodec != null)
         {
-            var codecs = new[] {WebRTCSettings.UseVideoCodec};
+            var codecs = new[] { WebRTCSettings.UseVideoCodec };
             transceiver.SetCodecPreferences(codecs);
         }
         _pc1Transceiver = transceiver;
@@ -306,7 +306,7 @@ class SimulcastSample : MonoBehaviour
 
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
-        switch((ProtocolOption)dropDownProtocol.value)
+        switch ((ProtocolOption)dropDownProtocol.value)
         {
             case ProtocolOption.Default:
                 break;
