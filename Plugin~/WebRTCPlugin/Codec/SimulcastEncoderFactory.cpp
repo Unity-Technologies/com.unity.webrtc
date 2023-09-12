@@ -8,8 +8,8 @@
 #include <api/video_codecs/video_encoder.h>
 #include <media/base/codec.h>
 #include <media/base/media_constants.h>
-#include <media/engine/simulcast_encoder_adapter.h>
 #include <media/engine/internal_encoder_factory.h>
+#include <media/engine/simulcast_encoder_adapter.h>
 #include <rtc_base/checks.h>
 
 #include "SimulcastEncoderFactory.h"
