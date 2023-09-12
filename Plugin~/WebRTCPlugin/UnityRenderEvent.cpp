@@ -37,6 +37,7 @@ namespace webrtc
     static std::unique_ptr<IGraphicsDevice> s_gfxDevice;
     static std::unique_ptr<GpuMemoryBufferPool> s_bufferPool;
     static int s_batchUpdateEventID = 0;
+    static int s_postLateUpdateEventID = 0;
 
     IGraphicsDevice* Plugin::GraphicsDevice() { return s_gfxDevice.get(); }
 
@@ -83,7 +84,8 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             break;
 
         // Reserve eventID range to use for custom plugin events.
-        s_batchUpdateEventID = s_UnityInterfaces->Get<IUnityGraphics>()->ReserveEventIDRange(1);
+        s_batchUpdateEventID = s_UnityInterfaces->Get<IUnityGraphics>()->ReserveEventIDRange(2);
+        s_postLateUpdateEventID = s_batchUpdateEventID + 1;
 
 #if defined(SUPPORT_VULKAN)
         if (renderer == kUnityGfxRendererVulkan)
@@ -113,6 +115,11 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 #endif
 
             vulkan->ConfigureEvent(s_batchUpdateEventID, &batchUpdateEventConfig);
+
+            UnityVulkanPluginEventConfig postLateUpdateEventConfig = {};
+            postLateUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
+
+            vulkan->ConfigureEvent(s_postLateUpdateEventID, &postLateUpdateEventConfig);
         }
 #endif
         s_gfxDevice.reset(GraphicsDevice::GetInstance().Init(s_UnityInterfaces, s_ProfilerMarkerFactory.get()));
@@ -338,6 +345,32 @@ GetBatchUpdateEventFunc(Context* context)
 }
 
 extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetBatchUpdateEventID() { return s_batchUpdateEventID; }
+
+static void UNITY_INTERFACE_API OnPostLateUpdateEvent(int eventID, void* data)
+{
+    if (eventID != s_postLateUpdateEventID)
+        return;
+    if (!s_context)
+        return;
+    if (!ContextManager::GetInstance()->Exists(s_context))
+        return;
+    std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
+    if (!lock.owns_lock())
+        return;
+
+    IGraphicsDevice* device = Plugin::GraphicsDevice();
+    if (!device->UpdateState())
+        return;
+}
+
+extern "C" UnityRenderingEventAndData UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+GetPostLateUpdateEventFunc(Context* context)
+{
+    s_context = context;
+    return OnPostLateUpdateEvent;
+}
+
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetPostLateUpdateEventID() { return s_postLateUpdateEventID; }
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {

@@ -634,11 +634,80 @@ namespace Unity.WebRTC
         private static SynchronizationContext s_syncContext;
         private static ILogger s_logger;
 
+        internal class PostLateUpdateWebRTC { }
+
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitializeOnLoadMethod()
         {
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+
+            var postLateUpdateWebRTC = new UnityEngine.LowLevel.PlayerLoopSystem
+            {
+                subSystemList = null,
+                updateDelegate = OnPostLateUpdateWebRTC,
+                type = typeof(PostLateUpdateWebRTC)
+            };
+
+            // We could create a new subsystem stage ordered after PostLate, but for optimal synchronization,
+            // it's better to directly call after PostLateUpdate.PresentAfterDraw
+            AddSubSystemPass(typeof(UnityEngine.PlayerLoop.PostLateUpdate), typeof(UnityEngine.PlayerLoop.PostLateUpdate.PresentAfterDraw), postLateUpdateWebRTC);
+        }
+
+        private static void AddSubSystemPass(Type stage, Type afterPass, UnityEngine.LowLevel.PlayerLoopSystem loopSystem)
+        {
+            var defaultPlayerLoop = UnityEngine.LowLevel.PlayerLoop.GetDefaultPlayerLoop();
+
+            UnityEngine.LowLevel.PlayerLoopSystem playerLoop = new()
+            {
+                loopConditionFunction = defaultPlayerLoop.loopConditionFunction,
+                type = defaultPlayerLoop.type,
+                updateDelegate = defaultPlayerLoop.updateDelegate,
+                updateFunction = defaultPlayerLoop.updateFunction
+            };
+
+            List<UnityEngine.LowLevel.PlayerLoopSystem> subSystemList = new();
+
+            foreach (var subSystem in defaultPlayerLoop.subSystemList)
+            {
+                if (subSystem.type == stage)
+                {
+                    UnityEngine.LowLevel.PlayerLoopSystem modSubSystem = new()
+                    {
+                        loopConditionFunction = subSystem.loopConditionFunction,
+                        type = subSystem.type,
+                        updateDelegate = subSystem.updateDelegate,
+                        updateFunction = subSystem.updateFunction
+                    };
+
+                    if (subSystem.subSystemList != null)
+                    {
+                        List<UnityEngine.LowLevel.PlayerLoopSystem> modSubSystemList = new();
+
+                        foreach (var subSystem2 in subSystem.subSystemList)
+                        {
+                            modSubSystemList.Add(subSystem2);
+                            if (subSystem2.type == afterPass)
+                                modSubSystemList.Add(loopSystem);
+                        }
+                        modSubSystem.subSystemList = modSubSystemList.ToArray();
+                    }
+
+                    subSystemList.Add(modSubSystem);
+                }
+                else
+                {
+                    subSystemList.Add(subSystem);
+                }
+            }
+
+            playerLoop.subSystemList = subSystemList.ToArray();
+            UnityEngine.LowLevel.PlayerLoop.SetPlayerLoop(playerLoop);
+        }
+
+        private static void OnPostLateUpdateWebRTC()
+        {
+            s_context?.PostLateUpdate();
         }
 
         internal static void InitializeInternal(bool limitTextureSize = true, bool enableNativeLog = false,
@@ -1542,6 +1611,10 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern int GetBatchUpdateEventID();
         [DllImport(WebRTC.Lib)]
+        public static extern IntPtr GetPostLateUpdateEventFunc(IntPtr context);
+        [DllImport(WebRTC.Lib)]
+        public static extern int GetPostLateUpdateEventID();
+        [DllImport(WebRTC.Lib)]
         public static extern IntPtr GetUpdateTextureFunc(IntPtr context);
         [DllImport(WebRTC.Lib)]
         public static extern void AudioSourceProcessLocalAudio(IntPtr source, IntPtr array, int sampleRate, int channels, int frames);
@@ -1633,9 +1706,9 @@ namespace Unity.WebRTC
             _command.Clear();
         }
 
-        public static void BatchUpdate(IntPtr callback, int eventID, IntPtr batchData)
+        public static void PluginEvent(IntPtr callback, int eventID, IntPtr eventData)
         {
-            _command.IssuePluginEventAndData(callback, eventID, batchData);
+            _command.IssuePluginEventAndData(callback, eventID, eventData);
         }
 
         public static void UpdateRendererTexture(IntPtr callback, Texture texture, uint rendererId)
