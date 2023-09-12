@@ -420,9 +420,6 @@ namespace webrtc
 
     int32_t NvEncoderImpl::Encode(const ::webrtc::VideoFrame& frame, const std::vector<VideoFrameType>* frameTypes)
     {
-        RTC_DCHECK_EQ(frame.width(), m_codec.width);
-        RTC_DCHECK_EQ(frame.height(), m_codec.height);
-
         if (!m_encoder)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
         if (!m_encodedCompleteCallback)
