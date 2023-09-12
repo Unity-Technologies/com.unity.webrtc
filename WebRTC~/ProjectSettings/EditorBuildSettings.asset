@@ -57,6 +57,9 @@ EditorBuildSettings:
     path: Assets/Samples/ReplaceTrack/ReplaceTrack.unity
     guid: 9607119e15db6cb40a49916fb3a70f9f
   - enabled: 1
+    path: Assets/Samples/Simulcast/Simulcast.unity
+    guid: d72d29a8c7f14f144b83412f921e3e4f
+  - enabled: 1
     path: Assets/Samples/Metadata/Metadata.unity
     guid: d6984f39ed7ce3e48b39f3eaf1ea1941
   - enabled: 1
