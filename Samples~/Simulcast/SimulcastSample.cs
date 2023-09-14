@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
+[Serializable]
+class EncoderParameters
+{
+    [SerializeField] public Dropdown optionMaxBitrate;
+    [SerializeField] public Dropdown optionMinBitrate;
+    [SerializeField] public Dropdown optionScaleResolution;
+}
+
 class SimulcastSample : MonoBehaviour
 {
 #pragma warning disable 0649
@@ -14,25 +23,14 @@ class SimulcastSample : MonoBehaviour
     [SerializeField] private Button callButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button hangUpButton;
-    [SerializeField] private Text localCandidateId;
-    [SerializeField] private Text remoteCandidateId;
-    [SerializeField] private Dropdown dropDownProtocol;
-
     [SerializeField] private Camera cam;
     [SerializeField] private RawImage sourceImage;
     [SerializeField] private RawImage receiveImage;
     [SerializeField] private Transform rotateObject;
+    [SerializeField] private EncoderParameters[] encoderParameters = new EncoderParameters[3];
 #pragma warning restore 0649
 
-    enum ProtocolOption
-    {
-        Default,
-        UDP,
-        TCP
-    }
-
     private RTCPeerConnection _pc1, _pc2;
-    private List<RTCRtpSender> pc1Senders;
     private MediaStream videoStream, receiveStream;
     private RTCRtpTransceiver _pc1Transceiver;
     private DelegateOnIceConnectionChange pc1OnIceConnectionChange;
@@ -42,6 +40,9 @@ class SimulcastSample : MonoBehaviour
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
     private bool videoUpdateStarted;
+
+    private ulong[] optionBitrate = new ulong[] { 100, 150, 200, 300, 400, 600, 800, 1100, 1400 };
+    private int[] optionScaleResolution = new[] { 1, 2, 4, 8 };
 
     private void Awake()
     {
@@ -54,7 +55,6 @@ class SimulcastSample : MonoBehaviour
 
     private void Start()
     {
-        pc1Senders = new List<RTCRtpSender>();
         callButton.interactable = false;
         restartButton.interactable = false;
         hangUpButton.interactable = false;
@@ -63,6 +63,24 @@ class SimulcastSample : MonoBehaviour
         pc2OnIceConnectionChange = state => { OnIceConnectionChange(_pc2, state); };
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
+
+        foreach(var paramters in encoderParameters)
+        {
+            paramters.optionMaxBitrate.options = optionBitrate.Select(bitrate => new Dropdown.OptionData { text = bitrate.ToString() }).ToList();
+            paramters.optionMinBitrate.options = optionBitrate.Select(bitrate => new Dropdown.OptionData { text = bitrate.ToString() }).ToList();
+            paramters.optionScaleResolution.options = optionScaleResolution.Select(scaleResolution => new Dropdown.OptionData { text = $"1/{scaleResolution}" }).ToList();
+        }
+
+        encoderParameters[0].optionMaxBitrate.value = 1; // 150
+        encoderParameters[0].optionMinBitrate.value = 0; // 100
+        encoderParameters[0].optionScaleResolution.value = 2; // 1/4
+        encoderParameters[1].optionMaxBitrate.value = 4; // 400
+        encoderParameters[1].optionMinBitrate.value = 3; // 300
+        encoderParameters[1].optionScaleResolution.value = 1; // 1/2
+        encoderParameters[2].optionMaxBitrate.value = 7; // 1100
+        encoderParameters[2].optionMinBitrate.value = 6; // 800
+        encoderParameters[2].optionScaleResolution.value = 0; // 1/1
+
         pc2Ontrack = e =>
         {
             receiveStream.AddTrack(e.Track);
@@ -71,12 +89,10 @@ class SimulcastSample : MonoBehaviour
 
         receiveStream.OnAddTrack = e =>
         {
-            Debug.Log("OnAddTrack");
             if (e.Track is VideoStreamTrack track)
             {
                 track.OnVideoReceived += tex =>
                 {
-                    Debug.Log("OnVideoReceived");
                     receiveImage.texture = tex;
                     receiveImage.color = Color.white;
                 };
@@ -118,61 +134,6 @@ class SimulcastSample : MonoBehaviour
     private void OnIceConnectionChange(RTCPeerConnection pc, RTCIceConnectionState state)
     {
         Debug.Log($"{GetName(pc)} IceConnectionState: {state}");
-
-        if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
-        {
-            StartCoroutine(CheckStats(pc));
-        }
-    }
-
-    // Display the video codec that is actually used.
-    IEnumerator CheckStats(RTCPeerConnection pc)
-    {
-        yield return new WaitForSeconds(0.1f);
-        if (pc == null)
-            yield break;
-
-        var op = pc.GetStats();
-        yield return op;
-        if (op.IsError)
-        {
-            Debug.LogErrorFormat("RTCPeerConnection.GetStats failed: {0}", op.Error);
-            yield break;
-        }
-
-        RTCStatsReport report = op.Value;
-        RTCIceCandidatePairStats activeCandidatePairStats = null;
-        RTCIceCandidateStats remoteCandidateStats = null;
-
-        foreach (var transportStatus in report.Stats.Values.OfType<RTCTransportStats>())
-        {
-            if (report.Stats.TryGetValue(transportStatus.selectedCandidatePairId, out var tmp))
-            {
-                activeCandidatePairStats = tmp as RTCIceCandidatePairStats;
-            }
-        }
-
-        if (activeCandidatePairStats == null || string.IsNullOrEmpty(activeCandidatePairStats.remoteCandidateId))
-        {
-            yield break;
-        }
-
-        foreach (var iceCandidateStatus in report.Stats.Values.OfType<RTCIceCandidateStats>())
-        {
-            if (iceCandidateStatus.Id == activeCandidatePairStats.remoteCandidateId)
-            {
-                remoteCandidateStats = iceCandidateStatus;
-            }
-        }
-
-        if (remoteCandidateStats == null || string.IsNullOrEmpty(remoteCandidateStats.Id))
-        {
-            yield break;
-        }
-
-        Debug.Log($"{GetName(pc)} candidate stats Id:{remoteCandidateStats.Id}, Type:{remoteCandidateStats.candidateType}");
-        var updateText = GetName(pc) == "pc1" ? localCandidateId : remoteCandidateId;
-        updateText.text = remoteCandidateStats.Id;
     }
 
     IEnumerator PeerNegotiationNeeded(RTCPeerConnection pc)
@@ -204,28 +165,28 @@ class SimulcastSample : MonoBehaviour
         encoder = new RTCRtpEncodingParameters();
         encoder.rid = "l";
         encoder.active = true;
-        encoder.maxBitrate = 150 * 1024;
-        encoder.minBitrate = 100 * 1024;
         encoder.maxFramerate = 30;
-        encoder.scaleResolutionDownBy = 4;
+        encoder.maxBitrate = optionBitrate[encoderParameters[0].optionMaxBitrate.value] * 1024;
+        encoder.minBitrate = optionBitrate[encoderParameters[0].optionMinBitrate.value] * 1024;
+        encoder.scaleResolutionDownBy = optionScaleResolution[encoderParameters[0].optionScaleResolution.value];
         parameters.Add(encoder);
 
         encoder = new RTCRtpEncodingParameters();
         encoder.rid = "m";
         encoder.active = true;
-        encoder.maxBitrate = 350 * 1024;
-        encoder.minBitrate = 300 * 1024;
         encoder.maxFramerate = 30;
-        encoder.scaleResolutionDownBy = 2;
+        encoder.maxBitrate = optionBitrate[encoderParameters[1].optionMaxBitrate.value] * 1024;
+        encoder.minBitrate = optionBitrate[encoderParameters[1].optionMinBitrate.value] * 1024;
+        encoder.scaleResolutionDownBy = optionScaleResolution[encoderParameters[1].optionScaleResolution.value];
         parameters.Add(encoder);
 
         encoder = new RTCRtpEncodingParameters();
         encoder.rid = "h";
         encoder.active = true;
-        encoder.maxBitrate = 1200 * 1024;
-        encoder.minBitrate = 1150 * 1024;
         encoder.maxFramerate = 30;
-        encoder.scaleResolutionDownBy = 1;
+        encoder.maxBitrate = optionBitrate[encoderParameters[2].optionMaxBitrate.value] * 1024;
+        encoder.minBitrate = optionBitrate[encoderParameters[2].optionMinBitrate.value] * 1024;
+        encoder.scaleResolutionDownBy = optionScaleResolution[encoderParameters[2].optionScaleResolution.value];
         parameters.Add(encoder);
 
         RTCRtpTransceiverInit init = new RTCRtpTransceiverInit();
@@ -266,6 +227,13 @@ class SimulcastSample : MonoBehaviour
         hangUpButton.interactable = true;
         restartButton.interactable = true;
 
+        foreach(var parameters in encoderParameters)
+        {
+            parameters.optionMaxBitrate.interactable = false;
+            parameters.optionMinBitrate.interactable = false;
+            parameters.optionScaleResolution.interactable = false;
+        }
+
         var configuration = GetSelectedSdpSemantics();
         _pc1 = new RTCPeerConnection(ref configuration);
         _pc1.OnIceCandidate = pc1OnIceCandidate;
@@ -301,25 +269,19 @@ class SimulcastSample : MonoBehaviour
         restartButton.interactable = false;
         hangUpButton.interactable = false;
 
+        foreach (var parameters in encoderParameters)
+        {
+            parameters.optionMaxBitrate.interactable = true;
+            parameters.optionMinBitrate.interactable = true;
+            parameters.optionScaleResolution.interactable = true;
+        }
+
+
         receiveImage.color = Color.black;
     }
 
     private void OnIceCandidate(RTCPeerConnection pc, RTCIceCandidate candidate)
     {
-        switch ((ProtocolOption)dropDownProtocol.value)
-        {
-            case ProtocolOption.Default:
-                break;
-            case ProtocolOption.UDP:
-                if (candidate.Protocol != RTCIceProtocol.Udp)
-                    return;
-                break;
-            case ProtocolOption.TCP:
-                if (candidate.Protocol != RTCIceProtocol.Tcp)
-                    return;
-                break;
-        }
-
         GetOtherPc(pc).AddIceCandidate(candidate);
         Debug.Log($"{GetName(pc)} ICE candidate:\n {candidate.Candidate}");
     }
