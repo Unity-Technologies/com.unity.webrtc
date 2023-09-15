@@ -156,11 +156,11 @@ namespace Unity.WebRTC
 
             var dest = CreateRenderTexture(texture.width, texture.height);
 
+            m_source = source;
             if (copyTexture != null)
             {
                 m_source.copyTexture_ = copyTexture;
             }
-            m_source = source;
             m_source.sourceTexture_ = texture;
             m_source.destTexture_ = dest;
             m_source.destTexturePtr_ = dest.GetNativeTexturePtr();
