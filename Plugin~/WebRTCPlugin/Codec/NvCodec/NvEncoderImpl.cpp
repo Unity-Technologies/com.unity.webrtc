@@ -13,6 +13,7 @@
 #include <common_video/h264/h264_common.h>
 #include <media/base/media_constants.h>
 #include <modules/video_coding/include/video_codec_interface.h>
+#include <modules/video_coding/utility/simulcast_utility.h>
 
 #include "Codec/H264ProfileLevelId.h"
 #include "Codec/NvCodec/NvEncoderCudaWithCUarray.h"
@@ -154,8 +155,6 @@ namespace webrtc
         , m_encoder(nullptr)
         , m_format(format)
         , m_encodedCompleteCallback(nullptr)
-        , m_encode_fps(1000, 1000)
-        , m_clock(Clock::GetRealTimeClock())
         , m_profiler(profiler)
     {
         RTC_CHECK(absl::EqualsIgnoreCase(codec.name, cricket::kH264CodecName));
@@ -188,6 +187,7 @@ namespace webrtc
         VideoEncoder::EncoderInfo info;
         info.implementation_name = "NvCodec";
         info.is_hardware_accelerated = true;
+        info.supports_native_handle = true;
         return info;
     }
 
@@ -204,6 +204,14 @@ namespace webrtc
         if (codec->width < 1 || codec->height < 1)
         {
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
+        }
+
+        int number_of_streams = SimulcastUtility::NumberOfSimulcastStreams(*codec);
+        bool doing_simulcast = (number_of_streams > 1);
+
+        if (doing_simulcast && !SimulcastUtility::ValidSimulcastParameters(*codec, number_of_streams))
+        {
+            return WEBRTC_VIDEO_CODEC_ERR_SIMULCAST_PARAMETERS_NOT_SUPPORTED;
         }
 
         m_codec = *codec;
@@ -236,11 +244,10 @@ namespace webrtc
             return ret;
         }
 
-        const int number_of_streams = 1;
         m_configurations.resize(number_of_streams);
 
         const CUresult result = cuCtxSetCurrent(m_context);
-        if (!ck(result))
+        if (result != CUDA_SUCCESS)
         {
             return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
         }
@@ -279,9 +286,6 @@ namespace webrtc
         m_configurations[0].key_frame_interval = m_codec.H264()->keyFrameInterval;
         m_configurations[0].max_bps = m_codec.maxBitrate * 1000;
         m_configurations[0].target_bps = m_codec.startBitrate * 1000;
-
-        m_bitrateAdjuster = std::make_unique<BitrateAdjuster>(0.5f, 0.95f);
-        m_bitrateAdjuster->SetTargetBitrateBps(m_configurations[0].target_bps);
 
         m_initializeParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
         m_encodeConfig.version = NV_ENC_CONFIG_VER;
@@ -416,17 +420,13 @@ namespace webrtc
 
     int32_t NvEncoderImpl::Encode(const ::webrtc::VideoFrame& frame, const std::vector<VideoFrameType>* frameTypes)
     {
-        RTC_DCHECK_EQ(frame.width(), m_codec.width);
-        RTC_DCHECK_EQ(frame.height(), m_codec.height);
-
         if (!m_encoder)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
         if (!m_encodedCompleteCallback)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
 
         auto frameBuffer = frame.video_frame_buffer();
-        if (frameBuffer->type() != VideoFrameBuffer::Type::kNative || frameBuffer->width() != m_codec.width ||
-            frameBuffer->height() != m_codec.height)
+        if (frameBuffer->type() != VideoFrameBuffer::Type::kNative)
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
 
         auto videoFrameBuffer = static_cast<ScalableBufferInterface*>(frameBuffer.get());
@@ -451,40 +451,45 @@ namespace webrtc
             }
         }
 
-        Size encodeSize(m_encoder->GetEncodeWidth(), m_encoder->GetEncodeHeight());
-
-        const NvEncInputFrame* encoderInputFrame = m_encoder->GetNextInputFrame();
-
-        // Copy CUDA buffer in VideoFrame to encoderInputFrame.
-        auto buffer = video_frame->GetGpuMemoryBuffer();
-        if (!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
-            return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
-
-        NV_ENC_PIC_PARAMS picParams = NV_ENC_PIC_PARAMS();
-        picParams.version = NV_ENC_PIC_PARAMS_VER;
-        picParams.encodePicFlags = 0;
-        if (send_key_frame)
+        try
         {
-            picParams.encodePicFlags =
-                NV_ENC_PIC_FLAG_FORCEINTRA | NV_ENC_PIC_FLAG_FORCEIDR | NV_ENC_PIC_FLAG_OUTPUT_SPSPPS;
-            m_configurations[0].key_frame_request = false;
-        }
+            Size encodeSize(m_encoder->GetEncodeWidth(), m_encoder->GetEncodeHeight());
 
-        std::vector<std::vector<uint8_t>> vPacket;
-        m_encoder->EncodeFrame(vPacket, &picParams);
+            const NvEncInputFrame* encoderInputFrame = m_encoder->GetNextInputFrame();
 
-        for (std::vector<uint8_t>& packet : vPacket)
-        {
-            int32_t result = ProcessEncodedFrame(packet, frame);
-            if (result != WEBRTC_VIDEO_CODEC_OK)
+            // Copy CUDA buffer in VideoFrame to encoderInputFrame.
+            auto buffer = video_frame->GetGpuMemoryBuffer();
+            if (!CopyResource(encoderInputFrame, buffer, encodeSize, m_context, m_memoryType))
+                return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
+
+            NV_ENC_PIC_PARAMS picParams = NV_ENC_PIC_PARAMS();
+            picParams.version = NV_ENC_PIC_PARAMS_VER;
+            picParams.encodePicFlags = 0;
+            if (send_key_frame)
             {
-                return result;
+                picParams.encodePicFlags =
+                    NV_ENC_PIC_FLAG_FORCEINTRA | NV_ENC_PIC_FLAG_FORCEIDR | NV_ENC_PIC_FLAG_OUTPUT_SPSPPS;
+                m_configurations[0].key_frame_request = false;
             }
-            m_bitrateAdjuster->Update(packet.size());
 
-            int64_t now_ms = m_clock->TimeInMilliseconds();
-            m_encode_fps.Update(1, now_ms);
+            std::vector<std::vector<uint8_t>> vPacket;
+            m_encoder->EncodeFrame(vPacket, &picParams);
+
+            for (std::vector<uint8_t>& packet : vPacket)
+            {
+                int32_t result = ProcessEncodedFrame(packet, frame);
+                if (result != WEBRTC_VIDEO_CODEC_OK)
+                {
+                    return result;
+                }
+            }
         }
+        catch (const NVENCException& e)
+        {
+            RTC_LOG(LS_ERROR) << "Failed EncodeFrame NvEncoder " << e.what();
+            return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
+        }
+
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
@@ -552,11 +557,8 @@ namespace webrtc
             return;
         }
 
-        m_bitrateAdjuster->SetTargetBitrateBps(parameters.bitrate.get_sum_bps());
-        const uint32_t bitrate = m_bitrateAdjuster->GetAdjustedBitrateBps();
-
         m_codec.maxFramerate = static_cast<uint32_t>(parameters.framerate_fps);
-        m_codec.maxBitrate = bitrate;
+        m_codec.maxBitrate = parameters.bitrate.GetSpatialLayerSum(0);
 
         // Check required level.
         auto requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
