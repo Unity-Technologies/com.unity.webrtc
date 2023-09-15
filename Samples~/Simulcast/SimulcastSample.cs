@@ -64,7 +64,7 @@ class SimulcastSample : MonoBehaviour
         pc1OnIceCandidate = candidate => { OnIceCandidate(_pc1, candidate); };
         pc2OnIceCandidate = candidate => { OnIceCandidate(_pc2, candidate); };
 
-        foreach(var paramters in encoderParameters)
+        foreach (var paramters in encoderParameters)
         {
             paramters.optionMaxBitrate.options = optionBitrate.Select(bitrate => new Dropdown.OptionData { text = bitrate.ToString() }).ToList();
             paramters.optionMinBitrate.options = optionBitrate.Select(bitrate => new Dropdown.OptionData { text = bitrate.ToString() }).ToList();
@@ -227,7 +227,7 @@ class SimulcastSample : MonoBehaviour
         hangUpButton.interactable = true;
         restartButton.interactable = true;
 
-        foreach(var parameters in encoderParameters)
+        foreach (var parameters in encoderParameters)
         {
             parameters.optionMaxBitrate.interactable = false;
             parameters.optionMinBitrate.interactable = false;
