@@ -231,13 +231,12 @@ namespace webrtc
             return false;
         }
 
-        if (m_unityVulkan != nullptr)
+        VkFence fence = destTexture->GetFence();
+        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
+        if (result != VK_SUCCESS)
         {
-            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
-        }
-        else
-        {
-            AccessQueueCallback(0, dest);
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
+            return false;
         }
 
         return true;
@@ -324,15 +323,13 @@ namespace webrtc
             return false;
         }
 
-        if (m_unityVulkan != nullptr)
+        VkFence fence = destTexture->GetFence();
+        result = QueueSubmit(m_graphicsQueue, commandBuffer, fence);
+        if (result != VK_SUCCESS)
         {
-            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, dest, false);
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
+            return false;
         }
-        else
-        {
-            AccessQueueCallback(0, dest);
-        }
-
         return true;
     }
 
@@ -458,18 +455,5 @@ namespace webrtc
         }
         return true;
     }
-
-    void VulkanGraphicsDevice::AccessQueueCallback(int eventID, void* data)
-    {
-        VulkanTexture2D* texture = reinterpret_cast<VulkanTexture2D*>(data);
-
-        VkResult qResult =
-            QueueSubmit(s_GraphicsDevice->m_graphicsQueue, texture->GetCommandBuffer(), texture->GetFence());
-        if (qResult != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << qResult;
-        }
-    }
-
 } // end namespace webrtc
 } // end namespace unity

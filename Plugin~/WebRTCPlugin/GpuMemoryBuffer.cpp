@@ -83,7 +83,9 @@ namespace webrtc
         if (!device_->WaitSync(textureCpuRead_.get(), timeout.count()))
         {
             RTC_LOG(LS_INFO) << "WaitSync failed.";
-            return nullptr;
+
+            // returns buffer because the video encoders don't check nullptr.
+            return I420Buffer::Create(textureCpuRead_->GetWidth(), textureCpuRead_->GetHeight());
         }
         return device_->ConvertRGBToI420(textureCpuRead_.get());
     }

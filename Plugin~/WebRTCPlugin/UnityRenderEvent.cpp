@@ -102,10 +102,9 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
             /// managed code.
             UnityVulkanPluginEventConfig batchUpdateEventConfig;
-            batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
+            batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_Allow;
             batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
-            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
-                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission;
 
             vulkan->ConfigureEvent(s_batchUpdateEventID, &batchUpdateEventConfig);
         }
