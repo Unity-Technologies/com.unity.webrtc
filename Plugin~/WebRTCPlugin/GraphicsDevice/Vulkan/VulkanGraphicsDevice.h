@@ -7,6 +7,7 @@
 #include <vulkan/vulkan.h>
 
 #include "PlatformBase.h"
+#include "VulkanUtility.h"
 
 #if CUDA_PLATFORM
 #include "GraphicsDevice/Cuda/CudaContext.h"
@@ -21,6 +22,7 @@ namespace webrtc
     using namespace ::webrtc;
 
     class UnityGraphicsVulkan;
+    class VulkanTexture2D;
     class VulkanGraphicsDevice : public IGraphicsDevice
     {
     public:
@@ -65,13 +67,14 @@ namespace webrtc
     private:
         bool LookupUnityVulkanImage(VkImage src, UnityVulkanImage* outImage, bool* setLayout, VkImageLayout layout);
 
-        VkCommandBuffer GetCommandBuffer();
-        void SubmitCommandBuffer();
+        VkCommandBuffer GetCommandBuffer(VulkanTexture2D* texture);
+        void SubmitCommandBuffer(VulkanTexture2D* texture);
 
         UnityGraphicsVulkan* m_unityVulkan;
         UnityVulkanInstance m_Instance;
         bool m_hasHostCachedMemory;
 
+#if VULKAN_USE_CRS
         // No access to VkFence internals through rendering plugin, track safe frame numbers
         UnityVulkanRecordingState m_LastState;
         std::mutex m_LastStateMtx;
@@ -81,6 +84,11 @@ namespace webrtc
         VkCommandPool m_commandPool;
         VkCommandBuffer m_commandBuffer;
         VkFence m_fence;
+#else
+        static void AccessQueueCallback(int eventID, void* data);
+        VkResult CreateCommandPool();
+        VkCommandPool m_commandPool;
+#endif
 
 #if CUDA_PLATFORM
         bool InitCudaContext();

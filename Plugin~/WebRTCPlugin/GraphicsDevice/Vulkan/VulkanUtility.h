@@ -1,5 +1,8 @@
 #pragma once
 
+// Texture synchronization against IUnityGraphicsVulkan::CommandRecordingState
+#define VULKAN_USE_CRS 0
+
 #include <array>
 
 #include <IUnityGraphicsVulkan.h>

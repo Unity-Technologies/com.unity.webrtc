@@ -14,8 +14,12 @@ namespace webrtc
         VulkanTexture2D(const uint32_t w, const uint32_t h);
         virtual ~VulkanTexture2D() override;
 
-        bool Init(const UnityVulkanInstance* instance);
-        bool InitStaging(const UnityVulkanInstance* instance, bool writable, bool hasHostCachedMemory);
+        bool Init(const UnityVulkanInstance* instance, const VkCommandPool commandPool);
+        bool InitStaging(
+            const UnityVulkanInstance* instance,
+            const VkCommandPool commandPool,
+            bool writable,
+            bool hasHostCachedMemory);
         void Shutdown();
 
         void* GetNativeTexturePtrV() override { return m_unityVulkanImage.image; }
@@ -31,8 +35,18 @@ namespace webrtc
 
         size_t GetPitch() const { return m_rowPitch; }
 
+#if VULKAN_USE_CRS
         void ResetFrameNumber() const { currentFrameNumber = 0; }
         mutable unsigned long long currentFrameNumber = 0;
+#else
+        bool CreateFence();
+        VkFence GetFence() const { return m_fence; }
+        VkCommandBuffer GetCommandBuffer() const { return m_commandBuffer; }
+
+        VkCommandPool m_commandPool;
+        VkCommandBuffer m_commandBuffer;
+        VkFence m_fence;
+#endif
 
     private:
         UnityVulkanInstance m_Instance = {};
