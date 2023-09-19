@@ -85,7 +85,6 @@ namespace webrtc
         VkCommandBuffer m_commandBuffer;
         VkFence m_fence;
 #else
-        static void AccessQueueCallback(int eventID, void* data);
         VkResult CreateCommandPool();
         VkCommandPool m_commandPool;
 #endif

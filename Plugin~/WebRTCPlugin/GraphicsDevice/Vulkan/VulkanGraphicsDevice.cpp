@@ -19,10 +19,6 @@ namespace unity
 {
 namespace webrtc
 {
-#if !VULKAN_USE_CRS
-    static VulkanGraphicsDevice* s_GraphicsDevice = nullptr;
-#endif
-
     VulkanGraphicsDevice::VulkanGraphicsDevice(
         UnityGraphicsVulkan* unityVulkan,
         const UnityVulkanInstance* unityVulkanInstance,
@@ -62,7 +58,6 @@ namespace webrtc
 #if VULKAN_USE_CRS
         return true;
 #else
-        s_GraphicsDevice = this;
         return VK_SUCCESS == CreateCommandPool();
 #endif
     }
@@ -100,7 +95,6 @@ namespace webrtc
         VULKAN_SAFE_DESTROY_COMMAND_POOL(m_Instance.device, m_commandPool, VK_NULL_HANDLE)
 #else
         VULKAN_SAFE_DESTROY_COMMAND_POOL(m_Instance.device, m_commandPool, VK_NULL_HANDLE)
-        s_GraphicsDevice = nullptr;
 #endif
     }
 
@@ -112,18 +106,6 @@ namespace webrtc
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
         return vkQueueSubmit(queue, 1, &submitInfo, fence);
-    }
-
-    void VulkanGraphicsDevice::AccessQueueCallback(int eventID, void* data)
-    {
-        VulkanTexture2D* texture = reinterpret_cast<VulkanTexture2D*>(data);
-
-        VkResult qResult =
-            QueueSubmit(s_GraphicsDevice->m_Instance.graphicsQueue, texture->GetCommandBuffer(), texture->GetFence());
-        if (qResult != VK_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << qResult;
-        }
     }
 
     VkResult VulkanGraphicsDevice::CreateCommandPool()
@@ -239,13 +221,11 @@ namespace webrtc
             return;
         }
 
-        if (m_unityVulkan != nullptr)
+        result = QueueSubmit(m_Instance.graphicsQueue, commandBuffer, texture->GetFence());
+        if (result != VK_SUCCESS)
         {
-            m_unityVulkan->AccessQueue(AccessQueueCallback, 0, texture, false);
-        }
-        else
-        {
-            AccessQueueCallback(0, texture);
+            RTC_LOG(LS_ERROR) << "vkQueueSubmit failed. result:" << result;
+            return;
         }
 #endif
     }

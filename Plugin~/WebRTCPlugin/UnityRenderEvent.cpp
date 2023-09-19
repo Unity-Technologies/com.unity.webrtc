@@ -11,6 +11,7 @@
 
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
+#include "GraphicsDevice/Vulkan/VulkanUtility.h"
 #include "UnityVulkanInterfaceFunctions.h"
 #endif
 
@@ -101,9 +102,15 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
             /// managed code.
             UnityVulkanPluginEventConfig batchUpdateEventConfig;
+#if VULKAN_USE_CRS
             batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
             batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
             batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+#else
+            batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_Allow;
+            batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
+            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission;
+#endif
 
             vulkan->ConfigureEvent(s_batchUpdateEventID, &batchUpdateEventConfig);
         }
