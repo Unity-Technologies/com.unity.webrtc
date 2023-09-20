@@ -32,7 +32,6 @@ class ChangeCodecsSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private bool videoUpdateStarted;
 
     private readonly string[] excludeCodecMimeType = { "video/red", "video/ulpfec", "video/rtx" };
     private RTCRtpCodecCapability[] availableCodecs;
@@ -164,11 +163,6 @@ class ChangeCodecsSample : MonoBehaviour
         foreach (var track in videoStream.GetTracks())
         {
             pc1Senders.Add(_pc1.AddTrack(track, videoStream));
-        }
-
-        if (!videoUpdateStarted)
-        {
-            videoUpdateStarted = true;
         }
 
         RTCRtpCodecCapability[] codecs = null;

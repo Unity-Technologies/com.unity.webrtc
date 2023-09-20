@@ -175,7 +175,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(sources1, Is.Empty);
 
             yield return test;
-            test.component.CoroutineUpdate();
 
             // wait for OnNegotiationNeeded callback in SignalingPeers class
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
