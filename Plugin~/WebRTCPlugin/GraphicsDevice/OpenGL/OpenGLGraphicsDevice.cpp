@@ -7,7 +7,7 @@
 
 #include "third_party/libyuv/include/libyuv.h"
 
-#include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLTexture2D.h"
 

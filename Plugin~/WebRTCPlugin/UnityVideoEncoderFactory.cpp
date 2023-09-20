@@ -6,7 +6,7 @@
 #include <tuple>
 
 #include "Codec/CreateVideoCodecFactory.h"
-#include "GraphicsDevice/GraphicsUtility.h"
+#include "GraphicsDevice/IGraphicsDevice.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityVideoEncoderFactory.h"

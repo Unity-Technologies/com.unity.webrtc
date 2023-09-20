@@ -1,5 +1,8 @@
 #pragma once
 
+// Texture synchronization against IUnityGraphicsVulkan::CommandRecordingState
+#define VULKAN_USE_CRS 0
+
 #include <array>
 
 #include <IUnityGraphicsVulkan.h>
@@ -48,12 +51,12 @@ namespace webrtc
 
         static VkResult DoImageLayoutTransition(
             const VkCommandBuffer commandBuffer,
-            const VkImage image,
-            const VkFormat format,
+            UnityVulkanImage* unityImage,
             const VkImageLayout oldLayout,
             const VkPipelineStageFlags oldStage,
             const VkImageLayout newLayout,
-            const VkPipelineStageFlags newStage);
+            const VkPipelineStageFlags newStage,
+            bool saveLayout = false);
 
         static VkResult CopyImage(
             const VkCommandBuffer commandBuffer,

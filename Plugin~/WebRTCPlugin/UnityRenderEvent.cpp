@@ -3,7 +3,6 @@
 #include "Context.h"
 #include "GpuMemoryBufferPool.h"
 #include "GraphicsDevice/GraphicsDevice.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 #include "ProfilerMarkerFactory.h"
 #include "ScopedProfiler.h"
 #include "UnityProfilerInterfaceFunctions.h"
@@ -12,6 +11,7 @@
 
 #if defined(SUPPORT_VULKAN)
 #include "GraphicsDevice/Vulkan/UnityVulkanInitCallback.h"
+#include "GraphicsDevice/Vulkan/VulkanUtility.h"
 #include "UnityVulkanInterfaceFunctions.h"
 #endif
 
@@ -102,10 +102,15 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             /// Configure the event on the rendering thread called from CommandBuffer::IssuePluginEventAndData method in
             /// managed code.
             UnityVulkanPluginEventConfig batchUpdateEventConfig;
+#if VULKAN_USE_CRS
             batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
             batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
-            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
-                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+#else
+            batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_Allow;
+            batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
+            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission;
+#endif
 
             vulkan->ConfigureEvent(s_batchUpdateEventID, &batchUpdateEventConfig);
         }
@@ -271,7 +276,6 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
     }
 
     IGraphicsDevice* device = Plugin::GraphicsDevice();
-    UnityGfxRenderer gfxRenderer = device->GetGfxRenderer();
     Timestamp timestamp = s_clock->CurrentTime();
 
     if (!device->UpdateState())
@@ -299,12 +303,6 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
             }
 
             timestamp = s_clock->CurrentTime();
-            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
-            if (!ptr)
-            {
-                RTC_LOG(LS_ERROR) << "GraphicsUtility::TextureHandleToNativeGraphicsPtr returns nullptr.";
-                return;
-            }
             unity::webrtc::Size size(trackData->width, trackData->height);
 
             if (s_bufferPool->bufferCount() < kLimitBufferCount)
@@ -313,7 +311,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
                 if (s_ProfilerMarkerFactory)
                     profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
-                auto frame = s_bufferPool->CreateFrame(ptr, size, trackData->format, timestamp);
+                auto frame = s_bufferPool->CreateFrame(trackData->texture, size, trackData->format, timestamp);
                 source->OnFrameCaptured(std::move(frame));
             }
         }

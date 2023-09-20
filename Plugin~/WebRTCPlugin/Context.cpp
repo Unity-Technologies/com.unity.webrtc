@@ -8,7 +8,6 @@
 #include "AudioTrackSinkAdapter.h"
 #include "Context.h"
 #include "EncodedStreamTransformer.h"
-#include "GraphicsDevice/GraphicsUtility.h"
 #include "GraphicsDevice/IGraphicsDevice.h"
 #include "MediaStreamObserver.h"
 #include "UnityAudioDecoderFactory.h"
