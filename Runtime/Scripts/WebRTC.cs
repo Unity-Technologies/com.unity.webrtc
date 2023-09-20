@@ -793,6 +793,7 @@ namespace Unity.WebRTC
 
         internal static void DisposeInternal()
         {
+            s_syncContext?.Post(DestroyImmediate, s_obj);
             if (s_context != null)
             {
                 s_context.Dispose();
@@ -1018,6 +1019,7 @@ namespace Unity.WebRTC
         {
             var obj = state as UnityEngine.Object;
             UnityEngine.Object.DestroyImmediate(obj);
+            obj = null;
         }
 
         static void Destroy(object state)
