@@ -12,7 +12,7 @@ namespace Unity.WebRTC
         {
             set
             {
-                if(_coroutine != null)
+                if (_coroutine != null)
                     StopCoroutine(_coroutine);
                 _coroutine = StartCoroutine(value());
             }

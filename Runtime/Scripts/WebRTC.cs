@@ -632,7 +632,7 @@ namespace Unity.WebRTC
 #endif
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
-        private static ILogger s_logger;        
+        private static ILogger s_logger;
         private static GameObject s_obj;
 
         [RuntimeInitializeOnLoadMethod]
