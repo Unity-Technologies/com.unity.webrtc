@@ -30,6 +30,32 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public class AudioOptions
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool? echoCancellation;
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool? autoGainControl;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool? noiseSuppression;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool? highpassFilter;
+
+    }
+
+    /// <summary>
     ///
     /// </summary>
     public class AudioStreamTrack : MediaStreamTrack
@@ -184,8 +210,8 @@ namespace Unity.WebRTC
         /// <summary>
         ///
         /// </summary>
-        public AudioStreamTrack()
-            : this(Guid.NewGuid().ToString(), new AudioTrackSource())
+        public AudioStreamTrack(AudioOptions options = null)
+            : this(Guid.NewGuid().ToString(), new AudioTrackSource(options))
         {
         }
 
@@ -193,8 +219,8 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         /// <param name="source"></param>
-        public AudioStreamTrack(AudioSource source)
-            : this(Guid.NewGuid().ToString(), new AudioTrackSource())
+        public AudioStreamTrack(AudioSource source, AudioOptions options = null)
+            : this(Guid.NewGuid().ToString(), new AudioTrackSource(options))
         {
             if (source == null)
                 throw new ArgumentNullException("source", "AudioSource argument is null.");
@@ -206,8 +232,8 @@ namespace Unity.WebRTC
             _audioCapturer.sender = true;
         }
 
-        public AudioStreamTrack(AudioListener listener)
-            : this(Guid.NewGuid().ToString(), new AudioTrackSource())
+        public AudioStreamTrack(AudioListener listener, AudioOptions options = null)
+            : this(Guid.NewGuid().ToString(), new AudioTrackSource(options))
         {
             if (listener == null)
                 throw new ArgumentNullException("listener", "AudioListener argument is null.");
@@ -369,11 +395,38 @@ namespace Unity.WebRTC
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct AudioOptionsInternal
+    {
+        public OptionalBool echoCancellation;
+        public OptionalBool autoGainControl;
+        public OptionalBool noiseSuppression;
+        public OptionalBool highpassFilter;
+
+        public static explicit operator AudioOptionsInternal(AudioOptions origin)
+        {
+            AudioOptionsInternal dst = new AudioOptionsInternal
+            {
+                echoCancellation = origin.echoCancellation,
+                autoGainControl = origin.autoGainControl,
+                noiseSuppression = origin.noiseSuppression,
+                highpassFilter = origin.highpassFilter
+            };
+            return dst;
+        }
+    }
+
     internal class AudioTrackSource : RefCountedObject
     {
-        public AudioTrackSource() : base(WebRTC.Context.CreateAudioTrackSource())
+        public AudioTrackSource(AudioOptions options) : base(CreateAudioTrackSource(options))
         {
             WebRTC.Table.Add(self, this);
+        }
+
+        static IntPtr CreateAudioTrackSource(AudioOptions options)
+        {
+            var _options = options == null ? new AudioOptionsInternal() : (AudioOptionsInternal)options;
+            return WebRTC.Context.CreateAudioTrackSource(ref _options);
         }
 
         ~AudioTrackSource()

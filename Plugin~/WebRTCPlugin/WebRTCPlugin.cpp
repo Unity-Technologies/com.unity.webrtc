@@ -288,9 +288,29 @@ extern "C"
         return source.get();
     }
 
-    UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface* ContextCreateAudioTrackSource(Context* context)
+    struct AudioOptions
     {
-        rtc::scoped_refptr<AudioSourceInterface> source = context->CreateAudioSource();
+        Optional<bool> echoCancellation;
+        Optional<bool> autoGainControl;
+        Optional<bool> noiseSuppression;
+        Optional<bool> highpassFilter;
+
+        operator cricket::AudioOptions() const
+        {
+            cricket::AudioOptions dst = {};
+            dst.echo_cancellation = static_cast<absl::optional<bool>>(echoCancellation);
+            dst.auto_gain_control = static_cast<absl::optional<bool>>(autoGainControl);
+            dst.noise_suppression = static_cast<absl::optional<bool>>(noiseSuppression);
+            dst.highpass_filter = static_cast<absl::optional<bool>>(highpassFilter);
+            return dst;
+        }
+    };
+
+    UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface* ContextCreateAudioTrackSource(Context* context, const AudioOptions* options)
+    {
+        cricket::AudioOptions _options = *options;
+        rtc::scoped_refptr<AudioSourceInterface> source =
+            context->CreateAudioSource(_options);
         context->AddRefPtr(source);
         return source.get();
     }

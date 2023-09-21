@@ -229,7 +229,8 @@ namespace Unity.WebRTC.RuntimeTest
         public void AddAndRemoveAudioTrackToMediaStream()
         {
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
-            var source = NativeMethods.ContextCreateAudioTrackSource(context);
+            var options = new AudioOptionsInternal();
+            var source = NativeMethods.ContextCreateAudioTrackSource(context, ref options);
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio", source);
             NativeMethods.MediaStreamAddTrack(stream, track);
 
@@ -262,7 +263,8 @@ namespace Unity.WebRTC.RuntimeTest
             var stream = NativeMethods.ContextCreateMediaStream(context, "MediaStream");
             var streamId = NativeMethods.MediaStreamGetID(stream).AsAnsiStringWithFreeMem();
             Assert.IsNotEmpty(streamId);
-            var source = NativeMethods.ContextCreateAudioTrackSource(context);
+            var options = new AudioOptionsInternal();
+            var source = NativeMethods.ContextCreateAudioTrackSource(context, ref options);
             var track = NativeMethods.ContextCreateAudioTrack(context, "audio", source);
             var error = NativeMethods.PeerConnectionAddTrack(peer, track, streamId, out var sender);
             Assert.That(error, Is.EqualTo(RTCErrorType.None));

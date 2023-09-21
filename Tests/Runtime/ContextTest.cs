@@ -80,7 +80,8 @@ namespace Unity.WebRTC.RuntimeTest
         public void CreateAndDeleteAudioTrack()
         {
             var context = WebRTC.Context;
-            var source = context.CreateAudioTrackSource();
+            var options = new AudioOptionsInternal();
+            var source = context.CreateAudioTrackSource(ref options);
             var track = context.CreateAudioTrack("audio", source);
             context.DeleteRefPtr(track);
             context.DeleteRefPtr(source);

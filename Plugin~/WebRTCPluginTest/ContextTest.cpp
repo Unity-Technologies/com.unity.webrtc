@@ -85,7 +85,7 @@ namespace webrtc
 
     TEST_P(ContextTest, CreateAndDeleteAudioTrack)
     {
-        const auto source = context->CreateAudioSource();
+        const auto source = context->CreateAudioSource(cricket::AudioOptions());
         EXPECT_NE(nullptr, source);
         const auto track = context->CreateAudioTrack("audio", source.get());
         EXPECT_NE(nullptr, track);
@@ -95,7 +95,7 @@ namespace webrtc
     {
         const auto stream = context->CreateMediaStream("audiostream");
         EXPECT_NE(nullptr, stream);
-        const auto source = context->CreateAudioSource();
+        const auto source = context->CreateAudioSource(cricket::AudioOptions());
         EXPECT_NE(nullptr, source);
         const auto track = context->CreateAudioTrack("audio", source.get());
         EXPECT_NE(nullptr, track);
