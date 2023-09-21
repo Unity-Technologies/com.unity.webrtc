@@ -306,11 +306,11 @@ extern "C"
         }
     };
 
-    UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface* ContextCreateAudioTrackSource(Context* context, const AudioOptions* options)
+    UNITY_INTERFACE_EXPORT webrtc::AudioSourceInterface*
+    ContextCreateAudioTrackSource(Context* context, const AudioOptions* options)
     {
         cricket::AudioOptions _options = *options;
-        rtc::scoped_refptr<AudioSourceInterface> source =
-            context->CreateAudioSource(_options);
+        rtc::scoped_refptr<AudioSourceInterface> source = context->CreateAudioSource(_options);
         context->AddRefPtr(source);
         return source.get();
     }
@@ -1408,9 +1408,11 @@ extern "C"
             return nullptr;
 
         std::vector<::RtpSource> result;
-        std::transform(sources.begin(), sources.end(), std::back_inserter(result), [](webrtc::RtpSource source) {
-            return source;
-        });
+        std::transform(
+            sources.begin(),
+            sources.end(),
+            std::back_inserter(result),
+            [](webrtc::RtpSource source) { return source; });
         return ConvertArray(result, length);
     }
 
