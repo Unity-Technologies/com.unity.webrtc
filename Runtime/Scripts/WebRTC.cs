@@ -640,13 +640,6 @@ namespace Unity.WebRTC
         {
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
-
-            // Instantiate GameObject for coroutine.
-            s_obj = new GameObject("webrtc");
-            s_obj.hideFlags = HideFlags.HideAndDontSave;
-            UnityEngine.Object.DontDestroyOnLoad(s_obj);
-            var comp = s_obj.AddComponent<UpdateCoroutine>();
-            comp.routine = UpdateInternal;
         }
 
         internal static void InitializeInternal(bool limitTextureSize = true, bool enableNativeLog = false,
@@ -668,6 +661,13 @@ namespace Unity.WebRTC
             s_context.limitTextureSize = limitTextureSize;
 
             NativeMethods.SetCurrentContext(s_context.self);
+
+            // Instantiate GameObject for coroutine.
+            s_obj = new GameObject("webrtc");
+            s_obj.hideFlags = HideFlags.HideAndDontSave;
+            UnityEngine.Object.DontDestroyOnLoad(s_obj);
+            var comp = s_obj.AddComponent<UpdateCoroutine>();
+            comp.routine = UpdateInternal;
         }
 
         /// <summary>
