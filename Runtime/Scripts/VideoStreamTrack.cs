@@ -28,7 +28,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// Flip vertically received video, change it befor start receive video
         /// </summary>
-        public static bool NeedReceivedVideoFlipVertically { get; set; } = false;
+        public static bool NeedReceivedVideoFlipVertically { get; set; } = true;
 
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
