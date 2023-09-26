@@ -418,7 +418,7 @@ namespace Unity.WebRTC
 
     internal class AudioTrackSource : RefCountedObject
     {
-        public AudioTrackSource(AudioOptions options) : base(CreateAudioTrackSource(options))
+        public AudioTrackSource(AudioOptions options = null) : base(CreateAudioTrackSource(options))
         {
             WebRTC.Table.Add(self, this);
         }
