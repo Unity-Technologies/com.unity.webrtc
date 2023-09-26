@@ -690,12 +690,10 @@ namespace Unity.WebRTC
                         track.UpdateTexture();
                         if (track.DataPtr != IntPtr.Zero)
                         {
-                            batch.data.tracks[trackIndex] = track.DataPtr;
+                            batch.tracks[trackIndex] = track.DataPtr;
                             trackIndex++;
                         }
                     }
-
-                    batch.data.tracksCount = trackIndex;
                     if (trackIndex > 0)
                         batch.Submit();
 

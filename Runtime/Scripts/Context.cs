@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -61,16 +63,16 @@ namespace Unity.WebRTC
         public struct BatchData
         {
             public int tracksCount;
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
-            public IntPtr[] tracks;
+            public IntPtr tracks;
         }
 
-        public BatchData data;
-        public IntPtr ptr;
+        public NativeArray<IntPtr> tracks;
+
+        BatchData data;
 
         public Batch()
         {
-            ResizeCapacity(1);
+            tracks = new NativeArray<IntPtr>(1, Allocator.Persistent);
         }
 
         ~Batch()
@@ -80,40 +82,30 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
-            if (ptr != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(ptr);
-                ptr = IntPtr.Zero;
-            }
+            tracks.Dispose();
         }
 
         public void ResizeCapacity(int totalTracks)
         {
-            const int roundedCapacity = 32;
-            int totalCapacity = ((totalTracks + roundedCapacity) / roundedCapacity) * roundedCapacity;
-
-            if (ptr != IntPtr.Zero && data.tracks.Length >= totalCapacity)
-                return;
-
-            data.tracksCount = 0;
-            data.tracks = new IntPtr[totalCapacity];
-
-            int size = Marshal.SizeOf(typeof(BatchData)) +
-                       Marshal.SizeOf(typeof(IntPtr)) * data.tracks.Length;
-
-            if (ptr == IntPtr.Zero)
-                ptr = Marshal.AllocHGlobal(size);
-            else
-                ptr = Marshal.ReAllocHGlobal(ptr, (IntPtr)size);
-            Marshal.StructureToPtr(data, ptr, false);
+            tracks.Dispose();
+            tracks = new NativeArray<IntPtr>(totalTracks, Allocator.Persistent);
         }
 
-        public void Submit(bool flush = false)
+        public unsafe IntPtr GetPtr()
         {
-            if (flush == false)
+            data.tracks = new IntPtr(tracks.GetUnsafePtr());
+            data.tracksCount = tracks.Length;
+            fixed (void* ptr = &data)
             {
-                Marshal.StructureToPtr(data, ptr, false);
-                WebRTC.Context.BatchUpdate(ptr);
+                return new IntPtr(ptr);
+            }
+        }
+
+        public unsafe void Submit(bool flush = false)
+        {
+            if (!flush)
+            {
+                WebRTC.Context.BatchUpdate(GetPtr());
             }
             else
             {

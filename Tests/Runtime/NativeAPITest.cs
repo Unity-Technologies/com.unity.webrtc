@@ -359,13 +359,11 @@ namespace Unity.WebRTC.RuntimeTest
             Batch batch = new Batch();
 
             int trackIndex = 0;
-            batch.data.tracks[trackIndex] = ptr;
-            batch.data.tracksCount = ++trackIndex;
+            batch.tracks[trackIndex] = ptr;
 
             yield return new WaitForSeconds(1.0f);
 
-            Marshal.StructureToPtr(batch.data, batch.ptr, false);
-            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.ptr);
+            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.GetPtr());
             VideoUpdateMethods.Flush();
 
             yield return new WaitForSeconds(1.0f);
@@ -414,15 +412,11 @@ namespace Unity.WebRTC.RuntimeTest
             Batch batch = new Batch();
 
             int trackIndex = 0;
-            batch.data.tracks[trackIndex] = ptr;
-            batch.data.tracksCount = ++trackIndex;
+            batch.tracks[trackIndex] = ptr;
 
             yield return new WaitForSeconds(1.0f);
 
-            Marshal.StructureToPtr(batch.data, batch.ptr, false);
-            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.ptr);
-
-            // this method is not supported on Direct3D12
+            VideoUpdateMethods.BatchUpdate(batchUpdateEvent, batchUpdateEventID, batch.GetPtr());
             VideoUpdateMethods.UpdateRendererTexture(updateTextureEvent, receiveTexture, rendererId);
             VideoUpdateMethods.Flush();
 
