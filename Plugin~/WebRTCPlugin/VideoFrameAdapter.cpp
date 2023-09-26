@@ -57,9 +57,8 @@ namespace webrtc
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::ScaledBuffer::CropAndScale(
         int offset_x, int offset_y, int crop_width, int crop_height, int scaled_width, int scaled_height)
     {
-        RTC_DCHECK_NOTREACHED();
-
-        return nullptr;
+        return rtc::make_ref_counted<ScaledBuffer>(
+            rtc::scoped_refptr<VideoFrameAdapter>(parent_), scaled_width, scaled_height);
     }
 
     VideoFrameAdapter::VideoFrameAdapter(rtc::scoped_refptr<VideoFrame> frame)
