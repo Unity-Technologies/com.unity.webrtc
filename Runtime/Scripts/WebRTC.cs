@@ -682,9 +682,9 @@ namespace Unity.WebRTC
                     batch.ResizeCapacity(VideoStreamTrack.s_tracks.Count);
 
                     int trackIndex = 0;
-                    foreach (var reference in VideoStreamTrack.s_tracks.Values)
+                    foreach (var pair in VideoStreamTrack.s_tracks)
                     {
-                        if (!reference.TryGetTarget(out var track))
+                        if (!pair.Value.TryGetTarget(out var track))
                             continue;
 
                         track.UpdateTexture();
