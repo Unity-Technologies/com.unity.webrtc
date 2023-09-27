@@ -682,8 +682,10 @@ namespace Unity.WebRTC
                     batch.ResizeCapacity(VideoStreamTrack.s_tracks.Count);
 
                     int trackIndex = 0;
-                    foreach (var pair in VideoStreamTrack.s_tracks)
+                    var enumerator = VideoStreamTrack.s_tracks.GetEnumerator();
+                    while (enumerator.MoveNext())
                     {
+                        var pair = enumerator.Current;
                         if (!pair.Value.TryGetTarget(out var track))
                             continue;
 
