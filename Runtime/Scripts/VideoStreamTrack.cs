@@ -148,7 +148,7 @@ namespace Unity.WebRTC
         public VideoStreamTrack(Texture texture, CopyTexture copyTexture = null)
             : base(CreateVideoTrack(texture, out var source))
         {
-            lock(s_tracks)
+            lock (s_tracks)
             {
                 if (s_tracks.ContainsKey(self))
                     throw new InvalidOperationException();
@@ -213,7 +213,7 @@ namespace Unity.WebRTC
                     }, 0.1f);
                 }
 
-                lock(s_tracks)
+                lock (s_tracks)
                 {
                     s_tracks.Remove(self);
                 }
