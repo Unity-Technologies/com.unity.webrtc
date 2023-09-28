@@ -28,7 +28,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// Flip vertically received video, change it befor start receive video
         /// </summary>
-        public static bool NeedReceivedVideoFlipVertically { get; set; } = false;
+        public static bool NeedReceivedVideoFlipVertically { get; set; } = true;
 
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
             new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
@@ -141,8 +141,8 @@ namespace Unity.WebRTC
         /// </summary>
         /// <param name="texture"></param>
         /// <param name="copyTexture">
-        /// By default, textures are copied as is, using Graphics.Blit,
-        /// use TextureCopyHelper for flip,
+        /// By default, textures are copied vertically flipped, using CopyTextureHelper.VerticalFlipCopy,
+        /// use Graphics.Blit for copy as is, CopyTextureHelper for flip,
         /// or write your own CopyTexture function</param>
         /// <exception cref="InvalidOperationException"></exception>
         public VideoStreamTrack(Texture texture, CopyTexture copyTexture = null)
@@ -157,10 +157,7 @@ namespace Unity.WebRTC
             var dest = CreateRenderTexture(texture.width, texture.height);
 
             m_source = source;
-            if (copyTexture != null)
-            {
-                m_source.copyTexture_ = copyTexture;
-            }
+            m_source.copyTexture_ = copyTexture ?? CopyTextureHelper.VerticalFlipCopy;
             m_source.sourceTexture_ = texture;
             m_source.destTexture_ = dest;
             m_source.destTexturePtr_ = dest.GetNativeTexturePtr();
@@ -335,7 +332,7 @@ namespace Unity.WebRTC
         internal Texture sourceTexture_;
         internal RenderTexture destTexture_;
         internal IntPtr destTexturePtr_;
-        internal CopyTexture copyTexture_ = Graphics.Blit;
+        internal CopyTexture copyTexture_;
 
         internal bool SyncApplicationFramerate
         {
