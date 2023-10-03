@@ -54,12 +54,6 @@ namespace webrtc
         if (impl == kNvCodecImpl)
         {
 #if CUDA_PLATFORM
-            HMODULE hModule = LoadLibrary(TEXT("nvEncodeAPI64.dll"));
-            if (hModule == NULL)
-            {
-                return nullptr;
-            }
-
             if (gfxDevice && gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
             {
                 CUcontext context = gfxDevice->GetCUcontext();

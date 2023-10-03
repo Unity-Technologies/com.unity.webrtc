@@ -31,6 +31,7 @@ namespace unity
 namespace webrtc
 {
     static void* s_hModule = nullptr;
+    static void* nvEncode_Module = nullptr;
     static bool FindModule()
     {
         if (s_hModule)
@@ -45,6 +46,14 @@ namespace webrtc
             return false;
         }
         s_hModule = module;
+
+        HMODULE module2 = LoadLibrary(TEXT("nvEncodeAPI64.dll"));
+        if (!module2)
+        {
+            RTC_LOG(LS_INFO) << "nvEncodeAPI64.dll is not found.";
+            return false;
+        }
+        nvEncode_Module = module2;
 #elif UNITY_LINUX
         s_hModule = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_GLOBAL);
         if (!s_hModule)
@@ -271,6 +280,13 @@ namespace webrtc
             dlclose(s_hModule);
 #endif
             s_hModule = nullptr;
+        }
+        if (nvEncode_Module)
+        {
+#if UNITY_WIN
+            FreeLibrary((HMODULE)nvEncode_Module);
+            nvEncode_Module = nullptr;
+#endif
         }
     }
 
