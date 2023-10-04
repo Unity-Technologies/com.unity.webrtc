@@ -92,11 +92,14 @@ On macOS, [homebrew](https://brew.sh/) is used to install CMake. XCode version *
 On Ubuntu (**WSL2** on Windows is also working well), 
 
 ```bash
-# Install Android NDK r21b
+# Download Android NDK r21b
 wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
 
+# Unzip the downloaded NDK file to home directory
+unzip android-ndk-r21b-linux-x86_64.zip -d ~/
+
 # Set Android NDK root path to `ANDROID_NDK` environment variable
-echo "export ANDROID_NDK=~/android-ndk-r21d/" >> ~/.profile
+echo "export ANDROID_NDK=~/android-ndk-r21b/" >> ~/.profile
 
 # Install CMake 3.24.3
 sudo apt install -y libssl-dev
