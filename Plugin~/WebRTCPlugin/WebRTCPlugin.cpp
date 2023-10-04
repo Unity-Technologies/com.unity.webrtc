@@ -1035,6 +1035,8 @@ extern "C"
         *dst = candidate->candidate();
     }
 
+    UNITY_INTERFACE_EXPORT void IceCandidateGetEmptyCandidate(Candidate* dst) { *dst = cricket::Candidate(); }
+
     UNITY_INTERFACE_EXPORT int32_t IceCandidateGetSdpLineIndex(const IceCandidateInterface* candidate)
     {
         return candidate->sdp_mline_index();
@@ -1388,9 +1390,11 @@ extern "C"
             return nullptr;
 
         std::vector<::RtpSource> result;
-        std::transform(sources.begin(), sources.end(), std::back_inserter(result), [](webrtc::RtpSource source) {
-            return source;
-        });
+        std::transform(
+            sources.begin(),
+            sources.end(),
+            std::back_inserter(result),
+            [](webrtc::RtpSource source) { return source; });
         return ConvertArray(result, length);
     }
 
