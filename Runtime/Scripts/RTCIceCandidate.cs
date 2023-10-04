@@ -249,7 +249,7 @@ namespace Unity.WebRTC
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
             RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
-            if(string.IsNullOrEmpty(candidateInfo.candidate))
+            if (string.IsNullOrEmpty(candidateInfo.candidate))
             {
                 NativeMethods.IceCandidateGetEmptyCandidate(out _candidate);
             }
