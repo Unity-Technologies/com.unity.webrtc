@@ -144,6 +144,11 @@ namespace Unity.WebRTC
                     return;
                 }
 
+                if (_filter != null)
+                {
+                    _filter.onAudioRead -= SetData;
+                    WebRTC.DestroyOnMainThread(_filter);
+                }
                 if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
                 {
                     if (_track != null && WebRTC.Table.ContainsKey(_track.self))
@@ -151,11 +156,6 @@ namespace Unity.WebRTC
                     WebRTC.Table.Remove(self);
                     WebRTC.Context.DeleteAudioTrackSink(self);
                     self = IntPtr.Zero;
-                }
-                if (_filter != null)
-                {
-                    _filter.onAudioRead -= SetData;
-                    WebRTC.DestroyOnMainThread(_filter);
                 }
                 this.disposed = true;
                 GC.SuppressFinalize(this);
