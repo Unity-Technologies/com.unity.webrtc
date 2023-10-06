@@ -63,6 +63,11 @@ namespace webrtc
         {
             return;
         }
+        if (!buffer)
+        {
+            RTC_LOG(LS_INFO) << "The video buffer is already released.";
+            return;
+        }
 
         if (m_frameBuffer == nullptr || m_frameBuffer->width() != buffer->width() ||
             m_frameBuffer->height() != buffer->height())
@@ -83,7 +88,7 @@ namespace webrtc
             tempBuffer.resize(size);
 
         // return a previous texture buffer when framebuffer is returned null.
-        if (frame == nullptr)
+        if (!frame)
             return tempBuffer.data();
 
         rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer;
