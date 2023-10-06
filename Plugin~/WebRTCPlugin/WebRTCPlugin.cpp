@@ -1390,11 +1390,9 @@ extern "C"
             return nullptr;
 
         std::vector<::RtpSource> result;
-        std::transform(
-            sources.begin(),
-            sources.end(),
-            std::back_inserter(result),
-            [](webrtc::RtpSource source) { return source; });
+        std::transform(sources.begin(), sources.end(), std::back_inserter(result), [](webrtc::RtpSource source) {
+            return source;
+        });
         return ConvertArray(result, length);
     }
 
