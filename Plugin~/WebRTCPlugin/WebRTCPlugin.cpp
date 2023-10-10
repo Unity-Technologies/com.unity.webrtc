@@ -302,6 +302,12 @@ extern "C"
             dst.auto_gain_control = static_cast<absl::optional<bool>>(autoGainControl);
             dst.noise_suppression = static_cast<absl::optional<bool>>(noiseSuppression);
             dst.highpass_filter = static_cast<absl::optional<bool>>(highpassFilter);
+#if defined(WEBRTC_IOS)
+            if (dst.echo_cancellation && dst.echo_cancellation.value())
+            {
+                dst.ios_force_software_aec_HACK = true;
+            }
+#endif
             return dst;
         }
     };
