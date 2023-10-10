@@ -173,6 +173,7 @@ namespace Unity.WebRTC
 
                 // Release buffers on the rendering thread
                 batch.Submit(true);
+                batch.Dispose();
 
                 NativeMethods.ContextDestroy(id);
                 self = IntPtr.Zero;
