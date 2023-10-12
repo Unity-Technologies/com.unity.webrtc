@@ -2,7 +2,8 @@
 
 <img src="https://img.shields.io/badge/unity-2020.3-green.svg?style=flat-square" alt="unity 2020.3">
 <img src="https://img.shields.io/badge/unity-2021.3-green.svg?style=flat-square" alt="unity 2021.3">
-<img src="https://img.shields.io/badge/unity-2022.1-green.svg?style=flat-square" alt="unity 2022.1">
+<img src="https://img.shields.io/badge/unity-2022.1-green.svg?style=flat-square" alt="unity 2022.3">
+<img src="https://img.shields.io/badge/unity-2022.1-green.svg?style=flat-square" alt="unity 2023.1">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
@@ -56,7 +57,7 @@ Please read this if you have an interest to customize native code in this projec
 | `3.0.0-pre.4` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Fix bugs | Jan 2023 |
 | `3.0.0-pre.5` | [M107](https://groups.google.com/g/discuss-webrtc/c/StVFkKuSRc8) | - Encoded Transform API | Apr 2023 |
 | `3.0.0-pre.6` | [M112](https://groups.google.com/g/discuss-webrtc/c/V-XFau9W9gY) | - Fix bugs | Jul 2023 |
-| `3.0.0-pre.7` | [M116](https://groups.google.com/g/discuss-webrtc/c/bEsO8Lz7psE) | - Fix bugs | Sep 2023 |
+| `3.0.0-pre.7` | [M116](https://groups.google.com/g/discuss-webrtc/c/bEsO8Lz7psE) | - Update libwebrtc M116 <br>- Simulcast for NVIDIA H.264 | Oct 2023 |
 
 ## Licenses
 

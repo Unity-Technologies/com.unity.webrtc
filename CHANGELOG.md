@@ -4,21 +4,30 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [3.0.0-pre.7] - 2023-09-30
+## [3.0.0-pre.7] - 2023-10-20
 
 ### Added
 
 - Add **Android x86_64** support experimentally.
+- Add an property `.CanTrickleIceCandidates` in `RTCPeerConnection` class.
+- Add an configurable logger in `WebRTC` class.
+- Support scale resolution for NVIDIA H.264 codec.
+- Support simulcast for NVIDIA H.264 codec.
+- Add an property `SyncApplicationFramerate` in `RTCRtpSender` class to improve latency of video streaming.
 
 ### Changed
 
+- Upgrade libwebrtc [M116](https://groups.google.com/g/discuss-webrtc/c/bEsO8Lz7psE).
 - Change Android API minimum level to **23** because the API level **22** is obsoleted on Unity2020.3 LTS.
 - Add `RTCDataChannel.onError` event.
+- Change a constructor of `VideoStreamTrack` to make simple to flip video texture.
 
 ### Fixed
 
 - Fix an issue when setting a scale factor of video encoding to a fractional scaling ratio.
 - Fix an occasional crash issue when using hardware encoder with D3D11 graphic device.
+- Fix an crash when `nvEncodeAPI64.dll` is not found on Windows.
+- Optimize audio sampling when using mute.
 
 ## [3.0.0-pre.6] - 2023-07-16
 
