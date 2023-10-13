@@ -82,7 +82,11 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
-            tracks.Dispose();
+            if(tracks.IsCreated)
+            {
+                tracks.Dispose();
+                tracks = default;
+            }
         }
 
         public void ResizeCapacity(int totalTracks)
