@@ -82,7 +82,7 @@ namespace Unity.WebRTC
 
         public void Dispose()
         {
-            if(tracks.IsCreated)
+            if (tracks.IsCreated)
             {
                 tracks.Dispose();
                 tracks = default;
