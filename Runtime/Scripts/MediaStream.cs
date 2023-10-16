@@ -115,10 +115,15 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// Add a new track to the stream.
         /// </summary>
+        /// <remarks>
+        /// This class keeps references of <see cref="MediaStreamTrack"/> to avoid GC.
+        /// Please call the <see cref="RemoveTrack(MediaStreamTrack)"/> method when it's no longer needed.
+        /// </remarks>
         /// <param name="track"></param>
         /// <returns></returns>
+        /// <seealso cref="RemoveTrack(MediaStreamTrack)"/>
         public bool AddTrack(MediaStreamTrack track)
         {
             cacheTracks.Add(track);
@@ -126,10 +131,11 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// Remove a new track to the stream.
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>
+        /// <seealso cref="AddTrack(MediaStreamTrack)"/>
         public bool RemoveTrack(MediaStreamTrack track)
         {
             cacheTracks.Remove(track);
