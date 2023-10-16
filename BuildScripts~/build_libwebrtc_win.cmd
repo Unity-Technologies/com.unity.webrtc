@@ -36,6 +36,9 @@ patch -N "src\third_party\abseil-cpp/absl/base/config.h" < "%COMMAND_DIR%\patche
 rem fix task_queue_base
 patch -N "src\api\task_queue\task_queue_base.h" < "%COMMAND_DIR%\patches\fix_task_queue_base.patch"
 
+rem fix SetRawImagePlanes() in LibvpxVp8Encoder
+patch -N "src\modules\video_coding\codecs\vp8\libvpx_vp8_encoder.cc" < "%COMMAND_DIR%\patches\libvpx_vp8_encoder.patch"
+
 mkdir "%ARTIFACTS_DIR%\lib"
 
 setlocal enabledelayedexpansion

@@ -33,6 +33,9 @@ patch -N "src/api/task_queue/BUILD.gn" < "$COMMAND_DIR/patches/disable_task_queu
 # add objc library to use videotoolbox
 patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
+# Fix SetRawImagePlanes() in LibvpxVp8Encoder
+patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
+
 # use included python
 export PATH="$(pwd)/depot_tools/bootstrap-3.8.0.chromium.8_bin/python/bin:$PATH"
 

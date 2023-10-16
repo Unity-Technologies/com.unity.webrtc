@@ -33,6 +33,9 @@ patch -N "src/api/task_queue/BUILD.gn" < "$COMMAND_DIR/patches/disable_task_queu
 # add objc library to use videotoolbox
 patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
 
+# Fix SetRawImagePlanes() in LibvpxVp8Encoder
+patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
+
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 for is_debug in "true" "false"
