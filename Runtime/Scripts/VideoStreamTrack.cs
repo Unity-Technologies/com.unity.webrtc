@@ -276,8 +276,12 @@ namespace Unity.WebRTC
     public static class CameraExtension
     {
         /// <summary>
-        ///
+        /// Create an instance of <see cref="VideoStreamTrack"/> to stream a camera.
         /// </summary>
+        /// <remarks>
+        /// You should keep a reference of <see cref="VideoStreamTrack"/>, created by this method.
+        /// This instance is collected by GC automatically if you don't own a reference.
+        /// </remarks>
         /// <param name="cam"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
