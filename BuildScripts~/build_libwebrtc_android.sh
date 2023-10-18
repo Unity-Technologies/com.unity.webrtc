@@ -42,6 +42,9 @@ patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutl
 patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
 patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
 
+# Fix SetRawImagePlanes() in LibvpxVp8Encoder
+patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
+
 # Fix AdaptedVideoTrackSource::video_adapter()
 pushd src
 patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
