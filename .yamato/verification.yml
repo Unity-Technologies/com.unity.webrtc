@@ -19,7 +19,7 @@ platforms:
   - name: Ubuntu 18.04
     agent: lin_18.04_bokken
     type: Unity::VM
-    image: katana-to-yamato/desktop-ubuntu-18.04-desktop-katana-git:v1.10-auto
+    image: desktop/ubuntu-18.04-desktop-unity:v2.1149605
     flavor: b1.large
     group: linux
   - name: macOS 10.14
