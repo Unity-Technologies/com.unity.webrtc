@@ -47,3 +47,10 @@ You must disable the bitcode option in Xcode project exported from Unity.
 - On the Xcode **Build Settings** tab, in the **Build Options** group, set Enable Bitcode to **No**.
 
 Or refer to the Unity Support's answer. https://support.unity.com/hc/en-us/articles/207942813-How-can-I-disable-Bitcode-support-
+
+## Known Issues
+
+- You might be able to find your issue in [GitHub Issues](https://github.com/Unity-Technologies/com.unity.webrtc/issues).
+- It is possible to get the framerate of video streaming to be drastically low when using Vulkan API Linux and Android. Please set **Don't Sync** in the Quality Settings Window.
+
+![VSync setting](images/vsync-setting.png)
