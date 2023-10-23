@@ -56,9 +56,17 @@ namespace webrtc
         return true;
     }
 
-    bool VulkanTexture2D::InitCpuRead(const UnityVulkanInstance* instance)
+    bool VulkanTexture2D::InitStaging(const UnityVulkanInstance* instance, bool writable, bool hasHostCachedMemory)
     {
         m_Instance = *instance;
+
+        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+
+        if (writable)
+            properties |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        else
+            properties |=
+                (hasHostCachedMemory ? VK_MEMORY_PROPERTY_HOST_CACHED_BIT : VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         const bool EXPORT_HANDLE = false;
         VkResult result = VulkanUtility::CreateImage(
@@ -67,8 +75,8 @@ namespace webrtc
             m_width,
             m_height,
             VK_IMAGE_TILING_LINEAR,
-            VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            (writable ? VK_IMAGE_USAGE_TRANSFER_SRC_BIT : VK_IMAGE_USAGE_TRANSFER_DST_BIT),
+            properties,
             m_textureFormat,
             &m_unityVulkanImage,
             EXPORT_HANDLE);

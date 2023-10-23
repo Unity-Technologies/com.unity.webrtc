@@ -70,6 +70,7 @@ namespace webrtc
 
         UnityGraphicsVulkan* m_unityVulkan;
         UnityVulkanInstance m_Instance;
+        bool m_hasHostCachedMemory;
 
         // No access to VkFence internals through rendering plugin, track safe frame numbers
         UnityVulkanRecordingState m_LastState;

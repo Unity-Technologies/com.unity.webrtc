@@ -27,6 +27,7 @@ namespace webrtc
         : IGraphicsDevice(renderer, profiler)
         , m_unityVulkan(unityVulkan)
         , m_Instance(*unityVulkanInstance)
+        , m_hasHostCachedMemory(false)
         , m_commandPool(VK_NULL_HANDLE)
         , m_commandBuffer(VK_NULL_HANDLE)
         , m_fence(VK_NULL_HANDLE)
@@ -41,6 +42,16 @@ namespace webrtc
 
     bool VulkanGraphicsDevice::InitV()
     {
+        VkPhysicalDeviceMemoryProperties memory;
+        vkGetPhysicalDeviceMemoryProperties(m_Instance.physicalDevice, &memory);
+
+        for (uint32_t i = 0; i < memory.memoryTypeCount; ++i)
+        {
+            const VkMemoryPropertyFlags propertyFlags = memory.memoryTypes[i].propertyFlags;
+            if ((propertyFlags & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT)) ==
+                (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT))
+                m_hasHostCachedMemory = true;
+        }
 #if CUDA_PLATFORM
         m_isCudaSupport = InitCudaContext();
 #endif
@@ -194,8 +205,9 @@ namespace webrtc
     ITexture2D*
     VulkanGraphicsDevice::CreateCPUReadTextureV(uint32_t w, uint32_t h, UnityRenderingExtTextureFormat textureFormat)
     {
+        bool writable = false;
         std::unique_ptr<VulkanTexture2D> vulkanTexture = std::make_unique<VulkanTexture2D>(w, h);
-        if (!vulkanTexture->InitCpuRead(&m_Instance))
+        if (!vulkanTexture->InitStaging(&m_Instance, writable, m_hasHostCachedMemory))
         {
             RTC_LOG(LS_ERROR) << "VulkanTexture2D::InitCpuRead failed.";
             return nullptr;

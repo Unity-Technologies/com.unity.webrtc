@@ -14,7 +14,7 @@ namespace webrtc
         virtual ~VulkanTexture2D() override;
 
         bool Init(const UnityVulkanInstance* instance);
-        bool InitCpuRead(const UnityVulkanInstance* instance);
+        bool InitStaging(const UnityVulkanInstance* instance, bool writable, bool hasHostCachedMemory);
         void Shutdown();
 
         inline virtual void* GetNativeTexturePtrV() override;
