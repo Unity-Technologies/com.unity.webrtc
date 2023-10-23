@@ -33,7 +33,13 @@ namespace webrtc
         ~VulkanGraphicsDevice() override = default;
         bool InitV() override;
         void ShutdownV() override;
-        inline void* GetEncodeDevicePtrV() override;
+
+#if CUDA_PLATFORM
+        void* GetEncodeDevicePtrV() override { return reinterpret_cast<void*>(m_cudaContext.GetContext()); }
+#else
+        void* GetEncodeDevicePtrV() override { return nullptr; }
+#endif
+
         ITexture2D* CreateDefaultTextureV(
             const uint32_t w, const uint32_t h, UnityRenderingExtTextureFormat textureFormat) override;
         ITexture2D*
@@ -88,15 +94,5 @@ namespace webrtc
         bool m_isCudaSupport;
 #endif
     };
-
-    void* VulkanGraphicsDevice::GetEncodeDevicePtrV()
-    {
-#if CUDA_PLATFORM
-        return reinterpret_cast<void*>(m_cudaContext.GetContext());
-#else
-        return nullptr;
-#endif
-    }
 } // end namespace webrtc
-
 } // end namespace unity
