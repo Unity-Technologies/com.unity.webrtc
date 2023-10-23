@@ -374,29 +374,21 @@ namespace webrtc
         VulkanTexture2D* vulkanTexture = static_cast<VulkanTexture2D*>(tex);
         const int32_t width = static_cast<int32_t>(tex->GetWidth());
         const int32_t height = static_cast<int32_t>(tex->GetHeight());
-        const VkDeviceMemory dstImageMemory = vulkanTexture->GetTextureImageMemory();
-        VkImageSubresource subresource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
-        VkSubresourceLayout subresourceLayout;
-        vkGetImageSubresourceLayout(m_Instance.device, vulkanTexture->GetImage(), &subresource, &subresourceLayout);
-        const int32_t rowPitch = static_cast<int32_t>(subresourceLayout.rowPitch);
+        const int32_t rowPitch = static_cast<int32_t>(vulkanTexture->GetPitch());
 
-        void* data;
-        std::vector<uint8_t> dst;
-        dst.resize(vulkanTexture->GetTextureImageMemorySize());
-        const VkResult result = vkMapMemory(m_Instance.device, dstImageMemory, 0, VK_WHOLE_SIZE, 0, &data);
-        if (result != VK_SUCCESS)
+        VkDeviceMemory textureImageMemory = vulkanTexture->GetTextureImageMemory();
+        void* data = nullptr;
+
+        if (vkMapMemory(m_Instance.device, textureImageMemory, 0, VK_WHOLE_SIZE, 0, &data) != VK_SUCCESS)
         {
             RTC_LOG(LS_INFO) << "vkMapMemory failed.";
             return nullptr;
         }
-        std::memcpy(static_cast<void*>(dst.data()), data, dst.size());
-
-        vkUnmapMemory(m_Instance.device, dstImageMemory);
 
         // convert format to i420
         rtc::scoped_refptr<webrtc::I420Buffer> i420Buffer = webrtc::I420Buffer::Create(width, height);
         libyuv::ARGBToI420(
-            dst.data(),
+            (const uint8_t*)data,
             rowPitch,
             i420Buffer->MutableDataY(),
             i420Buffer->StrideY(),
@@ -406,6 +398,7 @@ namespace webrtc
             i420Buffer->StrideV(),
             width,
             height);
+        vkUnmapMemory(m_Instance.device, textureImageMemory);
 
         return i420Buffer;
     }

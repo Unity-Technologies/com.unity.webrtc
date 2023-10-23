@@ -27,12 +27,15 @@ namespace webrtc
         inline VkDeviceSize GetTextureImageMemorySize() const;
         inline VkFormat GetTextureFormat() const;
 
+        size_t GetPitch() const { return m_rowPitch; }
+
         void ResetFrameNumber() const { currentFrameNumber = 0; }
         mutable unsigned long long currentFrameNumber = 0;
 
     private:
         UnityVulkanInstance m_Instance = {};
         VkFormat m_textureFormat;
+        size_t m_rowPitch;
         UnityVulkanImage m_unityVulkanImage = {};
         const VkAllocationCallbacks* m_allocator = nullptr;
     };

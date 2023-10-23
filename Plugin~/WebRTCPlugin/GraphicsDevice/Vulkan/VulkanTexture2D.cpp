@@ -86,6 +86,11 @@ namespace webrtc
             return false;
         }
 
+        VkImageSubresource subresource { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0 };
+        VkSubresourceLayout subresourceLayout;
+        vkGetImageSubresourceLayout(m_Instance.device, m_unityVulkanImage.image, &subresource, &subresourceLayout);
+        m_rowPitch = static_cast<size_t>(subresourceLayout.rowPitch);
+
         return true;
     }
 } // end namespace webrtc
