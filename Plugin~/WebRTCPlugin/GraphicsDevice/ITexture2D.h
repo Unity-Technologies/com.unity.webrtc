@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <stdint.h>
 
 namespace unity
@@ -40,29 +39,6 @@ namespace webrtc
     protected:
         uint32_t m_width;
         uint32_t m_height;
-
-    public:
-        inline static std::mutex s_TexturePtrMapMutex;
-        typedef std::map<void*, ITexture2D*> ITexture2DNativePtrMap;
-        inline static ITexture2DNativePtrMap s_TexturePtrMap;
-
-        static void BindTexture(void* nativePtr, ITexture2D* texturePtr)
-        {
-            std::lock_guard<std::mutex> trackLock(s_TexturePtrMapMutex);
-            s_TexturePtrMap.insert(std::make_pair(nativePtr, texturePtr));
-        }
-
-        static ITexture2D* GetTexturePtr(void* nativePtr)
-        {
-            ITexture2DNativePtrMap::const_iterator it = s_TexturePtrMap.find(nativePtr);
-            return (it == s_TexturePtrMap.end()) ? NULL : it->second;
-        }
-
-        static void RemoveTextureBinding(void* nativePtr)
-        {
-            std::lock_guard<std::mutex> trackLock(s_TexturePtrMapMutex);
-            s_TexturePtrMap.erase(nativePtr);
-        }
     };
 } // end namespace webrtc
 } // end namespace unity

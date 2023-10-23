@@ -262,22 +262,13 @@ namespace webrtc
 
     VkResult VulkanUtility::DoImageLayoutTransition(
         const VkCommandBuffer commandBuffer,
-        UnityVulkanImage* unityImage,
+        const VkImage image,
+        const VkFormat format,
         const VkImageLayout oldLayout,
         const VkPipelineStageFlags oldStage,
         const VkImageLayout newLayout,
-        const VkPipelineStageFlags newStage,
-        bool saveLayout)
+        const VkPipelineStageFlags newStage)
     {
-        if (unityImage == nullptr)
-            return VK_NOT_READY;
-
-        if (oldStage == newStage && oldLayout == newLayout)
-            return VK_SUCCESS;
-
-        if (saveLayout)
-            unityImage->layout = newLayout;
-
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -285,7 +276,7 @@ namespace webrtc
         barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; // for transferring queue family ownership
         barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-        barrier.image = unityImage->image;
+        barrier.image = image;
         barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         barrier.subresourceRange.baseMipLevel = 0;
         barrier.subresourceRange.levelCount = 1; // No mip map

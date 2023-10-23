@@ -3,7 +3,7 @@
 #include "Context.h"
 #include "CreateSessionDescriptionObserver.h"
 #include "EncodedStreamTransformer.h"
-#include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 #include "MediaStreamObserver.h"
 #include "PeerConnectionObject.h"
 #include "SetLocalDescriptionObserver.h"

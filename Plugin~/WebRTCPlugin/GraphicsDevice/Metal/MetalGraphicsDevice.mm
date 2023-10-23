@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 #include "MetalDevice.h"
 #include "MetalGraphicsDevice.h"
 #include "MetalTexture2D.h"
