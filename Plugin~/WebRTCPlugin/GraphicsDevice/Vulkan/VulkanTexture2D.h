@@ -17,8 +17,8 @@ namespace webrtc
         bool InitStaging(const UnityVulkanInstance* instance, bool writable, bool hasHostCachedMemory);
         void Shutdown();
 
-        void* GetNativeTexturePtrV() override { return m_unityVulkanImage.image; }
-        const void* GetNativeTexturePtrV() const override { return m_unityVulkanImage.image; };
+        void* GetNativeTexturePtrV() override { return &m_unityVulkanImage; }
+        const void* GetNativeTexturePtrV() const override { return &m_unityVulkanImage; };
         void* GetEncodeTexturePtrV() override { return nullptr; }
         const void* GetEncodeTexturePtrV() const override { return nullptr; }
 
