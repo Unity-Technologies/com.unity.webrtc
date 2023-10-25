@@ -91,15 +91,14 @@ namespace webrtc
         if (!frame)
             return tempBuffer.data();
 
-        rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer;
-        if (width == frame->width() && height == frame->height())
-        {
-            i420_buffer = frame->ToI420();
-        }
-        else
+        rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer = frame->ToI420();
+        if (!i420_buffer)
+            return tempBuffer.data();
+
+        if (width != frame->width() || height != frame->height())
         {
             auto temp = webrtc::I420Buffer::Create(width, height);
-            temp->ScaleFrom(*frame->ToI420());
+            temp->ScaleFrom(*i420_buffer);
             i420_buffer = temp;
         }
 
