@@ -24,16 +24,13 @@ class PostProcess : IPostprocessBuildWithReport
         string target = pbxProject.GetUnityMainTargetGuid();
         pbxProject.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
 
-
         //Unity Tests
         target = pbxProject.TargetGuidByName(PBXProject.GetUnityTestTargetName());
         pbxProject.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
 
-
         //Unity Framework
         target = pbxProject.GetUnityFrameworkTargetGuid();
         pbxProject.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
-
 
         pbxProject.WriteToFile(projectPath);
     }
