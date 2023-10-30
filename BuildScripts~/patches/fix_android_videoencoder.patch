@@ -1,0 +1,32 @@
+diff --git a/sdk/android/src/jni/video_encoder_wrapper.cc b/sdk/android/src/jni/video_encoder_wrapper.cc
+index 3912ede048..c4f19bbce8 100644
+--- a/sdk/android/src/jni/video_encoder_wrapper.cc
++++ b/sdk/android/src/jni/video_encoder_wrapper.cc
+@@ -170,6 +170,10 @@ int32_t VideoEncoderWrapper::Encode(
+   }
+ 
+   ScopedJavaLocalRef<jobject> j_frame = NativeToJavaVideoFrame(jni, frame);
++  if (j_frame.is_null()) {
++    RTC_LOG(LS_INFO) << "Video frame is null.";
++    return WEBRTC_VIDEO_CODEC_ERROR;	  
++  }
+   ScopedJavaLocalRef<jobject> ret =
+       Java_VideoEncoder_encode(jni, encoder_, j_frame, encode_info);
+   ReleaseJavaVideoFrame(jni, j_frame);
+diff --git a/sdk/android/src/jni/video_frame.cc b/sdk/android/src/jni/video_frame.cc
+index 121b34fa94..754a992788 100644
+--- a/sdk/android/src/jni/video_frame.cc
++++ b/sdk/android/src/jni/video_frame.cc
+@@ -303,8 +303,11 @@ ScopedJavaLocalRef<jobject> NativeToJavaVideoFrame(JNIEnv* jni,
+         static_cast<jlong>(frame.timestamp_us() *
+                            rtc::kNumNanosecsPerMicrosec));
+   } else {
++    auto i420_buffer = buffer->ToI420();
++    if (!i420_buffer)
++      return ScopedJavaLocalRef<jobject>(nullptr);
+     return Java_VideoFrame_Constructor(
+-        jni, WrapI420Buffer(jni, buffer->ToI420()),
++        jni, WrapI420Buffer(jni, i420_buffer),
+         static_cast<jint>(frame.rotation()),
+         static_cast<jlong>(frame.timestamp_us() *
+                            rtc::kNumNanosecsPerMicrosec));
