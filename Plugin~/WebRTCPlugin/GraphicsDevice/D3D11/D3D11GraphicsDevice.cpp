@@ -5,7 +5,7 @@
 #include "D3D11GraphicsDevice.h"
 #include "D3D11Texture2D.h"
 #include "GraphicsDevice/Cuda/GpuMemoryBufferCudaHandle.h"
-#include "GraphicsDevice/IGraphicsDevice.h"
+#include "GraphicsDevice/GraphicsUtility.h"
 #include "NvCodecUtils.h"
 
 using namespace ::webrtc;
