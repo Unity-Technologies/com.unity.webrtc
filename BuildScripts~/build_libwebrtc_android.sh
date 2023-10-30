@@ -45,9 +45,11 @@ patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDK
 # Fix SetRawImagePlanes() in LibvpxVp8Encoder
 patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
 
-# Fix AdaptedVideoTrackSource::video_adapter()
 pushd src
+# Fix AdaptedVideoTrackSource::video_adapter()
 patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
+# Fix Android video encoder 
+patch -p1 < "$COMMAND_DIR/patches/fix_android_videoencoder.patch"
 popd
 
 mkdir -p "$ARTIFACTS_DIR/lib"
