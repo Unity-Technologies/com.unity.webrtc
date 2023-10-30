@@ -104,8 +104,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
             UnityVulkanPluginEventConfig batchUpdateEventConfig;
             batchUpdateEventConfig.graphicsQueueAccess = kUnityVulkanGraphicsQueueAccess_DontCare;
             batchUpdateEventConfig.renderPassPrecondition = kUnityVulkanRenderPass_EnsureOutside;
-            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission |
-                kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
+            batchUpdateEventConfig.flags = kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState;
 
             vulkan->ConfigureEvent(s_batchUpdateEventID, &batchUpdateEventConfig);
         }
