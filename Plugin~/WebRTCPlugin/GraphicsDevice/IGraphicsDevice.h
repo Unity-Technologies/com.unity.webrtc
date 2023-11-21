@@ -30,6 +30,7 @@ namespace webrtc
         IGraphicsDevice(UnityGfxRenderer renderer, ProfilerMarkerFactory* profiler)
             : m_gfxRenderer(renderer)
             , m_profiler(profiler)
+            , m_syncTimeout(std::chrono::milliseconds(60))
         {
         }
 #if CUDA_PLATFORM
@@ -46,8 +47,10 @@ namespace webrtc
         virtual bool CopyResourceFromNativeV(ITexture2D* dest, NativeTexPtr nativeTexturePtr) = 0;
         virtual UnityGfxRenderer GetGfxRenderer() const { return m_gfxRenderer; }
         virtual std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) = 0;
-        virtual bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) { return true; }
+        virtual bool WaitSync(const ITexture2D* texture) { return true; }
         virtual bool ResetSync(const ITexture2D* texture) { return true; }
+        virtual void SetSyncTimeout(std::chrono::nanoseconds nsTimeout) { m_syncTimeout = nsTimeout; }
+        virtual std::chrono::nanoseconds GetSyncTimeout() const { return m_syncTimeout; }
         virtual bool WaitIdleForTest() { return true; }
         virtual void Enter() { }
         virtual void Leave() { }
@@ -62,6 +65,7 @@ namespace webrtc
     protected:
         UnityGfxRenderer m_gfxRenderer;
         ProfilerMarkerFactory* m_profiler;
+        std::chrono::nanoseconds m_syncTimeout;
     };
 
 } // end namespace webrtc

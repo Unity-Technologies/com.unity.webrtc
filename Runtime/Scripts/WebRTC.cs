@@ -772,6 +772,17 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        /// Sets the graphics sync timeout.
+        /// Graphics sync timeout determines how long the graphics device will wait on the frame copy for encoding before timing out.
+        /// By default timeout is set to 60 milliseconds.
+        /// </summary>
+        /// <param name="nSecTimeout">The timeout value specified in nanoseconds.</param>
+        public static void SetGraphicsSyncTimeout(uint nSecTimeout)
+        {
+            NativeMethods.SetGraphicsSyncTimeout(nSecTimeout);
+        }
+
         internal static void DisposeInternal()
         {
             if (s_context != null)
@@ -1615,6 +1626,9 @@ namespace Unity.WebRTC
         public static extern bool VideoFrameIsKeyFrame(IntPtr frame);
         [DllImport(WebRTC.Lib)]
         public static extern void FrameTransformerSendFrameToSink(IntPtr transform, IntPtr frame);
+
+        [DllImport(WebRTC.Lib)]
+        public static extern void SetGraphicsSyncTimeout(uint nSecTimeout);
 
     }
 
