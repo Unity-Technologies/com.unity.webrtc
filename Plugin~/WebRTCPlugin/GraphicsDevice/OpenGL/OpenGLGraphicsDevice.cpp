@@ -277,7 +277,7 @@ namespace webrtc
 #endif
     }
 
-    bool OpenGLGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    bool OpenGLGraphicsDevice::WaitSync(const ITexture2D* texture)
     {
         if (!OpenGLContext::CurrentContext())
             contexts_.push_back(OpenGLContext::CreateGLContext(mainContext_.get()));
@@ -289,7 +289,7 @@ namespace webrtc
             RTC_LOG(LS_INFO) << "The sync object is already reset.";
             return true;
         }
-        GLenum ret = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, nsTimeout);
+        GLenum ret = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, m_syncTimeout.count());
         GLenum error = glGetError();
         if (error != GL_NO_ERROR)
         {
