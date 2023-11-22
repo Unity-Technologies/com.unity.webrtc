@@ -1388,9 +1388,11 @@ extern "C"
             return nullptr;
 
         std::vector<::RtpSource> result;
-        std::transform(sources.begin(), sources.end(), std::back_inserter(result), [](webrtc::RtpSource source) {
-            return source;
-        });
+        std::transform(
+            sources.begin(),
+            sources.end(),
+            std::back_inserter(result),
+            [](webrtc::RtpSource source) { return source; });
         return ConvertArray(result, length);
     }
 
@@ -1582,7 +1584,7 @@ extern "C"
     UNITY_INTERFACE_EXPORT void SetGraphicsSyncTimeout(uint64_t nSecTimeout)
     {
         auto graphicsDevice = Plugin::GraphicsDevice();
-        graphicsDevice->SetSyncTimeout(std::chrono::nanoseconds(nSecTimeout));   
+        graphicsDevice->SetSyncTimeout(std::chrono::nanoseconds(nSecTimeout));
     }
 #pragma clang diagnostic pop
 }
