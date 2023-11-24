@@ -37,7 +37,7 @@ namespace webrtc
         rtc::scoped_refptr<webrtc::I420Buffer> ConvertRGBToI420(ITexture2D* tex) override;
         bool CopyResourceFromNativeV(ITexture2D* dest, void* nativeTexturePtr) override;
         std::unique_ptr<GpuMemoryBufferHandle> Map(ITexture2D* texture) override;
-        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override;
+        bool WaitSync(const ITexture2D* texture) override;
         bool ResetSync(const ITexture2D* texture) override;
 
 #if CUDA_PLATFORM

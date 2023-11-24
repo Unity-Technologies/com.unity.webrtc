@@ -106,12 +106,12 @@ namespace webrtc
         return true;
     }
 
-    bool MetalGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    bool MetalGraphicsDevice::WaitSync(const ITexture2D* texture)
     {
         const MetalTexture2D* texture2D = static_cast<const MetalTexture2D*>(texture);
         dispatch_semaphore_t semaphore = texture2D->GetSemaphore();
 
-        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, nsTimeout));
+        intptr_t value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, m_syncTimeout.count()));
         if (value != 0)
         {
             RTC_LOG(LS_INFO) << "The timeout occurred.";

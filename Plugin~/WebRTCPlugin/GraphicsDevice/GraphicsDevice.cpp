@@ -63,7 +63,7 @@ namespace webrtc
             RTC_DCHECK_NOTREACHED();
             return nullptr;
         }
-        bool WaitSync(const ITexture2D* texture, uint64_t nsTimeout = 0) override
+        bool WaitSync(const ITexture2D* texture) override
         {
             RTC_DCHECK_NOTREACHED();
             return true;

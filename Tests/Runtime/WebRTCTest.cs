@@ -131,5 +131,12 @@ namespace Unity.WebRTC.RuntimeTest
 
             Assert.That(() => WebRTC.Logger = Debug.unityLogger, Throws.Nothing);
         }
+
+        [Test]
+        public void SyncTimeout()
+        {
+            Assert.DoesNotThrow(() => WebRTC.SetGraphicsSyncTimeout(1));
+            Assert.DoesNotThrow(() => WebRTC.SetGraphicsSyncTimeout(60 * 1000 * 1000));
+        }
     }
 }

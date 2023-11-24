@@ -220,7 +220,7 @@ namespace webrtc
         return GpuMemoryBufferCudaHandle::CreateHandle(GetCUcontext(), resource);
     }
 
-    bool D3D11GraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    bool D3D11GraphicsDevice::WaitSync(const ITexture2D* texture)
     {
         const D3D11Texture2D* d3d11Texture = static_cast<const D3D11Texture2D*>(texture);
         const uint64_t value = d3d11Texture->GetSyncCount();
@@ -237,8 +237,7 @@ namespace webrtc
                 RTC_LOG(LS_INFO) << "ID3D11Fence::SetEventOnCompletion failed. error:" << hr;
                 return false;
             }
-            auto nanoseconds = std::chrono::nanoseconds(nsTimeout);
-            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(nanoseconds).count();
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_syncTimeout).count();
             DWORD ret = WaitForSingleObject(fenceEvent, static_cast<DWORD>(milliseconds));
             CloseHandle(fenceEvent);
 

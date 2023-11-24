@@ -1578,5 +1578,11 @@ extern "C"
     {
         frame->SetData(rtc::ArrayView<const uint8_t>(data, size));
     }
+
+    UNITY_INTERFACE_EXPORT void SetGraphicsSyncTimeout(uint64_t nSecTimeout)
+    {
+        auto graphicsDevice = Plugin::GraphicsDevice();
+        graphicsDevice->SetSyncTimeout(std::chrono::nanoseconds(nSecTimeout));
+    }
 #pragma clang diagnostic pop
 }

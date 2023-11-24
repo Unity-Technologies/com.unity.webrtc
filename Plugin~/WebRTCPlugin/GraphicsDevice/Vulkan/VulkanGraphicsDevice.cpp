@@ -451,7 +451,7 @@ namespace webrtc
         return false;
     }
 
-    bool VulkanGraphicsDevice::WaitSync(const ITexture2D* texture, uint64_t nsTimeout)
+    bool VulkanGraphicsDevice::WaitSync(const ITexture2D* texture)
     {
         if (!m_unityVulkan)
             return true;
@@ -459,8 +459,8 @@ namespace webrtc
         const VulkanTexture2D* vulkanTexture = static_cast<const VulkanTexture2D*>(texture);
         std::unique_lock<std::mutex> lock(m_LastStateMtx);
 
-        bool ret = m_LastStateCond.wait_until(
-            lock, std::chrono::system_clock::now() + std::chrono::nanoseconds(nsTimeout), [vulkanTexture, this] {
+        bool ret =
+            m_LastStateCond.wait_until(lock, std::chrono::system_clock::now() + m_syncTimeout, [vulkanTexture, this] {
                 return vulkanTexture->currentFrameNumber <= m_LastState.safeFrameNumber;
             });
         return ret;
