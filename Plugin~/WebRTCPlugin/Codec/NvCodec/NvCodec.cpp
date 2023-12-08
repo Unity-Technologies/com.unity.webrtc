@@ -146,15 +146,38 @@ namespace webrtc
         return std::make_unique<NvEncoderImpl>(codec, context, memoryType, format, profiler);
     }
 
-    bool NvEncoder::IsSupported()
+    bool NvEncoder::IsSupported(CUcontext context)
     {
         uint32_t version = 0;
         uint32_t currentVersion = (NVENCAPI_MAJOR_VERSION << 4) | NVENCAPI_MINOR_VERSION;
-        NVENC_API_CALL(NvEncodeAPIGetMaxSupportedVersion(&version));
-        if (currentVersion > version)
+        NVENCSTATUS result = NvEncodeAPIGetMaxSupportedVersion(&version);
+        if (result != NV_ENC_SUCCESS || currentVersion > version)
         {
             return false;
         }
+
+        // Check if this device can get the function list of nvencoder API
+        NV_ENCODE_API_FUNCTION_LIST funclist = { NV_ENCODE_API_FUNCTION_LIST_VER };
+        result = NvEncodeAPICreateInstance(&funclist);
+        if (result != NV_ENC_SUCCESS || funclist.nvEncOpenEncodeSession == nullptr)
+        {
+            return false;
+        }
+
+        // Check if this device can open encode session
+        NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS encodeSessionExParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
+        encodeSessionExParams.device = context;
+        encodeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_CUDA;
+        encodeSessionExParams.apiVersion = NVENCAPI_VERSION;
+        void *hEncoder = nullptr;
+        result = funclist.nvEncOpenEncodeSessionEx(&encodeSessionExParams, &hEncoder);
+        if (result != NV_ENC_SUCCESS || hEncoder == nullptr)
+        {
+            return false;
+        }
+
+        funclist.nvEncDestroyEncoder(hEncoder);
+        hEncoder = nullptr;
         return true;
     }
 

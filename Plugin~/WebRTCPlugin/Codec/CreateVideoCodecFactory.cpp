@@ -54,13 +54,16 @@ namespace webrtc
         if (impl == kNvCodecImpl)
         {
 #if CUDA_PLATFORM
-            if (gfxDevice && gfxDevice->IsCudaSupport() && NvEncoder::IsSupported())
+            if (gfxDevice && gfxDevice->IsCudaSupport())
             {
                 CUcontext context = gfxDevice->GetCUcontext();
-                NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
-                std::unique_ptr<VideoEncoderFactory> factory =
-                    std::make_unique<NvEncoderFactory>(context, format, profiler);
-                return CreateSimulcastEncoderFactory(std::move(factory));
+                if (NvEncoder::IsSupported(context))
+                {
+                    NV_ENC_BUFFER_FORMAT format = gfxDevice->GetEncodeBufferFormat();
+                    std::unique_ptr<VideoEncoderFactory> factory =
+                        std::make_unique<NvEncoderFactory>(context, format, profiler);
+                    return CreateSimulcastEncoderFactory(std::move(factory));
+                }
             }
 #endif
         }
