@@ -156,8 +156,8 @@ namespace webrtc
             return false;
         }
 
-        // Check if this device can get the function list of nvencoder API
-        #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+// Check if this device can get the function list of nvencoder API
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
         NV_ENCODE_API_FUNCTION_LIST funclist = { NV_ENCODE_API_FUNCTION_LIST_VER };
         result = NvEncodeAPICreateInstance(&funclist);
         if (result != NV_ENC_SUCCESS || funclist.nvEncOpenEncodeSession == nullptr)
@@ -165,8 +165,8 @@ namespace webrtc
             return false;
         }
 
-        // Check if this device can open encode session
-        #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+// Check if this device can open encode session
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
         NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS encodeSessionExParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
         encodeSessionExParams.device = context;
         encodeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_CUDA;
