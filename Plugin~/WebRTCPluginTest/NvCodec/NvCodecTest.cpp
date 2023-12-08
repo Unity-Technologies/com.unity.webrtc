@@ -36,10 +36,11 @@ namespace webrtc
                 GTEST_SKIP() << "The graphics driver is not installed on the device.";
             if (!device_->IsCudaSupport())
                 GTEST_SKIP() << "CUDA is not supported on this device.";
-            if (!NvEncoder::IsSupported())
-                GTEST_SKIP() << "Current Driver Version does not support this NvEncodeAPI version.";
 
             context_ = device_->GetCUcontext();
+
+            if (!NvEncoder::IsSupported(context_))
+                GTEST_SKIP() << "Current Driver Version does not support this NvEncodeAPI version.";
 
             VideoCodecTest::SetUp();
         }
