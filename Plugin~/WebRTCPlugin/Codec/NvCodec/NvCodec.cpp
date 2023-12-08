@@ -169,7 +169,7 @@ namespace webrtc
         encodeSessionExParams.device = context;
         encodeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_CUDA;
         encodeSessionExParams.apiVersion = NVENCAPI_VERSION;
-        void *hEncoder = nullptr;
+        void* hEncoder = nullptr;
         result = funclist.nvEncOpenEncodeSessionEx(&encodeSessionExParams, &hEncoder);
         if (result != NV_ENC_SUCCESS || hEncoder == nullptr)
         {
