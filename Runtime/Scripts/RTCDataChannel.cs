@@ -218,6 +218,10 @@ namespace Unity.WebRTC
     /// </example>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
+#if UNITY_WEBGL
+    public delegate void DelegateOnTextMessage(string msg);
+#endif
+
     /// <summary>
     /// Represents the method that will be invoked when an error occurs on the data channel.
     /// </summary>
@@ -287,6 +291,9 @@ namespace Unity.WebRTC
     public class RTCDataChannel : RefCountedObject
     {
         private DelegateOnMessage onMessage;
+#if UNITY_WEBGL
+        private DelegateOnTextMessage onTextMessage;
+#endif
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
         private DelegateOnError onError;
@@ -324,6 +331,17 @@ namespace Unity.WebRTC
             get => onMessage;
             set => onMessage = value;
         }
+
+#if UNITY_WEBGL
+        /// <summary>
+        ///
+        /// </summary>
+        public DelegateOnTextMessage OnTextMessage
+        {
+            get { return onTextMessage; }
+            set { onTextMessage = value; }
+        }
+#endif
 
         /// <summary>
         /// Delegate to be called when the data channel's message transport mechanism is opened or reopened.
@@ -752,6 +770,21 @@ namespace Unity.WebRTC
                 }
             });
         }
+
+#if UNITY_WEBGL
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
+        static void DataChannelNativeOnTextMessage(IntPtr ptr, IntPtr msgPtr)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    var msg = msgPtr.AsAnsiStringWithFreeMem();
+                    channel.onTextMessage?.Invoke(msg);
+                }
+            });
+        }
+#endif
 
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnOpen))]
         static void DataChannelNativeOnOpen(IntPtr ptr)

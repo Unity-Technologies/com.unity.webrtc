@@ -1,4 +1,6 @@
 using System;
+using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 
 namespace Unity.WebRTC
 {
@@ -60,6 +62,11 @@ namespace Unity.WebRTC
             }
             if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
             {
+
+#if UNITY_WEBGL
+                NativeMethods.DeleteTransceiver(self);
+#endif
+
                 WebRTC.Table.Remove(self);
             }
             base.Dispose();
@@ -105,12 +112,18 @@ namespace Unity.WebRTC
         {
             get
             {
+#if !UNITY_WEBGL
                 if (NativeMethods.TransceiverGetCurrentDirection(GetSelfOrThrow(), out var direction))
                 {
                     return direction;
                 }
 
                 return null;
+#else
+                int currentDirection = NativeMethods.TransceiverGetCurrentDirection(GetSelfOrThrow());
+                if (currentDirection == -1) return null;
+                else return (RTCRtpTransceiverDirection) currentDirection;
+#endif
             }
         }
 
@@ -166,6 +179,7 @@ namespace Unity.WebRTC
         /// <seealso cref="RTCPeerConnection"/>
         public RTCErrorType SetCodecPreferences(RTCRtpCodecCapability[] codecs)
         {
+#if !UNITY_WEBGL
             RTCRtpCodecCapabilityInternal[] array = Array.ConvertAll(codecs, v => v.Cast());
             MarshallingArray<RTCRtpCodecCapabilityInternal> instance = array;
             RTCErrorType error = NativeMethods.TransceiverSetCodecPreferences(GetSelfOrThrow(), instance.ptr, instance.length);
@@ -175,6 +189,13 @@ namespace Unity.WebRTC
             }
             instance.Dispose();
             return error;
+#else
+            string json = JsonConvert.SerializeObject(codecs, Formatting.None, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+
+            //TODO Get correct RTCErrorType from jslib.
+            NativeMethods.TransceiverSetCodecPreferences(self, json);
+            return RTCErrorType.None;
+#endif
         }
 
         /// <summary>

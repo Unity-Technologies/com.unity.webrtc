@@ -335,7 +335,11 @@ namespace Unity.WebRTC
 
             var label = Guid.NewGuid().ToString();
             source = new VideoTrackSource();
+#if !UNITY_WEBGL
             return WebRTC.Context.CreateVideoTrack(label, source.GetSelfOrThrow());
+#else
+            return WebRTC.Context.CreateVideoTrack(source.sourceTexture_.GetNativeTexturePtr(),source.destTexture_.GetNativeTexturePtr(),source.sourceTexture_.width,source.sourceTexture_.height);
+#endif
         }
 
         /// <summary>
