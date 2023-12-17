@@ -12,6 +12,7 @@ namespace Unity.WebRTC.RuntimeTest
     class AudioStreamTrackTest
     {
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         public IEnumerator Constructor()
         {
@@ -110,6 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [UnityTest]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.WebGLPlayer})]
         [Timeout(5000)]
         public IEnumerator AddMultiAudioTrack()
         {
@@ -182,7 +184,7 @@ namespace Unity.WebRTC.RuntimeTest
             UnityEngine.Object.DestroyImmediate(obj1);
             UnityEngine.Object.DestroyImmediate(obj2);
         }
-
+#if !UNITY_WEBGL
         [Test]
         public void AudioStreamTrackSetData()
         {
@@ -234,6 +236,7 @@ namespace Unity.WebRTC.RuntimeTest
             UnityEngine.Object.DestroyImmediate(obj);
         }
 
+
         [Test]
         public void AudioStreamRenderer()
         {
@@ -243,5 +246,6 @@ namespace Unity.WebRTC.RuntimeTest
             renderer.Dispose();
             UnityEngine.Object.DestroyImmediate(obj);
         }
+#endif
     }
 }

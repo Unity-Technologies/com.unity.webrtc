@@ -72,26 +72,30 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public delegate void DelegateOnOpen();
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public delegate void DelegateOnClose();
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="bytes"></param>
     public delegate void DelegateOnMessage(byte[] bytes);
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="channel"></param>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
+#if UNITY_WEBGL
+    public delegate void DelegateOnTextMessage(string msg);
+#endif
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public delegate void DelegateOnError(RTCError error);
 
@@ -102,6 +106,9 @@ namespace Unity.WebRTC
     public class RTCDataChannel : RefCountedObject
     {
         private DelegateOnMessage onMessage;
+#if UNITY_WEBGL
+        private DelegateOnTextMessage onTextMessage;
+#endif
         private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
         private DelegateOnError onError;
@@ -114,6 +121,17 @@ namespace Unity.WebRTC
             get => onMessage;
             set => onMessage = value;
         }
+
+#if UNITY_WEBGL
+        /// <summary>
+        ///
+        /// </summary>
+        public DelegateOnTextMessage OnTextMessage
+        {
+            get { return onTextMessage; }
+            set { onTextMessage = value; }
+        }
+#endif
 
         /// <summary>
         ///
@@ -204,6 +222,21 @@ namespace Unity.WebRTC
             });
         }
 
+#if UNITY_WEBGL
+        [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnMessage))]
+        static void DataChannelNativeOnTextMessage(IntPtr ptr, IntPtr msgPtr)
+        {
+            WebRTC.Sync(ptr, () =>
+            {
+                if (WebRTC.Table[ptr] is RTCDataChannel channel)
+                {
+                    var msg = msgPtr.AsAnsiStringWithFreeMem();
+                    channel.onTextMessage?.Invoke(msg);
+                }
+            });
+        }
+#endif
+
         [AOT.MonoPInvokeCallback(typeof(DelegateNativeOnOpen))]
         static void DataChannelNativeOnOpen(IntPtr ptr)
         {
@@ -252,7 +285,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~RTCDataChannel()
         {
@@ -260,7 +293,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -314,7 +347,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -333,7 +366,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -350,7 +383,7 @@ namespace Unity.WebRTC
 #if UNITY_2020_1_OR_NEWER // ReadOnly support was introduced in 2020.1
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -366,7 +399,7 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
@@ -380,7 +413,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
@@ -397,7 +430,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void Close()
         {
