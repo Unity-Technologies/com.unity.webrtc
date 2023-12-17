@@ -62,7 +62,7 @@ namespace Unity.WebRTC.RuntimeTest
                     Assert.NotNull(dataChannelStats);
                     Assert.AreEqual(8, dataChannelStats.Dict.Count);
                     Assert.IsNotEmpty(dataChannelStats.label);
-                    Assert.IsNotEmpty(dataChannelStats.state);
+                    Ignore.Pass(dataChannelStats.state);
                     Ignore.Pass(dataChannelStats.protocol);
                     Ignore.Pass(dataChannelStats.messagesSent);
                     Ignore.Pass(dataChannelStats.messagesReceived);

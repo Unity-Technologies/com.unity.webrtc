@@ -489,5 +489,4 @@ namespace Unity.WebRTC
             streams.Dispose();
         }
     }
-
 }

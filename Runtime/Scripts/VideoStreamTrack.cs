@@ -14,7 +14,7 @@ namespace Unity.WebRTC
     public delegate void OnVideoReceived(Texture renderer);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="source"></param>
     /// <param name="dest"></param>
@@ -254,7 +254,11 @@ namespace Unity.WebRTC
 
             var label = Guid.NewGuid().ToString();
             source = new VideoTrackSource();
+#if !UNITY_WEBGL
             return WebRTC.Context.CreateVideoTrack(label, source.GetSelfOrThrow());
+#else
+            return WebRTC.Context.CreateVideoTrack(source.sourceTexture_.GetNativeTexturePtr(),source.destTexture_.GetNativeTexturePtr(),source.sourceTexture_.width,source.sourceTexture_.height);
+#endif
         }
 
         /// <summary>
@@ -484,13 +488,13 @@ namespace Unity.WebRTC
 
     public static class CopyTextureHelper
     {
-        // Blit parameter to flip vertically 
+        // Blit parameter to flip vertically
         private static readonly Vector2 s_verticalScale = new Vector2(1f, -1f);
         private static readonly Vector2 s_verticalOffset = new Vector2(0f, 1f);
-        // Blit parameter to flip horizontally 
+        // Blit parameter to flip horizontally
         private static readonly Vector2 s_horizontalScale = new Vector2(-1f, 1f);
         private static readonly Vector2 s_horixontalOffset = new Vector2(1f, 0f);
-        // Blit parameter to flip diagonally 
+        // Blit parameter to flip diagonally
         private static readonly Vector2 s_diagonalScale = new Vector2(-1f, -1f);
         private static readonly Vector2 s_diagonalOffset = new Vector2(1f, 1f);
 

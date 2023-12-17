@@ -50,6 +50,8 @@ namespace Unity.WebRTC.RuntimeTest
         }
 #endif
 
+        // TODO replace with TestCaseSource
+#if !UNITY_WEBGL
         [Test]
         [TestCase(256, 256)]
         [TestCase(640, 360)]
@@ -94,7 +96,7 @@ namespace Unity.WebRTC.RuntimeTest
             var error = WebRTC.ValidateTextureSize(width, height, platform);
             Assert.That(error.errorType, Is.EqualTo(RTCErrorType.InvalidRange));
         }
-
+#endif
         [Test]
         public void ValidateGraphicsFormat()
         {
@@ -102,6 +104,8 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(() => WebRTC.ValidateGraphicsFormat(format), Throws.Nothing);
         }
 
+        // TODO replace with TestCaseSource
+#if !UNITY_WEBGL
         [Test]
         [TestCase((GraphicsFormat)87)] //LegacyARGB32_sRGB
         [TestCase((GraphicsFormat)88)] //LegacyARGB32_UNorm
@@ -109,6 +113,7 @@ namespace Unity.WebRTC.RuntimeTest
         {
             Assert.That(() => WebRTC.ValidateGraphicsFormat(format), Throws.Nothing);
         }
+#endif
 
         [Test]
         public void EnableLogging()

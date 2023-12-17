@@ -172,6 +172,40 @@ namespace Unity.WebRTC
         }
     }
 
+#if UNITY_WEBGL
+    public class RTCVideoTrackEvent
+    {
+        public RTCRtpTransceiver Transceiver { get; }
+
+        public RTCRtpReceiver Receiver
+        {
+            get
+            {
+                return Transceiver.Receiver;
+            }
+        }
+
+        public MediaStreamTrack Track
+        {
+            get
+            {
+                return Receiver.Track;
+            }
+        }
+
+        public int Width { get; }
+        public int Height { get; }
+
+        internal RTCVideoTrackEvent(IntPtr ptrTransceiver, RTCPeerConnection peer, int width, int height)
+        {
+            Transceiver = WebRTC.FindOrCreate(
+                ptrTransceiver, ptr => new RTCRtpTransceiver(ptr, peer));
+            Width = width;
+            Height = height;
+        }
+    }
+#endif
+
     /// <summary>
     /// 
     /// </summary>

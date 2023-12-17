@@ -1,4 +1,59 @@
 {% metadata_file .yamato/package.metafile %}
+{% metadata_file .yamato/meta/environments.yml %}
+
+editors:
+  - version: 2019.4
+  - version: 2020.3
+  - version: 2021.2
+
+platforms:
+  - name: win
+    type: Unity::VM
+    gpu_type: Unity::VM::GPU
+    image: renderstreaming/win10:v0.3.7-728388
+    gpu_image: renderstreaming/win10:v0.3.7-728285
+    flavor: b1.large
+    model: rtx2080
+    build_command: BuildScripts~/build_plugin_win.cmd
+    test_command: BuildScripts~/test_plugin_win.cmd
+    plugin_path: Runtime/Plugins/x86_64/webrtc.dll
+  - name: linux
+    type: Unity::VM
+    gpu_type: Unity::VM::GPU
+    image: renderstreaming/ubuntu-18.04:latest
+    gpu_image: renderstreaming/ubuntu-18.04:latest
+    flavor: b1.large
+    model: rtx2080
+    build_command: BuildScripts~/build_plugin_linux.sh
+    test_command: BuildScripts~/test_plugin_linux.sh
+    plugin_path: Runtime/Plugins/x86_64/libwebrtc.so
+  - name: macos
+    type: Unity::metal::macmini
+    gpu_type: Unity::metal::macmini
+    image: package-ci/mac:latest
+    gpu_image: package-ci/mac:latest
+    flavor: m1.mac
+    build_command: BuildScripts~/build_plugin_mac.sh
+    test_command: BuildScripts~/test_plugin_mac.sh
+    plugin_path: Runtime/Plugins/macOS/webrtc.bundle/**
+  - name: ios
+    type: Unity::metal::macmini
+    gpu_type: Unity::metal::macmini
+    image: package-ci/mac:latest
+    gpu_image: package-ci/mac:latest
+    flavor: m1.mac
+    build_command: BuildScripts~/build_plugin_ios.sh
+    test_command: BuildScripts~/test_plugin_ios.sh
+    plugin_path: Runtime/Plugins/iOS/webrtc.framework/**
+  - name: android
+    type: Unity::VM
+    gpu_type: Unity::VM
+    image: renderstreaming/android-linux-build:latest
+    gpu_image: renderstreaming/android-linux-build:latest
+    flavor: b1.large
+    build_command: BuildScripts~/build_plugin_android.sh
+    test_command: BuildScripts~/test_plugin_android.sh
+    plugin_path: Runtime/Plugins/Android/libwebrtc.aar
 
 test_targets:
   - name: win
@@ -316,6 +371,37 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
       paths:
         - "build/test-results/**"
 {% endfor %}
+
+test_{{ package.name }}_{{ editor.version }}_webgl_win:
+  name: Test {{ package.packagename }} with {{ editor.version }} on WebGL Windows
+  agent:
+    type: Unity::VM::GPU
+    image: package-ci/win10:stable
+    flavor: b1.large
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+  commands:
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat --output utr.bat
+    - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
+
+test_{{ package.name }}_{{ editor.version }}_webgl_macos:
+  name: Test {{ package.packagename }} with {{ editor.version }} on WebGL macOS
+  agent:
+    type: Unity::VM::osx
+    image: package-ci/mac:latest
+    flavor: m1.mac
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+  commands:
+    - find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+    - cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -u {{ editor.version }} -c WebGL -c Editor -c StandaloneSupport-IL2CPP --fast -w
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
+    - chmod +x ./utr
+    - ./utr --suite=playmode --platform=WebGL --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/test-results --timeout=5400
 {% endfor %}
 
 {% for target in test_targets %}

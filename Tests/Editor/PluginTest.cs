@@ -36,7 +36,6 @@ namespace Unity.WebRTC.EditorTest
         [Test]
         public static void CheckPluginImportSettings()
         {
-
             string[] guids = AssetDatabase.FindAssets("", new[] { "Packages/com.unity.webrtc/Runtime/Plugins" });
             foreach (string guid in guids)
             {
@@ -47,11 +46,12 @@ namespace Unity.WebRTC.EditorTest
                     continue;
                 PluginImporter pluginImporter = assetImporter as PluginImporter;
                 Assert.That(pluginImporter, Is.Not.Null);
-                Assert.That(pluginImporter.isPreloaded, Is.True);
+                if(!path.Contains("WebGL"))
+                {
+                    Assert.That(pluginImporter.isPreloaded, Is.True);
+                }
             }
-
         }
-
     }
 
 } //namespace Unity.WebRTC.EditorTest
