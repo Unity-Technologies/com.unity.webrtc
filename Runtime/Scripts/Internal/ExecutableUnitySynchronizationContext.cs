@@ -19,6 +19,8 @@ namespace Unity.WebRTC
         const int k_AwqInitialCapacity = 20;
 
         static SynchronizationContext s_MainThreadContext;
+        static object s_CallbackObject;
+        static SendOrPostCallback s_CallbackMethod;
 
         readonly List<WorkRequest> m_AsyncWorkQueue;
         readonly List<WorkRequest> m_CurrentFrameWork = new List<WorkRequest>(k_AwqInitialCapacity);
@@ -32,6 +34,16 @@ namespace Unity.WebRTC
                 s_MainThreadContext = context;
             }
 
+            if (s_CallbackObject == null)
+            {
+                s_CallbackObject = new CallbackObject(ExecuteAndAppendNextExecute);
+            }
+
+            if (s_CallbackMethod == null)
+            {
+                s_CallbackMethod = SendOrPostCallback;
+            }
+
             if (s_MainThreadContext == null || s_MainThreadContext != context)
             {
                 throw new InvalidOperationException("Unable to create executable synchronization context without a valid synchronization context.");
@@ -42,7 +54,7 @@ namespace Unity.WebRTC
             m_AsyncWorkQueue = new List<WorkRequest>();
 
             // Queue up and Execute work request with the synchronization context.
-            s_MainThreadContext.Post(SendOrPostCallback, new CallbackObject(ExecuteAndAppendNextExecute));
+            s_MainThreadContext.Post(s_CallbackMethod, s_CallbackObject);
         }
 
         ExecutableUnitySynchronizationContext(List<WorkRequest> queue, int mainThreadID)
@@ -191,7 +203,7 @@ namespace Unity.WebRTC
             // UnitySynchronizationContext works by performing work in batches so as not to stall the main thread
             // forever. Therefore it is safe to re-add ourselves to the delayed work queue. This is how we hook into
             // the main thread delayed tasks.
-            s_MainThreadContext.Post(SendOrPostCallback, new CallbackObject(ExecuteAndAppendNextExecute));
+            s_MainThreadContext.Post(s_CallbackMethod, s_CallbackObject);
         }
 
         class CallbackObject
