@@ -242,14 +242,9 @@ namespace webrtc
         // todo:(kazuki)
     }
 
-    rtc::scoped_refptr<AudioSourceInterface> Context::CreateAudioSource()
+    rtc::scoped_refptr<AudioSourceInterface> Context::CreateAudioSource(const cricket::AudioOptions& options)
     {
-        // avoid optimization specially for voice
-        cricket::AudioOptions audioOptions;
-        audioOptions.auto_gain_control = false;
-        audioOptions.noise_suppression = false;
-        audioOptions.highpass_filter = false;
-        return UnityAudioTrackSource::Create(audioOptions);
+        return UnityAudioTrackSource::Create(options);
     }
 
     rtc::scoped_refptr<AudioTrackInterface>
