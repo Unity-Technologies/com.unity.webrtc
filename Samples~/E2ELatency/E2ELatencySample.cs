@@ -96,8 +96,6 @@ class E2ELatencySample : MonoBehaviour
             receiveStream.AddTrack(e.Track);
         };
         pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
-
-        StartCoroutine(WebRTC.Update());
     }
 
     private void OnFramerateChanged(int value)

@@ -175,7 +175,6 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             yield return new WaitUntil(() => test.component.GetPeerReceivers(1).Any());
             var receiver = test.component.GetPeerReceivers(1).First();
-            test.component.CoroutineUpdate();
 
             yield return new WaitUntil(() => raisedTransformedFrame);
             Assert.That(raisedTransformedFrame, Is.True);
@@ -214,7 +213,6 @@ namespace Unity.WebRTC.RuntimeTest
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
             yield return new WaitUntil(() => test.component.GetPeerReceivers(1).Any());
             var receiver = test.component.GetPeerReceivers(1).First();
-            test.component.CoroutineUpdate();
 
             yield return new WaitUntil(() => raisedTransformedFrame);
             Assert.That(raisedTransformedFrame, Is.True);

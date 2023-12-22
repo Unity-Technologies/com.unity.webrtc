@@ -180,7 +180,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
-            test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetSenderStats(0, 0);
             yield return op;
@@ -225,7 +224,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
-            test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
             var op = test.component.GetReceiverStats(1, 0);
             yield return op;
@@ -268,7 +266,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
-            test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
 
             var senders = test.component.GetPeerSenders(0);
@@ -311,7 +308,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
-            test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
 
             var senders = test.component.GetPeerSenders(0);
@@ -360,7 +356,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, stream1);
             yield return test;
-            test.component.CoroutineUpdate();
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
 
             bool calledOnAddTrack = false;
@@ -398,7 +393,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddStream(0, videoStream);
             yield return test;
-            test.component.CoroutineUpdate();
             yield return new WaitForSeconds(0.1f);
 
             bool isCalledOnAddTrack = false;

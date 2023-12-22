@@ -40,7 +40,6 @@ class PeerConnectionSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private bool videoUpdateStarted;
 
     private void Awake()
     {
@@ -210,12 +209,6 @@ class PeerConnectionSample : MonoBehaviour
                     transceiver.SetCodecPreferences(codecs);
                 }
             }
-        }
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
         }
     }
 

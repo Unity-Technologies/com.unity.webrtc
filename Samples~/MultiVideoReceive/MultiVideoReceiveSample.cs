@@ -34,7 +34,6 @@ namespace Unity.WebRTC.Samples
         private DelegateOnTrack pc2Ontrack;
         private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
         private DelegateOnNegotiationNeeded pc2OnNegotiationNeeded;
-        private bool videoUpdateStarted;
         private int objectIndex = 0;
         private int videoIndex = 0;
 
@@ -194,12 +193,6 @@ namespace Unity.WebRTC.Samples
             _pc2.OnIceConnectionChange = pc2OnIceConnectionChange;
             _pc2.OnTrack = pc2Ontrack;
             _pc2.OnNegotiationNeeded = pc2OnNegotiationNeeded;
-
-            if (!videoUpdateStarted)
-            {
-                StartCoroutine(WebRTC.Update());
-                videoUpdateStarted = true;
-            }
         }
 
         private void AddTracks()

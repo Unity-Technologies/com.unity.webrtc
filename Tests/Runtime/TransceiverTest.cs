@@ -175,7 +175,6 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(sources1, Is.Empty);
 
             yield return test;
-            test.component.CoroutineUpdate();
 
             // wait for OnNegotiationNeeded callback in SignalingPeers class
             yield return new WaitUntil(() => test.component.NegotiationCompleted());
@@ -224,7 +223,6 @@ namespace Unity.WebRTC.RuntimeTest
             var test = new MonoBehaviourTest<SignalingPeers>();
             test.component.AddTransceiver(0, track);
             yield return test;
-            test.component.CoroutineUpdate();
 
             var senderTransceivers = test.component.GetPeerTransceivers(0);
             Assert.That(senderTransceivers.Count(), Is.EqualTo(1));

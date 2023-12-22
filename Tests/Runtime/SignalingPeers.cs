@@ -87,12 +87,6 @@ namespace Unity.WebRTC.RuntimeTest
             return peers[indexPeer].GetTransceivers();
         }
 
-
-        public Coroutine CoroutineUpdate()
-        {
-            return StartCoroutine(WebRTC.Update());
-        }
-
         void Awake()
         {
             RTCConfiguration config = default;

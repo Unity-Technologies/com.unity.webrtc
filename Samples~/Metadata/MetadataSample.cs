@@ -34,7 +34,6 @@ class MetadataSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private bool videoUpdateStarted;
 
     private readonly object metadataInputLock = new object();
     private readonly object metadataOutputLock = new object();
@@ -307,12 +306,6 @@ class MetadataSample : MonoBehaviour
         foreach (var sender in pc1Senders)
         {
             SetUpSenderTransform(sender);
-        }
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
         }
     }
 
