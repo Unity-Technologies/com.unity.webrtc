@@ -35,7 +35,7 @@ namespace webrtc
             CUmemorytype memoryType,
             NV_ENC_BUFFER_FORMAT format,
             ProfilerMarkerFactory* profiler);
-        static bool IsSupported();
+        static bool IsSupported(CUcontext context);
         ~NvEncoder() override { }
     };
 
