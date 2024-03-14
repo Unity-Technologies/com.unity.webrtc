@@ -245,11 +245,19 @@ struct BatchData
     VideoStreamTrackData** tracks;
 };
 
+static bool skipUpdate = true;
+
 // Notice: When DebugLog is used in a method called from RenderingThread,
 // it hangs when attempting to leave PlayMode and re-enter PlayMode.
 // So, we comment out `DebugLog`.
 static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
 {
+    if (skipUpdate)
+    {
+        RTC_LOG(LS_INFO) << "OnBatchUpdateEvent skipping first update";
+        skipUpdate = false;
+        return;
+    }
     if (eventID != s_batchUpdateEventID)
         return;
     if (!s_context)
