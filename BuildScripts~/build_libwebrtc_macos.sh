@@ -6,8 +6,8 @@ then
 fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
-export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5845
+export PATH="$(pwd)/depot_tools:$(pwd)/depot_tools/python-bin:$PATH"
+export WEBRTC_VERSION=6367
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
@@ -21,6 +21,12 @@ then
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
   gclient sync -D --force --reset
+else
+  # fetch and init config on only first time
+  cd src
+  git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
+  cd ..
+  gclient sync -D --force --reset
 fi
 
 # add jsoncpp
@@ -28,7 +34,7 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
 # disable GCD taskqueue, use stdlib taskqueue instead
 # This is because GCD cannot measure with UnityProfiler
-patch -N "src/api/task_queue/BUILD.gn" < "$COMMAND_DIR/patches/disable_task_queue_gcd.patch"
+# patch -N "src/api/task_queue/BUILD.gn" < "$COMMAND_DIR/patches/disable_task_queue_gcd.patch"
 
 # add objc library to use videotoolbox
 patch -N "src/sdk/BUILD.gn" < "$COMMAND_DIR/patches/add_objc_deps.patch"
@@ -38,33 +44,36 @@ patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
+outputDir=""
+
 for is_debug in "true" "false"
 do
   for target_cpu in "x64" "arm64"
   do
-
+    outputDir="${OUTPUT_DIR}_${is_debug}_${target_cpu}"
     # generate ninja files
-    gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} \
+    gn gen "$outputDir" --root="src" \
+      --args=" \
+      enable_iterator_debugging=false \
+      is_debug=${is_debug} \
+      is_component_build=false \
       target_os=\"mac\"  \
       target_cpu=\"${target_cpu}\" \
-      use_custom_libcxx=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
+      rtc_build_tools=false \
       rtc_use_h264=false \
-      symbol_level=0 \
-      enable_iterator_debugging=false \
-      is_component_build=false \
-      use_rtti=true \
       rtc_use_x11=false \
-      use_cxx17=true"
+      symbol_level=0 \
+      use_custom_libcxx=false \
+      use_rtti=true"
 
     # build static library
-    ninja -C "$OUTPUT_DIR" webrtc
+    ninja -C "$outputDir" webrtc
 
     # copy static library
     mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
-    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
+    cp "$outputDir/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/"
   done
 
   filename="libwebrtc.a"
@@ -83,12 +92,12 @@ do
 done
 
 "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+  --target :webrtc "$outputDir" "$outputDir"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+cp "$outputDir/LICENSE.md" "$ARTIFACTS_DIR"
 
 # create zip
 cd "$ARTIFACTS_DIR"

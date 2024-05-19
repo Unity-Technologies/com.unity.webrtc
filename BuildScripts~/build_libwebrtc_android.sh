@@ -6,8 +6,8 @@ then
 fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
-export PATH="$(pwd)/depot_tools:$PATH"
-export WEBRTC_VERSION=5845
+export PATH="$(pwd)/depot_tools:$(pwd)/depot_tools/python-bin:$PATH"
+export WEBRTC_VERSION=6367
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
@@ -23,24 +23,19 @@ then
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
   gclient sync -D --force --reset
+else
+  # fetch and init config on only first time
+  cd src
+  git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
+  cd ..
+  gclient sync -D --force --reset
 fi
 
 # Add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
-# Add visibility libunwind
-patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches/add_visibility_libunwind.patch"
-
-# Add deps libunwind
-patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
-
 # Add -mno-outline-atomics flag
 patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutlineatomics_flag.patch"
-
-# downgrade to JDK8 because Unity supports OpenJDK version 1.8.
-# https://docs.unity3d.com/Manual/android-sdksetup.html
-patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
-patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
 
 # Fix SetRawImagePlanes() in LibvpxVp8Encoder
 patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
@@ -54,32 +49,34 @@ popd
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
+outputDir=""
 
 for target_cpu in "arm64" "x64"
 do
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
-
   for is_debug in "true" "false"
   do
+    outputDir="${OUTPUT_DIR}_${is_debug}_${target_cpu}"
     # generate ninja files
     # use `treat_warnings_as_errors` option to avoid deprecation warnings
-    gn gen "$OUTPUT_DIR" --root="src" \
-      --args="is_debug=${is_debug} \
+    gn gen "$outputDir" --root="src" \
+      --args=" \
+      exclude_unwind_tables=true \
+      is_component_build=false \
+      is_debug=${is_debug} \
       is_java_debug=${is_debug} \
-      target_os=\"android\" \
-      target_cpu=\"${target_cpu}\" \
       rtc_use_h264=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
-      is_component_build=false \
-      use_rtti=true \
-      use_custom_libcxx=false \
+      rtc_build_tools=false \
+      target_os=\"android\" \
+      target_cpu=\"${target_cpu}\" \
       treat_warnings_as_errors=false \
-      use_errorprone_java_compiler=false \
-      use_cxx17=true"
+      use_rtti=true \
+      use_errorprone_java_compiler=false"
 
     # build static library
-    ninja -C "$OUTPUT_DIR" webrtc
+    ninja -C "$outputDir" webrtc
 
     filename="libwebrtc.a"
     if [ $is_debug = "true" ]; then
@@ -87,7 +84,7 @@ do
     fi
 
     # copy static library
-    cp "$OUTPUT_DIR/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
+    cp "$outputDir/obj/libwebrtc.a" "$ARTIFACTS_DIR/lib/${target_cpu}/${filename}"
   done
 done
 
@@ -95,40 +92,41 @@ pushd src
 
 for is_debug in "true" "false"
 do
+  aarOutputDir="${OUTPUT_DIR}_${is_debug}_aar"
   # use `treat_warnings_as_errors` option to avoid deprecation warnings
   "$PYTHON3_BIN" tools_webrtc/android/build_aar.py \
-    --build-dir $OUTPUT_DIR \
-    --output $OUTPUT_DIR/libwebrtc.aar \
+    --build-dir $aarOutputDir \
+    --output $aarOutputDir/libwebrtc.aar \
     --arch arm64-v8a x86_64 \
-    --extra-gn-args "is_debug=${is_debug} \
+    --extra-gn-args " \
+      is_debug=${is_debug} \
       is_java_debug=${is_debug} \
+      is_component_build=false \
       rtc_use_h264=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
-      is_component_build=false \
-      use_rtti=true \
-      use_custom_libcxx=false \
+      rtc_build_tools=false \
       treat_warnings_as_errors=false \
-      use_errorprone_java_compiler=false \
-      use_cxx17=true"
+      use_rtti=true \
+      use_errorprone_java_compiler=false"
 
   filename="libwebrtc.aar"
   if [ $is_debug = "true" ]; then
     filename="libwebrtc-debug.aar"
   fi
   # copy aar
-  cp "$OUTPUT_DIR/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
+  cp "$aarOutputDir/libwebrtc.aar" "$ARTIFACTS_DIR/lib/${filename}"
 done
 
 popd
 
 "$PYTHON3_BIN" "./src/tools_webrtc/libs/generate_licenses.py" \
-  --target :webrtc "$OUTPUT_DIR" "$OUTPUT_DIR"
+  --target :webrtc "$outputDir" "$outputDir"
 
 cd src
 find . -name "*.h" -print | cpio -pd "$ARTIFACTS_DIR/include"
 
-cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
+cp "$outputDir/LICENSE.md" "$ARTIFACTS_DIR"
 
 # create zip
 cd "$ARTIFACTS_DIR"
