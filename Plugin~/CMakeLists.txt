@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
+include(CMakePrintHelpers)
 
 set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
-    "10.0"
+    "15.0"
     CACHE STRING "Minimum iOS deployment version")
 set(CMAKE_OSX_DEPLOYMENT_TARGET
-    "10.12"
+    "10.13"
     CACHE STRING "Minimum OS X deployment version")
 
 project(
@@ -42,6 +43,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(XCODE)
+  cmake_print_variables(XCODE_VERSION)
   if(${XCODE_VERSION} VERSION_GREATER_EQUAL 12.0.0 AND ${XCODE_VERSION}
                                                        VERSION_LESS 11.0.0)
     message(

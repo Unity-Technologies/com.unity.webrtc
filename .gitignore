@@ -218,7 +218,7 @@ _pkginfo.txt
 ClientBin/
 Bin~/
 upm-ci~/
-Plugin~/webrtc/*
+Plugin~/webrtc*/*
 WebRTC~/CodeCoverage
 WebRTC~/TestResults-*
 *.dbmdl
