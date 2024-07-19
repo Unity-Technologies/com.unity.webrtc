@@ -66,8 +66,7 @@ namespace webrtc
         if (exportHandle)
         {
             externalInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
-            externalInfo.handleTypes =
-                static_cast<VkExternalMemoryHandleTypeFlags>(EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE);
+            externalInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
             imageInfo.pNext = &externalInfo;
         }
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -86,6 +85,7 @@ namespace webrtc
         VkResult result = vkCreateImage(instance.device, &imageInfo, allocator, &unityVulkanImage->image);
         if (result != VK_SUCCESS)
         {
+            RTC_LOG(LS_ERROR) << "Failed vkCreateImage result: " << result;
             return result;
         }
 
@@ -99,10 +99,10 @@ namespace webrtc
             instance.physicalDevice, memRequirements.memoryTypeBits, properties, &allocInfo.memoryTypeIndex);
         RTC_CHECK(success);
 
-        VkExportMemoryAllocateInfoKHR exportInfo = {};
+        VkExportMemoryAllocateInfo exportInfo = {};
         if (exportHandle)
         {
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
             exportInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
             allocInfo.pNext = &exportInfo;
         }
@@ -110,6 +110,7 @@ namespace webrtc
         result = vkAllocateMemory(instance.device, &allocInfo, allocator, &unityVulkanImage->memory.memory);
         if (result != VK_SUCCESS)
         {
+            RTC_LOG(LS_ERROR) << "Failed vkAllocateMemory result: " << result;
             return result;
         }
 
@@ -118,11 +119,12 @@ namespace webrtc
             vkBindImageMemory(instance.device, unityVulkanImage->image, unityVulkanImage->memory.memory, memoryOffset);
         if (result != VK_SUCCESS)
         {
+            RTC_LOG(LS_ERROR) << "Failed vkBindImageMemory result: " << result;
             return result;
         }
 
         unityVulkanImage->memory.offset = memoryOffset;
-        unityVulkanImage->memory.size = memRequirements.size;
+        unityVulkanImage->memory.size = allocInfo.allocationSize;
         unityVulkanImage->memory.flags = properties;
         unityVulkanImage->memory.memoryTypeIndex = allocInfo.memoryTypeIndex;
         unityVulkanImage->layout = imageInfo.initialLayout;
@@ -163,7 +165,7 @@ namespace webrtc
         VkImageView imageView = nullptr;
         if (vkCreateImageView(instance.device, &viewInfo, allocator, &imageView) != VK_SUCCESS)
         {
-            RTC_LOG(LS_INFO) << "Failed vkCreateImageView";
+            RTC_LOG(LS_ERROR) << "Failed vkCreateImageView";
             return nullptr;
         }
 
