@@ -56,10 +56,11 @@ endif()
 # Use lld linker instead of GNU ld. Link glibc++ statically because of
 # compatibility of lower version of GLIBCXX. This package must support Ubuntu
 # version 16.04, 18.04, 20.04.
-if(Linux)
-  set(CMAKE_CXX_FLAG "${CMAKE_CXX_FLAG} -static-libstdc++")
-  add_link_options(-static-libstdc++ -fuse-ld=lld-11)
-endif()
+# disable for ubuntu 22.04
+#if(Linux)
+#  set(CMAKE_CXX_FLAG "${CMAKE_CXX_FLAG} -static-libstdc++")
+#  add_link_options(-static-libstdc++ -fuse-ld=lld-11)
+#endif()
 
 # enable debug output
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -87,7 +88,12 @@ endif()
 if(Windows OR Linux)
   find_package(Vulkan REQUIRED)
 
+  # FindCUDA is removed in Cmake 3.27
+  cmake_policy(SET CMP0146 OLD)
   find_package(CUDA REQUIRED)
+  find_package(CUDAToolkit REQUIRED)
+  set(CMAKE_CUDA_ARCHITECTURES "native")
+  set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
 
   # Building CUDA kernel is not supported with Clang compiler on Windows.
   # https://gitlab.kitware.com/cmake/cmake/-/issues/20776
