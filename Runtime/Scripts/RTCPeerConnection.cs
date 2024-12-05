@@ -779,6 +779,12 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.CreateOffer(ref options);
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///             var description = asyncOperation.Desc;
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <seealso cref="CreateAnswer"/>
@@ -800,6 +806,12 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.CreateOffer();
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///             var description = asyncOperation.Desc;
+        ///         }
         ///     ]]></code>
         /// </example>
         public RTCSessionDescriptionAsyncOperation CreateOffer()
@@ -821,6 +833,12 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.CreateAnswer(ref options);
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///             var description = asyncOperation.Desc;
+        ///         }
         ///     ]]></code>
         /// </example>
         public RTCSessionDescriptionAsyncOperation CreateAnswer(ref RTCOfferAnswerOptions options)
@@ -841,6 +859,12 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.CreateAnswer();
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///             var description = asyncOperation.Desc;
+        ///         }
         ///     ]]></code>
         /// </example>
         public RTCSessionDescriptionAsyncOperation CreateAnswer()
@@ -891,6 +915,11 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.SetLocalDescription(ref desc);
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <exception cref="ArgumentException">
@@ -925,6 +954,11 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.SetLocalDescription(ref desc);
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///         }
         ///     ]]></code>
         /// </example>
         public RTCSetSessionDescriptionAsyncOperation SetLocalDescription()
@@ -947,6 +981,11 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         var asyncOperation = peerConnection.SetRemoteDescription(ref desc);
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <exception cref="ArgumentException">
