@@ -72,32 +72,57 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public delegate void DelegateOnOpen();
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public delegate void DelegateOnClose();
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="bytes"></param>
     public delegate void DelegateOnMessage(byte[] bytes);
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="channel"></param>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public delegate void DelegateOnError(RTCError error);
 
     /// <summary>
-    ///
+    /// Represents a network channel which can be used for bidirectional peer-to-peer transfers of arbitrary data.
     /// </summary>
+    /// <remarks>
+    /// RTCDataChannel interface represents a network channel which can be used for bidirectional peer-to-peer transfers of arbitrary data.
+    /// Every data channel is associated with an RTCPeerConnection, and each peer connection can have up to a theoretical maximum of 65,534 data channels.
+    ///
+    /// To create a data channel and ask a remote peer to join you, call the RTCPeerConnection's createDataChannel() method.
+    /// The peer being invited to exchange data receives a datachannel event (which has type RTCDataChannelEvent) to let it know the data channel has been added to the connection.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         var pc = new RTCPeerConnection();
+    ///         var dc = pc.createDataChannel("my channel");
+    ///
+    ///         dc.OnMessage = (event) => {
+    ///             Debug.LogFormat("received: {0}"`",${event.data});
+    ///         };
+    ///
+    ///         dc.OnOpen = () => {
+    ///             Debug.Log("datachannel open");
+    ///         };
+    ///
+    ///         dc.OnClose = () => {
+    ///             Debug.Log("datachannel close");
+    ///         };
+    ///     ]]></code>
+    /// </example>
     /// <seealso cref="RTCPeerConnection.CreateDataChannel(string, RTCDataChannelInit)"/>
     public class RTCDataChannel : RefCountedObject
     {
@@ -107,7 +132,7 @@ namespace Unity.WebRTC
         private DelegateOnError onError;
 
         /// <summary>
-        ///
+        /// Delegate to be called when a message has been received from the remote peer.
         /// </summary>
         public DelegateOnMessage OnMessage
         {
@@ -116,7 +141,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Delegate to be called when the data channel's messages is opened or reopened.
         /// </summary>
         public DelegateOnOpen OnOpen
         {
@@ -125,7 +150,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Delegate to be called when the data channel's messages is closed.
         /// </summary>
         public DelegateOnClose OnClose
         {
@@ -134,7 +159,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Delegate to be called when the errors occur.
         /// </summary>
         public DelegateOnError OnError
         {
@@ -252,7 +277,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~RTCDataChannel()
         {
@@ -260,7 +285,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Dispose()
         {
@@ -314,7 +339,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -333,7 +358,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -350,7 +375,7 @@ namespace Unity.WebRTC
 #if UNITY_2020_1_OR_NEWER // ReadOnly support was introduced in 2020.1
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -366,7 +391,7 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
@@ -380,7 +405,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
@@ -397,7 +422,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void Close()
         {
