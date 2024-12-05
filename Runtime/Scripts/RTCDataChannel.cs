@@ -168,27 +168,27 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel.
         /// </summary>
         public int Id => NativeMethods.DataChannelGetID(GetSelfOrThrow());
 
         /// <summary>
-        ///
+        /// Returns a string containing a name describing the data channel which are not required to be unique.
         /// </summary>
         public string Label => NativeMethods.DataChannelGetLabel(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        ///
+        /// Returns a string containing the name of the sub protocol in use. If no protocol was specified when the data channel was created, then this property's value is the empty string ("").
         /// </summary>
         public string Protocol => NativeMethods.DataChannelGetProtocol(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        ///
+        /// Returns the maximum number of times the browser should try to retransmit a message before giving up.
         /// </summary>
         public ushort MaxRetransmits => NativeMethods.DataChannelGetMaxRetransmits(GetSelfOrThrow());
 
         /// <summary>
-        ///
+        /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
         /// </summary>
         public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
 
@@ -285,7 +285,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Release all the resources RTCDataChannel class created.
         /// </summary>
         public override void Dispose()
         {
