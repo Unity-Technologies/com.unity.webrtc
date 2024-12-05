@@ -6,7 +6,7 @@ using Unity.Collections.LowLevel.Unsafe;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// Represents argument parameters for RTCPeerConnection.CreateDataChannel()
     /// </summary>
     /// <seealso cref="RTCPeerConnection.CreateDataChannel(string, RTCDataChannelInit)"/>
     public class RTCDataChannelInit
@@ -193,12 +193,12 @@ namespace Unity.WebRTC
         public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
 
         /// <summary>
-        ///
+        /// Indicates whether or not the data channel guarantees in-order delivery of messages.
         /// </summary>
         public bool Ordered => NativeMethods.DataChannelGetOrdered(GetSelfOrThrow());
 
         /// <summary>
-        ///
+        /// Returns the number of bytes of data currently queued to be sent over the data channel.
         /// </summary>
         public ulong BufferedAmount => NativeMethods.DataChannelGetBufferedAmount(GetSelfOrThrow());
 
@@ -208,7 +208,7 @@ namespace Unity.WebRTC
         public bool Negotiated => NativeMethods.DataChannelGetNegotiated(GetSelfOrThrow());
 
         /// <summary>
-        /// The property returns an enum of the <c>RTCDataChannelState</c> which shows
+        /// Returns an enum of the <c>RTCDataChannelState</c> which shows
         /// the state of the channel.
         /// </summary>
         /// <remarks>
@@ -285,7 +285,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Release all the resources RTCDataChannel class created.
+        /// Release all the resources RTCDataChannel instance has allocated.
         /// </summary>
         public override void Dispose()
         {
@@ -303,7 +303,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// The method Sends data across the data channel to the remote peer.
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
@@ -321,7 +321,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// The method Sends data across the data channel to the remote peer.
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
@@ -339,7 +339,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -358,7 +358,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -375,7 +375,7 @@ namespace Unity.WebRTC
 #if UNITY_2020_1_OR_NEWER // ReadOnly support was introduced in 2020.1
 
         /// <summary>
-        ///
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
@@ -391,7 +391,7 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        ///
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
@@ -405,7 +405,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
@@ -422,7 +422,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Closes the RTCDataChannel. Either peer is permitted to call this method to initiate closure of the channel.
         /// </summary>
         public void Close()
         {
