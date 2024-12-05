@@ -483,32 +483,42 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    ///     Represents a configuration for an ICE server used within WebRTC connections.
     /// </summary>
-    /// <seealso cref="RTCConfiguration"/>
+    /// <remarks>
+    ///     `RTCIceServer` struct represents a configuration for an ICE server used within WebRTC connections,
+    ///     including authentication credentials and STUN/TURN server URLs.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         RTCConfiguration configuration = default;
+    ///         configuration.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+    ///     ]]></code>
+    /// </example>
+    /// /// <seealso cref="RTCConfiguration"/>
     [Serializable]
     public struct RTCIceServer
     {
         /// <summary>
-        ///
+        ///     Specifies the credential for authenticating with the ICE server.
         /// </summary>
         [Tooltip("Optional: specifies the password to use when authenticating with the ICE server")]
         public string credential;
 
         /// <summary>
-        ///
+        ///     Specifies the type of credential used.
         /// </summary>
         [Tooltip("What type of credential the `password` value")]
         public RTCIceCredentialType credentialType;
 
         /// <summary>
-        ///
+        ///     An array containing the URLs of STUN or TURN servers to use for ICE negotiation.
         /// </summary>
         [Tooltip("Array to set URLs of your STUN/TURN servers")]
         public string[] urls;
 
         /// <summary>
-        ///
+        ///     Specifies the user name for authenticating with the ICE server.
         /// </summary>
         [Tooltip("Optional: specifies the username to use when authenticating with the ICE server")]
         public string username;
