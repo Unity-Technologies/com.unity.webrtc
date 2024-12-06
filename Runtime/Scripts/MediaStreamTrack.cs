@@ -100,7 +100,7 @@ namespace Unity.WebRTC
         ///     Stops the track.
         /// </summary>
         /// <remarks>
-        ///     `Stop` method disassociates track from its source (video or audio), not for destroying the track.
+        ///     `Stop` method disassociates the track from its source (video or audio) without destroying the track.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
