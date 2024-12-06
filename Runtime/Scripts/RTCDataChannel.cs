@@ -888,7 +888,7 @@ namespace Unity.WebRTC
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
         /// </exception>
-        /// <param name="msg"></param>
+        /// <param name="msg">The string message to be sent to the remote peer.</param>
         /// <seealso cref="ReadyState"/>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -962,7 +962,7 @@ namespace Unity.WebRTC
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
         /// </exception>
-        /// <param name="msg"></param>
+        /// <param name="msg">The byte array to be sent to the remote peer.</param>
         /// <seealso cref="ReadyState"/>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -1043,8 +1043,9 @@ namespace Unity.WebRTC
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
         /// </exception>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="msg"></param>
+        /// <typeparam name="T">The type of elements stored in the NativeArray, which must be a value type.</typeparam>
+        /// <param name="msg">The NativeArray containing the data to be sent to the remote peer.
+        /// </param>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using System;
@@ -1129,11 +1130,11 @@ namespace Unity.WebRTC
         /// and is also buffered if sent while the connection is closing or closed.
         /// </remarks>
         /// <exception cref="InvalidOperationException">
-        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
-        ///  is not <b>Open</b>.
+        /// Thrown when the <see cref="ReadyState"/> is not <b>Open</b>.
         /// </exception>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="msg"></param>
+        /// <typeparam name="T">The type of elements stored in the NativeSlice, which must be a value type.</typeparam>
+        /// <param name="msg">The NativeSlice containing the data to be sent to the remote peer.</param>
+        /// <seealso cref="RTCDataChannel.ReadyState"/>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using System;
@@ -1219,10 +1220,11 @@ namespace Unity.WebRTC
         /// and is also buffered if sent while the connection is closing or closed.
         /// </remarks>
         /// <exception cref="InvalidOperationException">
-        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
-        ///  is not <b>Open</b>.
-        /// </exception>        /// <typeparam name="T"></typeparam>
-        /// <param name="msg"></param>
+        /// Thrown when the <see cref="ReadyState"/> is not <b>Open</b>.
+        /// </exception>
+        /// <typeparam name="T">The type of elements stored in the read-only NativeArray, which must be a value type.</typeparam>
+        /// <param name="msg">The read-only NativeArray containing the data to be sent to the remote peer.</param>
+        /// <seealso cref="RTCDataChannel.ReadyState"/>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using System;
@@ -1306,11 +1308,11 @@ namespace Unity.WebRTC
         /// and is also buffered if sent while the connection is closing or closed.
         /// </remarks>
         /// <exception cref="InvalidOperationException">
-        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
-        ///  is not <b>Open</b>.
+        /// Thrown when the <see cref="ReadyState"/> is not <b>Open</b>.
         /// </exception>
-        /// <param name="msgPtr"></param>
-        /// <param name="length"></param>
+        /// <param name="msgPtr">A pointer to the memory location containing the data to be sent.</param>
+        /// <param name="length">The length of the data, in bytes, to be sent from the specified memory location.</param>
+        /// <seealso cref="RTCDataChannel.ReadyState"/>
         public unsafe void Send(void* msgPtr, int length)
         {
             if (ReadyState != RTCDataChannelState.Open)
@@ -1329,10 +1331,11 @@ namespace Unity.WebRTC
         /// and is also buffered if sent while the connection is closing or closed.
         /// </remarks>
         /// <exception cref="InvalidOperationException">
-        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
-        ///  is not <b>Open</b>.
-        /// </exception>        /// <param name="msgPtr"></param>
-        /// <param name="length"></param>
+        /// Thrown when the <see cref="ReadyState"/> is not <b>Open</b>.
+        /// </exception>
+        /// <param name="msgPtr">A pointer to the memory location containing the data to be sent.</param>
+        /// <param name="length">The length of the data, in bytes, to be sent from the specified memory location.</param>
+        /// <seealso cref="RTCDataChannel.ReadyState"/>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using System;
