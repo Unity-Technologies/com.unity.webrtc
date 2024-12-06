@@ -10,7 +10,13 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var transceivers = peerConnection.GetTransceivers();
+    ///         RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+    ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
+    ///         RTCErrorType error = transceiver.SetCodecPreferences(capabilities.codecs);
+    ///         if (error.errorType != RTCErrorType.None)
+    ///         {
+    ///             Debug.LogError($"Failed to set codec preferences: {error.message}");
+    ///         }
     ///     ]]></code>
     /// </example>
     /// <seealso cref="RTCPeerConnection"/>
@@ -148,7 +154,13 @@ namespace Unity.WebRTC
         /// <returns>`RTCErrorType` value.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var error = transceiver.SetCodecPreferences(codecs);
+        ///         RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+        ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
+        ///         RTCErrorType error = transceiver.SetCodecPreferences(capabilities.codecs);
+        ///         if (error.errorType != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to set codec preferences: {error.message}");
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <seealso cref="RTCPeerConnection"/>
@@ -175,7 +187,11 @@ namespace Unity.WebRTC
         /// <returns>`RTCErrorType` value.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var error = transceiver.Stop();
+        ///         RTCErrorType error = transceiver.Stop();
+        ///         if (error.errorType != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to stop transceiver: {error.message}");
+        ///         }
         ///     ]]></code>
         /// </example>
         public RTCErrorType Stop()
