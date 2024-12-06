@@ -13,7 +13,7 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var mediaStreamTracks = mediaStream.GetTracks();
+    ///         IEnumerable<MediaStreamTrack> mediaStreamTracks = mediaStream.GetTracks();
     ///     ]]></code>
     /// </example>
     /// <seealso cref="MediaStream"/>
