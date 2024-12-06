@@ -486,7 +486,7 @@ namespace Unity.WebRTC
     ///     Represents a configuration for an ICE server used within WebRTC connections.
     /// </summary>
     /// <remarks>
-    ///     `RTCIceServer` struct represents a configuration for an ICE server used within WebRTC connections,
+    ///     Represents a configuration for an ICE server used within WebRTC connections,
     ///     including authentication credentials and STUN/TURN server URLs.
     /// </remarks>
     /// <example>
