@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///     Delegate to be called when received new audio data.
+    ///     Delegate to be called when new audio data is received.
     /// </summary>
     /// <remarks>
     ///     `AudioReadEventHandler` is a delegate to be called when received new audio data.
