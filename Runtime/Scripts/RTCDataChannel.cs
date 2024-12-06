@@ -341,6 +341,10 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
         public unsafe void Send<T>(NativeArray<T> msg)
@@ -360,6 +364,10 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
         public unsafe void Send<T>(NativeSlice<T> msg)
@@ -377,7 +385,10 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>        /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
         public unsafe void Send<T>(NativeArray<T>.ReadOnly msg)
             where T : struct
@@ -393,6 +404,10 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>
         /// <param name="msgPtr"></param>
         /// <param name="length"></param>
         public unsafe void Send(void* msgPtr, int length)
@@ -407,7 +422,10 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
-        /// <param name="msgPtr"></param>
+        /// <exception cref="InvalidOperationException">
+        /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
+        ///  is not <b>Open</b>.
+        /// </exception>        /// <param name="msgPtr"></param>
         /// <param name="length"></param>
         public void Send(IntPtr msgPtr, int length)
         {
