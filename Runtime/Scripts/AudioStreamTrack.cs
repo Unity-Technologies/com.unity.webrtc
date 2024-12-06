@@ -443,7 +443,7 @@ namespace Unity.WebRTC
         ///     Event to be fired when new audio data is received.
         /// </summary>
         /// <remarks>
-        ///     `onReceived` event is fired when received new audio data.
+        ///     `onReceived` event is fired when new audio data is received.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
