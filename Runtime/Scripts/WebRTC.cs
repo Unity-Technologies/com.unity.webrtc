@@ -432,10 +432,74 @@ namespace Unity.WebRTC
     /// with each one proposing a set of connection setup options that the sender can accommodate.
     /// The connection setup is finalized when both parties agree on a particular configuration.
     /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using System.Collections;
+    ///         using System.Collections.Generic;
+    ///         using System.Linq;
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         class MediaStreamSample : MonoBehaviour
+    ///         {
+    ///             private RTCPeerConnection _pc1;
+    ///             private List<RTCRtpSender> pc1Senders;
+    ///             private MediaStream videoStream;
+    ///             private MediaStreamTrack track;
+    ///             private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
+    ///             private bool videoUpdateStarted;
+    ///
+    ///             private void Start()
+    ///             {
+    ///                 pc1Senders = new List<RTCRtpSender>();
+    ///                 pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
+    ///                 Call();
+    ///             }
+    ///
+    ///             IEnumerator PcOnNegotiationNeeded(RTCPeerConnection pc)
+    ///             {
+    ///                 var op = pc.CreateOffer();
+    ///                 yield return op;
+    ///                 if (!op.IsError)
+    ///                 {
+    ///                     yield return StartCoroutine(OnCreateOfferSuccess(pc, op.Desc));
+    ///                 }
+    ///             }
+    ///
+    ///             private void Call()
+    ///             {
+    ///                 RTCConfiguration configuration = default;
+    ///                 configuration.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+    ///                 _pc1 = new RTCPeerConnection(ref configuration);
+    ///                 _pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
+    ///
+    ///                 videoStream = Camera.main.CaptureStream(1280, 720);
+    ///                 track = videoStream.GetTracks().First();
+    ///
+    ///                 pc1Senders.Add(_pc1.AddTrack(track));
+    ///                 if (!videoUpdateStarted)
+    ///                 {
+    ///                     StartCoroutine(WebRTC.Update());
+    ///                     videoUpdateStarted = true;
+    ///                 }
+    ///             }
+    ///
+    ///             private IEnumerator OnCreateOfferSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
+    ///             {
+    ///                 Debug.Log($"Offer created. SDP is: \n{desc.sdp}");
+    ///                 var op = pc.SetLocalDescription(ref desc);
+    ///                 yield return op;
+    ///             }
+    ///         }
+    ///
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="RTCPeerConnection"/>
+    /// <seealso cref="RTCRtpSender"/>
     public struct RTCSessionDescription
     {
         /// <summary>
-        /// An enum that specifies the type of the session description.
+        /// An enum that specifies the type of the session description. Refer to <see cref="RTCSdpType"/>.
         /// </summary>
         public RTCSdpType type;
 
