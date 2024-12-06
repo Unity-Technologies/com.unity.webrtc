@@ -145,7 +145,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         var initOption = new RTCDataChannelInit();
     ///         var peerConnection = new RTCPeerConnection();
-    ///         var dataChannel = peerConnection.createDataChannel("test channel", initOption);
+    ///         var dataChannel = peerConnection.CreateDataChannel("test channel", initOption);
     ///
     ///         dataChannel.OnMessage = (event) => {
     ///             Debug.LogFormat("Received: {0}.",${event.data});
@@ -308,9 +308,10 @@ namespace Unity.WebRTC
         /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel.
         /// </summary>
         /// <remarks>
-        /// The `OnError` delegate is triggered whenever there is an error in the data channel, offering the application a chance to handle the error gracefully.
-        /// This includes logging the error, alerting the user, or attempting to rectify the issue depending on the nature and severity of the error encountered.
-        /// Proper error handling is crucial for maintaining robust communication and ensuring a seamless user experience.
+        /// The `Id` property provides a unique identifier for the data channel, typically assigned during the channel's creation.
+        /// This identifier is used internally to differentiate between multiple data channels associated with a single RTCPeerConnection.
+        /// Understanding and referencing these IDs can be crucial when managing complex peer-to-peer communication setups where multiple channels are active.
+        /// The ID is automatically generated unless explicitly set during manual channel negotiation.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -336,8 +337,10 @@ namespace Unity.WebRTC
         /// Returns a string containing a name describing the data channel which are not required to be unique.
         /// </summary>
         /// <remarks>
-        /// You may use the label as you wish; you could use it to identify all the channels that are being used for the same purpose, by giving them all the same name.
-        /// Or you could give each channel a unique label for tracking purposes. It's entirely up to the design decisions made when building your site or app.
+        /// The `Label` property specifies a name for the data channel, which is set when the channel is created.
+        /// This label is useful for identifying the purpose of the data channel, such as distinguishing between channels dedicated to different types of data or tasks.
+        /// While labels are not required to be unique, they provide meaningful context within an application, aiding in organization and management of multiple channels.
+        /// Developers can utilize labels to group channels by function or to describe their role in the communication process.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -391,9 +394,10 @@ namespace Unity.WebRTC
         /// Returns the maximum number of times the browser should try to retransmit a message before giving up.
         /// </summary>
         /// <remarks>
-        /// As set when the data channel was created, or null, which indicates that there is no maximum.
-        /// This can only be set when the RTCDataChannel is created by calling RTCPeerConnection.createDataChannel(), using the maxRetransmits field in the specified options.
-        /// </remarks>
+        /// The `MaxRetransmits` property defines the upper limit on the number of times a message will be retransmitted if initial delivery fails.
+        /// This setting is particularly valuable in conditions where reliable delivery is necessary, but the application is sensitive to potential delays caused by continuous retransmission attempts.
+        /// By specifying a limit, developers can balance the need for message reliability with the potential impact on performance and latency.
+        /// If no retransmit limit is set, the data channel may continue to attempt message delivery until it succeeds, which might not be suitable for all applications.        /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using UnityEngine;
@@ -421,8 +425,11 @@ namespace Unity.WebRTC
         /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
         /// </summary>
         /// <remarks>
-        /// This limits how long the browser can continue to attempt to transmit and retransmit the message before giving up.
-        /// </remarks>
+        /// The `MaxRetransmitTime` property sets the maximum duration, in milliseconds, that the data channel will attempt to retransmit a message in unreliable mode.
+        /// This constraint ensures that if a message cannot be delivered within the specified time frame, the channel will cease retransmission attempts.
+        /// It is particularly useful for applications where timing is critical, allowing developers to limit delays potentially caused by prolonged retransmission efforts.
+        /// By defining this timeout, applications can maintain performance efficiency while handling network fluctuations.
+        /// If not set, the retransmission will continue based on other reliability settings, possibly yielding variable delays.        /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using UnityEngine;
@@ -452,7 +459,7 @@ namespace Unity.WebRTC
         /// Determines whether the data channel ensures the delivery of messages in the order they were sent.
         /// </summary>
         /// <remarks>
-        /// This property controls whether the data channel delivers messages in the sequence they were dispatched.
+        /// The `Ordered` property controls whether the data channel delivers messages in the sequence they were dispatched.
         /// If set to true, messages will arrive in the exact order sent, ensuring consistent data flow, which can be critical for applications where order is important.
         /// If false, the data channel allows out-of-order delivery to potentially enhance transmission speed but is best suited for applications where strict order isn't a concern.        /// </remarks>
         /// <example>
@@ -484,9 +491,11 @@ namespace Unity.WebRTC
         /// Returns the number of bytes of data currently queued to be sent over the data channel.
         /// </summary>
         /// <remarks>
-        /// The queue may build up as a result of calls to the send() method.
-        /// This only includes data buffered by the user agent itself;
-        /// it doesn't include any framing overhead or buffering done by the operating system or network hardware.
+        /// The `BufferedAmount` property indicates the number of bytes of data currently queued to be sent over the data channel.
+        /// This value represents the amount of data buffered on the sender side that has not yet been transmitted to the network.
+        /// Monitoring this property helps developers understand and manage flow control, allowing for adjustments to data transmission rates to avoid congestion.
+        /// In scenarios where this value grows unexpectedly, it could indicate network congestion or slow peer processing, prompting the need to throttle data sending.
+        /// Proper use of this property ensures that applications can maintain efficient data flow while mitigating potential bottlenecks.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -530,7 +539,11 @@ namespace Unity.WebRTC
         /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
         /// </summary>
         /// <remarks>
-        /// True is for Web App and the False is for WebRTC layer. The default is false.
+        /// The `Negotiated` property indicates whether the data channel's connection parameters were explicitly negotiated by the application or automatically handled by the WebRTC implementation.
+        /// When set to `true`, it allows developers to manually manage the channel setup including selecting the channel ID, offering greater control over communication specifics.
+        /// This is especially useful in advanced scenarios where integration with complex signaling servers or custom negotiation processes are needed.
+        /// If `false`, the WebRTC stack automatically negotiates the channel's configuration, simplifying the setup but providing less granular control.
+        /// Proper switching between these modes ensures the application meets its communication requirements effectively.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
