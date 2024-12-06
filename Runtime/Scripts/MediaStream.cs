@@ -26,7 +26,7 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var mediaStream = new MediaStream();
+    ///         MediaStream mediaStream = new MediaStream();
     ///     ]]></code>
     /// </example>
     /// <seealso cref="MediaStreamTrack"/>
@@ -116,7 +116,7 @@ namespace Unity.WebRTC
         /// <returns>List of `MediaStreamTrack` objects, one for each video track contained in the media stream.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var videoTracks = mediaStream.GetVideoTracks();
+        ///         IEnumerable<VideoStreamTrack> videoTracks = mediaStream.GetVideoTracks();
         ///     ]]></code>
         /// </example>
         public IEnumerable<VideoStreamTrack> GetVideoTracks()
@@ -134,7 +134,7 @@ namespace Unity.WebRTC
         /// <returns>List of `AudioStreamTrack` objects, one for each audio track contained in the stream.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var audioTracks = mediaStream.GetAudioTracks();
+        ///         IEnumerable<AudioStreamTrack> audioTracks = mediaStream.GetAudioTracks();
         ///     ]]></code>
         /// </example>
         public IEnumerable<AudioStreamTrack> GetAudioTracks()
@@ -152,7 +152,7 @@ namespace Unity.WebRTC
         /// <returns>List of `MediaStreamTrack` objects.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var tracks = mediaStream.GetTracks();
+        ///         IEnumerable<MediaStreamTrack> tracks = mediaStream.GetTracks();
         ///     ]]></code>
         /// </example>
         public IEnumerable<MediaStreamTrack> GetTracks()
@@ -172,7 +172,11 @@ namespace Unity.WebRTC
         /// <returns>`true` if the track successfully added to the stream.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         mediaStream.AddTrack(track);
+        ///         MediaStream receiveStream = new MediaStream();
+        ///         peerConnection.OnTrack = e =>
+        ///         {
+        ///             bool result = receiveStream.AddTrack(e.Track);
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <seealso cref="RemoveTrack(MediaStreamTrack)"/>
@@ -192,7 +196,7 @@ namespace Unity.WebRTC
         /// <returns>`true` if the track successfully removed from the stream.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         mediaStream.RemoveTrack(track);
+        ///         bool result = mediaStream.RemoveTrack(track);
         ///     ]]></code>
         /// </example>
         /// <seealso cref="AddTrack(MediaStreamTrack)"/>
@@ -212,7 +216,7 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var mediaStream = new MediaStream();
+        ///         MediaStream mediaStream = new MediaStream();
         ///     ]]></code>
         /// </example>
         public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
