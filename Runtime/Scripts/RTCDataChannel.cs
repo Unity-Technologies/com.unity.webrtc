@@ -218,7 +218,7 @@ namespace Unity.WebRTC
         /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel.
         /// </summary>
         /// <remarks>
-        /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel. This ID is set at the time the data channel is created, either by the user agent (if RTCDataChannel.negotiated is false) or by the site or app script (if negotiated is true).
+        /// This ID is set at the time the data channel is created, either by the user agent (if RTCDataChannel.negotiated is false) or by the site or app script (if negotiated is true).
         /// Each RTCPeerConnection can therefore have up to a theoretical maximum of 65,534 data channels on it.
         /// </remarks>
         public int Id => NativeMethods.DataChannelGetID(GetSelfOrThrow());
@@ -235,7 +235,6 @@ namespace Unity.WebRTC
         /// Returns a string containing a name describing the data channel. These labels are not required to be unique.
         /// </summary>
         /// <remarks>
-        /// Returns a string containing a name describing the data channel. These labels are not required to be unique.
         /// You may use the label as you wish; you could use it to identify all the channels that are being used for the same purpose, by giving them all the same name.
         /// Or you could give each channel a unique label for tracking purposes. It's entirely up to the design decisions made when building your site or app.
         /// </remarks>
@@ -245,8 +244,7 @@ namespace Unity.WebRTC
         /// Returns the maximum number of times the browser should try to retransmit a message before giving up.
         /// </summary>
         /// <remarks>
-        /// Returns the maximum number of times the browser should try to retransmit a message before giving up,
-        /// as set when the data channel was created, or null, which indicates that there is no maximum.
+        /// As set when the data channel was created, or null, which indicates that there is no maximum.
         /// This can only be set when the RTCDataChannel is created by calling RTCPeerConnection.createDataChannel(), using the maxRetransmits field in the specified options.
         /// </remarks>
         public ushort MaxRetransmits => NativeMethods.DataChannelGetMaxRetransmits(GetSelfOrThrow());
@@ -255,7 +253,6 @@ namespace Unity.WebRTC
         /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
         /// </summary>
         /// <remarks>
-        /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
         /// This limits how long the browser can continue to attempt to transmit and retransmit the message before giving up.
         /// </remarks>
         public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
@@ -264,7 +261,7 @@ namespace Unity.WebRTC
         /// Indicates whether or not the data channel guarantees in-order delivery of messages.
         /// </summary>
         /// <remarks>
-        /// indicates whether or not the data channel guarantees in-order delivery of messages; the default is true, which indicates that the data channel is indeed ordered.
+        /// The default is true, which indicates that the data channel is indeed ordered.
         /// This is set when the RTCDataChannel is created, by setting the ordered property on the object passed as RTCPeerConnection.createDataChannel()'s options parameter.
         /// </remarks>
         public bool Ordered => NativeMethods.DataChannelGetOrdered(GetSelfOrThrow());
@@ -273,7 +270,9 @@ namespace Unity.WebRTC
         /// Returns the number of bytes of data currently queued to be sent over the data channel.
         /// </summary>
         /// <remarks>
-        ///
+        /// The queue may build up as a result of calls to the send() method.
+        /// This only includes data buffered by the user agent itself;
+        /// it doesn't include any framing overhead or buffering done by the operating system or network hardware.
         /// </remarks>
         public ulong BufferedAmount => NativeMethods.DataChannelGetBufferedAmount(GetSelfOrThrow());
 
@@ -281,7 +280,7 @@ namespace Unity.WebRTC
         /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
         /// </summary>
         /// <remarks>
-        ///
+        /// True is for Web App and the False is for WebRTC layer. The default is false.
         /// </remarks>
         public bool Negotiated => NativeMethods.DataChannelGetNegotiated(GetSelfOrThrow());
 
@@ -366,7 +365,13 @@ namespace Unity.WebRTC
         /// Release all the resources RTCDataChannel instance has allocated.
         /// </summary>
         /// <remarks>
+        /// The Dispose method leaves the RTCDataChannel in an unusable state.
+        /// After calling Dispose, you must release all references to the RTCDataChannel
+        /// so the garbage collector can reclaim the memory that the RTCDataChannel was occupying.
         ///
+        /// Note: Always call Dispose before you release your last reference to the
+        /// RTCDataChannel. Otherwise, the resources it is using will not be freed
+        /// until the garbage collector calls the Finalize method of the object.
         /// </remarks>
         public override void Dispose()
         {
@@ -387,7 +392,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -411,7 +415,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -435,7 +438,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -464,7 +466,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -491,7 +492,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -516,7 +516,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -540,7 +539,6 @@ namespace Unity.WebRTC
         /// Sends data across the data channel to the remote peer.
         /// </summary>
         /// <remarks>
-        /// Sends data across the data channel to the remote peer.
         /// This can be done any time except during the initial process of creating the underlying transport channel.
         /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
         /// and is also buffered if sent while the connection is closing or closed.
@@ -566,7 +564,6 @@ namespace Unity.WebRTC
         /// Closes the RTCDataChannel. Either peer is permitted to call this method to initiate closure of the channel.
         /// </summary>
         /// <remarks>
-        /// Closes the RTCDataChannel. Either peer is permitted to call this method to initiate closure of the channel.
         /// Closure of the data channel is not instantaneous. Most of the process of closing the connection is handled asynchronously;
         /// you can detect when the channel has finished closing by watching for a close event on the data channel.
         /// </remarks>
