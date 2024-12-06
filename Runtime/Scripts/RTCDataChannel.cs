@@ -77,68 +77,70 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Represents type of delegate to be called when WebRTC open event is sent.
+    /// Represents the method that will be invoked when the data channel is successfully opened and ready for communication.
     /// </summary>
     /// <remarks>
-    /// The WebRTC open event is sent to an RTCDataChannel object's onopen event handler when the underlying transport used to send and receive the data channel's messages is opened or reopened.
-    /// This event is not cancelable and does not bubble.
+    /// The `DelegateOnOpen` is triggered when the data channel's transport layer becomes successfully established and ready for data transfer.
+    /// This indicates that messages can now be sent and received over the channel, marking the transition from connecting to an operational state.
+    /// Useful for initializing or signaling to the application that the channel setup is complete and ready for communication.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnOpen"/>
     public delegate void DelegateOnOpen();
 
     /// <summary>
-    /// Represents type of delegate to be called when RTCDataChannel close event is sent.
+    /// Represents the method that will be invoked when the data channel has been closed and is no longer available for communication.
     /// </summary>
     /// <remarks>
-    /// The close event is sent to the onclose event handler on an RTCDataChannel instance when the data transport for the data channel has closed.
-    /// Before any further data can be transferred using RTCDataChannel, a new 'RTCDataChannel' instance must be created.
-    /// This event is not cancelable and does not bubble.
+    /// The `DelegateOnClose` is triggered when the data channel's underlying transport is terminated, signaling that no further messages can be sent or received.
+    /// Useful for cleaning up resources or notifying the application that the data channel is no longer in use.
+    /// This marks a transition to a non-operational state, and to resume communication, a new data channel must be established.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnClose"/>
     public delegate void DelegateOnClose();
 
     /// <summary>
-    /// Represents type of delegate to be called when RTCDataChannel message event is sent.
+    /// Represents the method that will be invoked when a message is received from the remote peer over the data channel.
     /// </summary>
     /// <remarks>
-    /// The WebRTC message event is sent to the onmessage event handler on an RTCDataChannel object when a message has been received from the remote peer.
+    /// The `DelegateOnMessage` is executed when the data channel successfully receives a message from the remote peer, providing the message content as a parameter.
+    /// This allows the application to process the incoming data, whether it's for updating the UI, triggering gameplay logic, or handling any response actions.
+    /// The method receives the message as a byte array, making it flexible for both textual and binary data.
     /// </remarks>
     /// <param name="bytes"></param>
     /// <seealso cref="RTCDataChannel.OnMessage"/>
     public delegate void DelegateOnMessage(byte[] bytes);
 
     /// <summary>
-    /// Represents type of delegate to be called when RTCPeerConnection datachannel event is sent.
+    /// Represents the method that will be invoked when a new data channel is added to the RTCPeerConnection.
     /// </summary>
     /// <remarks>
-    /// A datachannel event is sent to an RTCPeerConnection instance when an RTCDataChannel has been added to the connection,
-    /// as a result of the remote peer calling RTCPeerConnection.createDataChannel().
+    /// The `DelegateOnDataChannel` is triggered when a new data channel is established, typically as a result of the remote peer creating a channel.
+    /// This provides an opportunity to configure the new channel, such as setting message handlers or adjusting properties.
+    /// Ensuring the application is prepared to handle the new data channel is crucial for seamless peer-to-peer communication.
     /// </remarks>
     /// <param name="channel"></param>
     /// <seealso cref="RTCPeerConnection.OnDataChannel"/>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
     /// <summary>
-    /// Delegate to be called when RTCPeerConnection error event is sent.
+    /// Represents the method that will be invoked when an error occurs on the data channel.
     /// </summary>
     /// <remarks>
-    /// A WebRTC error event is sent to an RTCDataChannel object's onerror event handler when an error occurs on the data channel.
-    /// The RTCErrorEvent object provides details about the error that occurred; see that article for details.
-    /// This event is not cancelable and does not bubble.
+    /// The `DelegateOnError` is executed whenever an error arises within the data channel, allowing applications to handle various error scenarios gracefully.
+    /// It provides detailed information about the error, enabling developers to implement corrective measures or issue notifications to users.
+    /// Handling such errors is crucial for maintaining robust and reliable peer-to-peer communication.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnError"/>
     public delegate void DelegateOnError(RTCError error);
 
     /// <summary>
-    /// Represents a network channel which can be used for bidirectional peer-to-peer transfers of arbitrary data.
+    /// Creates a new RTCDataChannel for peer-to-peer data exchange, using the specified label and options.
     /// </summary>
     /// <remarks>
-    /// RTCDataChannel interface represents a network channel which can be used for bidirectional peer-to-peer transfers of arbitrary data.
-    /// Every data channel is associated with an RTCPeerConnection, and each peer connection can have up to a theoretical maximum of 65,534 data channels.
-    ///
-    /// To create a data channel and ask a remote peer to join you, call the RTCPeerConnection's createDataChannel() method.
-    /// The peer being invited to exchange data receives a datachannel event (which has type RTCDataChannelEvent) to let it know the data channel has been added to the connection.
-    /// </remarks>
+    /// The `CreateDataChannel` method establishes a bidirectional communication channel between peers, identified by a unique label.
+    /// This channel allows for the transmission of arbitrary data, such as text or binary, directly between connected peers without the need for a traditional server.
+    /// The optional parameters provide flexibility in controlling the behavior of the data channel, including options for reliability and ordering of messages.
+    /// It's essential for applications to configure these channels according to their specific communication needs.    /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
     ///         var initOption = new RTCDataChannelInit();
@@ -170,7 +172,9 @@ namespace Unity.WebRTC
         /// Delegate to be called when a message has been received from the remote peer.
         /// </summary>
         /// <remarks>
-        /// The WebRTC message event is sent to the onmessage event handler on an RTCDataChannel object when a message has been received from the remote peer.
+        /// The `OnMessage` delegate is invoked whenever a message is received over the data channel from the remote peer.
+        /// This provides the application an opportunity to process the received data, which could include tasks such as updating the user interface, storing information, or triggering specific logic.
+        /// The message is delivered as a byte array, offering flexibility to handle both text and binary data formats.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -202,6 +206,9 @@ namespace Unity.WebRTC
         /// Delegate to be called when the data channel's messages is opened or reopened.
         /// </summary>
         /// <remarks>
+        /// The `OnOpen` delegate is triggered when the data channel successfully establishes its underlying transport mechanism.
+        /// This state transition indicates that the channel is ready for data transmission, providing an opportunity for the application to initialize any required states or notify the user that the channel is ready to use.
+        /// It is a critical event for setting up initial data exchanges between peers.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -267,9 +274,9 @@ namespace Unity.WebRTC
         /// Delegate to be called when the errors occur.
         /// </summary>
         /// <remarks>
-        /// A WebRTC error event is sent to an RTCDataChannel object's onerror event handler when an error occurs on the data channel.
-        /// The RTCErrorEvent object provides details about the error that occurred; see that article for details.
-        /// This event is not cancelable and does not bubble.
+        /// The `OnClose` delegate is triggered when the data channel's transport layer is terminated, signifying the channel's transition to a closed state.
+        /// This event serves as a cue for the application to release resources, update the user interface, or handle any clean-up operations necessary to gracefully end the communication session.
+        /// Understanding this transition is vital for managing the lifecycle of data exchanges between peers.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
@@ -301,8 +308,9 @@ namespace Unity.WebRTC
         /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel.
         /// </summary>
         /// <remarks>
-        /// This ID is set at the time the data channel is created, either by the user agent (if RTCDataChannel.negotiated is false) or by the site or app script (if negotiated is true).
-        /// Each RTCPeerConnection can therefore have up to a theoretical maximum of 65,534 data channels on it.
+        /// The `OnError` delegate is triggered whenever there is an error in the data channel, offering the application a chance to handle the error gracefully.
+        /// This includes logging the error, alerting the user, or attempting to rectify the issue depending on the nature and severity of the error encountered.
+        /// Proper error handling is crucial for maintaining robust communication and ensuring a seamless user experience.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
