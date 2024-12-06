@@ -49,7 +49,7 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var audioStreamTrack = new AudioStreamTrack(texture);
+    ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack(texture);
     ///     ]]></code>
     /// </example>
     /// <seealso cref="MediaStreamTrack" />
@@ -211,7 +211,7 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code><![CDATA[
-        ///         var audioStreamTrack = new AudioStreamTrack();
+        ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack();
         ///     ]]></code>
         /// </example>
         public AudioStreamTrack()
@@ -228,7 +228,7 @@ namespace Unity.WebRTC
         /// <param name="source">`AudioSource` object.</param>
         /// <example>
         ///     <code><![CDATA[
-        ///         var audioStreamTrack = new AudioStreamTrack(source);
+        ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack(source);
         ///     ]]></code>
         /// </example>
         public AudioStreamTrack(AudioSource source)
@@ -253,7 +253,7 @@ namespace Unity.WebRTC
         /// <param name="listener">`AudioListener` object.</param>
         /// <example>
         ///     <code><![CDATA[
-        ///         var audioStreamTrack = new AudioStreamTrack(listener);
+        ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack(listener);
         ///     ]]></code>
         /// </example>
         public AudioStreamTrack(AudioListener listener)
@@ -422,6 +422,11 @@ namespace Unity.WebRTC
         /// <param name="span">`ReadOnlySpan<float>` containing audio data samples.</param>
         /// <param name="channels">Number of audio channels.</param>
         /// <param name="sampleRate">Sample rate of the audio data</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.SetData(span, channels, sampleRate);
+        ///     ]]></code>
+        /// </example>
         public void SetData(ReadOnlySpan<float> span, int channels, int sampleRate)
         {
             unsafe
