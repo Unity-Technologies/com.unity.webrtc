@@ -10,7 +10,7 @@ namespace Unity.WebRTC
     ///     Delegate to be called when new audio data is received.
     /// </summary>
     /// <remarks>
-    ///     `AudioReadEventHandler` is a delegate to be called when received new audio data.
+    ///     `AudioReadEventHandler` is a delegate to be called when new audio data is received.
     /// </remarks>
     /// <param name="data">Float array containing audio data samples.</param>
     /// <param name="channels">Number of audio channels.</param>
