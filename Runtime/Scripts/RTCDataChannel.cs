@@ -83,8 +83,31 @@ namespace Unity.WebRTC
     /// The `DelegateOnOpen` is triggered when the data channel's transport layer becomes successfully established and ready for data transfer.
     /// This indicates that messages can now be sent and received over the channel, marking the transition from connecting to an operational state.
     /// Useful for initializing or signaling to the application that the channel setup is complete and ready for communication.
+    /// This delegate is typically assigned to the <see cref="RTCDataChannel.OnOpen"/> property.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnOpen"/>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         public class DataChannelOpenExample : MonoBehaviour
+    ///         {
+    ///             private void Start()
+    ///             {
+    ///                 var initOption = new RTCDataChannelInit();
+    ///                 var peerConnection = new RTCPeerConnection();
+    ///                 var dataChannel = peerConnection.CreateDataChannel("test channel", initOption);
+    ///
+    ///                 // Assign the delegate to handle the OnOpen event
+    ///                 dataChannel.OnOpen = () =>
+    ///                 {
+    ///                     Debug.Log("DataChannel is now open and ready for communication.");
+    ///                 };
+    ///             }
+    ///         }
+    ///     ]]></code>
+    /// </example>
     public delegate void DelegateOnOpen();
 
     /// <summary>
@@ -94,8 +117,31 @@ namespace Unity.WebRTC
     /// The `DelegateOnClose` is triggered when the data channel's underlying transport is terminated, signaling that no further messages can be sent or received.
     /// Useful for cleaning up resources or notifying the application that the data channel is no longer in use.
     /// This marks a transition to a non-operational state, and to resume communication, a new data channel must be established.
+    /// This delegate is typically assigned to the <see cref="RTCDataChannel.OnClose"/> property.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnClose"/>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         public class DataChannelCloseExample : MonoBehaviour
+    ///         {
+    ///             private void Start()
+    ///             {
+    ///                 var initOption = new RTCDataChannelInit();
+    ///                 var peerConnection = new RTCPeerConnection();
+    ///                 var dataChannel = peerConnection.CreateDataChannel("test channel", initOption);
+    ///
+    ///                 // Assign the delegate to handle the OnClose event
+    ///                 dataChannel.OnClose = () =>
+    ///                 {
+    ///                     Debug.Log("DataChannel has been closed.");
+    ///                 };
+    ///             }
+    ///         }
+    ///     ]]></code>
+    /// </example>
     public delegate void DelegateOnClose();
 
     /// <summary>
@@ -105,9 +151,33 @@ namespace Unity.WebRTC
     /// The `DelegateOnMessage` is executed when the data channel successfully receives a message from the remote peer, providing the message content as a parameter.
     /// This allows the application to process the incoming data, whether it's for updating the UI, triggering gameplay logic, or handling any response actions.
     /// The method receives the message as a byte array, making it flexible for both textual and binary data.
+    /// This delegate is typically assigned to the <see cref="RTCDataChannel.OnMessage"/> property.
     /// </remarks>
-    /// <param name="bytes"></param>
+    /// <param name="bytes">The message received as a byte array.</param>
     /// <seealso cref="RTCDataChannel.OnMessage"/>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         public class DataChannelMessageExample : MonoBehaviour
+    ///         {
+    ///             private void Start()
+    ///             {
+    ///                 var initOption = new RTCDataChannelInit();
+    ///                 var peerConnection = new RTCPeerConnection();
+    ///                 var dataChannel = peerConnection.CreateDataChannel("test channel", initOption);
+    ///
+    ///                 // Assign the delegate to handle the OnMessage event
+    ///                 dataChannel.OnMessage = (bytes) =>
+    ///                 {
+    ///                     string message = System.Text.Encoding.UTF8.GetString(bytes);
+    ///                     Debug.Log("Received message: " + message);
+    ///                 };
+    ///             }
+    ///         }
+    ///     ]]></code>
+    /// </example>
     public delegate void DelegateOnMessage(byte[] bytes);
 
     /// <summary>
@@ -117,9 +187,35 @@ namespace Unity.WebRTC
     /// The `DelegateOnDataChannel` is triggered when a new data channel is established, typically as a result of the remote peer creating a channel.
     /// This provides an opportunity to configure the new channel, such as setting message handlers or adjusting properties.
     /// Ensuring the application is prepared to handle the new data channel is crucial for seamless peer-to-peer communication.
+    /// This delegate is typically assigned to the <see cref="RTCPeerConnection.OnDataChannel"/> property.
     /// </remarks>
-    /// <param name="channel"></param>
+    /// <param name="channel">The RTCDataChannel that has been added to the connection.</param>
     /// <seealso cref="RTCPeerConnection.OnDataChannel"/>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         public class DataChannelHandlerExample : MonoBehaviour
+    ///         {
+    ///             private void Start()
+    ///             {
+    ///                 var peerConnection = new RTCPeerConnection();
+    ///
+    ///                 // Assign the delegate to handle the OnDataChannel event
+    ///                 peerConnection.OnDataChannel = (channel) =>
+    ///                 {
+    ///                     Debug.Log("A new data channel has been added: " + channel.Label);
+    ///                     channel.OnMessage = (bytes) =>
+    ///                     {
+    ///                         string message = System.Text.Encoding.UTF8.GetString(bytes);
+    ///                         Debug.Log("Received message on new channel: " + message);
+    ///                     };
+    ///                 };
+    ///             }
+    ///         }
+    ///     ]]></code>
+    /// </example>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
     /// <summary>
@@ -129,8 +225,34 @@ namespace Unity.WebRTC
     /// The `DelegateOnError` is executed whenever an error arises within the data channel, allowing applications to handle various error scenarios gracefully.
     /// It provides detailed information about the error, enabling developers to implement corrective measures or issue notifications to users.
     /// Handling such errors is crucial for maintaining robust and reliable peer-to-peer communication.
+    /// This delegate is typically assigned to the <see cref="RTCDataChannel.OnError"/> property.
     /// </remarks>
+    /// <param name="error">The RTCError object that contains details about the error.</param>
     /// <seealso cref="RTCDataChannel.OnError"/>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         public class DataChannelErrorHandlingExample : MonoBehaviour
+    ///         {
+    ///             private void Start()
+    ///             {
+    ///                 var initOption = new RTCDataChannelInit();
+    ///                 var peerConnection = new RTCPeerConnection();
+    ///                 var dataChannel = peerConnection.CreateDataChannel("test channel", initOption);
+    ///
+    ///                 // Assign the delegate to handle the OnError event
+    ///                 dataChannel.OnError = (error) =>
+    ///                 {
+    ///                     Debug.LogError("DataChannel error occurred: " + error.message);
+    ///                     // Additional error handling logic can be implemented here
+    ///                 };
+    ///             }
+    ///         }
+    ///     ]]></code>
+    /// </example>
+
     public delegate void DelegateOnError(RTCError error);
 
     /// <summary>
@@ -140,7 +262,8 @@ namespace Unity.WebRTC
     /// The `CreateDataChannel` method establishes a bidirectional communication channel between peers, identified by a unique label.
     /// This channel allows for the transmission of arbitrary data, such as text or binary, directly between connected peers without the need for a traditional server.
     /// The optional parameters provide flexibility in controlling the behavior of the data channel, including options for reliability and ordering of messages.
-    /// It's essential for applications to configure these channels according to their specific communication needs.    /// </remarks>
+    /// It's essential for applications to configure these channels according to their specific communication needs.
+    /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
     ///         var initOption = new RTCDataChannelInit();
@@ -164,7 +287,7 @@ namespace Unity.WebRTC
     public class RTCDataChannel : RefCountedObject
     {
         private DelegateOnMessage onMessage;
-        private DelegateOnOpen onOpen;
+        private DelegateOnOpen  onOpen;
         private DelegateOnClose onClose;
         private DelegateOnError onError;
 
