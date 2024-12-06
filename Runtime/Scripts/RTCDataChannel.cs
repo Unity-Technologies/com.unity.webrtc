@@ -35,7 +35,7 @@ namespace Unity.WebRTC
         public int? maxRetransmits;
 
         /// <summary>
-        /// Provides the name of the sub-protocol being used on the RTCDataChannel.
+        /// Specifies the sub protocol being used by the data channel to transmit and process messages.
         /// </summary>
         public string protocol;
 
@@ -352,11 +352,12 @@ namespace Unity.WebRTC
         public string Label => NativeMethods.DataChannelGetLabel(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        /// Returns a string containing a name describing the data channel. These labels are not required to be unique.
+        /// Returns the sub protocol being used by the data channel to transmit and process messages.
         /// </summary>
         /// <remarks>
-        /// You may use the label as you wish; you could use it to identify all the channels that are being used for the same purpose, by giving them all the same name.
-        /// Or you could give each channel a unique label for tracking purposes. It's entirely up to the design decisions made when building your site or app.
+        /// The `Protocol` property retrieves the sub protocol negotiated for this data channel, which governs the rules for message format and communication behavior between peers.
+        /// This property is critical for ensuring compatibility and understanding between different systems or applications using the channel, especially when custom protocols are used.
+        /// If no protocol was specified during the data channel's creation, this property returns an empty string, indicating that no particular sub protocol is in effect.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
