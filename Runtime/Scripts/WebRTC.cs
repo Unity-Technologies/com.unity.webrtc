@@ -538,7 +538,12 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var configuration = peerConnection.GetConfiguration();
+    ///         RTCConfiguration configuration = peerConnection.GetConfiguration();
+    ///         if(configuration.urls.length == 0)
+    ///         {
+    ///             configuration.urls = new[] {"stun:stun.l.google.com:19302"};
+    ///         }
+    ///         peerConnection.SetConfiguration(configuration);
     ///     ]]></code>
     /// </example>
     /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
