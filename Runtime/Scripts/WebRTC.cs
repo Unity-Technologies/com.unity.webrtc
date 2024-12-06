@@ -423,24 +423,24 @@ namespace Unity.WebRTC
 
 
     /// <summary>
-    /// The RTCSessionDescription interface describes one end of a connection—or potential connection—and how it's configured.
-    /// Each RTCSessionDescription consists of a description type indicating which part of the offer/answer negotiation process it describes
-    /// and of the SDP descriptor of the session.
+    /// The RTCSessionDescription interface represents the setup of one side of a connection or a proposed connection.
+    /// It contains a description type that identifies the negotiation stage it pertains to, along with the session's SDP (Session Description Protocol)
+    /// details.
     /// </summary>
     /// <remarks>
-    /// The process of negotiating a connection between two peers involves exchanging RTCSessionDescription objects back and forth,
-    /// with each description suggesting one combination of connection configuration options that the sender of the description supports.
-    /// Once the two peers agree upon a configuration for the connection, negotiation is complete.
+    /// Establishing a connection between two parties involves swapping RTCSessionDescription objects,
+    /// with each one proposing a set of connection setup options that the sender can accommodate.
+    /// The connection setup is finalized when both parties agree on a particular configuration.
     /// </remarks>
     public struct RTCSessionDescription
     {
         /// <summary>
-        ///An enum describing the session description's type.
+        /// An enum that specifies the type of the session description.
         /// </summary>
         public RTCSdpType type;
 
         /// <summary>
-        ///A string containing the SDP describing the session.
+        /// A string that holds the session's SDP information.
         /// </summary>
         [MarshalAs(UnmanagedType.LPStr)]
         public string sdp;
