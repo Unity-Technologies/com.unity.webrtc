@@ -287,7 +287,7 @@ namespace Unity.WebRTC
     public class RTCDataChannel : RefCountedObject
     {
         private DelegateOnMessage onMessage;
-        private DelegateOnOpen  onOpen;
+        private DelegateOnOpen onOpen;
         private DelegateOnClose onClose;
         private DelegateOnError onError;
 
