@@ -16,9 +16,13 @@ namespace Unity.WebRTC
     /// <param name="renderer">`Texture` object where the video stream is rendered.</param>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///     videoStreamTrack.OnVideoReceived += (texture) =>
-    ///     {
-    ///     }
+    ///         [SerializeField]
+    ///         RawImage receivedImage;
+    ///
+    ///         videoStreamTrack.OnVideoReceived += (texture) =>
+    ///         {
+    ///             receivedImage.texture = texture;
+    ///         }
     ///     ]]></code>
     /// </example>
     /// <seealso cref="RTCPeerConnection" />
@@ -32,6 +36,12 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <param name="source">Source `Texture` object.</param>
     /// <param name="dest">Destination `Texture` object.</param>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture, CopyTextureHelper.VerticalFlipCopy);
+    ///     ]]>
+    /// </example>
+    /// <seealso cref="VideoStreamTrack(Texture, CopyTexture)" />
     public delegate void CopyTexture(Texture source, RenderTexture dest);
 
     /// <summary>
@@ -42,7 +52,7 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var videoStreamTrack = new VideoStreamTrack(texture);
+    ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture);
     ///     ]]></code>
     /// </example>
     /// <seealso cref="MediaStreamTrack" />
@@ -143,9 +153,13 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///     videoStreamTrack.OnVideoReceived += (texture) =>
-        ///     {
-        ///     }
+        ///         [SerializeField]
+        ///         RawImage receivedImage;
+        ///
+        ///         videoStreamTrack.OnVideoReceived += (texture) =>
+        ///         {
+        ///             receivedImage.texture = texture;
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <seealso cref="RTCPeerConnection"/>
@@ -200,7 +214,7 @@ namespace Unity.WebRTC
         /// </param>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var videoStreamTrack = new VideoStreamTrack(texture, copyTexture);
+        ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture, CopyTextureHelper.VerticalFlipCopy);
         ///     ]]></code>
         /// </example>
         /// <exception cref="InvalidOperationException"></exception>
