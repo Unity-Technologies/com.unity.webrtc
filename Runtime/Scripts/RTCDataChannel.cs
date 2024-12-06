@@ -72,48 +72,54 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// Specify the delegate type for OnOpen.
+    /// Represents type of delegate to be called when WebRTC open event is sent.
     /// </summary>
     /// <remarks>
-    ///
+    /// The WebRTC open event is sent to an RTCDataChannel object's onopen event handler when the underlying transport used to send and receive the data channel's messages is opened or reopened.
+    /// This event is not cancelable and does not bubble.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnOpen"/>
     public delegate void DelegateOnOpen();
 
     /// <summary>
-    /// Specify the delegate type for OnClose.
+    /// Represents type of delegate to be called when RTCDataChannel close event is sent.
     /// </summary>
     /// <remarks>
-    ///
+    /// The close event is sent to the onclose event handler on an RTCDataChannel instance when the data transport for the data channel has closed.
+    /// Before any further data can be transferred using RTCDataChannel, a new 'RTCDataChannel' instance must be created.
+    /// This event is not cancelable and does not bubble.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnClose"/>
     public delegate void DelegateOnClose();
 
     /// <summary>
-    /// Specify the delegate type for OnMessage.
+    /// Represents type of delegate to be called when RTCDataChannel message event is sent.
     /// </summary>
     /// <remarks>
-    ///
+    /// The WebRTC message event is sent to the onmessage event handler on an RTCDataChannel object when a message has been received from the remote peer.
     /// </remarks>
     /// <param name="bytes"></param>
     /// <seealso cref="RTCDataChannel.OnMessage"/>
     public delegate void DelegateOnMessage(byte[] bytes);
 
     /// <summary>
-    /// Specify the delegate type for RTCPeerConnection.OnDataChannel.
+    /// Represents type of delegate to be called when RTCPeerConnection datachannel event is sent.
     /// </summary>
     /// <remarks>
-    ///
+    /// A datachannel event is sent to an RTCPeerConnection instance when an RTCDataChannel has been added to the connection,
+    /// as a result of the remote peer calling RTCPeerConnection.createDataChannel().
     /// </remarks>
     /// <param name="channel"></param>
-    /// <seealso cref="RTCPeerConnection.OnError"/>
+    /// <seealso cref="RTCPeerConnection.OnDataChannel"/>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
     /// <summary>
-    /// Specify the delegate type for OnDataChannel.
+    /// Delegate to be called when RTCPeerConnection error event is sent.
     /// </summary>
     /// <remarks>
-    ///
+    /// A WebRTC error event is sent to an RTCDataChannel object's onerror event handler when an error occurs on the data channel.
+    /// The RTCErrorEvent object provides details about the error that occurred; see that article for details.
+    /// This event is not cancelable and does not bubble.
     /// </remarks>
     /// <seealso cref="RTCDataChannel.OnError"/>
     public delegate void DelegateOnError(RTCError error);
@@ -159,7 +165,7 @@ namespace Unity.WebRTC
         /// Delegate to be called when a message has been received from the remote peer.
         /// </summary>
         /// <remarks>
-        ///
+        /// The WebRTC message event is sent to the onmessage event handler on an RTCDataChannel object when a message has been received from the remote peer.
         /// </remarks>
         public DelegateOnMessage OnMessage
         {
@@ -171,7 +177,8 @@ namespace Unity.WebRTC
         /// Delegate to be called when the data channel's messages is opened or reopened.
         /// </summary>
         /// <remarks>
-        ///
+        /// The WebRTC open event is sent to an RTCDataChannel object's onopen event handler when the underlying transport used to send and receive the data channel's messages is opened or reopened.
+        /// This event is not cancelable and does not bubble.
         /// </remarks>
         public DelegateOnOpen OnOpen
         {
@@ -183,7 +190,9 @@ namespace Unity.WebRTC
         /// Delegate to be called when the data channel's messages is closed.
         /// </summary>
         /// <remarks>
-        ///
+        /// The close event is sent to the onclose event handler on an RTCDataChannel instance when the data transport for the data channel has closed.
+        /// Before any further data can be transferred using RTCDataChannel, a new 'RTCDataChannel' instance must be created.
+        /// This event is not cancelable and does not bubble.
         /// </remarks>
         public DelegateOnClose OnClose
         {
@@ -195,7 +204,9 @@ namespace Unity.WebRTC
         /// Delegate to be called when the errors occur.
         /// </summary>
         /// <remarks>
-        ///
+        /// A WebRTC error event is sent to an RTCDataChannel object's onerror event handler when an error occurs on the data channel.
+        /// The RTCErrorEvent object provides details about the error that occurred; see that article for details.
+        /// This event is not cancelable and does not bubble.
         /// </remarks>
         public DelegateOnError OnError
         {
@@ -207,7 +218,8 @@ namespace Unity.WebRTC
         /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel.
         /// </summary>
         /// <remarks>
-        ///
+        /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel. This ID is set at the time the data channel is created, either by the user agent (if RTCDataChannel.negotiated is false) or by the site or app script (if negotiated is true).
+        /// Each RTCPeerConnection can therefore have up to a theoretical maximum of 65,534 data channels on it.
         /// </remarks>
         public int Id => NativeMethods.DataChannelGetID(GetSelfOrThrow());
 
@@ -220,10 +232,12 @@ namespace Unity.WebRTC
         public string Label => NativeMethods.DataChannelGetLabel(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        /// Returns a string containing the name of the sub protocol in use. If no protocol was specified when the data channel was created, then this property's value is the empty string ("").
+        /// Returns a string containing a name describing the data channel. These labels are not required to be unique.
         /// </summary>
         /// <remarks>
-        ///
+        /// Returns a string containing a name describing the data channel. These labels are not required to be unique.
+        /// You may use the label as you wish; you could use it to identify all the channels that are being used for the same purpose, by giving them all the same name.
+        /// Or you could give each channel a unique label for tracking purposes. It's entirely up to the design decisions made when building your site or app.
         /// </remarks>
         public string Protocol => NativeMethods.DataChannelGetProtocol(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
@@ -231,7 +245,9 @@ namespace Unity.WebRTC
         /// Returns the maximum number of times the browser should try to retransmit a message before giving up.
         /// </summary>
         /// <remarks>
-        ///
+        /// Returns the maximum number of times the browser should try to retransmit a message before giving up,
+        /// as set when the data channel was created, or null, which indicates that there is no maximum.
+        /// This can only be set when the RTCDataChannel is created by calling RTCPeerConnection.createDataChannel(), using the maxRetransmits field in the specified options.
         /// </remarks>
         public ushort MaxRetransmits => NativeMethods.DataChannelGetMaxRetransmits(GetSelfOrThrow());
 
@@ -239,7 +255,8 @@ namespace Unity.WebRTC
         /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
         /// </summary>
         /// <remarks>
-        ///
+        /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
+        /// This limits how long the browser can continue to attempt to transmit and retransmit the message before giving up.
         /// </remarks>
         public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
 
@@ -247,7 +264,8 @@ namespace Unity.WebRTC
         /// Indicates whether or not the data channel guarantees in-order delivery of messages.
         /// </summary>
         /// <remarks>
-        ///
+        /// indicates whether or not the data channel guarantees in-order delivery of messages; the default is true, which indicates that the data channel is indeed ordered.
+        /// This is set when the RTCDataChannel is created, by setting the ordered property on the object passed as RTCPeerConnection.createDataChannel()'s options parameter.
         /// </remarks>
         public bool Ordered => NativeMethods.DataChannelGetOrdered(GetSelfOrThrow());
 
