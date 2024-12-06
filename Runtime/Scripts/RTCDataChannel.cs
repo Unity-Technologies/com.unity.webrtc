@@ -6,17 +6,17 @@ using Unity.Collections.LowLevel.Unsafe;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// Represents argument parameters for RTCPeerConnection.CreateDataChannel()
+    /// Provides configuration options for the data channel.
     /// </summary>
     /// <seealso cref="RTCPeerConnection.CreateDataChannel(string, RTCDataChannelInit)"/>
     public class RTCDataChannelInit
     {
         /// <summary>
-        ///
+        /// Indicates whether or not the data channel guarantees in-order delivery of messages.
         /// </summary>
         public bool? ordered;
         /// <summary>
-        ///
+        /// Represents the maximum number of milliseconds that attempts to transfer a message may take in unreliable mode..
         /// </summary>
         /// <remarks>
         /// Cannot be set along with <see cref="RTCDataChannelInit.maxRetransmits"/>.
@@ -24,7 +24,7 @@ namespace Unity.WebRTC
         /// <seealso cref="RTCDataChannelInit.maxRetransmits"/>
         public int? maxPacketLifeTime;
         /// <summary>
-        ///
+        /// Represents the maximum number of times the user agent should attempt to retransmit a message which fails the first time in unreliable mode.
         /// </summary>
         /// <remarks>
         /// Cannot be set along with <see cref="RTCDataChannelInit.maxPacketLifeTime"/>.
@@ -32,15 +32,15 @@ namespace Unity.WebRTC
         /// <seealso cref="RTCDataChannelInit.maxPacketLifeTime"/>
         public int? maxRetransmits;
         /// <summary>
-        ///
+        /// Provides the name of the sub-protocol being used on the RTCDataChannel.
         /// </summary>
         public string protocol;
         /// <summary>
-        ///
+        /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app (true) or by the WebRTC layer (false).
         /// </summary>
         public bool? negotiated;
         /// <summary>
-        ///
+        /// Indicates a 16-bit numeric ID for the channel.
         /// </summary>
         public int? id;
     }
