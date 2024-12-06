@@ -40,12 +40,12 @@ namespace Unity.WebRTC
         public string protocol;
 
         /// <summary>
-        /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
+        /// Specifies whether the data channel's connection is manually negotiated by the application or automatically handled by WebRTC.
         /// </summary>
         public bool? negotiated;
 
         /// <summary>
-        /// Indicates a 16-bit numeric ID for the channel.
+        /// Specifies a unique 16-bit identifier for the data channel, allowing explicit channel setup during manual negotiation.
         /// </summary>
         public int? id;
     }
