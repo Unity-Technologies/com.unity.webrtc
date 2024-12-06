@@ -72,9 +72,9 @@ namespace Unity.WebRTC
         /// <returns>`RTCRtpCapabilities` object contains an array of `RTCRtpCodecCapability` objects.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
-        ///         var transceiver = peerConnection.GetTransceivers().First();
-        ///         var error = transceiver.SetCodecPreferences(capabilities.codecs);
+        ///         RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+        ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
+        ///         RTCErrorType error = transceiver.SetCodecPreferences(capabilities.codecs);
         ///         if (error.errorType != RTCErrorType.None)
         ///         {
         ///             Debug.LogError($"Failed to set codec preferences: {error.message}");
@@ -100,14 +100,14 @@ namespace Unity.WebRTC
         /// <returns>`RTCStatsReportAsyncOperation` object containing `RTCStatsReport` object.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = sender.GetStats();
+        ///         RTCStatsReportAsyncOperation asyncOperation = sender.GetStats();
         ///         yield return asyncOperation;
         ///         
         ///         if (!asyncOperation.IsError)
         ///         {
-        ///             var statsReport = asyncOperation.Value;
-        ///             var stats = statsReport.Stats.ElementAt(0).Value;
-        ///             var statsText = "Id:" + stats.Id + "\n";
+        ///             RTCStatsReport statsReport = asyncOperation.Value;
+        ///             RTCStats stats = statsReport.Stats.ElementAt(0).Value;
+        ///             string statsText = "Id:" + stats.Id + "\n";
         ///             statsText += "Timestamp:" + stats.Timestamp + "\n";
         ///             statsText += stats.Dict.Aggregate(string.Empty, (str, next) =>
         ///                 str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
@@ -202,10 +202,10 @@ namespace Unity.WebRTC
         /// <returns>`RTCRtpSendParameters` object containing the current configuration of the `RTCRtpSender`.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var sender = peerConnection.GetSenders().First();
-        ///         var parameters = sender.GetParameters();
+        ///         RTCRtpSender sender = peerConnection.GetSenders().First();
+        ///         RTCRtpSendParameters parameters = sender.GetParameters();
         ///         parameters.encodings[0].maxBitrate = bandwidth * 1000;
-        ///         var error = sender.SetParameters(parameters);
+        ///         RTCError error = sender.SetParameters(parameters);
         ///         if (error.errorType != RTCErrorType.None)
         ///         {
         ///             Debug.LogError($"Failed to set parameters: {error.message}");
@@ -236,10 +236,10 @@ namespace Unity.WebRTC
         /// <returns>`RTCError` value.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var sender = peerConnection.GetSenders().First();
-        ///         var parameters = sender.GetParameters();
+        ///         RTCRtpSender sender = peerConnection.GetSenders().First();
+        ///         RTCRtpSendParameters parameters = sender.GetParameters();
         ///         parameters.encodings[0].maxBitrate = bandwidth * 1000;
-        ///         var error = sender.SetParameters(parameters);
+        ///         RTCError error = sender.SetParameters(parameters);
         ///         if (error.errorType != RTCErrorType.None)
         ///         {
         ///             Debug.LogError($"Failed to set parameters: {error.message}");
@@ -290,7 +290,7 @@ namespace Unity.WebRTC
         /// <returns>`true` if the track has been successfully replaced.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var transceiver = peerConnection.GetTransceivers().First();
+        ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
         ///         transceiver.Sender.ReplaceTrack(newTrack);
         ///     ]]></code>
         /// </example>
