@@ -628,7 +628,7 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         WebRTC.Update();
+    ///         StartCoroutine(WebRTC.Update());
     ///     ]]></code>
     /// </example>
     /// <seealso cref="WebRTCSettings"/>
@@ -933,7 +933,7 @@ namespace Unity.WebRTC
         /// <returns>`RenderTextureFormat` value for the specified `GraphicsDeviceType`.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var format = WebRTC.GetSupportedRenderTextureFormat(GraphicsDeviceType.Direct3D11);
+        ///         RenderTextureFormat format = WebRTC.GetSupportedRenderTextureFormat(GraphicsDeviceType.Direct3D11);
         ///     ]]></code>
         /// </example>
         public static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
@@ -952,7 +952,10 @@ namespace Unity.WebRTC
         /// <returns>`GraphicsFormat` value for the specified `GraphicsDeviceType`.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var format = WebRTC.GetSupportedGraphicsFormat(GraphicsDeviceType.Direct3D11);
+        ///         int width = WebRTCSettings.StreamSize.x;
+        ///         int height = WebRTCSettings.StreamSize.y;
+        ///         GraphicsFormat format = WebRTC.GetSupportedGraphicsFormat(GraphicsDeviceType.Direct3D11);
+        ///         RenderTexture texture = new RenderTexture(width, height, 0, format);
         ///     ]]></code>
         /// </example>
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
@@ -1003,7 +1006,7 @@ namespace Unity.WebRTC
         /// <returns>`TextureFormat` value for the specified `GraphicsDeviceType`.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var format = WebRTC.GetSupportedTextureFormat(GraphicsDeviceType.Direct3D11);
+        ///         TextureFormat format = WebRTC.GetSupportedTextureFormat(GraphicsDeviceType.Direct3D11);
         ///     ]]></code>
         /// </example>
         public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
