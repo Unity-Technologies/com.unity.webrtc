@@ -138,17 +138,17 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         var initOption = new RTCDataChannelInit();
     ///         var peerConnection = new RTCPeerConnection();
-    ///         var dataChennel = peerConnection.createDataChannel("test channel", initOption);
+    ///         var dataChannel = peerConnection.createDataChannel("test channel", initOption);
     ///
-    ///         dataChennel.OnMessage = (event) => {
+    ///         dataChannel.OnMessage = (event) => {
     ///             Debug.LogFormat("Received: {0}.",${event.data});
     ///         };
     ///
-    ///         dataChennel.OnOpen = () => {
+    ///         dataChannel.OnOpen = () => {
     ///             Debug.Log("DataChannel opened.");
     ///         };
     ///
-    ///         dataChennel.OnClose = () => {
+    ///         dataChannel.OnClose = () => {
     ///             Debug.Log("DataChannel closed.");
     ///         };
     ///     ]]></code>
