@@ -440,7 +440,7 @@ namespace Unity.WebRTC
     ///         using UnityEngine;
     ///         using Unity.WebRTC;
     ///
-    ///         class MediaStreamSample : MonoBehaviour
+    ///         class MediaStreamer : MonoBehaviour
     ///         {
     ///             private RTCPeerConnection _pc1;
     ///             private List<RTCRtpSender> pc1Senders;
