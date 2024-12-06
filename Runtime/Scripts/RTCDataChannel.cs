@@ -12,7 +12,7 @@ namespace Unity.WebRTC
     public class RTCDataChannelInit
     {
         /// <summary>
-        /// Indicates whether or not the data channel guarantees in-order delivery of messages.
+        /// Determines whether the data channel ensures the delivery of messages in the order they were sent.
         /// </summary>
         public bool? ordered;
         /// <summary>
@@ -434,12 +434,12 @@ namespace Unity.WebRTC
         public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
 
         /// <summary>
-        /// Indicates whether or not the data channel guarantees in-order delivery of messages.
+        /// Determines whether the data channel ensures the delivery of messages in the order they were sent.
         /// </summary>
         /// <remarks>
-        /// The default is true, which indicates that the data channel is indeed ordered.
-        /// This is set when the RTCDataChannel is created, by setting the ordered property on the object passed as RTCPeerConnection.createDataChannel()'s options parameter.
-        /// </remarks>
+        /// This property controls whether the data channel delivers messages in the sequence they were dispatched.
+        /// If set to true, messages will arrive in the exact order sent, ensuring consistent data flow, which can be critical for applications where order is important.
+        /// If false, the data channel allows out-of-order delivery to potentially enhance transmission speed but is best suited for applications where strict order isn't a concern.        /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using UnityEngine;
