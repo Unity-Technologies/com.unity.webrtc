@@ -18,6 +18,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnIceCandidate = candidate =>
     ///         {
+    ///             otherPeerConnection.AddIceCandidate(candidate);
     ///         }
     ///     ]]></code>
     /// </example>
@@ -35,6 +36,13 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnIceConnectionChange = state =>
     ///         {
+    ///             if (state == RTCIceConnectionState.Connected || state == RTCIceConnectionState.Completed)
+    ///             {
+    ///                 foreach (RTCRtpSender sender in peerConnection.GetSenders())
+    ///                 {
+    ///                     sender.SyncApplicationFramerate = true;
+    ///                 }
+    ///             }
     ///         }
     ///     ]]></code>
     /// </example>
@@ -52,6 +60,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnConnectionStateChange = state =>
     ///         {
+    ///             Debug.Log($"Connection state changed to {state}");
     ///         }
     ///     ]]></code>
     /// </example>
@@ -69,6 +78,10 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnIceGatheringStateChange = state =>
     ///         {
+    ///             if (state == RTCIceGatheringState.Complete)
+    ///             {
+    ///                 GameObject newCandidate = Instantiate(candidateElement, candidateParent);
+    ///             }
     ///         }
     ///     ]]></code>
     /// </example>
@@ -85,6 +98,20 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnNegotiationNeeded = () =>
     ///         {
+    ///             StartCoroutine(NegotiationProcess());
+    ///         }
+    ///
+    ///         IEnumerator NegotiationProcess()
+    ///         {
+    ///             RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateOffer();
+    ///             yield return asyncOperation;
+    ///
+    ///             if (!asyncOperation.IsError)
+    ///             {
+    ///                 RTCSessionDescription description = asyncOperation.Desc;
+    ///                 RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+    ///                 yield return asyncOperation;
+    ///             }
     ///         }
     ///     ]]></code>
     /// </example>
@@ -101,8 +128,10 @@ namespace Unity.WebRTC
     /// <param name="e">`RTCTrackEvent` object.</param>
     /// <example>
     ///     <code lang="cs"><![CDATA[
+    ///         MediaStream receiveStream = new MediaStream();
     ///         peerConnection.OnTrack = e =>
     ///         {
+    ///             receiveStream.AddTrack(e.Track);
     ///         }
     ///     ]]></code>
     /// </example>
@@ -122,7 +151,7 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var peerConnection = new RTCPeerConnection();
+    ///         RTCPeerConnection peerConnection = new RTCPeerConnection();
     ///     ]]></code>
     /// </example>
     /// <seealso cref="RTCConfiguration" />
@@ -199,10 +228,10 @@ namespace Unity.WebRTC
         /// <see cref="RTCIceConnectionState"/> enum.
         /// </summary>
         /// <example>
-        /// <code>
-        /// var peerConnection = new RTCPeerConnection(configuration);
-        /// var iceConnectionState = peerConnection.IceConnectionState;
-        /// </code>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCPeerConnection peerConnection = new RTCPeerConnection(configuration);
+        ///         RTCIceConnectionState iceConnectionState = peerConnection.IceConnectionState;
+        ///     ]]></code>
         /// </example>
         /// <seealso cref="ConnectionState"/>
         public RTCIceConnectionState IceConnectionState => NativeMethods.PeerConnectionIceConditionState(GetSelfOrThrow());
@@ -213,10 +242,10 @@ namespace Unity.WebRTC
         /// <see cref="RTCPeerConnectionState"/> enum.
         /// </summary>
         /// <example>
-        /// <code>
-        /// var peerConnection = new RTCPeerConnection(configuration);
-        /// var connectionState = peerConnection.ConnectionState;
-        /// </code>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCPeerConnection peerConnection = new RTCPeerConnection(configuration);
+        ///         RTCPeerConnectionState connectionState = peerConnection.ConnectionState;
+        ///     ]]></code>
         /// </example>
         /// <seealso cref="IceConnectionState"/>
         public RTCPeerConnectionState ConnectionState => NativeMethods.PeerConnectionState(GetSelfOrThrow());
@@ -227,10 +256,10 @@ namespace Unity.WebRTC
         /// <see cref="RTCSignalingState"/> enum.
         /// </summary>
         /// <example>
-        /// <code>
-        /// var peerConnection = new RTCPeerConnection(configuration);
-        /// var signalingState = peerConnection.SignalingState;
-        /// </code>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCPeerConnection peerConnection = new RTCPeerConnection(configuration);
+        ///         RTCSignalingState signalingState = peerConnection.SignalingState;
+        ///     ]]></code>
         /// </example>
         /// <seealso cref="ConnectionState"/>
         public RTCSignalingState SignalingState => NativeMethods.PeerConnectionSignalingState(GetSelfOrThrow());
@@ -248,7 +277,7 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var receivers = peerConnection.GetReceivers();
+        ///         IEnumerable<RTCRtpReceiver> receivers = peerConnection.GetReceivers();
         ///     ]]></code>
         /// </example>
         /// <returns>An array of `RTCRtpReceiver` objects, one for each track on the connection.</returns>
@@ -268,7 +297,14 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var senders = peerConnection.GetSenders();
+        ///         RTCRtpSender sender = peerConnection.GetSenders().First();
+        ///         RTCRtpSendParameters parameters = sender.GetParameters();
+        ///         parameters.encodings[0].maxBitrate = bandwidth * 1000;
+        ///         RTCError error = sender.SetParameters(parameters);
+        ///         if (error != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to set parameters: {error}");
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <returns>An array of `RTCRtpSender` objects, one for each track on the connection.</returns>
@@ -288,7 +324,13 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var transceivers = peerConnection.GetTransceivers();
+        ///         RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+        ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
+        ///         RTCErrorType error = transceiver.SetCodecPreferences(capabilities.codecs);
+        ///         if (error.errorType != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to set codec preferences: {error.message}");
+        ///         }
         ///     ]]></code>
         /// </example>
         /// <returns>An array of the `RTCRtpTransceiver` objects representing the transceivers handling sending and receiving all media on the `RTCPeerConnection`.</returns>
@@ -489,7 +531,7 @@ namespace Unity.WebRTC
         /// <returns>An object describing the <see cref="RTCPeerConnection"/>'s current configuration.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var configuration = myPeerConnection.GetConfiguration();
+        ///         RTCConfiguration configuration = myPeerConnection.GetConfiguration();
         ///         if(configuration.urls.length == 0)
         ///         {
         ///             configuration.urls = new[] {"stun:stun.l.google.com:19302"};
@@ -520,7 +562,7 @@ namespace Unity.WebRTC
         /// <returns> Error code. </returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var configuration = new RTCConfiguration
+        ///         RTCConfiguration configuration = new RTCConfiguration
         ///         {
         ///             iceServers = new[]
         ///             {
@@ -533,7 +575,7 @@ namespace Unity.WebRTC
         ///                 }
         ///             }
         ///         };
-        ///         var error = myPeerConnection.SetConfiguration(ref configuration);
+        ///         RTCErrorType error = myPeerConnection.SetConfiguration(ref configuration);
         ///         if(error == RTCErrorType.None)
         ///         {
         ///             ...
@@ -556,7 +598,7 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var peerConnection = new RTCPeerConnection();
+        ///         RTCPeerConnection peerConnection = new RTCPeerConnection();
         ///     ]]></code>
         /// </example>
         /// <seealso cref="RTCPeerConnection(ref RTCConfiguration)"/>
@@ -581,7 +623,7 @@ namespace Unity.WebRTC
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var peerConnection = new RTCPeerConnection();
+        ///         RTCPeerConnection peerConnection = new RTCPeerConnection(ref configuration);
         ///     ]]></code>
         /// </example>
         /// <param name="configuration">`RTCConfiguration` object to configure the new connection.</param>
@@ -662,7 +704,9 @@ namespace Unity.WebRTC
         /// <returns>`RTCRtpSender` object which is used to transmit the media data.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var sender = peerConnection.AddTrack(track, stream);
+        ///         MediaStream sendStream = new MediaStream();
+        ///         AudioStreamTrack audioTrack = new AudioStreamTrack(inputAudioSource)
+        ///         RTCRtpSender sender = peerConnection.AddTrack(audioTrack, sendStream);
         ///     ]]></code>
         /// </example>
         /// <seealso cref="RemoveTrack"/>
@@ -691,7 +735,7 @@ namespace Unity.WebRTC
         /// <returns>`RTCErrorType` value.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var result = peerConnection.RemoveTrack(sender);
+        ///         RTCErrorType error = peerConnection.RemoveTrack(sender);
         ///     ]]></code>
         /// </example>
         /// <seealso cref="AddTrack"/>
@@ -713,7 +757,9 @@ namespace Unity.WebRTC
         /// <returns>`RTCRtpTransceiver` object which is used to exchange the media data.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var transceiver = peerConnection.AddTransceiver(track, init);
+        ///         RTCRtpTransceiverInit init = new RTCRtpTransceiverInit();
+        ///         init.direction = RTCRtpTransceiverDirection.SendOnly;
+        ///         RTCRtpTransceiver transceiver = peerConnection.AddTransceiver(videoStreamTrack, init);
         ///     ]]></code>
         /// </example>
         public RTCRtpTransceiver AddTransceiver(MediaStreamTrack track, RTCRtpTransceiverInit init = null)
@@ -737,7 +783,9 @@ namespace Unity.WebRTC
         /// <returns>`RTCRtpTransceiver` object which is used to exchange the media data.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var transceiver = peerConnection.AddTransceiver(kind, init);
+        ///         RTCRtpTransceiverInit init = new RTCRtpTransceiverInit();
+        ///         init.direction = RTCRtpTransceiverDirection.RecvOnly;
+        ///         RTCRtpTransceiver transceiver = peerConnection.AddTransceiver(TrackKind.Audio, init);
         ///     ]]></code>
         /// </example>
         public RTCRtpTransceiver AddTransceiver(TrackKind kind, RTCRtpTransceiverInit init = null)
@@ -758,9 +806,14 @@ namespace Unity.WebRTC
         ///     If the value is null, the added ICE candidate is an "end-of-candidates" indicator.
         /// </param>
         /// <returns>`true` if the candidate has been successfully added to the remote peer's description by the ICE agent.</returns>
-        /// <example><code lang="cs"><![CDATA[
-        ///     var result = peerConnection.AddIceCandidate(candidate);
-        /// ]]></code></example>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         peerConnection.OnIceCandidate = candidate =>
+        ///         {
+        ///             bool result = otherPeerConnection.AddIceCandidate(candidate);
+        ///         }
+        ///     ]]></code>
+        /// </example>
         public bool AddIceCandidate(RTCIceCandidate candidate)
         {
             return NativeMethods.PeerConnectionAddIceCandidate(
@@ -778,12 +831,14 @@ namespace Unity.WebRTC
         /// <returns>`RTCSessionDescriptionAsyncOperation` object containing `RTCSessionDescription` object.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.CreateOffer(ref options);
+        ///         RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateOffer(ref options);
         ///         yield return asyncOperation;
-        ///         
+        ///
         ///         if (!asyncOperation.IsError)
         ///         {
-        ///             var description = asyncOperation.Desc;
+        ///             RTCSessionDescription description = asyncOperation.Desc;
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+        ///             yield return asyncOperation;
         ///         }
         ///     ]]></code>
         /// </example>
@@ -805,12 +860,14 @@ namespace Unity.WebRTC
         /// <returns>`RTCSessionDescriptionAsyncOperation` object containing `RTCSessionDescription` object.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.CreateOffer();
+        ///         RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateOffer();
         ///         yield return asyncOperation;
-        ///         
+        ///
         ///         if (!asyncOperation.IsError)
         ///         {
-        ///             var description = asyncOperation.Desc;
+        ///             RTCSessionDescription description = asyncOperation.Desc;
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+        ///             yield return asyncOperation;
         ///         }
         ///     ]]></code>
         /// </example>
@@ -832,12 +889,14 @@ namespace Unity.WebRTC
         /// <returns>`RTCSessionDescriptionAsyncOperation` object containing `RTCSessionDescription` object.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.CreateAnswer(ref options);
+        ///         RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateAnswer(ref options);
         ///         yield return asyncOperation;
-        ///         
+        ///
         ///         if (!asyncOperation.IsError)
         ///         {
-        ///             var description = asyncOperation.Desc;
+        ///             RTCSessionDescription description = asyncOperation.Desc;
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+        ///             yield return asyncOperation;
         ///         }
         ///     ]]></code>
         /// </example>
@@ -858,12 +917,14 @@ namespace Unity.WebRTC
         /// <returns>`RTCSessionDescriptionAsyncOperation` object containing `RTCSessionDescription` object.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.CreateAnswer();
+        ///         RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateAnswer();
         ///         yield return asyncOperation;
-        ///         
+        ///
         ///         if (!asyncOperation.IsError)
         ///         {
-        ///             var description = asyncOperation.Desc;
+        ///             RTCSessionDescription description = asyncOperation.Desc;
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+        ///             yield return asyncOperation;
         ///         }
         ///     ]]></code>
         /// </example>
@@ -914,11 +975,14 @@ namespace Unity.WebRTC
         /// </returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.SetLocalDescription(ref desc);
+        ///         RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateOffer();
         ///         yield return asyncOperation;
-        ///         
+        ///
         ///         if (!asyncOperation.IsError)
         ///         {
+        ///             RTCSessionDescription description = asyncOperation.Desc;
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+        ///             yield return asyncOperation;
         ///         }
         ///     ]]></code>
         /// </example>
@@ -953,11 +1017,20 @@ namespace Unity.WebRTC
         /// </returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.SetLocalDescription(ref desc);
-        ///         yield return asyncOperation;
-        ///         
-        ///         if (!asyncOperation.IsError)
+        ///         peerConnection.OnNegotiationNeeded = () =>
         ///         {
+        ///             StartCoroutine(NegotiationProcess());
+        ///         }
+        ///
+        ///         IEnumerator NegotiationProcess()
+        ///         {
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = peerConnection.SetLocalDescription(ref description);
+        ///             yield return asyncOperation;
+        ///             
+        ///             if (asyncOperation.IsError)
+        ///             {
+        ///                 Debug.LogError("Failed to set local description: " + asyncOperation.Error.message);
+        ///             }
         ///         }
         ///     ]]></code>
         /// </example>
@@ -980,11 +1053,14 @@ namespace Unity.WebRTC
         /// </returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
-        ///         var asyncOperation = peerConnection.SetRemoteDescription(ref desc);
+        ///         RTCSessionDescriptionAsyncOperation asyncOperation = peerConnection.CreateOffer();
         ///         yield return asyncOperation;
-        ///         
+        ///
         ///         if (!asyncOperation.IsError)
         ///         {
+        ///             RTCSessionDescription description = asyncOperation.Desc;
+        ///             RTCSetSessionDescriptionAsyncOperation asyncOperation = otherPeerConnection.SetRemoteDescription(ref description);
+        ///             yield return asyncOperation;
         ///         }
         ///     ]]></code>
         /// </example>
@@ -1020,13 +1096,13 @@ namespace Unity.WebRTC
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         // Already instantiated peerConnection as RTCPeerConnection.
-        ///         var operation = peerConnection.GetStats();
+        ///         RTCStatsReportAsyncOperation operation = peerConnection.GetStats();
         ///         yield return operation;
         ///
         ///         if (!operation.IsError)
         ///         {
-        ///             var report = operation.Value;
-        ///             foreach (var stat in report.Stats.Values)
+        ///             RTCStatsReport report = operation.Value;
+        ///             foreach (RTCStats stat in report.Stats.Values)
         ///             {
         ///                 Debug.Log(stat.Type.ToString());
         ///             }
