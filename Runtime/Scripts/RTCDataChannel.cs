@@ -74,18 +74,27 @@ namespace Unity.WebRTC
     /// <summary>
     /// Specify the delegate type for OnOpen.
     /// </summary>
+    /// <remarks>
+    ///
+    /// </remarks>
     /// <seealso cref="RTCDataChannel.OnOpen"/>
     public delegate void DelegateOnOpen();
 
     /// <summary>
     /// Specify the delegate type for OnClose.
     /// </summary>
+    /// <remarks>
+    ///
+    /// </remarks>
     /// <seealso cref="RTCDataChannel.OnClose"/>
     public delegate void DelegateOnClose();
 
     /// <summary>
     /// Specify the delegate type for OnMessage.
     /// </summary>
+    /// <remarks>
+    ///
+    /// </remarks>
     /// <param name="bytes"></param>
     /// <seealso cref="RTCDataChannel.OnMessage"/>
     public delegate void DelegateOnMessage(byte[] bytes);
@@ -93,6 +102,9 @@ namespace Unity.WebRTC
     /// <summary>
     /// Specify the delegate type for RTCPeerConnection.OnDataChannel.
     /// </summary>
+    /// <remarks>
+    ///
+    /// </remarks>
     /// <param name="channel"></param>
     /// <seealso cref="RTCPeerConnection.OnError"/>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
@@ -100,6 +112,9 @@ namespace Unity.WebRTC
     /// <summary>
     /// Specify the delegate type for OnDataChannel.
     /// </summary>
+    /// <remarks>
+    ///
+    /// </remarks>
     /// <seealso cref="RTCDataChannel.OnError"/>
     public delegate void DelegateOnError(RTCError error);
 
@@ -143,6 +158,9 @@ namespace Unity.WebRTC
         /// <summary>
         /// Delegate to be called when a message has been received from the remote peer.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public DelegateOnMessage OnMessage
         {
             get => onMessage;
@@ -152,6 +170,9 @@ namespace Unity.WebRTC
         /// <summary>
         /// Delegate to be called when the data channel's messages is opened or reopened.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public DelegateOnOpen OnOpen
         {
             get => onOpen;
@@ -161,6 +182,9 @@ namespace Unity.WebRTC
         /// <summary>
         /// Delegate to be called when the data channel's messages is closed.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public DelegateOnClose OnClose
         {
             get => onClose;
@@ -170,6 +194,9 @@ namespace Unity.WebRTC
         /// <summary>
         /// Delegate to be called when the errors occur.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public DelegateOnError OnError
         {
             get => onError;
@@ -179,41 +206,65 @@ namespace Unity.WebRTC
         /// <summary>
         /// Returns an ID number (between 0 and 65,534) which uniquely identifies the RTCDataChannel.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public int Id => NativeMethods.DataChannelGetID(GetSelfOrThrow());
 
         /// <summary>
         /// Returns a string containing a name describing the data channel which are not required to be unique.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public string Label => NativeMethods.DataChannelGetLabel(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
         /// Returns a string containing the name of the sub protocol in use. If no protocol was specified when the data channel was created, then this property's value is the empty string ("").
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public string Protocol => NativeMethods.DataChannelGetProtocol(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
         /// Returns the maximum number of times the browser should try to retransmit a message before giving up.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public ushort MaxRetransmits => NativeMethods.DataChannelGetMaxRetransmits(GetSelfOrThrow());
 
         /// <summary>
         /// Returns the amount of time, in milliseconds, the browser is allowed to take to attempt to transmit a message, as set when the data channel was created, or null.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public ushort MaxRetransmitTime => NativeMethods.DataChannelGetMaxRetransmitTime(GetSelfOrThrow());
 
         /// <summary>
         /// Indicates whether or not the data channel guarantees in-order delivery of messages.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public bool Ordered => NativeMethods.DataChannelGetOrdered(GetSelfOrThrow());
 
         /// <summary>
         /// Returns the number of bytes of data currently queued to be sent over the data channel.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public ulong BufferedAmount => NativeMethods.DataChannelGetBufferedAmount(GetSelfOrThrow());
 
         /// <summary>
         /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public bool Negotiated => NativeMethods.DataChannelGetNegotiated(GetSelfOrThrow());
 
         /// <summary>
@@ -296,6 +347,9 @@ namespace Unity.WebRTC
         /// <summary>
         /// Release all the resources RTCDataChannel instance has allocated.
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         public override void Dispose()
         {
             if (this.disposed)
@@ -314,6 +368,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -332,6 +392,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -350,6 +416,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -373,6 +445,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -394,6 +472,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -413,6 +497,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -431,6 +521,12 @@ namespace Unity.WebRTC
         /// <summary>
         /// Sends data across the data channel to the remote peer.
         /// </summary>
+        /// <remarks>
+        /// Sends data across the data channel to the remote peer.
+        /// This can be done any time except during the initial process of creating the underlying transport channel.
+        /// Data sent before connecting is buffered if possible (or an error occurs if it's not possible),
+        /// and is also buffered if sent while the connection is closing or closed.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// The method throws <c>InvalidOperationException</c> when <see cref="ReadyState"/>
         ///  is not <b>Open</b>.
@@ -451,6 +547,11 @@ namespace Unity.WebRTC
         /// <summary>
         /// Closes the RTCDataChannel. Either peer is permitted to call this method to initiate closure of the channel.
         /// </summary>
+        /// <remarks>
+        /// Closes the RTCDataChannel. Either peer is permitted to call this method to initiate closure of the channel.
+        /// Closure of the data channel is not instantaneous. Most of the process of closing the connection is handled asynchronously;
+        /// you can detect when the channel has finished closing by watching for a close event on the data channel.
+        /// </remarks>
         public void Close()
         {
             NativeMethods.DataChannelClose(GetSelfOrThrow());
