@@ -15,30 +15,35 @@ namespace Unity.WebRTC
         /// Determines whether the data channel ensures the delivery of messages in the order they were sent.
         /// </summary>
         public bool? ordered;
+
         /// <summary>
-        /// Represents the maximum number of milliseconds that attempts to transfer a message may take in unreliable mode..
+        /// Specifies the maximum number of transmission retries for a message when operating under non-guaranteed delivery conditions.
         /// </summary>
         /// <remarks>
         /// Cannot be set along with <see cref="RTCDataChannelInit.maxRetransmits"/>.
         /// </remarks>
         /// <seealso cref="RTCDataChannelInit.maxRetransmits"/>
         public int? maxPacketLifeTime;
+
         /// <summary>
-        /// Represents the maximum number of times the user agent should attempt to retransmit a message which fails the first time in unreliable mode.
+        /// Specifies the maximum number of times the data channel will attempt to resend a message if initial transmission fails under unreliable conditions.
         /// </summary>
         /// <remarks>
         /// Cannot be set along with <see cref="RTCDataChannelInit.maxPacketLifeTime"/>.
         /// </remarks>
         /// <seealso cref="RTCDataChannelInit.maxPacketLifeTime"/>
         public int? maxRetransmits;
+
         /// <summary>
         /// Provides the name of the sub-protocol being used on the RTCDataChannel.
         /// </summary>
         public string protocol;
+
         /// <summary>
         /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
         /// </summary>
         public bool? negotiated;
+
         /// <summary>
         /// Indicates a 16-bit numeric ID for the channel.
         /// </summary>
@@ -197,6 +202,7 @@ namespace Unity.WebRTC
         /// Delegate to be called when the data channel's messages is opened or reopened.
         /// </summary>
         /// <remarks>
+        /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         using UnityEngine;
