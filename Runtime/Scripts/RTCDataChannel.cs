@@ -36,7 +36,7 @@ namespace Unity.WebRTC
         /// </summary>
         public string protocol;
         /// <summary>
-        /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app (true) or by the WebRTC layer (false).
+        /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
         /// </summary>
         public bool? negotiated;
         /// <summary>
@@ -72,27 +72,35 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Specify the delegate type for OnOpen.
     /// </summary>
+    /// <seealso cref="RTCDataChannel.OnOpen"/>
     public delegate void DelegateOnOpen();
+
     /// <summary>
-    ///
+    /// Specify the delegate type for OnClose.
     /// </summary>
+    /// <seealso cref="RTCDataChannel.OnClose"/>
     public delegate void DelegateOnClose();
+
     /// <summary>
-    ///
+    /// Specify the delegate type for OnMessage.
     /// </summary>
     /// <param name="bytes"></param>
+    /// <seealso cref="RTCDataChannel.OnMessage"/>
     public delegate void DelegateOnMessage(byte[] bytes);
+
     /// <summary>
-    ///
+    /// Specify the delegate type for RTCPeerConnection.OnDataChannel.
     /// </summary>
     /// <param name="channel"></param>
+    /// <seealso cref="RTCPeerConnection.OnError"/>
     public delegate void DelegateOnDataChannel(RTCDataChannel channel);
 
     /// <summary>
-    ///
+    /// Specify the delegate type for OnDataChannel.
     /// </summary>
+    /// <seealso cref="RTCDataChannel.OnError"/>
     public delegate void DelegateOnError(RTCError error);
 
     /// <summary>
@@ -107,19 +115,20 @@ namespace Unity.WebRTC
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
-    ///         var pc = new RTCPeerConnection();
-    ///         var dc = pc.createDataChannel("my channel");
+    ///         var initOption = new RTCDataChannelInit();
+    ///         var peerConnection = new RTCPeerConnection();
+    ///         var dataChennel = peerConnection.createDataChannel("test channel", initOption);
     ///
-    ///         dc.OnMessage = (event) => {
-    ///             Debug.LogFormat("received: {0}"`",${event.data});
+    ///         dataChennel.OnMessage = (event) => {
+    ///             Debug.LogFormat("Received: {0}.",${event.data});
     ///         };
     ///
-    ///         dc.OnOpen = () => {
-    ///             Debug.Log("datachannel open");
+    ///         dataChennel.OnOpen = () => {
+    ///             Debug.Log("DataChannel opened.");
     ///         };
     ///
-    ///         dc.OnClose = () => {
-    ///             Debug.Log("datachannel close");
+    ///         dataChennel.OnClose = () => {
+    ///             Debug.Log("DataChannel closed.");
     ///         };
     ///     ]]></code>
     /// </example>
@@ -203,7 +212,7 @@ namespace Unity.WebRTC
         public ulong BufferedAmount => NativeMethods.DataChannelGetBufferedAmount(GetSelfOrThrow());
 
         /// <summary>
-        ///
+        /// Indicates whether the RTCDataChannel's connection is negotiated by the Web app or by the WebRTC layer.
         /// </summary>
         public bool Negotiated => NativeMethods.DataChannelGetNegotiated(GetSelfOrThrow());
 
