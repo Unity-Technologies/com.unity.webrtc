@@ -758,7 +758,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///     Logger that is used for capturing debug messages within the WebRTC package.
+        ///     Logger used for capturing debug messages within the WebRTC package.
         ///     Defaults to Debug.unityLogger.
         /// </summary>
         /// <exception cref="ArgumentNullException">Throws if setting a null logger.</exception>
