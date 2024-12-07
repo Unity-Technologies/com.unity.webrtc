@@ -725,7 +725,7 @@ namespace Unity.WebRTC
         ///     Executes any pending tasks generated asynchronously during the WebRTC runtime.
         /// </summary>
         /// <remarks>
-        ///     `ExecutePendingTasks` method processes pending tasks generated during WebRTC operations, up to a specified timeout.
+        ///     `ExecutePendingTasks` method processes pending tasks generated during WebRTC operations until reaching the specified timeout.
         /// </remarks>
         /// <param name="millisecondTimeout">
         ///     The amount of time in milliseconds that the task queue can take before task execution will cease.
