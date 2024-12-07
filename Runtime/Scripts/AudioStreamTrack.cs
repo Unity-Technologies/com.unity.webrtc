@@ -7,10 +7,22 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// This event is called on audio thread.
+    ///     Delegate to be called when new audio data is received.
     /// </summary>
-    /// <param name="data"></param>
-    /// <param name="channels"></param>
+    /// <remarks>
+    ///     `AudioReadEventHandler` is a delegate to be called when new audio data is received.
+    /// </remarks>
+    /// <param name="data">Float array containing audio data samples.</param>
+    /// <param name="channels">Number of audio channels.</param>
+    /// <param name="sampleRate">Sample rate of the audio data</param>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         audioStreamTrack.onReceived += (data, channels, sampleRate) =>
+    ///         {
+    ///         }
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="AudioStreamTrack.OnReceived"/>
     public delegate void AudioReadEventHandler(float[] data, int channels, int sampleRate);
 
     /// <summary>
@@ -30,12 +42,22 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    ///     Represents a single audio track within a stream.
     /// </summary>
+    /// <remarks>
+    ///     `AudioStreamTrack` is a `MediaStreamTrack` that represents a single audio track within a stream.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack(texture);
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="MediaStreamTrack" />
+    /// <seealso cref="WebRTC" />
     public class AudioStreamTrack : MediaStreamTrack
     {
         /// <summary>
-        ///
+        ///     AudioSource object.
         /// </summary>
         public AudioSource Source
         {
@@ -182,17 +204,33 @@ namespace Unity.WebRTC
         internal AudioTrackSource _trackSource;
 
         /// <summary>
-        ///
+        ///     Creates a new AudioStreamTrack object.
         /// </summary>
+        /// <remarks>
+        ///     `AudioStreamTrack` constructor creates an instance of `AudioStreamTrack`.
+        /// </remarks>
+        /// <example>
+        ///     <code><![CDATA[
+        ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack();
+        ///     ]]></code>
+        /// </example>
         public AudioStreamTrack()
             : this(Guid.NewGuid().ToString(), new AudioTrackSource())
         {
         }
 
         /// <summary>
-        ///
+        ///     Creates a new AudioStreamTrack object.
         /// </summary>
-        /// <param name="source"></param>
+        /// <remarks>
+        ///     `AudioStreamTrack` constructor creates an instance of `AudioStreamTrack` with a `source`.
+        /// </remarks>
+        /// <param name="source">`AudioSource` object.</param>
+        /// <example>
+        ///     <code><![CDATA[
+        ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack(source);
+        ///     ]]></code>
+        /// </example>
         public AudioStreamTrack(AudioSource source)
             : this(Guid.NewGuid().ToString(), new AudioTrackSource())
         {
@@ -206,6 +244,18 @@ namespace Unity.WebRTC
             _audioCapturer.sender = true;
         }
 
+        /// <summary>
+        ///     Creates a new AudioStreamTrack object.
+        /// </summary>
+        /// <remarks>
+        ///     `AudioStreamTrack` constructor creates an instance of `AudioStreamTrack` with a `listener`.
+        /// </remarks>
+        /// <param name="listener">`AudioListener` object.</param>
+        /// <example>
+        ///     <code><![CDATA[
+        ///         AudioStreamTrack audioStreamTrack = new AudioStreamTrack(listener);
+        ///     ]]></code>
+        /// </example>
         public AudioStreamTrack(AudioListener listener)
             : this(Guid.NewGuid().ToString(), new AudioTrackSource())
         {
@@ -241,8 +291,16 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Disposes of AudioStreamTrack.
         /// </summary>
+        /// <remarks>
+        ///     `Dispose` method disposes of the `AudioStreamTrack` and releases the associated resources. 
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.Dispose();
+        ///     ]]></code>
+        /// </example>
         public override void Dispose()
         {
             if (this.disposed)
@@ -270,11 +328,19 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Provides the audio data to the track.
         /// </summary>
-        /// <param name="nativeArray"></param>
-        /// <param name="channels"></param>
-        /// <param name="sampleRate"></param>
+        /// <remarks>
+        ///     `SetData` method provides the audio data to the track.
+        /// </remarks>
+        /// <param name="nativeArray">`NativeArray<float>` containing audio data samples.</param>
+        /// <param name="channels">Number of audio channels.</param>
+        /// <param name="sampleRate">Sample rate of the audio data</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.SetData(nativeArray, channels, sampleRate);
+        ///     ]]></code>
+        /// </example>
         public void SetData(NativeArray<float>.ReadOnly nativeArray, int channels, int sampleRate)
         {
             unsafe
@@ -285,11 +351,19 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Provides the audio data to the track.
         /// </summary>
-        /// <param name="nativeSlice"></param>
-        /// <param name="channels"></param>
-        /// <param name="sampleRate"></param>
+        /// <remarks>
+        ///     `SetData` method provides the audio data to the track.
+        /// </remarks>
+        /// <param name="nativeSlice">`NativeSlice<float>` containing audio data samples.</param>
+        /// <param name="channels">Number of audio channels.</param>
+        /// <param name="sampleRate">Sample rate of the audio data</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.SetData(nativeSlice, channels, sampleRate);
+        ///     ]]></code>
+        /// </example>
         public void SetData(NativeSlice<float> nativeSlice, int channels, int sampleRate)
         {
             unsafe
@@ -310,11 +384,19 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Provides the audio data to the track.
         /// </summary>
-        /// <param name="array"></param>
-        /// <param name="channels"></param>
-        /// <param name="sampleRate"></param>
+        /// <remarks>
+        ///     `SetData` method provides the audio data to the track.
+        /// </remarks>
+        /// <param name="array">Float array containing audio data samples.</param>
+        /// <param name="channels">Number of audio channels.</param>
+        /// <param name="sampleRate">Sample rate of the audio data</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.SetData(array, channels, sampleRate);
+        ///     ]]></code>
+        /// </example>
         public void SetData(float[] array, int channels, int sampleRate)
         {
             if (array == null)
@@ -332,11 +414,19 @@ namespace Unity.WebRTC
         // ReadOnlySpan<T> is supported since .NET Standard 2.1.
 #if UNITY_2021_2_OR_NEWER
         /// <summary>
-        /// 
+        ///     Provides the audio data to the track.
         /// </summary>
-        /// <param name="span"></param>
-        /// <param name="channels"></param>
-        /// <param name="sampleRate"></param>
+        /// <remarks>
+        ///     `SetData` method provides the audio data to the track.
+        /// </remarks>
+        /// <param name="span">`ReadOnlySpan<float>` containing audio data samples.</param>
+        /// <param name="channels">Number of audio channels.</param>
+        /// <param name="sampleRate">Sample rate of the audio data</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.SetData(span, channels, sampleRate);
+        ///     ]]></code>
+        /// </example>
         public void SetData(ReadOnlySpan<float> span, int channels, int sampleRate)
         {
             unsafe
@@ -350,8 +440,19 @@ namespace Unity.WebRTC
 #endif
 
         /// <summary>
-        /// 
+        ///     Event to be fired when new audio data is received.
         /// </summary>
+        /// <remarks>
+        ///     `onReceived` event is fired when new audio data is received.
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         audioStreamTrack.onReceived += (data, channels, sampleRate) =>
+        ///         {
+        ///         }
+        ///     ]]></code>
+        /// </example>
+        /// <seealso cref="AudioReadEventHandler"/>
         public event AudioReadEventHandler onReceived
         {
             add
