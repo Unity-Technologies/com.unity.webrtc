@@ -30,7 +30,6 @@ namespace Unity.WebRTC.Samples
         private DelegateOnTrack pc2Ontrack;
         private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
         private StringBuilder trackInfos;
-        private bool videoUpdateStarted;
 
         private void Awake()
         {
@@ -129,13 +128,6 @@ namespace Unity.WebRTC.Samples
                     }
                 }
             }
-
-            if (!videoUpdateStarted)
-            {
-                StartCoroutine(WebRTC.Update());
-                videoUpdateStarted = true;
-            }
-
             addTracksButton.interactable = false;
             removeTracksButton.interactable = true;
         }

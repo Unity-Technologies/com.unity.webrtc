@@ -92,7 +92,6 @@ namespace Unity.WebRTC.Samples
                 }
             };
             pc1OnNegotiationNeeded = () => { StartCoroutine(PeerNegotiationNeeded(_pc1)); };
-            StartCoroutine(WebRTC.Update());
         }
 
         private void Update()

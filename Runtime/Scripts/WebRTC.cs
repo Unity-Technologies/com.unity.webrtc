@@ -643,12 +643,21 @@ namespace Unity.WebRTC
         private static Context s_context = null;
         private static SynchronizationContext s_syncContext;
         private static ILogger s_logger;
+        private static GameObject s_obj;
 
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitializeOnLoadMethod()
         {
             // Initialize a custom invokable synchronization context to wrap the main thread UnitySynchronizationContext
             s_syncContext = new ExecutableUnitySynchronizationContext(SynchronizationContext.Current);
+
+            // Instantiate GameObject for coroutine.
+            s_obj = new GameObject("webrtc");
+            s_obj.hideFlags = HideFlags.HideAndDontSave;
+            if (Application.isPlaying)
+                UnityEngine.Object.DontDestroyOnLoad(s_obj);
+            var comp = s_obj.AddComponent<UpdateCoroutine>();
+            comp.routine = UpdateInternal;
         }
 
         internal static void InitializeInternal(bool limitTextureSize = true, bool enableNativeLog = false,
@@ -676,7 +685,18 @@ namespace Unity.WebRTC
         ///
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         public static IEnumerator Update()
+        {
+            var instruction = new WaitForEndOfFrame();
+
+            while (true)
+            {
+                yield return instruction;
+            }
+        }
+
+        public static IEnumerator UpdateInternal()
         {
             var instruction = new WaitForEndOfFrame();
 
@@ -1020,6 +1040,7 @@ namespace Unity.WebRTC
         {
             var obj = state as UnityEngine.Object;
             UnityEngine.Object.DestroyImmediate(obj);
+            obj = null;
         }
 
         static void Destroy(object state)

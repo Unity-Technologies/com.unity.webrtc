@@ -130,7 +130,6 @@ namespace Unity.WebRTC.RuntimeTest
         int width;
         int height;
         RTCRtpCodecCapability videoCodec;
-        Coroutine coroutine;
 
         void Start()
         {
@@ -138,8 +137,6 @@ namespace Unity.WebRTC.RuntimeTest
             cam = camObj.AddComponent<Camera>();
 
             IsTestFinished = true;
-
-            coroutine = StartCoroutine(WebRTC.Update());
         }
 
 
@@ -215,7 +212,6 @@ namespace Unity.WebRTC.RuntimeTest
             Clear();
             DestroyImmediate(camObj);
             camObj = null;
-            StopCoroutine(coroutine);
         }
 
         private void Update()

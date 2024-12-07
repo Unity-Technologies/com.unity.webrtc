@@ -225,7 +225,6 @@ class BandwidthSample : MonoBehaviour
 
         if (!videoUpdateStarted)
         {
-            StartCoroutine(WebRTC.Update());
             StartCoroutine(LoopStatsCoroutine());
             videoUpdateStarted = true;
         }

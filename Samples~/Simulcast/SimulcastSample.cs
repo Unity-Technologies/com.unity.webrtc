@@ -39,7 +39,6 @@ class SimulcastSample : MonoBehaviour
     private DelegateOnIceCandidate pc2OnIceCandidate;
     private DelegateOnTrack pc2Ontrack;
     private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
-    private bool videoUpdateStarted;
 
     private ulong[] optionBitrate = new ulong[] { 100, 150, 200, 300, 400, 600, 800, 1100, 1400 };
     private int[] optionScaleResolution = new[] { 1, 2, 4, 8 };
@@ -202,12 +201,6 @@ class SimulcastSample : MonoBehaviour
             transceiver.SetCodecPreferences(codecs);
         }
         _pc1Transceiver = transceiver;
-
-        if (!videoUpdateStarted)
-        {
-            StartCoroutine(WebRTC.Update());
-            videoUpdateStarted = true;
-        }
     }
 
     private void RemoveTracks()

@@ -60,7 +60,6 @@ namespace Unity.WebRTC
 
         void Start()
         {
-            StartCoroutine(WebRTC.Update());
             StartCoroutine(LoopStatsCoroutine());
 
             toggleEnableMicrophone.isOn = false;

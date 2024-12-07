@@ -37,7 +37,6 @@ namespace Unity.WebRTC.Samples
 
         private void Awake()
         {
-            StartCoroutine(WebRTC.Update());
             callButton.onClick.AddListener(Call);
             hangUpButton.onClick.AddListener(HangUp);
             addAudioObjectButton.onClick.AddListener(AddVideoObject);
