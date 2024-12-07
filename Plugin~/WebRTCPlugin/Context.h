@@ -103,7 +103,7 @@ namespace webrtc
         MediaStreamObserver* GetObserver(const webrtc::MediaStreamInterface* stream);
 
         // Audio Source
-        rtc::scoped_refptr<AudioSourceInterface> CreateAudioSource();
+        rtc::scoped_refptr<AudioSourceInterface> CreateAudioSource(const cricket::AudioOptions& options);
         // Audio Renderer
         AudioTrackSinkAdapter* CreateAudioTrackSinkAdapter();
         void DeleteAudioTrackSinkAdapter(AudioTrackSinkAdapter* sink);

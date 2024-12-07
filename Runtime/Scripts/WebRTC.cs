@@ -1298,7 +1298,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void ContextDeleteDataChannel(IntPtr ptr, IntPtr ptrChannel);
         [DllImport(WebRTC.Lib)]
-        public static extern IntPtr ContextCreateAudioTrackSource(IntPtr ptr);
+        public static extern IntPtr ContextCreateAudioTrackSource(IntPtr ptr, ref AudioOptionsInternal options);
         [DllImport(WebRTC.Lib)]
         public static extern IntPtr ContextCreateVideoTrackSource(IntPtr ptr);
         [DllImport(WebRTC.Lib)]
