@@ -892,7 +892,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///     Validates the specified graphics format to ensure it is supported.
+        ///     Checks whether the specified graphics format is supported.
         /// </summary>
         /// <remarks>
         ///     `ValidateGraphicsFormat` method checks whether the provided `GraphicsFormat` is compatible with the current graphics device.
