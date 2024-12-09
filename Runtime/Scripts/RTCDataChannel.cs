@@ -486,7 +486,7 @@ namespace Unity.WebRTC
         public string Label => NativeMethods.DataChannelGetLabel(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        /// Returns the sub protocol being used by the data channel to transmit and process messages.
+        /// Returns the subprotocol being used by the data channel to transmit and process messages.
         /// </summary>
         /// <remarks>
         /// The `Protocol` property retrieves the sub protocol negotiated for this data channel, which governs the rules for message format and communication behavior between peers.
