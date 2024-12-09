@@ -394,7 +394,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Delegate to be called when the errors occur.
+        /// Delegate to be called when errors occur.
         /// </summary>
         /// <remarks>
         /// The `OnClose` delegate is triggered when the data channel's transport layer is terminated, signifying the channel's transition to a closed state.
