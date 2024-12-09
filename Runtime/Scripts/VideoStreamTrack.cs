@@ -8,26 +8,63 @@ using UnityEngine.Experimental.Rendering;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    ///     Delegate to be called when the first frame of the video is received.
     /// </summary>
-    /// <param name="renderer"></param>
+    /// <remarks>
+    ///     `OnVideoReceived` delegate is called when the first frame of the video is received.
+    /// </remarks>
+    /// <param name="renderer">`Texture` object where the video stream is rendered.</param>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         [SerializeField]
+    ///         RawImage receivedImage;
+    ///
+    ///         videoStreamTrack.OnVideoReceived += (texture) =>
+    ///         {
+    ///             receivedImage.texture = texture;
+    ///         }
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="RTCPeerConnection" />
     public delegate void OnVideoReceived(Texture renderer);
 
     /// <summary>
-    ///
+    ///     Delegate to be called to copy texture.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="dest"></param>
+    /// <remarks>
+    ///     `CopyTexture` delegate is called to copy texture when the texture is updated.
+    /// </remarks>
+    /// <param name="source">Source `Texture` object.</param>
+    /// <param name="dest">Destination `Texture` object.</param>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture, CopyTextureHelper.VerticalFlipCopy);
+    ///     ]]>
+    /// </example>
+    /// <seealso cref="VideoStreamTrack(Texture, CopyTexture)" />
     public delegate void CopyTexture(Texture source, RenderTexture dest);
 
     /// <summary>
-    ///
+    ///     Represents a single video track within a stream
     /// </summary>
+    /// <remarks>
+    ///     `VideoStreamTrack` is a `MediaStreamTrack` that represents a single video track within a stream.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture);
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="MediaStreamTrack" />
+    /// <seealso cref="WebRTC" />
     public class VideoStreamTrack : MediaStreamTrack
     {
         /// <summary>
-        /// Flip vertically received video, change it befor start receive video
+        ///     If the value is set to true, the received video is flipped vertically.
         /// </summary>
+        /// <remarks>
+        ///     Change this property before starting to receive video.
+        /// </remarks>
         public static bool NeedReceivedVideoFlipVertically { get; set; } = true;
 
         internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
@@ -66,7 +103,8 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// encoded / decoded texture
+        ///     When the track is configured to receive a video stream, represents the `Texture` object where the video stream is rendered.
+        ///     When the track is configured to send a video stream, represents the destination `Texture` object to send.
         /// </summary>
         public Texture Texture
         {
@@ -79,7 +117,8 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// encoded / decoded texture ptr
+        ///     When the track is configured to receive a video stream, represents the pointer to the `Texture` object where the video stream is rendered.
+        ///     When the track is configured to send a video stream, represents the pointer to the destination `Texture` object to send.
         /// </summary>
         public IntPtr TexturePtr
         {
@@ -91,14 +130,39 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        ///     Indicates that the track is configured to decode an incoming video stream.
+        /// </summary>
         public bool Decoding => m_renderer != null;
-        public bool Encoding => m_source != null;
-        public IntPtr DataPtr => m_dataptr;
-
 
         /// <summary>
-        ///
+        ///     Indicates that the track is configured to encode and send a video stream to a remote peer.
         /// </summary>
+        public bool Encoding => m_source != null;
+
+        /// <summary>
+        ///     Pointer to the video stream data in the native memory.
+        /// </summary>
+        public IntPtr DataPtr => m_dataptr;
+
+        /// <summary>
+        ///     Event to be fired when the first frame of the video is received.
+        /// </summary>
+        /// <remarks>
+        ///     `OnVideoReceived` event is fired when the first frame of the video is received.
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         [SerializeField]
+        ///         RawImage receivedImage;
+        ///
+        ///         videoStreamTrack.OnVideoReceived += (texture) =>
+        ///         {
+        ///             receivedImage.texture = texture;
+        ///         }
+        ///     ]]></code>
+        /// </example>
+        /// <seealso cref="RTCPeerConnection"/>
         public event OnVideoReceived OnVideoReceived;
 
         internal void UpdateTexture()
@@ -135,15 +199,24 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Video Sender
-        /// Creates a new VideoStream object.
-        /// The track is created with a `source`.
+        ///     Creates a new VideoStreamTrack object.
         /// </summary>
-        /// <param name="texture"></param>
+        /// <remarks>
+        ///     `VideoStreamTrack` constructor creates an instance of `VideoStreamTrack` with a `source`.
+        /// </remarks>
+        /// <param name="texture">
+        ///     `Texture` object that provides the input source for the video stream and is used in creating the video track.
+        /// </param>
         /// <param name="copyTexture">
-        /// By default, textures are copied vertically flipped, using CopyTextureHelper.VerticalFlipCopy,
-        /// use Graphics.Blit for copy as is, CopyTextureHelper for flip,
-        /// or write your own CopyTexture function</param>
+        ///     By default, textures are copied vertically flipped, using `CopyTextureHelper.VerticalFlipCopy`,
+        ///     use `Graphics.Blit` for copy as is, `CopyTextureHelper` for flip,
+        ///     or write your own `CopyTexture` function.
+        /// </param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture, CopyTextureHelper.VerticalFlipCopy);
+        ///     ]]></code>
+        /// </example>
         /// <exception cref="InvalidOperationException"></exception>
         public VideoStreamTrack(Texture texture, CopyTexture copyTexture = null)
             : base(CreateVideoTrack(texture, out var source))
@@ -180,8 +253,16 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Disposes of VideoStremTrack
         /// </summary>
+        /// <remarks>
+        ///     `Dispose` method disposes of the `VideoStreamTrack` and releases the associated resources.
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         videoStreamTrack.Dispose();
+        ///     ]]></code>
+        /// </example>
         public override void Dispose()
         {
             if (this.disposed)
