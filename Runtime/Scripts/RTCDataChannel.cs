@@ -326,7 +326,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Delegate to be called when the data channel's messages is opened or reopened.
+        /// Delegate to be called when the data channel's message transport mechanism is opened or reopened.
         /// </summary>
         /// <remarks>
         /// The `OnOpen` delegate is triggered when the data channel successfully establishes its underlying transport mechanism.
