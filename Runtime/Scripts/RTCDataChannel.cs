@@ -457,7 +457,7 @@ namespace Unity.WebRTC
         public int Id => NativeMethods.DataChannelGetID(GetSelfOrThrow());
 
         /// <summary>
-        /// Returns a string containing a name describing the data channel which are not required to be unique.
+        /// Returns a string description of the data channel, which is not required to be unique.
         /// </summary>
         /// <remarks>
         /// The `Label` property specifies a name for the data channel, which is set when the channel is created.
