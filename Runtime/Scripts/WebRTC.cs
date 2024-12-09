@@ -541,30 +541,43 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    ///     Provides options to configure the new connection.
     /// </summary>
+    /// <remarks>
+    ///     `RTCConfiguration` struct provides options to configure the new connection.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         RTCConfiguration configuration = peerConnection.GetConfiguration();
+    ///         if(configuration.urls.length == 0)
+    ///         {
+    ///             configuration.urls = new[] {"stun:stun.l.google.com:19302"};
+    ///         }
+    ///         peerConnection.SetConfiguration(configuration);
+    ///     ]]></code>
+    /// </example>
     /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
     /// <seealso cref="RTCPeerConnection.SetConfiguration(ref RTCConfiguration)"/>
     [Serializable]
     public struct RTCConfiguration
     {
         /// <summary>
-        ///
+        ///     List of RTCIceServer objects, each describing one server which may be used by the ICE agent.
         /// </summary>
         public RTCIceServer[] iceServers;
 
         /// <summary>
-        ///
+        ///     Represents the current ICE transport policy.
         /// </summary>
         public RTCIceTransportPolicy? iceTransportPolicy;
 
         /// <summary>
-        ///
+        ///     Specifies how to handle negotiation of candidates when the remote peer is not compatible with the SDP BUNDLE standard.
         /// </summary>
         public RTCBundlePolicy? bundlePolicy;
 
         /// <summary>
-        ///
+        ///     Specifies the size of the prefetched ICE candidate pool.
         /// </summary>
         public int? iceCandidatePoolSize;
 
