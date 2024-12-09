@@ -360,7 +360,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Delegate to be called when the data channel's messages is closed.
+        /// Delegate to be called when the data channel's message transport mechanism is closed.
         /// </summary>
         /// <remarks>
         /// The close event is sent to the onclose event handler on an RTCDataChannel instance when the data transport for the data channel has closed.
