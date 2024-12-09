@@ -5,8 +5,17 @@ using UnityEngine;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    ///     Provides the ability to control and access to details on encoding and sending a MediaStreamTrack to a remote peer.
     /// </summary>
+    /// <remarks>
+    ///     `RTCRtpSender` class allows customization of media encoding and transmission to a remote peer.
+    ///     It provides access to the device's media capabilities and supports sending DTMF tones for telephony interactions.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         var senders = peerConnection.GetSenders();
+    ///     ]]></code>
+    /// <seealso cref="RTCPeerConnection" />
     public class RTCRtpSender : RefCountedObject
     {
         private RTCPeerConnection peer;
@@ -19,16 +28,27 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Finalizer for RTCRtpSender.
         /// </summary>
+        /// <remarks>
+        ///     Ensures that resources are released by calling the `Dispose` method
+        /// </remarks>
         ~RTCRtpSender()
         {
             this.Dispose();
         }
 
         /// <summary>
-        /// 
+        ///     Disposes of RTCRtpSender.
         /// </summary>
+        /// <remarks>
+        ///     `Dispose` method disposes of the `RTCRtpSender` and releases the associated resources. 
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         sender.Dispose();
+        ///     ]]></code>
+        /// </example>
         public override void Dispose()
         {
             if (this.disposed)
@@ -43,10 +63,24 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Provides a `RTCRtpCapabilities` object describing the codec and header extension capabilities.
         /// </summary>
-        /// <param name="kind"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetCapabilities` method provides a `RTCRtpCapabilities` object that describes the codec and header extension capabilities supported by `RTCRtpSender`.
+        /// </remarks>
+        /// <param name="kind">`TrackKind` value indicating the type of media.</param>
+        /// <returns>`RTCRtpCapabilities` object contains an array of `RTCRtpCodecCapability` objects.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCRtpCapabilities capabilities = RTCRtpSender.GetCapabilities(TrackKind.Video);
+        ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
+        ///         RTCErrorType error = transceiver.SetCodecPreferences(capabilities.codecs);
+        ///         if (error.errorType != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to set codec preferences: {error.message}");
+        ///         }
+        ///     ]]></code>
+        /// </example>
         public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
         {
             WebRTC.Context.GetSenderCapabilities(kind, out IntPtr ptr);
@@ -58,16 +92,37 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Asynchronously requests statistics about outgoing traffic on the RTCPeerConnection associated with the RTCRtpSender.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetStats` method asynchronously requests an `RTCStatsReport` containing statistics about the outgoing traffic for the `RTCPeerConnection` associated with the `RTCRtpSender`.
+        /// </remarks>
+        /// <returns>`RTCStatsReportAsyncOperation` object containing `RTCStatsReport` object.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCStatsReportAsyncOperation asyncOperation = sender.GetStats();
+        ///         yield return asyncOperation;
+        ///         
+        ///         if (!asyncOperation.IsError)
+        ///         {
+        ///             RTCStatsReport statsReport = asyncOperation.Value;
+        ///             RTCStats stats = statsReport.Stats.ElementAt(0).Value;
+        ///             string statsText = "Id:" + stats.Id + "\n";
+        ///             statsText += "Timestamp:" + stats.Timestamp + "\n";
+        ///             statsText += stats.Dict.Aggregate(string.Empty, (str, next) =>
+        ///                 str + next.Key + ":" + (next.Value == null ? string.Empty : next.Value.ToString()) + "\n");
+        ///             Debug.Log(statsText);
+        ///             statsReport.Dispose();
+        ///         }
+        ///     ]]></code>
+        /// </example>
         public RTCStatsReportAsyncOperation GetStats()
         {
             return peer.GetStats(this);
         }
 
         /// <summary>
-        ///
+        ///      MediaStreamTrack managed by RTCRtpSender. If it is null, no transmission occurs.
         /// </summary>
         public MediaStreamTrack Track
         {
@@ -80,6 +135,10 @@ namespace Unity.WebRTC
             }
         }
 
+        /// <summary>
+        ///     RTCRtpScriptTransform used to insert a transform stream in a worker thread into the sender pipeline,
+        ///     enabling transformations on encoded video and audio frames after output by a codec but before transmission.
+        /// </summary>
         public RTCRtpTransform Transform
         {
             set
@@ -98,7 +157,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Indicates if the video track's framerate is synchronized with the application's framerate.
         /// </summary>
         public bool SyncApplicationFramerate
         {
@@ -135,9 +194,25 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Retrieves the current configuration of the RTCRtpSender.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetParameters` method retrieves `RTCRtpSendParameters` object describing the current configuration of the `RTCRtpSender`.
+        /// </remarks>
+        /// <returns>`RTCRtpSendParameters` object containing the current configuration of the `RTCRtpSender`.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCRtpSender sender = peerConnection.GetSenders().First();
+        ///         RTCRtpSendParameters parameters = sender.GetParameters();
+        ///         parameters.encodings[0].maxBitrate = bandwidth * 1000;
+        ///         RTCError error = sender.SetParameters(parameters);
+        ///         if (error.errorType != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to set parameters: {error.message}");
+        ///         }
+        ///     ]]></code>
+        /// </example>
+        /// <seealso cref="SetParameters" />
         public RTCRtpSendParameters GetParameters()
         {
             NativeMethods.SenderGetParameters(GetSelfOrThrow(), out var ptr);
@@ -148,10 +223,30 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Updates the configuration of the sender's track.
         /// </summary>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `SetParameters` method updates the configuration of the sender's `MediaStreamTrack`
+        ///     by applying changes the RTP transmission and the encoding parameters for a specific outgoing media on the connection.
+        /// </remarks>
+        /// <param name="parameters">
+        ///     A `RTCRtpSendParameters` object previously obtained by calling the sender's `GetParameters`,
+        ///     includes desired configuration changes and potential codecs for encoding the sender's track.
+        /// </param>
+        /// <returns>`RTCError` value.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCRtpSender sender = peerConnection.GetSenders().First();
+        ///         RTCRtpSendParameters parameters = sender.GetParameters();
+        ///         parameters.encodings[0].maxBitrate = bandwidth * 1000;
+        ///         RTCError error = sender.SetParameters(parameters);
+        ///         if (error.errorType != RTCErrorType.None)
+        ///         {
+        ///             Debug.LogError($"Failed to set parameters: {error.message}");
+        ///         }
+        ///     ]]></code>
+        /// </example>
+        /// <seealso cref="GetParameters" />
         public RTCError SetParameters(RTCRtpSendParameters parameters)
         {
             if (Track is VideoStreamTrack videoTrack)
@@ -182,10 +277,23 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Replaces the current source track with a new MediaStreamTrack.
         /// </summary>
-        /// <param name="track"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///    `ReplaceTrack` method replaces the track currently being used as the sender's source with a new `MediaStreamTrack`.
+        ///    It is often used to switch between two cameras.
+        /// </remarks>
+        /// <param name="track">
+        ///     A `MediaStreamTrack` to replace the current source track of the `RTCRtpSender`.
+        ///     The new track must be the same type as the current one.
+        /// </param>
+        /// <returns>`true` if the track has been successfully replaced.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCRtpTransceiver transceiver = peerConnection.GetTransceivers().First();
+        ///         transceiver.Sender.ReplaceTrack(newTrack);
+        ///     ]]></code>
+        /// </example>
         public bool ReplaceTrack(MediaStreamTrack track)
         {
             IntPtr trackPtr = track?.GetSelfOrThrow() ?? IntPtr.Zero;

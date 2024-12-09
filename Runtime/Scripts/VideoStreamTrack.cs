@@ -351,67 +351,6 @@ namespace Unity.WebRTC
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    public static class CameraExtension
-    {
-        /// <summary>
-        /// Create an instance of <see cref="VideoStreamTrack"/> to stream a camera.
-        /// </summary>
-        /// <remarks>
-        /// You should keep a reference of <see cref="VideoStreamTrack"/>, created by this method.
-        /// This instance is collected by GC automatically if you don't own a reference.
-        /// </remarks>
-        /// <param name="cam"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="depth"></param>
-        /// <returns></returns>
-        public static VideoStreamTrack CaptureStreamTrack(this Camera cam, int width, int height,
-            RenderTextureDepth depth = RenderTextureDepth.Depth24, CopyTexture textureCopy = null)
-        {
-            switch (depth)
-            {
-                case RenderTextureDepth.Depth16:
-                case RenderTextureDepth.Depth24:
-                case RenderTextureDepth.Depth32:
-                    break;
-                default:
-                    throw new InvalidEnumArgumentException(nameof(depth), (int)depth, typeof(RenderTextureDepth));
-            }
-
-            if (width <= 0 || height <= 0)
-            {
-                throw new ArgumentException("width and height are should be greater than zero.");
-            }
-
-            int depthValue = (int)depth;
-            var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-            var rt = new UnityEngine.RenderTexture(width, height, depthValue, format);
-            rt.Create();
-            cam.targetTexture = rt;
-            return new VideoStreamTrack(rt, textureCopy);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="cam"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="depth"></param>
-        /// <returns></returns>
-        public static MediaStream CaptureStream(this Camera cam, int width, int height,
-            RenderTextureDepth depth = RenderTextureDepth.Depth24)
-        {
-            var stream = new MediaStream();
-            var track = cam.CaptureStreamTrack(width, height, depth);
-            stream.AddTrack(track);
-            return stream;
-        }
-    }
-
     internal class VideoTrackSource : RefCountedObject
     {
         internal Texture sourceTexture_;
@@ -565,13 +504,13 @@ namespace Unity.WebRTC
 
     public static class CopyTextureHelper
     {
-        // Blit parameter to flip vertically 
+        // Blit parameter to flip vertically
         private static readonly Vector2 s_verticalScale = new Vector2(1f, -1f);
         private static readonly Vector2 s_verticalOffset = new Vector2(0f, 1f);
-        // Blit parameter to flip horizontally 
+        // Blit parameter to flip horizontally
         private static readonly Vector2 s_horizontalScale = new Vector2(-1f, 1f);
         private static readonly Vector2 s_horixontalOffset = new Vector2(1f, 0f);
-        // Blit parameter to flip diagonally 
+        // Blit parameter to flip diagonally
         private static readonly Vector2 s_diagonalScale = new Vector2(-1f, -1f);
         private static readonly Vector2 s_diagonalOffset = new Vector2(1f, 1f);
 

@@ -17,8 +17,19 @@ namespace Unity.WebRTC
     public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
 
     /// <summary>
-    /// 
+    ///     Represents a stream of media content.
     /// </summary>
+    /// <remarks>
+    ///     `MediaStream` represents a stream of media content.
+    ///     A stream consists of several tracks, such as video or audio tracks.
+    ///     Each track is specified as an instance of `MediaStreamTrack`.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         MediaStream mediaStream = new MediaStream();
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="MediaStreamTrack"/>
     public class MediaStream : RefCountedObject
     {
         private DelegateOnAddTrack onAddTrack;
@@ -27,22 +38,33 @@ namespace Unity.WebRTC
         private HashSet<MediaStreamTrack> cacheTracks = new HashSet<MediaStreamTrack>();
 
         /// <summary>
-        ///
+        ///     String containing 36 characters denoting a unique identifier for the object.
         /// </summary>
         public string Id =>
             NativeMethods.MediaStreamGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        /// 
+        ///     Finalizer for MediaStream.
         /// </summary>
+        /// <remarks>
+        ///     Ensures that resources are released by calling the `Dispose` method.
+        /// </remarks>
         ~MediaStream()
         {
             this.Dispose();
         }
 
         /// <summary>
-        /// 
+        ///     Disposes of MediaStream.
         /// </summary>
+        /// <remarks>
+        ///     `Dispose` method disposes of the MediaStream and releases the associated resources. 
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         mediaStream.Dispose();
+        ///     ]]></code>
+        /// </example>
         public override void Dispose()
         {
             if (this.disposed)
@@ -58,7 +80,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Delegate to be called when a new MediaStreamTrack object has been added.
         /// </summary>
         /// todo:(kazuki) Rename to "onAddTrack"
         /// todo:(kazuki) Should we change the API to use UnityEvent or Action class?
@@ -72,7 +94,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Delegate to be called when a new MediaStreamTrack object has been removed.
         /// </summary>
         /// todo:(kazuki) Rename to "onAddTrack"
         /// todo:(kazuki) Should we change the API to use UnityEvent or Action class?
@@ -86,9 +108,17 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Returns a list of VideoStreamTrack objects in the stream.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetVideoTracks` method returns a sequence that represents all the `VideoStreamTrack` objects in this stream's track set.
+        /// </remarks>
+        /// <returns>List of `MediaStreamTrack` objects, one for each video track contained in the media stream.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         IEnumerable<VideoStreamTrack> videoTracks = mediaStream.GetVideoTracks();
+        ///     ]]></code>
+        /// </example>
         public IEnumerable<VideoStreamTrack> GetVideoTracks()
         {
             var buf = NativeMethods.MediaStreamGetVideoTracks(GetSelfOrThrow(), out ulong length);
@@ -96,9 +126,17 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Returns a list of AudioStreamTrack objects in the stream.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetAudioTracks` method returns a sequence that represents all the `AudioStreamTrack` objects in this stream's track set.
+        /// </remarks>
+        /// <returns>List of `AudioStreamTrack` objects, one for each audio track contained in the stream.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         IEnumerable<AudioStreamTrack> audioTracks = mediaStream.GetAudioTracks();
+        ///     ]]></code>
+        /// </example>
         public IEnumerable<AudioStreamTrack> GetAudioTracks()
         {
             var buf = NativeMethods.MediaStreamGetAudioTracks(GetSelfOrThrow(), out ulong length);
@@ -106,23 +144,41 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Returns a list of MediaStreamTrack objects in the stream.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetTracks` method returns a sequence that represents all the `MediaStreamTrack` objects in this stream's track set.
+        /// </remarks>
+        /// <returns>List of `MediaStreamTrack` objects.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         IEnumerable<MediaStreamTrack> tracks = mediaStream.GetTracks();
+        ///     ]]></code>
+        /// </example>
         public IEnumerable<MediaStreamTrack> GetTracks()
         {
             return GetAudioTracks().Cast<MediaStreamTrack>().Concat(GetVideoTracks());
         }
 
         /// <summary>
-        /// Add a new track to the stream.
+        ///     Add a new track to the stream.
         /// </summary>
         /// <remarks>
-        /// This class keeps references of <see cref="MediaStreamTrack"/> to avoid GC.
-        /// Please call the <see cref="RemoveTrack(MediaStreamTrack)"/> method when it's no longer needed.
+        ///     `AddTrack` method adds a new track to the stream.
+        ///     This class keeps references of <see cref="MediaStreamTrack"/> to avoid GC.
+        ///     Please call the <see cref="RemoveTrack(MediaStreamTrack)"/> method when it's no longer needed.
         /// </remarks>
-        /// <param name="track"></param>
-        /// <returns></returns>
+        /// <param name="track">`MediaStreamTrack` object to add to the stream.</param>
+        /// <returns>`true` if the track successfully added to the stream.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         MediaStream receiveStream = new MediaStream();
+        ///         peerConnection.OnTrack = e =>
+        ///         {
+        ///             bool result = receiveStream.AddTrack(e.Track);
+        ///         }
+        ///     ]]></code>
+        /// </example>
         /// <seealso cref="RemoveTrack(MediaStreamTrack)"/>
         public bool AddTrack(MediaStreamTrack track)
         {
@@ -131,10 +187,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Remove a new track to the stream.
+        ///     Remove a track from the stream.
         /// </summary>
-        /// <param name="track"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `RemoveTrack` method removes a track from the stream.
+        /// </remarks>
+        /// <param name="track">`MediaStreamTrack` object to remove from the stream.</param>
+        /// <returns>`true` if the track successfully removed from the stream.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         bool result = mediaStream.RemoveTrack(track);
+        ///     ]]></code>
+        /// </example>
         /// <seealso cref="AddTrack(MediaStreamTrack)"/>
         public bool RemoveTrack(MediaStreamTrack track)
         {
@@ -143,8 +207,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        ///     Creates a MediaStream instance.
         /// </summary>
+        /// <remarks>
+        ///     `MediaStream` constructor creates an instance of `MediaStream`,
+        ///     which serves as a collection of media tracks,
+        ///     each represented by a `MediaStreamTrack` object.
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         MediaStream mediaStream = new MediaStream();
+        ///     ]]></code>
+        /// </example>
         public MediaStream() : this(WebRTC.Context.CreateMediaStream(Guid.NewGuid().ToString()))
         {
         }
