@@ -489,9 +489,9 @@ namespace Unity.WebRTC
         /// Returns the subprotocol being used by the data channel to transmit and process messages.
         /// </summary>
         /// <remarks>
-        /// The `Protocol` property retrieves the sub protocol negotiated for this data channel, which governs the rules for message format and communication behavior between peers.
+        /// The `Protocol` property retrieves the subprotocol negotiated for this data channel, which governs the rules for message format and communication behavior between peers.
         /// This property is critical for ensuring compatibility and understanding between different systems or applications using the channel, especially when custom protocols are used.
-        /// If no protocol was specified during the data channel's creation, this property returns an empty string, indicating that no particular sub protocol is in effect.
+        /// If no protocol was specified during the data channel's creation, this property returns an empty string, indicating that no particular subprotocol is in effect.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[
