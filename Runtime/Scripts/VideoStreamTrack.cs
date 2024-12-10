@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -67,8 +67,8 @@ namespace Unity.WebRTC
         /// </remarks>
         public static bool NeedReceivedVideoFlipVertically { get; set; } = true;
 
-        internal static ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
-            new ConcurrentDictionary<IntPtr, WeakReference<VideoStreamTrack>>();
+        internal static Dictionary<IntPtr, WeakReference<VideoStreamTrack>> s_tracks =
+            new Dictionary<IntPtr, WeakReference<VideoStreamTrack>>();
 
         internal enum VideoStreamTrackAction
         {
@@ -221,8 +221,12 @@ namespace Unity.WebRTC
         public VideoStreamTrack(Texture texture, CopyTexture copyTexture = null)
             : base(CreateVideoTrack(texture, out var source))
         {
-            if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
-                throw new InvalidOperationException();
+            lock (s_tracks)
+            {
+                if (s_tracks.ContainsKey(self))
+                    throw new InvalidOperationException();
+                s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
+            }
 
             m_dataptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoStreamTrackData)));
             Marshal.StructureToPtr(m_data, m_dataptr, false);
@@ -243,8 +247,12 @@ namespace Unity.WebRTC
         internal VideoStreamTrack(IntPtr ptr)
             : base(CreateVideoTrack(ptr))
         {
-            if (!s_tracks.TryAdd(self, new WeakReference<VideoStreamTrack>(this)))
-                throw new InvalidOperationException();
+            lock (s_tracks)
+            {
+                if (s_tracks.ContainsKey(self))
+                    throw new InvalidOperationException();
+                s_tracks.Add(self, new WeakReference<VideoStreamTrack>(this));
+            }
 
             m_dataptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(VideoStreamTrackData)));
             Marshal.StructureToPtr(m_data, m_dataptr, false);
@@ -286,7 +294,10 @@ namespace Unity.WebRTC
                     }, 0.1f);
                 }
 
-                s_tracks.TryRemove(self, out var value);
+                lock (s_tracks)
+                {
+                    s_tracks.Remove(self);
+                }
             }
             base.Dispose();
         }
