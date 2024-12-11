@@ -25,20 +25,10 @@ namespace Unity.WebRTC
         /// <example>
         ///     Creates a GameObject with a Camera component and a VideoStreamTrack capturing video from the camera.
         ///     <code lang="cs"><![CDATA[
-        ///
         ///         private void AddVideoObject()
         ///         {
-        ///             var newCam = new GameObject($"Camera{objectIndex}").AddComponent<Camera>();
-        ///             newCam.backgroundColor = Random.ColorHSV();
-        ///             newCam.transform.SetParent(cameraParent);
-        ///             cameras.Add(newCam);
-        ///             var newSource = new GameObject($"SourceImage{objectIndex}").AddComponent<RawImage>();
-        ///             newSource.transform.SetParent(sourceImageParent);
-        ///             sourceImages.Add(newSource);
-        ///             var newReceive = new GameObject($"ReceiveImage{objectIndex}").AddComponent<RawImage>();
-        ///             newReceive.transform.SetParent(receiveImageParent);
-        ///             receiveImages.Add(newReceive);
-        ///
+        ///             Camera newCam = new GameObject("Camera").AddComponent<Camera>();
+        ///             RawImage newSource = new GameObject("SourceImage").AddComponent<RawImage>();
         ///             try
         ///             {
         ///                 videoStreamTrackList.Add(newCam.CaptureStreamTrack(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y));
@@ -47,12 +37,7 @@ namespace Unity.WebRTC
         ///             catch (Exception e)
         ///             {
         ///                 Debug.LogError(e.Message);
-        ///                 HangUp();
-        ///                 return;
         ///             }
-        ///
-        ///             objectIndex++;
-        ///             addTracksButton.interactable = true;
         ///         }
         ///     ]]></code>
         /// </example>
