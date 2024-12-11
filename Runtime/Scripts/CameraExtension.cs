@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 namespace Unity.WebRTC
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="Camera"/> objects to facilitate video streaming functionalities.
+    /// </summary>
     public static class CameraExtension
     {
         /// <summary>
