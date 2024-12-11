@@ -68,10 +68,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="MediaStream"/> containing <see cref="VideoStreamTrack"/> for streaming video from a <see cref="Camera"/> object.
+        /// Creates an instance of <see cref="MediaStream"/> with a <see cref="VideoStreamTrack"/> capturing video from a <see cref="Camera"/> object.
         /// </summary>
         /// <remarks>
-        /// It is recommended to maintain a reference to the <see cref="VideoStreamTrack"/> instance created by this method.
+        /// It is recommended to maintain a reference to the <see cref="MediaStream"/> instance created by this method.
         /// Without a reference, the instance may be collected by the garbage collector automatically.
         /// </remarks>
         /// <param name="cam">The camera from which to capture video frames</param>
@@ -82,12 +82,14 @@ namespace Unity.WebRTC
         /// <example>
         ///     Creates a MediaStream with a VideoStreamTrack capturing video from the camera.
         ///     <code lang="cs"><![CDATA[
-        ///         private void Call()
+        ///         private static MediaStream CreateMediaStream()
         ///         {
-        ///             videoStream = Camera.main.CaptureStream(1280, 720);
+        ///             MediaStream videoStream = Camera.main.CaptureStream(1280, 720);
+        ///             return videoStream;
         ///         }
         ///     ]]></code>
         /// </example>
+
         public static MediaStream CaptureStream(this Camera cam, int width, int height,
             RenderTextureDepth depth = RenderTextureDepth.Depth24)
         {
