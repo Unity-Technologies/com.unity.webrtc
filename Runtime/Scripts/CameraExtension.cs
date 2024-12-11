@@ -90,8 +90,7 @@ namespace Unity.WebRTC
         ///     ]]></code>
         /// </example>
 
-        public static MediaStream CaptureStream(this Camera cam, int width, int height,
-            RenderTextureDepth depth = RenderTextureDepth.Depth24)
+        public static MediaStream CaptureStream(this Camera cam, int width, int height, RenderTextureDepth depth = RenderTextureDepth.Depth24)
         {
             var stream = new MediaStream();
             var track = cam.CaptureStreamTrack(width, height, depth);
