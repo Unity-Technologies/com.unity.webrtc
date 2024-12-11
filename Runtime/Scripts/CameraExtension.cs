@@ -68,7 +68,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="MediaStream"/> with a <see cref="VideoStreamTrack"/> capturing video from a <see cref="Camera"/> object.
+        /// Creates an instance of <see cref="MediaStream"/> capturing video from a <see cref="Camera"/> object.
         /// </summary>
         /// <remarks>
         /// It is recommended to maintain a reference to the <see cref="MediaStream"/> instance created by this method.
