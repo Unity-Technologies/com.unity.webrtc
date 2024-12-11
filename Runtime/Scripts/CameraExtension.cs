@@ -68,13 +68,26 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Creates an instance of <see cref="MediaStream"/> containing <see cref="VideoStreamTrack"/> for streaming video from a <see cref="Camera"/> object.
         /// </summary>
-        /// <param name="cam"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="depth"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// It is recommended to maintain a reference to the <see cref="VideoStreamTrack"/> instance created by this method.
+        /// Without a reference, the instance may be collected by the garbage collector automatically.
+        /// </remarks>
+        /// <param name="cam">The camera from which to capture video frames</param>
+        /// <param name="width">The desired width of the video stream, in pixels. Must be greater than zero</param>
+        /// <param name="height">The desired height of the video stream, in pixels. Must be greater than zero</param>
+        /// <param name="depth">The depth buffer format for the render texture. Default is <see cref="RenderTextureDepth.Depth24"/></param>
+        /// <returns>A <see cref="MediaStream"/> containing the video track captured from the camera.</returns>
+        /// <example>
+        ///     Creates a MediaStream with a VideoStreamTrack capturing video from the camera.
+        ///     <code lang="cs"><![CDATA[
+        ///         private void Call()
+        ///         {
+        ///             videoStream = Camera.main.CaptureStream(1280, 720);
+        ///         }
+        ///     ]]></code>
+        /// </example>
         public static MediaStream CaptureStream(this Camera cam, int width, int height,
             RenderTextureDepth depth = RenderTextureDepth.Depth24)
         {
