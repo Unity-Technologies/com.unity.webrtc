@@ -5,7 +5,7 @@
         {
             "ValidationTest": "Restricted File Type Validation",
             "ExceptionMessage": "/Runtime/Plugins/x86_64/webrtc.dll should not be included in packages unless absolutely necessary. Please confirm that its inclusion is deliberate and intentional.",
-            "PackageVersion": "3.0.0-pre.7"
+            "PackageVersion": "3.0.0-pre.8"
         }
     ]
 }
