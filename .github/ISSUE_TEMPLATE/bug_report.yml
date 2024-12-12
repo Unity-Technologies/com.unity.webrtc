@@ -27,6 +27,7 @@ body:
         What version of the package are you using?
         You can check the Unity version in Package Manager Window. See [manual](https://docs.unity3d.com/Manual/upm-ui.html).
       options:
+        - 3.0.0-pre.8
         - 3.0.0-pre.7
         - 3.0.0-pre.6
         - 3.0.0-pre.5
