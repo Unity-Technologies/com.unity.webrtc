@@ -2,8 +2,8 @@
 
 <img src="https://img.shields.io/badge/unity-2020.3-green.svg?style=flat-square" alt="unity 2020.3">
 <img src="https://img.shields.io/badge/unity-2021.3-green.svg?style=flat-square" alt="unity 2021.3">
-<img src="https://img.shields.io/badge/unity-2022.1-green.svg?style=flat-square" alt="unity 2022.3">
-<img src="https://img.shields.io/badge/unity-2022.1-green.svg?style=flat-square" alt="unity 2023.1">
+<img src="https://img.shields.io/badge/unity-2022.3-green.svg?style=flat-square" alt="unity 2022.3">
+<img src="https://img.shields.io/badge/unity-6000.0-green.svg?style=flat-square" alt="unity 2023.1">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
 
