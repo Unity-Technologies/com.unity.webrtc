@@ -4,6 +4,25 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-pre.8] - 2024-12-12
+
+### Changed
+- doc: improve the API doc of CameraExtension 
+- doc: improve the API doc of RTCSessionDescription
+- doc: improve the API doc of RTCDataChannel
+- doc: Improve the API doc of RTCConfiguration
+- doc: Improve the API doc of RTCRtpEncodingParameters
+- doc: Improve the API doc of RTCRtpSender
+- doc: Improve the API doc of RTCRtpTransceiver
+- doc: Improve the API doc of WebRTC
+- doc: Improve the API doc of AudioStreamTrack
+- doc: Improve the API doc of VideoStreamTrack
+- doc: Improve the API doc of MediaStreamTrack
+- doc: Improve the API doc of MediaStream
+- doc: Improve the API doc of RTCPeerConnection
+- doc: Improve the API doc of RTCIceServer
+
+
 ## [3.0.0-pre.7] - 2023-10-20
 
 ### Added
