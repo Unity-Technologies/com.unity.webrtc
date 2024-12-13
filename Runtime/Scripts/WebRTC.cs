@@ -1553,6 +1553,8 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern void IceCandidateGetCandidate(IntPtr candidate, out CandidateInternal dst);
         [DllImport(WebRTC.Lib)]
+        public static extern void IceCandidateGetEmptyCandidate(out CandidateInternal dst);
+        [DllImport(WebRTC.Lib)]
         public static extern int IceCandidateGetSdpLineIndex(IntPtr candidate);
         [DllImport(WebRTC.Lib)]
         [return: MarshalAs(UnmanagedType.LPStr)]
