@@ -60,9 +60,8 @@ namespace webrtc
     inline absl::optional<NV_ENC_LEVEL>
     NvEncRequiredLevel(const VideoCodec& codec, std::vector<SdpVideoFormat>& formats, const GUID& guid)
     {
-        int pixelCount = codec.width * codec.height;
         auto requiredLevel = unity::webrtc::H264SupportedLevel(
-            pixelCount, static_cast<int>(codec.maxFramerate), static_cast<int>(codec.maxBitrate));
+            codec.width, codec.height, static_cast<int>(codec.maxFramerate), static_cast<int>(codec.maxBitrate));
 
         if (!requiredLevel)
         {
@@ -223,7 +222,7 @@ namespace webrtc
             // workaround
             // Use supported max framerate that calculated by h264 level define.
             m_codec.maxFramerate = static_cast<uint32_t>(
-                SupportedMaxFramerate(s_maxSupportedH264Level.value(), m_codec.width * m_codec.height));
+                SupportedMaxFramerate(s_maxSupportedH264Level.value(), m_codec.width, m_codec.height));
             requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
             if (!requiredLevel)
             {
@@ -567,7 +566,7 @@ namespace webrtc
             // workaround
             // Use supported max framerate that calculated by h264 level define.
             m_codec.maxFramerate = static_cast<uint32_t>(
-                SupportedMaxFramerate(s_maxSupportedH264Level.value(), m_codec.width * m_codec.height));
+                SupportedMaxFramerate(s_maxSupportedH264Level.value(), m_codec.width, m_codec.height));
             requiredLevel = NvEncRequiredLevel(m_codec, s_formats, m_profileGuid);
             if (!requiredLevel)
             {
