@@ -7,6 +7,7 @@ var UnityWebRTCContext = {
   ContextCreate: function (uid, encodeType) {
     var context = {
       id: uid,
+      refPtr: new Set(),
       encodeType: UWEncoderType[encodeType]
     };
     uwcom_addManageObj(context);
@@ -15,10 +16,7 @@ var UnityWebRTCContext = {
 
   ContextDestroy: function (uid) {
     var contextPtrs = Object.keys(UWManaged).filter(function (contextPtr) {
-      if ('id' in UWManaged[contextPtr]) {
-        return UWManaged[contextPtr].id === uid;
-      } else
-        return false;
+      return 'id' in UWManaged[contextPtr] && UWManaged[contextPtr].id === uid;
     });
     if (contextPtrs.length > 1) {
       console.error('ContextDestroy: multiple Contexts with the same id');
@@ -31,19 +29,27 @@ var UnityWebRTCContext = {
   },
 
   SetCurrentContext: function (contextPtr) {
-    throw new Error("Not implemented");
+    UWManaged["__currentContext__"] = UWManaged[contextPtr];
   },
-  
+
   // TODO
-  ContextAddRefPtr: function (ptr){
-    throw new Error("Not implemented");
+  ContextAddRefPtr: function (contextPtr,ptr){
+    if (!uwcom_existsCheck(contextPtr, "ContextDeleteRefPtr", "context")) return;
+    /** @type {{ refPtr: Set }} */
+    var context = UWManaged[contextPtr];
+    if(context && context.refPtr)
+      context.refPtr.add(ptr);
   },
-  
+
   // TODO
-  ContextDeleteRefPtr: function(ptr){
-    throw new Error("Not implemented");
+  ContextDeleteRefPtr: function(contextPtr,ptr){
+    if (!uwcom_existsCheck(contextPtr, "ContextDeleteRefPtr", "context")) return;
+    /** @type {{ refPtr: Set }} */
+    var context = UWManaged[contextPtr];
+    if(context.refPtr)
+      context.refPtr.delete(ptr);
   },
-  
+
   // TODO
   ContextCreateAudioTrackSource: function(contextPtr){
     if (!uwcom_existsCheck(contextPtr, "ContextCreateAudioTrackSource", "context")) return;
@@ -51,7 +57,7 @@ var UnityWebRTCContext = {
     uwcom_addManageObj(audioTrackSource);
     return audioTrackSource.managePtr;
   },
-  
+
   // TODO
   ContextCreateVideoTrackSource: function(contextPtr){
     if (!uwcom_existsCheck(contextPtr, "ContextCreateVideoTrackSource", "context")) return;
@@ -59,7 +65,7 @@ var UnityWebRTCContext = {
     uwcom_addManageObj(videoTrackSource);
     return videoTrackSource.managePtr;
   },
-  
+
   ContextGetEncoderType: function (contextPtr) {
     if (!uwcom_existsCheck(contextPtr, 'ContextGetEncoderType', 'context')) return;
     var context = UWManaged[contextPtr];
@@ -97,7 +103,7 @@ var UnityWebRTCContext = {
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetRemoteDescription', 'peer')) return 11; // OperationErrorWithData
     return _PeerConnectionSetDescription(peerPtr, typeIdx, sdpPtr, 'Remote');
   },
-  
+
   PeerConnectionSetLocalDescriptionWithoutDescription: function (contextPtr, peerPtr) {
     if (!uwcom_existsCheck(contextPtr, 'PeerConnectionSetLocalDescriptionWithoutDescription', 'context')) return 11; // OperationErrorWithData
     if (!uwcom_existsCheck(peerPtr, 'PeerConnectionSetLocalDescriptionWithoutDescription', 'peer')) return 11; // OperationErrorWithData
@@ -142,7 +148,7 @@ var UnityWebRTCContext = {
   ContextRegisterMediaStreamObserver: function (contextPtr, streamPtr) {
     if (!uwcom_existsCheck(contextPtr, 'MediaStreamRegisterOnAddTrack', 'context')) return;
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamRegisterOnAddTrack', 'stream')) return;
-    
+
     var stream = UWManaged[streamPtr];
     stream.onaddtrack = (function(evt) {
       uwcom_addManageObj(evt.track);
@@ -153,24 +159,50 @@ var UnityWebRTCContext = {
       Module.dynCall_vii(uwevt_MSOnRemoveTrack, stream.managePtr, evt.track.managePtr);
     });
   },
-    
-  ContextUnRegisterMediaStreamObserver: function (contextPtr, streamPtr) {
 
+  ContextUnRegisterMediaStreamObserver: function (contextPtr, streamPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'MediaStreamRegisterOnAddTrack', 'context')) return;
+    if (!uwcom_existsCheck(streamPtr, 'MediaStreamRegisterOnAddTrack', 'stream')) return;
+    var context = UWManaged[contextPtr];
+    var stream = UWManaged[streamPtr];
+    throw new Error("Not implemented");
   },
-    
+
   MediaStreamRegisterOnAddTrack: function (contextPtr, streamPtr, MediaStreamOnAddTrack) {
     if (!uwcom_existsCheck(contextPtr, 'MediaStreamRegisterOnAddTrack', 'context')) return;
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamRegisterOnAddTrack', 'stream')) return;
+    var context = UWManaged[contextPtr];
+    var stream = UWManaged[streamPtr];
     uwevt_MSOnAddTrack = MediaStreamOnAddTrack;
   },
 
   MediaStreamRegisterOnRemoveTrack: function (contextPtr, streamPtr, MediaStreamOnRemoveTrack) {
     if (!uwcom_existsCheck(contextPtr, 'MediaStreamRegisterOnRemoveTrack', 'context')) return;
     if (!uwcom_existsCheck(streamPtr, 'MediaStreamRegisterOnRemoveTrack', 'stream')) return;
+    var context = UWManaged[contextPtr];
+    var stream = UWManaged[streamPtr];
     uwevt_MSOnRemoveTrack = MediaStreamOnRemoveTrack;
   },
 
+  StatsCollectorRegisterCallback: function(onCollectStatsCallback) {
+    throw new Error("Not implemented");
+  },
+  CreateSessionDescriptionObserverRegisterCallback: function(nativeCreateSessionDescCallback) {
+    throw new Error("Not implemented");
+  },
+  SetLocalDescriptionObserverRegisterCallback: function(setLocalDescriptionCallback) {
+    throw new Error("Not implemented");
+  },
+  SetRemoteDescriptionObserverRegisterCallback: function(setRemoteDescriptionCallback) {
+    throw new Error("Not implemented");
+  },
+  SetTransformedFrameRegisterCallback: function(transformedFrameCallback) {
+    throw new Error("Not implemented");
+  },
+
   GetBatchUpdateEventFunc: function (contextPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'GetBatchUpdateEventFunc', 'context')) return;
+    var context = UWManaged[contextPtr];
     throw new Error("Not implemented");
     return null;
   },
@@ -180,19 +212,31 @@ var UnityWebRTCContext = {
     return -1;
   },
 
-  AudioTrackAddSink: function(track, sink) {
+  AudioTrackAddSink: function(trackPtr, sinkPtr) {
+    if (!uwcom_existsCheck(trackPtr, 'AudioTrackAddSink', 'track')) return;
+    if (!uwcom_existsCheck(sinkPtr, 'AudioTrackAddSink', 'sink')) return;
+    var track = UWManaged[trackPtr];
+    var sink = UWManaged[sinkPtr];
     throw new Error("Not implemented");
   },
 
-  AudioTrackRemoveSink: function(track, sink) {
+  AudioTrackRemoveSink: function(trackPtr, sinkPtr) {
+    if (!uwcom_existsCheck(trackPtr, 'AudioTrackRemoveSink', 'track')) return;
+    if (!uwcom_existsCheck(sinkPtr, 'AudioTrackRemoveSink', 'sink')) return;
+    var track = UWManaged[trackPtr];
+    var sink = UWManaged[sinkPtr];
     throw new Error("Not implemented");
   },
 
-  AudioTrackSinkProcessAudio: function(sink, data, length, channels, sampleRate) {
+  AudioTrackSinkProcessAudio: function(sinkPtr, data, length, channels, sampleRate) {
+    if (!uwcom_existsCheck(sinkPtr, 'AudioTrackSinkProcessAudio', 'sink')) return;
+    var sink = UWManaged[sinkPtr];
     throw new Error("Not implemented");
   },
 
   GetUpdateTextureFunc: function (contextPtr) {
+    if (!uwcom_existsCheck(contextPtr, 'GetUpdateTextureFunc', 'context')) return;
+    var context = UWManaged[contextPtr];
     throw new Error("Not implemented");
   },
 
@@ -233,13 +277,21 @@ var UnityWebRTCContext = {
   },
 
   ContextRegisterAudioReceiveCallback: function (contextPtr, trackPtr, AudioTrackOnReceive){
-    
+    if (!uwcom_existsCheck(contextPtr, 'ContextRegisterAudioReceiveCallback', 'context')) return;
+    if (!uwcom_existsCheck(trackPtr, 'ContextRegisterAudioReceiveCallback', 'track')) return;
+    var context = UWManaged[contextPtr];
+    var track = UWManaged[trackPtr];
+    throw new Error("Not implemented");
   },
 
   ContextUnregisterAudioReceiveCallback: function (contextPtr, trackPtr){
-    
+    if (!uwcom_existsCheck(contextPtr, 'ContextUnregisterAudioReceiveCallback', 'context')) return;
+    if (!uwcom_existsCheck(trackPtr, 'ContextUnregisterAudioReceiveCallback', 'track')) return;
+    var context = UWManaged[contextPtr];
+    var track = UWManaged[trackPtr];
+    throw new Error("Not implemented");
   },
-  
+
   // CreateVideoRenderer: function(contextPtr) {
 
   // },

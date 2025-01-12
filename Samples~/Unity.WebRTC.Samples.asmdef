@@ -1,9 +1,10 @@
 {
     "name": "Unity.WebRTC.Samples",
+    "rootNamespace": "",
     "references": [
-        "Unity.WebRTC"
+        "Unity.WebRTC",
+        "UnityWebGLMicrophone"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -11,5 +12,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
