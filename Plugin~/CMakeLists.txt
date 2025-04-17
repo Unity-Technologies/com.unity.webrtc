@@ -51,12 +51,9 @@ if(XCODE)
   endif()
 endif()
 
-# Use lld linker instead of GNU ld. Link glibc++ statically because of
-# compatibility of lower version of GLIBCXX. This package must support Ubuntu
-# version 16.04, 18.04, 20.04.
+# Use lld linker instead of GNU ld.
 if(Linux)
-  set(CMAKE_CXX_FLAG "${CMAKE_CXX_FLAG} -static-libstdc++")
-  add_link_options(-static-libstdc++ -fuse-ld=lld-11)
+  add_link_options(-fuse-ld=lld-11)
 endif()
 
 # enable debug output
