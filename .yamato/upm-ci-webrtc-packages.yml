@@ -233,9 +233,9 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
     type: Unity::mobile::iPhone
-    image: package-ci/macos-12:v4.10.0-1271191
-    model: SE
-    flavor: b1.medium
+    image: mobile/ios-macos-13:v2.2903163
+    model: 13
+    flavor: m1.mac
   skip_checkout: true
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_ios
