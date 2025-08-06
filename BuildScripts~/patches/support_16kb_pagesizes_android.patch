@@ -1,14 +1,13 @@
 diff --git a/sdk/android/BUILD.gn b/sdk/android/BUILD.gn
-index 8a3e20c4e9..a4d02eddd2 100644
+index 8a3e20c4e9..1fdfa38d7b 100644
 --- a/sdk/android/BUILD.gn
 +++ b/sdk/android/BUILD.gn
-@@ -131,7 +131,8 @@ if (is_android) {
-     configs += [ "//build/config/android:hide_all_but_jni" ]
+@@ -132,6 +132,8 @@ if (is_android) {
      ldflags = [
        "-lEGL",
--      "-Wl,--build-id",
-+      "-Wl,-z,max-page-size=16384,--build-id",
-+      "-Wl,-z,common-page-size=16384,--build-id",
+       "-Wl,--build-id",
++      "-Wl,-z,max-page-size=16384",
++      "-Wl,-z,common-page-size=16384",
      ]
  
      deps = [
