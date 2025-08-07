@@ -1,5 +1,5 @@
 upm:
-  registry_url: https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
+  registry_url: https://artifactory.prd.it.unity3d.com/artifactory/api/npm/upm-npm
   package_version: stable
 webrtc_version:
   name: M116
