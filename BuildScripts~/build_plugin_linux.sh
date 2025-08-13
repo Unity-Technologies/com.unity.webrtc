@@ -5,6 +5,13 @@ export SOLUTION_DIR=$(pwd)/Plugin~
 export OUTPUT_FILEPATH=$(pwd)/Runtime/Plugins/x86_64/libwebrtc.so
 export LIBCXX_BUILD_DIR=$(pwd)/llvm-project/build
 
+BUILD_TYPE="${1:-release}"
+if [ "$BUILD_TYPE" = "debug" ]; then
+  CMAKE_BUILD_TYPE="Debug"
+else
+  CMAKE_BUILD_TYPE="Release"
+fi
+
 source ~/.profile
 
 # Download LibWebRTC 
@@ -13,7 +20,7 @@ unzip -d $SOLUTION_DIR/webrtc webrtc.zip
 
 # Build UnityRenderStreaming Plugin 
 pushd "$SOLUTION_DIR"
-cmake --preset=x86_64-linux -DCMAKE_VERBOSE_MAKEFILE=1
+cmake --preset=x86_64-linux -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
 cmake --build --preset=release-linux --target WebRTCPlugin
 popd
 
