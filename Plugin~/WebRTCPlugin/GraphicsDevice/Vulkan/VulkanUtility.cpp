@@ -107,10 +107,10 @@ namespace webrtc
         {
 #if UNITY_ANDROID
             // When AllocateMemory is executed, Android requires the VkImage to be used as additional information.
-            dedicatedAllocateInfo.sType  = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
-            dedicatedAllocateInfo.pNext  = nullptr;
+            dedicatedAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
+            dedicatedAllocateInfo.pNext = nullptr;
             dedicatedAllocateInfo.buffer = VK_NULL_HANDLE;
-            dedicatedAllocateInfo.image  = unityVulkanImage->image;
+            dedicatedAllocateInfo.image = unityVulkanImage->image;
             exportInfo.pNext = &dedicatedAllocateInfo;
 #endif
             exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
