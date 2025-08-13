@@ -100,7 +100,9 @@ namespace webrtc
         RTC_CHECK(success);
 
         VkExportMemoryAllocateInfo exportInfo = {};
+#if UNITY_ANDROID
         VkMemoryDedicatedAllocateInfo dedicatedAllocateInfo = {};
+#endif
         if (exportHandle)
         {
 #if UNITY_ANDROID
