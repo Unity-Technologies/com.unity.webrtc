@@ -13,59 +13,65 @@
 struct RenderSurfaceBase;
 typedef struct RenderSurfaceBase* UnityRenderBuffer;
 
-typedef struct UnityGraphicsD3D12ResourceState UnityGraphicsD3D12ResourceState;
-struct UnityGraphicsD3D12ResourceState
+typedef struct UnityGraphicsD3D12ResourceState
 {
     ID3D12Resource*       resource; // Resource to barrier.
     D3D12_RESOURCE_STATES expected; // Expected resource state before this command list is executed.
     D3D12_RESOURCE_STATES current;  // State this resource will be in after this command list is executed.
-};
+}UnityGraphicsD3D12ResourceState;
 
-struct UnityGraphicsD3D12RecordingState
+typedef struct UnityGraphicsD3D12RecordingState
 {
     ID3D12GraphicsCommandList* commandList;              // D3D12 command list that is currently recorded by Unity
-};
+}UnityGraphicsD3D12RecordingState;
 
-enum UnityD3D12GraphicsQueueAccess
+typedef enum UnityD3D12GraphicsQueueAccess
 {
-    // No queue acccess, no work must be submitted to UnityD3D12Instance::graphicsQueue from the plugin event callback
+    // Enables access to CommandRecordingState and disables access to GetCommandQueue. When using this plugin callbacks
+    // will be called from the render thread. When accessing the command queue from GetCommandQueue it is hihgly likely
+    // that submission thread will be using at the same time and it will cause issues.
     kUnityD3D12GraphicsQueueAccess_DontCare,
 
-    // Make sure that Unity worker threads don't access the D3D12 graphics queue
-    // This disables access to the current Unity command buffer
+    // Enables access to GetCommandQueue and disables access to CommandRecordingState. When using this plugin callbacks
+    // will be called from the submission thread. When accessing the commmand list from CommandRecordingState it is highly
+    // likely that the render thread will be accessing it at the same time and it will cause issues.
     kUnityD3D12GraphicsQueueAccess_Allow,
-};
+}UnityD3D12GraphicsQueueAccess;
 
-enum UnityD3D12EventConfigFlagBits
+typedef enum UnityD3D12EventConfigFlagBits
 {
     kUnityD3D12EventConfigFlag_EnsurePreviousFrameSubmission = (1 << 0), // default: (NOT SUPPORTED)
     kUnityD3D12EventConfigFlag_FlushCommandBuffers = (1 << 1),           // submit existing command buffers, default: not set
     kUnityD3D12EventConfigFlag_SyncWorkerThreads = (1 << 2),             // wait for worker threads to finish, default: not set
     kUnityD3D12EventConfigFlag_ModifiesCommandBuffersState = (1 << 3),   // should be set when descriptor set bindings, vertex buffer bindings, etc are changed (default: set)
-};
+}UnityD3D12EventConfigFlagBits;
 
-struct UnityD3D12PluginEventConfig
+typedef struct UnityD3D12PluginEventConfig
 {
     UnityD3D12GraphicsQueueAccess graphicsQueueAccess;
     UINT32 flags;                                           // UnityD3D12EventConfigFlagBits to be used when invoking a native plugin
     bool ensureActiveRenderTextureIsBound;                  // If true, the actively bound render texture will be bound prior the execution of the native plugin method.
-};
+}UnityD3D12PluginEventConfig;
 
-typedef struct UnityGraphicsD3D12PhysicalVideoMemoryControlValues UnityGraphicsD3D12PhysicalVideoMemoryControlValues;
-struct UnityGraphicsD3D12PhysicalVideoMemoryControlValues // all absolute values in bytes
+typedef struct UnityGraphicsD3D12PhysicalVideoMemoryControlValues // all absolute values in bytes
 {
     UINT64 reservation;           // Minimum required physical memory for an application [default = 64MB].
     UINT64 systemMemoryThreshold; // If free physical video memory drops below this threshold, resources will be allocated in system memory. [default = 64MB]
     UINT64 residencyHysteresisThreshold;    // Minimum free physical video memory needed to start bringing evicted resources back after shrunken video memory budget expands again. [default = 128MB]
     float nonEvictableRelativeThreshold;    // The relative proportion of the video memory budget that must be kept available for non-evictable resources. [default = 0.25]
-};
+}UnityGraphicsD3D12PhysicalVideoMemoryControlValues;
 
 // Should only be used on the rendering/submission thread.
-UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v7)
+UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v8)
 {
     ID3D12Device* (UNITY_INTERFACE_API * GetDevice)();
 
+    // Swap chain is only accessible when using the unity player.
+    // When using the editor GetSwapChain will return nullptr.
     IDXGISwapChain* (UNITY_INTERFACE_API * GetSwapChain)();
+
+    // These are also only accessible when using the player, 
+    // both of these return 0 when editor is used.
     UINT32(UNITY_INTERFACE_API * GetSyncInterval)();
     UINT(UNITY_INTERFACE_API * GetPresentFlags)();
 
@@ -73,9 +79,55 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v7)
     // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
     UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
 
-    //     Executes a given command list on a worker thread.
+    //     Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
     //    [Optional] Declares expected and post-execution resource states.
-    //     Returns the fence value.
+    //     Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
+    UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
+
+    void(UNITY_INTERFACE_API * SetPhysicalVideoMemoryControlValues)(const UnityGraphicsD3D12PhysicalVideoMemoryControlValues * memInfo);
+
+    ID3D12CommandQueue* (UNITY_INTERFACE_API * GetCommandQueue)();
+
+    ID3D12Resource* (UNITY_INTERFACE_API * TextureFromRenderBuffer)(UnityRenderBuffer rb);
+    ID3D12Resource* (UNITY_INTERFACE_API * TextureFromNativeTexture)(UnityTextureID texture);
+
+    // Change the precondition for a specific user-defined event
+    // Should be called during initialization
+    void(UNITY_INTERFACE_API * ConfigureEvent)(int eventID, const UnityD3D12PluginEventConfig * pluginEventConfig);
+
+    bool(UNITY_INTERFACE_API * CommandRecordingState)(UnityGraphicsD3D12RecordingState * outCommandRecordingState);
+
+    // Ask the state of a resource to be the requested state in the active command list. Adds barriers if needed.
+    void(UNITY_INTERFACE_API * RequestResourceState)(ID3D12Resource * resource, D3D12_RESOURCE_STATES state);
+
+    // Notify Unity about the state of a resource in the active command list.
+    // Needs to be called after adding commands to command recording state if they change the state of any resource,
+    // so that the graphics backend can add necessary barriers for any further commands.
+    void(UNITY_INTERFACE_API * NotifyResourceState)(ID3D12Resource * resource, D3D12_RESOURCE_STATES state, bool UAVAccess);
+};
+UNITY_REGISTER_INTERFACE_GUID(0x9d303045d00d4cfdULL, 0x8febb42968b423b6ULL, IUnityGraphicsD3D12v8) // TODO: Get proper values
+
+// Should only be used on the rendering/submission thread.
+UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v7)
+{
+    ID3D12Device* (UNITY_INTERFACE_API * GetDevice)();
+
+    // Swap chain is only accessible when using the unity player.
+    // When using the editor GetSwapChain will return nullptr.
+    IDXGISwapChain* (UNITY_INTERFACE_API * GetSwapChain)();
+
+    // These are also only accessible when using the player, 
+    // both of these return 0 when editor is used.
+    UINT32(UNITY_INTERFACE_API * GetSyncInterval)();
+    UINT(UNITY_INTERFACE_API * GetPresentFlags)();
+
+    ID3D12Fence* (UNITY_INTERFACE_API * GetFrameFence)();
+    // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
+    UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
+
+    //     Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
+    //    [Optional] Declares expected and post-execution resource states.
+    //     Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
     UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
 
     void(UNITY_INTERFACE_API * SetPhysicalVideoMemoryControlValues)(const UnityGraphicsD3D12PhysicalVideoMemoryControlValues * memInfo);
@@ -102,9 +154,9 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v6)
     // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
     UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
 
-    //     Executes a given command list on a worker thread.
+    //     Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
     //    [Optional] Declares expected and post-execution resource states.
-    //     Returns the fence value.
+    //     Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
     UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
 
     void(UNITY_INTERFACE_API * SetPhysicalVideoMemoryControlValues)(const UnityGraphicsD3D12PhysicalVideoMemoryControlValues * memInfo);
@@ -131,9 +183,9 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v5)
     // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
     UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
 
-    //     Executes a given command list on a worker thread.
+    //     Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
     //    [Optional] Declares expected and post-execution resource states.
-    //     Returns the fence value.
+    //     Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
     UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
 
     void(UNITY_INTERFACE_API * SetPhysicalVideoMemoryControlValues)(const UnityGraphicsD3D12PhysicalVideoMemoryControlValues * memInfo);
@@ -153,9 +205,9 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v4)
     // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
     UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
 
-    // Executes a given command list on a worker thread.
+    // Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
     // [Optional] Declares expected and post-execution resource states.
-    // Returns the fence value.
+    // Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
     UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
 
     void(UNITY_INTERFACE_API * SetPhysicalVideoMemoryControlValues)(const UnityGraphicsD3D12PhysicalVideoMemoryControlValues * memInfo);
@@ -173,9 +225,9 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v3)
     // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
     UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
 
-    // Executes a given command list on a worker thread.
+    // Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
     // [Optional] Declares expected and post-execution resource states.
-    // Returns the fence value.
+    // Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
     UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
 
     void(UNITY_INTERFACE_API * SetPhysicalVideoMemoryControlValues)(const UnityGraphicsD3D12PhysicalVideoMemoryControlValues * memInfo);
@@ -191,9 +243,9 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsD3D12v2)
     // Returns the value set on the frame fence once the current frame completes or the GPU is flushed
     UINT64(UNITY_INTERFACE_API * GetNextFrameFenceValue)();
 
-    // Executes a given command list on a worker thread.
+    // Executes a given command list on a worker thread. The command list type must be D3D12_COMMAND_LIST_TYPE_DIRECT.
     // [Optional] Declares expected and post-execution resource states.
-    // Returns the fence value.
+    // Returns the fence value. The value will be set once the current frame completes or the GPU is flushed.
     UINT64(UNITY_INTERFACE_API * ExecuteCommandList)(ID3D12GraphicsCommandList * commandList, int stateCount, UnityGraphicsD3D12ResourceState * states);
 };
 UNITY_REGISTER_INTERFACE_GUID(0xEC39D2F18446C745ULL, 0xB1A2626641D6B11FULL, IUnityGraphicsD3D12v2)

@@ -4,6 +4,10 @@
 //
 // Unless expressly provided otherwise, the Software under this license is made available strictly on an “AS IS” BASIS WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.Please review the license for details on these and other terms and conditions.
 
+#ifndef __cplusplus
+#error "This file cannot be compiled in a C environment"
+#endif
+
 #pragma once
 
 
@@ -26,7 +30,7 @@ enum UnityShaderCompilerExtCompilerPlatform
     kUnityShaderCompilerExtCompPlatformUnused2,
     kUnityShaderCompilerExtCompPlatformUnused3,
     kUnityShaderCompilerExtCompPlatformD3D11,           // Direct3D 11 (FL10.0 and up), compiled with MS D3DCompiler
-    kUnityShaderCompilerExtCompPlatformGLES20,          // OpenGL ES 2.0 / WebGL 1.0, compiled with MS D3DCompiler + HLSLcc
+    kUnityShaderCompilerExtCompPlatformUnused5,
     kUnityShaderCompilerExtCompPlatformUnused6,
     kUnityShaderCompilerExtCompPlatformUnused7,
     kUnityShaderCompilerExtCompPlatformUnused8,
@@ -46,7 +50,9 @@ enum UnityShaderCompilerExtCompilerPlatform
     kUnityShaderCompilerExtCompPlatformGameCoreXboxSeries,// GameCore XboxSeries
     kUnityShaderCompilerExtCompPlatformPS5,
     kUnityShaderCompilerExtCompPlatformPS5NGGC,
-
+    kUnityShaderCompilerExtCompPlatformUnused25,
+    kUnityShaderCompilerExtCompPlatformWebGPU,
+    kUnityShaderCompilerExtCompPlatformSwitch2,
     kUnityShaderCompilerExtCompPlatformCount
 };
 
@@ -72,7 +78,7 @@ enum UnityShaderCompilerExtGPUProgramType
     kUnityShaderCompilerExtGPUProgramTargetGLES31AEP = 2,
     kUnityShaderCompilerExtGPUProgramTargetGLES31 = 3,
     kUnityShaderCompilerExtGPUProgramTargetGLES3 = 4,
-    kUnityShaderCompilerExtGPUProgramTargetGLES = 5,
+    kUnityShaderCompilerExtGPUProgramTargetGLES = 5, // removed
     kUnityShaderCompilerExtGPUProgramTargetGLCore32 = 6,
     kUnityShaderCompilerExtGPUProgramTargetGLCore41 = 7,
     kUnityShaderCompilerExtGPUProgramTargetGLCore43 = 8,
@@ -99,7 +105,8 @@ enum UnityShaderCompilerExtGPUProgramType
     kUnityShaderCompilerExtGPUProgramTargetUnused4 = 29,
     kUnityShaderCompilerExtGPUProgramTargetUnused5 = 30,
     kUnityShaderCompilerExtGPUProgramTargetRayTracing = 31,
-
+    kUnityShaderCompilerExtGPUProgramTargetPS5NGGC = 32,
+    kUnityShaderCompilerExtGPUProgramTargetWebGPU = 33,
     kUnityShaderCompilerExtGPUProgramTargetCount
 };
 

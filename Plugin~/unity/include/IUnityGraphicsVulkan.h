@@ -6,6 +6,7 @@
 
 #pragma once
 #include "IUnityInterface.h"
+#include <stdbool.h>
 
 #ifndef UNITY_VULKAN_HEADER
 #define UNITY_VULKAN_HEADER <vulkan/vulkan.h>
@@ -13,7 +14,7 @@
 
 #include UNITY_VULKAN_HEADER
 
-struct UnityVulkanInstance
+typedef struct UnityVulkanInstance
 {
     VkPipelineCache pipelineCache; // Unity's pipeline cache is serialized to disk
     VkInstance instance;
@@ -24,9 +25,9 @@ struct UnityVulkanInstance
     unsigned int queueFamilyIndex;
 
     void* reserved[8];
-};
+}UnityVulkanInstance;
 
-struct UnityVulkanMemory
+typedef struct UnityVulkanMemory
 {
     VkDeviceMemory memory;        // Vulkan memory handle
     VkDeviceSize offset;          // offset within memory
@@ -36,9 +37,9 @@ struct UnityVulkanMemory
     unsigned int memoryTypeIndex; // index into VkPhysicalDeviceMemoryProperties::memoryTypes
 
     void* reserved[4];
-};
+}UnityVulkanMemory;
 
-enum UnityVulkanResourceAccessMode
+typedef enum UnityVulkanResourceAccessMode
 {
     // Does not imply any pipeline barriers, should only be used to query resource attributes
     kUnityVulkanResourceAccess_ObserveOnly,
@@ -48,9 +49,9 @@ enum UnityVulkanResourceAccessMode
 
     // Recreates the backing resource (VkBuffer/VkImage) but keeps the previous one alive if it's in use
     kUnityVulkanResourceAccess_Recreate,
-};
+}UnityVulkanResourceAccessMode;
 
-struct UnityVulkanImage
+typedef struct UnityVulkanImage
 {
     UnityVulkanMemory memory;   // memory that backs the image
     VkImage image;              // Vulkan image handle
@@ -66,9 +67,9 @@ struct UnityVulkanImage
     int mipCount;
 
     void* reserved[4];
-};
+}UnityVulkanImage;
 
-struct UnityVulkanBuffer
+typedef struct UnityVulkanBuffer
 {
     UnityVulkanMemory memory;   // memory that backs the buffer
     VkBuffer buffer;            // Vulkan buffer handle
@@ -76,9 +77,9 @@ struct UnityVulkanBuffer
     VkBufferUsageFlags usage;
 
     void* reserved[4];
-};
+}UnityVulkanBuffer;
 
-struct UnityVulkanRecordingState
+typedef struct UnityVulkanRecordingState
 {
     VkCommandBuffer commandBuffer;              // Vulkan command buffer that is currently recorded by Unity
     VkCommandBufferLevel commandBufferLevel;
@@ -91,28 +92,28 @@ struct UnityVulkanRecordingState
     unsigned long long safeFrameNumber;         // all resources that were used in this frame (or before) are safe to be released
 
     void* reserved[4];
-};
+}UnityVulkanRecordingState;
 
-enum UnityVulkanEventRenderPassPreCondition
+typedef enum UnityVulkanEventRenderPassPreCondition
 {
     // Don't care about the state on Unity's current command buffer
     // This is the default precondition
     kUnityVulkanRenderPass_DontCare,
 
-    // Make sure that there is currently no RenderPass in progress.
-    // This allows e.g. resource uploads.
+    // Make sure that there is currently RenderPass in progress.
     // There are no guarantees about the currently bound descriptor sets, vertex buffers, index buffers and pipeline objects
     // Unity does however set dynamic pipeline set VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR based on the current settings
     // If used in combination with the SRP RenderPass API the resuls is undefined
     kUnityVulkanRenderPass_EnsureInside,
 
     // Make sure that there is currently no RenderPass in progress.
+    // This allows e.g. resource uploads.
     // Ends the current render pass (and resumes it afterwards if needed)
     // If used in combination with the SRP RenderPass API the resuls is undefined.
     kUnityVulkanRenderPass_EnsureOutside
-};
+}UnityVulkanEventRenderPassPreCondition;
 
-enum UnityVulkanGraphicsQueueAccess
+typedef enum UnityVulkanGraphicsQueueAccess
 {
     // No queue acccess, no work must be submitted to UnityVulkanInstance::graphicsQueue from the plugin event callback
     kUnityVulkanGraphicsQueueAccess_DontCare,
@@ -120,22 +121,22 @@ enum UnityVulkanGraphicsQueueAccess
     // Make sure that Unity worker threads don't access the Vulkan graphics queue
     // This disables access to the current Unity command buffer
     kUnityVulkanGraphicsQueueAccess_Allow,
-};
+}UnityVulkanGraphicsQueueAccess;
 
-enum UnityVulkanEventConfigFlagBits
+typedef enum UnityVulkanEventConfigFlagBits
 {
     kUnityVulkanEventConfigFlag_EnsurePreviousFrameSubmission = (1 << 0), // default: set
     kUnityVulkanEventConfigFlag_FlushCommandBuffers = (1 << 1),           // submit existing command buffers, default: not set
     kUnityVulkanEventConfigFlag_SyncWorkerThreads = (1 << 2),             // wait for worker threads to finish, default: not set
     kUnityVulkanEventConfigFlag_ModifiesCommandBuffersState = (1 << 3),   // should be set when descriptor set bindings, vertex buffer bindings, etc are changed (default: set)
-};
+}UnityVulkanEventConfigFlagBits;
 
-struct UnityVulkanPluginEventConfig
+typedef struct UnityVulkanPluginEventConfig
 {
     UnityVulkanEventRenderPassPreCondition renderPassPrecondition;
     UnityVulkanGraphicsQueueAccess graphicsQueueAccess;
     uint32_t flags;
-};
+}UnityVulkanPluginEventConfig;
 
 // Constant that can be used to reference the whole image
 const VkImageSubresource* const UnityVulkanWholeImage = NULL;
@@ -143,16 +144,16 @@ const VkImageSubresource* const UnityVulkanWholeImage = NULL;
 // callback function, see InterceptInitialization
 typedef PFN_vkGetInstanceProcAddr(UNITY_INTERFACE_API * UnityVulkanInitCallback)(PFN_vkGetInstanceProcAddr getInstanceProcAddr, void* userdata);
 
-enum UnityVulkanSwapchainMode
+typedef enum UnityVulkanSwapchainMode
 {
     kUnityVulkanSwapchainMode_Default,
     kUnityVulkanSwapchainMode_Offscreen
-};
+}UnityVulkanSwapchainMode;
 
-struct UnityVulkanSwapchainConfiguration
+typedef struct UnityVulkanSwapchainConfiguration
 {
     UnityVulkanSwapchainMode mode;
-};
+}UnityVulkanSwapchainConfiguration;
 
 enum
 {
@@ -257,8 +258,8 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsVulkanV2)
     // Most rules/restrictions for implementing a Vulkan layer apply
     // Returns true on success, false on failure (typically because it is used too late)
     bool(UNITY_INTERFACE_API * AddInterceptInitialization)(UnityVulkanInitCallback func, void* userdata, int32_t priority);
-
     // Remove vulkan intercept initialization callback.
+
     // Removal will not take effect until the next time vulkan is initialized.
     bool(UNITY_INTERFACE_API * RemoveInterceptInitialization)(UnityVulkanInitCallback func);
 };

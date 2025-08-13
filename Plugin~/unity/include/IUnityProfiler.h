@@ -92,6 +92,8 @@ enum UnityBuiltinProfilerCategory_
     kUnityProfilerCategoryNetworkOperations = 34,
     kUnityProfilerCategoryUIDetails = 35,
     kUnityProfilerCategoryDebug = 36,
+    kUnityProfilerCategoryJobs = 37,
+    kUnityProfilerCategoryText = 38,
 };
 typedef uint16_t UnityProfilerCategoryId;
 
@@ -106,6 +108,8 @@ typedef struct UnityProfilerCategoryDesc
     // NULL-terminated string which is associated with the category.
     const char* name;
 } UnityProfilerCategoryDesc;
+
+#define GET_UNITY_PROFILER_MARKER_VERBOSITY(MARKER_FLAGS) ((MARKER_FLAGS) & (7 << 10))
 
 enum UnityProfilerMarkerFlag_
 {
@@ -122,9 +126,20 @@ enum UnityProfilerMarkerFlag_
 
     kUnityProfilerMarkerFlagCounter = 1 << 7,            // Marker is also used as a counter.
 
+    kUnityProfilerMarkerFlagSampleGPU = 1 << 8,          // Indicates that the marker can be used for GPU sampling
+
+    // Bits 10-12 for verbosity levels. Allows to filter markers during visualization.
+    // Use GET_UNITY_PROFILER_MARKER_VERBOSITY() to extract the verbosity level from the flags.
+    // Set only ONE of these levels for a given marker or their bits will conflict.
     kUnityProfilerMarkerFlagVerbosityDebug = 1 << 10,    // Internal debug markers - e.g. JobSystem Idle.
-    kUnityProfilerMarkerFlagVerbosityInternal = 1 << 11, // Internal markers - e.g. Mutex/semaphore waits.
-    kUnityProfilerMarkerFlagVerbosityAdvanced = 1 << 12  // Markers which are useful for advanced users - e.g. Loading.
+    kUnityProfilerMarkerFlagVerbosityInternal = 2 << 10, // Internal markers - e.g. Mutex/semaphore waits.
+    kUnityProfilerMarkerFlagVerbosityExternal = 3 << 10, // Marker should be echoed to any attached external profilers (such as Superluminal) even if they normally wouldn't capture it. This is usually applied to markers which have additional context that might be useful in those tools
+    kUnityProfilerMarkerFlagVerbosityAdvanced = 4 << 10, // Markers which are useful for advanced users - e.g. Loading.
+
+    // Marker which was created with a recorder to make an early binding.
+    // If we create marker with the same name later, we just pick and initialized this one.
+    // In this way we can setup callback pointers for dynamic markers.
+    kUnityProfilerMarkerFlagPrecreated = 1 << 15
 };
 typedef uint16_t UnityProfilerMarkerFlags;
 
@@ -165,6 +180,7 @@ enum UnityProfilerMarkerDataType_
     kUnityProfilerMarkerDataTypeString = 8,
     kUnityProfilerMarkerDataTypeString16 = 9,
     kUnityProfilerMarkerDataTypeBlob8 = 11,
+    kUnityProfilerMarkerDataTypeGfxResourceId = 12,
     kUnityProfilerMarkerDataTypeCount // Total count of data types
 };
 typedef uint8_t UnityProfilerMarkerDataType;
@@ -241,6 +257,7 @@ template<typename T> struct UnityProfilerCounter;
 // Available since 2021.2
 UNITY_DECLARE_INTERFACE(IUnityProfilerV2)
 {
+#ifdef __cplusplus
     void BeginSample(const UnityProfilerMarkerDesc * markerDesc)
     {
         (this->EmitEvent)(markerDesc, kUnityProfilerMarkerEventTypeBegin, 0, NULL);
@@ -255,6 +272,7 @@ UNITY_DECLARE_INTERFACE(IUnityProfilerV2)
     {
         (this->EmitEvent)(markerDesc, kUnityProfilerMarkerEventTypeEnd, 0, NULL);
     }
+#endif
 
     // Create instrumentation event.
     // \param markerDesc is a pointer to marker description struct.
@@ -263,10 +281,10 @@ UNITY_DECLARE_INTERFACE(IUnityProfilerV2)
     // \param eventData is a metadata array of eventDataCount elements.
     void(UNITY_INTERFACE_API * EmitEvent)(const UnityProfilerMarkerDesc * markerDesc, UnityProfilerMarkerEventType eventType, uint16_t eventDataCount, const UnityProfilerMarkerData * eventData);
 
-    // Returns 1 if Unity Profiler is enabled, 0 overwise.
+    // Returns 1 if Unity Profiler is enabled, 0 otherwise.
     int(UNITY_INTERFACE_API * IsEnabled)();
 
-    // Returns 1 if Unity Profiler is available, 0 overwise.
+    // Returns 1 if Unity Profiler is available, 0 otherwise.
     // Profiler is available only in Development builds. Release builds have Unity Profiler compiled out.
     // However individual markers can be available even in Release builds (e.g. GC.Collect) and be collected with
     // Recorder API or forwarded to platform and other profilers (via IUnityProfilerCallbacks::RegisterMarkerEventCallback API).
@@ -274,7 +292,7 @@ UNITY_DECLARE_INTERFACE(IUnityProfilerV2)
     int(UNITY_INTERFACE_API * IsAvailable)();
 
     // Creates a new Unity Profiler marker.
-    // \param desc Pointer to the const UnityProfilerMarkerDesc* which is set to the created marker in a case of a succesful execution.
+    // \param desc Pointer to the const UnityProfilerMarkerDesc* which is set to the created marker in a case of a successful execution.
     // \param name Marker name to be displayed in Unity Profiler.
     // \param flags Marker flags. One of UnityProfilerMarkerFlag_ enum. Use kUnityProfilerMarkerFlagDefault if not sure.
     // \param eventDataCount Maximum count of potential metadata parameters count.
@@ -290,7 +308,7 @@ UNITY_DECLARE_INTERFACE(IUnityProfilerV2)
     int(UNITY_INTERFACE_API * SetMarkerMetadataName)(const UnityProfilerMarkerDesc * desc, int index, const char* metadataName, UnityProfilerMarkerDataType metadataType, UnityProfilerMarkerDataUnit metadataUnit);
 
     // Creates a new Unity Profiler category.
-    // \param category is a pointer to UnityProfilerCategoryId variable which is set to the created category id in case of a succesful execution.
+    // \param category is a pointer to UnityProfilerCategoryId variable which is set to the created category id in case of a successful execution.
     // \param name Category name to be displayed in Unity Profiler.
     // \return 0 on success and non-zero in case of error.
     int(UNITY_INTERFACE_API * CreateCategory)(UnityProfilerCategoryId *category, const char* name, uint32_t unused);
@@ -462,6 +480,7 @@ struct UnityProfilerCounter : public UnityProfilerCounterValue
 // Available since 2020.1
 UNITY_DECLARE_INTERFACE(IUnityProfiler)
 {
+#ifdef __cplusplus
     void BeginSample(const UnityProfilerMarkerDesc* markerDesc)
     {
         (this->EmitEvent)(markerDesc, kUnityProfilerMarkerEventTypeBegin, 0, NULL);
@@ -476,6 +495,7 @@ UNITY_DECLARE_INTERFACE(IUnityProfiler)
     {
         (this->EmitEvent)(markerDesc, kUnityProfilerMarkerEventTypeEnd, 0, NULL);
     }
+#endif
 
     void(UNITY_INTERFACE_API * EmitEvent)(const UnityProfilerMarkerDesc* markerDesc, UnityProfilerMarkerEventType eventType, uint16_t eventDataCount, const UnityProfilerMarkerData* eventData);
 

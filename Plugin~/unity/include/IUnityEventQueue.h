@@ -4,6 +4,10 @@
 //
 // Unless expressly provided otherwise, the Software under this license is made available strictly on an “AS IS” BASIS WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.Please review the license for details on these and other terms and conditions.
 
+#ifndef __cplusplus
+#error "This file cannot be compiled in a C environment"
+#endif
+
 #pragma once
 
 #include "IUnityInterface.h"

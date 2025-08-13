@@ -8,6 +8,7 @@
 
 
 #include "IUnityGraphics.h"
+#include <stdbool.h>
 
 /*
     Low-level Native Plugin Rendering Extensions
@@ -290,13 +291,13 @@ typedef enum UnityRenderingExtTextureFormat
     // Video formats
     kUnityRenderingExtFormatYUV2,
 
-    // Automatic formats, back-end decides
-    kUnityRenderingExtFormatDepthAuto_removed_donotuse,
-    kUnityRenderingExtFormatShadowAuto_removed_donotuse,
-    kUnityRenderingExtFormatVideoAuto_removed_donotuse,
+    // Obsoleted
+    //kUnityRenderingExtFormatDepthAuto_removed_donotuse = 142,
+    //kUnityRenderingExtFormatShadowAuto_removed_donotuse = 143,
+    //kUnityRenderingExtFormatVideoAuto_removed_donotuse = 144,
 
     // ASTC hdr profile
-    kUnityRenderingExtFormatRGBA_ASTC4X4_UFloat,
+    kUnityRenderingExtFormatRGBA_ASTC4X4_UFloat = 145,
     kUnityRenderingExtFormatRGBA_ASTC5X5_UFloat,
     kUnityRenderingExtFormatRGBA_ASTC6X6_UFloat,
     kUnityRenderingExtFormatRGBA_ASTC8X8_UFloat,

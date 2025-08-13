@@ -8,7 +8,7 @@
 #include "IUnityInterface.h"
 
 /// The type of the log message
-enum UnityLogType
+typedef enum UnityLogType
 {
     /// UnityLogType used for Errors.
     kUnityLogTypeError = 0,
@@ -18,7 +18,7 @@ enum UnityLogType
     kUnityLogTypeLog = 3,
     /// UnityLogType used for Exceptions.
     kUnityLogTypeException = 4,
-};
+}UnityLogType;
 
 #define UNITY_WRAP_CODE(CODE_) do { CODE_; } while (0)
 #define UNITY_LOG(PTR_, MSG_) UNITY_WRAP_CODE((PTR_)->Log(kUnityLogTypeLog, MSG_, __FILE__, __LINE__))

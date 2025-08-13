@@ -16,10 +16,53 @@
 
 @class NSBundle;
 @protocol MTLDevice;
+@protocol MTLCommandQueue;
 @protocol MTLCommandBuffer;
 @protocol MTLCommandEncoder;
 @protocol MTLTexture;
 @class MTLRenderPassDescriptor;
+
+UNITY_DECLARE_INTERFACE(IUnityGraphicsMetalV2)
+{
+    // V2
+
+    // Unity has it's own internal logic to happen on command buffer commit, so if you need to commit the current command buffer
+    //   you need to call this function.
+    // It will just commit the current buffer and returns it (so it can be waited on by the caller code)
+    id<MTLCommandBuffer>(UNITY_INTERFACE_API * CommitCurrentCommandBuffer)();
+
+    // returns Unity Metal Command Queue
+    id<MTLCommandQueue>(UNITY_INTERFACE_API * CommandQueue)();
+
+    // V1
+
+    NSBundle* (UNITY_INTERFACE_API * MetalBundle)();
+    id<MTLDevice>(UNITY_INTERFACE_API * MetalDevice)();
+
+    id<MTLCommandBuffer>(UNITY_INTERFACE_API * CurrentCommandBuffer)();
+
+    // for custom rendering support there are two scenarios:
+    // you want to use current in-flight MTLCommandEncoder (NB: it might be nil)
+    id<MTLCommandEncoder>(UNITY_INTERFACE_API * CurrentCommandEncoder)();
+    // or you might want to create your own encoder.
+    // In that case you should end unity's encoder before creating your own and end yours before returning control to unity
+    void(UNITY_INTERFACE_API * EndCurrentCommandEncoder)();
+
+    // returns MTLRenderPassDescriptor used to create current MTLCommandEncoder
+    MTLRenderPassDescriptor* (UNITY_INTERFACE_API * CurrentRenderPassDescriptor)();
+
+    // converting trampoline UnityRenderBufferHandle into native RenderBuffer
+    UnityRenderBuffer(UNITY_INTERFACE_API * RenderBufferFromHandle)(void* bufferHandle);
+
+    // access to RenderBuffer's texure
+    // NB: you pass here *native* RenderBuffer, acquired by calling (C#) RenderBuffer.GetNativeRenderBufferPtr
+    // AAResolvedTextureFromRenderBuffer will return nil in case of non-AA RenderBuffer or if called for depth RenderBuffer
+    // StencilTextureFromRenderBuffer will return nil in case of no-stencil RenderBuffer or if called for color RenderBuffer
+    id<MTLTexture>(UNITY_INTERFACE_API * TextureFromRenderBuffer)(UnityRenderBuffer buffer);
+    id<MTLTexture>(UNITY_INTERFACE_API * AAResolvedTextureFromRenderBuffer)(UnityRenderBuffer buffer);
+    id<MTLTexture>(UNITY_INTERFACE_API * StencilTextureFromRenderBuffer)(UnityRenderBuffer buffer);
+};
+UNITY_REGISTER_INTERFACE_GUID(0xF58857784FEF46ECULL, 0x9DB7A8803B87DA3DULL, IUnityGraphicsMetalV2)
 
 
 UNITY_DECLARE_INTERFACE(IUnityGraphicsMetalV1)
@@ -42,7 +85,7 @@ UNITY_DECLARE_INTERFACE(IUnityGraphicsMetalV1)
     // converting trampoline UnityRenderBufferHandle into native RenderBuffer
     UnityRenderBuffer(UNITY_INTERFACE_API * RenderBufferFromHandle)(void* bufferHandle);
 
-    // access to RenderBuffer's texure
+    // access to RenderBuffer's texture
     // NB: you pass here *native* RenderBuffer, acquired by calling (C#) RenderBuffer.GetNativeRenderBufferPtr
     // AAResolvedTextureFromRenderBuffer will return nil in case of non-AA RenderBuffer or if called for depth RenderBuffer
     // StencilTextureFromRenderBuffer will return nil in case of no-stencil RenderBuffer or if called for color RenderBuffer
