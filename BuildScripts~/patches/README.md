@@ -198,3 +198,17 @@ pushd src
 patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
 popd
 ```
+
+## Support 16 KB page sizes for 64 bit Android
+
+Submitting apps to Google Play and targeting Android 15+ devices must support 16 KB page sizes on 64-bit devices. This patch adds linker flags of the shared library `libjingle_peerconnection_so.so` to support 16 KB page sizes.
+
+### Patch file
+
+- support_16kb_pagesizes_android.patch
+
+### Example
+
+```
+patch -N "src/sdk/android/BUILD.gn" < "$COMMAND_DIR/patches/support_16kb_pagesizes_android.patch"
+```

@@ -421,18 +421,90 @@ namespace Unity.WebRTC
         Closed
     }
 
+
     /// <summary>
-    ///
+    /// The RTCSessionDescription interface represents the setup of one side of a connection or a proposed connection.
+    /// It contains a description type that identifies the negotiation stage it pertains to, along with the session's SDP (Session Description Protocol)
+    /// details.
     /// </summary>
+    /// <remarks>
+    /// Establishing a connection between two parties involves swapping RTCSessionDescription objects,
+    /// with each one proposing a set of connection setup options that the sender can accommodate.
+    /// The connection setup is finalized when both parties agree on a particular configuration.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         using System.Collections;
+    ///         using System.Collections.Generic;
+    ///         using System.Linq;
+    ///         using UnityEngine;
+    ///         using Unity.WebRTC;
+    ///
+    ///         class MediaStreamer : MonoBehaviour
+    ///         {
+    ///             private RTCPeerConnection _pc1;
+    ///             private List<RTCRtpSender> pc1Senders;
+    ///             private MediaStream videoStream;
+    ///             private MediaStreamTrack track;
+    ///             private DelegateOnNegotiationNeeded pc1OnNegotiationNeeded;
+    ///             private bool videoUpdateStarted;
+    ///
+    ///             private void Start()
+    ///             {
+    ///                 pc1Senders = new List<RTCRtpSender>();
+    ///                 pc1OnNegotiationNeeded = () => { StartCoroutine(PcOnNegotiationNeeded(_pc1)); };
+    ///                 Call();
+    ///             }
+    ///
+    ///             IEnumerator PcOnNegotiationNeeded(RTCPeerConnection pc)
+    ///             {
+    ///                 var op = pc.CreateOffer();
+    ///                 yield return op;
+    ///                 if (!op.IsError)
+    ///                 {
+    ///                     yield return StartCoroutine(OnCreateOfferSuccess(pc, op.Desc));
+    ///                 }
+    ///             }
+    ///
+    ///             private void Call()
+    ///             {
+    ///                 RTCConfiguration configuration = default;
+    ///                 configuration.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+    ///                 _pc1 = new RTCPeerConnection(ref configuration);
+    ///                 _pc1.OnNegotiationNeeded = pc1OnNegotiationNeeded;
+    ///
+    ///                 videoStream = Camera.main.CaptureStream(1280, 720);
+    ///                 track = videoStream.GetTracks().First();
+    ///
+    ///                 pc1Senders.Add(_pc1.AddTrack(track));
+    ///                 if (!videoUpdateStarted)
+    ///                 {
+    ///                     StartCoroutine(WebRTC.Update());
+    ///                     videoUpdateStarted = true;
+    ///                 }
+    ///             }
+    ///
+    ///             private IEnumerator OnCreateOfferSuccess(RTCPeerConnection pc, RTCSessionDescription desc)
+    ///             {
+    ///                 Debug.Log($"Offer created. SDP is: \n{desc.sdp}");
+    ///                 var op = pc.SetLocalDescription(ref desc);
+    ///                 yield return op;
+    ///             }
+    ///         }
+    ///
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="RTCPeerConnection"/>
+    /// <seealso cref="RTCRtpSender"/>
     public struct RTCSessionDescription
     {
         /// <summary>
-        ///
+        /// An enum that specifies the type of the session description. Refer to <see cref="RTCSdpType"/>.
         /// </summary>
         public RTCSdpType type;
 
         /// <summary>
-        ///
+        /// A string that holds the session's SDP information.
         /// </summary>
         [MarshalAs(UnmanagedType.LPStr)]
         public string sdp;
@@ -483,32 +555,42 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    ///     Represents a configuration for an ICE server used within WebRTC connections.
     /// </summary>
-    /// <seealso cref="RTCConfiguration"/>
+    /// <remarks>
+    ///     Represents a configuration for an ICE server used within WebRTC connections,
+    ///     including authentication credentials and STUN/TURN server URLs.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         RTCConfiguration configuration = default;
+    ///         configuration.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
+    ///     ]]></code>
+    /// </example>
+    /// /// <seealso cref="RTCConfiguration"/>
     [Serializable]
     public struct RTCIceServer
     {
         /// <summary>
-        ///
+        ///     Specifies the credential for authenticating with the ICE server.
         /// </summary>
         [Tooltip("Optional: specifies the password to use when authenticating with the ICE server")]
         public string credential;
 
         /// <summary>
-        ///
+        ///     Specifies the type of credential used.
         /// </summary>
         [Tooltip("What type of credential the `password` value")]
         public RTCIceCredentialType credentialType;
 
         /// <summary>
-        ///
+        ///     An array containing the URLs of STUN or TURN servers to use for ICE negotiation.
         /// </summary>
         [Tooltip("Array to set URLs of your STUN/TURN servers")]
         public string[] urls;
 
         /// <summary>
-        ///
+        ///     Specifies the user name for authenticating with the ICE server.
         /// </summary>
         [Tooltip("Optional: specifies the username to use when authenticating with the ICE server")]
         public string username;
@@ -531,30 +613,43 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    ///     Provides options to configure the new connection.
     /// </summary>
+    /// <remarks>
+    ///     `RTCConfiguration` struct provides options to configure the new connection.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         RTCConfiguration configuration = peerConnection.GetConfiguration();
+    ///         if(configuration.urls.length == 0)
+    ///         {
+    ///             configuration.urls = new[] {"stun:stun.l.google.com:19302"};
+    ///         }
+    ///         peerConnection.SetConfiguration(configuration);
+    ///     ]]></code>
+    /// </example>
     /// <seealso cref="RTCPeerConnection.GetConfiguration()"/>
     /// <seealso cref="RTCPeerConnection.SetConfiguration(ref RTCConfiguration)"/>
     [Serializable]
     public struct RTCConfiguration
     {
         /// <summary>
-        ///
+        ///     List of RTCIceServer objects, each describing one server which may be used by the ICE agent.
         /// </summary>
         public RTCIceServer[] iceServers;
 
         /// <summary>
-        ///
+        ///     Represents the current ICE transport policy.
         /// </summary>
         public RTCIceTransportPolicy? iceTransportPolicy;
 
         /// <summary>
-        ///
+        ///     Specifies how to handle negotiation of candidates when the remote peer is not compatible with the SDP BUNDLE standard.
         /// </summary>
         public RTCBundlePolicy? bundlePolicy;
 
         /// <summary>
-        ///
+        ///     Specifies the size of the prefetched ICE candidate pool.
         /// </summary>
         public int? iceCandidatePoolSize;
 
@@ -621,8 +716,17 @@ namespace Unity.WebRTC
     };
 
     /// <summary>
-    ///
+    ///     Provides utilities and management functions for integrating WebRTC functionality. 
     /// </summary>
+    /// <remarks>
+    ///     `WebRTC` class provides a set of static methods and properties to manage the WebRTC functionality.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         StartCoroutine(WebRTC.Update());
+    ///     ]]></code>
+    /// </example>
+    /// <seealso cref="WebRTCSettings"/>
     public static class WebRTC
     {
 #if UNITY_IOS
@@ -663,9 +767,17 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Updates the texture data for all video tracks at the end of each frame.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///    `Update` method updates the texture data for all video tracks at the end of each frame.
+        /// </remarks>
+        /// <returns>`IEnumerator` to facilitate coroutine execution.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         StartCoroutine(WebRTC.Update());
+        ///     ]]></code>
+        /// </example>
         public static IEnumerator Update()
         {
             var instruction = new WaitForEndOfFrame();
@@ -705,15 +817,22 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Executes any pending tasks generated asynchronously during the WebRTC runtime.
+        ///     Executes any pending tasks generated asynchronously during the WebRTC runtime.
         /// </summary>
+        /// <remarks>
+        ///     `ExecutePendingTasks` method processes pending tasks generated during WebRTC operations until reaching the specified timeout.
+        /// </remarks>
         /// <param name="millisecondTimeout">
-        /// The amount of time in milliseconds that the task queue can take before task execution will cease.
+        ///     The maximum time in milliseconds for which to process the task queue before task execution stops.
         /// </param>
         /// <returns>
-        /// <c>true</c> if all pending tasks were completed within <see cref="millisecondTimeout"/> milliseconds and <c>false</c>
-        /// otherwise.
+        ///     `true` if all pending tasks were completed within <see cref="millisecondTimeout"/> milliseconds and `false` otherwise.
         /// </returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         WebRTC.ExecutePendingTasks(100);
+        ///     ]]></code>
+        /// </example>
         public static bool ExecutePendingTasks(int millisecondTimeout)
         {
             if (s_syncContext is ExecutableUnitySynchronizationContext executableContext)
@@ -725,7 +844,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Controls whether texture size constraints are applied during WebRTC streaming.
         /// </summary>
         public static bool enableLimitTextureSize
         {
@@ -734,8 +853,8 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Get & set the logger to use when logging debug messages inside the WebRTC package.
-        /// By default will use Debug.unityLogger.
+        ///     Logger used for capturing debug messages within the WebRTC package.
+        ///     Defaults to Debug.unityLogger.
         /// </summary>
         /// <exception cref="ArgumentNullException">Throws if setting a null logger.</exception>
         public static ILogger Logger
@@ -756,10 +875,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// Configure native logging settings for WebRTC.
+        ///     Configures native logging settings for WebRTC.
         /// </summary>
+        /// <remarks>
+        ///     `ConfigureNativeLogging` method is used to enable or disable native logging and set the native logging level.
+        /// </remarks>
         /// <param name="enableNativeLogging">Enables or disable native logging.</param>
         /// <param name="nativeLoggingSeverity">Sets the native logging level.</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         WebRTC.ConfigureNativeLogging(true, NativeLoggingSeverity.Warning);
+        ///     ]]></code>
+        /// </example>
         public static void ConfigureNativeLogging(bool enableNativeLogging, NativeLoggingSeverity nativeLoggingSeverity)
         {
             if (enableNativeLogging)
@@ -860,9 +987,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Checks whether the specified graphics format is supported.
         /// </summary>
-        /// <param name="format"></param>
+        /// <remarks>
+        ///     `ValidateGraphicsFormat` method checks whether the provided `GraphicsFormat` is compatible with the current graphics device.
+        ///     This method throws an `ArgumentException` if the format is not supported.
+        /// </remarks>
+        /// <param name="format">`GraphicsFormat` value to be validated.</param>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         WebRTC.ValidateGraphicsFormat(format);
+        ///     ]]></code>
+        /// </example>
         public static void ValidateGraphicsFormat(GraphicsFormat format)
         {
             // can't recognize legacy format
@@ -883,10 +1019,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Determines the appropriate RenderTextureFormat for a given GraphicsDeviceType.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetSupportedRenderTextureFormat` method determines the appropriate `RenderTextureFormat` for a given `GraphicsDeviceType`.
+        /// </remarks>
+        /// <param name="type">`GraphicsDeviceType` for which `RenderTextureFormat` is being determined.</param>
+        /// <returns>`RenderTextureFormat` value for the specified `GraphicsDeviceType`.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RenderTextureFormat format = WebRTC.GetSupportedRenderTextureFormat(GraphicsDeviceType.Direct3D11);
+        ///     ]]></code>
+        /// </example>
         public static RenderTextureFormat GetSupportedRenderTextureFormat(GraphicsDeviceType type)
         {
             var graphicsFormat = GetSupportedGraphicsFormat(type);
@@ -894,10 +1038,21 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Determines the appropriate GraphicsFormat for a given GraphicsDeviceType.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetSupportedGraphicsFormat` method determines the appropriate `GraphicsFormat` for a given `GraphicsDeviceType`.
+        /// </remarks>
+        /// <param name="type">`GraphicsDeviceType` for which `GraphicsFormat` is being determined.</param>
+        /// <returns>`GraphicsFormat` value for the specified `GraphicsDeviceType`.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         int width = WebRTCSettings.StreamSize.x;
+        ///         int height = WebRTCSettings.StreamSize.y;
+        ///         GraphicsFormat format = WebRTC.GetSupportedGraphicsFormat(GraphicsDeviceType.Direct3D11);
+        ///         RenderTexture texture = new RenderTexture(width, height, 0, format);
+        ///     ]]></code>
+        /// </example>
         public static GraphicsFormat GetSupportedGraphicsFormat(GraphicsDeviceType type)
         {
             if (QualitySettings.activeColorSpace == ColorSpace.Linear)
@@ -937,10 +1092,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        ///     Determines the appropriate TextureFormat for a given GraphicsDeviceType.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     `GetSupportedTextureFormat` method determines the appropriate `TextureFormat` for a given `GraphicsDeviceType`.
+        /// </remarks>
+        /// <param name="type">`GraphicsDeviceType` for which `TextureFormat` is being determined.</param>
+        /// <returns>`TextureFormat` value for the specified `GraphicsDeviceType`.</returns>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         TextureFormat format = WebRTC.GetSupportedTextureFormat(GraphicsDeviceType.Direct3D11);
+        ///     ]]></code>
+        /// </example>
         public static TextureFormat GetSupportedTextureFormat(GraphicsDeviceType type)
         {
             var graphicsFormat = GetSupportedGraphicsFormat(type);

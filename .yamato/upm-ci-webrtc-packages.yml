@@ -197,7 +197,7 @@ pack_{{ package.name }}:
   name: Pack {{ package.packagename }}
   agent:
     type: Unity::VM
-    image: package-ci/ubuntu-20.04:v4.4.0-1252344
+    image: package-ci/ubuntu-22.04:v4
     flavor: b1.large
   commands:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}

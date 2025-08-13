@@ -5,43 +5,92 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    ///     Represents the parameters for a codec used to encode the track's media.
     /// </summary>
+    /// <remarks>
+    ///     Represents the configuration for encoding a media track's codec, detailing properties like
+    ///     active state, bitrate, framerate, RTP stream ID, and video scaling, enabling precise control of media transmission.
+    /// </remarks>
+    /// <example>
+    ///     <code lang="cs"><![CDATA[
+    ///         [SerializeField]
+    ///         Camera cam;
+    ///     
+    ///         void Call()
+    ///         {
+    ///             MediaStream videoStream = cam.CaptureStream(WebRTCSettings.StreamSize.x, WebRTCSettings.StreamSize.y);
+    ///             RTCRtpTransceiverInit init = new RTCRtpTransceiverInit()
+    ///             {
+    ///                 direction = RTCRtpTransceiverDirection.SendOnly,
+    ///                 sendEncodings = new RTCRtpEncodingParameters[] {
+    ///                     new RTCRtpEncodingParameters { maxFramerate = 30 }
+    ///                 },
+    ///             };
+    ///             MediaStreamTrack videoTrack = videoStream.GetTracks().First();
+    ///             RTCRtpTransceiver transceiver = peerConnection.AddTransceiver(videoTrack, init);
+    ///         }
+    ///     ]]></code>
+    /// </example>
     public class RTCRtpEncodingParameters
     {
         /// <summary>
-        /// 
+        ///     Indicates whether the encoding is sent.
         /// </summary>
+        /// <remarks>
+        ///     By default, the value is `true`. Setting it to `false` stops the transmission but does not cause the SSRC to be removed.
+        /// </remarks>
         public bool active;
 
         /// <summary>
-        /// 
+        ///     Specifies the maximum number of bits per second allocated for encoding tracks.
         /// </summary>
+        /// <remarks>
+        ///     `maxBitrate` defines the maximum encoding bitrate using TIAS bandwidth, not including protocol overhead.
+        ///     Factors like `maxFramerate` and network capacity can further limit this rate.
+        ///     Video tracks may drop frames, and audio tracks might pause if bitrates are too low, balancing quality and efficiency.
+        /// </remarks>
         public ulong? maxBitrate;
 
         /// <summary>
-        /// 
+        ///     Specifies the minimum number of bits per second allocated for encoding tracks.
         /// </summary>
         public ulong? minBitrate;
 
         /// <summary>
-        /// 
+        ///     Specifies the maximum number of frames per second allocated for encoding tracks.
         /// </summary>
         public uint? maxFramerate;
 
         /// <summary>
-        /// 
+        ///     Specifies a scaling factor for reducing the resolution of video tracks during encoding.
         /// </summary>
+        /// <remarks>
+        ///     `scaleResolutionDownBy` property scales down video resolutions for encoding.
+        ///     With the default value 1.0 preserves the original size.
+        ///     Values above 1.0 reduce dimensions, helping optimize bandwidth and processing needs.
+        ///     Values below 1.0 are invalid.
+        /// </remarks>
         public double? scaleResolutionDownBy;
 
         /// <summary>
-        /// 
+        ///     Specifies an RTP stream ID (RID) for the RID header extension.
         /// </summary>
+        /// <remarks>
+        ///     The value can be set only during transceiver creation and not modifiable with `RTCRtpSender.SetParameters`.
+        /// </remarks>
         public string rid;
 
         /// <summary>
-        /// 
+        ///     Creates a new RTCRtpEncodingParameters object.
         /// </summary>
+        /// <remarks>
+        ///     A constructor creates an instance of `RTCRtpEncodingParameters`.
+        /// </remarks>
+        /// <example>
+        ///     <code lang="cs"><![CDATA[
+        ///         RTCRtpEncodingParameters parameters = new RTCRtpEncodingParameters();
+        ///     ]]></code>
+        /// </example>
         public RTCRtpEncodingParameters() { }
 
         internal RTCRtpEncodingParameters(ref RTCRtpEncodingParametersInternal parameter)

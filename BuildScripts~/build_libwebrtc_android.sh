@@ -25,6 +25,9 @@ then
   gclient sync -D --force --reset
 fi
 
+# Support 16 KB page sizes for 64 bit Android
+patch -N "src/sdk/android/BUILD.gn" < "$COMMAND_DIR/patches/support_16kb_pagesizes_android.patch"
+
 # Add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
