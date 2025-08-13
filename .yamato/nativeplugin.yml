@@ -83,7 +83,7 @@ build_types:
 {% for platform in build_platforms %}
 {% for build_type in build_types %}
 build_{{ platform.name }}_{{ build_type }}:
-  name: Build native plugin for {{ platform.name }}
+  name: Build {{ platform.name }} native plugin for {{ build_type }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
