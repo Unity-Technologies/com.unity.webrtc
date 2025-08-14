@@ -68,6 +68,39 @@ namespace webrtc
             externalInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
             externalInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
             imageInfo.pNext = &externalInfo;
+
+            VkPhysicalDeviceImageFormatInfo2 formatInfo = {};
+            formatInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
+            formatInfo.format = format;
+            formatInfo.type = VK_IMAGE_TYPE_2D;
+            formatInfo.tiling = tiling;
+            formatInfo.usage = usage;
+            formatInfo.pNext = &externalInfo;
+
+            VkExternalImageFormatProperties externalProps = {};
+            externalProps.sType = VK_STRUCTURE_TYPE_EXTERNAL_IMAGE_FORMAT_PROPERTIES;
+
+            VkImageFormatProperties2 formatProperties = {};
+            formatProperties.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2;
+            formatProperties.pNext = &externalProps;
+
+            VkResult result =
+                vkGetPhysicalDeviceImageFormatProperties2(instance.physicalDevice, &formatInfo, &formatProperties);
+            if (result != VK_SUCCESS)
+            {
+                RTC_LOG(LS_ERROR) << "Failed vkGetPhysicalDeviceImageFormatProperties2 result: " << result;
+                return result;
+            }
+            
+            if (externalProps.externalMemoryProperties.externalMemoryFeatures & VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT)
+            {
+                // This image format is exportable.
+            }
+            else
+            {
+                RTC_LOG(LS_ERROR) << "External memory is not exportable";
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }            
         }
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
         imageInfo.extent.width = static_cast<uint32_t>(width);
