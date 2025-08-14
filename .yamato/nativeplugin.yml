@@ -74,21 +74,27 @@ test_platforms:
     type: Unity::mobile::shield
     image: mobile/android-package-ci-win:v0.1.4-1212670
     flavor: b1.large
+
+build_types:
+  - debug
+  - release
 ---
 
 {% for platform in build_platforms %}
-build_{{ platform.name }}:
-  name: Build native plugin for {{ platform.name }}
+{% for build_type in build_types %}
+build_{{ platform.name }}_{{ build_type }}:
+  name: Build {{ platform.name }} native plugin for {{ build_type }}
   agent:
     type: {{ platform.type }}
     image: {{ platform.image }}
     flavor: {{ platform.flavor }}
   commands:
-    - {{ platform.build_command }}
+    - {{ platform.build_command }} {{ build_type }}
   artifacts:
     {{ platform.name }}_plugin:
       paths:
         - {{ platform.plugin_path }}
+{% endfor %} 
 
 build_testrunner_{{ platform.name }}:
   name: Build test runner for native plugin {{ platform.name }}
@@ -199,5 +205,5 @@ push_plugin:
     - git push origin HEAD:$GIT_BRANCH
   dependencies:
     {% for platform in build_platforms %}
-    - .yamato/nativeplugin.yml#build_{{ platform.name }}
+    - .yamato/nativeplugin.yml#build_{{ platform.name }}_release
     {% endfor %}
