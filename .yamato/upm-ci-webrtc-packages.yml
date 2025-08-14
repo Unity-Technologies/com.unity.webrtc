@@ -208,7 +208,7 @@ pack_{{ package.name }}:
         - "upm-ci~/packages/**/*"
   dependencies:
     {% for platform in plugin_platforms %}
-    - .yamato/nativeplugin.yml#build_{{ platform }}
+    - .yamato/nativeplugin.yml#build_{{ platform }}_release
     {% endfor %}
 
 {% for editor in editors %}

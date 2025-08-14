@@ -4,6 +4,13 @@ export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.we
 export SOLUTION_DIR=$(pwd)/Plugin~
 export PLUGIN_DIR=$(pwd)/Runtime/Plugins/Android
 
+BUILD_TYPE="${1:-release}"
+if [ "$BUILD_TYPE" = "debug" ]; then
+  CMAKE_BUILD_TYPE="Debug"
+else
+  CMAKE_BUILD_TYPE="Release"
+fi
+
 # Download LibWebRTC 
 curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
@@ -20,7 +27,7 @@ do
     -D CMAKE_ANDROID_API=24 \
     -D CMAKE_ANDROID_ARCH_ABI=$ARCH_ABI \
     -D CMAKE_ANDROID_NDK=$ANDROID_NDK \
-    -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
     -D CMAKE_ANDROID_STL_TYPE=c++_static
 
   cmake \

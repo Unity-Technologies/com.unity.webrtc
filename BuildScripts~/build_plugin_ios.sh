@@ -6,6 +6,13 @@ export WEBRTC_FRAMEWORK_DIR=$(pwd)/Runtime/Plugins/iOS
 export WEBRTC_ARCHIVE_DIR=build/webrtc.xcarchive
 export WEBRTC_SIM_ARCHIVE_DIR=build/webrtc-sim.xcarchive
 
+BUILD_TYPE="${1:-release}"
+if [ "$BUILD_TYPE" = "debug" ]; then
+  CMAKE_BUILD_TYPE="Debug"
+else
+  CMAKE_BUILD_TYPE="Release"
+fi
+
 # Install cmake
 export HOMEBREW_NO_AUTO_UPDATE=1
 brew install cmake
@@ -21,6 +28,7 @@ cmake . \
   -D CMAKE_SYSTEM_NAME=iOS \
   -D "CMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -D CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+  -D CMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
   -B build
 
 xcodebuild \
