@@ -113,7 +113,7 @@ namespace Unity.WebRTC.Editor
             if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK)
                 return;
 
-            var architecture = (iOSArchitecture)PlayerSettings.GetArchitecture(BuildTargetGroup.iOS);
+            var architecture = (iOSArchitecture)PlayerSettings.GetArchitecture(NamedBuildTarget.iOS);
 
             if (architecture != iOSArchitecture.ARM64)
             {
