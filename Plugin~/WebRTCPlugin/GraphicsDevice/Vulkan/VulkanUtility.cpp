@@ -97,7 +97,7 @@ namespace webrtc
             }
 
             if (!(externalProps.externalMemoryProperties.externalMemoryFeatures &
-                VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT))
+                  VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT))
             {
                 RTC_LOG(LS_ERROR) << "External memory is not exportable";
                 return VK_ERROR_INITIALIZATION_FAILED;
