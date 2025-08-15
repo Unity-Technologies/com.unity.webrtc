@@ -108,7 +108,13 @@ namespace webrtc
         VkMemoryDedicatedAllocateInfo dedicatedAllocateInfo = {};
 #endif
         if (exportHandle)
+        VkExportMemoryAllocateInfoKHR exportInfo = {};
+#if UNITY_ANDROID
+        VkMemoryDedicatedAllocateInfo dedicatedAllocateInfo = {};
+#endif
+        if (exportHandle)
         {
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
             exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
             exportInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
 
