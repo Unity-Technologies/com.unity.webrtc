@@ -68,40 +68,6 @@ namespace webrtc
             externalInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
             externalInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
             imageInfo.pNext = &externalInfo;
-
-            VkPhysicalDeviceExternalImageFormatInfo externalImageFormatInfo = {};
-            externalImageFormatInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO;
-            externalImageFormatInfo.handleType = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
-
-            VkPhysicalDeviceImageFormatInfo2 formatInfo = {};
-            formatInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
-            formatInfo.format = format;
-            formatInfo.type = VK_IMAGE_TYPE_2D;
-            formatInfo.tiling = tiling;
-            formatInfo.usage = usage;
-            formatInfo.pNext = &externalImageFormatInfo;
-
-            VkExternalImageFormatProperties externalProps = {};
-            externalProps.sType = VK_STRUCTURE_TYPE_EXTERNAL_IMAGE_FORMAT_PROPERTIES;
-
-            VkImageFormatProperties2 formatProperties = {};
-            formatProperties.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2;
-            formatProperties.pNext = &externalProps;
-
-            VkResult result =
-                vkGetPhysicalDeviceImageFormatProperties2(instance.physicalDevice, &formatInfo, &formatProperties);
-            if (result != VK_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "Failed vkGetPhysicalDeviceImageFormatProperties2 result: " << result;
-                return result;
-            }
-
-            if (!(externalProps.externalMemoryProperties.externalMemoryFeatures &
-                  VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT))
-            {
-                RTC_LOG(LS_ERROR) << "External memory is not exportable";
-                return VK_ERROR_INITIALIZATION_FAILED;
-            }
         }
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
         imageInfo.extent.width = static_cast<uint32_t>(width);
@@ -131,7 +97,11 @@ namespace webrtc
         allocInfo.allocationSize = memRequirements.size;
         bool success = VulkanUtility::FindMemoryTypeIndex(
             instance.physicalDevice, memRequirements.memoryTypeBits, properties, &allocInfo.memoryTypeIndex);
-        RTC_CHECK(success);
+        if (!success) {
+            RTC_LOG(LS_ERROR) << "Failed to find suitable memory type";
+            vkDestroyImage(instance.device, unityVulkanImage->image, allocator);
+            return VK_ERROR_INITIALIZATION_FAILED;
+        }
 
         VkExportMemoryAllocateInfo exportInfo = {};
 #if UNITY_ANDROID
@@ -139,6 +109,10 @@ namespace webrtc
 #endif
         if (exportHandle)
         {
+            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+            exportInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
+
+            // If we use Android hardware buffer, we need to set the image as additional information.
 #if UNITY_ANDROID
             // When AllocateMemory is executed, Android requires the VkImage to be used as additional information.
             dedicatedAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
@@ -147,15 +121,16 @@ namespace webrtc
             dedicatedAllocateInfo.image = unityVulkanImage->image;
             exportInfo.pNext = &dedicatedAllocateInfo;
 #endif
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
-            exportInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
             allocInfo.pNext = &exportInfo;
         }
 
         result = vkAllocateMemory(instance.device, &allocInfo, allocator, &unityVulkanImage->memory.memory);
         if (result != VK_SUCCESS)
         {
-            RTC_LOG(LS_ERROR) << "Failed vkAllocateMemory result: " << result;
+            RTC_LOG(LS_ERROR) << "Failed vkAllocateMemory result: " << result
+                              << " allocationSize: " << allocInfo.allocationSize
+                              << " memoryTypeIndex: " << allocInfo.memoryTypeIndex;
+            vkDestroyImage(instance.device, unityVulkanImage->image, allocator);
             return result;
         }
 
@@ -270,6 +245,12 @@ namespace webrtc
 #ifndef _WIN32
     void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory memory)
     {
+#ifdef UNITY_ANDROID
+        // For Android Hardware Buffer, we need different handling
+        // This might require additional implementation depending on your needs
+        RTC_LOG(LS_WARNING) << "Android Hardware Buffer export not fully implemented";
+        return nullptr;
+#else
         int fd = -1;
 
         VkMemoryGetFdInfoKHR fdInfo = {};
@@ -285,6 +266,7 @@ namespace webrtc
         }
 
         return (void*)(uintptr_t)fd;
+#endif
     }
 #else
     void* VulkanUtility::GetExportHandle(const VkDevice device, const VkDeviceMemory memory)

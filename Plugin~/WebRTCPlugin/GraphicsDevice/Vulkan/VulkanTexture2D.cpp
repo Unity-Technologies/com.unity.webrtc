@@ -35,7 +35,13 @@ namespace webrtc
     {
         m_Instance = *instance;
 
+        // we don't support external memory handle on Android.
+#if UNITY_ANDROID
+        const bool EXPORT_HANDLE = false;
+#else
         const bool EXPORT_HANDLE = true;
+#endif
+
         VkResult result = VulkanUtility::CreateImage(
             m_Instance,
             m_allocator,
