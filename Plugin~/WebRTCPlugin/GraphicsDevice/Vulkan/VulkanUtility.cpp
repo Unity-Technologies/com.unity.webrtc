@@ -115,7 +115,6 @@ namespace webrtc
         if (exportHandle)
         {
             exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
-            exportInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
             exportInfo.handleTypes = EXTERNAL_MEMORY_HANDLE_SUPPORTED_TYPE;
 
             // If we use Android hardware buffer, we need to set the image as additional information.
