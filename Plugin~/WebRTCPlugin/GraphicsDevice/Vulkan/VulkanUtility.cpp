@@ -103,11 +103,6 @@ namespace webrtc
             return VK_ERROR_INITIALIZATION_FAILED;
         }
 
-        VkExportMemoryAllocateInfo exportInfo = {};
-#if UNITY_ANDROID
-        VkMemoryDedicatedAllocateInfo dedicatedAllocateInfo = {};
-#endif
-        if (exportHandle)
         VkExportMemoryAllocateInfoKHR exportInfo = {};
 #if UNITY_ANDROID
         VkMemoryDedicatedAllocateInfo dedicatedAllocateInfo = {};
@@ -120,7 +115,7 @@ namespace webrtc
             // If we use Android hardware buffer, we need to set the image as additional information.
 #if UNITY_ANDROID
             // When AllocateMemory is executed, Android requires the VkImage to be used as additional information.
-            dedicatedAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
+            dedicatedAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO_KHR;
             dedicatedAllocateInfo.pNext = nullptr;
             dedicatedAllocateInfo.buffer = VK_NULL_HANDLE;
             dedicatedAllocateInfo.image = unityVulkanImage->image;
