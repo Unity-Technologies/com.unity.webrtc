@@ -30,7 +30,6 @@ INSTANCE_VULKAN_FUNCTION(vkGetPhysicalDeviceFormatProperties)
 INSTANCE_VULKAN_FUNCTION(vkCreateDevice)
 INSTANCE_VULKAN_FUNCTION(vkGetDeviceProcAddr)
 INSTANCE_VULKAN_FUNCTION(vkDestroyInstance)
-INSTANCE_VULKAN_FUNCTION(vkGetPhysicalDeviceImageFormatProperties2)
 
 #undef INSTANCE_VULKAN_FUNCTION
 
