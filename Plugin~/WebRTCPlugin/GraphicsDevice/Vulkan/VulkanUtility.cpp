@@ -97,7 +97,8 @@ namespace webrtc
         allocInfo.allocationSize = memRequirements.size;
         bool success = VulkanUtility::FindMemoryTypeIndex(
             instance.physicalDevice, memRequirements.memoryTypeBits, properties, &allocInfo.memoryTypeIndex);
-        if (!success) {
+        if (!success)
+        {
             RTC_LOG(LS_ERROR) << "Failed to find suitable memory type";
             vkDestroyImage(instance.device, unityVulkanImage->image, allocator);
             return VK_ERROR_INITIALIZATION_FAILED;
