@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <chrono>
 #include <third_party/libyuv/include/libyuv/convert.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"
@@ -107,6 +108,7 @@ namespace webrtc
                 kUnityVulkanResourceAccess_PipelineBarrier,
                 unityVulkanImage.get()))
         {
+            RTC_LOG(LS_ERROR) << "UnityGraphicsVulkan::AccessTexture failed.";
             return nullptr;
         }
         return unityVulkanImage;
@@ -463,6 +465,13 @@ namespace webrtc
             m_LastStateCond.wait_until(lock, std::chrono::system_clock::now() + m_syncTimeout, [vulkanTexture, this] {
                 return vulkanTexture->currentFrameNumber <= m_LastState.safeFrameNumber;
             });
+        if (!ret)
+        {
+            RTC_LOG(LS_ERROR) << "WaitSync timeout. "
+                              << "texture: " << texture
+                              << "currentFrameNumber: " << vulkanTexture->currentFrameNumber
+                              << ", safeFrameNumber: " << m_LastState.safeFrameNumber;
+        }
         return ret;
     }
 

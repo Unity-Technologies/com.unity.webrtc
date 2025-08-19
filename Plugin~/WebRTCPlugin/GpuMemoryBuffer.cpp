@@ -65,8 +65,10 @@ namespace webrtc
     {
         // One texture cannot map CUDA memory and CPU memory simultaneously.
         // Believe there is still room for improvement.
+#if CUDA_PLATFORM
         if (!device_->CopyResourceFromNativeV(texture_.get(), ptr))
             return false;
+#endif
         if (!device_->CopyResourceFromNativeV(textureCpuRead_.get(), ptr))
             return false;
         return true;
