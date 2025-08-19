@@ -3,6 +3,14 @@
 set LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M116-20250805/webrtc-win.zip
 set SOLUTION_DIR=%cd%\Plugin~
 
+set "BUILD_TYPE=%~1"
+if "%BUILD_TYPE%"=="" set "BUILD_TYPE=release"
+if /i "%BUILD_TYPE%"=="debug" (
+  set CMAKE_BUILD_TYPE=Debug
+) else (
+  set CMAKE_BUILD_TYPE=Release
+)
+
 echo Download LibWebRTC
 
 if not exist %SOLUTION_DIR%\webrtc (
@@ -17,5 +25,5 @@ rem https://gitlab.kitware.com/cmake/cmake/-/issues/20776
 rem This program use CUDA kernel to change the video resolution when using NVIDIA Video Codec.
 
 cd %SOLUTION_DIR%
-cmake --preset=x64-windows-msvc
+cmake --preset=x64-windows-msvc -DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%
 cmake --build --preset=release-windows-msvc --target=WebRTCPlugin
