@@ -461,15 +461,14 @@ namespace webrtc
         const VulkanTexture2D* vulkanTexture = static_cast<const VulkanTexture2D*>(texture);
         std::unique_lock<std::mutex> lock(m_LastStateMtx);
 
-        bool ret =
-            m_LastStateCond.wait_until(lock, std::chrono::system_clock::now() + m_syncTimeout, [vulkanTexture, this] {
-                return vulkanTexture->currentFrameNumber <= m_LastState.safeFrameNumber;
-            });
+        bool ret = m_LastStateCond.wait_until(
+            lock,
+            std::chrono::system_clock::now() + m_syncTimeout,
+            [vulkanTexture, this] { return vulkanTexture->currentFrameNumber <= m_LastState.safeFrameNumber; });
         if (!ret)
         {
             RTC_LOG(LS_ERROR) << "WaitSync timeout. "
-                              << "texture: " << texture
-                              << "currentFrameNumber: " << vulkanTexture->currentFrameNumber
+                              << "texture: " << texture << "currentFrameNumber: " << vulkanTexture->currentFrameNumber
                               << ", safeFrameNumber: " << m_LastState.safeFrameNumber;
         }
         return ret;
