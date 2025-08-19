@@ -166,7 +166,7 @@ test_architectures_macos:
   - name: arm64 (Apple Silicon)
     target_name: macos-m1
     editor_version: 6000.3
-    architecture: arm64    
+    architecture: arm64
   - name: x64
     target_name: macos
     editor_version: trunk
@@ -178,7 +178,7 @@ test_architectures_macos:
   - name: arm64 (Apple Silicon)
     target_name: macos-m1
     editor_version: trunk
-    architecture: arm64    
+    architecture: arm64
 
 package:
   name: webrtc
