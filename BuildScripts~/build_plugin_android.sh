@@ -50,7 +50,7 @@ do
   zip -g libwebrtc.aar jni/$ARCH_ABI/libwebrtc.so
   # If debug build, add Vulkan validation layer
   if [ "$BUILD_TYPE" = "debug" ]; then
-    mv $SOLUTION_DIR/android-binaries/$ARCH_ABI/libVkLayer_khronos_validation.so jni/$ARCH_ABI
+    cp $SOLUTION_DIR/android-binaries/$ARCH_ABI/libVkLayer_khronos_validation.so jni/$ARCH_ABI
     zip -g libwebrtc.aar jni/$ARCH_ABI/libVkLayer_khronos_validation.so
   fi
   rm -r jni
