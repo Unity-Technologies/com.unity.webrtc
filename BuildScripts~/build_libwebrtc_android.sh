@@ -69,6 +69,10 @@ do
 
   for is_debug in "true" "false"
   do
+    symbol_level=0
+    if [ $is_debug = "true" ]; then
+      symbol_level=1
+    fi
     # generate ninja files
     # use `treat_warnings_as_errors` option to avoid deprecation warnings
     gn gen "$OUTPUT_DIR" --root="src" \
@@ -84,7 +88,8 @@ do
       use_custom_libcxx=false \
       treat_warnings_as_errors=false \
       use_errorprone_java_compiler=false \
-      use_cxx17=true"
+      use_cxx17=true \
+      symbol_level=${symbol_level}"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
@@ -103,6 +108,10 @@ pushd src
 
 for is_debug in "true" "false"
 do
+  symbol_level=0
+  if [ $is_debug = "true" ]; then
+    symbol_level=1
+  fi
   # use `treat_warnings_as_errors` option to avoid deprecation warnings
   "$PYTHON3_BIN" tools_webrtc/android/build_aar.py \
     --build-dir $OUTPUT_DIR \
@@ -118,7 +127,8 @@ do
       use_custom_libcxx=false \
       treat_warnings_as_errors=false \
       use_errorprone_java_compiler=false \
-      use_cxx17=true"
+      use_cxx17=true \
+      symbol_level=${symbol_level}"
 
   filename="libwebrtc.aar"
   if [ $is_debug = "true" ]; then
