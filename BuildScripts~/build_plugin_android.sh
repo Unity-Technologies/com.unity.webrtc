@@ -16,6 +16,15 @@ curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
 
+# If debug build, download android-binaries that contains Vulkan validation layer
+if [ "$BUILD_TYPE" = "debug" ]; then
+  if [ ! -d "$SOLUTION_DIR/android-binaries" ]; then
+    wget https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases/download/vulkan-sdk-1.4.321.0/android-binaries-1.4.321.0.zip
+    unzip -d "$(pwd)" android-binaries-1.4.321.0.zip
+    mv "$(pwd)/android-binaries-1.4.321.0" $SOLUTION_DIR/android-binaries
+  fi
+fi
+
 # Build UnityRenderStreaming Plugin 
 cd "$SOLUTION_DIR"
 for ARCH_ABI in "arm64-v8a" "x86_64"
@@ -39,6 +48,11 @@ do
   mkdir -p jni/$ARCH_ABI
   mv libwebrtc.so jni/$ARCH_ABI
   zip -g libwebrtc.aar jni/$ARCH_ABI/libwebrtc.so
+  # If debug build, add Vulkan validation layer
+  if [ "$BUILD_TYPE" = "debug" ]; then
+    mv $SOLUTION_DIR/android-binaries/$ARCH_ABI/libVkLayer_khronos_validation.so jni/$ARCH_ABI
+    zip -g libwebrtc.aar jni/$ARCH_ABI/libVkLayer_khronos_validation.so
+  fi
   rm -r jni
   popd
   rm -rf build
