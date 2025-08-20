@@ -19,7 +19,7 @@ cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
 # If debug build, download android-binaries that contains Vulkan validation layer
 if [ "$BUILD_TYPE" = "debug" ]; then
   if [ ! -d "$SOLUTION_DIR/android-binaries" ]; then
-    wget https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases/download/vulkan-sdk-1.4.321.0/android-binaries-1.4.321.0.zip
+    wget -q --show-progress https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases/download/vulkan-sdk-1.4.321.0/android-binaries-1.4.321.0.zip
     unzip -d "$(pwd)" android-binaries-1.4.321.0.zip
     mv "$(pwd)/android-binaries-1.4.321.0" $SOLUTION_DIR/android-binaries
   fi
@@ -50,7 +50,7 @@ do
   zip -g libwebrtc.aar jni/$ARCH_ABI/libwebrtc.so
   # If debug build, add Vulkan validation layer
   if [ "$BUILD_TYPE" = "debug" ]; then
-    mv $SOLUTION_DIR/android-binaries/$ARCH_ABI/libVkLayer_khronos_validation.so jni/$ARCH_ABI
+    cp $SOLUTION_DIR/android-binaries/$ARCH_ABI/libVkLayer_khronos_validation.so jni/$ARCH_ABI
     zip -g libwebrtc.aar jni/$ARCH_ABI/libVkLayer_khronos_validation.so
   fi
   rm -r jni
