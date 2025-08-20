@@ -1,0 +1,15 @@
+diff --git a/modules/video_coding/codecs/vp9/libvpx_vp9_encoder.cc b/modules/video_coding/codecs/vp9/libvpx_vp9_encoder.cc
+index e460625aea..4194e550df 100644
+--- a/modules/video_coding/codecs/vp9/libvpx_vp9_encoder.cc
++++ b/modules/video_coding/codecs/vp9/libvpx_vp9_encoder.cc
+@@ -2090,7 +2090,9 @@ rtc::scoped_refptr<VideoFrameBuffer> LibvpxVp9Encoder::PrepareBufferForProfile0(
+     case VideoFrameBuffer::Type::kI420A: {
+       MaybeRewrapRawWithFormat(VPX_IMG_FMT_I420);
+       const I420BufferInterface* i420_buffer = mapped_buffer->GetI420();
+-      RTC_DCHECK(i420_buffer);
++      if(!i420_buffer) {
++        return {};
++      }
+       raw_->planes[VPX_PLANE_Y] = const_cast<uint8_t*>(i420_buffer->DataY());
+       raw_->planes[VPX_PLANE_U] = const_cast<uint8_t*>(i420_buffer->DataU());
+       raw_->planes[VPX_PLANE_V] = const_cast<uint8_t*>(i420_buffer->DataV());
