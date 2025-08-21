@@ -33,13 +33,13 @@ mkdir -p "$ARTIFACTS_DIR/lib"
 
 for target_cpu in "x64"
 do
-  symbol_level=0
-  if [ $is_debug = "true" ]; then
-    symbol_level=1
-  fi
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
   for is_debug in "true" "false"
   do
+    symbol_level=0
+    if [ $is_debug = "true" ]; then
+      symbol_level=1
+    fi
     args="is_debug=${is_debug} \
       target_os=\"linux\" \
       target_cpu=\"${target_cpu}\" \
