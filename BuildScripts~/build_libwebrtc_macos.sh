@@ -40,6 +40,10 @@ mkdir -p "$ARTIFACTS_DIR/lib"
 
 for is_debug in "true" "false"
 do
+  symbol_level=0
+  if [ $is_debug = "true" ]; then
+    symbol_level=1
+  fi
   for target_cpu in "x64" "arm64"
   do
 
@@ -57,7 +61,8 @@ do
       is_component_build=false \
       use_rtti=true \
       rtc_use_x11=false \
-      use_cxx17=true"
+      use_cxx17=true \
+      symbol_level=${symbol_level}"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
