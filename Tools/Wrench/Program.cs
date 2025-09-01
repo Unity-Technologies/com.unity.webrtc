@@ -1,4 +1,4 @@
-﻿using TEMPLATE.Cookbook.Settings;
+using WebRTC.Cookbook.Settings;
 using RecipeEngine;
 using RecipeEngine.Modules.Wrench.Helpers;
 
@@ -8,7 +8,7 @@ public static class Program
 {
     public static int Main(string[] args)
     {
-        var settings = new TEMPLATESettings();
+        var settings = new WebRTCSettings();
 
         // ReSharper disable once UnusedVariable
         var engine = EngineFactory
