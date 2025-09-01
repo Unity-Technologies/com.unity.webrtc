@@ -65,7 +65,7 @@ test_targets:
         platform: standalone
   - name: linux-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.4.1-1294625
+    image: package-ci/ubuntu-22.04:v4
     flavor: b1.large
     model: rtx2080
     is_gpu: true
