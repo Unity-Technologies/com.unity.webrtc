@@ -81,33 +81,6 @@ test_editors:
       - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
       - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
-  - version: 2022.1
-    tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
-      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
-      - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
-      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
-  - version: 2021.3
-    tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
-      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
-      - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
-      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
-  - version: 2020.3
-    tests:
-      - TestEditorTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestEditorTestsMacEditorIsolatedPackagesVerified1014
-      - TestEditorTestsWindowsEditorIsolatedPackagesVerified
-      - TestIntegrationTestsiOSiPhoneSE
-      - TestPlaymodeTestsLinuxEditorIsolatedPackagesVerified1804
-      - TestPlaymodeTestsMacEditorIsolatedPackagesVerified1014
-      - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
 
 {% for editor in test_editors %}
@@ -139,7 +112,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
       mv upm-ci~/package WebRTC~/Packages/com.unity.webrtc
 {% if platform.group == "linux" %}
     # install utr
-    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr --output utr
     - chmod a+x ./utr
     # install unity-downloader-cli
     - curl -L https://artifactory.prd.it.unity3d.com/artifactory/api/gpg/key/public | sudo apt-key add -
@@ -151,7 +124,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - ./utr --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "macos" %}
     # install utr
-    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr --output utr; chmod a+x ./utr
     - chmod a+x ./utr
     # install unity-downloader-cli
     - pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
@@ -160,7 +133,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - ./utr --suite={{ test.suite }} --editor-location=.Editor --testproject=WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "windows" %}
     # install utr
-    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr.bat > utr.bat
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat > utr.bat
     # install unity-downloader-cli
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u {{ editor.version }} -c editor --fast --wait
@@ -170,7 +143,7 @@ verificationtest_{{ id }}_{{ editor.version }}:
     - ./utr.bat --suite={{ test.suite }} --editor-location=.Editor --testproject=./WebRTC~ --reruncount=2 --timeout=3600
 {% elsif platform.group == "ios" %}
     # install utr
-    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools/utr-standalone/utr --output utr; chmod a+x ./utr
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr --output utr; chmod a+x ./utr
     - chmod a+x ./utr
     # install unity-downloader-cli
     - pip3 install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
