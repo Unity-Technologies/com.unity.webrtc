@@ -322,8 +322,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     flavor: {{ target.flavor }}
 {% if target.is_gpu == "true" and target.model %}
     model: {{ target.model }}
-{% endif %}    
+{% endif %}
   commands:
+# workaround: Install x11.so.6 for linux test
+{% if target.name == "linux-gpu" or target.name == "linux" %}
+    - sudo apt install -y libx11-6
+{% endif %}
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
