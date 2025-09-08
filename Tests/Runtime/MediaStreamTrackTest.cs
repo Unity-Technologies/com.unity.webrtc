@@ -91,9 +91,11 @@ namespace Unity.WebRTC.RuntimeTest
             var height = 256;
             var format = RenderTextureFormat.R8;
             var rt = new RenderTexture(width, height, 0, format);
-            var created = rt.Create();
-            if (!created)
+            if (rt.format != format)
+            {
                 Assert.Ignore("RenderTextureFormat.R8 texture format is not supported on this platform.");
+            }
+            rt.Create();
 
             Assert.That(() => { new VideoStreamTrack(rt); }, Throws.TypeOf<ArgumentException>());
             Object.DestroyImmediate(rt);
