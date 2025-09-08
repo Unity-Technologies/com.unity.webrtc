@@ -120,11 +120,11 @@ test_targets_android:
 test_architectures_macos:
   - name: x64 (Rosetta 2)
     target_name: macos-m1
-    editor_version: 2022.3
+    editor_version: 6000.3
     architecture: x64
   - name: arm64 (Apple Silicon)
     target_name: macos-m1
-    editor_version: 2022.3
+    editor_version: 6000.3
     architecture: arm64
   - name: x64 (Rosetta 2)
     target_name: macos-m1
