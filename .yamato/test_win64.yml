@@ -7,20 +7,24 @@ test_targets:
     flavor: b1.large
     gfx_types:
       - name: d3d11
-        extra-editor-arg: force-d3d11
+        utr-arg: Direct3D11
       - name: d3d12
-        extra-editor-arg: force-d3d12
+        utr-arg: Direct3D12
       - name: vulkan
-        extra-editor-arg: force-vulkan
+        utr-arg: Vulkan
     test_params:
       - backend: mono
         platform: editmode
+        suite: editor
       - backend: mono
         platform: playmode
+        suite: playmode
       - backend: mono
         platform: standalone
+        suite: playmode
       - backend: il2cpp
         platform: standalone
+        suite: playmode
   - name: win-gpu
     type: Unity::VM::GPU
     image: package-ci/win10:v4.0.0-1214578
@@ -28,26 +32,73 @@ test_targets:
     model: rtx2080
     gfx_types:
       - name: d3d11
-        extra-editor-arg: force-d3d11
+        utr-arg: Direct3D11
       - name: d3d12
-        extra-editor-arg: force-d3d12
+        utr-arg: Direct3D12
       - name: vulkan
-        extra-editor-arg: force-vulkan
+        utr-arg: Vulkan
     test_params:
       - backend: mono
         platform: editmode
+        suite: editor
       - backend: mono
         platform: playmode
+        suite: playmode
       - backend: mono
         platform: standalone
+        suite: playmode
       - backend: il2cpp
         platform: standalone
+        suite: playmode
+
+build_params:
+  type: Unity::VM
+  image: package-ci/win10:v1.21.0-1103459
+  flavor: b1.large
+  platform: standalone
+  backends:
+    - name: mono
+      utr-backend: Mono2X
+      additional_component_arg: StandaloneSupport-Mono
+    - name: il2cpp
+      utr-backend: Il2Cpp
+      additional_component_arg: StandaloneSupport-IL2CPP
 ---
 
 {% for editor in editors %}
+{% for backend in build_params.backends %}
+build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ editor.version }}:
+  name : Build {{ package.packagename }} with {{ build_params.platform }} {{ backend.name }} {{ editor.version }} on win
+  agent:
+    type: {{ build_params.type }}
+    image: {{ build_params.image }}
+    flavor: {{ build_params.flavor }}
+  variables:
+    EDITOR_VERSION: {{ editor.version }}
+  commands:
+    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -u %EDITOR_VERSION% -c editor -c {{ backend.additional_component_arg }} --wait --published --fast
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
+    - ./utr --suite=playmode --platform=StandaloneWindows64 --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only --scripting-backend={{ backend.utr-backend }} --extra-editor-arg="-nographics"
+  artifacts:
+    players:
+      paths:
+        - "build/players/**"
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+{% endfor %}
+
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
+
+# Start standalone test on Windows
+{% if param.platform == "standalone" %}
+
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -58,16 +109,45 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     model: {{ target.model }}
 {% endif %}
   commands:
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
+    - ./utr --suite={{ param.suite }} --platform=StandaloneWindows64 --player-load-path=build/players --artifacts_path=build/logs --playergraphicsapi={{ gfx_type.utr-arg }}
+  artifacts:
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/test_win64.yml#build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_win_{{ editor.version }}
+
+# End standalone test on Windows
+# Start editmode/playmode test on Windows
+{% else %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
+  agent:
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
+{% if target.model %}
+    model: {{ target.model }}
+{% endif %}
+  variables:
+    EDITOR_VERSION: {{ editor.version }}
+  commands:    
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }} --extra-editor-arg {{ gfx_type.extra-editor-arg }} --enable-load-and-test-isolation
+    - unity-downloader-cli -u %EDITOR_VERSION% -c editor --wait --published --fast
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
+    - ./utr --suite={{ param.suite }} --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=artifacts/logs --playergraphicsapi={{ gfx_type.utr-arg }}
   artifacts:
-    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
+    logs:
       paths:
-        - "upm-ci~/test-results/**/*"
+        - "artifacts/logs/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
+# End editmode/playmode test on Windows
+{% endif %}
+
 {% endfor %}
 {% endfor %}
 
@@ -79,6 +159,6 @@ test_{{ package.name }}_{{ editor.version }}_{{ target.name }}:
     - .yamato/test_win64.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 {% endfor %}
 {% endfor %}
-  
+
 {% endfor %}
 {% endfor %}
