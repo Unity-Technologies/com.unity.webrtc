@@ -35,18 +35,52 @@ test_targets:
         extra-editor-arg: force-vulkan
     test_params:
       - backend: mono
+        utr-backend: Mono2X
+        additional_component_arg: StandaloneSupport-Mono
         platform: editmode
       - backend: mono
+        utr-backend: Mono2X
+        additional_component_arg: StandaloneSupport-Mono
         platform: playmode
       - backend: mono
+        utr-backend: Mono2X
+        additional_component_arg: StandaloneSupport-Mono
         platform: standalone
       - backend: il2cpp
+        utr-backend: Il2Cpp
+        additional_component_arg: StandaloneSupport-IL2CPP
         platform: standalone
 ---
 
 {% for editor in editors %}
 {% for target in test_targets %}
 {% for param in target.test_params %}
+
+# Start standalone test on Windows
+{% if param.platform == "standalone" %}
+
+build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}:
+  name : Build {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }}
+  agent:
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
+  commands:
+    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - unity-downloader-cli -u %EDITOR_VERSION% -c editor -c {{ param.additional_component_arg }} --wait --published --fast
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
+    - ./utr --suite=playmode --platform=StandaloneWindows64 --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only --scripting-backend={{ param.backend }}"
+  artifacts:
+    players:
+      paths:
+        - "build/players/**"
+    logs:
+      paths:
+        - "build/logs/**"
+  dependencies:
+    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
+
 {% for gfx_type in target.gfx_types %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
@@ -57,19 +91,65 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% if target.model %}
     model: {{ target.model }}
 {% endif %}
+  variables:
+    EDITOR_VERSION: {{ editor.version }}
   commands:
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }} --extra-editor-arg {{ gfx_type.extra-editor-arg }} --enable-load-and-test-isolation
+    - unity-downloader-cli -u %EDITOR_VERSION% -c editor --wait --published --fast
+    - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
+    - ./utr --suite=playmode --platform=StandaloneWindows64 --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --artifacts_path=build/logs --build-only {{player_test.utr_build}}
+#    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+#    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }} --extra-editor-arg {{ gfx_type.extra-editor-arg }} --enable-load-and-test-isolation
+  artifacts:
+    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results:
+      paths:
+        - "upm-ci~/test-results/**/*"
+    logs:
+      paths:
+        - "build/logs/**"        
+  dependencies:
+    - .yamato/test_win64.yml#build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}
+{% endfor %}
+{% endfor %}
+
+# End standalone test on Windows
+# Start editmode/playmode test on Windows
+{% else %}
+{% for architecture in test_architectures_macos %}
+test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ architecture.architecture }}:
+  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ architecture.name }}
+  agent:
+    type: {{ target.type }}
+    image: {{ target.image }}
+    flavor: {{ target.flavor }}
+  variables:
+      TEMPLATE_FILE: BuildScripts~/template/remote.sh.template
+      PACKAGE_DIR: com.unity.webrtc
+      TEST_PROJECT_DIR: com.unity.webrtc/WebRTC~
+      TEST_RESULT_DIR: upm-ci~/test-results/
+      TEST_TARGET: macos
+      TEST_PLATFORM: {{ param.platform }}
+      TEST_ARCHITECTURE : {{ architecture.architecture }}
+      SCRIPTING_BACKEND: {{ param.backend }}
+      EDITOR_VERSION: {{ editor.version }}
+      EXTRA_EDITOR_ARG: {{ target.gfx_type.extra-editor-arg }}
+  commands:
+    - |
+      find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
+      cp -rf upm-ci~/package/Runtime/Plugins Runtime/
+    - BuildScripts~/test_package_mac.sh
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
-        - "upm-ci~/test-results/**/*"
+        - "upm-ci~/test-results/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 {% endfor %}
-{% endfor %}
+
+# End editmode/playmode test on macOS
+{% endif %}
+
 
 test_{{ package.name }}_{{ editor.version }}_{{ target.name }}:
   name: Test {{ package.packagename }} with {{ editor.version }} on {{ target.name }} device
