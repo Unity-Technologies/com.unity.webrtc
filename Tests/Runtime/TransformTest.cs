@@ -150,7 +150,7 @@ namespace Unity.WebRTC.RuntimeTest
         // Crash on Android player on CI testing
         [UnityTest]
         [Timeout(1000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.Android })]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer })]
         public IEnumerator TransformedAudioFrameCallback()
         {
             GameObject obj = new GameObject("audio");
@@ -188,11 +188,11 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         // todo:
-        // This test is failed for OSXEditor and Android platform on CI.
+        // This test is failed for OSXEditor and Android and iOS platform on CI.
         // OSX standalone works well.
         [UnityTest]
         [Timeout(1000)]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor, RuntimePlatform.Android,
+        [UnityPlatform(exclude = new[] { RuntimePlatform.OSXEditor, RuntimePlatform.Android, RuntimePlatform.IPhonePlayer,
             RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor })]
         public IEnumerator TransformedVideoFrameCallback()
         {

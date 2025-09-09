@@ -65,7 +65,7 @@ test_targets:
         platform: standalone
   - name: linux-gpu
     type: Unity::VM::GPU
-    image: renderstreaming/ubuntu:v0.4.1-1294625
+    image: package-ci/ubuntu-22.04:v4
     flavor: b1.large
     model: rtx2080
     is_gpu: true
@@ -82,31 +82,6 @@ test_targets:
       - backend: mono
         platform: standalone
       - backend: il2cpp
-        platform: standalone
-  - name: macos
-    type: Unity::metal::macmini
-    image: package-ci/macos-12:v4.10.0-1271191
-    flavor: m1.mac
-    architecture: x64
-    gfx_types:
-      - name: metal
-        extra-editor-arg: force-metal
-    test_params:
-      - backend: mono
-        utr-backend: Mono2X
-        additional_component_arg: StandaloneSupport-Mono
-        platform: editmode
-      - backend: mono
-        utr-backend: Mono2X
-        additional_component_arg: StandaloneSupport-Mono
-        platform: playmode
-      - backend: mono
-        utr-backend: Mono2X
-        additional_component_arg: StandaloneSupport-Mono
-        platform: standalone
-      - backend: il2cpp
-        utr-backend: Il2Cpp
-        additional_component_arg: StandaloneSupport-IL2CPP
         platform: standalone
   - name: macos-m1
     type: Unity::metal::devkit
@@ -143,50 +118,22 @@ test_targets_android:
     extra-editor-arg: gles3
 
 test_architectures_macos:
-  - name: x64
-    target_name: macos
-    editor_version: 2020.3
-    architecture: x64
   - name: x64 (Rosetta 2)
     target_name: macos-m1
-    editor_version: 2020.3
-    architecture: x64
-  - name: x64
-    target_name: macos
-    editor_version: 2021.3
-    architecture: x64
-  - name: x64 (Rosetta 2)
-    target_name: macos-m1
-    editor_version: 2021.3
+    editor_version: 6000.3
     architecture: x64
   - name: arm64 (Apple Silicon)
     target_name: macos-m1
-    editor_version: 2021.3
+    editor_version: 6000.3
     architecture: arm64
-  - name: x64
-    target_name: macos
-    editor_version: 2022.1
-    architecture: x64
   - name: x64 (Rosetta 2)
     target_name: macos-m1
-    editor_version: 2022.1
+    editor_version: trunk
     architecture: x64
   - name: arm64 (Apple Silicon)
     target_name: macos-m1
-    editor_version: 2022.1
+    editor_version: trunk
     architecture: arm64
-  - name: x64
-    target_name: macos
-    editor_version: trunk
-    architecture: x64
-  - name: x64 (Rosetta 2)
-    target_name: macos-m1
-    editor_version: trunk
-    architecture: x64
-  - name: arm64 (Apple Silicon)
-    target_name: macos-m1
-    editor_version: trunk
-    architecture: arm64    
 
 package:
   name: webrtc
@@ -218,6 +165,8 @@ build_{{ package.name }}_{{ editor.version }}_ios:
     type: Unity::VM::osx
     image: package-ci/macos-12:v4.10.0-1271191
     flavor: b1.large
+  variables:
+    UNITY_HANDLEUIINTERRUPTIONS: 1
   commands:
     - |
       find upm-ci~/packages/ -name "*.tgz" | xargs -I file tar xvf file -C upm-ci~
@@ -241,9 +190,9 @@ test_{{ package.name }}_{{ editor.version }}_ios:
   name: Test {{ package.packagename }} with {{ editor.version }} on ios device
   agent:
     type: Unity::mobile::iPhone
-    image: package-ci/macos-12:v4.10.0-1271191
-    model: SE
-    flavor: b1.medium
+    image: mobile/ios-macos-13:v2.2903163
+    model: 13
+    flavor: m1.mac
   skip_checkout: true
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ editor.version }}_ios
@@ -322,7 +271,7 @@ test_{{ package.name }}_{{ editor.version }}_android_{{ target.name }}:
 {% for editor in editors %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.name != "macos" and target.name != "macos-m1" %}
+{% if target.name != "macos-m1" %}
 test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -331,8 +280,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     flavor: {{ target.flavor }}
 {% if target.is_gpu == "true" and target.model %}
     model: {{ target.model }}
-{% endif %}    
+{% endif %}
   commands:
+# workaround: Install libx11-6 for linux test
+{% if target.name == "linux-gpu" or target.name == "linux" %}
+    - sudo apt install -y libx11-6
+{% endif %}
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
@@ -346,7 +299,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 
 {% elsif param.platform == "standalone" %}
 
-# build standalone runtime for testing on macOS(Intel/Silicon)
+# build standalone runtime for testing on macOS
 build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
   name : Build {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
   agent:
@@ -372,7 +325,7 @@ build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
-# standalone test on macOS(Intel/Silicon)
+# standalone test on macOS
 {% assign architectures = test_architectures_macos | where: "editor_version", editor.version | where: "target_name", target.name %}
 {% for architecture in architectures %}
 
@@ -402,12 +355,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#build_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
 
-# end standalone test on macOS(Intel/Silicon)
+# end standalone test on macOS
 {% endfor %}
 
 {% else %}
 
-# editmode/playmode test on macOS(Intel/Silicon)
+# editmode/playmode test on macOS
 {% assign architectures = test_architectures_macos | where: "editor_version", editor.version | where: "target_name", target.name %}
 {% for architecture in architectures %}
 
@@ -440,7 +393,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
-# end editmode/playmode test on macOS(Intel/Silicon)
+# end editmode/playmode test on macOS
 {% endfor %}
 
 {% endif %}
@@ -499,7 +452,7 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-{% if target.name == "macos" or target.name == "macos-m1" %}
+{% if target.name == "macos-m1" %}
 {% assign architectures = test_architectures_macos | where: "editor_version", editor.version | where: "target_name", target.name %}
 {% for architecture in architectures %}
     - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ architecture.architecture }}_{{ gfx_type.name }}

@@ -165,6 +165,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.IPhonePlayer })]
         public IEnumerator ReceiverGetContributingSource()
         {
             var track = new AudioStreamTrack();

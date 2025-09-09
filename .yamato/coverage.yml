@@ -1,6 +1,6 @@
 {% metadata_file .yamato/package.metafile %}
 
-editor_version: 2021.3
+editor_version: 6000.3
 
 # todo(kazuki): Use old version because Code Coverage 1.2.2 has some issues.
 coverage-pkg-version: 1.1.1

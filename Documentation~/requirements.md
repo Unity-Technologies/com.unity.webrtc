@@ -8,16 +8,13 @@ It is recommended to use the latest Long-Term Support (LTS) version of Unity, se
 
 This version of the package is compatible with the following versions of the Unity Editor:
 
-- **Unity 2020.3**
-- **Unity 2021.3**
-- **Unity 2022.3**
-- **Unity 2023.1**
+- **Unity 6000.3**
 
 ## Support Platform
 
 - **Windows 10** (x64 only)
-- **Linux** (Ubuntu 16.04, 18.04, 20.04)
-- **macOS** (**Intel** and **Apple Slicon**)
+- **Linux** (Ubuntu 22.04, 24.04)
+- **macOS** (**Apple Slicon**)
 - **iOS**
 - **Android** (**ARM64** only. **ARMv7** is not supported)
 
