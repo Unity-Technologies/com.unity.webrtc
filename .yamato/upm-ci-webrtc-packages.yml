@@ -282,7 +282,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     model: {{ target.model }}
 {% endif %}
   commands:
-# workaround: Install x11.so.6 for linux test
+# workaround: Install libx11-6 for linux test
 {% if target.name == "linux-gpu" or target.name == "linux" %}
     - sudo apt install -y libx11-6
 {% endif %}
