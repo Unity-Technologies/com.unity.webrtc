@@ -5,7 +5,6 @@ test_targets:
     type: Unity::VM
     image: package-ci/win10:v1.21.0-1103459
     flavor: b1.large
-    is_gpu: false
     gfx_types:
       - name: d3d11
         extra-editor-arg: force-d3d11
@@ -27,7 +26,6 @@ test_targets:
     image: package-ci/win10:v4.0.0-1214578
     flavor: b1.large
     model: rtx2080
-    is_gpu: true
     gfx_types:
       - name: d3d11
         extra-editor-arg: force-d3d11
@@ -56,14 +54,10 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     type: {{ target.type }}
     image: {{ target.image }}
     flavor: {{ target.flavor }}
-{% if target.is_gpu == "true" and target.model %}
+{% if target.model %}
     model: {{ target.model }}
 {% endif %}
   commands:
-# workaround: Install libx11-6 for linux test
-{% if target.name == "linux-gpu" or target.name == "linux" %}
-    - sudo apt install -y libx11-6
-{% endif %}
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
