@@ -80,7 +80,7 @@ build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ e
         - "build/logs/**"
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% for endfor %}
+{% endfor %}
 
 {% for target in test_targets %}
 {% for param in target.test_params %}
