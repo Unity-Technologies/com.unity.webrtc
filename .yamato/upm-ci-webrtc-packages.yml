@@ -1,88 +1,4 @@
 {% metadata_file .yamato/package.metafile %}
-
-test_targets:
-  - name: win
-    type: Unity::VM
-    image: package-ci/win10:v1.21.0-1103459
-    flavor: b1.large
-    is_gpu: false
-    gfx_types:
-      - name: d3d11
-        extra-editor-arg: force-d3d11
-      - name: d3d12
-        extra-editor-arg: force-d3d12
-      - name: vulkan
-        extra-editor-arg: force-vulkan
-    test_params:
-      - backend: mono
-        platform: editmode
-      - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
-        platform: standalone
-  - name: linux
-    type: Unity::VM
-    image: package-ci/ubuntu-20.04:v1.4.0-1235639
-    flavor: b1.large
-    is_gpu: false
-    gfx_types:
-      - name: glcore
-        extra-editor-arg: force-glcore
-      - name: vulkan
-        extra-editor-arg: force-vulkan
-    test_params:
-      - backend: mono
-        platform: editmode
-      - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
-        platform: standalone
-  - name: win-gpu
-    type: Unity::VM::GPU
-    image: package-ci/win10:v4.0.0-1214578
-    flavor: b1.large
-    model: rtx2080
-    is_gpu: true
-    gfx_types:
-      - name: d3d11
-        extra-editor-arg: force-d3d11
-      - name: d3d12
-        extra-editor-arg: force-d3d12
-      - name: vulkan
-        extra-editor-arg: force-vulkan
-    test_params:
-      - backend: mono
-        platform: editmode
-      - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
-        platform: standalone
-  - name: linux-gpu
-    type: Unity::VM::GPU
-    image: package-ci/ubuntu-22.04:v4
-    flavor: b1.large
-    model: rtx2080
-    is_gpu: true
-    gfx_types:
-      - name: glcore
-        extra-editor-arg: force-glcore
-      - name: vulkan
-        extra-editor-arg: force-vulkan    
-    test_params:
-      - backend: mono
-        platform: editmode
-      - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
-        platform: standalone
 ---
 
 pack_{{ package.name }}:
@@ -102,39 +18,6 @@ pack_{{ package.name }}:
     {% for platform in plugin_platforms %}
     - .yamato/nativeplugin.yml#build_{{ platform }}_release
     {% endfor %}
-
-{% for target in test_targets %}
-{% for editor in editors %}
-{% for param in target.test_params %}
-{% for gfx_type in target.gfx_types %}
-test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}:
-  name : Test {{ package.packagename }} with {{ param.platform }} {{ param.backend }} {{ editor.version }} on {{ target.name }} {{ gfx_type.name }}
-  agent:
-    type: {{ target.type }}
-    image: {{ target.image }}
-    flavor: {{ target.flavor }}
-{% if target.is_gpu == "true" and target.model %}
-    model: {{ target.model }}
-{% endif %}
-  commands:
-# workaround: Install libx11-6 for linux test
-{% if target.name == "linux-gpu" or target.name == "linux" %}
-    - sudo apt install -y libx11-6
-{% endif %}
-    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
-    - upm-ci package test -u {{ editor.version }} --platform {{ param.platform }} --backend {{ param.backend }} --extra-editor-arg {{ gfx_type.extra-editor-arg }} --enable-load-and-test-isolation
-  artifacts:
-    {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
-      paths:
-        - "upm-ci~/test-results/**/*"
-  dependencies:
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
-{% endfor %}
-{% endfor %}
-{% endfor %}
-{% endfor %}
 
 trigger_pullrequest:
   name : Trigger by the Pull requests which directs to main branch or feature branch
@@ -164,16 +47,8 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
     - .yamato/test_ios.yml#test_{{ package.name }}_{{ editor.version }}_ios
     - .yamato/test_android.yml#test_{{ package.name }}_{{ editor.version }}_android
     - .yamato/test_macos.yml#test_{{ package.name }}_{{ editor.version }}_macos
-{% for target in test_targets %}
-{% for param in target.test_params %}
-{% for gfx_type in target.gfx_types %}
-# vulkan and d3d12 gfx device is not supported on VMs without GPU
-{% if target.is_gpu == "false" and gfx_type.name != "vulkan" and gfx_type.name != "d3d12" %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-{% endif %}
-{% endfor %}
-{% endfor %}
-{% endfor %}
+    - .yamato/test_win64.yml#test_{{ package.name }}_{{ editor.version }}_win
+    - .yamato/test_linux.yml#test_{{ package.name }}_{{ editor.version }}_linux
 
 test_{{ package.name }}_{{ editor.version }}_gpu:
   name : Test {{ package.packagename }} {{ editor.version }} all platforms with GPU
@@ -181,20 +56,8 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
     - .yamato/test_ios.yml#test_{{ package.name }}_{{ editor.version }}_ios
     - .yamato/test_android.yml#test_{{ package.name }}_{{ editor.version }}_android
     - .yamato/test_macos.yml#test_{{ package.name }}_{{ editor.version }}_macos
-{% for target in test_targets %}
-{% for param in target.test_params %}
-{% for gfx_type in target.gfx_types %}
-{% if target.is_gpu == "true" %}
-# workaround: avoid playmode linux glcore
-{% if target.name == "linux-gpu" and gfx_type.name == "glcore" and param.platform == "playmode" %}
-{% else %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-{% endif %}
-{% endif %}
-{% endfor %}
-{% endfor %}
-{% endfor %}
-
+    - .yamato/test_win64.yml#test_{{ package.name }}_{{ editor.version }}_win-gpu
+    - .yamato/test_linux.yml#test_{{ package.name }}_{{ editor.version }}_linux-gpu
 {% endfor %}
 
 publish_{{ package.name }}:
