@@ -4,6 +4,10 @@ upm:
 webrtc_version:
   name: M116
 
+package:
+  name: webrtc
+  packagename: com.unity.webrtc
+
 editors:
   - version: 6000.3
   - version: trunk

@@ -134,10 +134,6 @@ test_architectures_macos:
     target_name: macos-m1
     editor_version: trunk
     architecture: arm64
-
-package:
-  name: webrtc
-  packagename: com.unity.webrtc
 ---
 
 pack_{{ package.name }}:
