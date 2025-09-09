@@ -49,3 +49,4 @@ test_{{ package.name }}_{{ editor.version }}_ios:
     logs:
       paths:
         - "build/test-results/**"
+{% endfor %}
