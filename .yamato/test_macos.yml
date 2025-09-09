@@ -1,6 +1,6 @@
 {% metadata_file .yamato/package.metafile %}
 
-- target: 
+target: 
   name: macos-m1
   type: Unity::metal::devkit
   image: package-ci/macos-12:v4.10.0-1271191
