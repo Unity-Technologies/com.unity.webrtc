@@ -15,12 +15,16 @@ test_targets:
     test_params:
       - backend: mono
         platform: editmode
+        suite: editor
       - backend: mono
         platform: playmode
+        suite: playmode
       - backend: mono
         platform: standalone
+        suite: playmode
       - backend: il2cpp
         platform: standalone
+        suite: playmode
   - name: win-gpu
     type: Unity::VM::GPU
     image: package-ci/win10:v4.0.0-1214578
@@ -36,12 +40,16 @@ test_targets:
     test_params:
       - backend: mono
         platform: editmode
+        suite: editor
       - backend: mono
         platform: playmode
+        suite: playmode
       - backend: mono
         platform: standalone
+        suite: playmode
       - backend: il2cpp
         platform: standalone
+        suite: playmode
 
 build_params:
   type: Unity::VM
@@ -65,6 +73,8 @@ build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ e
     type: {{ build_params.type }}
     image: {{ build_params.image }}
     flavor: {{ build_params.flavor }}
+  variables:
+    EDITOR_VERSION: {{ editor.version }}
   commands:
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
@@ -98,11 +108,9 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% if target.model %}
     model: {{ target.model }}
 {% endif %}
-  variables:
-    EDITOR_VERSION: {{ editor.version }}
   commands:
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
-    - ./utr --suite=playmode --platform=StandaloneWindows64 --player-load-path=build/players --artifacts_path=build/logs --playergraphicsapi={{ gfx_type.utr_arg }}
+    - ./utr --suite={{ param.suite }} --platform=StandaloneWindows64 --player-load-path=build/players --artifacts_path=build/logs --playergraphicsapi={{ gfx_type.utr-arg }}
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results:
       paths:
@@ -132,7 +140,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u %EDITOR_VERSION% -c editor --wait --published --fast
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
-    - ./utr --suite={{ param.platform }} --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/logs --playergraphicsapi={{ gfx_type.utr_arg }}
+    - ./utr --suite={{ param.suite }} --editor-location=.Editor --testproject=WebRTC~ --artifacts_path=build/logs --playergraphicsapi={{ gfx_type.utr-arg }}
   artifacts:
     {{ package.name }}_{{ param.backend }}_{{ editor.version }}_{{ target.name }}_test_results: 
       paths:
@@ -140,7 +148,7 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
   dependencies:
     - .yamato/upm-ci-{{ package.name }}-packages.yml#pack_{{ package.name }}
 
-# End editmode/playmode test on macOS
+# End editmode/playmode test on Windows
 {% endif %}
 
 {% endfor %}
