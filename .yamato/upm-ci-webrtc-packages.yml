@@ -1,27 +1,6 @@
 {% metadata_file .yamato/package.metafile %}
 
 test_targets:
-  - name: win
-    type: Unity::VM
-    image: package-ci/win10:v1.21.0-1103459
-    flavor: b1.large
-    is_gpu: false
-    gfx_types:
-      - name: d3d11
-        extra-editor-arg: force-d3d11
-      - name: d3d12
-        extra-editor-arg: force-d3d12
-      - name: vulkan
-        extra-editor-arg: force-vulkan
-    test_params:
-      - backend: mono
-        platform: editmode
-      - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
-        platform: standalone
   - name: linux
     type: Unity::VM
     image: package-ci/ubuntu-20.04:v1.4.0-1235639
@@ -30,28 +9,6 @@ test_targets:
     gfx_types:
       - name: glcore
         extra-editor-arg: force-glcore
-      - name: vulkan
-        extra-editor-arg: force-vulkan
-    test_params:
-      - backend: mono
-        platform: editmode
-      - backend: mono
-        platform: playmode
-      - backend: mono
-        platform: standalone
-      - backend: il2cpp
-        platform: standalone
-  - name: win-gpu
-    type: Unity::VM::GPU
-    image: package-ci/win10:v4.0.0-1214578
-    flavor: b1.large
-    model: rtx2080
-    is_gpu: true
-    gfx_types:
-      - name: d3d11
-        extra-editor-arg: force-d3d11
-      - name: d3d12
-        extra-editor-arg: force-d3d12
       - name: vulkan
         extra-editor-arg: force-vulkan
     test_params:
@@ -164,13 +121,10 @@ test_{{ package.name }}_{{ editor.version }}_nogpu:
     - .yamato/test_ios.yml#test_{{ package.name }}_{{ editor.version }}_ios
     - .yamato/test_android.yml#test_{{ package.name }}_{{ editor.version }}_android
     - .yamato/test_macos.yml#test_{{ package.name }}_{{ editor.version }}_macos
+    - .yamato/test_win64.yml#test_{{ package.name }}_{{ editor.version }}_win
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
-# vulkan and d3d12 gfx device is not supported on VMs without GPU
-{% if target.is_gpu == "false" and gfx_type.name != "vulkan" and gfx_type.name != "d3d12" %}
-    - .yamato/upm-ci-{{ package.name }}-packages.yml#test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name }}_{{ editor.version }}_{{ gfx_type.name }}
-{% endif %}
 {% endfor %}
 {% endfor %}
 {% endfor %}
@@ -181,6 +135,7 @@ test_{{ package.name }}_{{ editor.version }}_gpu:
     - .yamato/test_ios.yml#test_{{ package.name }}_{{ editor.version }}_ios
     - .yamato/test_android.yml#test_{{ package.name }}_{{ editor.version }}_android
     - .yamato/test_macos.yml#test_{{ package.name }}_{{ editor.version }}_macos
+    - .yamato/test_win64.yml#test_{{ package.name }}_{{ editor.version }}_win-gpu
 {% for target in test_targets %}
 {% for param in target.test_params %}
 {% for gfx_type in target.gfx_types %}
