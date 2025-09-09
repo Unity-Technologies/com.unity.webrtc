@@ -1,4 +1,5 @@
 {% metadata_file .yamato/package.metafile %}
+---
 
 {% for editor in editors %}
 build_{{ package.name }}_{{ editor.version }}_ios:
