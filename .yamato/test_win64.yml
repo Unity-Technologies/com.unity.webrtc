@@ -53,7 +53,7 @@ test_targets:
 
 build_params:
   type: Unity::VM
-  image: package-ci/win10:v1.21.0-1103459
+  image: package-ci/win10:default
   flavor: b1.large
   platform: standalone
   backends:
@@ -80,7 +80,7 @@ build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ e
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u %EDITOR_VERSION% -c editor -c {{ backend.additional_component_arg }} --wait --published --fast
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
-    - ./utr --suite=playmode --platform=StandaloneWindows64 --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --artifacts_path=artifacts/logs --build-only --scripting-backend={{ backend.utr-backend }} --extra-editor-arg="-nographics"
+    - ./utr --suite=playmode --platform=StandaloneWindows64 --editor-location=.Editor --testproject=WebRTC~ --player-save-path=build/players --artifacts_path=artifacts/logs --build-only --scripting-backend={{ backend.utr-backend }}
   artifacts:
     players:
       paths:
