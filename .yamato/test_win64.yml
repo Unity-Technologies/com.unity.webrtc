@@ -76,8 +76,8 @@ build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ e
   variables:
     EDITOR_VERSION: {{ editor.version }}
   commands:
-    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
-    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
+    - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
     - unity-downloader-cli -u %EDITOR_VERSION% -c editor -c {{ backend.additional_component_arg }} --wait --published --fast
     - curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat --output utr.bat
     - ./utr --suite=playmode --platform=StandaloneWindows64 --editor-location=.Editor --testproject="WebRTC~" --player-save-path=build/players --artifacts_path=artifacts/logs --build-only --scripting-backend={{ backend.utr-backend }}
