@@ -1,0 +1,8 @@
+{
+    "per_package": {
+        "com.unity.webrtc@3": {
+            "exemptions": [
+            ]
+        }
+    }
+}
