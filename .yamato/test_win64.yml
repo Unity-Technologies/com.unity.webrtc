@@ -80,7 +80,7 @@ build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ e
     - git config --global core.symlinks true
     - git config --unset core.symlinks
     - del /q "WebRTC~/Packages/com.unity.webrtc/"
-    - git reset —hard
+    - git reset --hard
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
     - unity-downloader-cli -u %EDITOR_VERSION% -c editor -c {{ backend.additional_component_arg }} --wait --published --fast
