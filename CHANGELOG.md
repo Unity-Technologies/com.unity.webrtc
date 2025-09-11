@@ -13,11 +13,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - 0a3
 
 ### Changed
+
+- Update minimum Unity version.
 - Upgrade libwebrtc to support 16kb pagesizes for Android.
 
 ## [3.0.0-pre.8] - 2024-12-12
 
 ### Changed
+
 - doc: improve the API doc of CameraExtension 
 - doc: improve the API doc of RTCSessionDescription
 - doc: improve the API doc of RTCDataChannel
