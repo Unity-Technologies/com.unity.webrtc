@@ -1,4 +1,4 @@
-com.unity.webrtc copyright © 2022 Unity Technologies ApS
+com.unity.webrtc copyright © 2025 Unity Technologies ApS
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
