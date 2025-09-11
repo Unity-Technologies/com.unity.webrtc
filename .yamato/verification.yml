@@ -93,7 +93,7 @@ test_xray:
     - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
     - upm-ci package pack  
     - upm-pvp xray --packages "upm-ci~/packages/*.tgz" --results upm-ci~/xray
-    - upm-pvp require "supported rme ./xray-exemptions.json" --allow-missing --results upm-ci~/xray
+    - upm-pvp require "supported rme ./.xray-exemptions.json" --allow-missing --results upm-ci~/xray
   artifacts:
     artifacts:
       paths:
