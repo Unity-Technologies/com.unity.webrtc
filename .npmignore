@@ -21,6 +21,7 @@ build.sh
 build.sh.meta
 build.bat
 build.bat.meta
+xray-exemptions.json
 
 WebRTC~/**
 
