@@ -1,8 +1,13 @@
 {
-    "per_package": {
-        "com.unity.webrtc@3": {
-            "exemptions": [
-            ]
+  "per_package": {
+    "com.unity.webrtc@3": {
+      "exemptions": {
+        "PVP-41-1" : {
+          "errors": [
+            "CHANGELOG.md: line 7: Unreleased section is not allowed for public release"
+          ]
         }
+      }
     }
+  }
 }
