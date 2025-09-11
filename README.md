@@ -56,6 +56,7 @@ Please read this if you have an interest to customize native code in this projec
 | `3.0.0-pre.6`    | [M112](https://groups.google.com/g/discuss-webrtc/c/V-XFau9W9gY) | - Fix bugs | Jul 2023 |
 | `3.0.0-pre.7`    | [M116](https://groups.google.com/g/discuss-webrtc/c/bEsO8Lz7psE) | - Update libwebrtc M116 <br>- Simulcast for NVIDIA H.264 | Oct 2023 |
 | `3.0.0-pre.8`    | [M116](https://groups.google.com/g/discuss-webrtc/c/bEsO8Lz7psE) | - Update docs | Dec 2024 |
+| `3.0.0`    | [M116](https://groups.google.com/g/discuss-webrtc/c/bEsO8Lz7psE) | - Release verified version | Sep 2025 |
 
 ## Licenses
 

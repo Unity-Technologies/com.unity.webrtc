@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### NextVersion
 - 3.0.0
 ### UnityVersion
-- 6000.3
+- 6000.0
 ### UnityRelease
 - 0a3
 
