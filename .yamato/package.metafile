@@ -4,10 +4,12 @@ upm:
 webrtc_version:
   name: M116
 
+package:
+  name: webrtc
+  packagename: com.unity.webrtc
+
 editors:
-  - version: 2020.3
-  - version: 2021.3
-  - version: 2022.3
+  - version: 6000.3
   - version: trunk
 
 plugin_platforms:
@@ -17,5 +19,5 @@ plugin_platforms:
   - ios
   - android
 
-editor_version_for_validate: 2020.3
-editor_version_for_trigger: 2021.3
+editor_version_for_validate: 6000.3
+editor_version_for_trigger: 6000.3
