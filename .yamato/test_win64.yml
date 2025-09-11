@@ -76,6 +76,11 @@ build_{{ package.name }}_{{ build_params.platform }}_{{ backend.name }}_win_{{ e
   variables:
     EDITOR_VERSION: {{ editor.version }}
   commands:
+  # symlink is not enabled on Windows, so we need to enable it and chekout again
+    - git config --global core.symlinks true
+    - git config --unset core.symlinks
+    - del /q "WebRTC~/Packages/com.unity.webrtc/"
+    - git reset —hard
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple --upgrade
     - unity-downloader-cli -u %EDITOR_VERSION% -c editor -c {{ backend.additional_component_arg }} --wait --published --fast
@@ -132,7 +137,12 @@ test_{{ package.name }}_{{ param.platform }}_{{ param.backend }}_{{ target.name 
 {% endif %}
   variables:
     EDITOR_VERSION: {{ editor.version }}
-  commands:    
+  commands:
+  # symlink is not enabled on Windows, so we need to enable it and chekout again
+    - git config --global core.symlinks true
+    - git config --unset core.symlinks
+    - del /q "WebRTC~/Packages/com.unity.webrtc/"
+    - git reset —hard
     - pip config set global.index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - pip install unity-downloader-cli --index-url https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
     - unity-downloader-cli -u %EDITOR_VERSION% -c editor --wait --published --fast
