@@ -102,8 +102,7 @@ test_xray:
 xray_trigger:
   name: X-Ray Trigger
   triggers:
-    expression: | 
-      expression: pull_request.target eq "main"
+    expression: pull_request.target eq "main"
   dependencies:
     - .yamato/verification.yml#test_xray
 
