@@ -3,9 +3,9 @@ using System;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    /// Base class for objects managed with reference and disposal.
     /// </summary>
-    public class RefCountedObject : IDisposable
+    public abstract class RefCountedObject : IDisposable
     {
         internal IntPtr self;
         internal protected bool disposed;
@@ -27,7 +27,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// Releases resources used by the object.
         /// </summary>
         public virtual void Dispose()
         {
