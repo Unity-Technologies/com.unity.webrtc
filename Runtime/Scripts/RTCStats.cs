@@ -5,7 +5,7 @@ using System.Linq;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// Associates a string value with an enum field for RTCStatsType.
     /// </summary>
     public class StringValueAttribute : Attribute
     {
@@ -25,7 +25,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Identifies the type of RTC statistics object.
     /// </summary>
     public enum RTCStatsType
     {
@@ -207,7 +207,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Base class for all RTC statistics objects.
     /// </summary>
     public class RTCStats
     {
@@ -460,7 +460,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Contains certificate-related statistics for a peer connection.
     /// </summary>
     public class RTCCertificateStats : RTCStats
     {
@@ -490,7 +490,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Provides codec-specific statistics for RTP streams.
     /// </summary>
     public class RTCCodecStats : RTCStats
     {
@@ -530,7 +530,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Reports statistics for a data channel.
     /// </summary>
     public class RTCDataChannelStats : RTCStats
     {
@@ -580,7 +580,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Details statistics for a pair of ICE candidates.
     /// </summary>
     public class RTCIceCandidatePairStats : RTCStats
     {
@@ -700,7 +700,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Contains statistics for a single ICE candidate.
     /// </summary>
     public class RTCIceCandidateStats : RTCStats
     {
@@ -801,7 +801,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Provides statistics for the peer connection itself.
     /// </summary>
     public class RTCPeerConnectionStats : RTCStats
     {
@@ -822,7 +822,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Base class for RTP stream statistics.
     /// </summary>
     public class RTCRTPStreamStats : RTCStats
     {
@@ -853,7 +853,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Statistics for received RTP streams.
     /// </summary>
     public class RTCReceivedRtpStreamStats : RTCRTPStreamStats
     {
@@ -873,7 +873,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Statistics for sent RTP streams.
     /// </summary>
     public class RTCSentRtpStreamStats : RTCRTPStreamStats
     {
@@ -893,7 +893,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Reports inbound RTP stream statistics.
     /// </summary>
     public class RTCInboundRTPStreamStats : RTCReceivedRtpStreamStats
     {
@@ -1194,7 +1194,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Reports outbound RTP stream statistics.
     /// </summary>
     public class RTCOutboundRTPStreamStats : RTCSentRtpStreamStats
     {
@@ -1356,7 +1356,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Statistics for remote inbound RTP streams.
     /// </summary>
     public class RTCRemoteInboundRtpStreamStats : RTCReceivedRtpStreamStats
     {
@@ -1391,7 +1391,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Statistics for remote outbound RTP streams.
     /// </summary>
     public class RTCRemoteOutboundRtpStreamStats : RTCSentRtpStreamStats
     {
@@ -1431,7 +1431,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Base class for media source statistics.
     /// </summary>
     public class RTCMediaSourceStats : RTCStats
     {
@@ -1451,7 +1451,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Audio source-specific statistics.
     /// </summary>
     public class RTCAudioSourceStats : RTCMediaSourceStats
     {
@@ -1486,7 +1486,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Video source-specific statistics.
     /// </summary>
     public class RTCVideoSourceStats : RTCMediaSourceStats
     {
@@ -1520,7 +1520,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Reports audio playout statistics.
     /// </summary>
     public class RTCAudioPlayoutStats : RTCStats
     {
@@ -1560,7 +1560,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Provides transport-level statistics for a connection.
     /// </summary>
     public class RTCTransportStats : RTCStats
     {
@@ -1697,7 +1697,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Represents a report containing multiple RTCStats objects.
     /// </summary>
     public class RTCStatsReport : IDisposable
     {

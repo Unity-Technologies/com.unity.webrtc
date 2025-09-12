@@ -361,7 +361,7 @@ namespace Unity.WebRTC
         /// <summary>
         ///     Delegate to be called when the IceConnectionState is changed.
         /// </summary>
-        /// <returns>A delegate containing <see cref="IceConnectionState"/>.</returns>
+        /// <value>A delegate containing <see cref="IceConnectionState"/>.</value>
         /// <example>
         ///     <code><![CDATA[
         ///         peerConnection.OnIceConnectionChange = iceConnectionState =>
@@ -619,7 +619,7 @@ namespace Unity.WebRTC
         /// </summary>
         /// <remarks>
         ///    `RTCPeerConnection` constructor creates an instance of peer connection with a default configuration.
-        ///     An <seealso cref="RTCConfiguration "/> object providing options to configure the new connection.
+        ///     An <see cref="RTCConfiguration "/> object providing options to configure the new connection.
         /// </remarks>
         /// <example>
         ///     <code lang="cs"><![CDATA[

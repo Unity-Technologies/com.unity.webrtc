@@ -15,6 +15,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         var senders = peerConnection.GetSenders();
     ///     ]]></code>
+    /// </example>
     /// <seealso cref="RTCPeerConnection" />
     public class RTCRtpSender : RefCountedObject
     {

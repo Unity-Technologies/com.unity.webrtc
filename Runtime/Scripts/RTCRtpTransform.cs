@@ -7,58 +7,58 @@ using Unity.Collections.LowLevel.Unsafe;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// Types of encoded video frames.
     /// </summary>
     public enum RTCEncodedVideoFrameType
     {
         /// <summary>
-        ///
+        /// No frame data.
         /// </summary>
         Empty,
 
         /// <summary>
-        ///
+        /// Key frame for video decoding.
         /// </summary>
         Key,
 
         /// <summary>
-        ///
+        /// Delta frame containing changes.
         /// </summary>
         Delta
     }
 
     /// <summary>
-    ///
+    /// Metadata for an encoded video frame.
     /// </summary>
     public class RTCEncodedVideoFrameMetadata
     {
         /// <summary>
-        ///
+        /// Unique identifier for the frame.
         /// </summary>
         public readonly long? frameId;
 
         /// <summary>
-        ///
+        /// Frame width in pixels.
         /// </summary>
         public readonly ushort width;
 
         /// <summary>
-        ///
+        /// Frame height in pixels.
         /// </summary>
         public readonly ushort height;
 
         /// <summary>
-        ///
+        /// Simulcast stream index.
         /// </summary>
         public readonly int simulcastIndex;
 
         /// <summary>
-        ///
+        /// Temporal layer index.
         /// </summary>
         public readonly long temporalIndex;
 
         /// <summary>
-        ///
+        /// An Array of positive integers indicating the frameIds of frames on which this frame depends.
         /// </summary>
         public readonly long[] dependencies;
 
@@ -91,25 +91,25 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Represents an encoded RTP frame.
     /// </summary>
     public class RTCEncodedFrame
     {
         internal IntPtr self;
 
         /// <summary>
-        ///
+        /// Timestamp of the frame.
         /// </summary>
         public uint Timestamp => NativeMethods.FrameGetTimestamp(self);
         /// <summary>
-        ///
+        /// SSRC identifier for the frame.
         /// </summary>
         public uint Ssrc => NativeMethods.FrameGetSsrc(self);
 
         /// <summary>
-        ///
+        /// Gets the encoded frame data as a read-only array.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Read-only byte array of frame data.</returns>
 #if UNITY_ANDROID
         // todo: Optimizing for Android platform leads a crash issue.
         [MethodImpl(MethodImplOptions.NoOptimization)]
@@ -131,9 +131,9 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Sets the frame data from a read-only array.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Read-only byte array.</param>
         public void SetData(NativeArray<byte>.ReadOnly data)
         {
             unsafe
@@ -143,11 +143,11 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Sets a portion of the frame data.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="length"></param>
+        /// <param name="data">Read-only byte array.</param>
+        /// <param name="startIndex">Start index in array.</param>
+        /// <param name="length">Number of bytes to set.</param>
         public void SetData(NativeArray<byte>.ReadOnly data, int startIndex, int length)
         {
             unsafe
@@ -157,9 +157,9 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Sets the frame data from a native slice.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Native slice of bytes.</param>
         public void SetData(NativeSlice<byte> data)
         {
             unsafe
@@ -175,7 +175,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Encoded audio frame for RTP transform.
     /// </summary>
     public class RTCEncodedAudioFrame : RTCEncodedFrame
     {
@@ -183,12 +183,12 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Encoded video frame for RTP transform.
     /// </summary>
     public class RTCEncodedVideoFrame : RTCEncodedFrame
     {
         /// <summary>
-        ///
+        /// Type of the encoded video frame.
         /// </summary>
         public RTCEncodedVideoFrameType Type
         {
@@ -200,9 +200,9 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Gets metadata for the encoded video frame.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Metadata object.</returns>
         public RTCEncodedVideoFrameMetadata GetMetadata()
         {
             IntPtr ptr = NativeMethods.VideoFrameGetMetadata(self);
@@ -216,12 +216,12 @@ namespace Unity.WebRTC
     };
 
     /// <summary>
-    ///
+    /// RTP transform for encoded frames.
     /// </summary>
     public class RTCRtpTransform : RefCountedObject
     {
         /// <summary>
-        ///
+        /// Track kind for the transform.
         /// </summary>
         public TrackKind Kind { get; }
 
@@ -236,7 +236,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Releases resources used by the transform.
         /// </summary>
         ~RTCRtpTransform()
         {
@@ -244,16 +244,16 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Writes an encoded frame to the transform sink.
         /// </summary>
-        /// <param name="frame"></param>
+        /// <param name="frame">Encoded frame to write.</param>
         public void Write(RTCEncodedFrame frame)
         {
             NativeMethods.FrameTransformerSendFrameToSink(self, frame.self);
         }
 
         /// <summary>
-        ///
+        /// Releases resources used by the transform.
         /// </summary>
         public override void Dispose()
         {
@@ -270,12 +270,12 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Event for transformed RTP frames.
     /// </summary>
     public class RTCTransformEvent
     {
         /// <summary>
-        ///
+        /// Transformed encoded frame.
         /// </summary>
         public RTCEncodedFrame Frame { get; }
 
@@ -286,13 +286,13 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Callback for transformed RTP frames.
     /// </summary>
-    /// <param name="e"></param>
+    /// <param name="e">Transform event argument.</param>
     public delegate void TransformedFrameCallback(RTCTransformEvent e);
 
     /// <summary>
-    ///
+    /// Script-based RTP transform for encoded frames.
     /// </summary>
     public class RTCRtpScriptTransform : RTCRtpTransform
     {

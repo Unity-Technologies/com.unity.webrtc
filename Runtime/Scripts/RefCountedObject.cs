@@ -8,6 +8,10 @@ namespace Unity.WebRTC
     public abstract class RefCountedObject : IDisposable
     {
         internal IntPtr self;
+
+        /// <summary>
+        /// Indicates whether the object has been disposed.
+        /// </summary>
         internal protected bool disposed;
 
         internal RefCountedObject(IntPtr ptr)
