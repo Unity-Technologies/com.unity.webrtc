@@ -40,6 +40,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture, CopyTextureHelper.VerticalFlipCopy);
     ///     ]]>
+    ///     </code>
     /// </example>
     /// <seealso cref="VideoStreamTrack(Texture, CopyTexture)" />
     public delegate void CopyTexture(Texture source, RenderTexture dest);

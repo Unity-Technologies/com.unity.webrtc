@@ -50,12 +50,12 @@ namespace Unity.WebRTC
     public delegate void DelegateOnIceConnectionChange(RTCIceConnectionState state);
 
     /// <summary>
-    ///     Delegate to be called after a new track has been added to an RTCRtpReceiver which is part of the connection.
+    /// Delegate to be called after a new track has been added to an RTCRtpReceiver which is part of the connection.
     /// </summary>
     /// <remarks>
-    ///     This delegate is called after a new track has been added to an `RTCRtpReceiver` which is part of the connection.
+    /// This delegate is called after a new track has been added to an `RTCRtpReceiver` which is part of the connection.
     /// </remarks>
-    /// <param name="state"></param>
+    /// <param name="state">New connection state.</param>
     /// <example>
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnConnectionStateChange = state =>
@@ -73,7 +73,7 @@ namespace Unity.WebRTC
     /// <remarks>
     ///    This delegate is called when the state of the ICE candidate gathering process changes.
     /// </remarks>
-    /// <param name="state"></param>
+    /// <param name="state">New ICE gathering state.</param>
     /// <example>
     ///     <code lang="cs"><![CDATA[
     ///         peerConnection.OnIceGatheringStateChange = state =>

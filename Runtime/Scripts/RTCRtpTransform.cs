@@ -297,10 +297,10 @@ namespace Unity.WebRTC
     public class RTCRtpScriptTransform : RTCRtpTransform
     {
         /// <summary>
-        ///
+        /// Constructor for RTCRtpScriptTransform.
         /// </summary>
-        /// <param name="kind"></param>
-        /// <param name="callback"></param>
+        /// <param name="kind">Track kind for the transform.</param>
+        /// <param name="callback">Callback to invoke for transformed frames.</param>
         public RTCRtpScriptTransform(TrackKind kind, TransformedFrameCallback callback)
             : base(kind, callback)
         {
