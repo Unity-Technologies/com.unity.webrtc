@@ -10,333 +10,333 @@ using UnityEngine.Rendering;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// Indicates a specific error detail encountered during WebRTC operations.
     /// </summary>
     public enum RTCErrorDetailType
     {
         /// <summary>
-        ///
+        /// Failure occurred in the data channel.
         /// </summary>
         DataChannelFailure,
 
         /// <summary>
-        ///
+        /// DTLS handshake or encryption failed.
         /// </summary>
         DtlsFailure,
 
         /// <summary>
-        ///
+        /// Fingerprint verification failed.
         /// </summary>
         FingerprintFailure,
 
         /// <summary>
-        ///
+        /// Identity provider script error.
         /// </summary>
         IdpBadScriptFailure,
 
         /// <summary>
-        ///
+        /// Identity provider execution error.
         /// </summary>
         IdpExecutionFailure,
 
         /// <summary>
-        ///
+        /// Identity provider could not be loaded.
         /// </summary>
         IdpLoadFailure,
 
         /// <summary>
-        ///
+        /// Identity provider requires user login.
         /// </summary>
         IdpNeedLogin,
 
         /// <summary>
-        ///
+        /// Identity provider operation timed out.
         /// </summary>
         IdpTimeout,
 
         /// <summary>
-        ///
+        /// TLS error occurred with identity provider.
         /// </summary>
         IdpTlsFailure,
 
         /// <summary>
-        ///
+        /// Identity provider token expired.
         /// </summary>
         IdpTokenExpired,
 
         /// <summary>
-        ///
+        /// Identity provider token is invalid.
         /// </summary>
         IdpTokenInvalid,
 
         /// <summary>
-        ///
+        /// SCTP transport failure.
         /// </summary>
         SctpFailure,
 
         /// <summary>
-        ///
+        /// SDP syntax is incorrect.
         /// </summary>
         SdpSyntaxError,
 
         /// <summary>
-        ///
+        /// Hardware encoder is not available.
         /// </summary>
         HardwareEncoderNotAvailable,
 
         /// <summary>
-        ///
+        /// Hardware encoder encountered an error.
         /// </summary>
         HardwareEncoderError
     }
 
     /// <summary>
-    ///
+    /// Represents an error returned from a WebRTC operation.
     /// </summary>
     public struct RTCError
     {
         /// <summary>
-        ///
+        /// Type of error encountered.
         /// </summary>
         public RTCErrorType errorType;
 
         /// <summary>
-        ///
+        /// Detailed error message.
         /// </summary>
         public string message;
     }
 
     /// <summary>
-    ///
+    /// Represents the state of a peer connection.
     /// </summary>
     /// <seealso cref="RTCPeerConnection.ConnectionState"/>
     public enum RTCPeerConnectionState : int
     {
         /// <summary>
-        ///
+        /// The initial state of the peer connection.
         /// </summary>
         New = 0,
 
         /// <summary>
-        ///
+        /// The peer connection is in the process of connecting.
         /// </summary>
         Connecting = 1,
 
         /// <summary>
-        ///
+        /// The peer connection has been established.
         /// </summary>
         Connected = 2,
 
         /// <summary>
-        ///
+        /// The peer connection has been disconnected.
         /// </summary>
         Disconnected = 3,
 
         /// <summary>
-        ///
+        /// The peer connection has failed.
         /// </summary>
         Failed = 4,
 
         /// <summary>
-        ///
+        /// The peer connection has been closed.
         /// </summary>
         Closed = 5
     }
 
     /// <summary>
-    ///
+    /// Represents the ICE connection state for a peer connection.
     /// </summary>
     /// <seealso cref="RTCPeerConnection.IceConnectionState"/>
     public enum RTCIceConnectionState : int
     {
         /// <summary>
-        ///
+        /// The ICE connection is in the initial state.
         /// </summary>
         New = 0,
 
         /// <summary>
-        ///
+        /// The ICE connection is in the process of checking candidates.
         /// </summary>
         Checking = 1,
 
         /// <summary>
-        ///
+        /// The ICE connection has been established.
         /// </summary>
         Connected = 2,
 
         /// <summary>
-        ///
+        /// The ICE connection has been completed.
         /// </summary>
         Completed = 3,
 
         /// <summary>
-        ///
+        /// The ICE connection has failed.
         /// </summary>
         Failed = 4,
 
         /// <summary>
-        ///
+        /// The ICE connection has been disconnected.
         /// </summary>
         Disconnected = 5,
 
         /// <summary>
-        ///
+        /// The ICE connection has been closed.
         /// </summary>
         Closed = 6,
 
         /// <summary>
-        ///
+        /// This is a sentinel value used for bounds checking.
         /// </summary>
         Max = 7
     }
 
     /// <summary>
-    ///
+    /// Represents the ICE gathering state for a peer connection.
     /// </summary>
     /// <seealso cref="RTCPeerConnection.GatheringState"/>
     public enum RTCIceGatheringState : int
     {
         /// <summary>
-        ///
+        /// The ICE gathering state is in the initial state.
         /// </summary>
         New = 0,
 
         /// <summary>
-        ///
+        /// The ICE gathering state is in the process of gathering candidates.
         /// </summary>
         Gathering = 1,
 
         /// <summary>
-        ///
+        /// The ICE gathering state has completed gathering candidates.
         /// </summary>
         Complete = 2
     }
 
     /// <summary>
-    ///
+    /// Represents the signaling state for a peer connection.
     /// </summary>
     /// <seealso cref="RTCPeerConnection.SignalingState"/>
     public enum RTCSignalingState : int
     {
         /// <summary>
-        ///
+        /// The signaling state is stable.
         /// </summary>
         Stable = 0,
 
         /// <summary>
-        ///
+        /// The signaling state has a local offer.
         /// </summary>
         HaveLocalOffer = 1,
 
         /// <summary>
-        ///
+        /// The signaling state has a local provisional answer.
         /// </summary>
         HaveLocalPrAnswer = 2,
 
         /// <summary>
-        ///
+        /// The signaling state has a remote offer.
         /// </summary>
         HaveRemoteOffer = 3,
 
         /// <summary>
-        ///
+        /// The signaling state has a remote provisional answer.
         /// </summary>
         HaveRemotePrAnswer = 4,
 
         /// <summary>
-        ///
+        /// The signaling state is closed.
         /// </summary>
         Closed = 5,
     }
 
     /// <summary>
-    ///
+    /// Represents the type of error returned from a WebRTC operation.
     /// </summary>
     public enum RTCErrorType
     {
         /// <summary>
-        ///
+        /// No error occurred.
         /// </summary>
         None,
 
         /// <summary>
-        ///
+        /// The operation is not supported.
         /// </summary>
         UnsupportedOperation,
 
         /// <summary>
-        ///
+        /// The parameter is not supported.
         /// </summary>
         UnsupportedParameter,
 
         /// <summary>
-        ///
+        /// The parameter is invalid.
         /// </summary>
         InvalidParameter,
 
         /// <summary>
-        ///
+        /// The object is in an invalid state for the requested operation.
         /// </summary>
         InvalidRange,
 
         /// <summary>
-        ///
+        /// The syntax of the operation is incorrect.
         /// </summary>
         SyntaxError,
 
         /// <summary>
-        ///
+        /// The object is in an invalid state for the requested operation.
         /// </summary>
         InvalidState,
 
         /// <summary>
-        ///
+        /// The operation is not allowed in the current context.
         /// </summary>
         InvalidModification,
 
         /// <summary>
-        ///
+        /// The network connection has failed.
         /// </summary>
         NetworkError,
 
         /// <summary>
-        ///
+        /// The operation was aborted.
         /// </summary>
         ResourceExhausted,
 
         /// <summary>
-        ///
+        /// An internal error occurred.
         /// </summary>
         InternalError,
 
         /// <summary>
-        ///
+        /// The operation failed.
         /// </summary>
         OperationErrorWithData
     }
 
     /// <summary>
-    ///
+    /// Represents the type of event for a peer connection.
     /// </summary>
     public enum RTCPeerConnectionEventType
     {
         /// <summary>
-        ///
+        /// The connection state has changed.
         /// </summary>
         ConnectionStateChange,
 
         /// <summary>
-        ///
+        /// A new data channel has been added.
         /// </summary>
         DataChannel,
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         IceCandidate,
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         IceConnectionStateChange,
 
@@ -347,7 +347,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Represents the type of SDP message.
     /// </summary>
     public enum RTCSdpType
     {
@@ -511,7 +511,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Options for creating an offer or answer.
     /// </summary>
     public struct RTCOfferAnswerOptions
     {
@@ -555,7 +555,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///     Represents a configuration for an ICE server used within WebRTC connections.
+    ///     Represents the configuration for an ICE server used within WebRTC connections.
     /// </summary>
     /// <remarks>
     ///     Represents a configuration for an ICE server used within WebRTC connections,
@@ -567,7 +567,7 @@ namespace Unity.WebRTC
     ///         configuration.iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } };
     ///     ]]></code>
     /// </example>
-    /// /// <seealso cref="RTCConfiguration"/>
+    /// <seealso cref="RTCConfiguration"/>
     [Serializable]
     public struct RTCIceServer
     {
@@ -685,32 +685,32 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Represents the severity level for native logging output.
     /// </summary>
     public enum NativeLoggingSeverity
     {
         /// <summary>
-        ///
+        /// Verbose logging, includes all details.
         /// </summary>
         Verbose,
 
         /// <summary>
-        ///
+        /// Informational messages only.
         /// </summary>
         Info,
 
         /// <summary>
-        ///
+        /// Warnings about potential issues.
         /// </summary>
         Warning,
 
         /// <summary>
-        ///
+        /// Error messages indicating failures.
         /// </summary>
         Error,
 
         /// <summary>
-        ///
+        /// Disables native logging output.
         /// </summary>
         None,
     };

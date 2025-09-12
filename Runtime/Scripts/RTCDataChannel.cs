@@ -801,7 +801,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Finalizer for <see cref="RTCDataChannel"/>.
         /// </summary>
         ~RTCDataChannel()
         {

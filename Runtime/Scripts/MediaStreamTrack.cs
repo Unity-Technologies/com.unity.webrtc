@@ -124,49 +124,49 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Specifies the type of media for a track.
     /// </summary>
     public enum TrackKind
     {
         /// <summary>
-        /// 
+        /// Represents an audio track.
         /// </summary>
         Audio,
 
         /// <summary>
-        /// 
+        /// Represents a video track.
         /// </summary>
         Video
     }
 
     /// <summary>
-    /// 
+    /// Indicates the current state of a media track.
     /// </summary>
     public enum TrackState
     {
         /// <summary>
-        /// 
+        /// The track is active and live.
         /// </summary>
         Live,
 
         /// <summary>
-        /// 
+        /// The track has ended.
         /// </summary>
         Ended
     }
 
     /// <summary>
-    /// 
+    /// Represents an event triggered when a track is added to a peer connection.
     /// </summary>
     public class RTCTrackEvent
     {
         /// <summary>
-        /// 
+        /// The transceiver associated with the track event.
         /// </summary>
         public RTCRtpTransceiver Transceiver { get; }
 
         /// <summary>
-        /// 
+        /// The receiver associated with the track event.
         /// </summary>
         public RTCRtpReceiver Receiver
         {
@@ -177,7 +177,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// The media track associated with the event.
         /// </summary>
         public MediaStreamTrack Track
         {
@@ -188,7 +188,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// The media streams associated with the track event.
         /// </summary>
         public IEnumerable<MediaStream> Streams
         {
@@ -206,12 +206,12 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Represents an event triggered when a media stream track is added or removed.
     /// </summary>
     public class MediaStreamTrackEvent
     {
         /// <summary>
-        /// 
+        /// The media stream track associated with the event.
         /// </summary>
         public MediaStreamTrack Track { get; }
 

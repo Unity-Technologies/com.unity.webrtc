@@ -15,6 +15,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         var senders = peerConnection.GetSenders();
     ///     ]]></code>
+    /// </example>
     /// <seealso cref="RTCPeerConnection" />
     public class RTCRtpSender : RefCountedObject
     {
@@ -122,7 +123,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///      MediaStreamTrack managed by RTCRtpSender. If it is null, no transmission occurs.
+        ///      <see cref="MediaStreamTrack"/> managed by RTCRtpSender. If it is null, no transmission occurs.
         /// </summary>
         public MediaStreamTrack Track
         {
@@ -136,7 +137,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///     RTCRtpScriptTransform used to insert a transform stream in a worker thread into the sender pipeline,
+        ///     <see cref="RTCRtpScriptTransform"/> used to insert a transform stream in a worker thread into the sender pipeline,
         ///     enabling transformations on encoded video and audio frames after output by a codec but before transmission.
         /// </summary>
         public RTCRtpTransform Transform

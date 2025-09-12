@@ -5,27 +5,27 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    ///
+    /// Represents a contributing source for RTP streams.
     /// </summary>
     public class RTCRtpContributingSource
     {
         /// <summary>
-        /// This value is in the range 0.0 to 1.0
+        /// The audio level of the source, ranging from 0.0 to 1.0.
         /// </summary>
         public double? audioLevel { get; private set; }
 
         /// <summary>
-        ///
+        /// The RTP timestamp of the source.
         /// </summary>
         public long? rtpTimestamp { get; private set; }
 
         /// <summary>
-        ///
+        /// The SSRC of the source.
         /// </summary>
         public uint? source { get; private set; }
 
         /// <summary>
-        ///
+        /// The timestamp of the source.
         /// </summary>
         public long? timestamp { get; private set; }
 
@@ -56,7 +56,7 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    ///
+    /// Represents a receiver for RTP streams.
     /// </summary>
     public class RTCRtpReceiver : RefCountedObject
     {
@@ -70,7 +70,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Finalizer for RTCRtpReceiver.
         /// </summary>
         ~RTCRtpReceiver()
         {
@@ -78,7 +78,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Releases resources used by the object.
         /// </summary>
         public override void Dispose()
         {
@@ -94,10 +94,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Gets the capabilities of the RTP receiver.
         /// </summary>
-        /// <param name="kind"></param>
-        /// <returns></returns>
+        /// <param name="kind">The type of media track (audio or video).</param>
+        /// <returns>Capabilities supported by the receiver.</returns>
         public static RTCRtpCapabilities GetCapabilities(TrackKind kind)
         {
             WebRTC.Context.GetReceiverCapabilities(kind, out IntPtr ptr);
@@ -109,17 +109,18 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Gets the statistics report for the receiver.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns an asynchronous operation for retrieving receiver statistics.</returns>
         public RTCStatsReportAsyncOperation GetStats()
         {
             return peer.GetStats(this);
         }
 
         /// <summary>
-        ///
+        /// Gets the contributing sources for the receiver.
         /// </summary>
+        /// <returns>Returns an array of contributing sources.</returns>
         public RTCRtpContributingSource[] GetContributingSources()
         {
             RTCRtpContributingSourceInternal[] array = NativeMethods.ReceiverGetSources(self, out var length).AsArray<RTCRtpContributingSourceInternal>((int)length);
@@ -133,8 +134,9 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Gets the synchronization sources for the receiver.
         /// </summary>
+        /// <returns>Returns an array of synchronization sources.</returns>
         public RTCRtpContributingSource[] GetSynchronizationSources()
         {
             RTCRtpContributingSourceInternal[] array = NativeMethods.ReceiverGetSources(self, out var length).AsArray<RTCRtpContributingSourceInternal>((int)length);
@@ -147,6 +149,9 @@ namespace Unity.WebRTC
             return sources;
         }
 
+        /// <summary>
+        /// Gets the media stream track associated with the receiver.
+        /// </summary>
         public MediaStreamTrack Track
         {
             get
@@ -159,7 +164,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Gets or sets the RTP transform for the receiver.
         /// </summary>
         public RTCRtpTransform Transform
         {
@@ -179,7 +184,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Gets the media streams associated with the receiver.
         /// </summary>
         public IEnumerable<MediaStream> Streams
         {

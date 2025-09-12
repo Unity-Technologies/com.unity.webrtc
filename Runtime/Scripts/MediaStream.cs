@@ -5,24 +5,24 @@ using System.Linq;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    /// Delegate invoked when a <see cref="MediaStreamTrack"/> is added to the <see cref="MediaStream"/>.
     /// </summary>
-    /// <param name="e"></param>
+    /// <param name="e">Event containing the added track information.</param>
     public delegate void DelegateOnAddTrack(MediaStreamTrackEvent e);
 
     /// <summary>
-    /// 
+    /// Delegate invoked when a <see cref="MediaStreamTrack"/> is removed from the <see cref="MediaStream"/>.
     /// </summary>
-    /// <param name="e"></param>
+    /// <param name="e">Event containing the removed track information.</param>
     public delegate void DelegateOnRemoveTrack(MediaStreamTrackEvent e);
 
     /// <summary>
     ///     Represents a stream of media content.
     /// </summary>
     /// <remarks>
-    ///     `MediaStream` represents a stream of media content.
+    ///     <see cref="MediaStream"/> represents a stream of media content.
     ///     A stream consists of several tracks, such as video or audio tracks.
-    ///     Each track is specified as an instance of `MediaStreamTrack`.
+    ///     Each track is specified as an instance of <see cref="MediaStreamTrack"/>.
     /// </remarks>
     /// <example>
     ///     <code lang="cs"><![CDATA[
@@ -44,7 +44,7 @@ namespace Unity.WebRTC
             NativeMethods.MediaStreamGetID(GetSelfOrThrow()).AsAnsiStringWithFreeMem();
 
         /// <summary>
-        ///     Finalizer for MediaStream.
+        ///     Finalizer for <see cref="MediaStream"/>.
         /// </summary>
         /// <remarks>
         ///     Ensures that resources are released by calling the `Dispose` method.
@@ -80,10 +80,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///     Delegate to be called when a new MediaStreamTrack object has been added.
+        /// Delegate to be called when a new <see cref="MediaStreamTrack"/> object has been added.
         /// </summary>
-        /// todo:(kazuki) Rename to "onAddTrack"
-        /// todo:(kazuki) Should we change the API to use UnityEvent or Action class?
+        // todo:(kazuki) Rename to "onAddTrack"
+        // todo:(kazuki) Should we change the API to use UnityEvent or Action class?
         public DelegateOnAddTrack OnAddTrack
         {
             get => onAddTrack;
@@ -94,10 +94,10 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///     Delegate to be called when a new MediaStreamTrack object has been removed.
+        /// Delegate to be called when a new <see cref="MediaStreamTrack"/> object has been removed.
         /// </summary>
-        /// todo:(kazuki) Rename to "onAddTrack"
-        /// todo:(kazuki) Should we change the API to use UnityEvent or Action class?
+        // todo:(kazuki) Rename to "onAddTrack"
+        // todo:(kazuki) Should we change the API to use UnityEvent or Action class?
         public DelegateOnRemoveTrack OnRemoveTrack
         {
             get => onRemoveTrack;
@@ -111,9 +111,9 @@ namespace Unity.WebRTC
         ///     Returns a list of VideoStreamTrack objects in the stream.
         /// </summary>
         /// <remarks>
-        ///     `GetVideoTracks` method returns a sequence that represents all the `VideoStreamTrack` objects in this stream's track set.
+        ///     `GetVideoTracks` method returns a sequence that represents all the <see cref="VideoStreamTrack"/> objects in this stream's track set.
         /// </remarks>
-        /// <returns>List of `MediaStreamTrack` objects, one for each video track contained in the media stream.</returns>
+        /// <returns>List of <see cref="MediaStreamTrack"/> objects, one for each video track contained in the media stream.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         IEnumerable<VideoStreamTrack> videoTracks = mediaStream.GetVideoTracks();
@@ -129,9 +129,9 @@ namespace Unity.WebRTC
         ///     Returns a list of AudioStreamTrack objects in the stream.
         /// </summary>
         /// <remarks>
-        ///     `GetAudioTracks` method returns a sequence that represents all the `AudioStreamTrack` objects in this stream's track set.
+        ///     `GetAudioTracks` method returns a sequence that represents all the <see cref="AudioStreamTrack"/> objects in this stream's track set.
         /// </remarks>
-        /// <returns>List of `AudioStreamTrack` objects, one for each audio track contained in the stream.</returns>
+        /// <returns>List of <see cref="AudioStreamTrack"/> objects, one for each audio track contained in the stream.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         IEnumerable<AudioStreamTrack> audioTracks = mediaStream.GetAudioTracks();
@@ -147,9 +147,9 @@ namespace Unity.WebRTC
         ///     Returns a list of MediaStreamTrack objects in the stream.
         /// </summary>
         /// <remarks>
-        ///     `GetTracks` method returns a sequence that represents all the `MediaStreamTrack` objects in this stream's track set.
+        ///     `GetTracks` method returns a sequence that represents all the <see cref="MediaStreamTrack"/> objects in this stream's track set.
         /// </remarks>
-        /// <returns>List of `MediaStreamTrack` objects.</returns>
+        /// <returns>List of <see cref="MediaStreamTrack"/> objects.</returns>
         /// <example>
         ///     <code lang="cs"><![CDATA[
         ///         IEnumerable<MediaStreamTrack> tracks = mediaStream.GetTracks();
