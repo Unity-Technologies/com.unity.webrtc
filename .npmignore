@@ -23,6 +23,7 @@ build.bat
 build.bat.meta
 
 WebRTC~/**
+Tools/**
 
 # waste of the plugin artifacts
 linux_plugin-*
