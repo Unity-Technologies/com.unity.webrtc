@@ -500,11 +500,6 @@ namespace Unity.WebRTC
         public string transportId { get { return GetString("transportId"); } }
 
         /// <summary>
-        /// Identifies the RTP stream associated with this codec.
-        /// </summary>
-        public string rtpStreamId { get { return GetString("rtpStreamId"); } }
-
-        /// <summary>
         /// Identifies the payload type for this codec.
         /// </summary>
         public uint payloadType { get { return GetUnsignedInt("payloadType"); } }
