@@ -46,5 +46,19 @@ namespace Unity.WebRTC.RuntimeTest
             ConditionalIgnoreAttribute.AddConditionalIgnoreMapping(UnsupportedPlatformOpenGL,
                 !VideoStreamTrack.IsSupported(Application.platform, SystemInfo.graphicsDeviceType));
         }
+
+        internal static bool IsUnstableOnGraphicsDevice(RuntimePlatform platform, string deviceName)
+        {
+            switch (platform)
+            {
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.WindowsEditor:
+                    return deviceName.Contains("Microsoft Basic Render Driver");
+                case RuntimePlatform.LinuxPlayer:
+                case RuntimePlatform.LinuxEditor:
+                    return deviceName.Contains("llvmpipe");
+            }
+            return false;
+        }
     }
 }
