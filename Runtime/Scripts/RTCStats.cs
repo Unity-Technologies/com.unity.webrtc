@@ -520,11 +520,6 @@ namespace Unity.WebRTC
         public uint channels { get { return GetUnsignedInt("channels"); } }
 
         /// <summary>
-        /// Identifies the codec's RTP payload type.
-        /// </summary>
-        public uint rtpPayloadType { get { return GetUnsignedInt("rtpPayloadType"); } }
-
-        /// <summary>
         /// The SDP format parameters associated with this codec.
         /// </summary>
         public string sdpFmtpLine { get { return GetString("sdpFmtpLine"); } }
