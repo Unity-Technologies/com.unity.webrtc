@@ -751,11 +751,6 @@ namespace Unity.WebRTC
         public int priority { get { return GetInt("priority"); } }
 
         /// <summary>
-        /// The port number of the candidate.
-        /// </summary>
-        public int port { get { return GetInt("port"); } }
-
-        /// <summary>
         /// The protocol used by the candidate (e.g., "udp", "tcp").
         /// </summary>
         public string protocol { get { return GetString("protocol"); } }
@@ -769,11 +764,6 @@ namespace Unity.WebRTC
         /// The type of the candidate (e.g., "host", "srflx", "prflx", "relay").
         /// </summary>
         public string candidateType { get { return GetString("candidateType"); } }
-
-        /// <summary>
-        /// The TCP type of the candidate (e.g., "active", "passive", "so").
-        /// </summary>
-        public int priority { get { return GetInt("priority"); } }
 
         /// <summary>
         /// The URL of the TURN server used by the candidate, if applicable.
@@ -1023,11 +1013,6 @@ namespace Unity.WebRTC
         public ulong silentConcealedSamples { get { return GetUnsignedLong("silentConcealedSamples"); } }
 
         /// <summary>
-        /// The total number of silent concealed samples for the received audio track
-        /// </summary>
-        public ulong silentConcealedSamples { get { return GetUnsignedLong("silentConcealedSamples"); } }
-
-        /// <summary>
         /// The total number of concealment events for the received audio track
         /// </summary>
         public ulong concealmentEvents { get { return GetUnsignedLong("concealmentEvents"); } }
@@ -1051,11 +1036,6 @@ namespace Unity.WebRTC
         /// The total audio energy for the received audio track.
         /// </summary>
         public double totalAudioEnergy { get { return GetDouble("totalAudioEnergy"); } }
-
-        /// <summary>
-        /// The total number of audio frames received on this stream.
-        /// </summary>
-        public double totalSamplesReceived { get { return GetDouble("totalSamplesReceived"); } }
 
         /// <summary>
         /// The total duration of audio samples received on this stream.
