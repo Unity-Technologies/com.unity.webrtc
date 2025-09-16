@@ -16,6 +16,9 @@
           "errors": [
             "Runtime/Plugins/iOS/webrtc.framework/Info.plist"
           ]
+        },
+        "PVP-150-1": {
+          "all": true
         }
       }
     }
