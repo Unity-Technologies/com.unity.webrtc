@@ -503,7 +503,7 @@ namespace Unity.WebRTC
         /// Identifies the RTP stream associated with this codec.
         /// </summary>
         public string rtpStreamId { get { return GetString("rtpStreamId"); } }
-        
+
         /// <summary>
         /// Identifies the payload type for this codec.
         /// </summary>
