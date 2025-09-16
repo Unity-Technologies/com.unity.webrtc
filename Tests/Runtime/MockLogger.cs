@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace Unity.WebRTC.RuntimeTest
 {
-    public class MockLogger : ILogger
+    internal class MockLogger : ILogger
     {
         public void LogFormat(LogType logType, Object context, string format, params object[] args)
         {

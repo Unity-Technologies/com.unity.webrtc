@@ -40,6 +40,7 @@ namespace Unity.WebRTC
     ///     <code lang="cs"><![CDATA[
     ///         VideoStreamTrack videoStreamTrack = new VideoStreamTrack(texture, CopyTextureHelper.VerticalFlipCopy);
     ///     ]]>
+    ///     </code>
     /// </example>
     /// <seealso cref="VideoStreamTrack(Texture, CopyTexture)" />
     public delegate void CopyTexture(Texture source, RenderTexture dest);
@@ -502,7 +503,7 @@ namespace Unity.WebRTC
         }
     }
 
-    public static class CopyTextureHelper
+    internal static class CopyTextureHelper
     {
         // Blit parameter to flip vertically
         private static readonly Vector2 s_verticalScale = new Vector2(1f, -1f);

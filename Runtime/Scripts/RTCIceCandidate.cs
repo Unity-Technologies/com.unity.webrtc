@@ -4,20 +4,20 @@ using System.Runtime.InteropServices;
 namespace Unity.WebRTC
 {
     /// <summary>
-    /// 
+    /// Initialization options for creating an ICE candidate.
     /// </summary>
     public class RTCIceCandidateInit
     {
         /// <summary>
-        /// 
+        /// SDP string describing the candidate.
         /// </summary>
         public string candidate;
         /// <summary>
-        /// 
+        /// The media stream identification for the candidate.
         /// </summary>
         public string sdpMid;
         /// <summary>
-        /// 
+        /// The index of the m-line in SDP.
         /// </summary>
         public int? sdpMLineIndex;
     }
@@ -29,68 +29,68 @@ namespace Unity.WebRTC
     public enum RTCIceComponent : int
     {
         /// <summary>
-        /// 
+        /// RTP component.
         /// </summary>
         Rtp = 1,
         /// <summary>
-        /// 
+        /// RTCP component.
         /// </summary>
         Rtcp = 2,
     }
 
     /// <summary>
-    /// 
+    /// Indicates the transport protocol used by the ICE candidate.
     /// </summary>
     public enum RTCIceProtocol : int
     {
         /// <summary>
-        /// 
+        /// UDP protocol.
         /// </summary>
         Udp = 1,
         /// <summary>
-        /// 
+        /// TCP protocol.
         /// </summary>
         Tcp = 2
     }
 
     /// <summary>
-    /// 
+    /// Specifies the type of ICE candidate.
     /// </summary>
     public enum RTCIceCandidateType
     {
         /// <summary>
-        /// 
+        /// Host candidate type.
         /// </summary>
         Host,
         /// <summary>
-        /// 
+        /// Server reflexive candidate type.
         /// </summary>
         Srflx,
         /// <summary>
-        /// 
+        /// Peer reflexive candidate type.
         /// </summary>
         Prflx,
         /// <summary>
-        /// 
+        /// Relay candidate type.
         /// </summary>
         Relay
     }
 
     /// <summary>
-    /// 
+    /// Describes the TCP type for ICE candidates.
     /// </summary>
     public enum RTCIceTcpCandidateType
     {
         /// <summary>
-        /// 
+        /// Active TCP candidate.
         /// </summary>
         Active,
         /// <summary>
-        /// 
+        /// Passive TCP candidate.
         /// </summary>
         Passive,
         /// <summary>
-        /// 
+        /// Simultaneous open TCP candidate.
         /// </summary>
         So
     }
@@ -147,64 +147,64 @@ namespace Unity.WebRTC
     }
 
     /// <summary>
-    /// 
+    /// Represents an ICE candidate used for network connectivity checks.
     /// </summary>
     public class RTCIceCandidate : IDisposable
     {
         /// <summary>
-        /// 
+        /// Returns the SDP string for this candidate.
         /// </summary>
         public string Candidate => NativeMethods.IceCandidateGetSdp(self);
         /// <summary>
-        /// 
+        /// Returns the media stream identification.
         /// </summary>
         public string SdpMid => NativeMethods.IceCandidateGetSdpMid(self);
         /// <summary>
-        /// 
+        /// Returns the index of the m-line in SDP.
         /// </summary>
         public int? SdpMLineIndex => NativeMethods.IceCandidateGetSdpLineIndex(self);
         /// <summary>
-        /// 
+        /// Returns a string which uniquely identifies the candidate.
         /// </summary>
         public string Foundation => _candidate.foundation;
         /// <summary>
-        /// 
+        /// Returns the ICE component type.
         /// </summary>
         public RTCIceComponent? Component => _candidate.component;
         /// <summary>
-        /// 
+        /// Returns the priority value for this candidate.
         /// </summary>
         public uint Priority => _candidate.priority;
         /// <summary>
-        /// 
+        /// Returns the IP address for this candidate.
         /// </summary>
         public string Address => _candidate.address;
         /// <summary>
-        /// 
+        /// Returns the transport protocol for this candidate.
         /// </summary>
         public RTCIceProtocol? Protocol => _candidate.protocol.ParseRTCIceProtocol();
         /// <summary>
-        /// 
+        /// Returns the port number for this candidate.
         /// </summary>
         public ushort? Port => _candidate.port;
         /// <summary>
-        /// 
+        /// Returns the candidate type.
         /// </summary>
         public RTCIceCandidateType? Type => _candidate.type.ParseRTCIceCandidateType();
         /// <summary>
-        /// 
+        /// Returns the TCP type for this candidate, if applicable.
         /// </summary>
         public RTCIceTcpCandidateType? TcpType => _candidate.tcpType.ParseRTCIceTcpCandidateType();
         /// <summary>
-        /// 
+        /// Returns the related IP address for this candidate.
         /// </summary>
         public string RelatedAddress => _candidate.relatedAddress;
         /// <summary>
-        /// 
+        /// Returns the related port number for this candidate.
         /// </summary>
         public ushort? RelatedPort => _candidate.relatedPort;
         /// <summary>
-        /// 
+        /// Returns the username fragment for this candidate.
         /// </summary>
         public string UserNameFragment => _candidate.usernameFragment;
 
@@ -214,7 +214,7 @@ namespace Unity.WebRTC
         private bool disposed;
 
         /// <summary>
-        /// 
+        /// Finalizer for RTCIceCandidate to release resources.
         /// </summary>
         ~RTCIceCandidate()
         {
@@ -222,7 +222,7 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        ///
+        /// Releases resources used by the ICE candidate.
         /// </summary>
         public void Dispose()
         {
@@ -242,9 +242,9 @@ namespace Unity.WebRTC
         }
 
         /// <summary>
-        /// 
+        /// Creates a new RTCIceCandidate instance from initialization data.
         /// </summary>
-        /// <param name="candidateInfo"></param>
+        /// <param name="candidateInfo">Initialization data for the candidate.</param>
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();

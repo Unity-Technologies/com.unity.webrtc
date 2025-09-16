@@ -83,6 +83,29 @@ test_editors:
       - TestPlaymodeTestsWindowsEditorIsolatedPackagesVerified
 ---
 
+test_xray:
+  name: X-Ray Tests
+  agent:
+    type: Unity::VM
+    image: package-ci/win10:default
+    flavor: b1.large
+  commands:
+    - npm install upm-ci-utils@{{ upm.package_version }} -g --registry {{ upm.registry_url }}
+    - upm-ci package pack  
+    - upm-pvp xray --packages "upm-ci~/packages/*.tgz" --results upm-ci~/xray
+    - upm-pvp require "supported rme ./xray-exemptions.json" --allow-missing --results upm-ci~/xray
+  artifacts:
+    artifacts:
+      paths:
+        - "upm-ci~/**/*"
+
+xray_trigger:
+  name: X-Ray Trigger
+  triggers:
+    expression: pull_request.target eq "main"
+  dependencies:
+    - .yamato/verification.yml#test_xray
+
 {% for editor in test_editors %}
 verificationtest_{{ editor.version }}:
   name : Verification Test on Unity Editor {{ editor.version }}

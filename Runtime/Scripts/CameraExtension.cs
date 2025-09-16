@@ -23,7 +23,7 @@ namespace Unity.WebRTC
         /// <param name="textureCopy">An optional <see cref="CopyTexture"/> to facilitate texture copying. Default is null</param>
         /// <returns>A <see cref="VideoStreamTrack"/> instance that can be used to stream video.</returns>
         /// <example>
-        ///     Creates a GameObject with a Camera component and a VideoStreamTrack capturing video from the camera.
+        ///     <para>Creates a GameObject with a Camera component and a VideoStreamTrack capturing video from the camera.</para>
         ///     <code lang="cs"><![CDATA[
         ///         private void AddVideoObject()
         ///         {
@@ -80,7 +80,7 @@ namespace Unity.WebRTC
         /// <param name="depth">The depth buffer format for the render texture. Default is <see cref="RenderTextureDepth.Depth24"/></param>
         /// <returns>A <see cref="MediaStream"/> containing the video track captured from the camera.</returns>
         /// <example>
-        ///     Creates a MediaStream with a VideoStreamTrack capturing video from the camera.
+        ///     <para>Creates a MediaStream with a VideoStreamTrack capturing video from the camera.</para>
         ///     <code lang="cs"><![CDATA[
         ///         private static MediaStream CreateMediaStream()
         ///         {
