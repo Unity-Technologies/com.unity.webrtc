@@ -928,11 +928,6 @@ namespace Unity.WebRTC
         public uint packetsReceived { get { return GetUnsignedInt("packetsReceived"); } }
 
         /// <summary>
-        /// The total number of RTP packets lost.
-        /// </summary>
-        public uint packetsLost { get { return GetUnsignedInt("packetsLost"); } }
-
-        /// <summary>
         /// The total number of RTP packets discarded.
         /// </summary>
         public ulong packetsDiscarded { get { return GetUnsignedLong("packetsDiscarded"); } }
