@@ -150,7 +150,7 @@ if(Windows)
   # Select runtime library (MT, MTD) on windows platform
   set_target_properties(
     WebRTCLib PROPERTIES MSVC_RUNTIME_LIBRARY
-                         "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+                         "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
 elseif(macOS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-lto -fno-rtti")
