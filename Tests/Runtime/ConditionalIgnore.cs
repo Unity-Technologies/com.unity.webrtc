@@ -57,8 +57,9 @@ namespace Unity.WebRTC.RuntimeTest
                 case RuntimePlatform.LinuxPlayer:
                 case RuntimePlatform.LinuxEditor:
                     return deviceName.Contains("llvmpipe");
+                default:
+                    return false;
             }
-            return false;
         }
     }
 }
