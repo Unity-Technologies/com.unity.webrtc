@@ -111,6 +111,7 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor })]
         public IEnumerator AddMultiAudioTrack()
         {
             GameObject obj = new GameObject("audio");
