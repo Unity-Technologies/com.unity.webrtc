@@ -26,6 +26,66 @@ publish_dry_run_webrtc:
       browsable: onNonSuccess
   dependencies:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_webrtc
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_0_-_macos
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.0-macos
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.0-macos
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_0_-_ubuntu
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.0-ubuntu
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.0-ubuntu
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_0_-_windows
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.0-windows
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.0-windows
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_2_-_macos
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.2-macos
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.2-macos
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_2_-_ubuntu
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.2-ubuntu
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.2-ubuntu
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_2_-_windows
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.2-windows
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.2-windows
+        unzip: true
+      packages:
+        ignore_artifact: true
   - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_3_-_macos
     specific_options:
       UTR:
@@ -118,6 +178,66 @@ publish_webrtc:
       browsable: onNonSuccess
   dependencies:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_webrtc
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_0_-_macos
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.0-macos
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.0-macos
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_0_-_ubuntu
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.0-ubuntu
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.0-ubuntu
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_0_-_windows
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.0-windows
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.0-windows
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_2_-_macos
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.2-macos
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.2-macos
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_2_-_ubuntu
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.2-ubuntu
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.2-ubuntu
+        unzip: true
+      packages:
+        ignore_artifact: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_2_-_windows
+    specific_options:
+      UTR:
+        location: results/UTR/validate-webrtc-6000.2-windows
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-webrtc-6000.2-windows
+        unzip: true
+      packages:
+        ignore_artifact: true
   - path: .yamato/wrench/validation-jobs.yml#validate_-_webrtc_-_6000_3_-_macos
     specific_options:
       UTR:

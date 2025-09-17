@@ -12,7 +12,7 @@ public class WebRTCSettings : AnnotatedSettingsBase
     // update this to list all packages in this repo that you want to release.
     Dictionary<string, PackageOptions> PackageOptions = new()
     {
-        { "com.unity.webrtc", new PackageOptions { ReleaseOptions = new ReleaseOptions() { IsReleasing = true } } }
+        { "com.unity.webrtc", new PackageOptions { ReleaseOptions = new ReleaseOptions() { IsReleasing = true }, AdditionalEditorVersions = ["6000.0", "6000.2"] } }
     };
 
     public WebRTCSettings()
