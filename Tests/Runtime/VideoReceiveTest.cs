@@ -81,6 +81,11 @@ namespace Unity.WebRTC.RuntimeTest
             if (SystemInfo.processorType == "Apple M1")
                 Assert.Ignore("todo:: This test will hang up on Apple M1");
 
+            if (ConditionalIgnore.IsUnstableOnGraphicsDevice(Application.platform, SystemInfo.graphicsDeviceName))
+            {
+                Assert.Ignore($"This test is not stable on {SystemInfo.graphicsDeviceName}");
+            }
+
             var value = testValues[index];
             var test = new MonoBehaviourTest<VideoReceivePeers>();
             test.component.SetResolution(value.width, value.height);

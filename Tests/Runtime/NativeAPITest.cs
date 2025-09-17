@@ -396,6 +396,11 @@ namespace Unity.WebRTC.RuntimeTest
             "Not support VideoStreamTrack for OpenGL")]
         public IEnumerator CallVideoUpdateMethodsUpdateRenderer()
         {
+            if (ConditionalIgnore.IsUnstableOnGraphicsDevice(Application.platform, SystemInfo.graphicsDeviceName))
+            {
+                Assert.Ignore($"This test is not stable on {SystemInfo.graphicsDeviceName}");
+            }
+
             const int width = 1280;
             const int height = 720;
             var renderTexture = CreateRenderTexture(width, height);
