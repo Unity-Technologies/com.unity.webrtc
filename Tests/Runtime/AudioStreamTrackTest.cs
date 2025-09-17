@@ -111,11 +111,9 @@ namespace Unity.WebRTC.RuntimeTest
 
         [UnityTest]
         [Timeout(5000)]
+        [UnityPlatform(exclude = new[] { RuntimePlatform.LinuxEditor })]
         public IEnumerator AddMultiAudioTrack()
         {
-            if (Application.RuntimePlatform == RuntimePlatform.LinuxEditor)
-                Assert.Ignore("Skip on Linux: This test has timeout error sometimes when playmode test.");
-
             GameObject obj = new GameObject("audio");
             AudioSource source = obj.AddComponent<AudioSource>();
 
