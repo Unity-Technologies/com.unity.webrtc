@@ -11,6 +11,7 @@ Plugin~/**
 .npmignore
 .github
 .gitignore
+.gitattributes
 .editorconfig
 CONTRIBUTING.md
 CONTRIBUTING.md.meta
