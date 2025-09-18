@@ -12,11 +12,6 @@
             "Runtime/Plugins/x86_64/webrtc.dll"
           ]
         },
-        "PVP-121-2": {
-          "errors": [
-            "Runtime/Plugins/iOS/webrtc.framework/Info.plist"
-          ]
-        },
         "PVP-150-1": {
           "errors": [
             "Unity.WebRTC.RTCOutboundRTPStreamStats: mediaSourceId: empty <summary> tag",
