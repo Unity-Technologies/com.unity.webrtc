@@ -154,15 +154,15 @@ namespace Unity.WebRTC
         /// <summary>
         /// Returns the SDP string for this candidate.
         /// </summary>
-        public string Candidate => NativeMethods.IceCandidateGetSdp(self);
+        public string Candidate => self == IntPtr.Zero ? string.Empty : NativeMethods.IceCandidateGetSdp(self);
         /// <summary>
         /// Returns the media stream identification.
         /// </summary>
-        public string SdpMid => NativeMethods.IceCandidateGetSdpMid(self);
+        public string SdpMid => self == IntPtr.Zero ? string.Empty : NativeMethods.IceCandidateGetSdpMid(self);
         /// <summary>
         /// Returns the index of the m-line in SDP.
         /// </summary>
-        public int? SdpMLineIndex => NativeMethods.IceCandidateGetSdpLineIndex(self);
+        public int? SdpMLineIndex => self == IntPtr.Zero ? null : NativeMethods.IceCandidateGetSdpLineIndex(self);
         /// <summary>
         /// Returns a string which uniquely identifies the candidate.
         /// </summary>
@@ -170,7 +170,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// Returns the ICE component type.
         /// </summary>
-        public RTCIceComponent? Component => _candidate.component;
+        public RTCIceComponent? Component => _candidate.component == 0 ? null : (RTCIceComponent)_candidate.component;
         /// <summary>
         /// Returns the priority value for this candidate.
         /// </summary>
@@ -182,7 +182,7 @@ namespace Unity.WebRTC
         /// <summary>
         /// Returns the transport protocol for this candidate.
         /// </summary>
-        public RTCIceProtocol? Protocol => _candidate.protocol.ParseRTCIceProtocol();
+        public RTCIceProtocol? Protocol => string.IsNullOrEmpty(_candidate.protocol) ? null : _candidate.protocol.ParseRTCIceProtocol();
         /// <summary>
         /// Returns the port number for this candidate.
         /// </summary>
@@ -190,11 +190,11 @@ namespace Unity.WebRTC
         /// <summary>
         /// Returns the candidate type.
         /// </summary>
-        public RTCIceCandidateType? Type => _candidate.type.ParseRTCIceCandidateType();
+        public RTCIceCandidateType? Type => string.IsNullOrEmpty(_candidate.type) ? null : _candidate.type.ParseRTCIceCandidateType();
         /// <summary>
         /// Returns the TCP type for this candidate, if applicable.
         /// </summary>
-        public RTCIceTcpCandidateType? TcpType => _candidate.tcpType.ParseRTCIceTcpCandidateType();
+        public RTCIceTcpCandidateType? TcpType => string.IsNullOrEmpty(_candidate.tcpType) ? null : _candidate.tcpType.ParseRTCIceTcpCandidateType();
         /// <summary>
         /// Returns the related IP address for this candidate.
         /// </summary>
@@ -248,19 +248,23 @@ namespace Unity.WebRTC
         public RTCIceCandidate(RTCIceCandidateInit candidateInfo = null)
         {
             candidateInfo = candidateInfo ?? new RTCIceCandidateInit();
-            if (candidateInfo.sdpMLineIndex == null && candidateInfo.sdpMid == null)
-                throw new ArgumentException("sdpMid and sdpMLineIndex are both null");
-
             RTCIceCandidateInitInternal option = (RTCIceCandidateInitInternal)candidateInfo;
-            RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
-            if (error != RTCErrorType.None)
-                throw new ArgumentException(
-                        $"create candidate is failed. error type:{error}, " +
-                        $"candidate:{candidateInfo.candidate}\n" +
-                        $"sdpMid:{candidateInfo.sdpMid}\n" +
-                        $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
+            if (string.IsNullOrEmpty(candidateInfo.candidate))
+            {
+                NativeMethods.IceCandidateGetEmptyCandidate(out _candidate);
+            }
+            else
+            {
+                RTCErrorType error = NativeMethods.CreateIceCandidate(ref option, out self);
+                if (error != RTCErrorType.None)
+                    throw new ArgumentException(
+                            $"create candidate is failed. error type:{error}, " +
+                            $"candidate:{candidateInfo.candidate}\n" +
+                            $"sdpMid:{candidateInfo.sdpMid}\n" +
+                            $"sdpMLineIndex:{candidateInfo.sdpMLineIndex}\n");
 
-            NativeMethods.IceCandidateGetCandidate(self, out _candidate);
+                NativeMethods.IceCandidateGetCandidate(self, out _candidate);
+            }
         }
     }
 
@@ -288,7 +292,7 @@ namespace Unity.WebRTC
     {
         [MarshalAs(UnmanagedType.LPStr)]
         public string candidate;
-        public RTCIceComponent component;
+        public int component;
         [MarshalAs(UnmanagedType.LPStr)]
         public string foundation;
         [MarshalAs(UnmanagedType.LPStr)]
