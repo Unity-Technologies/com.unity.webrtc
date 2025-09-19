@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update minimum Unity version.
 - Upgrade libwebrtc to support 16kb pagesizes for Android.
 - Change Info.plist format for iOS native plugin.
-- Change a license as a Unity Companion License.
+- Change license to Unity Companion License.
 
 ### Fixed
 - VideoStreamTrack fails to start streaming on Android.
