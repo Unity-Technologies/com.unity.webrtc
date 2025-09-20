@@ -75,6 +75,19 @@ namespace webrtc
         int32_t Release() override { return encoder_->Release(); }
         int32_t Encode(const VideoFrame& frame, const std::vector<VideoFrameType>* frame_types) override
         {
+            // Eagerly check for a valid I420 buffer to handle GPU timeouts.
+            rtc::scoped_refptr<VideoFrameBuffer> vfb = frame.video_frame_buffer();
+            if (vfb && vfb->type() == VideoFrameBuffer::Type::kI420)
+            {
+                if (!vfb->GetI420())
+                {
+                    // If the buffer is null, the encoder will crash if we submit the frame. The GPU timed out
+                    // copying the bytes to the CPU (most likely), or the conversion to I420 failed, so drop the frame.
+                    RTC_LOG(LS_WARNING) << "Converting GPU frame to I420 failed. Dropping frame.";
+                    return WEBRTC_VIDEO_CODEC_ERROR;
+                }
+            }
+            
             int32_t result;
             {
                 std::unique_ptr<const ScopedProfiler> profiler;
