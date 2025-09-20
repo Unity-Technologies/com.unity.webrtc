@@ -39,6 +39,10 @@ patch -N "src\api\task_queue\task_queue_base.h" < "%COMMAND_DIR%\patches\fix_tas
 rem fix SetRawImagePlanes() in LibvpxVp8Encoder
 patch -N "src\modules\video_coding\codecs\vp8\libvpx_vp8_encoder.cc" < "%COMMAND_DIR%\patches\libvpx_vp8_encoder.patch"
 
+patch -N "src\modules\video_coding\codecs\vp9\libvpx_vp9_encoder.cc" < "%COMMAND_DIR%\patches\libvpx_vp9_encoder.patch"
+
+patch -N "src\modules\video_coding\codecs\av1\libaom_av1_encoder.cc" < "%COMMAND_DIR%\patches\libaom_av1_encoder.patch"
+
 mkdir "%ARTIFACTS_DIR%\lib"
 
 setlocal enabledelayedexpansion
