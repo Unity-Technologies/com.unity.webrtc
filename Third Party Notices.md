@@ -1124,15 +1124,15 @@ Component Name: opus
 
 License Type: BSD
 
-Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic, Jean-Marc Valin, Timothy B. Terriberry, CSIRO, Gregory Maxwell, Mark Borgerding, Erik de Castro Lopo
+Copyright 2001-2023 Xiph.Org, Skype Limited, Octasic, Jean-Marc Valin, Timothy B. Terriberry, CSIRO, Gregory Maxwell, Mark Borgerding, Erik de Castro Lopo, Mozilla, Amazon
 
-https://gitlab.xiph.org/xiph/opus
+https://gitlab.xiph.org/xiph/opus/-/blob/main/COPYING
 
 ```
-Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic,
+Copyright 2001-2023 Xiph.Org, Skype Limited, Octasic,
                     Jean-Marc Valin, Timothy B. Terriberry,
                     CSIRO, Gregory Maxwell, Mark Borgerding,
-                    Erik de Castro Lopo
+                    Erik de Castro Lopo, Mozilla, Amazon
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
