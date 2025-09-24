@@ -1040,7 +1040,7 @@ License Type: BSD
 
 Copyright 2011 The LibYuv Project Authors. All rights reserved.
 
-http://code.google.com/p/libyuv/
+https://chromium.googlesource.com/libyuv/libyuv/
 
 ```
 Copyright 2011 The LibYuv Project Authors. All rights reserved.
