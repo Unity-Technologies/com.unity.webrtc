@@ -266,7 +266,7 @@ License Type: Custom license
 
 Copyright (c) 1999, Bob Withers - bwit@pobox.com
 
-https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/rtc_base/third_party/base64/
+https://webrtc.googlesource.com/src.git/+/refs/branch-heads/5845/rtc_base/third_party/base64
 
 ```
 //*********************************************************************
