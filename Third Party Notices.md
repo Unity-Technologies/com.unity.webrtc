@@ -1631,14 +1631,14 @@ Component Name: glad
 
 License Type: MIT
 
-Copyright (c) 2013-2021 David Herberth
+Copyright (c) 2013-2022 David Herberth
 
 https://github.com/Dav1dde/glad
 
 ```
 The MIT License (MIT)
 
-Copyright (c) 2013-2021 David Herberth
+Copyright (c) 2013-2022 David Herberth
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
