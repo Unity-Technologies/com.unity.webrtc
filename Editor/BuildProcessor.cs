@@ -36,7 +36,7 @@ namespace Unity.WebRTC.Editor
         /// <summary>
         ///
         /// </summary>
-        public const AndroidArchitecture RequiredAndroidArchitectures = AndroidArchitecture.ARM64;
+        public const AndroidArchitecture RequiredAndroidArchitectures = AndroidArchitecture.ARM64 | AndroidArchitecture.X86_64;
 
         /// <summary>
         ///
@@ -86,7 +86,7 @@ namespace Unity.WebRTC.Editor
         /// </summary>
         static void EnsureAndroidArchitecture()
         {
-            if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64)
+            if ((PlayerSettings.Android.targetArchitectures & RequiredAndroidArchitectures) == 0)
             {
                 Debug.LogWarning(
                     $"WebRTC apps require a target architecture to be set {RequiredAndroidArchitectures}. " +
