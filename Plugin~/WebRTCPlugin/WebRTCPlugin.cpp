@@ -1035,6 +1035,8 @@ extern "C"
         *dst = candidate->candidate();
     }
 
+    UNITY_INTERFACE_EXPORT void IceCandidateGetEmptyCandidate(Candidate* dst) { *dst = cricket::Candidate(); }
+
     UNITY_INTERFACE_EXPORT int32_t IceCandidateGetSdpLineIndex(const IceCandidateInterface* candidate)
     {
         return candidate->sdp_mline_index();
