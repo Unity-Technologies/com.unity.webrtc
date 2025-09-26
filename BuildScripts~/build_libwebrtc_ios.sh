@@ -43,6 +43,10 @@ mkdir -p "$ARTIFACTS_DIR/lib"
 
 for is_debug in "true" "false"
 do
+  symbol_level=0
+  if [ $is_debug = "true" ]; then
+    symbol_level=1
+  fi
   for target_cpu in "arm64" "x64"
   do
     # generate ninja files
@@ -62,7 +66,8 @@ do
       ios_enable_code_signing=false \
       rtc_include_tests=false \
       rtc_build_examples=false \
-      use_cxx17=true"
+      use_cxx17=true \
+      symbol_level=${symbol_level}"
 
     # build static library
     ninja -C "$OUTPUT_DIR" webrtc
