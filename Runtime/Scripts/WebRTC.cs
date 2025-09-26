@@ -791,23 +791,23 @@ namespace Unity.WebRTC
                     RenderTexture.active = null;
 
                     var batch = Context.batch;
-                    batch.ResizeCapacity(VideoStreamTrack.s_tracks.Count);
-
                     int trackIndex = 0;
-                    foreach (var reference in VideoStreamTrack.s_tracks.Values)
+                    lock (VideoStreamTrack.s_tracks)
                     {
-                        if (!reference.TryGetTarget(out var track))
-                            continue;
-
-                        track.UpdateTexture();
-                        if (track.DataPtr != IntPtr.Zero)
+                        batch.ResizeCapacity(VideoStreamTrack.s_tracks.Count);
+                        foreach (var pair in VideoStreamTrack.s_tracks)
                         {
-                            batch.data.tracks[trackIndex] = track.DataPtr;
-                            trackIndex++;
+                            if (!pair.Value.TryGetTarget(out var track))
+                                continue;
+
+                            track.UpdateTexture();
+                            if (track.DataPtr != IntPtr.Zero)
+                            {
+                                batch.tracks[trackIndex] = track.DataPtr;
+                                trackIndex++;
+                            }
                         }
                     }
-
-                    batch.data.tracksCount = trackIndex;
                     if (trackIndex > 0)
                         batch.Submit();
 
