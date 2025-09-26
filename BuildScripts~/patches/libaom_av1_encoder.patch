@@ -1,0 +1,15 @@
+diff --git a/modules/video_coding/codecs/av1/libaom_av1_encoder.cc b/modules/video_coding/codecs/av1/libaom_av1_encoder.cc
+index 28a8e5f846..817826d248 100644
+--- a/modules/video_coding/codecs/av1/libaom_av1_encoder.cc
++++ b/modules/video_coding/codecs/av1/libaom_av1_encoder.cc
+@@ -603,7 +603,9 @@ int32_t LibaomAv1Encoder::Encode(
+       // Set frame_for_encode_ data pointers and strides.
+       MaybeRewrapImgWithFormat(AOM_IMG_FMT_I420);
+       auto i420_buffer = mapped_buffer->GetI420();
+-      RTC_DCHECK(i420_buffer);
++      if (!i420_buffer) {
++        return WEBRTC_VIDEO_CODEC_ENCODER_FAILURE;
++      }
+       frame_for_encode_->planes[AOM_PLANE_Y] =
+           const_cast<unsigned char*>(i420_buffer->DataY());
+       frame_for_encode_->planes[AOM_PLANE_U] =
