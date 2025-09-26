@@ -38,20 +38,23 @@ namespace webrtc
         { 2073600, 36864, 240000, H264Level::kLevel5_2 },
     };
 
-    static const int kPixelsPerMacroblock = 16 * 16;
+    static const int kPixelsPerMacroblockSide = 16;
     static const int kUnitMaxBRWithNAL = 1200;
 
-    absl::optional<webrtc::H264Level> H264SupportedLevel(int maxFramePixelCount, int maxFramerate, int maxBitrate)
+    absl::optional<webrtc::H264Level> H264SupportedLevel(int maxFrameWidthPixelCount, int maxFrameHeightPixelCount, int maxFramerate, int maxBitrate)
     {
-        if (maxFramePixelCount <= 0 || maxFramerate <= 0 || maxBitrate <= 0)
+        if (maxFrameWidthPixelCount <= 0 || maxFrameHeightPixelCount <= 0 || maxFramerate <= 0 || maxBitrate <= 0)
             return absl::nullopt;
+
+        int maxFrameMacroblockCount =
+            ((maxFrameWidthPixelCount + kPixelsPerMacroblockSide - 1) / kPixelsPerMacroblockSide) *
+            ((maxFrameHeightPixelCount + kPixelsPerMacroblockSide - 1) / kPixelsPerMacroblockSide);
 
         for (size_t i = 0; i < arraysize(kLevelConstraints); i++)
         {
             const LevelConstraint& level_constraint = kLevelConstraints[i];
-            if (level_constraint.max_macroblock_frame_size * kPixelsPerMacroblock >= maxFramePixelCount &&
-                level_constraint.max_macroblocks_per_second >=
-                    maxFramerate * maxFramePixelCount / kPixelsPerMacroblock &&
+            if (level_constraint.max_macroblock_frame_size >= maxFrameMacroblockCount &&
+                level_constraint.max_macroblocks_per_second >= maxFramerate * maxFrameMacroblockCount &&
                 level_constraint.max_video_bitrate * kUnitMaxBRWithNAL >= maxBitrate)
             {
                 return level_constraint.level;
@@ -62,14 +65,18 @@ namespace webrtc
         return absl::nullopt;
     }
 
-    int SupportedMaxFramerate(H264Level level, int maxFramePixelCount)
+    int SupportedMaxFramerate(H264Level level, int maxFrameWidthPixelCount, int maxFrameHeightPixelCount)
     {
+        int maxFrameMacroblockCount =
+            ((maxFrameWidthPixelCount + kPixelsPerMacroblockSide - 1) / kPixelsPerMacroblockSide) *
+            ((maxFrameHeightPixelCount + kPixelsPerMacroblockSide - 1) / kPixelsPerMacroblockSide);
+
         for (size_t i = 0; i < arraysize(kLevelConstraints); i++)
         {
             const LevelConstraint& level_constraint = kLevelConstraints[i];
             if (level_constraint.level == level)
             {
-                return level_constraint.max_macroblocks_per_second * kPixelsPerMacroblock / maxFramePixelCount;
+                return level_constraint.max_macroblocks_per_second / maxFrameMacroblockCount;
             }
         }
 
