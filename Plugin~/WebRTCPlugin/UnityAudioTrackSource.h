@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include <api/media_stream_interface.h>
+#include <modules/audio_processing/include/audio_processing.h>
 #include <pc/local_audio_source.h>
 
 namespace unity
@@ -34,6 +35,7 @@ namespace webrtc
         std::vector<AudioTrackSinkInterface*> _arrSink;
         std::mutex _mutex;
         cricket::AudioOptions _options;
+        rtc::scoped_refptr<AudioProcessing> _audioProcessing;
         int _sampleRate = 0;
         size_t _numChannels = 0;
         size_t _numFrames = 0;
