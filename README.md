@@ -3,7 +3,6 @@
 > [!NOTE]
 > com.unity.webrtc is deprecated.
 
-
 <img src="https://img.shields.io/badge/unity-6000.3-green.svg?style=flat-square" alt="unity 6000.3">
 
 **WebRTC for Unity** is a package that allows [WebRTC](https://webrtc.org) to be used in Unity.
