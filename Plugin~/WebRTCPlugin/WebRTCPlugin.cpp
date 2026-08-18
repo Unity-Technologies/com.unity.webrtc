@@ -92,7 +92,7 @@ namespace webrtc
     bool* ConvertArray(std::vector<bool> vec, size_t* length)
     {
         *length = vec.size();
-        size_t size = sizeof(bool*) * vec.size();
+        size_t size = sizeof(bool) * vec.size();
         auto dst = CoTaskMemAlloc(size);
         bool* ret = static_cast<bool*>(dst);
         for (size_t i = 0; i < vec.size(); i++)
