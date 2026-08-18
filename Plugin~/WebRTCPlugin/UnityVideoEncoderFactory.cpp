@@ -141,7 +141,7 @@ namespace webrtc
     }
 
     webrtc::VideoEncoderFactory::CodecSupport UnityVideoEncoderFactory::QueryCodecSupport(
-        const SdpVideoFormat& format, absl::optional<std::string> scalability_mode) const
+        const SdpVideoFormat& format, std::optional<std::string> scalability_mode) const
     {
         VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
         RTC_DCHECK(format.IsCodecInList(factory->GetSupportedFormats()));
@@ -149,10 +149,10 @@ namespace webrtc
     }
 
     std::unique_ptr<webrtc::VideoEncoder>
-    UnityVideoEncoderFactory::CreateVideoEncoder(const webrtc::SdpVideoFormat& format)
+    UnityVideoEncoderFactory::Create(const Environment& env, const webrtc::SdpVideoFormat& format)
     {
         VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
-        auto encoder = factory->CreateVideoEncoder(format);
+        auto encoder = factory->Create(env, format);
         if (!profiler_)
             return encoder;
 

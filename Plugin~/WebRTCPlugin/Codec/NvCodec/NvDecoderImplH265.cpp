@@ -17,7 +17,7 @@ namespace webrtc
 {
     using namespace ::webrtc;
 
-    ColorSpace ExtractH264ColorSpace(const CUVIDEOFORMAT& format)
+    ColorSpace ExtractH265ColorSpace(const CUVIDEOFORMAT& format)
     {
         return ColorSpace(
             static_cast<ColorSpace::PrimaryID>(format.video_signal_description.color_primaries),
@@ -26,7 +26,7 @@ namespace webrtc
             static_cast<ColorSpace::RangeID>(format.video_signal_description.video_full_range_flag));
     }
 
-    NvDecoderImpl::NvDecoderImpl(CUcontext context, ProfilerMarkerFactory* profiler)
+    NvDecoderImplH265::NvDecoderImplH265(CUcontext context, ProfilerMarkerFactory* profiler)
         : m_context(context)
         , m_decoder(nullptr)
         , m_isConfiguredDecoder(false)
@@ -39,9 +39,9 @@ namespace webrtc
                 "NvDecoderImpl.ConvertNV12ToI420", kUnityProfilerCategoryOther, kUnityProfilerMarkerFlagDefault, 0);
     }
 
-    NvDecoderImpl::~NvDecoderImpl() { Release(); }
+    NvDecoderImplH265::~NvDecoderImplH265() { Release(); }
 
-    VideoDecoder::DecoderInfo NvDecoderImpl::GetDecoderInfo() const
+    VideoDecoder::DecoderInfo NvDecoderImplH265::GetDecoderInfo() const
     {
         VideoDecoder::DecoderInfo info;
         info.implementation_name = "NvCodec";
@@ -49,11 +49,11 @@ namespace webrtc
         return info;
     }
 
-    bool NvDecoderImpl::Configure(const Settings& settings)
+    bool NvDecoderImplH265::Configure(const Settings& settings)
     {
-        if (settings.codec_type() != kVideoCodecH264)
+        if (settings.codec_type() != kVideoCodecH265)
         {
-            RTC_LOG(LS_ERROR) << "initialization failed on codectype is not kVideoCodecH264";
+            RTC_LOG(LS_ERROR) << "initialization failed on codectype is not kVideoCodecH265";
             return false;
         }
         if (!settings.max_render_resolution().Valid())
@@ -79,23 +79,23 @@ namespace webrtc
 
         // bUseDeviceFrame: allocate in memory or cuda device memory
         m_decoder = std::make_unique<NvDecoderInternal>(
-            m_context, false, cudaVideoCodec_H264, true, false, nullptr, nullptr, false, maxWidth, maxHeight);
+            m_context, false, cudaVideoCodec_HEVC, true, false, nullptr, nullptr, false, maxWidth, maxHeight);
         return true;
     }
 
-    int32_t NvDecoderImpl::RegisterDecodeCompleteCallback(DecodedImageCallback* callback)
+    int32_t NvDecoderImplH265::RegisterDecodeCompleteCallback(DecodedImageCallback* callback)
     {
         this->m_decodedCompleteCallback = callback;
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    int32_t NvDecoderImpl::Release()
+    int32_t NvDecoderImplH265::Release()
     {
         m_buffer_pool.Release();
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    int32_t NvDecoderImpl::Decode(const EncodedImage& input_image, bool missing_frames, int64_t render_time_ms)
+    int32_t NvDecoderImplH265::Decode(const EncodedImage& input_image, bool missing_frames, int64_t render_time_ms)
     {
         CUcontext current;
         if (!ck(cuCtxGetCurrent(&current)))
@@ -119,9 +119,9 @@ namespace webrtc
             return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
         }
 
-        m_h264_bitstream_parser.ParseBitstream(input_image);
-        absl::optional<int> qp = m_h264_bitstream_parser.GetLastSliceQp();
-        absl::optional<SpsParser::SpsState> sps = m_h264_bitstream_parser.sps();
+        m_h265_bitstream_parser.ParseBitstream(input_image);
+        std::optional<int> qp = m_h265_bitstream_parser.GetLastSliceQp();
+        std::optional<H265SpsParser::SpsState> sps = m_h265_bitstream_parser.sps();
 
         if (m_isConfiguredDecoder)
         {
@@ -136,13 +136,13 @@ namespace webrtc
         do
         {
             nFrameReturnd = m_decoder->Decode(
-                input_image.data(), static_cast<int>(input_image.size()), CUVID_PKT_TIMESTAMP, input_image.Timestamp());
+                input_image.data(), static_cast<int>(input_image.size()), CUVID_PKT_TIMESTAMP, input_image.ntp_time_ms_);
         } while (nFrameReturnd == 0);
 
         m_isConfiguredDecoder = true;
 
         // todo: support other output format
-        // Chromium's H264 Encoder is output on NV12, so currently only NV12 is supported.
+        // Chromium's H265 Encoder is output on NV12, so currently only NV12 is supported.
         if (m_decoder->GetOutputFormat() != cudaVideoSurfaceFormat_NV12)
         {
             RTC_LOG(LS_ERROR) << "not supported this format: " << m_decoder->GetOutputFormat();
@@ -152,7 +152,7 @@ namespace webrtc
         // Pass on color space from input frame if explicitly specified.
         const ColorSpace& color_space = input_image.ColorSpace()
             ? *input_image.ColorSpace()
-            : ExtractH264ColorSpace(m_decoder->GetVideoFormatInfo());
+            : ExtractH265ColorSpace(m_decoder->GetVideoFormatInfo());
 
         for (int i = 0; i < nFrameReturnd; i++)
         {
@@ -195,7 +195,7 @@ namespace webrtc
                                            .build();
 
             // todo: measurement decoding time
-            absl::optional<int32_t> decodetime;
+            std::optional<int32_t> decodetime;
             m_decodedCompleteCallback->Decoded(decoded_frame, decodetime, qp);
         }
 

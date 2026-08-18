@@ -2,6 +2,7 @@ target_sources(
   WebRTCLib
   PRIVATE CreateVideoCodecFactory.cpp CreateVideoCodecFactory.h
           H264ProfileLevelId.cpp H264ProfileLevelId.h
+          H265ProfileLevelId.cpp H265ProfileLevelId.h
           SimulcastEncoderFactory.cpp SimulcastEncoderFactory.h)
 
 if(Windows OR Linux)

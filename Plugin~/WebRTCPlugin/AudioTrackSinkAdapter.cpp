@@ -34,10 +34,12 @@ namespace webrtc
         // the `number_of_channels` argument is passed as `1`. However, Unity expects
         // to receive audio which is stereo channel usually, in this case we need to
         // resample audio monoural to stereo.
+        const InterleavedView<const int16_t> view(static_cast<const int16_t*>(audio_data), number_of_frames, number_of_channels);
         webrtc::voe::RemixAndResample(
-            static_cast<const int16_t*>(audio_data),
-            number_of_frames,
-            number_of_channels,
+            // static_cast<const int16_t*>(audio_data),
+            // number_of_frames,
+            // number_of_channels,
+            view,
             sample_rate,
             &_resampler,
             &_frame);

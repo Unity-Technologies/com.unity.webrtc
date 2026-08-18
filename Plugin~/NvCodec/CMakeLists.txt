@@ -16,6 +16,15 @@ if(Linux)
   add_subdirectory(implib)
 endif()
 
+# set iterator debug level and compiler flags.
+if(Windows AND CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0 /Zi /Od")
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} -D_ITERATOR_DEBUG_LEVEL=0")
+endif()
+
 target_include_directories(
   NvCodec PRIVATE ${CUDA_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIR}
                   ${GLEW_INCLUDE_DIRS} ${NVCODEC_INCLUDE_DIR})

@@ -4,6 +4,8 @@
 
 #include "H264ProfileLevelId.h"
 
+#include "api/video_codecs/h265_profile_tier_level.h"
+
 using namespace ::webrtc;
 
 namespace unity

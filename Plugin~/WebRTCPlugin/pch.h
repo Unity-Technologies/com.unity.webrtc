@@ -2,6 +2,7 @@
 
 #pragma region std headers
 #include <array>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #pragma endregion

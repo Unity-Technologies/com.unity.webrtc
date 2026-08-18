@@ -11,6 +11,7 @@
 #include <api/video_codecs/video_encoder_factory.h>
 #include <media/base/codec.h>
 
+#include "api/video_codecs/h265_profile_tier_level.h"
 #include "nvEncodeAPI.h"
 
 namespace unity
@@ -21,6 +22,14 @@ namespace webrtc
 
     int SupportedEncoderCount(CUcontext context);
     H264Level SupportedMaxH264Level(CUcontext context);
+    H265Level SupportedMaxH265Level(CUcontext context);
+
+    std::vector<SdpVideoFormat> SupportedH264EncoderCodecs(CUcontext context);
+    std::vector<SdpVideoFormat> SupportedH265EncoderCodecs(CUcontext context);
+
+    std::vector<SdpVideoFormat> SupportedH264DecoderCodecs(CUcontext context);
+    std::vector<SdpVideoFormat> SupportedH265DecoderCodecs(CUcontext context);
+
     std::vector<SdpVideoFormat> SupportedNvEncoderCodecs(CUcontext context);
     std::vector<SdpVideoFormat> SupportedNvDecoderCodecs(CUcontext context);
 
@@ -56,7 +65,7 @@ namespace webrtc
         ~NvEncoderFactory() override;
 
         std::vector<SdpVideoFormat> GetSupportedFormats() const override;
-        std::unique_ptr<VideoEncoder> CreateVideoEncoder(const SdpVideoFormat& format) override;
+        std::unique_ptr<VideoEncoder> Create(const Environment& env, const SdpVideoFormat& format) override;
 
     private:
         CUcontext context_;
@@ -74,7 +83,7 @@ namespace webrtc
         ~NvDecoderFactory() override;
 
         std::vector<webrtc::SdpVideoFormat> GetSupportedFormats() const override;
-        std::unique_ptr<webrtc::VideoDecoder> CreateVideoDecoder(const webrtc::SdpVideoFormat& format) override;
+        std::unique_ptr<webrtc::VideoDecoder> Create(const Environment& env, const webrtc::SdpVideoFormat& format) override;
 
     private:
         CUcontext context_;
@@ -89,7 +98,7 @@ namespace webrtc
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 
-    static absl::optional<H264Profile> GuidToProfile(GUID& guid)
+    static std::optional<H264Profile> H264GuidToProfile(GUID& guid)
     {
         if (guid == NV_ENC_H264_PROFILE_BASELINE_GUID)
             return H264Profile::kProfileBaseline;
@@ -99,10 +108,10 @@ namespace webrtc
             return H264Profile::kProfileHigh;
         if (guid == NV_ENC_H264_PROFILE_CONSTRAINED_HIGH_GUID)
             return H264Profile::kProfileConstrainedHigh;
-        return absl::nullopt;
+        return std::nullopt;
     }
 
-    static absl::optional<GUID> ProfileToGuid(H264Profile profile)
+    static std::optional<GUID> H264ProfileToGuid(H264Profile profile)
     {
         if (profile == H264Profile::kProfileBaseline)
             return NV_ENC_H264_PROFILE_BASELINE_GUID;
@@ -116,8 +125,53 @@ namespace webrtc
             return NV_ENC_H264_PROFILE_HIGH_GUID;
         if (profile == H264Profile::kProfileConstrainedHigh)
             return NV_ENC_H264_PROFILE_CONSTRAINED_HIGH_GUID;
-        return absl::nullopt;
+        return std::nullopt;
     }
+
+    static std::optional<H265Profile> H265GuidToProfile(GUID& guid)
+    {
+        if (guid == NV_ENC_HEVC_PROFILE_MAIN_GUID)
+            return H265Profile::kProfileMain;
+        if (guid == NV_ENC_HEVC_PROFILE_MAIN10_GUID)
+            return H265Profile::kProfileMain10;
+        if (guid == NV_ENC_HEVC_PROFILE_FREXT_GUID)
+            return H265Profile::kProfileRangeExtensions;
+
+        return std::nullopt;
+    }
+
+    static std::optional<GUID> H265ProfileToGuid(H265Profile profile)
+    {
+        if (profile == H265Profile::kProfileMain)
+            return NV_ENC_HEVC_PROFILE_MAIN_GUID;
+        if (profile == H265Profile::kProfileMain10)
+            return NV_ENC_HEVC_PROFILE_MAIN10_GUID;
+        if (profile == H265Profile::kProfileRangeExtensions)
+            return NV_ENC_HEVC_PROFILE_FREXT_GUID;
+
+        return std::nullopt;
+    }
+
+    inline SdpVideoFormat CreateH265Format(H265Profile profile,
+                                H265Level level,
+                                H265Tier tier,
+                                const std::string& tx_mode = "SRST",
+                                bool add_scalability_modes = false) {
+        absl::InlinedVector<ScalabilityMode, kScalabilityModeCount> scalability_modes;
+        if (add_scalability_modes) {
+            for (const auto scalability_mode : kAllScalabilityModes) {
+                scalability_modes.push_back(scalability_mode);
+            }
+        }
+        return SdpVideoFormat(
+            cricket::kH265CodecName,
+            {{cricket::kH265FmtpProfileId, H265ProfileToString(profile)},
+             {cricket::kH265FmtpLevelId, H265LevelToString(level)},
+             {cricket::kH265FmtpTierFlag, H265TierToString(tier)},
+             {cricket::kH265FmtpTxMode, tx_mode}},
+            scalability_modes);
+    }
+
 #pragma clang diagnostic pop
 }
 }

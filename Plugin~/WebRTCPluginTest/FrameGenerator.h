@@ -18,8 +18,8 @@ namespace webrtc
         IGraphicsDevice* device,
         int width,
         int height,
-        absl::optional<FrameGeneratorInterface::OutputType> type,
-        absl::optional<int> numFrames);
+        std::optional<FrameGeneratorInterface::OutputType> type,
+        std::optional<int> numFrames);
 
     class ITexture2D;
     class VideoFrameGenerator : public FrameGeneratorInterface
@@ -30,7 +30,7 @@ namespace webrtc
         void ChangeResolution(size_t width, size_t height) override;
         FrameGeneratorInterface::Resolution GetResolution() const override;
         VideoFrameData NextFrame() override;
-        absl::optional<int> fps() const override { return absl::nullopt; }
+        std::optional<int> fps() const override { return std::nullopt; }
 
     private:
         IGraphicsDevice* device_;

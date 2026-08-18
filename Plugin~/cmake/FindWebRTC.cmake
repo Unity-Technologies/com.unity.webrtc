@@ -1,6 +1,6 @@
 # Find WebRTC include path
 
-set(WEBRTC_DIR "${CMAKE_SOURCE_DIR}/webrtc")
+set(WEBRTC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/webrtc")
 
 set(WEBRTC_INCLUDE_DIR
   ${WEBRTC_DIR}/include

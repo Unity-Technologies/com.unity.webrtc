@@ -6,14 +6,14 @@ if not exist depot_tools (
 
 set COMMAND_DIR=%~dp0
 set PATH=%cd%\depot_tools;%PATH%
-set WEBRTC_VERSION=5845
+set WEBRTC_VERSION=7103
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2022
 set OUTPUT_DIR=out
 set ARTIFACTS_DIR=%cd%\artifacts
 set PYPI_URL=https://artifactory.prd.it.unity3d.com/artifactory/api/pypi/pypi/simple
-set vs2022_install=C:\Program Files\Microsoft Visual Studio\2022\Professional
+set vs2022_install=C:\Program Files\Microsoft Visual Studio\2022\Community
 
 if not exist src (
   call fetch.bat --nohooks webrtc
@@ -49,7 +49,7 @@ for %%i in (x64) do (
 
     rem generate ninja for release
     call gn.bat gen %OUTPUT_DIR% --root="src" ^
-      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
+      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false rtc_use_h265=true proprietary_codecs=true symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
 
     rem build
     call ninja.bat -C %OUTPUT_DIR% webrtc
@@ -77,6 +77,8 @@ powershell -File "%COMMAND_DIR%\Unescape.ps1" "%OUTPUT_DIR%\LICENSE.md"
 
 rem copy header
 xcopy src\*.h "%ARTIFACTS_DIR%\include" /C /S /I /F /H
+
+xcopy src\*.inc "%ARTIFACTS_DIR%\include" /C /S /I /F /H
 
 rem copy license
 copy "%OUTPUT_DIR%\LICENSE.md" "%ARTIFACTS_DIR%"

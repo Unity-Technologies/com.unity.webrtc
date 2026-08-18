@@ -4,7 +4,6 @@
 #include <api/audio_codecs/audio_encoder_factory_template.h>
 #include <api/audio_codecs/g711/audio_encoder_g711.h>
 #include <api/audio_codecs/g722/audio_encoder_g722.h>
-#include <api/audio_codecs/ilbc/audio_encoder_ilbc.h>
 #include <api/audio_codecs/opus/audio_encoder_multi_channel_opus.h>
 #include <api/audio_codecs/opus/audio_encoder_opus.h>
 
@@ -21,7 +20,7 @@ namespace webrtc
     struct StereoSupportEncoder
     {
         using Config = typename T::Config;
-        static absl::optional<Config> SdpToConfig(const SdpAudioFormat& audio_format)
+        static std::optional<Config> SdpToConfig(const SdpAudioFormat& audio_format)
         {
             return T::SdpToConfig(audio_format);
         }
@@ -45,9 +44,11 @@ namespace webrtc
         }
         static AudioCodecInfo QueryAudioEncoder(const Config& config) { return T::QueryAudioEncoder(config); }
         static std::unique_ptr<AudioEncoder> MakeAudioEncoder(
-            const Config& config, int payload_type, absl::optional<AudioCodecPairId> codec_pair_id = absl::nullopt)
+        const Environment& env,
+  const AudioEncoderOpusConfig& config,
+  const AudioEncoderFactory::Options& options)
         {
-            return T::MakeAudioEncoder(config, payload_type, codec_pair_id);
+            return T::MakeAudioEncoder(env, config, options);
         }
     };
 
@@ -56,7 +57,6 @@ namespace webrtc
         return ::webrtc::CreateAudioEncoderFactory<
             StereoSupportEncoder<AudioEncoderOpus>,
             AudioEncoderMultiChannelOpus,
-            AudioEncoderIlbc,
             AudioEncoderG722,
             AudioEncoderG711,
             AudioEncoderL16>();

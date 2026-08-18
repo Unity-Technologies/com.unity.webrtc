@@ -169,6 +169,18 @@ namespace webrtc
         rtc::scoped_refptr<AudioEncoderFactory> audioEncoderFactory = CreateAudioEncoderFactory();
         rtc::scoped_refptr<AudioDecoderFactory> audioDecoderFactory = CreateAudioDecoderFactory();
 
+        RTC_LOG(LS_INFO) << "[WEBRTC]" << "Create peer connection factory";
+        RTC_LOG(LS_INFO) << "[WEBRTC]" << "Supported video encode formats: " << videoEncoderFactory->GetSupportedFormats().size();
+        for (auto format : videoEncoderFactory->GetSupportedFormats())
+        {
+            RTC_LOG(LS_INFO) << "- " + format.ToString();
+        }
+        RTC_LOG(LS_INFO) << "[WEBRTC]" << "Supported video decode formats: " << videoDecoderFactory->GetSupportedFormats().size();
+        for (auto format : videoDecoderFactory->GetSupportedFormats())
+        {
+            RTC_LOG(LS_INFO) << "- " + format.ToString();
+        }
+
         m_peerConnectionFactory = CreatePeerConnectionFactory(
             m_workerThread.get(),
             m_workerThread.get(),

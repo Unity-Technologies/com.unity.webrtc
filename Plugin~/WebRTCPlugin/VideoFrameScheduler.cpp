@@ -51,21 +51,21 @@ namespace webrtc
 
     void VideoFrameScheduler::SetMaxFramerateFps(int maxFramerate) { maxFramerate_ = maxFramerate; }
 
-    absl::optional<TimeDelta> VideoFrameScheduler::ScheduleNextFrame()
+    std::optional<TimeDelta> VideoFrameScheduler::ScheduleNextFrame()
     {
         if (paused_)
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         if (!callback_)
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         if (maxFramerate_ == 0)
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         Timestamp now = clock_->CurrentTime();

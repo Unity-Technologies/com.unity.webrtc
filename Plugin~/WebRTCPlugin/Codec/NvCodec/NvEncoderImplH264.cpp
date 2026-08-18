@@ -1,12 +1,5 @@
 #include "pch.h"
 
-// todo::
-// CMake doesn't support building CUDA kernel with Clang compiler on Windows.
-// https://gitlab.kitware.com/cmake/cmake/-/issues/20776
-#if !(_WIN32 && __clang__)
-#define SUPPORT_CUDA_KERNEL 1
-#endif
-
 #include <absl/strings/match.h>
 #include <api/video/video_codec_constants.h>
 #include <api/video/video_codec_type.h>
@@ -22,9 +15,6 @@
 #include "NvEncoder/NvEncoderCuda.h"
 #include "NvEncoderImpl.h"
 #include "ProfilerMarkerFactory.h"
-#if SUPPORT_CUDA_KERNEL
-#include "ResizeSurf.h"
-#endif
 #include "ScopedProfiler.h"
 #include "UnityVideoTrackSource.h"
 #include "VideoFrameAdapter.h"
@@ -33,117 +23,10 @@ namespace unity
 {
 namespace webrtc
 {
-    inline bool operator==(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs)
-    {
-        return lhs.Width == rhs.Width && lhs.Height == rhs.Height && lhs.NumChannels == rhs.NumChannels &&
-            lhs.Format == rhs.Format;
-    }
+    std::optional<H264Level> NvEncoderImplH264::s_maxSupportedH264Level;
+    std::vector<SdpVideoFormat> NvEncoderImplH264::s_formats;
 
-    inline bool operator!=(const CUDA_ARRAY_DESCRIPTOR& lhs, const CUDA_ARRAY_DESCRIPTOR& rhs) { return !(lhs == rhs); }
-
-    inline absl::optional<webrtc::H264Level> NvEncSupportedLevel(std::vector<SdpVideoFormat>& formats, const GUID& guid)
-    {
-        for (const auto& format : formats)
-        {
-            const auto profileLevelId = webrtc::ParseSdpForH264ProfileLevelId(format.parameters);
-            if (!profileLevelId.has_value())
-                continue;
-            const auto guid2 = ProfileToGuid(profileLevelId.value().profile);
-            if (guid2.has_value() && guid == guid2.value())
-            {
-                return profileLevelId.value().level;
-            }
-        }
-        return absl::nullopt;
-    }
-
-    inline absl::optional<NV_ENC_LEVEL>
-    NvEncRequiredLevel(const VideoCodec& codec, std::vector<SdpVideoFormat>& formats, const GUID& guid)
-    {
-        int pixelCount = codec.width * codec.height;
-        auto requiredLevel = unity::webrtc::H264SupportedLevel(
-            pixelCount, static_cast<int>(codec.maxFramerate), static_cast<int>(codec.maxBitrate));
-
-        if (!requiredLevel)
-        {
-            return absl::nullopt;
-        }
-
-        // Check NvEnc supported level.
-        auto supportedLevel = NvEncSupportedLevel(formats, guid);
-        if (!supportedLevel)
-        {
-            return absl::nullopt;
-        }
-
-        // The supported level must be over the required level.
-        if (static_cast<int>(requiredLevel.value()) > static_cast<int>(supportedLevel.value()))
-        {
-            return absl::nullopt;
-        }
-        return static_cast<NV_ENC_LEVEL>(requiredLevel.value());
-    }
-
-    absl::optional<H264Level> NvEncoderImpl::s_maxSupportedH264Level;
-    std::vector<SdpVideoFormat> NvEncoderImpl::s_formats;
-
-#if SUPPORT_CUDA_KERNEL
-    CUresult Resize(const CUarray& src, CUarray& dst, const Size& size)
-    {
-        CUDA_ARRAY_DESCRIPTOR srcDesc = {};
-        CUresult result = cuArrayGetDescriptor(&srcDesc, src);
-        if (result != CUDA_SUCCESS)
-        {
-            RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-            return result;
-        }
-        CUDA_ARRAY_DESCRIPTOR dstDesc = {};
-        dstDesc.Format = srcDesc.Format;
-        dstDesc.NumChannels = srcDesc.NumChannels;
-        dstDesc.Width = static_cast<size_t>(size.width());
-        dstDesc.Height = static_cast<size_t>(size.height());
-
-        bool create = false;
-        if (!dst)
-        {
-            create = true;
-        }
-        else
-        {
-            CUDA_ARRAY_DESCRIPTOR desc = {};
-            result = cuArrayGetDescriptor(&desc, dst);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "cuArrayGetDescriptor failed. error:" << result;
-                return result;
-            }
-            if (desc != dstDesc)
-            {
-                result = cuArrayDestroy(dst);
-                if (result != CUDA_SUCCESS)
-                {
-                    RTC_LOG(LS_ERROR) << "cuArrayDestroy failed. error:" << result;
-                    return result;
-                }
-                dst = nullptr;
-                create = true;
-            }
-        }
-
-        if (create)
-        {
-            CUresult result = cuArrayCreate(&dst, &dstDesc);
-            if (result != CUDA_SUCCESS)
-            {
-                RTC_LOG(LS_ERROR) << "cuArrayCreate failed. error:" << result;
-                return result;
-            }
-        }
-        return ResizeSurf(src, dst);
-    }
-#endif
-
-    NvEncoderImpl::NvEncoderImpl(
+    NvEncoderImplH264::NvEncoderImplH264(
         const cricket::VideoCodec& codec,
         CUcontext context,
         CUmemorytype memoryType,
@@ -164,7 +47,7 @@ namespace webrtc
         RTC_CHECK(codec.GetParam(cricket::kH264FmtpProfileLevelId, &profileLevelIdString));
 
         auto profileLevelId = ParseH264ProfileLevelId(profileLevelIdString.c_str());
-        m_profileGuid = ProfileToGuid(profileLevelId.value().profile).value();
+        m_profileGuid = H264ProfileToGuid(profileLevelId.value().profile).value();
         m_level = static_cast<NV_ENC_LEVEL>(profileLevelId.value().level);
         m_configurations.reserve(kMaxSimulcastStreams);
 
@@ -180,9 +63,9 @@ namespace webrtc
             s_maxSupportedH264Level = SupportedMaxH264Level(m_context);
     }
 
-    NvEncoderImpl::~NvEncoderImpl() { Release(); }
+    NvEncoderImplH264::~NvEncoderImplH264() { Release(); }
 
-    VideoEncoder::EncoderInfo NvEncoderImpl::GetEncoderInfo() const
+    VideoEncoder::EncoderInfo NvEncoderImplH264::GetEncoderInfo() const
     {
         VideoEncoder::EncoderInfo info;
         info.implementation_name = "NvCodec";
@@ -191,7 +74,7 @@ namespace webrtc
         return info;
     }
 
-    int NvEncoderImpl::InitEncode(const VideoCodec* codec, const VideoEncoder::Settings& settings)
+    int NvEncoderImplH264::InitEncode(const VideoCodec* codec, const VideoEncoder::Settings& settings)
     {
         if (!codec || codec->codecType != kVideoCodecH264)
         {
@@ -326,13 +209,13 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    int32_t NvEncoderImpl::RegisterEncodeCompleteCallback(EncodedImageCallback* callback)
+    int32_t NvEncoderImplH264::RegisterEncodeCompleteCallback(EncodedImageCallback* callback)
     {
         m_encodedCompleteCallback = callback;
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    int32_t NvEncoderImpl::Release()
+    int32_t NvEncoderImplH264::Release()
     {
         if (m_encoder)
         {
@@ -349,7 +232,7 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    bool NvEncoderImpl::CopyResource(
+    bool NvEncoderImplH264::CopyResource(
         const NvEncInputFrame* encoderInputFrame,
         GpuMemoryBufferInterface* buffer,
         Size& size,
@@ -418,7 +301,7 @@ namespace webrtc
         return true;
     }
 
-    int32_t NvEncoderImpl::Encode(const ::webrtc::VideoFrame& frame, const std::vector<VideoFrameType>* frameTypes)
+    int32_t NvEncoderImplH264::Encode(const ::webrtc::VideoFrame& frame, const std::vector<VideoFrameType>* frameTypes)
     {
         if (!m_encoder)
             return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
@@ -493,11 +376,11 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    int32_t NvEncoderImpl::ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame)
+    int32_t NvEncoderImplH264::ProcessEncodedFrame(std::vector<uint8_t>& packet, const ::webrtc::VideoFrame& inputFrame)
     {
         m_encodedImage._encodedWidth = m_encoder->GetEncodeWidth();
         m_encodedImage._encodedHeight = m_encoder->GetEncodeHeight();
-        m_encodedImage.SetTimestamp(inputFrame.timestamp());
+        // m_encodedImage.SetTimestamp(inputFrame.timestamp());
         m_encodedImage.SetSimulcastIndex(0);
         m_encodedImage.ntp_time_ms_ = inputFrame.ntp_time_ms();
         m_encodedImage.capture_time_ms_ = inputFrame.render_time_ms();
@@ -506,7 +389,7 @@ namespace webrtc
         m_encodedImage.timing_.flags = VideoSendTiming::kInvalid;
         m_encodedImage._frameType = VideoFrameType::kVideoFrameDelta;
         m_encodedImage.SetColorSpace(inputFrame.color_space());
-        std::vector<H264::NaluIndex> naluIndices = H264::FindNaluIndices(packet.data(), packet.size());
+        std::vector<H264::NaluIndex> naluIndices = H264::FindNaluIndices(rtc::ArrayView<uint8_t> (packet.data(), packet.size()));
         for (uint32_t i = 0; i < naluIndices.size(); i++)
         {
             const H264::NaluType naluType = H264::ParseNaluType(packet[naluIndices[i].payload_start_offset]);
@@ -536,7 +419,7 @@ namespace webrtc
         return WEBRTC_VIDEO_CODEC_OK;
     }
 
-    void NvEncoderImpl::SetRates(const RateControlParameters& parameters)
+    void NvEncoderImplH264::SetRates(const RateControlParameters& parameters)
     {
         if (m_encoder == nullptr)
         {
@@ -622,7 +505,7 @@ namespace webrtc
         m_configurations[0].SetStreamState(true);
     }
 
-    void NvEncoderImpl::LayerConfig::SetStreamState(bool sendStream)
+    void NvEncoderImplH264::LayerConfig::SetStreamState(bool sendStream)
     {
         if (sendStream && !sending)
         {

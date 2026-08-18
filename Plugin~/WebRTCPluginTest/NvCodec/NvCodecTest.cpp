@@ -319,7 +319,7 @@ namespace webrtc
         encoded_frame._frameType = VideoFrameType::kVideoFrameKey;
         EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK, decoder_->Decode(encoded_frame, false, 0));
         std::unique_ptr<VideoFrame> decoded_frame;
-        absl::optional<uint8_t> decoded_qp;
+        std::optional<uint8_t> decoded_qp;
         ASSERT_TRUE(WaitForDecodedFrame(&decoded_frame, &decoded_qp));
         ASSERT_TRUE(decoded_frame);
         EXPECT_EQ(encoded_frame.Timestamp(), decoded_frame->timestamp());

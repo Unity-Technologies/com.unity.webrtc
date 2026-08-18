@@ -33,7 +33,7 @@ namespace webrtc
         virtual void SetMaxFramerateFps(int maxFramerate);
 
     private:
-        absl::optional<TimeDelta> ScheduleNextFrame();
+        std::optional<TimeDelta> ScheduleNextFrame();
         void CaptureNextFrame();
         void StartRepeatingTask();
         void StopTask();

@@ -56,20 +56,20 @@ namespace webrtc
         std::unique_ptr<VideoEncoder> CreateEncoder() override
         {
             SdpVideoFormat format = FindFormat(codecName, encoderFactory.GetSupportedFormats());
-            return encoderFactory.CreateVideoEncoder(format);
+            return encoderFactory.Create(format);
         }
 
         std::unique_ptr<VideoDecoder> CreateDecoder() override
         {
             SdpVideoFormat format = FindFormat(codecName, decoderFactory.GetSupportedFormats());
-            return decoderFactory.CreateVideoDecoder(format);
+            return decoderFactory.Create(env, format);
         }
 
         std::unique_ptr<FrameGeneratorInterface> CreateFrameGenerator(
             int width,
             int height,
-            absl::optional<FrameGeneratorInterface::OutputType> type,
-            absl::optional<int> num_squares) override
+            std::optional<FrameGeneratorInterface::OutputType> type,
+            std::optional<int> num_squares) override
         {
             return CreateVideoFrameGenerator(container_->device(), width, height, type, num_squares);
         }

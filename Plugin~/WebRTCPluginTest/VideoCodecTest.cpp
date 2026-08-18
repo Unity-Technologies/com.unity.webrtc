@@ -38,7 +38,7 @@ namespace webrtc
     }
 
     void VideoCodecTest::FakeDecodedImageCallback::Decoded(
-        VideoFrame& frame, absl::optional<int32_t> decode_time_ms, absl::optional<uint8_t> qp)
+        VideoFrame& frame, std::optional<int32_t> decode_time_ms, std::optional<uint8_t> qp)
     {
         MutexLock lock(&_test->decodedFrameSection_);
         _test->decodedFrame_.emplace(frame);
@@ -56,7 +56,7 @@ namespace webrtc
 
         // I420Buffer::SetBlack(frame_data.buffer);
         const uint32_t timestamp = lastInputFrameTimestamp_ + kVideoPayloadTypeFrequency / codecSettings_.maxFramerate;
-        input_frame.set_timestamp(timestamp);
+        input_frame.set_timestamp_us(timestamp);
 
         lastInputFrameTimestamp_ = timestamp;
         return input_frame;
@@ -101,7 +101,7 @@ namespace webrtc
         return false;
     }
 
-    bool VideoCodecTest::WaitForDecodedFrame(std::unique_ptr<VideoFrame>* frame, absl::optional<uint8_t>* qp)
+    bool VideoCodecTest::WaitForDecodedFrame(std::unique_ptr<VideoFrame>* frame, std::optional<uint8_t>* qp)
     {
         EXPECT_TRUE(decodedFrameEvent_.Wait(kDecodeTimeoutMs)) << "Timed out while waiting for a decoded frame.";
         // This becomes unsafe if there are multiple threads waiting for frames.
@@ -128,7 +128,7 @@ namespace webrtc
             codecSettings_.width,
             codecSettings_.height,
             test::FrameGeneratorInterface::OutputType::kI420,
-            absl::optional<int>());
+            std::optional<int>());
 
         encoder_ = CreateEncoder();
         decoder_ = CreateDecoder();

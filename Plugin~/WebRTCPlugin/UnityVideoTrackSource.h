@@ -6,7 +6,7 @@
 #include <api/media_stream_interface.h>
 #include <api/task_queue/task_queue_factory.h>
 #include <media/base/adapted_video_track_source.h>
-#include <rtc_base/task_queue.h>
+#include <api/task_queue/task_queue_base.h>
 
 #include "VideoFrame.h"
 
@@ -78,7 +78,7 @@ namespace webrtc
         const absl::optional<bool> needs_denoising_;
         std::mutex mutex_;
 
-        std::unique_ptr<rtc::TaskQueue> taskQueue_;
+        std::unique_ptr<webrtc::TaskQueueBase, TaskQueueDeleter> taskQueue_;
         std::unique_ptr<VideoFrameScheduler> scheduler_;
         rtc::scoped_refptr<unity::webrtc::VideoFrame> frame_;
         bool syncApplicationFramerate_;

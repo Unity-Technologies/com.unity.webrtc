@@ -95,10 +95,10 @@ namespace webrtc
     }
 
     std::unique_ptr<webrtc::VideoDecoder>
-    UnityVideoDecoderFactory::CreateVideoDecoder(const webrtc::SdpVideoFormat& format)
+    UnityVideoDecoderFactory::Create(const Environment& env,const webrtc::SdpVideoFormat& format)
     {
         VideoDecoderFactory* factory = FindCodecFactory(factories_, format);
-        auto decoder = factory->CreateVideoDecoder(format);
+        auto decoder = factory->Create(env, format);
         if (!profiler_)
             return decoder;
 

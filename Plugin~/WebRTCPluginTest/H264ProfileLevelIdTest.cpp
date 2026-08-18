@@ -2,6 +2,8 @@
 
 #include "Codec/H264ProfileLevelId.h"
 
+#include "api/video_codecs/sdp_video_format.h"
+
 namespace unity
 {
 namespace webrtc

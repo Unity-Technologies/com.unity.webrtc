@@ -15,7 +15,7 @@ namespace webrtc
     {
     public:
         virtual std::vector<webrtc::SdpVideoFormat> GetSupportedFormats() const override;
-        virtual std::unique_ptr<webrtc::VideoDecoder> CreateVideoDecoder(const webrtc::SdpVideoFormat& format) override;
+        virtual std::unique_ptr<webrtc::VideoDecoder> Create(const Environment& env, const webrtc::SdpVideoFormat& format) override;
 
         UnityVideoDecoderFactory(IGraphicsDevice* gfxDevice, ProfilerMarkerFactory* profiler);
         ~UnityVideoDecoderFactory() override;
