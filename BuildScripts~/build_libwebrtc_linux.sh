@@ -36,6 +36,10 @@ do
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
   for is_debug in "true" "false"
   do
+    symbol_level=0
+    if [ $is_debug = "true" ]; then
+      symbol_level=1
+    fi
     args="is_debug=${is_debug} \
       target_os=\"linux\" \
       target_cpu=\"${target_cpu}\" \
@@ -48,7 +52,8 @@ do
       is_component_build=false \
       use_rtti=true \
       rtc_use_x11=false \
-      use_cxx17=true"
+      use_cxx17=true \
+      symbol_level=${symbol_level}"
 
     if [ $is_debug = "true" ]; then
       args="${args} is_asan=true is_lsan=true";

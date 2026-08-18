@@ -47,9 +47,15 @@ for %%i in (x64) do (
   mkdir "%ARTIFACTS_DIR%/lib/%%i"
   for %%j in (true false) do (
 
+    rem set symbol_level depending on is_debug
+    set symbol_level=0
+    if %%j==true (
+      set symbol_level=1
+    )
+    
     rem generate ninja for release
     call gn.bat gen %OUTPUT_DIR% --root="src" ^
-      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=0 enable_iterator_debugging=false use_cxx17=true"
+      --args="is_debug=%%j is_clang=true target_cpu=\"%%i\" use_custom_libcxx=false rtc_include_tests=false rtc_build_examples=false rtc_use_h264=false symbol_level=!symbol_level! enable_iterator_debugging=false use_cxx17=true"
 
     rem build
     call ninja.bat -C %OUTPUT_DIR% webrtc
