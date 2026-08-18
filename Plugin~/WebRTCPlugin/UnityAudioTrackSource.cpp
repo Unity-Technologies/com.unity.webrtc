@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <common_audio/include/audio_util.h>
+#include <modules/audio_processing/include/audio_processing.h>
 #include <rtc_base/ref_counted_object.h>
 
 #include "UnityAudioTrackSource.h"
@@ -68,6 +69,16 @@ namespace webrtc
 
         while (_convertedAudioData.size() >= nNumSamplesFor10ms)
         {
+            if (_audioProcessing)
+            {
+                StreamConfig streamConfig(nSampleRate, nNumChannels);
+                _audioProcessing->ProcessStream(
+                    _convertedAudioData.data(),
+                    streamConfig,
+                    streamConfig,
+                    _convertedAudioData.data());
+            }
+
             for (auto sink : _arrSink)
                 sink->OnData(_convertedAudioData.data(), nBitPerSample, nSampleRate, nNumChannels, nNumFramesFor10ms);
             _convertedAudioData.erase(_convertedAudioData.begin(), _convertedAudioData.begin() + nNumSamplesFor10ms);
@@ -78,6 +89,30 @@ namespace webrtc
     UnityAudioTrackSource::UnityAudioTrackSource(const cricket::AudioOptions& audio_options)
         : _options(audio_options)
     {
+        // Build and configure the APM so that the options are actually applied.
+        // cricket::AudioOptions are stored as metadata by LocalAudioSource but are
+        // never wired into any real processing — PushAudioData() bypasses the WebRTC
+        // voice engine entirely, so we must drive the APM ourselves here.
+        AudioProcessing::Config apmConfig;
+
+        apmConfig.noise_suppression.enabled =
+            audio_options.noise_suppression.value_or(true);
+        apmConfig.noise_suppression.level =
+            AudioProcessing::Config::NoiseSuppression::kHigh;
+
+        apmConfig.gain_controller1.enabled =
+            audio_options.auto_gain_control.value_or(true);
+        apmConfig.gain_controller1.mode =
+            AudioProcessing::Config::GainController1::kAdaptiveDigital;
+
+        apmConfig.high_pass_filter.enabled =
+            audio_options.highpass_filter.value_or(false);
+
+        apmConfig.echo_canceller.enabled =
+            audio_options.echo_cancellation.value_or(false);
+
+        _audioProcessing = AudioProcessingBuilder().Create();
+        _audioProcessing->ApplyConfig(apmConfig);
     }
 
     UnityAudioTrackSource::~UnityAudioTrackSource() { }

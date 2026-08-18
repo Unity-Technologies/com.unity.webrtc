@@ -244,11 +244,10 @@ namespace webrtc
 
     rtc::scoped_refptr<AudioSourceInterface> Context::CreateAudioSource()
     {
-        // avoid optimization specially for voice
         cricket::AudioOptions audioOptions;
-        audioOptions.auto_gain_control = false;
-        audioOptions.noise_suppression = false;
+        audioOptions.noise_suppression = true;
         audioOptions.highpass_filter = false;
+        audioOptions.auto_gain_control = true;
         return UnityAudioTrackSource::Create(audioOptions);
     }
 
