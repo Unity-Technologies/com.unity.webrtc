@@ -29,6 +29,10 @@ patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 # Fix SetRawImagePlanes() in LibvpxVp8Encoder
 patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
 
+patch -N "src/modules/video_coding/codecs/vp9/libvpx_vp9_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp9_encoder.patch"
+
+patch -N "src/modules/video_coding/codecs/av1/libaom_av1_encoder.cc" < "$COMMAND_DIR/patches/libaom_av1_encoder.patch"
+
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 for target_cpu in "x64"
