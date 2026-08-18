@@ -8,7 +8,7 @@ namespace Unity.WebRTC.RuntimeTest
         [Test]
         public void Construct()
         {
-            Assert.Throws<ArgumentException>(() => new RTCIceCandidate());
+            Assert.That(() => new RTCIceCandidate(), Throws.Nothing);
         }
 
         [Test]
@@ -22,23 +22,52 @@ namespace Unity.WebRTC.RuntimeTest
                     "candidate:102362043 1 udp 2122262783 240b:10:2fe0:4900:3cbd:7306:63c4:a8e1 50241 typ host generation 0 ufrag DEIG network-id 5"
             };
             var candidate = new RTCIceCandidate(option);
-            Assert.IsNotEmpty(candidate.Candidate);
-            Assert.AreEqual(candidate.Candidate, option.candidate);
-            Assert.AreEqual(candidate.SdpMLineIndex, option.sdpMLineIndex);
-            Assert.AreEqual(candidate.SdpMid, option.sdpMid);
-            Assert.AreEqual(RTCIceComponent.Rtp, candidate.Component);
-            Assert.IsNotEmpty(candidate.Foundation);
-            Assert.NotNull(candidate.Port);
-            Assert.NotNull(candidate.Priority);
-            Assert.IsNotEmpty(candidate.Address);
-            Assert.NotNull(candidate.Protocol);
-            Assert.IsNotEmpty(candidate.RelatedAddress);
-            Assert.NotNull(candidate.RelatedPort);
-            Assert.IsNotEmpty(candidate.SdpMid);
-            Assert.NotNull(candidate.SdpMLineIndex);
-            Assert.NotNull(candidate.Type);
-            Assert.Null(candidate.TcpType);
-            Assert.IsNotEmpty(candidate.UserNameFragment);
+            Assert.That(candidate.Candidate, Is.Not.Empty);
+            Assert.That(candidate.Candidate, Is.EqualTo(option.candidate));
+            Assert.That(candidate.SdpMLineIndex, Is.EqualTo(option.sdpMLineIndex));
+            Assert.That(candidate.SdpMid, Is.EqualTo(option.sdpMid));
+            Assert.That(candidate.Component, Is.EqualTo(RTCIceComponent.Rtp));
+            Assert.That(candidate.Foundation, Is.Not.Empty);
+            Assert.That(candidate.Port, Is.Not.Null);
+            Assert.That(candidate.Priority, Is.Not.Null);
+            Assert.That(candidate.Address, Is.Not.Empty);
+            Assert.That(candidate.Protocol, Is.Not.Null);
+            Assert.That(candidate.RelatedAddress, Is.Not.Empty);
+            Assert.That(candidate.RelatedPort, Is.Not.Null);
+            Assert.That(candidate.SdpMid, Is.Not.Empty);
+            Assert.That(candidate.SdpMLineIndex, Is.Not.Null);
+            Assert.That(candidate.Type, Is.Not.Null);
+            Assert.That(candidate.TcpType, Is.Null);
+            Assert.That(candidate.UserNameFragment, Is.Not.Empty);
+        }
+
+        [Test]
+        public void ConstructWithEndOfCandidate()
+        {
+            var option = new RTCIceCandidateInit
+            {
+                sdpMid = "0",
+                sdpMLineIndex = 0,
+                candidate = ""
+            };
+            var candidate = new RTCIceCandidate(option);
+            Assert.That(candidate.Candidate, Is.Empty);
+            Assert.That(candidate.Candidate, Is.Empty);
+            Assert.That(candidate.SdpMLineIndex, Is.Null);
+            Assert.That(candidate.SdpMid, Is.Empty);
+            Assert.That(candidate.Component, Is.Null);
+            Assert.That(candidate.Foundation, Is.Empty);
+            Assert.That(candidate.Port, Is.Zero);
+            Assert.That(candidate.Priority, Is.Zero);
+            Assert.That(candidate.Address, Is.EqualTo(":0"));
+            Assert.That(candidate.Protocol, Is.Null);
+            Assert.That(candidate.RelatedAddress, Is.EqualTo(":0"));
+            Assert.That(candidate.RelatedPort, Is.Zero);
+            Assert.That(candidate.SdpMid, Is.Empty);
+            Assert.That(candidate.SdpMLineIndex, Is.Null);
+            Assert.That(candidate.Type, Is.Null);
+            Assert.That(candidate.TcpType, Is.Null);
+            Assert.That(candidate.UserNameFragment, Is.Empty);
         }
     }
 }
