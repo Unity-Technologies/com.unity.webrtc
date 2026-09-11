@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include "UnityVulkanInitCallback.h"
+#include <cstring>
+#include <set>
 
 namespace unity
 {
@@ -23,6 +25,16 @@ namespace webrtc
 #endif
     };
 
+    namespace
+    {
+        // Compare type to use const char* in set
+        struct StrCompare {
+            bool operator()(const char* a, const char* b) const {
+                return std::strcmp(a, b) < 0;
+            }
+        };
+    }
+
     static VKAPI_ATTR VkResult VKAPI_CALL Hook_vkCreateDevice(
         VkPhysicalDevice physicalDevice,
         const VkDeviceCreateInfo* pCreateInfo,
@@ -32,22 +44,16 @@ namespace webrtc
         // copy value
         VkDeviceCreateInfo newCreateInfo = *pCreateInfo;
 
-        // copy extension name list
-        std::vector<const char*> enabledExtensions;
-        enabledExtensions.reserve(pCreateInfo->enabledExtensionCount);
-        for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++)
-        {
-            enabledExtensions.push_back(newCreateInfo.ppEnabledExtensionNames[i]);
-        }
+        // Use a set to prevent duplicate extensions
+        // Add extensions from CreateInfo
+        std::set<const char*, StrCompare> uniqueExtensions(newCreateInfo.ppEnabledExtensionNames,
+            newCreateInfo.ppEnabledExtensionNames + newCreateInfo.enabledExtensionCount);
 
-        // get the union of the two
-        std::vector<const char*> newExtensions;
-        std::set_union(
-            requestedDeviceExtensions.begin(),
-            requestedDeviceExtensions.end(),
-            enabledExtensions.begin(),
-            enabledExtensions.end(),
-            std::inserter(newExtensions, std::end(newExtensions)));
+        // Add additional requested extensions
+        uniqueExtensions.insert(requestedDeviceExtensions.begin(), requestedDeviceExtensions.end());
+
+        // Use vector for continuous memory layout
+        std::vector<const char*> newExtensions(uniqueExtensions.begin(), uniqueExtensions.end());
 
         RTC_LOG(LS_INFO) << "WebRTC plugin intercepts vkCreateDevice.";
 
@@ -79,22 +85,16 @@ namespace webrtc
         // copy value
         VkInstanceCreateInfo newCreateInfo = *pCreateInfo;
 
-        // copy extension name list
-        std::vector<const char*> enabledExtensions;
-        enabledExtensions.reserve(pCreateInfo->enabledExtensionCount);
-        for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++)
-        {
-            enabledExtensions.push_back(newCreateInfo.ppEnabledExtensionNames[i]);
-        }
+        // Use a set to prevent duplicate extensions
+        // Add extensions from CreateInfo
+        std::set<const char*, StrCompare> uniqueExtensions(newCreateInfo.ppEnabledExtensionNames,
+            newCreateInfo.ppEnabledExtensionNames + newCreateInfo.enabledExtensionCount);
 
-        // get the union of the two
-        std::vector<const char*> newExtensions;
-        std::set_union(
-            requestedInstanceExtensions.begin(),
-            requestedInstanceExtensions.end(),
-            enabledExtensions.begin(),
-            enabledExtensions.end(),
-            std::inserter(newExtensions, std::end(newExtensions)));
+        // Add additional requested extensions
+        uniqueExtensions.insert(requestedInstanceExtensions.begin(), requestedInstanceExtensions.end());
+
+        // Use vector for continuous memory layout
+        std::vector<const char*> newExtensions(uniqueExtensions.begin(), uniqueExtensions.end());
 
         RTC_LOG(LS_INFO) << "WebRTC plugin intercepts vkCreateInstance.";
 
