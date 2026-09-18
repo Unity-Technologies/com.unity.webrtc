@@ -11,7 +11,7 @@ Call the [`GetStats`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RT
 // Get Statistics
 var statsOperation = peerConnection.GetStats();
 yield return statsOperation;
-var statsReport = statisOperation.Value;
+var statsReport = statsOperation.Value;
 ```
 
 You can get the statistics at the time of calling the [`GetStats`](../api/Unity.WebRTC.RTCPeerConnection.html#Unity_WebRTC_RTCPeerConnection_GetStats) method.

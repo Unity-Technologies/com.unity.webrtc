@@ -25,11 +25,11 @@ Pressing the button on the list of PeerConnections will display the list of stat
 Selecting an item from the pulldown menu displays a list of statistics.
 Below is an example when you select [`CandidatePair`]().
 
-![WebRTC Stats Exsample StatsMember](images/webrtc-stats_example-statsmember.png)
+![WebRTC Stats Example StatsMember](images/webrtc-stats_example-statsmember.png)
 
 It also displays a graph for data that changes over time.
 
-![WebRTC Stats Exsample StatsGraph](images/webrtc-stats_example-statsgraph.png)
+![WebRTC Stats Example StatsGraph](images/webrtc-stats_example-statsgraph.png)
 
 ## Storing Statistics.
 You can save the collected statistics by pressing the Save button in the upper right corner of the screen.
