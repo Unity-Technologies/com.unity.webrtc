@@ -8,7 +8,7 @@ Install dependencies to make development environment.
 
 ### Windows
 
-On windows, first, you need to install **Visual Studio 2022**. The build process use the **clang** compiler. To install clang, see [MSDN](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170). And [chocolatey](https://chocolatey.org/) is used to install.
+On windows, first, you need to install **Visual Studio 2022**. The build process uses the **clang** compiler. To install clang, see [MSDN](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170). And [chocolatey](https://chocolatey.org/) is used to install.
 
 ```powershell
 # Install CUDA
@@ -35,7 +35,7 @@ setx VULKAN_SDK "C:\VulkanSDK\1.2.182.0" /m
 
 ### Ubuntu
 
-The below commands shows the build process developing environment on **Ubuntu 16.04**.
+The below commands show the build process developing environment on **Ubuntu 16.04**.
 
 ```bash
 # Install clang 11

@@ -10,13 +10,13 @@ The package contains the following samples.
 | MediaStream | Sending and receiving video/audio |
 | MultiPeers | Instantiating multiple peers and streaming video/audio |
 | Stats | Checking the process of getting stats |
-| MungeSDP | Checking effects with mungring SDP parameters |
+| MungeSDP | Checking effects with munging SDP parameters |
 | VideoReceive | Sending and receiving video stream |
 | MultiVideoReceive | Receiving multiple video streams with one peer |
 | MultiplePeerConnections | Receiving video stream with multiple peers |
 | ChangeCodecs | Controlling codecs of the video sender |
 | TricleIce | Checking the trickle ICE functionality |
-| RestartIce | Checking do an ICE restart |
+| RestartIce | Checking doing an ICE restart |
 | PerfectNegotiation | Demonstrating [Perfect Negotiation Pattern](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation) |
 | Latency | Measuring a latency of video streaming |
 | ReplaceTrack | Change another video track without stopping video streaming |

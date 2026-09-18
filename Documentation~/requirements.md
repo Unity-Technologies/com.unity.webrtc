@@ -14,7 +14,7 @@ This version of the package is compatible with the following versions of the Uni
 
 - **Windows 10** (x64 only)
 - **Linux** (Ubuntu 22.04, 24.04)
-- **macOS** (**Apple Slicon**)
+- **macOS** (**Apple Silicon**)
 - **iOS**
 - **Android** (**ARM64** only. **ARMv7** is not supported)
 
@@ -31,7 +31,7 @@ Please note that there are unsupported platforms below.
 To build the apk file for **Android platform**, you need to configure player settings below.
 
 - Choose **IL2CPP** for **Scripting backend** in Player Settings Window.
-- Set enadle **ARM64** and Set disable **ARMv7** for **Target Architectures** setting in Player Settings Window.
+- Set enable **ARM64** and Set disable **ARMv7** for **Target Architectures** setting in Player Settings Window.
 - Choose **Require** for **Internet Access** in Player Setting Window.
 
 > [!NOTE]
