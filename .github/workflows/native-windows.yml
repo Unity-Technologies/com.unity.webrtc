@@ -1,0 +1,97 @@
+name: Native plugin (Windows)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Plugin~/**'
+      - 'BuildScripts~/build_plugin_win.cmd'
+      - '.github/workflows/native-windows.yml'
+  pull_request:
+    paths:
+      - 'Plugin~/**'
+      - 'BuildScripts~/build_plugin_win.cmd'
+      - '.github/workflows/native-windows.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Prebuilt libwebrtc M116 published by Unity. Pinned by checksum because the fork does not control that release.
+  LIBWEBRTC_URL: https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M116-20250805/webrtc-win.zip
+  LIBWEBRTC_SHA256: e3f2e88746dbd0b9b82ed7cdcab623131252d773712b41798f8be1a8ac948f79
+
+jobs:
+  build:
+    name: Build webrtc.dll (${{ matrix.config }})
+    # Visual Studio 2022 + CUDA 12 keeps the minimum NVIDIA driver version low for users.
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [Release]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install CUDA
+        uses: Jimver/cuda-toolkit@v0.2.36
+        with:
+          cuda: '12.9.1'
+          method: network
+          sub-packages: '["nvcc", "cudart", "visual_studio_integration"]'
+
+      - name: Install Vulkan headers and loader
+        uses: humbletim/setup-vulkan-sdk@v1.2.1
+        with:
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
+
+      - name: Cache libwebrtc
+        id: libwebrtc-cache
+        uses: actions/cache@v6
+        with:
+          path: Plugin~/webrtc
+          key: libwebrtc-win-${{ env.LIBWEBRTC_SHA256 }}
+
+      - name: Download libwebrtc
+        if: steps.libwebrtc-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri $env:LIBWEBRTC_URL -OutFile webrtc.zip
+          $hash = (Get-FileHash webrtc.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne $env:LIBWEBRTC_SHA256) { throw "webrtc.zip checksum mismatch: $hash" }
+          7z x -aoa webrtc.zip -o"Plugin~/webrtc"
+
+      - name: Configure
+        shell: pwsh
+        working-directory: Plugin~
+        # Point the Visual Studio generator at the CUDA toolkit installed in this job.
+        run: cmake --preset=x64-windows-msvc -T "cuda=$env:CUDA_PATH" -Wno-dev
+
+      - name: Build
+        shell: pwsh
+        working-directory: Plugin~
+        run: cmake --build out/build/x64-windows-msvc --config ${{ matrix.config }} --target WebRTCPlugin --parallel
+
+      - name: Check exports
+        shell: pwsh
+        run: |
+          $dll = 'Runtime/Plugins/x86_64/webrtc.dll'
+          if (-not (Test-Path $dll)) { throw "$dll was not built" }
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $dumpbin = Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" | Select-Object -First 1
+          $exports = & $dumpbin.FullName /exports $dll
+          foreach ($name in 'ContextCreate', 'GetBatchUpdateEventFunc', 'UnityPluginLoad', 'UnityPluginUnload') {
+            if (-not ($exports -match "\b$name\b")) { throw "Missing export $name" }
+          }
+          Get-Item $dll | Format-List Name, Length, LastWriteTime
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: webrtc-win-x64-${{ matrix.config }}
+          path: Runtime/Plugins/x86_64/webrtc.dll
+          if-no-files-found: error
