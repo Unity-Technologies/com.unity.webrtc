@@ -37,7 +37,10 @@ namespace Unity.WebRTC.EditorTest
         public static void CheckPluginImportSettings()
         {
 
-            string[] guids = AssetDatabase.FindAssets("", new[] { "Packages/com.unity.webrtc/Runtime/Plugins" });
+            var packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(WebRTC).Assembly);
+            Assert.That(packageInfo, Is.Not.Null);
+            string[] guids = AssetDatabase.FindAssets("", new[] { $"{packageInfo.assetPath}/Runtime/Plugins" });
+            Assert.That(guids, Is.Not.Empty);
             foreach (string guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);

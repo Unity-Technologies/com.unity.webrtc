@@ -21,10 +21,8 @@ build.sh
 build.sh.meta
 build.bat
 build.bat.meta
-xray-exemptions.json
 
 WebRTC~/**
-Tools/**
 
 # waste of the plugin artifacts
 linux_plugin-*

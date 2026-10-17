@@ -1,16 +1,13 @@
 # Contributing
 
-## If you are interested in contributing, here are some ground rules:
-* Talk to us before doing the work -- we love contributions, but we might already be working on the same thing, or we might have different opinions on how it should be implemented.
+Contributions are welcome: bug reports, fixes, platform support and documentation.
 
+## Ground rules
 
-## All contributions are subject to the Apache 2.0 Contributor License Agreement
-By making a pull request, you confirm you agree to the terms and conditions of 
-the Apache 2.0 Contributor License Agreement
-(whether [Individual](https://www.apache.org/licenses/icla.pdf) or [Corporate](https://www.apache.org/licenses/cla-corporate.txt))
-and have signed and submitted such Contributor License Agreement to
-the Apache 2.0 Software Foundation, and you further agree that your Contributions
-are your original creation and that you have complete right and authority 
-to make your Contributions.
+* For anything larger than a small fix, open an issue first so we can agree on the approach before you do the work.
+* Keep pull requests focused on one change, and describe how you tested it (Unity version, platform, graphics API).
+* Changes to the native plugin in `Plugin~` should build on all platforms the package supports. See [Plugin~/README.md](Plugin~/README.md).
 
-## Once you have a change ready following these ground rules. Simply make a pull request
+## License of contributions
+
+This project is licensed under the [Apache License 2.0](LICENSE.md). By submitting a pull request, you agree that your contribution is licensed under the same terms (see section 5 of the license), and that you have the right to submit it.

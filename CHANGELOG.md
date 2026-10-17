@@ -4,6 +4,19 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Fork the package as `com.fdgs.webrtc`, based on the last Apache-2.0 release of `com.unity.webrtc`. The `Unity.WebRTC` namespace and assembly names are unchanged.
+- Replace Unity's internal CI with GitHub Actions.
+- Update documentation, issue templates and package metadata for the fork.
+
+### Fixed
+
+- `PluginTest.CheckPluginImportSettings` looked up plugins under a hardcoded `Packages/com.unity.webrtc` path.
+- Native plugin: build with Visual Studio 2026, CUDA 13 and CMake 4 (missing `<chrono>` includes, new `cuCtxCreate` signature, googletest 1.15.2). Adds `x64-windows-vs2026` CMake presets.
+
 ## [3.0.0] - 2025-09-12
 
 ### Changed

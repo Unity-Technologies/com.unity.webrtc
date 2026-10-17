@@ -1,0 +1,19 @@
+# Normalize text files to LF in the repository and in the working tree,
+# so Unity YAML assets, C#, C++ and shell scripts stay byte-identical across platforms.
+* text=auto eol=lf
+
+# Windows batch scripts need CRLF to run reliably.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Prebuilt native plugins and other binaries.
+*.dll binary
+*.so binary
+*.dylib binary
+*.aar binary
+*.a binary
+*.lib binary
+*.png binary
+*.jpg binary
+*.zip binary

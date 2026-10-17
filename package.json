@@ -1,21 +1,38 @@
 {
   "name": "com.fdgs.webrtc",
-  "displayName": "WebRTC",
+  "displayName": "WebRTC (FDGS)",
   "version": "3.0.0",
   "unity": "6000.0",
-  "description": "The WebRTC package provides browsers and mobile applications with Real-Time Communications (RTC) capabilities.",
+  "description": "Community-maintained fork of the deprecated com.unity.webrtc package. Provides Real-Time Communications (RTC) capabilities for Unity: peer connections, audio and video streaming, and data channels.",
   "keywords": [
     "webrtc",
-    "web"
+    "streaming",
+    "rtc",
+    "video",
+    "audio",
+    "datachannel"
   ],
+  "author": {
+    "name": "FireDragonGameStudio",
+    "url": "https://github.com/FireDragonGameStudio"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs.git"
+  },
+  "documentationUrl": "https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/tree/main/Documentation~",
+  "changelogUrl": "https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/blob/main/LICENSE.md",
   "dependencies": {
     "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.editorcoroutines": "1.0.0",
     "com.unity.modules.audio": "1.0.0"
   },
-  "samples": [{
+  "samples": [
+    {
       "displayName": "Example",
-      "description": "WebRTC sample",
+      "description": "WebRTC sample scenes",
       "path": "Samples~"
     }
   ]

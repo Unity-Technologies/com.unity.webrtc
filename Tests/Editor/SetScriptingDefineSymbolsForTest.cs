@@ -8,7 +8,8 @@ namespace Unity.WebRTC.EditorTest
     {
         static SetScriptingDefineSymbolsForTest()
         {
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("YAMATO_JOB_ID")))
+            // Opt-in for tests that need real devices (e.g. a webcam), which CI runners do not have.
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBRTC_ENABLE_DEVICE_TESTS")))
             {
                 var target = EditorUserBuildSettings.activeBuildTarget;
                 var group = BuildPipeline.GetBuildTargetGroup(target);

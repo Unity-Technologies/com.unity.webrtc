@@ -219,6 +219,11 @@ Plugin~/webrtc/*
 WebRTC~/CodeCoverage
 WebRTC~/TestResults-*
 WebRTC~/Logs
+WebRTC~/Library/
+WebRTC~/Temp/
+WebRTC~/UserSettings/
+WebRTC~/MemoryCaptures/
+WebRTC~/*.log
 *.dbmdl
 *.dbproj.schemaview
 *.jfm

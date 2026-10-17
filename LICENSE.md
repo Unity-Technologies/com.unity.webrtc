@@ -1,4 +1,5 @@
 com.unity.webrtc copyright © 2025 Unity Technologies ApS
+Modifications in com.fdgs.webrtc copyright © 2026 FireDragonGameStudio
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

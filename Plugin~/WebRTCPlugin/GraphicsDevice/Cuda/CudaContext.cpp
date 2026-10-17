@@ -30,6 +30,16 @@ namespace unity
 {
 namespace webrtc
 {
+    // CUDA 13 added a CUctxCreateParams argument to cuCtxCreate.
+    static CUresult CreateCudaContext(CUcontext* context, CUdevice device)
+    {
+#if CUDA_VERSION >= 13000
+        return cuCtxCreate(context, nullptr, 0, device);
+#else
+        return cuCtxCreate(context, 0, device);
+#endif
+    }
+
     static void* s_hModule = nullptr;
     static void* nvEncode_Module = nullptr;
     static bool FindModule()
@@ -133,7 +143,7 @@ namespace webrtc
             return CUDA_ERROR_INVALID_DEVICE;
 
         CUCTX_CUDA_CALL_ERROR(FindCudaDevice(deviceUUID.data(), &cuDevice));
-        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, cuDevice));
+        CUCTX_CUDA_CALL_ERROR(CreateCudaContext(&m_context, cuDevice));
         return CUDA_SUCCESS;
     }
     //---------------------------------------------------------------------------------------------------------------------
@@ -163,7 +173,7 @@ namespace webrtc
         if (cuD3D11GetDevice(&dev, pDxgiAdapter.Get()) != CUDA_SUCCESS)
             return CUDA_ERROR_NO_DEVICE;
 
-        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, dev));
+        CUCTX_CUDA_CALL_ERROR(CreateCudaContext(&m_context, dev));
         return CUDA_SUCCESS;
     }
 #endif
@@ -207,7 +217,7 @@ namespace webrtc
         if (!deviceFound)
             return CUDA_ERROR_NO_DEVICE;
 
-        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, cuDevice));
+        CUCTX_CUDA_CALL_ERROR(CreateCudaContext(&m_context, cuDevice));
         return CUDA_SUCCESS;
     }
 #endif
@@ -239,7 +249,7 @@ namespace webrtc
         CUdevice cuDevice = 0;
 
         CUCTX_CUDA_CALL_ERROR(cuDeviceGet(&cuDevice, cuDevId));
-        CUCTX_CUDA_CALL_ERROR(cuCtxCreate(&m_context, 0, cuDevice));
+        CUCTX_CUDA_CALL_ERROR(CreateCudaContext(&m_context, cuDevice));
 
         return CUDA_SUCCESS;
     }

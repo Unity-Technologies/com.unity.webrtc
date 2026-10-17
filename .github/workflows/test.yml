@@ -1,0 +1,75 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-check:
+    name: Package check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate package.json
+        run: python3 -c "import json; m = json.load(open('package.json')); assert m['name'] == 'com.fdgs.webrtc', m['name']; print(m['name'], m['version'])"
+
+      - name: Check that every asset has a .meta file
+        run: |
+          missing=0
+          while IFS= read -r -d '' path; do
+            if [ ! -f "$path.meta" ]; then
+              echo "::error file=$path::Missing $path.meta"
+              missing=1
+            fi
+          # Files inside .framework/.bundle folders are part of one asset and have no .meta of their own.
+          done < <(find Runtime Editor Tests -mindepth 1 \( -path '*.framework/*' -o -path '*.bundle/*' \) -prune -o ! -name '*.meta' -print0)
+          exit $missing
+
+  unity-tests:
+    name: Unity ${{ matrix.unityVersion }} (${{ matrix.testMode }})
+    needs: package-check
+    runs-on: ubuntu-latest
+    # Unity license secrets are not available to pull requests from forks.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    strategy:
+      fail-fast: false
+      matrix:
+        # Minimum supported version (see package.json) and the current LTS.
+        unityVersion: [6000.0.84f1, 6000.3.26f1]
+        testMode: [editmode]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: WebRTC~/Library
+          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ hashFiles('WebRTC~/Packages/manifest.json', 'WebRTC~/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-
+
+      # Requires the repository secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD.
+      # See https://game.ci/docs/github/activation
+      - uses: game-ci/unity-test-runner@v4
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: WebRTC~
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: ${{ matrix.testMode }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Unity ${{ matrix.unityVersion }} ${{ matrix.testMode }} results
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.unityVersion }}-${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.artifactsPath }}

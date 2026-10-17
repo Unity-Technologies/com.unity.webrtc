@@ -11,11 +11,15 @@ Check Package Manager window, Click `+` button and select `Add package from git 
 Input the string below to the input field.
 
 ```
-com.unity.webrtc@3.0.0-pre.8
+https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs.git
 ```
 
-The list of version string is [here](https://github.com/Unity-Technologies/com.unity.webrtc/tags). In most cases, the latest version is recommended to use.
+To pin a specific version, append a tag, for example `https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs.git#v3.0.0`. The list of tags is [here](https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/tags). In most cases, the latest version is recommended to use.
 
 ![Input webrtc package git URL](images/install_input_webrtc_git_url.png)
 
- Click `Add` button, and will start install the package.
+Click `Add` button, and will start install the package.
+
+> [!NOTE]
+> This package (`com.fdgs.webrtc`) is a fork of `com.unity.webrtc` and contains the same assemblies and namespace (`Unity.WebRTC`).
+> Remove `com.unity.webrtc` from your project before installing it; the two packages cannot be installed side by side.

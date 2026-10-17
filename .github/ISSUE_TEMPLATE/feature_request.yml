@@ -3,21 +3,19 @@ description: Suggest an idea for this project.
 title: "[REQUEST]: "
 labels: 
   - enhancement
-assignees: 
-  - karasusan
 body: 
   - type: markdown
     attributes:
       value: |
         Please check below before post your issue.
-        * For questions, ask in [Unity Forum](https://forum.unity.com/forums/unity-render-streaming.413).
-        * Before you file an issue read the [Contributing guide](https://github.com/Unity-Technologies/com.unity.webrtc/blob/develop/CONTRIBUTING.md).
-        * Check to make sure someone hasn't already opened a similar [issue](https://github.com/Unity-Technologies/com.unity.webrtc/issues).
+        * For questions, use [GitHub Discussions](https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/discussions).
+        * Before you file an issue read the [Contributing guide](https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/blob/main/CONTRIBUTING.md).
+        * Check to make sure someone hasn't already opened a similar [issue](https://github.com/FireDragonGameStudio/com.unity.webrtc.fdgs/issues).
          
         Please note the following points.
-        * We try to reply as soon as possible but we will get in touch with you within **5 working days**.
+        * This project is maintained by volunteers, so replies may take a while.
         * If you solved the issue yourself, please **post the comment and close your issue**.
-        * We would close the issue if we do not receive a reply for more than **2 weeks**.
+        * We may close the issue if we do not receive a reply for more than **4 weeks**.
 
   - type: textarea
     id: problem

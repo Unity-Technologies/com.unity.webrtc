@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <chrono>
+
 #include <third_party/libyuv/include/libyuv/convert.h>
 
 #include "GraphicsDevice/GraphicsUtility.h"

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <chrono>
+
 #include "GpuMemoryBuffer.h"
 #include "GraphicsDevice/ITexture2D.h"
 

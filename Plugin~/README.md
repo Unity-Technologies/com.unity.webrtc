@@ -1,12 +1,33 @@
 # Build Native Plugin
 
-This guide will cover building and deploying the native plugin `com.unity.webrtc` depends on.
+This guide will cover building and deploying the native plugin `com.fdgs.webrtc` depends on.
 
 ## Developing environment
 
 Install dependencies to make development environment.
 
 ### Windows
+
+#### Visual Studio 2026 (recommended)
+
+Install the following:
+
+- **Visual Studio 2026** with the *Desktop development with C++* workload
+- **CUDA Toolkit** 12.x or 13.x, including its Visual Studio integration (`winget install Nvidia.CUDA`)
+- **Vulkan SDK** (`winget install KhronosGroup.VulkanSDK`)
+- **7-Zip** (used by the build script to extract the prebuilt libwebrtc)
+
+Use the CMake bundled with Visual Studio 2026 (version 4.2 or later is needed for the `Visual Studio 18 2026` generator), for example from a *Developer PowerShell for VS 2026*:
+
+```powershell
+cd Plugin~
+cmake --preset=x64-windows-vs2026
+cmake --build --preset=release-windows-vs2026 --target=WebRTCPlugin
+```
+
+Visual Studio finds CUDA through the environment variables the CUDA installer sets (`CUDA_PATH_V<major>_<minor>`), so open a new terminal after installing CUDA. You can also run `BuildScripts~uild_plugin_win.cmd release vs2026` from the repository root, which downloads the prebuilt libwebrtc first.
+
+#### Visual Studio 2022
 
 On windows, first, you need to install **Visual Studio 2022**. The build process use the **clang** compiler. To install clang, see [MSDN](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170). And [chocolatey](https://chocolatey.org/) is used to install.
 
@@ -128,7 +149,7 @@ Alternatively, after the script has been run, a project ready for your IDE or ot
 
 ### Deploying the Plugin
 
-When you run the build, `webrtc.dll` will be placed in `Packages\com.unity.webrtc\Runtime\Plugins\x86_64`. You should then be able to verify the following settings in the Unity Inspector window.
+When you run the build, `webrtc.dll` will be placed in `Runtime\Plugins\x86_64` of this package. You should then be able to verify the following settings in the Unity Inspector window.
 
 **WARNING:** If "Load on startup" is not ticked, your editor will crash when running your project. This may become unticked after you make a change to the plugin. ([#444](https://github.com/Unity-Technologies/com.unity.webrtc/issues/444))
 

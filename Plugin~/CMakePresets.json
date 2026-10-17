@@ -111,6 +111,23 @@
       "inherits": "default-windows-vs2022"
     },
     {
+      "name": "x64-windows-vs2026",
+      "description": "Visual Studio 2026 (MSVC); CUDA is picked up from its Visual Studio integration",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Visual Studio 18 2026",
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ]
+        }
+      }
+    },
+    {
       "name": "x64-windows-clangcl",
       "description": "Sets x64 arch, generator, compilers",
       "toolset": "ClangCL",
@@ -198,6 +215,21 @@
       "configurePreset": "x64-windows-msvc",
       "configuration": "Release",
       "cleanFirst": true
+    },
+    {
+      "name": "debug-windows-vs2026",
+      "displayName": "Build Debug",
+      "description": "Debug build using Visual Studio 2026",
+      "configurePreset": "x64-windows-vs2026",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "release-windows-vs2026",
+      "displayName": "Build Release",
+      "description": "Release build using Visual Studio 2026",
+      "configurePreset": "x64-windows-vs2026",
+      "configuration": "Release"
     },
     {
       "name": "debug-windows-clang",
