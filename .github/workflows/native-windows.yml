@@ -2,7 +2,7 @@ name: Native plugin (Windows)
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
     paths:
       - 'Plugin~/**'
       - 'BuildScripts~/build_plugin_win.cmd'
