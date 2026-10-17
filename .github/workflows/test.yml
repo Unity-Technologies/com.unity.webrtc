@@ -13,7 +13,7 @@ concurrency:
 jobs:
   package-check:
     name: Package check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -35,7 +35,7 @@ jobs:
   unity-tests:
     name: Unity ${{ matrix.unityVersion }} (${{ matrix.testMode }})
     needs: package-check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Unity license secrets are not available to pull requests from forks.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     strategy:
@@ -46,6 +46,12 @@ jobs:
         testMode: [editmode]
     steps:
       - uses: actions/checkout@v7
+
+      # game-ci always uses the Unity version from ProjectVersion.txt for a full project,
+      # so write the matrix version there before restoring the cache and running tests.
+      - name: Select Unity ${{ matrix.unityVersion }}
+        run: |
+          echo "m_EditorVersion: ${{ matrix.unityVersion }}" > WebRTC~/ProjectSettings/ProjectVersion.txt
 
       - uses: actions/cache@v6
         with:
@@ -61,7 +67,10 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          # Lets the action query GitHub's API with the job token instead of the shared, rate-limited runner IP.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          cliVersion: v0.1.72
           projectPath: WebRTC~
           unityVersion: ${{ matrix.unityVersion }}
           testMode: ${{ matrix.testMode }}
@@ -69,7 +78,7 @@ jobs:
           checkName: Unity ${{ matrix.unityVersion }} ${{ matrix.testMode }} results
 
       - uses: actions/upload-artifact@v7
-        if: always()
+        if: always() && steps.tests.outputs.artifactsPath != ''
         with:
           name: test-results-${{ matrix.unityVersion }}-${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
