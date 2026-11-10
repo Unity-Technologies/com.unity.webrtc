@@ -117,11 +117,12 @@ namespace Unity.WebRTC
         public NativeArray<byte>.ReadOnly GetData()
         {
             NativeMethods.FrameGetData(self, out var data, out var size);
+            int length = checked((int)size.ToUInt64());
 
             unsafe
             {
                 var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
-                    data.ToPointer(), size, Allocator.None);
+                    data.ToPointer(), length, Allocator.None);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref arr, AtomicSafetyHandle.Create());

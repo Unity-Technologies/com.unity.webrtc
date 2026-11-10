@@ -45,6 +45,7 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(array, Is.Not.Null);
             Assert.That(array.Length, Is.GreaterThan(0));
             videoFrame.SetData(array);
+            VerifyFrameDataRoundTrip(videoFrame);
 
             RTCEncodedVideoFrameMetadata metadata = videoFrame.GetMetadata();
             Assert.That(metadata, Is.Not.Null);
@@ -74,6 +75,33 @@ namespace Unity.WebRTC.RuntimeTest
             Assert.That(array, Is.Not.Null);
             Assert.That(array.Length, Is.GreaterThan(0));
             audioFrame.SetData(array);
+            VerifyFrameDataRoundTrip(audioFrame);
+        }
+
+        static void VerifyFrameDataRoundTrip(RTCEncodedFrame frame)
+        {
+            // Exercise the native size_t output with a known payload length, then
+            // restore the encoded frame before it reaches the decoder.
+            var replacementData = new byte[513];
+            for (int i = 0; i < replacementData.Length; i++)
+                replacementData[i] = (byte)(i % 251);
+            // Transform callbacks run on a libwebrtc thread without a Unity Temp scope.
+            using (var original = new NativeArray<byte>(frame.GetData().ToArray(), Allocator.Persistent))
+            using (var replacement = new NativeArray<byte>(replacementData, Allocator.Persistent))
+            {
+                try
+                {
+                    frame.SetData(replacement.AsReadOnly());
+                    var returned = frame.GetData();
+                    Assert.That(returned.Length, Is.EqualTo(replacement.Length));
+                    for (int i = 0; i < returned.Length; i++)
+                        Assert.That(returned[i], Is.EqualTo(replacement[i]));
+                }
+                finally
+                {
+                    frame.SetData(original.AsReadOnly());
+                }
+            }
         }
 
         [Test]
