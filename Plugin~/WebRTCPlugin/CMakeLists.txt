@@ -224,10 +224,18 @@ elseif(Android)
 
   # Linker excludes unused symbols from the shared library when linking the
   # archive file (libwebrtc.a).
-  file(READ "${CMAKE_SOURCE_DIR}/tools/android/jni_symbols.txt" JNI_SYMBOLS)
-  string(REPLACE "\n" ";" JNI_SYMBOLS ${JNI_SYMBOLS})
+  file(STRINGS "${CMAKE_SOURCE_DIR}/tools/android/jni_symbols.txt" JNI_SYMBOLS)
   list(TRANSFORM JNI_SYMBOLS PREPEND "-Wl,--undefined=")
-  target_link_options(WebRTCLib PUBLIC ${JNI_SYMBOLS})
+  string(JOIN "\n" JNI_SYMBOL_OPTIONS ${JNI_SYMBOLS})
+  set(JNI_SYMBOLS_RESPONSE_FILE "${CMAKE_CURRENT_BINARY_DIR}/jni_symbols.rsp")
+  file(GENERATE OUTPUT "${JNI_SYMBOLS_RESPONSE_FILE}"
+       CONTENT "${JNI_SYMBOL_OPTIONS}\n")
+  # Keep the link command below cmd.exe's length limit on Windows hosts.
+  target_link_options(WebRTCLib PUBLIC "@${JNI_SYMBOLS_RESPONSE_FILE}")
+  if(CMAKE_HOST_WIN32)
+    # A short Windows path can hide clang++.exe's C++ driver basename.
+    target_link_options(WebRTCLib PUBLIC --driver-mode=g++)
+  endif()
 
   set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/../Runtime/Plugins/Android")
 endif()
@@ -261,13 +269,15 @@ target_sources(WebRTCPlugin PRIVATE pch.cpp pch.h WebRTCPlugin.cpp
                                     WebRTCPlugin.h UnityRenderEvent.cpp)
 
 # rename dll/framework filename
+set(WEBRTC_PLUGIN_OUTPUT_DIR "${PROJECT_BINARY_DIR}" CACHE PATH
+    "Directory for the built native plugin")
 set_target_properties(
   WebRTCPlugin
   PROPERTIES OUTPUT_NAME webrtc
-             RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}
-             RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}
-             LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}
-             LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR})
+             RUNTIME_OUTPUT_DIRECTORY_RELEASE ${WEBRTC_PLUGIN_OUTPUT_DIR}
+             RUNTIME_OUTPUT_DIRECTORY_DEBUG ${WEBRTC_PLUGIN_OUTPUT_DIR}
+             LIBRARY_OUTPUT_DIRECTORY_RELEASE ${WEBRTC_PLUGIN_OUTPUT_DIR}
+             LIBRARY_OUTPUT_DIRECTORY_DEBUG ${WEBRTC_PLUGIN_OUTPUT_DIR})
 
 if(Windows)
   # Set linker option

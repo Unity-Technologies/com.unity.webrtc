@@ -115,6 +115,44 @@ sudo apt install -y pkg-config zip
 
 ## Build plugin
 
+### Android plugin on M116
+
+The Android plugin scripts rebuild the Unity plugin against the pinned
+`M116-20250805` libwebrtc archive; they do not rebuild Chromium/libwebrtc. Both
+`arm64-v8a` and `x86_64` are packaged into `Runtime/Plugins/Android/libwebrtc.aar`
+after both builds succeed. The archive is SHA256 checked, and dependencies,
+per-ABI build trees, and logs are cached under `artifacts~/android`.
+
+On Windows, use PowerShell with the NDK, CMake, and Ninja supplied by Unity's
+Android Build Support module. For example:
+
+```powershell
+$androidPlayer = 'C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Data\PlaybackEngines\AndroidPlayer'
+& .\BuildScripts~\build_plugin_android.ps1 `
+  -AndroidNdk "$androidPlayer\NDK" `
+  -CMakePath "$androidPlayer\SDK\cmake\3.22.1\bin\cmake.exe" `
+  -NinjaPath "$androidPlayer\SDK\cmake\3.22.1\bin\ninja.exe"
+```
+
+Pass `-OutputDirectory artifacts~/android/preview` to inspect a rebuilt AAR
+without replacing the shipped plugin. `-BuildType debug` selects Debug instead
+of Release. The PowerShell build writes dependency and binary hashes to
+`artifacts~/android/package/<configuration>/build-manifest.json`.
+
+On Linux/macOS, install CMake 3.22+, Ninja, curl, unzip, zip, and an Android NDK:
+
+```bash
+export ANDROID_NDK=/path/to/android-ndk
+bash BuildScripts~/build_plugin_android.sh release
+```
+
+Set `PLUGIN_DIR` to an absolute output directory to leave the shipped AAR
+untouched, `ARTIFACT_DIR` to relocate the cache, or `JOBS` to change parallelism.
+The shell script's Debug build also packages the Vulkan validation layers.
+Android plugin-only builds disable `BUILD_TESTING`; normal native CMake builds
+retain tests by default. `WEBRTC_DIR` and `WEBRTC_PLUGIN_OUTPUT_DIR` can be passed
+to CMake to relocate the extracted dependency and plugin output.
+
 To build plugin, you need to execute command in the `BuildScripts~` folder.
 
 - [BuildScripts~/build_plugin_android.sh](../BuildScripts~/build_plugin_android.sh)

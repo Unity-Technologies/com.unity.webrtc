@@ -14,8 +14,8 @@ project(
 
 cmake_policy(SET CMP0076 NEW)
 
-# Enable unit testing
-enable_testing()
+# Native tests can be disabled for plugin-only builds without downloading GTest.
+include(CTest)
 
 # Define flags to determine the build target platform Windows, Linux, macOS,
 # iOS, Android
@@ -100,4 +100,6 @@ if(Windows OR Linux)
 endif()
 
 add_subdirectory(WebRTCPlugin)
-add_subdirectory(WebRTCPluginTest)
+if(BUILD_TESTING)
+  add_subdirectory(WebRTCPluginTest)
+endif()
