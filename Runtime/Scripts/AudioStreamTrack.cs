@@ -102,6 +102,10 @@ namespace Unity.WebRTC
 
             internal IntPtr self;
 
+            // Keep native sink draining and deletion mutually exclusive. An audio
+            // callback already in flight can outlive removal from the filter.
+            private readonly object _sinkLock = new object();
+
             private AudioSource _audioSource;
             private AudioCustomFilter _filter;
             private AudioStreamTrack _track;
@@ -161,26 +165,44 @@ namespace Unity.WebRTC
 
             public void Dispose()
             {
-                if (this.disposed)
+                lock (_sinkLock)
                 {
-                    return;
+                    if (this.disposed)
+                        return;
+
+                    if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
+                    {
+                        if (_track != null && WebRTC.Table.ContainsKey(_track.self))
+                            _track.RemoveSink(this);
+                        WebRTC.Table.Remove(self);
+                        WebRTC.Context.DeleteAudioTrackSink(self);
+                    }
+                    self = IntPtr.Zero;
+                    this.disposed = true;
                 }
 
+                // Unity cleanup and user callbacks must stay outside the sink lock.
                 if (_filter != null)
                 {
                     _filter.onAudioRead -= SetData;
                     WebRTC.DestroyOnMainThread(_filter);
                 }
-                if (self != IntPtr.Zero && !WebRTC.Context.IsNull)
-                {
-                    if (_track != null && WebRTC.Table.ContainsKey(_track.self))
-                        _track.RemoveSink(this);
-                    WebRTC.Table.Remove(self);
-                    WebRTC.Context.DeleteAudioTrackSink(self);
-                    self = IntPtr.Zero;
-                }
-                this.disposed = true;
                 GC.SuppressFinalize(this);
+            }
+
+            /// <summary>
+            /// Drains decoded audio while the native sink is alive. Returns false
+            /// without modifying data once the renderer has been disposed.
+            /// </summary>
+            internal bool ProcessAudio(float[] data, int length, int channels, int sampleRate)
+            {
+                lock (_sinkLock)
+                {
+                    if (self == IntPtr.Zero)
+                        return false;
+                    NativeMethods.AudioTrackSinkProcessAudio(self, data, length, channels, sampleRate);
+                    return true;
+                }
             }
 
             /// <summary>
@@ -192,7 +214,8 @@ namespace Unity.WebRTC
             /// <param name="data"></param>
             internal void SetData(float[] data, int channels, int sampleRate)
             {
-                NativeMethods.AudioTrackSinkProcessAudio(self, data, data.Length, channels, sampleRate);
+                if (!ProcessAudio(data, data.Length, channels, sampleRate))
+                    return;
 
                 onReceived?.Invoke(data, channels, sampleRate);
             }
