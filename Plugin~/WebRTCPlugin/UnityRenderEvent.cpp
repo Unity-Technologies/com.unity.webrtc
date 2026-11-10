@@ -299,7 +299,8 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
             }
 
             timestamp = s_clock->CurrentTime();
-            void* ptr = GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
+            NativeGraphicsPtr ptr =
+                GraphicsUtility::TextureHandleToNativeGraphicsPtr(trackData->texture, device, gfxRenderer);
             if (!ptr)
             {
                 RTC_LOG(LS_ERROR) << "GraphicsUtility::TextureHandleToNativeGraphicsPtr returns nullptr.";
@@ -313,7 +314,7 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
                 if (s_ProfilerMarkerFactory)
                     profiler = s_ProfilerMarkerFactory->CreateScopedProfiler(*s_MarkerEncode);
 
-                auto frame = s_bufferPool->CreateFrame(ptr, size, trackData->format, timestamp);
+                auto frame = s_bufferPool->CreateFrame(ptr.get(), size, trackData->format, timestamp);
                 source->OnFrameCaptured(std::move(frame));
             }
         }

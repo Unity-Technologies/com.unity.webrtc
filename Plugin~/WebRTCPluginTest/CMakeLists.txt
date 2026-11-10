@@ -8,6 +8,7 @@ target_sources(
           CreateVideoCodecFactoryTest.cpp
           FrameGenerator.cpp
           FrameGenerator.h
+          GraphicsUtilityTest.cpp
           GpuMemoryBufferTest.cpp
           GpuMemoryBufferPoolTest.cpp
           GraphicsDeviceContainer.cpp
