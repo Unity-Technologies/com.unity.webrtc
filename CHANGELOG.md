@@ -4,6 +4,28 @@ All notable changes to the webrtc package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.2] - 2026-11-10
+
+### Fixed
+
+- Keep WebRTC events running after a user callback throws, correct encoded-frame
+  size marshalling, and synchronize audio sink processing with teardown.
+- Correct native array element widths, including packed boolean stats.
+- Rebuild the Android M116 plugin with GPU readback guards, Vulkan descriptor
+  cleanup and extension deduplication, safe log re-registration and transformer
+  sink removal, and synchronized reference-table access.
+- Skip received texture uploads when no new video frame is available.
+- Correct the visionOS adapter buffer type and iOS-configured audio ABI in source.
+  The shipped visionOS framework is unchanged; a rebuilt framework and Vision Pro
+  device validation are still required before enabling H.264 sending there.
+
+### Changed
+
+- Add reproducible Android builds for Windows and Unix hosts using verified M116
+  dependencies, separate ABI caches, and 16 KB page alignment.
+- Native binary updates in this release apply to Android. Other platform plugins
+  retain their existing binaries.
+
 ## [3.0.0] - 2025-09-12
 
 ### Changed

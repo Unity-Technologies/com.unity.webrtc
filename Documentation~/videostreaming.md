@@ -219,6 +219,25 @@ if (error != RTCErrorType.None)
     Debug.LogError("SetCodecPreferences failed");
 ```
 
+### Interim visionOS codec selection
+
+The visionOS H.264 adapter fixes require a rebuilt and device-validated native
+framework. Until that framework is available, apply VP8-only preferences to each
+visionOS video transceiver before creating its offer or answer. Ordering VP8 first
+while retaining H.264 still allows H.264 negotiation. Peers must support VP8 for
+this workaround; check the result and the negotiated codec in the stats report.
+
+```CSharp
+#if UNITY_VISIONOS && !UNITY_EDITOR
+var vp8 = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs
+    .Where(codec => codec.mimeType == "video/VP8").ToArray();
+if (vp8.Length == 0)
+    throw new System.NotSupportedException("VP8 is required by the visionOS workaround.");
+if (transceiver.SetCodecPreferences(vp8) != RTCErrorType.None)
+    throw new System.InvalidOperationException("Could not select VP8 on visionOS.");
+#endif
+```
+
 ### Video Encoder
 
 There are two types of encoder for video streaming, one is using hardware for encoding and one is using software. Regarding different kinds of codecs, the hardware encoder uses `H.264`, and the software encoder uses `VP8`, `VP9`, `AV1`.
