@@ -118,10 +118,15 @@ namespace Unity.WebRTC.RuntimeTest
         }
 
         [Test]
-        public void AsArrayReturnsBoolArray()
+        public void AsArrayReturnsPackedNativeBoolArray()
         {
-            bool[] source = { true, false, true };
-            IntPtr ptr = source.ToPtr();
+            bool[] source = { false, true, false, true, true };
+            // Pad the allocation to make the previous int-width reader fail
+            // deterministically without reading outside the test allocation.
+            byte[] native = new byte[source.Length * sizeof(int)];
+            for (int i = 0; i < source.Length; i++)
+                native[i] = source[i] ? (byte)1 : (byte)0;
+            IntPtr ptr = native.ToPtr();
             bool[] dest = ptr.AsArray<bool>(source.Length);
             Assert.That(dest, Is.Not.Null);
             Assert.That(source, Is.EqualTo(dest));

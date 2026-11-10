@@ -73,7 +73,8 @@ namespace Unity.WebRTC
             }
             else if (typeof(T) == typeof(bool))
             {
-                int[] _array = new int[length];
+                // Native std::vector<bool> is exported as packed C++ bool bytes.
+                byte[] _array = new byte[length];
                 Marshal.Copy(ptr, _array, 0, length);
                 ret = Array.ConvertAll(_array, Convert.ToBoolean) as T[];
             }
