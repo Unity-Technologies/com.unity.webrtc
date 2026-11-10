@@ -28,6 +28,7 @@ namespace webrtc
 
         // used in UnityRenderingExtEventUpdateTexture
         // called on RenderThread
+        // Returns nullptr when Unity should retain the texture without another upload.
         void* ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format);
 
     private:

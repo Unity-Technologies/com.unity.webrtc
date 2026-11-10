@@ -82,18 +82,17 @@ namespace webrtc
     void* UnityVideoRenderer::ConvertVideoFrameToTextureAndWriteToBuffer(int width, int height, libyuv::FourCC format)
     {
         auto frame = GetFrameBuffer();
+        // A null texData in the custom texture-update callback skips this upload.
+        if (!frame)
+            return nullptr;
 
         size_t size = static_cast<size_t>(width * height * 4);
         if (tempBuffer.size() != size)
             tempBuffer.resize(size);
 
-        // return a previous texture buffer when framebuffer is returned null.
-        if (!frame)
-            return tempBuffer.data();
-
         rtc::scoped_refptr<webrtc::I420BufferInterface> i420_buffer = frame->ToI420();
         if (!i420_buffer)
-            return tempBuffer.data();
+            return nullptr;
 
         if (width != frame->width() || height != frame->height())
         {
@@ -121,6 +120,7 @@ namespace webrtc
         if (result)
         {
             RTC_LOG(LS_INFO) << "libyuv::ConvertFromI420 failed. error:" << result;
+            return nullptr;
         }
         return tempBuffer.data();
     }

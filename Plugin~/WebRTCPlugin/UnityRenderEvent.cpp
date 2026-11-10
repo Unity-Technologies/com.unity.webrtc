@@ -347,6 +347,10 @@ extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetBatchUpdateEventID(
 
 static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 {
+    auto event = static_cast<UnityRenderingExtEventType>(eventID);
+    if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
+        reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2*>(data)->texData = nullptr;
+
     if (!s_context)
         return;
     if (!ContextManager::GetInstance()->Exists(s_context))
@@ -354,8 +358,6 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
     std::unique_lock<std::mutex> lock(s_context->mutex, std::try_to_lock);
     if (!lock.owns_lock())
         return;
-
-    auto event = static_cast<UnityRenderingExtEventType>(eventID);
 
     if (event == kUnityRenderingExtEventUpdateTextureBeginV2)
     {
@@ -374,14 +376,21 @@ static void UNITY_INTERFACE_API TextureUpdateCallback(int eventID, void* data)
 
             params->texData = renderer->ConvertVideoFrameToTextureAndWriteToBuffer(
                 width, height, ConvertTextureFormat(params->format));
+
+            if (params->texData == nullptr)
+            {
+                // A skipped upload may not produce an EndV2 callback. Balance
+                // the marker and release the renderer now; EndV2 is then a no-op.
+                s_mapVideoRenderer.erase(params->userData);
+                if (s_UnityProfiler && s_UnityProfiler->IsAvailable())
+                    s_UnityProfiler->EndSample(s_MarkerDecode);
+            }
         }
     }
     if (event == kUnityRenderingExtEventUpdateTextureEndV2)
     {
         auto params = reinterpret_cast<UnityRenderingExtTextureUpdateParamsV2*>(data);
-        s_mapVideoRenderer.erase(params->userData);
-
-        if (s_UnityProfiler && s_UnityProfiler->IsAvailable())
+        if (s_mapVideoRenderer.erase(params->userData) != 0 && s_UnityProfiler && s_UnityProfiler->IsAvailable())
             s_UnityProfiler->EndSample(s_MarkerDecode);
     }
 }
