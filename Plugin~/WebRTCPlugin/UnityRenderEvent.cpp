@@ -292,7 +292,10 @@ static void UNITY_INTERFACE_API OnBatchUpdateEvent(int eventID, void* data)
             RTC_DCHECK_GT(trackData->height, 0);
 
             UnityVideoTrackSource* source = static_cast<UnityVideoTrackSource*>(trackData->source);
-            if (!s_context->ExistsRefPtr(source))
+            // Keep the source alive through frame capture if teardown removes
+            // its reference-table entry concurrently.
+            auto sourceRef = s_context->GetRefPtr(source);
+            if (!sourceRef)
             {
                 trackData->source = nullptr;
                 continue;
