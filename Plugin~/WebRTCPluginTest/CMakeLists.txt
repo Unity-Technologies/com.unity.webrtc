@@ -27,7 +27,8 @@ target_sources(
           VideoFrameSchedulerTest.cpp
           VideoFrameTest.cpp
           VideoRendererTest.cpp
-          VideoTrackSourceTest.cpp)
+          VideoTrackSourceTest.cpp
+          VulkanExtensionNamesTest.cpp)
 
 if(Windows OR Linux)
   add_subdirectory(NvCodec)
