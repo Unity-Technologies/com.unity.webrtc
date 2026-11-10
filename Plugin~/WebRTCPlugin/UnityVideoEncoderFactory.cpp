@@ -37,7 +37,7 @@ namespace webrtc
         int32_t InitEncode(const VideoCodec* codec_settings, int32_t number_of_cores, size_t max_payload_size) override
         {
             int32_t result = encoder_->InitEncode(codec_settings, number_of_cores, max_payload_size);
-            if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
+            if (profiler_ && result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
             {
                 std::stringstream ss;
                 ss << "Encoder ";
@@ -54,7 +54,7 @@ namespace webrtc
         int InitEncode(const VideoCodec* codec_settings, const VideoEncoder::Settings& settings) override
         {
             int result = encoder_->InitEncode(codec_settings, settings);
-            if (result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
+            if (profiler_ && result >= WEBRTC_VIDEO_CODEC_OK && !profilerThread_)
             {
                 std::stringstream ss;
                 ss << "Encoder ";
@@ -75,6 +75,14 @@ namespace webrtc
         int32_t Release() override { return encoder_->Release(); }
         int32_t Encode(const VideoFrame& frame, const std::vector<VideoFrameType>* frame_types) override
         {
+            // GPU readback can time out. Do not submit a missing I420 buffer to the encoder.
+            rtc::scoped_refptr<VideoFrameBuffer> buffer = frame.video_frame_buffer();
+            if (buffer && buffer->type() == VideoFrameBuffer::Type::kI420 && !buffer->GetI420())
+            {
+                RTC_LOG(LS_WARNING) << "Converting GPU frame to I420 failed. Dropping frame.";
+                return WEBRTC_VIDEO_CODEC_ERROR;
+            }
+
             int32_t result;
             {
                 std::unique_ptr<const ScopedProfiler> profiler;
@@ -153,10 +161,10 @@ namespace webrtc
     {
         VideoEncoderFactory* factory = FindCodecFactory(factories_, format);
         auto encoder = factory->CreateVideoEncoder(format);
-        if (!profiler_)
-            return encoder;
+        if (!encoder)
+            return nullptr;
 
-        // Use Unity Profiler for measuring encoding process.
+        // Keep the readback guard active even when Unity profiling is unavailable.
         return std::make_unique<UnityVideoEncoder>(std::move(encoder), profiler_);
     }
 }
