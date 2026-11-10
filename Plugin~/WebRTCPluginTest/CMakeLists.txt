@@ -6,6 +6,7 @@ target_sources(
           pch.h
           ContextTest.cpp
           CreateVideoCodecFactoryTest.cpp
+          EncodedStreamTransformerTest.cpp
           FrameGenerator.cpp
           FrameGenerator.h
           GraphicsUtilityTest.cpp
