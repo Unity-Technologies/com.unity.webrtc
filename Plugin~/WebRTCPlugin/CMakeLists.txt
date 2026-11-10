@@ -210,7 +210,7 @@ elseif(xros)
   set(PROJECT_BINARY_DIR "${CMAKE_SOURCE_DIR}/${XROS_OUT_DIR}")
   MESSAGE(STATUS "xros output to ${PROJECT_BINARY_DIR}")
 
-  target_compile_definitions(WebRTCLib PUBLIC WEBRTC_XROS WEBRTC_MAC
+  target_compile_definitions(WebRTCLib PUBLIC WEBRTC_XROS WEBRTC_IOS WEBRTC_MAC
                                               WEBRTC_POSIX)
   target_include_directories(WebRTCLib SYSTEM PUBLIC ${WEBRTC_OBJC_INCLUDE_DIR})
   target_link_libraries(WebRTCLib PRIVATE ${WEBRTC_LIBRARY} ${FRAMEWORK_LIBS})
