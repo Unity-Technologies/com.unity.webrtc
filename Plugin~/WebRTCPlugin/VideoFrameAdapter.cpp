@@ -39,19 +39,21 @@ namespace webrtc
 
     rtc::scoped_refptr<webrtc::I420BufferInterface> VideoFrameAdapter::ScaledBuffer::ToI420()
     {
-        return parent_->GetOrCreateFrameBufferForSize(Size(width_, height_))->ToI420();
+        auto buffer = parent_->GetOrCreateFrameBufferForSize(Size(width_, height_));
+        return buffer ? buffer->ToI420() : nullptr;
     }
 
     const I420BufferInterface* VideoFrameAdapter::ScaledBuffer::GetI420() const
     {
-        return parent_->GetOrCreateFrameBufferForSize(Size(width_, height_))->GetI420();
+        auto buffer = parent_->GetOrCreateFrameBufferForSize(Size(width_, height_));
+        return buffer ? buffer->GetI420() : nullptr;
     }
 
     rtc::scoped_refptr<VideoFrameBuffer>
     VideoFrameAdapter::ScaledBuffer::GetMappedFrameBuffer(rtc::ArrayView<VideoFrameBuffer::Type> types)
     {
         auto buffer = parent_->GetOrCreateFrameBufferForSize(Size(width_, height_));
-        return Contains(types, buffer->type()) ? buffer : nullptr;
+        return buffer && Contains(types, buffer->type()) ? buffer : nullptr;
     }
 
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::ScaledBuffer::CropAndScale(
@@ -81,12 +83,14 @@ namespace webrtc
 
     const I420BufferInterface* VideoFrameAdapter::GetI420() const
     {
-        return ConvertToVideoFrameBuffer(frame_)->GetI420();
+        auto buffer = ConvertToVideoFrameBuffer(frame_);
+        return buffer ? buffer->GetI420() : nullptr;
     }
 
     rtc::scoped_refptr<I420BufferInterface> VideoFrameAdapter::ToI420()
     {
-        return ConvertToVideoFrameBuffer(frame_)->ToI420();
+        auto buffer = ConvertToVideoFrameBuffer(frame_);
+        return buffer ? buffer->ToI420() : nullptr;
     }
 
     rtc::scoped_refptr<VideoFrameBuffer> VideoFrameAdapter::CropAndScale(
@@ -108,6 +112,9 @@ namespace webrtc
                 return scaledI420buffer;
             }
         }
+        // A failed readback must not be scaled or cached as a valid frame.
+        if (!ToI420())
+            return nullptr;
         auto buffer = VideoFrameBuffer::CropAndScale(0, 0, width(), height(), size.width(), size.height());
         scaledI40Buffers_.push_back(buffer);
         return buffer;

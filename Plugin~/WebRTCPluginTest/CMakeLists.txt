@@ -20,6 +20,7 @@ target_sources(
           InternalCodecsTest.cpp
           UnityVideoEncoderFactoryTest.cpp
           UnityVideoDecoderFactoryTest.cpp
+          VideoFrameAdapterTest.cpp
           VideoCodecTest.cpp
           VideoCodecTest.h
           VideoFrameSchedulerTest.cpp
