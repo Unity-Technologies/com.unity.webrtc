@@ -69,7 +69,7 @@ namespace webrtc
 
     VideoFrameBuffer::Type VideoFrameAdapter::type() const
     {
-#if UNITY_IOS || UNITY_OSX || UNITY_ANDROID
+#if UNITY_IOS || UNITY_OSX || UNITY_ANDROID || UNITY_VISIONOS
         // todo(kazuki): support for kNative type for mobile platform and macOS.
         // Need to pass ObjCFrameBuffer instead of VideoFrameAdapter on macOS/iOS.
         // Need to pass AndroidVideoBuffer instead of VideoFrameAdapter on Android.
