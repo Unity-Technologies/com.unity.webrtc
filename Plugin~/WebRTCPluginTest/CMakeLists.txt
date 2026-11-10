@@ -19,6 +19,7 @@ target_sources(
           GraphicsDeviceTestBase.h
           H264ProfileLevelIdTest.cpp
           InternalCodecsTest.cpp
+          UnityLogStreamTest.cpp
           UnityVideoEncoderFactoryTest.cpp
           UnityVideoDecoderFactoryTest.cpp
           VideoFrameAdapterTest.cpp
