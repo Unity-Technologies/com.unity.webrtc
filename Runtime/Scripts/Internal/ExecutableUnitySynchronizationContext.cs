@@ -223,6 +223,10 @@ namespace Unity.WebRTC
                 {
                     m_DelegateCallback(m_DelegateState);
                 }
+                catch (Exception exception)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
                 finally
                 {
                     m_WaitHandle?.Set();

@@ -20,7 +20,9 @@
 #if _MSC_VER
 #define UNITY_WIN 1
 #elif defined(__APPLE__)
-#if TARGET_OS_IOS
+#if TARGET_OS_VISION
+#define UNITY_VISIONOS 1
+#elif TARGET_OS_IOS
 #define UNITY_IOS 1
 #elif TARGET_OS_SIMULATOR
 #define UNITY_IOS_SIMULATOR 1
@@ -64,7 +66,7 @@
 #define SUPPORT_VULKAN 1
 #endif
 
-#if UNITY_IOS || UNITY_OSX || UNITY_IOS_SIMULATOR
+#if UNITY_IOS || UNITY_OSX || UNITY_IOS_SIMULATOR || defined(UNITY_VISIONOS)
 #define SUPPORT_METAL 1
 #endif
 

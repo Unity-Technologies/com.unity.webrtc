@@ -61,6 +61,8 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+artifacts.meta
+artifacts~/
 
 # StyleCop
 StyleCopReport.xml
@@ -386,6 +388,11 @@ Runtime/Plugins/x86_64/*.lib.meta
 Runtime/Plugins/x86_64/*.ilk.meta
 Runtime/Plugins/x86_64/*.pdb.meta
 
+#macos
+**/.DS_Store
 
-
-
+out/
+src/
+.cipd/
+.gclient*
+depot_tools/

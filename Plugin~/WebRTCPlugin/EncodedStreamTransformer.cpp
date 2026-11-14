@@ -38,12 +38,14 @@ namespace webrtc
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        sink_callbacks_.erase(std::remove_if(
-            sink_callbacks_.begin(),
-            sink_callbacks_.end(),
-            [ssrc](std::pair<uint32_t, rtc::scoped_refptr<webrtc::TransformedFrameCallback>> v) {
-                return v.first == ssrc;
-            }));
+        sink_callbacks_.erase(
+            std::remove_if(
+                sink_callbacks_.begin(),
+                sink_callbacks_.end(),
+                [ssrc](const std::pair<uint32_t, rtc::scoped_refptr<webrtc::TransformedFrameCallback>>& v) {
+                    return v.first == ssrc;
+                }),
+            sink_callbacks_.end());
     }
 
     void EncodedStreamTransformer::Transform(std::unique_ptr<::webrtc::TransformableFrameInterface> frame)

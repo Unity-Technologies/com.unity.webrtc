@@ -53,6 +53,7 @@
 *.scenetemplate eol=lf
 *.shader eol=lf
 *.shadergraph eol=lf
+*.sh eol=lf
 *.shadersubgraph eol=lf
 *.shadervariants eol=lf
 *.signal eol=lf

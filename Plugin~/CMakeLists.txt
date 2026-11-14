@@ -14,8 +14,8 @@ project(
 
 cmake_policy(SET CMP0076 NEW)
 
-# Enable unit testing
-enable_testing()
+# Native tests can be disabled for plugin-only builds without downloading GTest.
+include(CTest)
 
 # Define flags to determine the build target platform Windows, Linux, macOS,
 # iOS, Android
@@ -24,6 +24,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
   set(iOS TRUE)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "visionOS" OR CMAKE_SYSTEM_NAME STREQUAL "xros")
+  MESSAGE(STATUS "building for visionOS")
+  set(xros TRUE)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(Linux TRUE)
@@ -78,7 +82,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 find_package(WebRTC REQUIRED)
 
-if(iOS OR macOS)
+if(iOS OR macOS OR xros)
   find_package(Framework REQUIRED)
 endif()
 
@@ -96,4 +100,6 @@ if(Windows OR Linux)
 endif()
 
 add_subdirectory(WebRTCPlugin)
-add_subdirectory(WebRTCPluginTest)
+if(BUILD_TESTING)
+  add_subdirectory(WebRTCPluginTest)
+endif()

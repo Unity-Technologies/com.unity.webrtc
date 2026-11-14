@@ -729,7 +729,7 @@ namespace Unity.WebRTC
     /// <seealso cref="WebRTCSettings"/>
     public static class WebRTC
     {
-#if UNITY_IOS
+#if (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
         internal const string Lib = "__Internal";
 #else
         internal const string Lib = "webrtc";
@@ -757,7 +757,7 @@ namespace Unity.WebRTC
             NativeMethods.SetLocalDescriptionObserverRegisterCallback(OnSetLocalDescription);
             NativeMethods.SetRemoteDescriptionObserverRegisterCallback(OnSetRemoteDescription);
             NativeMethods.SetTransformedFrameRegisterCallback(OnSetTransformedFrame);
-#if UNITY_IOS && !UNITY_EDITOR
+#if (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             s_context = Context.Create();
@@ -1064,7 +1064,6 @@ namespace Unity.WebRTC
                     case GraphicsDeviceType.Vulkan:
                         return GraphicsFormat.B8G8R8A8_SRGB;
                     case GraphicsDeviceType.OpenGLCore:
-                    case GraphicsDeviceType.OpenGLES2:
                     case GraphicsDeviceType.OpenGLES3:
                         return GraphicsFormat.R8G8B8A8_SRGB;
                     case GraphicsDeviceType.Metal:
@@ -1080,7 +1079,6 @@ namespace Unity.WebRTC
                     case GraphicsDeviceType.Vulkan:
                         return GraphicsFormat.B8G8R8A8_UNorm;
                     case GraphicsDeviceType.OpenGLCore:
-                    case GraphicsDeviceType.OpenGLES2:
                     case GraphicsDeviceType.OpenGLES3:
                         return GraphicsFormat.R8G8B8A8_UNorm;
                     case GraphicsDeviceType.Metal:
@@ -1423,7 +1421,7 @@ namespace Unity.WebRTC
 
     internal static class NativeMethods
     {
-#if UNITY_IOS && !UNITY_EDITOR
+#if (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
         [DllImport(WebRTC.Lib)]
         public static extern void RegisterRenderingWebRTCPlugin();
 #endif
@@ -1779,7 +1777,7 @@ namespace Unity.WebRTC
         [DllImport(WebRTC.Lib)]
         public static extern uint FrameGetSsrc(IntPtr frame);
         [DllImport(WebRTC.Lib)]
-        public static extern void FrameGetData(IntPtr frame, out IntPtr data, out int size);
+        public static extern void FrameGetData(IntPtr frame, out IntPtr data, out UIntPtr size);
         [DllImport(WebRTC.Lib)]
         public static extern void FrameSetData(IntPtr frame, IntPtr data, int size);
         [DllImport(WebRTC.Lib)]

@@ -74,26 +74,46 @@ namespace webrtc
 
         bool ExistsRefPtr(const rtc::RefCountInterface* ptr) const
         {
+            std::lock_guard<std::mutex> lock(m_mutexRefPtr);
             return m_mapRefPtr.find(ptr) != m_mapRefPtr.end();
+        }
+        rtc::scoped_refptr<rtc::RefCountInterface> GetRefPtr(const rtc::RefCountInterface* ptr) const
+        {
+            std::lock_guard<std::mutex> lock(m_mutexRefPtr);
+            auto it = m_mapRefPtr.find(ptr);
+            return it == m_mapRefPtr.end() ? nullptr : it->second;
         }
         template<typename T>
         void AddRefPtr(rtc::scoped_refptr<T> refptr)
         {
+            std::lock_guard<std::mutex> lock(m_mutexRefPtr);
             m_mapRefPtr.emplace(refptr.get(), refptr);
         }
-        void AddRefPtr(rtc::RefCountInterface* ptr) { m_mapRefPtr.emplace(ptr, ptr); }
+        void AddRefPtr(rtc::RefCountInterface* ptr)
+        {
+            std::lock_guard<std::mutex> lock(m_mutexRefPtr);
+            m_mapRefPtr.emplace(ptr, ptr);
+        }
 
         template<typename T>
         void RemoveRefPtr(rtc::scoped_refptr<T>& refptr)
         {
-            std::lock_guard<std::mutex> lock(mutex);
-            m_mapRefPtr.erase(refptr.get());
+            RemoveRefPtr(refptr.get());
         }
         template<typename T>
         void RemoveRefPtr(T* ptr)
         {
-            std::lock_guard<std::mutex> lock(mutex);
-            m_mapRefPtr.erase(ptr);
+            // A final Release may run callbacks. Keep it outside the table lock.
+            rtc::scoped_refptr<rtc::RefCountInterface> removed;
+            {
+                std::lock_guard<std::mutex> lock(m_mutexRefPtr);
+                auto it = m_mapRefPtr.find(ptr);
+                if (it != m_mapRefPtr.end())
+                {
+                    removed = std::move(it->second);
+                    m_mapRefPtr.erase(it);
+                }
+            }
         }
 
         // MediaStream
@@ -164,6 +184,9 @@ namespace webrtc
         std::map<const DataChannelInterface*, std::unique_ptr<DataChannelObject>> m_mapDataChannels;
         std::map<const uint32_t, std::shared_ptr<UnityVideoRenderer>> m_mapVideoRenderer;
         std::map<const AudioTrackSinkAdapter*, std::unique_ptr<AudioTrackSinkAdapter>> m_mapAudioTrackAndSink;
+        // Render events hold mutex and pin references through GetRefPtr. A separate
+        // lock avoids re-entering that mutex or holding it during a final Release.
+        mutable std::mutex m_mutexRefPtr;
         std::map<const rtc::RefCountInterface*, rtc::scoped_refptr<rtc::RefCountInterface>> m_mapRefPtr;
 
         static uint32_t s_rendererId;

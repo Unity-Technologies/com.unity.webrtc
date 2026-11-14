@@ -1,4 +1,4 @@
-if(iOS)
+if(iOS OR xros)
   set(FRAMEWORK_LIBS
     "-framework Foundation"
     "-framework AVFoundation"

@@ -13,7 +13,7 @@ namespace webrtc
 
     namespace webrtc = ::webrtc;
 
-    void* GraphicsUtility::TextureHandleToNativeGraphicsPtr(
+    NativeGraphicsPtr GraphicsUtility::TextureHandleToNativeGraphicsPtr(
         void* textureHandle, IGraphicsDevice* device, UnityGfxRenderer renderer)
     {
 #if SUPPORT_VULKAN
@@ -21,10 +21,11 @@ namespace webrtc
         {
             VulkanGraphicsDevice* vulkanDevice = static_cast<VulkanGraphicsDevice*>(device);
             std::unique_ptr<UnityVulkanImage> unityVulkanImage = vulkanDevice->AccessTexture(textureHandle);
-            return unityVulkanImage.release();
+            return NativeGraphicsPtr(
+                unityVulkanImage.release(), [](void* ptr) { delete static_cast<UnityVulkanImage*>(ptr); });
         }
 #endif
-        return textureHandle;
+        return NativeGraphicsPtr(textureHandle, [](void*) {});
     }
 
 } // end namespace webrtc

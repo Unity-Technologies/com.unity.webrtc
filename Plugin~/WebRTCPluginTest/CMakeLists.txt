@@ -6,8 +6,10 @@ target_sources(
           pch.h
           ContextTest.cpp
           CreateVideoCodecFactoryTest.cpp
+          EncodedStreamTransformerTest.cpp
           FrameGenerator.cpp
           FrameGenerator.h
+          GraphicsUtilityTest.cpp
           GpuMemoryBufferTest.cpp
           GpuMemoryBufferPoolTest.cpp
           GraphicsDeviceContainer.cpp
@@ -18,14 +20,17 @@ target_sources(
           GraphicsDeviceTestBase.h
           H264ProfileLevelIdTest.cpp
           InternalCodecsTest.cpp
+          UnityLogStreamTest.cpp
           UnityVideoEncoderFactoryTest.cpp
           UnityVideoDecoderFactoryTest.cpp
+          VideoFrameAdapterTest.cpp
           VideoCodecTest.cpp
           VideoCodecTest.h
           VideoFrameSchedulerTest.cpp
           VideoFrameTest.cpp
           VideoRendererTest.cpp
-          VideoTrackSourceTest.cpp)
+          VideoTrackSourceTest.cpp
+          VulkanExtensionNamesTest.cpp)
 
 if(Windows OR Linux)
   add_subdirectory(NvCodec)

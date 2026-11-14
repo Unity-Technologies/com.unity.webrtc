@@ -191,10 +191,16 @@ namespace webrtc
             m_workerThread->BlockingCall([this]() { m_audioDevice = nullptr; });
             m_mapClients.clear();
 
-            // check count of refptr to avoid to forget disposing
-            RTC_DCHECK_EQ(m_mapRefPtr.size(), 0);
-
-            m_mapRefPtr.clear();
+            {
+                decltype(m_mapRefPtr) remainingRefs;
+                {
+                    std::lock_guard<std::mutex> refLock(m_mutexRefPtr);
+                    // check count of refptr to avoid to forget disposing
+                    RTC_DCHECK_EQ(m_mapRefPtr.size(), 0);
+                    remainingRefs.swap(m_mapRefPtr);
+                }
+                // Release references before joining threads, outside the table lock.
+            }
             m_mapMediaStreamObserver.clear();
             m_mapDataChannels.clear();
             m_mapVideoRenderer.clear();

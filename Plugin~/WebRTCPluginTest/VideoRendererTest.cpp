@@ -6,6 +6,7 @@
 #include "GraphicsDeviceTestBase.h"
 #include "UnityVideoRenderer.h"
 #include "UnityVideoTrackSource.h"
+#include <api/make_ref_counted.h>
 #include <api/task_queue/default_task_queue_factory.h>
 
 using testing::_;
@@ -76,6 +77,48 @@ namespace webrtc
 
         void* data = m_renderer->ConvertVideoFrameToTextureAndWriteToBuffer(kWidth, kHeight, libyuv::FOURCC_ARGB);
         EXPECT_NE(nullptr, data);
+    }
+
+    TEST(UnityVideoRendererUploadTest, SkipsRepeatedUpdatesUntilAnotherFrameArrives)
+    {
+        UnityVideoRenderer renderer(1, [](UnityVideoRenderer*, int, int) {}, false);
+        auto buffer = I420Buffer::Create(8, 8);
+        I420Buffer::SetBlack(buffer.get());
+
+        EXPECT_EQ(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+        renderer.SetFrameBuffer(buffer, 1);
+        EXPECT_NE(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+        EXPECT_EQ(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+        EXPECT_EQ(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+
+        renderer.SetFrameBuffer(buffer, 2);
+        EXPECT_NE(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+        EXPECT_EQ(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+    }
+
+    class FailedRendererBuffer : public VideoFrameBuffer
+    {
+    public:
+        Type type() const override { return Type::kI420; }
+        int width() const override { return 8; }
+        int height() const override { return 8; }
+        rtc::scoped_refptr<I420BufferInterface> ToI420() override { return nullptr; }
+        const I420BufferInterface* GetI420() const override { return nullptr; }
+    };
+
+    TEST(UnityVideoRendererUploadTest, FailedConversionDoesNotUploadStalePixels)
+    {
+        UnityVideoRenderer renderer(1, [](UnityVideoRenderer*, int, int) {}, false);
+        auto buffer = I420Buffer::Create(8, 8);
+        I420Buffer::SetBlack(buffer.get());
+        renderer.SetFrameBuffer(buffer, 1);
+        ASSERT_NE(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+
+        renderer.SetFrameBuffer(rtc::make_ref_counted<FailedRendererBuffer>(), 2);
+        EXPECT_EQ(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
+
+        renderer.SetFrameBuffer(buffer, 3);
+        EXPECT_NE(renderer.ConvertVideoFrameToTextureAndWriteToBuffer(8, 8, libyuv::FOURCC_ARGB), nullptr);
     }
 
     INSTANTIATE_TEST_SUITE_P(GfxDeviceAndColorSpece, VideoRendererTest, testing::ValuesIn(VALUES_TEST_ENV));

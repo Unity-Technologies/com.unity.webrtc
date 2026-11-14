@@ -311,7 +311,6 @@ namespace Unity.WebRTC
                 platform != RuntimePlatform.OSXPlayer)
                 return true;
             if (graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore &&
-                graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2 &&
                 graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3)
                 return true;
             return false;

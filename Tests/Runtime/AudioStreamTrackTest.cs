@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -243,6 +244,82 @@ namespace Unity.WebRTC.RuntimeTest
             renderer.Source = obj.AddComponent<AudioSource>();
             renderer.Dispose();
             UnityEngine.Object.DestroyImmediate(obj);
+        }
+
+        [Test]
+        public void DisposedAudioStreamRendererDoesNotProcessAudio()
+        {
+            var renderer = new AudioStreamTrack.AudioStreamRenderer(null);
+            var data = new float[960];
+            try
+            {
+                Assert.That(renderer.ProcessAudio(data, data.Length, 2, 48000), Is.True);
+                renderer.Dispose();
+                Array.Fill(data, 0.25f);
+                bool received = false;
+                renderer.onReceived += (_, __, ___) => received = true;
+
+                Assert.That(renderer.ProcessAudio(data, data.Length, 2, 48000), Is.False);
+                renderer.SetData(data, 2, 48000);
+                Assert.That(data, Is.All.EqualTo(0.25f), "A disposed sink must leave the caller's data untouched.");
+                Assert.That(received, Is.False);
+                Assert.That(renderer.self, Is.EqualTo(IntPtr.Zero));
+            }
+            finally
+            {
+                renderer.Dispose();
+            }
+        }
+
+        [Test]
+        public void AudioStreamRendererDisposeWhileDraining()
+        {
+            for (int cycle = 0; cycle < 8; cycle++)
+            {
+                var renderer = new AudioStreamTrack.AudioStreamRenderer(null);
+                using (var started = new ManualResetEvent(false))
+                {
+                    int stop = 0;
+                    bool rejectedAfterDispose = false;
+                    Exception workerException = null;
+                    var worker = new Thread(() =>
+                    {
+                        try
+                        {
+                            var data = new float[960];
+                            while (Volatile.Read(ref stop) == 0)
+                            {
+                                if (!renderer.ProcessAudio(data, data.Length, 2, 48000))
+                                {
+                                    rejectedAfterDispose = true;
+                                    break;
+                                }
+                                started.Set();
+                                Thread.Yield();
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            workerException = exception;
+                        }
+                    }) { IsBackground = true };
+                    worker.Start();
+                    try
+                    {
+                        Assert.That(started.WaitOne(2000), Is.True, "The worker did not drain the live native sink.");
+                        renderer.Dispose();
+                        Assert.That(worker.Join(2000), Is.True, "Audio draining did not finish after sink disposal.");
+                        Assert.That(workerException, Is.Null);
+                        Assert.That(rejectedAfterDispose, Is.True);
+                    }
+                    finally
+                    {
+                        Volatile.Write(ref stop, 1);
+                        worker.Join(2000);
+                        renderer.Dispose();
+                    }
+                }
+            }
         }
     }
 }

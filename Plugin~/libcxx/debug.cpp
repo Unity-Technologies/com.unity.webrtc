@@ -18,7 +18,8 @@
 
 
 #include "__config"
-#include "__debug"
+//christoph: This file appears to be missing from XCode 15.4?
+//#include "__debug"
 #include "functional"
 #include "algorithm"
 #include "string"
@@ -33,6 +34,7 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#if defined(USE_DEBUG_MODE)
 #if __clang_major__ >= 12
 std::string __libcpp_debug_info::what() const {
   string msg = __file_;
@@ -59,7 +61,6 @@ bool __libcpp_set_debug_function(__libcpp_debug_function_type __func) {
   return true;
 }
 
-#if defined(USE_DEBUG_MODE)
 
 _LIBCPP_FUNC_VIS
 __libcpp_db*

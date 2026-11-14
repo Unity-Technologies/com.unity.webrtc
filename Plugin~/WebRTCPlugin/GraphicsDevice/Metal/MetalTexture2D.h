@@ -2,8 +2,9 @@
 
 #include "GraphicsDevice/ITexture2D.h"
 #include "WebRTCMacros.h"
-
 #include <api/video/i420_buffer.h>
+#include <Metal/Metal.h>
+
 
 namespace unity
 {

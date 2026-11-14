@@ -12,7 +12,7 @@
 #include "SimulcastEncoderFactory.h"
 #endif
 
-#if UNITY_OSX || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS || UNITY_VISIONOS
 #import <sdk/objc/components/video_codec/RTCVideoDecoderFactoryH264.h>
 #import <sdk/objc/components/video_codec/RTCVideoEncoderFactoryH264.h>
 #import <sdk/objc/native/api/video_decoder_factory.h>
@@ -36,7 +36,7 @@ namespace webrtc
 
         if (impl == kVideoToolboxImpl)
         {
-#if UNITY_OSX || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS || UNITY_VISIONOS
             return webrtc::ObjCToNativeVideoEncoderFactory([[RTCVideoEncoderFactoryH264 alloc] init]).release();
 #endif
         }
@@ -80,7 +80,7 @@ namespace webrtc
 
         if (impl == kVideoToolboxImpl)
         {
-#if UNITY_OSX || UNITY_IOS
+#if UNITY_OSX || UNITY_IOS || UNITY_VISIONOS
             return webrtc::ObjCToNativeVideoDecoderFactory([[RTCVideoDecoderFactoryH264 alloc] init]).release();
 #endif
         }

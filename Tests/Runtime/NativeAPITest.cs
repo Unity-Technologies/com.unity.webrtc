@@ -43,7 +43,7 @@ namespace Unity.WebRTC.RuntimeTest
         [SetUp]
         public void Init()
         {
-#if UNITY_IOS && !UNITY_EDITOR
+#if (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             NativeMethods.RegisterRenderingWebRTCPlugin();
 #endif
             context = WebRTC.Context.self;
